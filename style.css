@@ -17,6 +17,11 @@ body{
   font-family: "Helvetica Neue", Arial, sans-serif;
   display: flex;
   flex-direction: column;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.card, .link-chip, .back-link{
+  touch-action: manipulation;
 }
 
 .hero{
@@ -88,25 +93,42 @@ body{
 
 .card:hover{
   transform: translateY(-4px);
-  border-color: var(--red);
+  border-color: var(--accent, var(--red));
   box-shadow: 0 8px 20px rgba(0,0,0,0.12);
 }
 
-.card:hover .icon{
-  background: var(--red);
-  color: var(--white);
+.card:hover .icon,
+.card:active .icon{
+  filter: brightness(0.88);
 }
+
+.card:active{
+  transform: translateY(-1px);
+  border-color: var(--accent, var(--red));
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+}
+
+.card:focus-visible{
+  outline: 3px solid var(--accent, var(--red));
+  outline-offset: 3px;
+}
+
+.card-boletim      { --accent: #B45309; }
+.card-conversation { --accent: #2563EB; }
+.card-kids         { --accent: #0D9488; }
+.card-adults       { --accent: #6D28D9; }
+.card-spanish      { --accent: #C2410C; }
 
 .icon{
   width: 64px;
   height: 64px;
   border-radius: 14px;
-  background: var(--black);
+  background: var(--accent, var(--black));
   color: var(--white);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease, filter 0.15s ease;
 }
 
 .icon svg{
@@ -131,6 +153,7 @@ body{
   border-color: var(--gray-light);
   color: var(--gray);
   cursor: default;
+  pointer-events: none;
 }
 
 .card.is-soon .icon{
@@ -215,4 +238,53 @@ footer{
   padding: 1.5rem;
   color: var(--gray);
   font-size: 0.85rem;
+}
+
+@media (max-width: 640px){
+  .hero{
+    padding: 2.25rem 1.25rem 1.75rem;
+  }
+
+  .back-link{
+    position: static;
+    display: inline-block;
+    margin-bottom: 0.9rem;
+    padding: 0.4rem 0.1rem;
+  }
+
+  .grid{
+    grid-template-columns: 1fr;
+    padding: 1.75rem 1rem 2.5rem;
+    gap: 1.1rem;
+  }
+
+  .card{
+    padding: 1.5rem 1.25rem;
+    min-height: 0;
+    gap: 0.75rem;
+  }
+
+  .card h2{ font-size: 1.25rem; }
+  .card p{ font-size: 0.92rem; }
+
+  .icon{
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+  }
+  .icon svg{ width: 28px; height: 28px; }
+
+  .badge{
+    top: 0.9rem;
+    right: 0.9rem;
+  }
+
+  .links-section{ padding: 0 1rem 2.5rem; }
+
+  .link-chip{
+    padding: 0.75rem 1.1rem;
+    font-size: 0.88rem;
+  }
+
+  footer{ padding: 1.25rem 1rem; }
 }
