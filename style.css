@@ -113,11 +113,11 @@ body{
   outline-offset: 3px;
 }
 
-.card-boletim      { --accent: #B45309; }
-.card-conversation { --accent: #2563EB; }
-.card-kids         { --accent: #0D9488; }
-.card-adults       { --accent: #6D28D9; }
-.card-spanish      { --accent: #C2410C; }
+.card-boletim      { --accent: #1E40AF; }
+.card-conversation { --accent: #0EA5E9; }
+.card-kids         { --accent: #38BDF8; }
+.card-adults       { --accent: #1E3A8A; }
+.card-spanish      { --accent: #0369A1; }
 
 .icon{
   width: 64px;
