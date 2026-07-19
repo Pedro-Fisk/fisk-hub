@@ -115,9 +115,9 @@ body{
 
 .card-boletim      { --accent: #B45309; }
 .card-conversation { --accent: #2563EB; }
-.card-kids         { --accent: #0D9488; }
-.card-adults       { --accent: #6D28D9; }
-.card-spanish      { --accent: #C2410C; }
+.card-kids         { --accent: #38BDF8; }
+.card-adults       { --accent: #1D4ED8; }
+.card-spanish      { --accent: #F97316; }
 
 .icon{
   width: 64px;
@@ -287,4 +287,38 @@ footer{
   }
 
   footer{ padding: 1.25rem 1rem; }
+}
+
+.boletins-grid{
+  max-width: 760px;
+}
+
+.boletins-grid .card{
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 1.4rem;
+  min-height: 0;
+}
+
+.boletins-grid .icon{
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+  flex: none;
+}
+
+.boletins-grid .icon svg{
+  width: 26px;
+  height: 26px;
+}
+
+.boletins-grid .icon-emoji{
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.boletins-grid .card h2{
+  font-size: 1.05rem;
+  font-weight: 700;
 }
