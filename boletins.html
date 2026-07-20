@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gerador de Boletins — FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css">
 <link rel="stylesheet" href="style.css">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
@@ -12,6 +13,7 @@
 
   <header class="hero">
     <a class="back-link" href="index.html">&larr; Voltar aos recursos</a>
+    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
     <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
     <h1>Gerador de Boletins</h1>
     <p>Escolha o tipo de boletim que você quer montar</p>
@@ -53,8 +55,10 @@
   </main>
 
   <footer>
-    <p>Feito para professores FISK</p>
+    <p>Ferramenta desenvolvida exclusivamente para uso interno das escolas Fisk. A utilização deste sistema e de seu conteúdo por pessoas ou instituições não autorizadas, incluindo professores particulares, é proibida. Desenvolvido por @fiskcacapava e @taubatefisk</p>
   </footer>
 
+  <script src="assets/fisk-shared.js"></script>
+  <script>fiskInitThemeToggle('themeToggle');</script>
 </body>
 </html>
