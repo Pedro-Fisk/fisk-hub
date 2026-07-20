@@ -47,7 +47,10 @@ body{
 }
 
 .hero-logo{
-  display: none;
+  display: inline-block;
+  height: 52px;
+  width: auto;
+  margin-bottom: 1.1rem;
 }
 
 .hero h1{
@@ -115,9 +118,9 @@ body{
 
 .card-boletim      { --accent: #B45309; }
 .card-conversation { --accent: #2563EB; }
-.card-kids         { --accent: #38BDF8; }
-.card-adults       { --accent: #1D4ED8; }
-.card-spanish      { --accent: #F97316; }
+.card-kids         { --accent: #CC0E50; }
+.card-adults       { --accent: #1096B5; }
+.card-spanish      { --accent: #CC7C08; }
 
 .icon{
   width: 64px;
@@ -301,4 +304,10 @@ footer{
 
 .boletins-grid .icon{
   background: var(--black);
+}
+
+.boletins-grid .card:hover .icon,
+.boletins-grid .card:active .icon{
+  background: var(--accent);
+  filter: none;
 }
