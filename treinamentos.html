@@ -4,40 +4,216 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Treinamentos Internos — FISK</title>
-<link rel="stylesheet" href="assets/fisk-shared.css">
-<link rel="stylesheet" href="style.css">
-<meta name="theme-color" content="#161414">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,600;0,700;0,800;1,800;1,900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#14181b">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+<style>
+  /* Página sempre escura, no estilo da plataforma FISK EXPO. */
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;background:#14181b;color:#f2efef;font-family:'Nunito',system-ui,sans-serif;display:flex;flex-direction:column}
+
+  .tn-bar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:18px;padding:14px 28px;background:#191e22;box-shadow:0 2px 12px rgba(0,0,0,.4)}
+  .tn-logo{font-family:'Poppins';font-weight:800;font-size:21px;letter-spacing:.5px;color:#fff;text-decoration:none;white-space:nowrap}
+  .tn-logo span{color:#d81f26}
+  .tn-search{flex:1;max-width:340px;margin-left:auto;position:relative}
+  .tn-search input{width:100%;background:#22282d;border:1.5px solid #313a41;border-radius:999px;padding:9px 16px 9px 38px;color:#f2efef;font-family:inherit;font-size:14px;outline:none}
+  .tn-search input:focus{border-color:#d81f26}
+  .tn-search input::placeholder{color:#8b969e}
+  .tn-search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:#8b969e}
+  .tn-back{color:#c9d2d8;text-decoration:none;font-size:13.5px;font-weight:700;white-space:nowrap}
+  .tn-back:hover{color:#fff}
+
+  main{flex:1;padding:26px 0 46px}
+  .tn-row{margin:0 0 34px}
+  .tn-row h2{font-family:'Poppins';font-weight:700;font-size:16px;margin:0 0 12px;padding:0 28px;color:#e8edf0}
+  .tn-strip{position:relative}
+  .tn-scroller{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x proximity;padding:4px 28px 14px;scrollbar-width:none}
+  .tn-scroller::-webkit-scrollbar{display:none}
+
+  .tn-card{flex:0 0 300px;scroll-snap-align:start;border-radius:12px;overflow:hidden;background:#22282d;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease;border:none;padding:0;text-align:left;color:inherit;font-family:inherit}
+  .tn-card:hover{transform:translateY(-3px) scale(1.015);box-shadow:0 10px 26px rgba(0,0,0,.45)}
+  .tn-thumb{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;padding:16px}
+  .tn-thumb b{font-family:'Poppins';font-style:italic;font-weight:900;font-size:19px;line-height:1.25;text-transform:uppercase;color:#fff;text-align:center;transform:rotate(-4deg);text-shadow:2.5px 2.5px 0 rgba(0,0,0,.35),0 0 18px rgba(255,255,255,.25)}
+  .tn-foot{display:flex;align-items:center;gap:10px;padding:11px 14px;background:#23292e}
+  .tn-play{width:30px;height:30px;border-radius:50%;background:transparent;border:none;color:#fff;display:flex;align-items:center;justify-content:center;flex:none;padding:0}
+  .tn-play svg{width:20px;height:20px}
+  .tn-chip{margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;letter-spacing:.5px;color:#e8edf0;background:#31383e;border-radius:6px;padding:4px 9px}
+  .tn-chip svg{width:12px;height:12px}
+
+  /* gradientes dos cards (rotação por item, como na EXPO) */
+  .g0{background:linear-gradient(120deg,#b3002d,#f5772b)}
+  .g1{background:linear-gradient(120deg,#e33324,#7040d8)}
+  .g2{background:linear-gradient(120deg,#b3002d,#f0a020)}
+  .g3{background:linear-gradient(120deg,#e8352c,#3a55e0)}
+  .g4{background:linear-gradient(120deg,#c40e46,#8a3ce0)}
+  .g5{background:linear-gradient(120deg,#d81f26,#f7b32b)}
+
+  .tn-arrow{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;border:none;background:rgba(20,24,27,.85);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;box-shadow:0 2px 10px rgba(0,0,0,.5)}
+  .tn-arrow:hover{background:#d81f26}
+  .tn-arrow svg{width:20px;height:20px}
+  .tn-prev{left:8px}
+  .tn-next{right:8px}
+  .tn-arrow[hidden]{display:none}
+
+  .tn-empty{padding:40px 28px;color:#8b969e;font-size:15px;display:none}
+
+  /* player */
+  .tn-modal{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.82);align-items:center;justify-content:center;padding:24px}
+  .tn-modal.open{display:flex}
+  .tn-box{width:min(960px,96vw);background:#191e22;border-radius:14px;overflow:hidden;box-shadow:0 18px 60px rgba(0,0,0,.6)}
+  .tn-box-head{display:flex;align-items:center;gap:12px;padding:13px 18px}
+  .tn-box-head h3{margin:0;font-family:'Poppins';font-weight:700;font-size:15px;flex:1;color:#f2efef}
+  .tn-box-head a{color:#e8edf0;font-size:12.5px;font-weight:800;text-decoration:none;background:#31383e;border-radius:6px;padding:5px 11px}
+  .tn-box-head a:hover{background:#d81f26}
+  .tn-close{background:none;border:none;color:#c9d2d8;font-size:22px;cursor:pointer;padding:2px 6px;line-height:1}
+  .tn-close:hover{color:#fff}
+  .tn-frame{aspect-ratio:16/9;width:100%;border:none;background:#000}
+
+  footer{text-align:center;padding:1.4rem 1.5rem;color:#77828a;font-size:.78rem}
+  footer p{margin:0 auto;max-width:720px;line-height:1.5}
+
+  @media (max-width:640px){
+    .tn-bar{padding:12px 14px;gap:10px;flex-wrap:wrap}
+    .tn-search{order:3;flex-basis:100%;max-width:none}
+    .tn-row h2{padding:0 14px}
+    .tn-scroller{padding:4px 14px 12px;gap:12px}
+    .tn-card{flex-basis:78vw}
+    .tn-arrow{display:none}
+  }
+</style>
 </head>
 <body>
 
-  <header class="hero">
-    <a class="back-link" href="index.html">&larr; Voltar aos recursos</a>
-    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
-    <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
-    <h1>Treinamentos Internos</h1>
-    <p>O catálogo em vídeo dos treinamentos da nossa escola</p>
-  </header>
-
-  <main class="grid boletins-grid" style="max-width:640px">
-    <div class="card is-soon" style="align-items:center;text-align:center">
-      <span class="badge">Em breve</span>
-      <div class="icon">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M10 8.8l5 3.2-5 3.2V8.8z" fill="currentColor"/>
-        </svg>
-      </div>
-      <h2>Estamos montando o catálogo</h2>
-      <p>Em breve você vai poder navegar por todos os treinamentos em vídeo já gravados pela escola, organizados por tema — como num streaming de treinamentos.</p>
+  <nav class="tn-bar">
+    <a class="tn-logo" href="index.html">FISK <span>TREINAMENTOS</span></a>
+    <div class="tn-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input type="search" id="tnSearch" placeholder="Pesquisar treinamento">
     </div>
-  </main>
+    <a class="tn-back" href="index.html">&larr; Voltar ao Hub</a>
+  </nav>
+
+  <main id="tnMain"></main>
+  <p class="tn-empty" id="tnEmpty">Nenhum treinamento encontrado com esse termo.</p>
+
+  <div class="tn-modal" id="tnModal">
+    <div class="tn-box">
+      <div class="tn-box-head">
+        <h3 id="tnModalTitle"></h3>
+        <a id="tnModalPdf" href="#" target="_blank" rel="noopener" hidden>📄 Material (PDF)</a>
+        <a id="tnModalOpen" href="#" target="_blank" rel="noopener">Abrir no Drive</a>
+        <button type="button" class="tn-close" id="tnModalClose" aria-label="Fechar">✕</button>
+      </div>
+      <iframe class="tn-frame" id="tnFrame" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    </div>
+  </div>
 
   <footer>
     <p>Ferramenta desenvolvida exclusivamente para uso interno das escolas Fisk. A utilização deste sistema e de seu conteúdo por pessoas ou instituições não autorizadas, incluindo professores particulares, é proibida. Desenvolvido por @fiskcacapava e @taubatefisk</p>
   </footer>
 
-  <script src="assets/fisk-shared.js"></script>
-  <script>fiskInitThemeToggle('themeToggle');</script>
+<script src="treinamentos-data.js"></script>
+<script>
+(function(){
+  const main=document.getElementById('tnMain');
+
+  /* converte links do Drive/YouTube para a versão embutível */
+  function embedUrl(u){
+    let m=u.match(/drive\.google\.com\/file\/d\/([\w-]+)/);
+    if(m) return 'https://drive.google.com/file/d/'+m[1]+'/preview';
+    m=u.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
+    if(m) return 'https://www.youtube.com/embed/'+m[1];
+    return u;
+  }
+
+  const ICON_PLAY='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5l11 6.5-11 6.5v-13z"/></svg>';
+  const ICON_PDF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 2.5h8l4.5 4.5v14a.9.9 0 0 1-1 1H6a.9.9 0 0 1-1-1v-17.5a.9.9 0 0 1 1-1z"/><path d="M14 2.5V7h4.5"/></svg>';
+  const ICON_FOLDER='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 6.5a1.5 1.5 0 0 1 1.5-1.5H9l2 2.5h8.5A1.5 1.5 0 0 1 21 9v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18V6.5z"/></svg>';
+  const ICON_CHEV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';
+
+  let g=0; // rotação dos gradientes
+  function cardHtml(item){
+    const grad='g'+(g++%6);
+    const chips=[];
+    if(item.pdf) chips.push('<span class="tn-chip">'+ICON_PDF+' PDF</span>');
+    if(item.pasta) chips.push('<span class="tn-chip">'+ICON_FOLDER+' PASTA</span>');
+    const foot=(item.video?'<span class="tn-play">'+ICON_PLAY+'</span>':'')+chips.join('');
+    return '<button type="button" class="tn-card" data-title="'+item.titulo.replace(/"/g,'&quot;')+'">'
+      +'<span class="tn-thumb '+grad+'"><b>'+item.titulo+'</b></span>'
+      +'<span class="tn-foot">'+(foot||'<span class="tn-chip">EM BREVE</span>')+'</span></button>';
+  }
+
+  function render(){
+    main.innerHTML=TRAININGS.map((cat,ci)=>
+      '<section class="tn-row" data-cat="'+ci+'"><h2>'+cat.categoria+'</h2>'
+      +'<div class="tn-strip">'
+      +'<button type="button" class="tn-arrow tn-prev" style="transform:translateY(-50%) rotate(180deg)">'+ICON_CHEV+'</button>'
+      +'<div class="tn-scroller">'+cat.itens.map(cardHtml).join('')+'</div>'
+      +'<button type="button" class="tn-arrow tn-next">'+ICON_CHEV+'</button>'
+      +'</div></section>').join('');
+
+    // setas: rolam uma "página" por clique e somem quando não há overflow
+    main.querySelectorAll('.tn-strip').forEach(strip=>{
+      const sc=strip.querySelector('.tn-scroller');
+      const upd=()=>{const over=sc.scrollWidth>sc.clientWidth+8;strip.querySelectorAll('.tn-arrow').forEach(a=>a.hidden=!over);};
+      upd(); window.addEventListener('resize',upd);
+      strip.querySelector('.tn-prev').onclick=()=>sc.scrollBy({left:-sc.clientWidth+80,behavior:'smooth'});
+      strip.querySelector('.tn-next').onclick=()=>sc.scrollBy({left:sc.clientWidth-80,behavior:'smooth'});
+    });
+
+    // clique nos cards
+    main.querySelectorAll('.tn-card').forEach(card=>{
+      const item=findItem(card.dataset.title);
+      card.onclick=()=>{
+        if(item.video) openModal(item);
+        else if(item.pdf) window.open(item.pdf,'_blank','noopener');
+        else if(item.pasta) window.open(item.pasta,'_blank','noopener');
+      };
+    });
+  }
+
+  function findItem(title){
+    for(const c of TRAININGS){ for(const i of c.itens){ if(i.titulo===title) return i; } }
+    return null;
+  }
+
+  /* ---- player ---- */
+  const modal=document.getElementById('tnModal'), frame=document.getElementById('tnFrame');
+  function openModal(item){
+    document.getElementById('tnModalTitle').textContent=item.titulo;
+    const pdf=document.getElementById('tnModalPdf');
+    pdf.hidden=!item.pdf; if(item.pdf) pdf.href=item.pdf;
+    document.getElementById('tnModalOpen').href=item.video;
+    frame.src=embedUrl(item.video);
+    modal.classList.add('open');
+  }
+  function closeModal(){ modal.classList.remove('open'); frame.src=''; }
+  document.getElementById('tnModalClose').onclick=closeModal;
+  modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+
+  /* ---- busca ---- */
+  const norm=s=>s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+  document.getElementById('tnSearch').addEventListener('input',e=>{
+    const q=norm(e.target.value.trim());
+    let any=false;
+    main.querySelectorAll('.tn-row').forEach(row=>{
+      let rowAny=false;
+      row.querySelectorAll('.tn-card').forEach(card=>{
+        const hit=!q||norm(card.dataset.title).includes(q);
+        card.style.display=hit?'':'none';
+        if(hit) rowAny=true;
+      });
+      row.style.display=rowAny?'':'none';
+      if(rowAny) any=true;
+    });
+    document.getElementById('tnEmpty').style.display=any?'none':'block';
+  });
+
+  render();
+})();
+</script>
 </body>
 </html>
