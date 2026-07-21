@@ -8,12 +8,13 @@
 
    Campos de cada item (todos os links são do Google Drive/YouTube):
    - titulo: nome exibido no card (obrigatório)
-   - video:  link do vídeo — vira player embutido ("" = sem vídeo)
+   - video:  link do vídeo — vira player embutido ("" = sem vídeo,
+             o card mostra EM BREVE)
    - pdf:    link de material de apoio/leitura ("" = sem PDF)
-   - pasta:  link de pasta no Drive com o material ("" = sem pasta)
 
-   Os vídeos são do Drive interno: o professor precisa estar logado na
-   conta Google da escola para assistir.
+   ⚠️ Use sempre links de ARQUIVO (vídeo ou PDF), nunca de pasta: as
+   pastas do Drive são restritas — só os arquivos têm liberação
+   individual de visualização para os professores.
    ============================================================ */
 const TRAININGS = [
   {
@@ -23,7 +24,6 @@ const TRAININGS = [
         titulo: "Treinamento de Realidade Individual",
         video: "https://drive.google.com/file/d/1U9iTKuWqOZq9SGxWXFY-xCYFvUxvzjKm/view",
         pdf: "",
-        pasta: "",
       },
     ],
   },
@@ -34,13 +34,11 @@ const TRAININGS = [
         titulo: "Treinamento de Exploration e Checking",
         video: "",
         pdf: "",
-        pasta: "https://drive.google.com/drive/u/1/folders/1SGOASNenPbD1uJSepuxzpZ0RyV9-77io",
       },
       {
         titulo: "Checklist de Explicação — Procedimentos de Exploração",
         video: "",
         pdf: "https://drive.google.com/file/d/16_Xk31PJOV8ineWby2zQZhtcncsMRBj6/view",
-        pasta: "",
       },
     ],
   },
@@ -51,7 +49,6 @@ const TRAININGS = [
         titulo: "Tipos de Atividades — videos, songs, trailer, speak up",
         video: "https://drive.google.com/file/d/1OMxNmOXiz8xXny-kKJ_JQYzkuMWmvlxr/view",
         pdf: "",
-        pasta: "",
       },
     ],
   },
@@ -62,7 +59,6 @@ const TRAININGS = [
         titulo: "Texto — About Teaching Teenagers",
         video: "",
         pdf: "https://drive.google.com/file/d/1YpqBEog0ZM4S0kTN4W4euaOjpbYMAMk2/view",
-        pasta: "",
       },
     ],
   },
@@ -73,7 +69,6 @@ const TRAININGS = [
         titulo: "Treinamento de Gamificação",
         video: "https://drive.google.com/file/d/1XVoPly5AXr71zEJuk-XdWmgnoYTALUbT/view",
         pdf: "",
-        pasta: "",
       },
     ],
   },
