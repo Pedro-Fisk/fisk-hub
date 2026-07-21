@@ -10,6 +10,8 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 </head>
 <body>
+<script>/* aplica o tema salvo antes da primeira pintura, para o modo escuro persistir entre as páginas sem piscar */try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
+
 
   <header class="hero">
     <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
@@ -108,6 +110,18 @@
   </footer>
 
   <script src="assets/fisk-shared.js"></script>
-  <script>fiskInitThemeToggle('themeToggle');</script>
+  <script>
+    fiskInitThemeToggle('themeToggle');
+    /* O Conversation Maker fica em outro domínio (vercel.app) e não enxerga
+       o localStorage daqui — o tema atual vai na URL. */
+    (function(){
+      var cm=document.querySelector('a[href^="https://conversation-maker"]');
+      if(!cm) return;
+      function sync(){ cm.href='https://conversation-maker.vercel.app/?theme='+(document.body.classList.contains('theme-dark')?'dark':'light'); }
+      sync();
+      var tg=document.getElementById('themeToggle');
+      if(tg) tg.addEventListener('click', function(){ setTimeout(sync, 0); });
+    })();
+  </script>
 </body>
 </html>
