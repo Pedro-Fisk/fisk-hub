@@ -61,6 +61,7 @@
 .card-kids         { --accent: #CC0E50; }
 .card-adults       { --accent: #1096B5; }
 .card-spanish      { --accent: #CC7C08; }
+.card-simulado     { --accent: #7C3AED; }
 
 .icon{
   width: 64px;
