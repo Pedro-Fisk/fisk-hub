@@ -191,7 +191,7 @@
       met:      { label: 'MET / Siele', color: '#2563EB' },
     };
 
-    /* Calendário escolar 2026 — extraído manualmente da planilha */
+    /* Calendário escolar 2026 — extraído manualmente da planilha Fisk */
     const FALLBACK_EVENTS = [
       /* JULHO */
       { date: '2026-07-06', title: 'Congresso de Diretores + Reunião Comercial 13h30', type: 'reuniao' },
@@ -207,9 +207,33 @@
       { date: '2026-08-11', title: 'Reunião SEC TBT 10h + Treinamento Profes FOCUS Online 13h30', type: 'reuniao' },
       { date: '2026-08-17', title: 'Simulado MET CPV 18h', type: 'met' },
       { date: '2026-08-19', title: 'Reunião Comercial 13h30 + Simulado MET CPV 18h', type: 'reuniao' },
-      { date: '2026-08-24', title: 'Reuniões de Pais CPV (Naty)', type: 'reuniao' },
-      { date: '2026-08-26', title: 'Reuniões de Pais CPV (Pedro)', type: 'reuniao' },
+      { date: '2026-08-24', title: 'Reuniões de Pais CPV (Naty) 18h', type: 'reuniao' },
+      { date: '2026-08-26', title: 'Reuniões de Pais CPV (Pedro) 18h', type: 'reuniao' },
       { date: '2026-08-31', title: 'Reunião Comercial 13h30 + Reuniões de Pais TBT (Naty)', type: 'reuniao' },
+      /* SETEMBRO */
+      { date: '2026-09-01', title: 'Início inscrições MET Oficial + Reunião Geral Online 13h30', type: 'met' },
+      { date: '2026-09-09', title: 'Reunião Comercial 13h30', type: 'reuniao' },
+      { date: '2026-09-14', title: 'Reunião Comercial 13h30 + Simulado MET CPV 18h', type: 'met' },
+      { date: '2026-09-21', title: 'Reunião SEC Presencial CPV 13h30', type: 'reuniao' },
+      { date: '2026-09-22', title: 'Reunião SEC Presencial TBT 10h', type: 'reuniao' },
+      { date: '2026-09-28', title: 'Reunião Comercial 13h30', type: 'reuniao' },
+      /* OUTUBRO */
+      { date: '2026-10-01', title: 'Fim inscrições MET Oficial', type: 'met' },
+      { date: '2026-10-06', title: 'Reunião Geral Online 13h30', type: 'reuniao' },
+      { date: '2026-10-19', title: 'Reunião SEC Presencial CPV 13h30 + Simulado MET CPV 18h', type: 'met' },
+      { date: '2026-10-20', title: 'Reunião SEC Presencial TBT 10h', type: 'reuniao' },
+      { date: '2026-10-21', title: 'Simulado MET CPV 18h', type: 'met' },
+      /* NOVEMBRO */
+      { date: '2026-11-03', title: 'Reunião Geral Online 13h30', type: 'reuniao' },
+      { date: '2026-11-09', title: 'Reunião Comercial 13h30 + Simulado MET CPV 18h', type: 'met' },
+      { date: '2026-11-11', title: 'Simulado MET CPV 18h', type: 'met' },
+      { date: '2026-11-16', title: 'Reunião SEC Presencial CPV 13h30', type: 'reuniao' },
+      { date: '2026-11-17', title: 'Reunião SEC Presencial TBT 10h', type: 'reuniao' },
+      { date: '2026-11-26', title: 'MET Oficial — prova', type: 'met' },
+      /* DEZEMBRO */
+      { date: '2026-12-01', title: 'Reunião Geral Online 13h30', type: 'reuniao' },
+      { date: '2026-12-14', title: 'Reunião SEC Presencial CPV 13h30', type: 'reuniao' },
+      { date: '2026-12-15', title: 'Reunião SEC Presencial TBT 10h', type: 'reuniao' },
     ];
 
     /* Converte CSV do Sheets para array de eventos.
