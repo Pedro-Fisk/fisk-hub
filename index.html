@@ -133,6 +133,7 @@
     </button>
     <div class="cal-body is-open" id="calBody">
       <div class="cal-inner">
+        <div class="cal-upcoming" id="calUpcoming" hidden></div>
         <div class="cal-nav-row">
           <button class="cal-nav-btn" onclick="changeMonth(-1)" title="Mês anterior">&#8249;</button>
           <span class="cal-month-nav-label" id="calMonthLabel"></span>
@@ -202,56 +203,56 @@
     const SHEET_CSV_URL = '';
 
     const EVENT_TYPES = {
-      reuniao:  { label: 'Reunião',     color: '#d97706' },
-      evento:   { label: 'Evento',      color: '#d81f26' },
+      reuniao:  { label: 'Reunião',     color: '#2563EB' },
+      evento:   { label: 'Evento',      color: '#2563EB' },
       simulado: { label: 'Simulado',    color: '#7C3AED' },
-      met:      { label: 'MET / Siele', color: '#2563EB' },
+      met:      { label: 'MET / Siele', color: '#0EA5A0' },
     };
 
-    /* Calendário escolar 2026 — extraído manualmente da planilha Fisk */
+    /* Calendário escolar 2026 — extraído manualmente da planilha Fisk.
+       ATENÇÃO: lista incompleta — vários eventos pedagógicos da planilha não
+       foram transcritos (ex.: reunião de professores Kids/Teens e simulado TBT
+       em 21/08). O ideal é ligar a planilha ao vivo (ver SHEET_CSV_URL).
+       Removidos por não competirem ao professor: reuniões de secretaria
+       ("Reunião SEC"), comerciais / gestão comercial, Congresso de Diretores,
+       Gestão Pedagógica e Reunião Geral Online. Onde a data também tinha algo
+       relevante (treinamento, simulado, reunião de pais), manteve-se só essa parte. */
     const FALLBACK_EVENTS = [
       /* JULHO */
-      { date: '2026-07-06', title: 'Congresso de Diretores + Reunião Comercial 13h30', type: 'reuniao' },
-      { date: '2026-07-07', title: 'Reunião Gestão Pedagógica 10h + Reunião Geral Online 13h30', type: 'reuniao' },
-      { date: '2026-07-20', title: 'Reunião SEC Presencial CPV 13h30', type: 'reuniao' },
-      { date: '2026-07-21', title: 'Reunião SEC Presencial TBT 10h', type: 'reuniao' },
       { date: '2026-07-27', title: 'Reunião de Professores Presencial (CPV 08h30 / TBT 14h)', type: 'reuniao' },
       { date: '2026-07-29', title: 'Coquetel Fisk CPV 50 Anos', type: 'evento' },
       /* AGOSTO */
-      { date: '2026-08-03', title: 'Reunião Gestão Comercial 10h + Reunião Comercial 13h30', type: 'reuniao' },
-      { date: '2026-08-04', title: 'Reunião Gestão Pedagógica 10h + Reunião Geral Online 13h30', type: 'reuniao' },
-      { date: '2026-08-10', title: 'Reunião SEC Presencial CPV 13h30', type: 'reuniao' },
-      { date: '2026-08-11', title: 'Reunião SEC TBT 10h + Treinamento Profes FOCUS Online 13h30', type: 'reuniao' },
+      { date: '2026-08-11', title: 'Treinamento Profes FOCUS Online 13h30', type: 'reuniao' },
       { date: '2026-08-17', title: 'Simulado MET CPV 18h', type: 'met' },
-      { date: '2026-08-19', title: 'Reunião Comercial 13h30 + Simulado MET CPV 18h', type: 'reuniao' },
+      { date: '2026-08-19', title: 'Simulado MET CPV 18h', type: 'met' },
       { date: '2026-08-24', title: 'Reuniões de Pais CPV (Naty) 18h', type: 'reuniao' },
       { date: '2026-08-26', title: 'Reuniões de Pais CPV (Pedro) 18h', type: 'reuniao' },
-      { date: '2026-08-31', title: 'Reunião Comercial 13h30 + Reuniões de Pais TBT (Naty)', type: 'reuniao' },
+      { date: '2026-08-31', title: 'Reuniões de Pais TBT (Naty)', type: 'reuniao' },
       /* SETEMBRO */
-      { date: '2026-09-01', title: 'Início inscrições MET Oficial + Reunião Geral Online 13h30', type: 'met' },
-      { date: '2026-09-09', title: 'Reunião Comercial 13h30', type: 'reuniao' },
-      { date: '2026-09-14', title: 'Reunião Comercial 13h30 + Simulado MET CPV 18h', type: 'met' },
-      { date: '2026-09-21', title: 'Reunião SEC Presencial CPV 13h30', type: 'reuniao' },
-      { date: '2026-09-22', title: 'Reunião SEC Presencial TBT 10h', type: 'reuniao' },
-      { date: '2026-09-28', title: 'Reunião Comercial 13h30', type: 'reuniao' },
+      { date: '2026-09-01', title: 'Início inscrições MET Oficial', type: 'met' },
+      { date: '2026-09-14', title: 'Simulado MET CPV 18h', type: 'met' },
       /* OUTUBRO */
       { date: '2026-10-01', title: 'Fim inscrições MET Oficial', type: 'met' },
-      { date: '2026-10-06', title: 'Reunião Geral Online 13h30', type: 'reuniao' },
-      { date: '2026-10-19', title: 'Reunião SEC Presencial CPV 13h30 + Simulado MET CPV 18h', type: 'met' },
-      { date: '2026-10-20', title: 'Reunião SEC Presencial TBT 10h', type: 'reuniao' },
+      { date: '2026-10-19', title: 'Simulado MET CPV 18h', type: 'met' },
       { date: '2026-10-21', title: 'Simulado MET CPV 18h', type: 'met' },
       /* NOVEMBRO */
-      { date: '2026-11-03', title: 'Reunião Geral Online 13h30', type: 'reuniao' },
-      { date: '2026-11-09', title: 'Reunião Comercial 13h30 + Simulado MET CPV 18h', type: 'met' },
+      { date: '2026-11-09', title: 'Simulado MET CPV 18h', type: 'met' },
       { date: '2026-11-11', title: 'Simulado MET CPV 18h', type: 'met' },
-      { date: '2026-11-16', title: 'Reunião SEC Presencial CPV 13h30', type: 'reuniao' },
-      { date: '2026-11-17', title: 'Reunião SEC Presencial TBT 10h', type: 'reuniao' },
       { date: '2026-11-26', title: 'MET Oficial — prova', type: 'met' },
-      /* DEZEMBRO */
-      { date: '2026-12-01', title: 'Reunião Geral Online 13h30', type: 'reuniao' },
-      { date: '2026-12-14', title: 'Reunião SEC Presencial CPV 13h30', type: 'reuniao' },
-      { date: '2026-12-15', title: 'Reunião SEC Presencial TBT 10h', type: 'reuniao' },
     ];
+
+    /* Semanas temáticas — destacam a semana inteira (não um único dia).
+       start/end em AAAA-MM-DD (inclusive). */
+    const WEEK_HIGHLIGHTS = [
+      { start: '2026-08-24', end: '2026-08-28', title: 'Semana de Aniversário do Buddy · Taubaté', color: '#EC4899' },
+      { start: '2026-08-31', end: '2026-09-04', title: 'Semana de Aniversário do Buddy · Caçapava', color: '#EC4899' },
+    ];
+
+    /* rgba a partir de hex (#rrggbb) para os fundos suaves das semanas. */
+    function hexToRgba(hex, a) {
+      const n = parseInt(hex.slice(1), 16);
+      return `rgba(${(n>>16)&255}, ${(n>>8)&255}, ${n&255}, ${a})`;
+    }
 
     /* Converte CSV do Sheets para array de eventos.
        Espera colunas: Data (DD/MM/AAAA), Título, Tipo (reuniao|evento|simulado|met) */
@@ -288,6 +289,14 @@
       const today  = new Date();
       const tY = today.getFullYear(), tM = today.getMonth(), tD = today.getDate();
 
+      /* Janela "próxima semana": de hoje até 7 dias à frente (comparação por dia). */
+      const weekStart = new Date(tY, tM, tD);
+      const weekEnd   = new Date(tY, tM, tD + 7);
+      const inNextWeek = (y, m, d) => {
+        const dt = new Date(y, m, d);
+        return dt >= weekStart && dt <= weekEnd;
+      };
+
       const monthNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
                           'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
       document.getElementById('calMonthLabel').textContent = monthNames[month] + ' ' + year;
@@ -298,6 +307,17 @@
       const firstDay    = new Date(year, month, 1).getDay();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
 
+      /* Semanas temáticas que tocam o mês exibido / o dia consultado. */
+      const weekOf = (y, m, d) => {
+        const dt = new Date(y, m, d);
+        return WEEK_HIGHLIGHTS.find(w =>
+          dt >= new Date(w.start + 'T00:00:00') && dt <= new Date(w.end + 'T23:59:59'));
+      };
+      const monthStart = new Date(year, month, 1, 0, 0, 0);
+      const monthEnd   = new Date(year, month + 1, 0, 23, 59, 59);
+      const monthWeeks = WEEK_HIGHLIGHTS.filter(w =>
+        new Date(w.start + 'T12:00:00') <= monthEnd && new Date(w.end + 'T12:00:00') >= monthStart);
+
       const eventsMap = {};
       const monthEvents = [];
       events.forEach(e => {
@@ -306,7 +326,8 @@
           const day = d.getDate();
           (eventsMap[day] = eventsMap[day] || []).push(e);
           const past = isPastMo || (isThisMo && day < tD);
-          monthEvents.push({ ...e, day, past });
+          const upcoming = inNextWeek(year, month, day);
+          monthEvents.push({ ...e, day, past, upcoming });
         }
       });
       monthEvents.sort((a, b) => a.day - b.day);
@@ -317,11 +338,14 @@
       for (let d = 1; d <= daysInMonth; d++) {
         const isToday = isThisMo && d === tD;
         const isPast  = isPastMo || (isThisMo && d < tD);
+        const isUpcoming = !!(eventsMap[d] && inNextWeek(year, month, d));
+        const wk = weekOf(year, month, d);
         const dots = (eventsMap[d] || []).map(e => {
           const color = EVENT_TYPES[e.type]?.color || '#888';
           return `<span class="cal-dot" style="background:${color}"></span>`;
         }).join('');
-        html += `<div class="cal-cell${isToday ? ' cal-today' : ''}${isPast ? ' cal-past' : ''}">
+        const wkStyle = wk ? ` style="background:${hexToRgba(wk.color, 0.14)};box-shadow:inset 0 0 0 1px ${hexToRgba(wk.color, 0.35)}"` : '';
+        html += `<div class="cal-cell${isToday ? ' cal-today' : ''}${isPast ? ' cal-past' : ''}${isUpcoming ? ' cal-cell-upcoming' : ''}${wk ? ' cal-cell-week' : ''}"${wkStyle}>
           <span class="cal-day-num">${d}</span>
           ${dots ? `<div class="cal-dots">${dots}</div>` : ''}
         </div>`;
@@ -329,20 +353,36 @@
       document.getElementById('calGrid').innerHTML = html;
 
       const usedTypes = [...new Set(monthEvents.map(e => e.type))];
-      document.getElementById('calLegend').innerHTML = usedTypes.map(t => {
+      const legendTypes = usedTypes.map(t => {
         const info = EVENT_TYPES[t] || { label: t, color: '#888' };
         return `<span class="cal-legend-item">
           <span class="cal-legend-dot" style="background:${info.color}"></span>${info.label}
         </span>`;
+      });
+      if (monthWeeks.length) {
+        legendTypes.push(`<span class="cal-legend-item">
+          <span class="cal-legend-dot cal-legend-week" style="background:${hexToRgba(monthWeeks[0].color, 0.35)};border-color:${monthWeeks[0].color}"></span>Semana temática
+        </span>`);
+      }
+      document.getElementById('calLegend').innerHTML = legendTypes.join('');
+
+      const fmtDM = dt => String(dt.getDate()).padStart(2, '0') + '/' + String(dt.getMonth() + 1).padStart(2, '0');
+      const weekBanners = monthWeeks.map(w => {
+        const s = new Date(w.start + 'T12:00:00'), e = new Date(w.end + 'T12:00:00');
+        return `<div class="cal-week-banner" style="background:${hexToRgba(w.color, 0.12)};border-color:${hexToRgba(w.color, 0.45)}">
+          <span class="cal-week-ico">🎉</span>
+          <span class="cal-week-name">${w.title}</span>
+          <span class="cal-week-range" style="color:${w.color}">${fmtDM(s)}–${fmtDM(e)}</span>
+        </div>`;
       }).join('');
 
       const listEl = document.getElementById('calEventList');
-      if (monthEvents.length === 0) {
+      if (monthEvents.length === 0 && !weekBanners) {
         listEl.innerHTML = '<p class="cal-no-events">Nenhum evento para este mês.</p>';
       } else {
-        listEl.innerHTML = monthEvents.map(e => {
+        listEl.innerHTML = weekBanners + monthEvents.map(e => {
           const info = EVENT_TYPES[e.type] || { label: e.type, color: '#888' };
-          return `<div class="cal-event-item${e.past ? ' is-past' : ''}">
+          return `<div class="cal-event-item${e.past ? ' is-past' : ''}${e.upcoming ? ' is-upcoming' : ''}">
             <span class="cal-event-dot" style="background:${info.color}"></span>
             <span class="cal-event-day">${e.day}</span>
             <span class="cal-event-title">${e.title}</span>
@@ -350,6 +390,63 @@
           </div>`;
         }).join('');
       }
+
+      renderUpcoming();
+    }
+
+    /* Destaque "Foco da semana": lista os eventos dos próximos 7 dias
+       (a partir de hoje), independentemente do mês exibido, para o professor
+       ver de imediato o que vem pela frente. */
+    function renderUpcoming() {
+      const box = document.getElementById('calUpcoming');
+      if (!box) return;
+      const today = new Date();
+      const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const end   = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
+      const weekdays = ['dom','seg','ter','qua','qui','sex','sáb'];
+
+      const upcoming = _calEvents
+        .map(e => ({ ...e, dt: new Date(e.date + 'T12:00:00') }))
+        .filter(e => { const d = new Date(e.dt.getFullYear(), e.dt.getMonth(), e.dt.getDate()); return d >= start && d <= end; })
+        .sort((a, b) => a.dt - b.dt);
+
+      /* Semanas temáticas que se sobrepõem aos próximos 7 dias. */
+      const upWeeks = WEEK_HIGHLIGHTS.filter(w =>
+        new Date(w.start + 'T12:00:00') <= end && new Date(w.end + 'T12:00:00') >= start);
+
+      if (upcoming.length === 0 && upWeeks.length === 0) { box.hidden = true; box.innerHTML = ''; return; }
+
+      box.hidden = false;
+      const fmtDM = dt => String(dt.getDate()).padStart(2, '0') + '/' + String(dt.getMonth() + 1).padStart(2, '0');
+      const weekItems = upWeeks.map(w => {
+        const s = new Date(w.start + 'T12:00:00'), e = new Date(w.end + 'T12:00:00');
+        return `<div class="cal-up-item cal-up-week" style="border-color:${hexToRgba(w.color, 0.5)};background:${hexToRgba(w.color, 0.1)}">
+          <span class="cal-up-ico">🎉</span>
+          <span class="cal-up-when" style="color:${w.color}">${fmtDM(s)}–${fmtDM(e)}</span>
+          <span class="cal-up-title">${w.title}</span>
+        </div>`;
+      }).join('');
+      const items = upcoming.map(e => {
+        const info = EVENT_TYPES[e.type] || { label: e.type, color: '#888' };
+        const dd = String(e.dt.getDate()).padStart(2, '0');
+        const mm = String(e.dt.getMonth() + 1).padStart(2, '0');
+        const wd = weekdays[e.dt.getDay()];
+        return `<div class="cal-up-item">
+          <span class="cal-event-dot" style="background:${info.color}"></span>
+          <span class="cal-up-when">${wd} ${dd}/${mm}</span>
+          <span class="cal-up-title">${e.title}</span>
+        </div>`;
+      }).join('');
+
+      box.innerHTML = `<div class="cal-up-head">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
+            <circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.8"/>
+            <circle cx="12" cy="12" r="1.4" fill="currentColor"/>
+          </svg>
+          Foco da semana <span class="cal-up-sub">· próximos 7 dias</span>
+        </div>
+        <div class="cal-up-list">${weekItems}${items}</div>`;
     }
 
     function changeMonth(delta) {
@@ -359,22 +456,53 @@
       buildCalendar();
     }
 
-    function toggleCal() {
+    /* Abre/fecha o painel animando até a altura EXATA do conteúdo (em vez de
+       um teto fixo de 1600px), para a transição de abrir e fechar ser suave
+       e sem "tempo morto". */
+    function setCalOpen(open, animate) {
       const btn  = document.getElementById('calToggle');
       const body = document.getElementById('calBody');
-      const open = body.classList.toggle('is-open');
-      btn.setAttribute('aria-expanded', open);
+      body.classList.toggle('is-open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+
+      if (!animate) {
+        body.style.maxHeight = open ? 'none' : '0px';
+        return;
+      }
+      if (open) {
+        body.style.maxHeight = body.scrollHeight + 'px';
+        const onEnd = (e) => {
+          if (e.propertyName !== 'max-height') return;
+          body.style.maxHeight = 'none';   // libera para trocar de mês sem cortar
+          body.removeEventListener('transitionend', onEnd);
+        };
+        body.addEventListener('transitionend', onEnd);
+      } else {
+        body.style.maxHeight = body.scrollHeight + 'px';  // sai de 'none' com altura fixa
+        void body.offsetHeight;                            // força reflow
+        requestAnimationFrame(() => { body.style.maxHeight = '0px'; });
+      }
+    }
+
+    function toggleCal() {
+      const open = !document.getElementById('calBody').classList.contains('is-open');
+      setCalOpen(open, true);
       try { localStorage.setItem('cal-open', open ? '1' : '0'); } catch(e) {}
+      if (open) {
+        /* Ancora o título no topo: ele desliza suavemente para cima e o
+           calendário se desdobra para baixo, a partir dele. */
+        requestAnimationFrame(() => {
+          const btn = document.getElementById('calToggle');
+          const y = btn.getBoundingClientRect().top + window.scrollY - 12;
+          if (Math.abs(y - window.scrollY) > 4) window.scrollTo({ top: y, behavior: 'smooth' });
+        });
+      }
     }
 
     (function initCal() {
-      try {
-        const saved = localStorage.getItem('cal-open');
-        if (saved === '0') {
-          document.getElementById('calBody').classList.remove('is-open');
-          document.getElementById('calToggle').setAttribute('aria-expanded', 'false');
-        }
-      } catch(e) {}
+      let open = true;
+      try { if (localStorage.getItem('cal-open') === '0') open = false; } catch(e) {}
+      setCalOpen(open, false);
       loadEvents().then(evts => { _calEvents = evts; buildCalendar(); });
     })();
     /* O Conversation Maker fica em outro domínio (vercel.app) e não enxerga
