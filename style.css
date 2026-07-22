@@ -155,10 +155,12 @@
   font-size: 1.05rem;
   font-weight: 800;
 }
-.cal-month-label{
-  font-weight: 600;
-  color: var(--gray);
-  font-size: .95rem;
+.cal-month-nav-label{
+  font-weight: 800;
+  color: var(--black);
+  font-size: .98rem;
+  min-width: 140px;
+  text-align: center;
 }
 
 .cal-chevron{
@@ -178,14 +180,42 @@
   border-radius: 0 0 var(--surface-radius) var(--surface-radius);
   box-shadow: var(--surface-shadow);
 }
-.cal-body.is-open{ max-height: 700px; }
+.cal-body.is-open{ max-height: 820px; }
 
 .cal-inner{
   padding: 1.25rem 1.35rem 1.35rem;
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 1.25rem 2rem;
+  gap: 1rem 2rem;
 }
+
+.cal-nav-row{
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .75rem;
+  padding-bottom: .1rem;
+}
+
+.cal-nav-btn{
+  background: none;
+  border: 1.5px solid var(--surface-border-color);
+  border-radius: 8px;
+  width: 28px; height: 28px;
+  cursor: pointer;
+  color: var(--black);
+  font-size: 1.25rem;
+  line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color .15s, color .15s;
+}
+.cal-nav-btn:hover{ border-color: var(--red); color: var(--red); }
+
+/* Dias e eventos passados */
+.cal-cell.cal-past .cal-day-num{ opacity: .35; }
+.cal-cell.cal-past .cal-dots   { opacity: .35; }
+.cal-event-item.is-past        { opacity: .35; }
 
 .cal-grid{
   display: grid;
@@ -302,8 +332,9 @@ body.theme-dark .cal-event-item{ background: rgba(255,255,255,.04); }
 
 @media (max-width: 640px){
   .cal-section{ padding: 0 1rem 2rem; }
-  .cal-inner{ grid-template-columns: 1fr; gap: 1rem; }
+  .cal-inner{ grid-template-columns: 1fr; gap: .75rem; }
   .cal-grid{ min-width: 0; }
+  .cal-body.is-open{ max-height: 1100px; }
 }
 
 .links-section{

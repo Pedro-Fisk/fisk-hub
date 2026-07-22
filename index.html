@@ -100,6 +100,19 @@
       <p>Gere termos de atraso para alunos com poucos cliques</p>
     </a>
 
+    <a class="card is-soon" href="#" aria-disabled="true" tabindex="-1">
+      <span class="badge">Em breve</span>
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="12,2 22,8 12,14 2,8" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M6 11v5.5c0 0 2.2 3 6 3s6-3 6-3V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="22" y1="8" x2="22" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2>Simulador MET e SIELE</h2>
+      <p>Pratique para os exames de certificação com simulados interativos</p>
+    </a>
+
   </main>
 
   <!-- ═══════════════════════════════════════
@@ -113,7 +126,6 @@
           <path d="M3 9h18M8 2v4M16 2v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
         </svg>
         Calendário Escolar
-        <span class="cal-month-label" id="calMonthLabel"></span>
       </span>
       <svg class="cal-chevron" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -121,6 +133,11 @@
     </button>
     <div class="cal-body is-open" id="calBody">
       <div class="cal-inner">
+        <div class="cal-nav-row">
+          <button class="cal-nav-btn" onclick="changeMonth(-1)" title="Mês anterior">&#8249;</button>
+          <span class="cal-month-nav-label" id="calMonthLabel"></span>
+          <button class="cal-nav-btn" onclick="changeMonth(1)" title="Próximo mês">&#8250;</button>
+        </div>
         <div class="cal-grid" id="calGrid"></div>
         <div class="cal-events-col">
           <div class="cal-legend" id="calLegend"></div>
@@ -260,19 +277,27 @@
       return FALLBACK_EVENTS;
     }
 
-    function buildCalendar(events) {
-      const today = new Date();
-      const year  = today.getFullYear();
-      const month = today.getMonth();
+    let _calEvents = [];
+    let _calYear   = new Date().getFullYear();
+    let _calMonth  = new Date().getMonth();
+
+    function buildCalendar() {
+      const events = _calEvents;
+      const year   = _calYear;
+      const month  = _calMonth;
+      const today  = new Date();
+      const tY = today.getFullYear(), tM = today.getMonth(), tD = today.getDate();
 
       const monthNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
                           'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-      document.getElementById('calMonthLabel').textContent = '— ' + monthNames[month] + ' ' + year;
+      document.getElementById('calMonthLabel').textContent = monthNames[month] + ' ' + year;
+
+      const isPastMo   = year < tY || (year === tY && month < tM);
+      const isThisMo   = year === tY && month === tM;
 
       const firstDay    = new Date(year, month, 1).getDay();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-      // Mapeia eventos do mês atual
       const eventsMap = {};
       const monthEvents = [];
       events.forEach(e => {
@@ -280,29 +305,29 @@
         if (d.getFullYear() === year && d.getMonth() === month) {
           const day = d.getDate();
           (eventsMap[day] = eventsMap[day] || []).push(e);
-          monthEvents.push({ ...e, day });
+          const past = isPastMo || (isThisMo && day < tD);
+          monthEvents.push({ ...e, day, past });
         }
       });
       monthEvents.sort((a, b) => a.day - b.day);
 
-      // Grid do calendário
       const dayNames = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-      let html = dayNames.map(d => `<div class="cal-day-header">${d}</div>`).join('');
+      let html = dayNames.map(n => `<div class="cal-day-header">${n}</div>`).join('');
       for (let i = 0; i < firstDay; i++) html += '<div class="cal-cell cal-empty"></div>';
       for (let d = 1; d <= daysInMonth; d++) {
-        const isToday = d === today.getDate();
+        const isToday = isThisMo && d === tD;
+        const isPast  = isPastMo || (isThisMo && d < tD);
         const dots = (eventsMap[d] || []).map(e => {
           const color = EVENT_TYPES[e.type]?.color || '#888';
           return `<span class="cal-dot" style="background:${color}"></span>`;
         }).join('');
-        html += `<div class="cal-cell${isToday ? ' cal-today' : ''}">
+        html += `<div class="cal-cell${isToday ? ' cal-today' : ''}${isPast ? ' cal-past' : ''}">
           <span class="cal-day-num">${d}</span>
           ${dots ? `<div class="cal-dots">${dots}</div>` : ''}
         </div>`;
       }
       document.getElementById('calGrid').innerHTML = html;
 
-      // Legenda
       const usedTypes = [...new Set(monthEvents.map(e => e.type))];
       document.getElementById('calLegend').innerHTML = usedTypes.map(t => {
         const info = EVENT_TYPES[t] || { label: t, color: '#888' };
@@ -311,14 +336,13 @@
         </span>`;
       }).join('');
 
-      // Lista de eventos
       const listEl = document.getElementById('calEventList');
       if (monthEvents.length === 0) {
         listEl.innerHTML = '<p class="cal-no-events">Nenhum evento para este mês.</p>';
       } else {
         listEl.innerHTML = monthEvents.map(e => {
           const info = EVENT_TYPES[e.type] || { label: e.type, color: '#888' };
-          return `<div class="cal-event-item">
+          return `<div class="cal-event-item${e.past ? ' is-past' : ''}">
             <span class="cal-event-dot" style="background:${info.color}"></span>
             <span class="cal-event-day">${e.day}</span>
             <span class="cal-event-title">${e.title}</span>
@@ -328,7 +352,13 @@
       }
     }
 
-    // Estado collapsible persiste no localStorage
+    function changeMonth(delta) {
+      _calMonth += delta;
+      if (_calMonth > 11) { _calMonth = 0; _calYear++; }
+      if (_calMonth < 0)  { _calMonth = 11; _calYear--; }
+      buildCalendar();
+    }
+
     function toggleCal() {
       const btn  = document.getElementById('calToggle');
       const body = document.getElementById('calBody');
@@ -345,7 +375,7 @@
           document.getElementById('calToggle').setAttribute('aria-expanded', 'false');
         }
       } catch(e) {}
-      loadEvents().then(buildCalendar);
+      loadEvents().then(evts => { _calEvents = evts; buildCalendar(); });
     })();
     /* O Conversation Maker fica em outro domínio (vercel.app) e não enxerga
        o localStorage daqui — o tema atual vai na URL. */
