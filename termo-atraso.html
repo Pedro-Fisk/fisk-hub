@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Termo de Atraso — FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css">
+<meta name="theme-color" content="#161414">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<style>
+  /* específico da ferramenta (o kit compartilhado traz tokens e componentes).
+     O DOCUMENTO gerado é azul (princípios do boletim de jovens e adultos);
+     os acentos azuis abaixo antecipam essa identidade na tela. */
+  :root{ --blue:#0b5394; --blue-mid:#3d85c6; --blue-pill:#073763; --blue-soft:#e8f1fa; }
+  main{max-width:760px;margin:0 auto;padding:1.2rem;width:100%}
+  .painel{background:var(--white);border:1px solid var(--surface-border-color);
+          border-radius:var(--surface-radius);box-shadow:var(--surface-shadow);
+          padding:1.1rem 1.2rem;margin-bottom:1rem}
+  .painel h2{margin:0 0 .7rem;font-size:1.05rem;color:var(--blue)}
+  .aviso{font-size:.85rem;color:var(--gray)}
+  .lista-alunos{display:flex;flex-direction:column;gap:.4rem;max-height:300px;overflow-y:auto}
+  .aluno-item{display:flex;align-items:center;gap:.6rem;padding:.5rem .7rem;
+              border:1px solid var(--gray-light);border-radius:10px;cursor:pointer;
+              font-size:.92rem;background:var(--white)}
+  .aluno-item:hover{border-color:var(--blue-mid)}
+  .aluno-item.sel{border-color:var(--blue);background:var(--blue-soft)}
+  .badge{margin-left:auto;font-size:.72rem;font-weight:800;padding:.15rem .5rem;
+         border-radius:99px;white-space:nowrap}
+  .badge.atraso{background:var(--red);color:var(--white)}
+  .badge.ok{background:var(--gray-light);color:var(--gray)}
+  .linha-campos{display:flex;flex-wrap:wrap;gap:.7rem}
+  .campo{flex:1 1 160px}
+  .campo label{display:block;font-size:.78rem;font-weight:800;margin-bottom:.2rem}
+  .campo input[type=text], .campo textarea{width:100%;padding:.45rem .6rem;
+    border:1px solid var(--gray-light);border-radius:8px;font-family:var(--font-body);font-size:.92rem}
+  .campo textarea{min-height:80px;resize:vertical}
+  .motivos label, .sugg-chk{display:flex;gap:.55rem;align-items:flex-start;font-size:.9rem;
+    padding:.45rem .7rem;font-weight:600;cursor:pointer;border:1.5px solid var(--gray-light);
+    border-radius:10px;margin-bottom:.4rem}
+  .motivos label:has(input:checked), .sugg-chk:has(input:checked){
+    border-color:var(--blue);background:var(--blue-soft)}
+  .btn-generate{background:var(--green);color:var(--white);border:0;border-radius:12px;
+    font-size:1.05rem;font-weight:800;padding:.8rem 1.6rem;cursor:pointer;width:100%}
+  .btn-generate:hover{background:var(--green-dark)}
+  .btn-sec{background:var(--black);color:var(--white);border:0;border-radius:10px;
+    font-weight:700;padding:.55rem 1rem;cursor:pointer;font-size:.85rem}
+  .metricas{display:flex;gap:.7rem;flex-wrap:wrap;margin:.5rem 0}
+  .metrica{flex:1 1 120px;background:var(--blue-soft);border-radius:10px;
+    padding:.5rem .7rem;text-align:center}
+  .metrica b{display:block;font-size:1.3rem;font-family:var(--font-heading);color:var(--blue-pill)}
+  .metrica.alerta{background:#fdeaea}
+  .metrica.alerta b{color:var(--red)}
+  .metrica span{font-size:.72rem;font-weight:700}
+  #preview{width:100%;height:560px;border:1px solid var(--gray-light);border-radius:10px}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <a class="back-link" href="index.html">&larr; Voltar aos recursos</a>
+  <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+  <h1>Termo de Atraso</h1>
+  <p>Comunicado de atraso no plano de curso — gerado com os dados vivos do card</p>
+</header>
+
+<main>
+
+  <section class="painel" id="painelTurma">
+    <h2>1 · Aluno</h2>
+    <p class="aviso" id="statusCard">⏳ Aguardando os dados da turma (abra pela sidebar do card)…</p>
+    <div class="linha-campos" id="origemStandalone" hidden style="margin:.6rem 0">
+      <div class="campo"><label>Professor(a)</label>
+        <select id="selProf" style="width:100%;padding:.45rem .6rem;border:1px solid var(--gray-light);border-radius:8px;font-family:var(--font-body)"></select>
+      </div>
+      <div class="campo" style="flex:2 1 260px"><label>Turma</label>
+        <select id="selTurma" style="width:100%;padding:.45rem .6rem;border:1px solid var(--gray-light);border-radius:8px;font-family:var(--font-body)"></select>
+      </div>
+      <div class="campo" style="flex:0 0 auto;align-self:flex-end">
+        <button class="btn-sec" id="btnCarregar">Carregar turma</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:.6rem;margin:.6rem 0;flex-wrap:wrap">
+      <button class="btn-sec" id="btnPick" hidden>👆 Escolher clicando no card</button>
+      <button class="btn-sec" id="btnLivre" style="background:var(--blue)">✍️ Criar termo livre (sem turma)</button>
+    </div>
+    <div class="lista-alunos" id="listaAlunos"></div>
+  </section>
+
+  <section class="painel" hidden id="painelSituacao">
+    <h2>2 · Situação do aluno <span class="aviso">(calculada automaticamente — ajuste se precisar)</span></h2>
+    <div class="metricas">
+      <div class="metrica" id="mAtraso"><b>–</b><span>aulas de atraso</span></div>
+      <div class="metrica" id="mFaltas"><b>–</b><span>faltas</span></div>
+      <div class="metrica"><b id="mUltima">–</b><span>última lição feita</span></div>
+      <div class="metrica"><b id="mPrevista">–</b><span>lição em que deveria estar</span></div>
+    </div>
+    <div class="linha-campos" id="camposLivre" hidden>
+      <div class="campo" style="flex:2 1 260px"><label>Nome do aluno</label><input type="text" id="fNome" placeholder="nome completo"></div>
+      <div class="campo"><label>Última lição feita</label><input type="text" id="fUltima" placeholder="ex.: L3"></div>
+      <div class="campo"><label>Lição em que deveria estar</label><input type="text" id="fPrevistaLivre" placeholder="ex.: L6"></div>
+    </div>
+    <div class="linha-campos">
+      <div class="campo"><label>Estágio (book)</label><input type="text" id="fBook"></div>
+      <div class="campo"><label>Professor(a)</label><input type="text" id="fProf"></div>
+      <div class="campo"><label>Dias e horário</label><input type="text" id="fHorario"></div>
+      <div class="campo"><label>Nº de aulas atrasadas</label><input type="text" id="fAtraso"></div>
+      <div class="campo"><label>Nº de faltas</label><input type="text" id="fFaltas"></div>
+    </div>
+  </section>
+
+  <section class="painel" hidden id="painelMotivos">
+    <h2>3 · Motivos do atraso</h2>
+    <div class="motivos" id="listaMotivos">
+      <label><input type="checkbox" value="Dificuldade em acompanhar as atividades do plano de curso"> Dificuldade em acompanhar as atividades do plano de curso</label>
+      <label><input type="checkbox" value="Faltas às aulas"> Faltas às aulas</label>
+      <label><input type="checkbox" value="Conversas paralelas durante as aulas"> Conversas paralelas durante as aulas</label>
+      <label><input type="checkbox" value="Costuma fazer as tarefas de casa em sala de aula"> Costuma fazer as tarefas de casa em sala de aula</label>
+    </div>
+    <div class="campo"><label>Outros</label><input type="text" id="moOutros" placeholder="descreva, se necessário…"></div>
+  </section>
+
+  <section class="painel" hidden id="painelSugestoes">
+    <h2>4 · Sugestões para compensação <span class="aviso">(clique para incluir)</span></h2>
+    <div id="listaSugestoes">
+      <label class="sugg-chk"><input type="checkbox" value="Participar das tutorias semanais (aulas extras, sem custo adicional)"> Participar das tutorias semanais (aulas extras, sem custo adicional)</label>
+      <label class="sugg-chk"><input type="checkbox" value="Revisar em casa as lições em atraso, com o áudio do livro"> Revisar em casa as lições em atraso, com o áudio do livro</label>
+      <label class="sugg-chk"><input type="checkbox" value="Trazer as tarefas de casa feitas para aproveitar melhor a aula"> Trazer as tarefas de casa feitas para aproveitar melhor a aula</label>
+      <label class="sugg-chk"><input type="checkbox" value="Evitar faltas e chegar no horário para não perder explicações"> Evitar faltas e chegar no horário para não perder explicações</label>
+      <label class="sugg-chk"><input type="checkbox" value="Combinar com a recepção um horário de reposição"> Combinar com a recepção um horário de reposição</label>
+    </div>
+    <div class="campo">
+      <label>Orientações adicionais do professor</label>
+      <textarea id="fSugestoes" placeholder="Escreva livremente outras dicas ou combinados com o aluno…"></textarea>
+    </div>
+  </section>
+
+  <section class="painel" hidden id="painelGerar">
+    <button class="btn-generate" id="btnPdf">📄 Gerar Termo de Atraso (PDF)</button>
+    <p class="aviso" style="margin:.6rem 0 0">O PDF sai fechado (não editável) e o card recebe automaticamente
+    uma nota na célula da última aula do aluno registrando o termo.</p>
+    <embed id="preview" type="application/pdf" hidden style="margin-top:.8rem">
+  </section>
+
+</main>
+
+<footer>
+  <p>Ferramenta desenvolvida exclusivamente para uso interno das escolas Fisk.</p>
+</footer>
+
+<script>
+/* ============ ORIGENS DE DADOS ============
+ * 1) Sidebar do card (Apps Script) → payload via postMessage — modo padrão.
+ * 2) Standalone (aberta direto no Fisk Hub) → dropdowns de professor/turma
+ *    buscando na API do Apps Script (Web App), sempre ao vivo da planilha.
+ * Preencher API_URL após publicar a implantação do App da Web no card.
+ */
+var API_URL = '';   // ex.: 'https://script.google.com/macros/s/AKfycb.../exec'
+var API_KEY = '';   // mesma API_KEY das propriedades do script
+
+var payload = null, alunoSel = null;
+var standalone = (window.parent === window);
+
+window.addEventListener('message', function (ev) {
+  var m = ev.data || {};
+  if (m.tipo === 'fisk-card-payload') { payload = m.dados; montarLista(); }
+  if (m.tipo === 'fisk-aluno-escolhido') selecionarAluno(m.aluno);
+});
+/* avisa a sidebar que a página está pronta para receber o payload */
+if (!standalone) window.parent.postMessage({ tipo: 'fisk-hub-pronto' }, '*');
+
+/* ---- modo standalone: dropdowns alimentados pela API ---- */
+function api(params) {
+  var qs = Object.keys(params).map(function (k) {
+    return k + '=' + encodeURIComponent(params[k]);
+  }).join('&');
+  return fetch(API_URL + '?key=' + encodeURIComponent(API_KEY) + '&' + qs)
+    .then(function (r) { return r.json(); })
+    .then(function (j) { if (j.erro) throw new Error(j.erro); return j; });
+}
+
+if (standalone) {
+  if (API_URL) {
+    document.getElementById('origemStandalone').hidden = false;
+    document.getElementById('statusCard').textContent = 'Escolha o professor e a turma — os dados vêm ao vivo do card.';
+    api({ fn: 'profs' }).then(function (j) {
+      var sel = document.getElementById('selProf');
+      sel.innerHTML = j.profs.map(function (p) { return '<option>' + p + '</option>'; }).join('');
+      carregarTurmasDoProf();
+    }).catch(mostrarErroApi);
+    document.getElementById('selProf').addEventListener('change', carregarTurmasDoProf);
+    document.getElementById('btnCarregar').addEventListener('click', function () {
+      var st = document.getElementById('selTurma');
+      if (!st.value) return;
+      document.getElementById('statusCard').textContent = '🔄 Lendo a turma ao vivo…';
+      api({ fn: 'turma', prof: document.getElementById('selProf').value, linha: st.value })
+        .then(function (dados) { payload = dados; montarLista(); })
+        .catch(mostrarErroApi);
+    });
+  } else {
+    document.getElementById('statusCard').textContent =
+      '⚠️ Abra esta ferramenta pelo botão FISK HUB dentro do card (o acesso direto será liberado quando a API for publicada).';
+  }
+}
+function carregarTurmasDoProf() {
+  api({ fn: 'turmas', prof: document.getElementById('selProf').value }).then(function (j) {
+    document.getElementById('selTurma').innerHTML = j.turmas.map(function (t) {
+      return '<option value="' + t.linhaTitulo + '">' + t.titulo + '</option>';
+    }).join('');
+  }).catch(mostrarErroApi);
+}
+function mostrarErroApi(err) {
+  document.getElementById('statusCard').textContent = '⚠️ ' + err.message;
+}
+
+document.getElementById('btnPick').addEventListener('click', function () {
+  window.parent.postMessage({ tipo: 'fisk-pick-aluno' }, '*');
+  document.getElementById('statusCard').textContent = '👆 Agora clique na célula do nome do aluno, lá no card…';
+});
+
+/* ---- modo livre: termo sem vínculo com turma (ex.: aluno ainda não
+   transferido no card). Tudo é preenchido à mão; nada é registrado no card. */
+var modoLivre = false;
+document.getElementById('btnLivre').addEventListener('click', function () {
+  modoLivre = true;
+  alunoSel = { nome: '', book: '', ultimaLicao: null, licaoPrevista: null,
+               faltas: '', pctFaltas: '', aulasAtraso: null, linhaCard: null, ultimaPresencaIdx: null };
+  document.querySelectorAll('.aluno-item').forEach(function (el) { el.classList.remove('sel'); });
+  ['painelSituacao','painelMotivos','painelSugestoes','painelGerar'].forEach(function (id) {
+    document.getElementById(id).hidden = false;
+  });
+  document.getElementById('camposLivre').hidden = false;
+  document.querySelector('#painelSituacao .metricas').hidden = true;
+  ['fBook','fAtraso','fFaltas','fNome','fUltima','fPrevistaLivre'].forEach(function (id) {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('fProf').value = payload ? tituloCaso(payload.professor) : '';
+  document.getElementById('fHorario').value = '';
+  document.getElementById('statusCard').textContent = '✍️ Termo livre: preencha os dados do aluno manualmente.';
+});
+
+function montarLista() {
+  document.getElementById('btnPick').hidden = standalone; // clicar na célula só faz sentido dentro do card
+  var pend = payload.alunos.filter(function (a) { return a.precisaTermo; }).length;
+  document.getElementById('statusCard').textContent =
+    '✅ ' + payload.turma.split('\n')[0] + ' — ' + payload.alunos.length + ' alunos, ' +
+    (pend ? pend + ' sinalizado(s) para termo de atraso.' : 'nenhum termo pendente.');
+  var ul = document.getElementById('listaAlunos');
+  ul.innerHTML = '';
+  payload.alunos
+    .slice()
+    .sort(function (a, b) { return (b.aulasAtraso || 0) - (a.aulasAtraso || 0); })
+    .forEach(function (a) {
+      var div = document.createElement('div');
+      div.className = 'aluno-item';
+      div.innerHTML = '<span>' + a.nome + '</span>' +
+        (a.precisaTermo
+          ? '<span class="badge atraso">' + a.aulasAtraso + ' aulas atrasado</span>'
+          : '<span class="badge ok">' + (a.aulasAtraso == null ? 'sem placeholder' : 'em dia') + '</span>');
+      div.addEventListener('click', function () { selecionarAluno(a); });
+      div.dataset.nome = a.nome;
+      ul.appendChild(div);
+    });
+}
+
+function selecionarAluno(a) {
+  alunoSel = a;
+  modoLivre = false;
+  document.getElementById('camposLivre').hidden = true;
+  document.querySelector('#painelSituacao .metricas').hidden = false;
+  document.querySelectorAll('.aluno-item').forEach(function (el) {
+    el.classList.toggle('sel', el.dataset.nome === a.nome);
+  });
+  ['painelSituacao','painelMotivos','painelSugestoes','painelGerar'].forEach(function (id) {
+    document.getElementById(id).hidden = false;
+  });
+  var mA = document.getElementById('mAtraso');
+  mA.querySelector('b').textContent = a.aulasAtraso == null ? '?' : a.aulasAtraso;
+  mA.classList.toggle('alerta', !!a.precisaTermo);
+  document.getElementById('mFaltas').querySelector('b').textContent = a.faltas + ' (' + a.pctFaltas + '%)';
+  document.getElementById('mUltima').textContent = a.ultimaLicao || '–';
+  document.getElementById('mPrevista').textContent = a.licaoPrevista || '–';
+  document.getElementById('fBook').value = a.book || '';
+  document.getElementById('fProf').value = payload ? tituloCaso(payload.professor) : '';
+  document.getElementById('fHorario').value = payload ? extrairHorario(payload.turma) : '';
+  document.getElementById('fAtraso').value = a.aulasAtraso == null ? '' : a.aulasAtraso;
+  document.getElementById('fFaltas').value = a.faltas;
+  var chkFaltas = document.querySelector('#listaMotivos input[value="Faltas às aulas"]');
+  chkFaltas.checked = a.faltas > 0 && a.pctFaltas >= 15;
+}
+
+function tituloCaso(s){ s=String(s||'').toLowerCase(); return s.charAt(0).toUpperCase()+s.slice(1); }
+/* pega os dias/horário do título da turma: 1ª linha, do primeiro dia da semana em diante
+   (ex.: "INTERMEDIATE- 4ª 15h às 17h30\nERA DO CLAUDINEI" → "4ª 15h às 17h30") */
+function extrairHorario(titulo){
+  var l = String(titulo||'').split('\n')[0];
+  var m = l.match(/(2ª|3ª|4ª|5ª|6ª|s[áa]b\.?|dom\.?).*$/i);
+  return m ? m[0].trim() : '';
+}
+
+/* ============ PDF (pdf-lib, documento FECHADO — sem campos editáveis) ============ */
+document.getElementById('btnPdf').addEventListener('click', gerarPDF);
+
+async function gerarPDF() {
+  if (!alunoSel) return;
+  if (modoLivre) {
+    alunoSel.nome = valorDe('fNome').trim();
+    alunoSel.book = valorDe('fBook').trim();
+    alunoSel.ultimaLicao = valorDe('fUltima').trim() || null;
+    alunoSel.licaoPrevista = valorDe('fPrevistaLivre').trim() || null;
+    if (!alunoSel.nome) { alert('Preencha o nome do aluno.'); return; }
+  }
+  var PDF = PDFLib;
+  var doc = await PDF.PDFDocument.create();
+  var page = doc.addPage([595.28, 841.89]); // A4
+  var helv = await doc.embedFont(PDF.StandardFonts.Helvetica);
+  var bold = await doc.embedFont(PDF.StandardFonts.HelveticaBold);
+  var italic = await doc.embedFont(PDF.StandardFonts.HelveticaOblique);
+
+  /* paleta azul do documento (ecoa os azuis do próprio card) */
+  var BLUE = PDF.rgb(0.043, 0.325, 0.58);      // #0b5394 — molduras
+  var PILL = PDF.rgb(0.027, 0.216, 0.388);     // #073763 — pílulas de seção
+  var SOFT = PDF.rgb(0.91, 0.945, 0.98);       // #e8f1fa — preenchimentos suaves
+  var TITLE = PDF.rgb(0.29, 0.333, 0.376);     // #4a5560 — título (boletim)
+  var SUB = PDF.rgb(0.42, 0.467, 0.502);       // #6b7780 — subtítulo
+  var TEXT = PDF.rgb(0.121, 0.11, 0.11);       // #1f1c1c
+  var WHITE = PDF.rgb(1, 1, 1);
+  var W = 595.28, M = 44;
+
+  /* retângulo arredondado (princípio visual do boletim) */
+  function rrect(x, yTop, w, h, r, opts) {
+    var p = 'M ' + r + ',0 H ' + (w - r) + ' A ' + r + ' ' + r + ' 0 0 1 ' + w + ' ' + r +
+      ' V ' + (h - r) + ' A ' + r + ' ' + r + ' 0 0 1 ' + (w - r) + ' ' + h +
+      ' H ' + r + ' A ' + r + ' ' + r + ' 0 0 1 0 ' + (h - r) +
+      ' V ' + r + ' A ' + r + ' ' + r + ' 0 0 1 ' + r + ' 0 Z';
+    page.drawSvgPath(p, Object.assign({ x: x, y: yTop }, opts));
+  }
+  function centro(texto, y, size, font, color) {
+    var w = font.widthOfTextAtSize(texto, size);
+    page.drawText(texto, { x: (W - w) / 2, y: y, size: size, font: font, color: color });
+  }
+  function quebrar(texto, font, size, larguraMax) {
+    var out = [];
+    String(texto).split('\n').forEach(function (par) {
+      var atual = '';
+      par.split(' ').forEach(function (pp) {
+        var t = atual ? atual + ' ' + pp : pp;
+        if (font.widthOfTextAtSize(t, size) > larguraMax) { out.push(atual); atual = pp; }
+        else atual = t;
+      });
+      out.push(atual);
+    });
+    return out;
+  }
+
+  var y = 812;
+
+  /* cabeçalho: logo + título central + subtítulo itálico (estilo boletim) */
+  try {
+    var img = await fetch('assets/fisk-logo.png').then(function (r) { return r.arrayBuffer(); });
+    var png = await doc.embedPng(img);
+    var lh = 26, lw = png.width * (lh / png.height);
+    page.drawImage(png, { x: W - M - lw, y: y - lh + 6, width: lw, height: lh });
+  } catch (e) {
+    page.drawText('FISK', { x: W - M - 52, y: y - 12, size: 22, font: bold, color: PDF.rgb(0.847, 0.122, 0.149) });
+  }
+  centro('COMUNICADO DE ATRASO NO PLANO DE CURSO', y - 10, 14.5, bold, TITLE);
+  centro('Comunicado aos pais ou responsáveis.', y - 27, 10.5, italic, SUB);
+  y -= 44;
+
+  /* pílula de data à direita (rc-datebox) */
+  var hoje = new Date();
+  var dataStr = 'Data: ' + ('0' + hoje.getDate()).slice(-2) + '/' + ('0' + (hoje.getMonth() + 1)).slice(-2) + '/' + hoje.getFullYear();
+  rrect(W - M - 120, y, 120, 18, 9, { borderColor: BLUE, borderWidth: 1.2 });
+  page.drawText(dataStr, { x: W - M - 104, y: y - 12.5, size: 8.5, font: helv, color: TEXT });
+  y -= 26;
+
+  /* moldura de identificação */
+  rrect(M, y, W - 2 * M, 58, 12, { borderColor: BLUE, borderWidth: 2 });
+  function idCampo(rotulo, valor, x, yy, larg) {
+    page.drawText(rotulo, { x: x, y: yy, size: 9, font: bold, color: TEXT });
+    var lx = x + bold.widthOfTextAtSize(rotulo, 9) + 5;
+    page.drawLine({ start: { x: lx, y: yy - 2.5 }, end: { x: x + larg, y: yy - 2.5 }, thickness: 1, color: BLUE });
+    page.drawText(String(valor || ''), { x: lx + 3, y: yy, size: 9.5, font: helv, color: TEXT });
+  }
+  idCampo('Aluno(a):', alunoSel.nome, M + 14, y - 22, 300);
+  idCampo('Estágio:', valorDe('fBook'), M + 330, y - 22, 175);
+  idCampo('Professor(a):', valorDe('fProf'), M + 14, y - 44, 180);
+  idCampo('Dias e horário:', valorDe('fHorario'), M + 210, y - 44, 295);
+  y -= 74;
+
+  /* carta (texto gentil, com o nome do aluno e tutorias) */
+  var nome = alunoSel.nome.trim();
+  var primeiro = nome.split(' ')[0];
+  var nAtraso = valorDe('fAtraso') || '____';
+  var carta =
+    'Prezada família,\n' +
+    'Queremos manter vocês próximos da jornada de ' + nome + ' aqui na Fisk. Notamos que ' + primeiro +
+    ' está ' + nAtraso + ' aula(s) atrasado(a) em relação ao plano de curso, e nosso objetivo é ajudá-lo(a) a ' +
+    'retomar o ritmo com tranquilidade. Para isso, convidamos ' + primeiro + ' a participar das tutorias — ' +
+    'aulas extras, sem nenhum custo adicional — para que possa concluir seu livro (estágio) na data prevista. ' +
+    'É nosso compromisso oferecer todas as oportunidades para que cada aluno avance no seu melhor potencial, ' +
+    'e contamos com a parceria de vocês nessa caminhada.';
+  quebrar(carta, helv, 9.8, W - 2 * M - 8).forEach(function (l) {
+    page.drawText(l, { x: M + 4, y: y, size: 9.8, font: helv, color: TEXT });
+    y -= 13.5;
+  });
+  y -= 10;
+
+  /* seção: pílula azul-escura + caixa arredondada (pill-head do boletim) */
+  function secao(titulo, alturaCaixa) {
+    var pw = bold.widthOfTextAtSize(titulo, 9.5) + 28;
+    rrect(M, y, pw, 20, 10, { color: PILL });
+    page.drawText(titulo, { x: M + 14, y: y - 13.5, size: 9.5, font: bold, color: WHITE });
+    y -= 26;
+    rrect(M, y, W - 2 * M, alturaCaixa, 12, { borderColor: BLUE, borderWidth: 2 });
+  }
+
+  /* 1 · situação do aluno — 4 caixinhas (gradecell) */
+  secao('SITUAÇÃO DO ALUNO', 52);
+  var stats = [
+    ['ÚLTIMA LIÇÃO FEITA', alunoSel.ultimaLicao || '–'],
+    ['LIÇÃO PREVISTA', alunoSel.licaoPrevista || '–'],
+    ['AULAS ATRASADAS', valorDe('fAtraso') || '–'],
+    ['FALTAS', valorDe('fFaltas') || '0']
+  ];
+  var boxW = (W - 2 * M - 5 * 12) / 4;
+  stats.forEach(function (s, i) {
+    var bx = M + 12 + i * (boxW + 12);
+    rrect(bx, y - 8, boxW, 36, 8, { color: SOFT, borderColor: BLUE, borderWidth: 1.2 });
+    var lw1 = bold.widthOfTextAtSize(s[0], 6.3);
+    page.drawText(s[0], { x: bx + (boxW - lw1) / 2, y: y - 18, size: 6.3, font: bold, color: PILL });
+    var vw = bold.widthOfTextAtSize(String(s[1]), 12);
+    page.drawText(String(s[1]), { x: bx + (boxW - vw) / 2, y: y - 34, size: 12, font: bold, color: TEXT });
+  });
+  y -= 52 + 14;
+
+  /* 2 · motivos do atraso — caixas de seleção desenhadas (fechadas) */
+  var motivos = Array.prototype.map.call(
+    document.querySelectorAll('#listaMotivos input'),
+    function (c) { return { texto: c.value, marcado: c.checked }; });
+  var outros = valorDe('moOutros').trim();
+  motivos.push({ texto: 'Outros: ' + (outros || '—'), marcado: !!outros });
+  var altM = motivos.length * 16 + 18;
+  secao('MOTIVOS DO ATRASO NO CURSO', altM);
+  var my = y - 20;
+  motivos.forEach(function (mo) {
+    rrect(M + 14, my + 8.5, 10, 10, 2.5, mo.marcado
+      ? { color: BLUE } : { borderColor: BLUE, borderWidth: 1.1 });
+    if (mo.marcado) {
+      page.drawLine({ start: { x: M + 16.2, y: my + 3.2 }, end: { x: M + 18.4, y: my + 1 }, thickness: 1.4, color: WHITE });
+      page.drawLine({ start: { x: M + 18.4, y: my + 1 }, end: { x: M + 21.8, y: my + 6 }, thickness: 1.4, color: WHITE });
+    }
+    page.drawText(mo.texto, { x: M + 30, y: my, size: 9.2, font: mo.marcado ? bold : helv, color: TEXT });
+    my -= 16;
+  });
+  y -= altM + 14;
+
+  /* 3 · sugestões para compensação — itens escolhidos + texto livre */
+  var sugestoes = Array.prototype.filter.call(
+    document.querySelectorAll('#listaSugestoes input'),
+    function (c) { return c.checked; }).map(function (c) { return c.value; });
+  var livres = valorDe('fSugestoes').trim();
+  var linhasLivres = livres ? quebrar(livres, helv, 9.2, W - 2 * M - 44) : [];
+  var altS = Math.max(1, sugestoes.length) * 15 + linhasLivres.length * 12.5 + 20;
+  secao('SUGESTÕES PARA COMPENSAÇÃO', altS);
+  var sy = y - 20;
+  if (!sugestoes.length && !linhasLivres.length) {
+    page.drawText('—', { x: M + 14, y: sy, size: 9.2, font: helv, color: TEXT });
+  }
+  sugestoes.forEach(function (s) {
+    page.drawCircle({ x: M + 18, y: sy + 3, size: 1.7, color: BLUE });
+    page.drawText(s, { x: M + 26, y: sy, size: 9.2, font: helv, color: TEXT });
+    sy -= 15;
+  });
+  linhasLivres.forEach(function (l) {
+    page.drawText(l, { x: M + 26, y: sy, size: 9.2, font: italic, color: TEXT });
+    sy -= 12.5;
+  });
+  y -= altS + 26;
+
+  /* assinaturas */
+  page.drawText('Atenciosamente,', { x: W - M - 150, y: y, size: 9.5, font: helv, color: TEXT });
+  y -= 40;
+  [[M, 'Ciente: pais ou responsável'], [W / 2 + 24, 'Assinatura do(a) professor(a)']].forEach(function (s) {
+    page.drawLine({ start: { x: s[0], y: y }, end: { x: s[0] + 205, y: y }, thickness: .9, color: BLUE });
+    page.drawText(s[1], { x: s[0], y: y - 12, size: 8.5, font: helv, color: SUB });
+    page.drawText('Data: ____/____/______', { x: s[0], y: y - 26, size: 8.5, font: helv, color: SUB });
+  });
+
+  var bytes = await doc.save();
+  var blob = new Blob([bytes], { type: 'application/pdf' });
+  var url = URL.createObjectURL(blob);
+  var aEl = document.createElement('a');
+  aEl.href = url;
+  aEl.download = 'Termo de Atraso - ' + alunoSel.nome + '.pdf';
+  aEl.click();
+  var prev = document.getElementById('preview');
+  prev.src = url; prev.hidden = false;
+
+  /* registra no card (nota na célula da última aula do aluno) */
+  if (!standalone) {
+    window.parent.postMessage({ tipo: 'fisk-termo-gerado', nomeAluno: alunoSel.nome }, '*');
+  } else if (API_URL && alunoSel.linhaCard != null) {
+    api({ fn: 'registrarTermo', prof: payload.aba, linhaCard: alunoSel.linhaCard, idx: alunoSel.ultimaPresencaIdx })
+      .then(function () {
+        document.getElementById('statusCard').textContent = '📄 Termo registrado no card (nota na célula da última aula).';
+      }).catch(mostrarErroApi);
+  }
+}
+
+function valorDe(id) { return document.getElementById(id).value; }
+</script>
+</body>
+</html>

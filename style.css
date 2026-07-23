@@ -56,6 +56,7 @@
 }
 
 .card-boletim      { --accent: #B45309; }
+.card-termo        { --accent: #0B5394; } /* azul do documento (ecoa o card online) */
 .card-conversation { --accent: #2563EB; }
 .card-planner      { --accent: #15803D; }
 .card-kids         { --accent: #CC0E50; }
