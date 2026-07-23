@@ -54,6 +54,12 @@
   .metrica.alerta b{color:var(--red)}
   .metrica span{font-size:.72rem;font-weight:700}
   #preview{width:100%;height:560px;border:1px solid var(--gray-light);border-radius:10px}
+  /* indicador de carregamento por dropdown: spinner enquanto busca, ✓ quando pronto */
+  .ind{display:inline-block;width:13px;height:13px;margin-left:.4rem;vertical-align:-2px}
+  .ind.spin{border:2px solid var(--gray-light);border-top-color:var(--blue);border-radius:50%;
+            animation:gira .7s linear infinite}
+  .ind.ok::after{content:'✓';color:var(--green);font-weight:800;font-size:.9rem}
+  @keyframes gira{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -71,14 +77,14 @@
     <h2>1 · Aluno</h2>
     <p class="aviso" id="statusCard">⏳ Aguardando os dados da turma (abra pela sidebar do card)…</p>
     <div class="linha-campos" id="origemStandalone" hidden style="margin:.6rem 0">
-      <div class="campo"><label>Escola</label>
+      <div class="campo"><label>Escola<span class="ind" id="indEscola"></span></label>
         <select id="selEscola" style="width:100%;padding:.45rem .6rem;border:1px solid var(--gray-light);border-radius:8px;font-family:var(--font-body)"></select>
       </div>
-      <div class="campo"><label>Professor(a)</label>
-        <select id="selProf" style="width:100%;padding:.45rem .6rem;border:1px solid var(--gray-light);border-radius:8px;font-family:var(--font-body)"></select>
+      <div class="campo"><label>Professor(a)<span class="ind" id="indProf"></span></label>
+        <select id="selProf" disabled style="width:100%;padding:.45rem .6rem;border:1px solid var(--gray-light);border-radius:8px;font-family:var(--font-body)"></select>
       </div>
-      <div class="campo" style="flex:2 1 240px"><label>Turma</label>
-        <select id="selTurma" style="width:100%;padding:.45rem .6rem;border:1px solid var(--gray-light);border-radius:8px;font-family:var(--font-body)"></select>
+      <div class="campo" style="flex:2 1 240px"><label>Turma<span class="ind" id="indTurma"></span></label>
+        <select id="selTurma" disabled style="width:100%;padding:.45rem .6rem;border:1px solid var(--gray-light);border-radius:8px;font-family:var(--font-body)"></select>
       </div>
       <div class="campo" style="flex:0 0 auto;align-self:flex-end">
         <button class="btn-sec" id="btnCarregar">Carregar turma</button>
@@ -194,46 +200,75 @@ function api(params) {
     .then(function (j) { if (j.erro) throw new Error(j.erro); return j; });
 }
 
-/* fluxo standalone em cascata: Escola → Professor(a) (abas do card) → Turma → alunos */
+/* Fluxo standalone em cascata: Escola → Professor(a) (abas do card) → Turma → alunos.
+   Nada vem pré-selecionado: cada menu começa em branco e só carrega depois da
+   escolha anterior, com spinner enquanto busca e ✓ quando os dados chegam. */
+function ind(id, estado) {
+  document.getElementById(id).className = 'ind' + (estado ? ' ' + estado : '');
+}
+function montarSelect(sel, placeholder, itens) {
+  sel.innerHTML = '<option value="" disabled selected>' + placeholder + '</option>' +
+    itens.map(function (i) { return '<option value="' + i.v + '">' + i.t + '</option>'; }).join('');
+  sel.disabled = false;
+}
 if (standalone && !temHashPayload) {
   if (API_URL) {
     document.getElementById('origemStandalone').hidden = false;
     document.getElementById('statusCard').textContent = 'Escolha a escola, o professor e a turma — os dados vêm ao vivo do card.';
+    var selEscola = document.getElementById('selEscola');
+    var selProf = document.getElementById('selProf');
+    var selTurma = document.getElementById('selTurma');
+    selEscola.innerHTML = '<option value="" disabled selected>Carregando escolas…</option>';
+    selEscola.disabled = true;
+    selProf.innerHTML = '<option value="" disabled selected>—</option>';
+    selTurma.innerHTML = '<option value="" disabled selected>—</option>';
+    ind('indEscola', 'spin');
     api({ fn: 'escolas' }).then(function (j) {
-      document.getElementById('selEscola').innerHTML =
-        j.escolas.map(function (e) { return '<option>' + e + '</option>'; }).join('');
-      carregarProfsDaEscola();
-    }).catch(mostrarErroApi);
-    document.getElementById('selEscola').addEventListener('change', carregarProfsDaEscola);
-    document.getElementById('selProf').addEventListener('change', carregarTurmasDoProf);
+      montarSelect(selEscola, 'Escolha a escola…', j.escolas.map(function (e) { return { v: e, t: e }; }));
+      ind('indEscola', 'ok');
+    }).catch(function (e) { ind('indEscola', ''); mostrarErroApi(e); });
+
+    selEscola.addEventListener('change', function () {
+      if (!selEscola.value) return;
+      selProf.innerHTML = '<option value="" disabled selected>Carregando professores…</option>';
+      selProf.disabled = true;
+      selTurma.innerHTML = '<option value="" disabled selected>—</option>';
+      selTurma.disabled = true;
+      ind('indProf', 'spin'); ind('indTurma', '');
+      api({ fn: 'profs', escola: selEscola.value }).then(function (j) {
+        montarSelect(selProf, 'Escolha o professor(a)…', j.profs.map(function (p) { return { v: p, t: p }; }));
+        ind('indProf', 'ok');
+      }).catch(function (e) { ind('indProf', ''); mostrarErroApi(e); });
+    });
+
+    selProf.addEventListener('change', function () {
+      if (!selProf.value) return;
+      selTurma.innerHTML = '<option value="" disabled selected>Carregando turmas…</option>';
+      selTurma.disabled = true;
+      ind('indTurma', 'spin');
+      api({ fn: 'turmas', escola: selEscola.value, prof: selProf.value }).then(function (j) {
+        montarSelect(selTurma, 'Escolha a turma…', j.turmas.map(function (t) {
+          return { v: t.linhaTitulo, t: t.titulo };
+        }));
+        ind('indTurma', 'ok');
+      }).catch(function (e) { ind('indTurma', ''); mostrarErroApi(e); });
+    });
+
     document.getElementById('btnCarregar').addEventListener('click', function () {
-      var st = document.getElementById('selTurma');
-      if (!st.value) return;
+      if (!selTurma.value) return;
+      var btn = document.getElementById('btnCarregar');
+      btn.disabled = true;
+      btn.textContent = '⏳ Carregando alunos…';
       document.getElementById('statusCard').textContent = '🔄 Lendo a turma ao vivo…';
-      api({ fn: 'turma', escola: document.getElementById('selEscola').value,
-            prof: document.getElementById('selProf').value, linha: st.value })
+      api({ fn: 'turma', escola: selEscola.value, prof: selProf.value, linha: selTurma.value })
         .then(function (dados) { payload = dados; montarLista(); })
-        .catch(mostrarErroApi);
+        .catch(mostrarErroApi)
+        .finally(function () { btn.disabled = false; btn.textContent = 'Carregar turma'; });
     });
   } else {
     document.getElementById('statusCard').textContent =
       '⚠️ Abra esta ferramenta pelo botão FISK HUB dentro do card (o acesso direto será liberado quando a API for publicada).';
   }
-}
-function carregarProfsDaEscola() {
-  api({ fn: 'profs', escola: document.getElementById('selEscola').value }).then(function (j) {
-    document.getElementById('selProf').innerHTML =
-      j.profs.map(function (p) { return '<option>' + p + '</option>'; }).join('');
-    carregarTurmasDoProf();
-  }).catch(mostrarErroApi);
-}
-function carregarTurmasDoProf() {
-  api({ fn: 'turmas', escola: document.getElementById('selEscola').value,
-        prof: document.getElementById('selProf').value }).then(function (j) {
-    document.getElementById('selTurma').innerHTML = j.turmas.map(function (t) {
-      return '<option value="' + t.linhaTitulo + '">' + t.titulo + '</option>';
-    }).join('');
-  }).catch(mostrarErroApi);
 }
 function mostrarErroApi(err) {
   document.getElementById('statusCard').textContent = '⚠️ ' + err.message;
