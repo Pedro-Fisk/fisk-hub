@@ -82,7 +82,6 @@
       </div>
     </div>
     <div style="display:flex;gap:.6rem;margin:.6rem 0;flex-wrap:wrap">
-      <button class="btn-sec" id="btnPick" hidden>👆 Escolher clicando no card</button>
       <button class="btn-sec" id="btnLivre" style="background:var(--blue)">✍️ Criar termo livre (sem turma)</button>
     </div>
     <div class="lista-alunos" id="listaAlunos"></div>
@@ -126,13 +125,13 @@
     <div id="listaSugestoes">
       <label class="sugg-chk"><input type="checkbox" value="Participar das tutorias semanais (aulas extras, sem custo adicional)"> Participar das tutorias semanais (aulas extras, sem custo adicional)</label>
       <label class="sugg-chk"><input type="checkbox" value="Revisar em casa as lições em atraso, com o áudio do livro"> Revisar em casa as lições em atraso, com o áudio do livro</label>
-      <label class="sugg-chk"><input type="checkbox" value="Trazer as tarefas de casa feitas para aproveitar melhor a aula"> Trazer as tarefas de casa feitas para aproveitar melhor a aula</label>
-      <label class="sugg-chk"><input type="checkbox" value="Evitar faltas e chegar no horário para não perder explicações"> Evitar faltas e chegar no horário para não perder explicações</label>
-      <label class="sugg-chk"><input type="checkbox" value="Combinar com a recepção um horário de reposição"> Combinar com a recepção um horário de reposição</label>
+      <label class="sugg-chk"><input type="checkbox" value="Fazer as tarefas de casa para melhorar o aproveitamento do tempo de aula"> Fazer as tarefas de casa para melhorar o aproveitamento do tempo de aula</label>
+      <label class="sugg-chk"><input type="checkbox" value="Evitar faltas"> Evitar faltas</label>
     </div>
     <div class="campo">
       <label>Orientações adicionais do professor</label>
       <textarea id="fSugestoes" placeholder="Escreva livremente outras dicas ou combinados com o aluno…"></textarea>
+      <button class="btn-sec" id="btnPolish" hidden style="margin-top:.5rem">✨ Lapidar texto com IA</button>
     </div>
   </section>
 
@@ -158,17 +157,29 @@
  */
 var API_URL = '';   // ex.: 'https://script.google.com/macros/s/AKfycb.../exec'
 var API_KEY = '';   // mesma API_KEY das propriedades do script
+var POLISH_URL = '';  // endpoint da lapidação com IA (ex.: https://conversation-maker.vercel.app/api/polish-text)
+var POLISH_CODE = ''; // mesmo ACCESS_CODE que os professores usam na Conversation Maker
 
 var payload = null, alunoSel = null;
 var standalone = (window.parent === window);
+/* payload no fragmento da URL = aberto "em tela cheia" a partir da sidebar */
+var temHashPayload = location.hash.indexOf('#p=') === 0;
 
 window.addEventListener('message', function (ev) {
   var m = ev.data || {};
   if (m.tipo === 'fisk-card-payload') { payload = m.dados; montarLista(); }
-  if (m.tipo === 'fisk-aluno-escolhido') selecionarAluno(m.aluno);
 });
 /* avisa a sidebar que a página está pronta para receber o payload */
 if (!standalone) window.parent.postMessage({ tipo: 'fisk-hub-pronto' }, '*');
+
+if (temHashPayload) {
+  try {
+    payload = JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(3)))));
+    montarLista();
+  } catch (e) {
+    document.getElementById('statusCard').textContent = '⚠️ Não consegui ler os dados da turma: ' + e.message;
+  }
+}
 
 /* ---- modo standalone: dropdowns alimentados pela API ---- */
 function api(params) {
@@ -180,7 +191,7 @@ function api(params) {
     .then(function (j) { if (j.erro) throw new Error(j.erro); return j; });
 }
 
-if (standalone) {
+if (standalone && !temHashPayload) {
   if (API_URL) {
     document.getElementById('origemStandalone').hidden = false;
     document.getElementById('statusCard').textContent = 'Escolha o professor e a turma — os dados vêm ao vivo do card.';
@@ -214,11 +225,6 @@ function mostrarErroApi(err) {
   document.getElementById('statusCard').textContent = '⚠️ ' + err.message;
 }
 
-document.getElementById('btnPick').addEventListener('click', function () {
-  window.parent.postMessage({ tipo: 'fisk-pick-aluno' }, '*');
-  document.getElementById('statusCard').textContent = '👆 Agora clique na célula do nome do aluno, lá no card…';
-});
-
 /* ---- modo livre: termo sem vínculo com turma (ex.: aluno ainda não
    transferido no card). Tudo é preenchido à mão; nada é registrado no card. */
 var modoLivre = false;
@@ -241,7 +247,6 @@ document.getElementById('btnLivre').addEventListener('click', function () {
 });
 
 function montarLista() {
-  document.getElementById('btnPick').hidden = standalone; // clicar na célula só faz sentido dentro do card
   var pend = payload.alunos.filter(function (a) { return a.precisaTermo; }).length;
   document.getElementById('statusCard').textContent =
     '✅ ' + payload.turma.split('\n')[0] + ' — ' + payload.alunos.length + ' alunos, ' +
@@ -511,6 +516,33 @@ async function gerarPDF() {
 }
 
 function valorDe(id) { return document.getElementById(id).value; }
+
+/* ---- lapidação do texto livre com IA (ativa quando POLISH_URL for definido) ---- */
+if (POLISH_URL) {
+  var btnPolish = document.getElementById('btnPolish');
+  btnPolish.hidden = false;
+  btnPolish.addEventListener('click', function () {
+    var bruto = valorDe('fSugestoes').trim();
+    if (!bruto) return;
+    btnPolish.disabled = true;
+    btnPolish.textContent = '✨ Lapidando…';
+    fetch(POLISH_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ accessCode: POLISH_CODE, texto: bruto, aluno: alunoSel ? alunoSel.nome : '' })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (j.textoLapidado) document.getElementById('fSugestoes').value = j.textoLapidado;
+        else throw new Error(j.erro || 'resposta inesperada');
+      })
+      .catch(function (e) { alert('Não consegui lapidar o texto: ' + e.message); })
+      .finally(function () {
+        btnPolish.disabled = false;
+        btnPolish.textContent = '✨ Lapidar texto com IA';
+      });
+  });
+}
 </script>
 </body>
 </html>
