@@ -90,6 +90,12 @@
         <button class="btn-sec" id="btnCarregar">Carregar turma</button>
       </div>
     </div>
+    <!-- troca rápida de turma (aparece quando os dados vêm do card, via sidebar ou tela cheia) -->
+    <div class="linha-campos" id="trocaTurma" hidden style="margin:.6rem 0">
+      <div class="campo" style="flex:2 1 240px"><label>Turma<span class="ind" id="indTrocaTurma"></span></label>
+        <select id="selTrocaTurma" style="width:100%;padding:.45rem .6rem;border:1px solid var(--gray-light);border-radius:8px;font-family:var(--font-body)"></select>
+      </div>
+    </div>
     <div style="display:flex;gap:.6rem;margin:.6rem 0;flex-wrap:wrap">
       <button class="btn-sec" id="btnLivre" style="background:var(--blue)">✍️ Criar termo livre (sem turma)</button>
     </div>
@@ -295,7 +301,60 @@ document.getElementById('btnLivre').addEventListener('click', function () {
   document.getElementById('statusCard').textContent = '✍️ Termo livre: preencha os dados do aluno manualmente.';
 });
 
+/* ---- troca rápida de turma dentro da ferramenta ----
+   A turma clicada no card já vem carregada; este menu deixa o professor pular
+   para qualquer outra turma dele (ou para o termo livre) sem voltar ao card. */
+var turmasCache = null;
+function initTrocaTurma() {
+  if (!API_URL || !payload || !payload.escola || !payload.aba) return;
+  var sel = document.getElementById('selTrocaTurma');
+  document.getElementById('trocaTurma').hidden = false;
+  function preencher() {
+    sel.innerHTML = turmasCache.map(function (t) {
+      return '<option value="' + t.linhaTitulo + '">' + t.titulo + '</option>';
+    }).join('') + '<option value="livre">✍️ Termo livre (sem turma)</option>';
+    if (payload.linhaTitulo) sel.value = String(payload.linhaTitulo);
+  }
+  if (turmasCache) { preencher(); return; }
+  document.getElementById('indTrocaTurma').className = 'ind spin';
+  sel.innerHTML = '<option value="" disabled selected>Carregando turmas…</option>';
+  sel.disabled = true;
+  api({ fn: 'turmas', escola: payload.escola, prof: payload.aba }).then(function (j) {
+    turmasCache = j.turmas;
+    preencher();
+    sel.disabled = false;
+    document.getElementById('indTrocaTurma').className = 'ind ok';
+  }).catch(function (e) {
+    document.getElementById('indTrocaTurma').className = 'ind';
+    mostrarErroApi(e);
+  });
+}
+document.getElementById('selTrocaTurma').addEventListener('change', function () {
+  var v = this.value;
+  if (!v) return;
+  if (v === 'livre') { document.getElementById('btnLivre').click(); return; }
+  document.getElementById('indTrocaTurma').className = 'ind spin';
+  document.getElementById('statusCard').textContent = '🔄 Lendo a turma ao vivo…';
+  api({ fn: 'turma', escola: payload.escola, prof: payload.aba, linha: v })
+    .then(function (dados) {
+      payload = dados;
+      montarLista();
+      document.getElementById('indTrocaTurma').className = 'ind ok';
+    })
+    .catch(function (e) {
+      document.getElementById('indTrocaTurma').className = 'ind';
+      mostrarErroApi(e);
+    });
+});
+
 function montarLista() {
+  /* turma (re)carregada: limpa a seleção anterior e esconde os painéis do aluno */
+  alunoSel = null;
+  modoLivre = false;
+  ['painelSituacao','painelMotivos','painelSugestoes','painelGerar'].forEach(function (id) {
+    document.getElementById(id).hidden = true;
+  });
+  initTrocaTurma();
   var pend = payload.alunos.filter(function (a) { return a.precisaTermo; }).length;
   document.getElementById('statusCard').textContent =
     '✅ ' + payload.turma.split('\n')[0] + ' — ' + payload.alunos.length + ' alunos, ' +
@@ -553,15 +612,18 @@ async function gerarPDF() {
   var prev = document.getElementById('preview');
   prev.src = url; prev.hidden = false;
 
-  /* registra no card (nota na célula da última aula do aluno) */
-  if (!standalone) {
-    window.parent.postMessage({ tipo: 'fisk-termo-gerado', nomeAluno: alunoSel.nome }, '*');
-  } else if (API_URL && alunoSel.linhaCard != null) {
-    api({ fn: 'registrarTermo', escola: payload.escola || '', prof: payload.aba,
+  /* registra no card (nota na célula da última aula do aluno) — prefere a API,
+     que funciona em qualquer modo e respeita a turma trocada no seletor */
+  if (modoLivre || alunoSel.linhaCard == null) {
+    // termo livre: nada a registrar no card
+  } else if (API_URL && payload && payload.escola) {
+    api({ fn: 'registrarTermo', escola: payload.escola, prof: payload.aba,
           linhaCard: alunoSel.linhaCard, idx: alunoSel.ultimaPresencaIdx })
       .then(function () {
         document.getElementById('statusCard').textContent = '📄 Termo registrado no card (nota na célula da última aula).';
       }).catch(mostrarErroApi);
+  } else if (!standalone) {
+    window.parent.postMessage({ tipo: 'fisk-termo-gerado', nomeAluno: alunoSel.nome }, '*');
   }
 }
 
