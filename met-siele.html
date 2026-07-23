@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador MET e SIELE — FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css">
+<link rel="stylesheet" href="style.css">
+<meta name="theme-color" content="#161414">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+<script>try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
+
+  <header class="hero">
+    <a class="back-link" href="index.html">&larr; Voltar aos recursos</a>
+    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
+    <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+    <h1>Simulador MET e SIELE</h1>
+    <p>Escolha como deseja usar a ferramenta</p>
+  </header>
+
+  <main class="grid boletins-grid">
+
+    <a class="card card-simulado" href="https://pedro-fisk.github.io/met-siele-simulador/?modo=professor" target="_blank" rel="noopener">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2.5" y="3.5" width="19" height="13" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8 20.5h8M12 16.5v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M9 10l4-2.3v4.6L9 10z" fill="currentColor"/>
+        </svg>
+      </div>
+      <h2>Teacher Mode</h2>
+      <p>Conduza o simulado questão a questão na TV — você controla o áudio, a turma vota e a resposta é revelada com o comentário</p>
+    </a>
+
+    <a class="card card-simulado" href="https://pedro-fisk.github.io/met-siele-simulador/" target="_blank" rel="noopener">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M5 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M15.5 11.5l1.5 1.5-1.5 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>Student Mode</h2>
+      <p>Faça o simulado completo ou os mini simulados com áudio, tempo de prova e nota estimada no Quadro Europeu (CEFR)</p>
+    </a>
+
+  </main>
+
+  <footer>
+    <p>Ferramenta desenvolvida exclusivamente para uso interno das escolas Fisk. A utilização deste sistema e de seu conteúdo por pessoas ou instituições não autorizadas, incluindo professores particulares, é proibida. Desenvolvido por @fiskcacapava e @taubatefisk</p>
+  </footer>
+
+  <script src="assets/fisk-shared.js"></script>
+  <script>fiskInitThemeToggle('themeToggle');</script>
+</body>
+</html>

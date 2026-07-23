@@ -63,6 +63,7 @@
 .card-adults       { --accent: #1096B5; }
 .card-spanish      { --accent: #CC7C08; }
 .card-simulado     { --accent: #7C3AED; }
+.card-met          { --accent: #0EA5A0; } /* teal dos eventos MET no calendário */
 
 .icon{
   width: 64px;
