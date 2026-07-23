@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" id="htmlRoot">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,10 +14,15 @@
 
 
   <header class="hero">
+    <div class="lang-toggle" id="langToggle">
+      <button class="lang-btn is-active" data-lang="pt" aria-label="Português">PT</button>
+      <button class="lang-btn" data-lang="en" aria-label="English">EN</button>
+      <button class="lang-btn" data-lang="es" aria-label="Español">ES</button>
+    </div>
     <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
     <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
-    <h1>Recursos do Professor</h1>
-    <p>Ferramentas rápidas para o seu dia a dia em sala de aula</p>
+    <h1>Fisk Hub</h1>
+    <p data-i18n="subtitle">Ferramentas rápidas para o seu dia a dia em sala de aula</p>
   </header>
 
   <main class="grid">
@@ -33,8 +38,8 @@
           <path d="M11 16.5h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
       </div>
-      <h2>Criador de Planners</h2>
-      <p>Crie o PPT / Planner do aluno com as datas corretas</p>
+      <h2 data-i18n="card-planner-h2">Criador de Planners</h2>
+      <p data-i18n="card-planner-p">Crie o PPT / Planner do aluno com as datas corretas</p>
     </a>
 
     <a class="card card-conversation" href="https://conversation-maker.vercel.app/" target="_blank" rel="noopener">
@@ -44,8 +49,8 @@
           <path d="M9.5 18.5a1.5 1.5 0 001.5 1.5h6l3 2.5v-2.5a1.5 1.5 0 001.5-1.5v-6a1.5 1.5 0 00-1.5-1.5H18" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
         </svg>
       </div>
-      <h2>Conversation Maker</h2>
-      <p>Crie conversações completas em powerpoint, prontas para usar</p>
+      <h2 data-i18n="card-conv-h2">Conversation Maker</h2>
+      <p data-i18n="card-conv-p">Crie conversações completas em powerpoint, prontas para usar</p>
     </a>
 
     <a class="card card-simulado" href="quick-practice.html">
@@ -57,12 +62,12 @@
           <path d="M8 20.5h8M12 16.5v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
       </div>
-      <h2>Quick Practice</h2>
-      <p>Projete exercícios na TV e pratique em turma</p>
+      <h2 data-i18n="card-qp-h2">Quick Practice</h2>
+      <p data-i18n="card-qp-p">Projete exercícios na TV e pratique em turma</p>
     </a>
 
     <a class="card is-soon" href="#" aria-disabled="true" tabindex="-1">
-      <span class="badge">Em breve</span>
+      <span class="badge" data-i18n="soon">Em breve</span>
       <div class="icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="2.5" y="3.5" width="19" height="13" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
@@ -70,12 +75,12 @@
           <path d="M6 8h7M6 11h9M6 13.5h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
       </div>
-      <h2>Planejador de Aula Personalizada</h2>
-      <p>Monte planos de aula sob medida</p>
+      <h2 data-i18n="card-lessonplan-h2">Planejador de Aula Personalizada</h2>
+      <p data-i18n="card-lessonplan-p">Monte planos de aula sob medida</p>
     </a>
 
     <a class="card is-soon" href="#" aria-disabled="true" tabindex="-1">
-      <span class="badge">Em breve</span>
+      <span class="badge" data-i18n="soon">Em breve</span>
       <div class="icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M6 2.5h9l4 4v14.5a1 1 0 01-1 1H6a1 1 0 01-1-1v-17.5a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
@@ -84,8 +89,22 @@
           <path d="M12 12.5v1.5l1 1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-      <h2>Gerador de Termo de Atraso</h2>
-      <p>Gere termos de atraso para alunos com poucos cliques</p>
+      <h2 data-i18n="card-termo-h2">Gerador de Termo de Atraso</h2>
+      <p data-i18n="card-termo-p">Gere termos de atraso para alunos com poucos cliques</p>
+    </a>
+
+    <a class="card is-soon" href="#" aria-disabled="true" tabindex="-1">
+      <span class="badge" data-i18n="soon">Em breve</span>
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 2.5h9l4 4v14.5a1 1 0 01-1 1H6a1 1 0 01-1-1v-17.5a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M15 2.5v4h4" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M9 15a3 3 0 104.24-2.74" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          <polyline points="11.5,10.5 9.5,12.5 11.5,12.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2 data-i18n="card-2ndchance-h2">Gerador de Notificação 2nd Chance</h2>
+      <p data-i18n="card-2ndchance-p">Envie quando o aluno precisa refazer a prova</p>
     </a>
 
     <a class="card card-boletim" href="boletins.html">
@@ -96,12 +115,12 @@
           <path d="M8.5 13.5L7 21l5-2 5 2-1.5-7.5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
         </svg>
       </div>
-      <h2>Gerador de Boletins</h2>
-      <p>Monte boletins dos alunos rapidamente</p>
+      <h2 data-i18n="card-boletim-h2">Gerador de Boletins</h2>
+      <p data-i18n="card-boletim-p">Monte boletins dos alunos rapidamente</p>
     </a>
 
     <a class="card is-soon" href="#" aria-disabled="true" tabindex="-1">
-      <span class="badge">Em breve</span>
+      <span class="badge" data-i18n="soon">Em breve</span>
       <div class="icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <polygon points="12,2 22,8 12,14 2,8" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
@@ -109,12 +128,12 @@
           <line x1="22" y1="8" x2="22" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
       </div>
-      <h2>Simulador MET e SIELE</h2>
-      <p>Pratique para os exames de certificação com simulados interativos</p>
+      <h2 data-i18n="card-met-h2">Simulador MET e SIELE</h2>
+      <p data-i18n="card-met-p">Pratique para os exames de certificação com simulados interativos</p>
     </a>
 
     <a class="card is-soon" href="#" aria-disabled="true" tabindex="-1">
-      <span class="badge">Em breve</span>
+      <span class="badge" data-i18n="soon">Em breve</span>
       <div class="icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="4" y="2" width="16" height="20" rx="2" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
@@ -125,8 +144,8 @@
           <path d="M14 16h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
         </svg>
       </div>
-      <h2>Checking Guide</h2>
-      <p>Verifique o aproveitamento do aluno antes de avançar para a próxima lição</p>
+      <h2 data-i18n="card-checking-h2">Checking Guide</h2>
+      <p data-i18n="card-checking-p">Verifique o aproveitamento do aluno antes de avançar para a próxima lição</p>
     </a>
 
   </main>
@@ -141,7 +160,7 @@
           <rect x="3" y="4" width="18" height="17" rx="2" stroke="currentColor" stroke-width="1.6"/>
           <path d="M3 9h18M8 2v4M16 2v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
         </svg>
-        Calendário Escolar
+        <span data-i18n="cal-title">Calendário Escolar</span>
         <span style="font-size:0.65rem;font-weight:700;background:#f59e0b;color:#1a1a1a;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:middle;letter-spacing:0.02em;">BETA</span>
       </span>
       <svg class="cal-chevron" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -152,9 +171,9 @@
       <div class="cal-inner">
         <div class="cal-upcoming" id="calUpcoming" hidden></div>
         <div class="cal-nav-row">
-          <button class="cal-nav-btn" onclick="changeMonth(-1)" title="Mês anterior">&#8249;</button>
+          <button class="cal-nav-btn" onclick="changeMonth(-1)" id="calPrev" title="Mês anterior">&#8249;</button>
           <span class="cal-month-nav-label" id="calMonthLabel"></span>
-          <button class="cal-nav-btn" onclick="changeMonth(1)" title="Próximo mês">&#8250;</button>
+          <button class="cal-nav-btn" onclick="changeMonth(1)" id="calNext" title="Próximo mês">&#8250;</button>
         </div>
         <div class="cal-grid" id="calGrid"></div>
         <div class="cal-events-col">
@@ -166,22 +185,22 @@
   </section>
 
   <section class="links-section">
-    <h2 class="links-title">Links Úteis</h2>
+    <h2 class="links-title" data-i18n="links-title">Links Úteis</h2>
     <div class="links-row">
       <a class="link-chip" href="https://sgf.fisk.com.br:154/SGFPROF/" target="_blank" rel="noopener">
-        <span>Portal do Professor (SGF)</span>
+        <span data-i18n="link-sgf">Portal do Professor (SGF)</span>
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6h9v9M18 6L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
       <a class="link-chip" href="https://expo.fisk.com.br/" target="_blank" rel="noopener">
-        <span>Treinamentos Fundação Fisk</span>
+        <span data-i18n="link-expo">Treinamentos Fundação Fisk</span>
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6h9v9M18 6L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
       <a class="link-chip" href="treinamentos.html">
-        <span>Treinamentos Internos</span>
+        <span data-i18n="link-interno">Treinamentos Internos</span>
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6h9v9M18 6L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
       <a class="link-chip" href="https://www.baamboozle.com/sign-in" target="_blank" rel="noopener">
-        <span>Plataforma Baamboozle</span>
+        <span data-i18n="link-baamboozle">Plataforma Baamboozle</span>
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6h9v9M18 6L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
       <a class="link-chip" href="https://lyricstraining.com/" target="_blank" rel="noopener">
@@ -193,19 +212,177 @@
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6h9v9M18 6L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
       <a class="link-chip" href="https://cyber.fisk.com.br:175/cyberfisknew/index.html" target="_blank" rel="noopener">
-        <span>Cyber Fisk (aluno)</span>
+        <span data-i18n="link-cyber">Cyber Fisk (aluno)</span>
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6h9v9M18 6L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
     </div>
   </section>
 
   <footer>
-    <p>Ferramenta desenvolvida exclusivamente para uso interno das escolas Fisk. A utilização deste sistema e de seu conteúdo por pessoas ou instituições não autorizadas, incluindo professores particulares, é proibida. Desenvolvido por @fiskcacapava e @taubatefisk</p>
+    <p data-i18n="footer">Ferramenta desenvolvida exclusivamente para uso interno das escolas Fisk. A utilização deste sistema e de seu conteúdo por pessoas ou instituições não autorizadas, incluindo professores particulares, é proibida. Desenvolvido por @fiskcacapava e @taubatefisk</p>
   </footer>
 
   <script src="assets/fisk-shared.js"></script>
   <script>
     fiskInitThemeToggle('themeToggle');
+
+    /* ════════════════════════════════════════════════
+       INTERNACIONALIZAÇÃO (PT / EN / ES)
+    ════════════════════════════════════════════════ */
+    let _lang = (function(){
+      try { return localStorage.getItem('fisk-lang') || 'pt'; } catch(e) { return 'pt'; }
+    })();
+
+    const T = {
+      pt: {
+        subtitle:          'Ferramentas rápidas para o seu dia a dia em sala de aula',
+        'card-planner-h2': 'Criador de Planners',
+        'card-planner-p':  'Crie o PPT / Planner do aluno com as datas corretas',
+        'card-conv-h2':    'Conversation Maker',
+        'card-conv-p':     'Crie conversações completas em powerpoint, prontas para usar',
+        'card-qp-h2':      'Quick Practice',
+        'card-qp-p':       'Projete exercícios na TV e pratique em turma',
+        'card-lessonplan-h2': 'Planejador de Aula Personalizada',
+        'card-lessonplan-p':  'Monte planos de aula sob medida',
+        'card-termo-h2':   'Gerador de Termo de Atraso',
+        'card-termo-p':    'Gere termos de atraso para alunos com poucos cliques',
+        'card-2ndchance-h2': 'Gerador de Notificação 2nd Chance',
+        'card-2ndchance-p':  'Envie quando o aluno precisa refazer a prova',
+        'card-boletim-h2': 'Gerador de Boletins',
+        'card-boletim-p':  'Monte boletins dos alunos rapidamente',
+        'card-met-h2':     'Simulador MET e SIELE',
+        'card-met-p':      'Pratique para os exames de certificação com simulados interativos',
+        'card-checking-h2': 'Checking Guide',
+        'card-checking-p':  'Verifique o aproveitamento do aluno antes de avançar para a próxima lição',
+        'soon':            'Em breve',
+        'cal-title':       'Calendário Escolar',
+        'cal-focus-head':  'Foco da semana',
+        'cal-focus-sub':   '· próximos 7 dias',
+        'cal-no-events':   'Nenhum evento para este mês.',
+        'cal-week-theme':  'Semana temática',
+        'cal-months':      ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+        'cal-days':        ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
+        'cal-prev':        'Mês anterior',
+        'cal-next':        'Próximo mês',
+        'evt-reuniao':     'Reunião',
+        'evt-evento':      'Evento',
+        'evt-simulado':    'Simulado',
+        'evt-met':         'MET / Siele',
+        'links-title':     'Links Úteis',
+        'link-sgf':        'Portal do Professor (SGF)',
+        'link-expo':       'Treinamentos Fundação Fisk',
+        'link-interno':    'Treinamentos Internos',
+        'link-baamboozle': 'Plataforma Baamboozle',
+        'link-cyber':      'Cyber Fisk (aluno)',
+        'footer':          'Ferramenta desenvolvida exclusivamente para uso interno das escolas Fisk. A utilização deste sistema e de seu conteúdo por pessoas ou instituições não autorizadas, incluindo professores particulares, é proibida. Desenvolvido por @fiskcacapava e @taubatefisk',
+      },
+      en: {
+        subtitle:          'Quick tools for your day-to-day in the classroom',
+        'card-planner-h2': 'Planner Creator',
+        'card-planner-p':  'Create student planners with the correct dates',
+        'card-conv-h2':    'Conversation Maker',
+        'card-conv-p':     'Generate full conversation PowerPoints, ready to use',
+        'card-qp-h2':      'Quick Practice',
+        'card-qp-p':       'Project exercises on the TV and practice with your class',
+        'card-lessonplan-h2': 'Custom Lesson Planner',
+        'card-lessonplan-p':  'Build tailored lesson plans',
+        'card-termo-h2':   'Late Notice Generator',
+        'card-termo-p':    'Generate late notices for students in just a few clicks',
+        'card-2ndchance-h2': '2nd Chance Notification Generator',
+        'card-2ndchance-p':  'Send it when the student needs to take the test again',
+        'card-boletim-h2': 'Report Card Generator',
+        'card-boletim-p':  'Build student report cards quickly',
+        'card-met-h2':     'MET & SIELE Simulator',
+        'card-met-p':      'Practice for certification exams with interactive simulations',
+        'card-checking-h2': 'Checking Guide',
+        'card-checking-p':  'Verify student progress before moving on to the next lesson',
+        'soon':            'Coming soon',
+        'cal-title':       'School Calendar',
+        'cal-focus-head':  "Week's focus",
+        'cal-focus-sub':   '· next 7 days',
+        'cal-no-events':   'No events this month.',
+        'cal-week-theme':  'Theme week',
+        'cal-months':      ['January','February','March','April','May','June','July','August','September','October','November','December'],
+        'cal-days':        ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+        'cal-prev':        'Previous month',
+        'cal-next':        'Next month',
+        'evt-reuniao':     'Meeting',
+        'evt-evento':      'Event',
+        'evt-simulado':    'Mock Exam',
+        'evt-met':         'MET / SIELE',
+        'links-title':     'Useful Links',
+        'link-sgf':        'Teacher Portal (SGF)',
+        'link-expo':       'Fisk Foundation Training',
+        'link-interno':    'Internal Training',
+        'link-baamboozle': 'Baamboozle Platform',
+        'link-cyber':      'Cyber Fisk (student)',
+        'footer':          'Tool developed exclusively for internal use at Fisk schools. Use of this system and its content by unauthorized persons or institutions, including private teachers, is prohibited. Developed by @fiskcacapava and @taubatefisk',
+      },
+      es: {
+        subtitle:          'Herramientas rápidas para tu día a día en el aula',
+        'card-planner-h2': 'Creador de Planners',
+        'card-planner-p':  'Crea planners del alumno con las fechas correctas',
+        'card-conv-h2':    'Conversation Maker',
+        'card-conv-p':     'Genera conversaciones completas en PowerPoint, listas para usar',
+        'card-qp-h2':      'Quick Practice',
+        'card-qp-p':       'Proyecta ejercicios en la TV y practica con la clase',
+        'card-lessonplan-h2': 'Planificador de Clase',
+        'card-lessonplan-p':  'Arma planes de clase a medida',
+        'card-termo-h2':   'Generador de Aviso de Atraso',
+        'card-termo-p':    'Genera avisos de atraso para alumnos en pocos clics',
+        'card-2ndchance-h2': 'Generador de Notificación 2nd Chance',
+        'card-2ndchance-p':  'Envíalo cuando el alumno necesita repetir el examen',
+        'card-boletim-h2': 'Generador de Boletines',
+        'card-boletim-p':  'Genera boletines de alumnos rápidamente',
+        'card-met-h2':     'Simulador MET y SIELE',
+        'card-met-p':      'Practica para los exámenes de certificación con simulacros interactivos',
+        'card-checking-h2': 'Checking Guide',
+        'card-checking-p':  'Verifica el aprovechamiento del alumno antes de avanzar a la próxima lección',
+        'soon':            'Próximamente',
+        'cal-title':       'Calendario Escolar',
+        'cal-focus-head':  'Foco de la semana',
+        'cal-focus-sub':   '· próximos 7 días',
+        'cal-no-events':   'No hay eventos este mes.',
+        'cal-week-theme':  'Semana temática',
+        'cal-months':      ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
+        'cal-days':        ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'],
+        'cal-prev':        'Mes anterior',
+        'cal-next':        'Próximo mes',
+        'evt-reuniao':     'Reunión',
+        'evt-evento':      'Evento',
+        'evt-simulado':    'Simulacro',
+        'evt-met':         'MET / SIELE',
+        'links-title':     'Links Útiles',
+        'link-sgf':        'Portal del Profesor (SGF)',
+        'link-expo':       'Capacitación Fundación Fisk',
+        'link-interno':    'Capacitación Interna',
+        'link-baamboozle': 'Plataforma Baamboozle',
+        'link-cyber':      'Cyber Fisk (alumno)',
+        'footer':          'Herramienta desarrollada exclusivamente para uso interno de las escuelas Fisk. El uso de este sistema y su contenido por personas o instituciones no autorizadas, incluidos los profesores particulares, está prohibido. Desarrollado por @fiskcacapava y @taubatefisk',
+      },
+    };
+
+    function tr(key) { return (T[_lang] || T.pt)[key] || key; }
+
+    function applyLang(lang) {
+      _lang = lang;
+      try { localStorage.setItem('fisk-lang', lang); } catch(e) {}
+      document.getElementById('htmlRoot').lang = lang === 'pt' ? 'pt-BR' : lang;
+      document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        var val = tr(el.dataset.i18n);
+        if (val && typeof val === 'string') el.textContent = val;
+      });
+      document.querySelectorAll('.lang-btn').forEach(function(btn) {
+        btn.classList.toggle('is-active', btn.dataset.lang === lang);
+      });
+      var prev = document.getElementById('calPrev');
+      var next = document.getElementById('calNext');
+      if (prev) prev.title = tr('cal-prev');
+      if (next) next.title = tr('cal-next');
+      buildCalendar();
+    }
+
+
 
     /* ════════════════════════════════════════════════
        CALENDÁRIO ESCOLAR
@@ -314,8 +491,7 @@
         return dt >= weekStart && dt <= weekEnd;
       };
 
-      const monthNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
-                          'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+      const monthNames = tr('cal-months');
       document.getElementById('calMonthLabel').textContent = monthNames[month] + ' ' + year;
 
       const isPastMo   = year < tY || (year === tY && month < tM);
@@ -349,7 +525,7 @@
       });
       monthEvents.sort((a, b) => a.day - b.day);
 
-      const dayNames = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+      const dayNames = tr('cal-days');
       let html = dayNames.map(n => `<div class="cal-day-header">${n}</div>`).join('');
       for (let i = 0; i < firstDay; i++) html += '<div class="cal-cell cal-empty"></div>';
       for (let d = 1; d <= daysInMonth; d++) {
@@ -370,15 +546,15 @@
       document.getElementById('calGrid').innerHTML = html;
 
       const usedTypes = [...new Set(monthEvents.map(e => e.type))];
-      const legendTypes = usedTypes.map(t => {
-        const info = EVENT_TYPES[t] || { label: t, color: '#888' };
+      const legendTypes = usedTypes.map(tp => {
+        const info = EVENT_TYPES[tp] || { label: tp, color: '#888' };
         return `<span class="cal-legend-item">
-          <span class="cal-legend-dot" style="background:${info.color}"></span>${info.label}
+          <span class="cal-legend-dot" style="background:${info.color}"></span>${tr('evt-' + tp) || info.label}
         </span>`;
       });
       if (monthWeeks.length) {
         legendTypes.push(`<span class="cal-legend-item">
-          <span class="cal-legend-dot cal-legend-week" style="background:${hexToRgba(monthWeeks[0].color, 0.35)};border-color:${monthWeeks[0].color}"></span>Semana temática
+          <span class="cal-legend-dot cal-legend-week" style="background:${hexToRgba(monthWeeks[0].color, 0.35)};border-color:${monthWeeks[0].color}"></span>${tr('cal-week-theme')}
         </span>`);
       }
       document.getElementById('calLegend').innerHTML = legendTypes.join('');
@@ -395,15 +571,16 @@
 
       const listEl = document.getElementById('calEventList');
       if (monthEvents.length === 0 && !weekBanners) {
-        listEl.innerHTML = '<p class="cal-no-events">Nenhum evento para este mês.</p>';
+        listEl.innerHTML = `<p class="cal-no-events">${tr('cal-no-events')}</p>`;
       } else {
         listEl.innerHTML = weekBanners + monthEvents.map(e => {
           const info = EVENT_TYPES[e.type] || { label: e.type, color: '#888' };
+          const evtLabel = tr('evt-' + e.type) || info.label;
           return `<div class="cal-event-item${e.past ? ' is-past' : ''}${e.upcoming ? ' is-upcoming' : ''}">
             <span class="cal-event-dot" style="background:${info.color}"></span>
             <span class="cal-event-day">${e.day}</span>
             <span class="cal-event-title">${e.title}</span>
-            <span class="cal-event-type" style="color:${info.color}">${info.label}</span>
+            <span class="cal-event-type" style="color:${info.color}">${evtLabel}</span>
           </div>`;
         }).join('');
       }
@@ -420,7 +597,7 @@
       const today = new Date();
       const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
       const end   = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
-      const weekdays = ['dom','seg','ter','qua','qui','sex','sáb'];
+      const weekdays = tr('cal-days').map(function(d){ return d.toLowerCase(); });
 
       const upcoming = _calEvents
         .map(e => ({ ...e, dt: new Date(e.date + 'T12:00:00') }))
@@ -461,7 +638,7 @@
             <circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.8"/>
             <circle cx="12" cy="12" r="1.4" fill="currentColor"/>
           </svg>
-          Foco da semana <span class="cal-up-sub">· próximos 7 dias</span>
+          ${tr('cal-focus-head')} <span class="cal-up-sub">${tr('cal-focus-sub')}</span>
         </div>
         <div class="cal-up-list">${weekItems}${items}</div>`;
     }
@@ -531,6 +708,14 @@
       sync();
       var tg=document.getElementById('themeToggle');
       if(tg) tg.addEventListener('click', function(){ setTimeout(sync, 0); });
+    })();
+
+    (function initLang() {
+      applyLang(_lang);
+      document.getElementById('langToggle').addEventListener('click', function(e) {
+        var btn = e.target.closest('.lang-btn');
+        if (btn) applyLang(btn.dataset.lang);
+      });
     })();
   </script>
 </body>

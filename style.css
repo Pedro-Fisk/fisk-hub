@@ -553,3 +553,38 @@ body.theme-dark .cal-event-item{ background: rgba(255,255,255,.04); }
 body.theme-dark .card{
   box-shadow: 0 4px 14px rgba(0,0,0,0.35);
 }
+
+/* ── Language toggle ─────────────────────────────────────────────────────── */
+.lang-toggle {
+  position: absolute;
+  top: 1.05rem;
+  right: 4.2rem;
+  display: flex;
+  gap: 2px;
+  z-index: 10;
+}
+
+.lang-btn {
+  border: 1.5px solid rgba(255,255,255,0.25);
+  background: transparent;
+  color: rgba(255,255,255,0.65);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.52rem;
+  border-radius: 6px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: all 0.12s ease;
+  font-family: inherit;
+}
+
+.lang-btn.is-active {
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+  border-color: rgba(255,255,255,0.55);
+}
+
+.lang-btn:hover:not(.is-active) {
+  color: #fff;
+  border-color: rgba(255,255,255,0.42);
+}
