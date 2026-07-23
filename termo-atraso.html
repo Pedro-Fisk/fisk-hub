@@ -12,6 +12,8 @@
      O DOCUMENTO gerado é azul (princípios do boletim de jovens e adultos);
      os acentos azuis abaixo antecipam essa identidade na tela. */
   :root{ --blue:#0b5394; --blue-mid:#3d85c6; --blue-pill:#073763; --blue-soft:#e8f1fa; }
+  /* garante que hidden vença as classes com display próprio (ex.: .linha-campos) */
+  [hidden]{ display:none !important; }
   main{max-width:760px;margin:0 auto;padding:1.2rem;width:100%}
   .painel{background:var(--white);border:1px solid var(--surface-border-color);
           border-radius:var(--surface-radius);box-shadow:var(--surface-shadow);
