@@ -558,7 +558,7 @@ body.theme-dark .card{
 .lang-toggle {
   position: absolute;
   top: 1.05rem;
-  right: 4.2rem;
+  right: 6rem;
   display: flex;
   gap: 2px;
   z-index: 10;

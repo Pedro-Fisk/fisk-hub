@@ -15,9 +15,9 @@
 
   <header class="hero">
     <div class="lang-toggle" id="langToggle">
-      <button class="lang-btn is-active" data-lang="pt" aria-label="Português">PT</button>
-      <button class="lang-btn" data-lang="en" aria-label="English">EN</button>
-      <button class="lang-btn" data-lang="es" aria-label="Español">ES</button>
+      <button class="lang-btn is-active" data-lang="pt" aria-label="Português">🇧🇷 PT</button>
+      <button class="lang-btn" data-lang="en" aria-label="English">🇺🇸 EN</button>
+      <button class="lang-btn" data-lang="es" aria-label="Español">🇪🇸 ES</button>
     </div>
     <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
     <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
@@ -230,7 +230,7 @@
        INTERNACIONALIZAÇÃO (PT / EN / ES)
     ════════════════════════════════════════════════ */
     let _lang = (function(){
-      try { return localStorage.getItem('fisk-lang') || 'pt'; } catch(e) { return 'pt'; }
+      try { return localStorage.getItem('fisk-lang') || 'en'; } catch(e) { return 'en'; }
     })();
 
     const T = {
