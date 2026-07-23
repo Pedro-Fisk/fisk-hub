@@ -196,6 +196,19 @@ if (temHashPayload) {
   }
 }
 
+/* referência de turma no fragmento (#t=escola|prof|linha) = link da célula-botão
+   do card: busca a turma ao vivo pela API assim que a página abre */
+var temHashTurma = location.hash.indexOf('#t=') === 0;
+if (temHashTurma && API_URL) {
+  try {
+    var refT = decodeURIComponent(location.hash.slice(3)).split('|');
+    document.getElementById('statusCard').textContent = '🔄 Lendo a turma ao vivo…';
+    api({ fn: 'turma', escola: refT[0], prof: refT[1], linha: refT[2] })
+      .then(function (dados) { payload = dados; montarLista(); })
+      .catch(mostrarErroApi);
+  } catch (e) { mostrarErroApi(e); }
+}
+
 /* ---- modo standalone: dropdowns alimentados pela API ---- */
 function api(params) {
   var qs = Object.keys(params).map(function (k) {
@@ -217,7 +230,7 @@ function montarSelect(sel, placeholder, itens) {
     itens.map(function (i) { return '<option value="' + i.v + '">' + i.t + '</option>'; }).join('');
   sel.disabled = false;
 }
-if (standalone && !temHashPayload) {
+if (standalone && !temHashPayload && location.hash.indexOf('#t=') !== 0) {
   if (API_URL) {
     document.getElementById('origemStandalone').hidden = false;
     document.getElementById('statusCard').textContent = 'Escolha a escola, o professor e a turma — os dados vêm ao vivo do card.';
