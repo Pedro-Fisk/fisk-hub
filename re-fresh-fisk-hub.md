@@ -75,8 +75,19 @@ Apps Script (o "card") via `API_URL` + `API_KEY`.
     Único sinal confiável: **dia da semana + horário** (`acharPastaPorHorario_`). Horário
     aparece como `17h30`/`17:30`/`17 30`/`20h`/`20h00` — tudo normalizado para minutos.
     Empate entre pastas ⇒ recusa (ambiguidade não pode virar gravação no lugar errado).
+  - **Por que o nível NUNCA entra no casamento** (regra do negócio, confirmada pelo Pedro):
+    em Kids/Teens, que seguem planejamento fixo, o número é **marcador de semestre** —
+    1 = 1º semestre, 2 = 2º semestre, qualquer que seja o livro (Teens Elementary,
+    Connect, Station). Então pasta `Teens Elementary 1` com card `Teens Elementary 2` é a
+    MESMA turma com o nome do semestre passado. Nome de nível é ruído, não sinal.
+  - **Pastas que não são turma** convivem com as turmas dentro do professor
+    (`Alunos transferidos`, `Bilhete de atraso`, `Evaluation Report FPA…`, `FISK CITY`,
+    `1 - Plano de aula`, `REPORT CARDS - SÁB 10H30`). A última tem dia e hora no nome e
+    chegou a vencer o casamento quando a turma real não existia → `ehPastaAdministrativa_`
+    descarta essas por palavra-chave.
   - **Aluno:** o nome bate; o card às vezes traz sufixo (`Livia Cruz Santos (confirmar)`),
-    resolvido pelo "contém".
+    resolvido pelo "contém". Professor abreviado (`MARIANA G.` ↔ `5 - Mariana`) casa por
+    palavras significativas, exigindo vencedor único.
   - Dentro da pasta da turma também existem `1 - Plano de aula`, `Bilhete de atraso` etc.
   - Diagnóstico: `?action=driveDebug&key=TEACHER&escola=|pasta=<id>` lista o que o script
     enxerga; `?action=driveMatch&key=TEACHER&escola=&professor=&turma=[&aluno=]` simula o
