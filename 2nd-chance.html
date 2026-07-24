@@ -52,6 +52,9 @@
   .prova.alerta b{color:var(--blue-pill)}
   .prova .rf{display:inline-block;margin-top:.2rem;font-size:.68rem;font-weight:800;
              font-style:italic;color:var(--blue-pill)}
+  .prova-in{width:100%;border:none;background:transparent;text-align:center;outline:none;
+            font-family:var(--font-heading);font-weight:800;font-size:1.5rem;color:var(--blue-pill);padding:.05rem 0}
+  .prova-in::placeholder{color:var(--blue-bd);font-weight:600}
   .sugs label{display:flex;gap:.5rem;align-items:flex-start;font-size:.9rem;padding:.5rem .7rem;
               border:1.5px solid var(--gray-light);border-radius:10px;margin-bottom:.4rem;cursor:pointer;font-weight:600}
   .sugs label:has(input:checked){border-color:var(--blue);background:var(--blue-soft)}
@@ -98,7 +101,6 @@
       <div style="flex:1 1 200px">
         <select id="selTurma" disabled><option value="" disabled selected>Turma…</option></select><span id="indTurma" class="ind"></span>
       </div>
-      <button type="button" class="btn btn-ghost" id="btnCarregar" disabled>Carregar turma</button>
     </div>
     <div class="status" id="statusCard"></div>
     <div class="row" style="margin-top:.7rem">
@@ -114,7 +116,7 @@
         <button data-av="1" class="active">1ª Avaliação</button>
         <button data-av="2">2ª Avaliação</button>
       </div>
-      <label class="chk"><input type="checkbox" id="soPrecisam" checked> só quem precisa de 2nd chance</label>
+      <label class="chk"><input type="checkbox" id="soPrecisam"> só quem precisa de 2nd chance</label>
     </div>
     <div class="lista" id="lista"></div>
   </div>
@@ -128,11 +130,8 @@
       <div class="row">
         <div class="campo"><label>Nome completo do aluno</label><input type="text" id="fNome"></div>
       </div>
-      <div class="row">
-        <div class="campo"><label>Prova Escrita (0–10)</label><input type="text" id="fEscrita" inputmode="decimal" placeholder="ex.: 5,0"></div>
-        <div class="campo"><label>Prova Auditiva (0–10)</label><input type="text" id="fAuditiva" inputmode="decimal" placeholder="ex.: 5,0"></div>
-      </div>
     </div>
+    <p class="sub" id="provasHint" style="margin:-.2rem 0 .6rem">Digite as notas das provas nos blocos acima (0 a 10). Se o aluno já tem boletim lançado no card, elas vêm preenchidas — mas você pode ajustar.</p>
 
     <div class="row">
       <div class="campo"><label>Professor(a)</label><input type="text" id="fProf"></div>
@@ -239,7 +238,7 @@ function montarSelect(sel, ph, itens) {
 function initCascade() {
   $('origem').hidden = false;
   statusCard('Escolha escola, professor(a) e turma — os dados vêm ao vivo do card.');
-  var selEscola = $('selEscola'), selProf = $('selProf'), selTurma = $('selTurma'), btn = $('btnCarregar');
+  var selEscola = $('selEscola'), selProf = $('selProf'), selTurma = $('selTurma');
   ind('indEscola', 'spin');
   api({ fn: 'escolas' }).then(function (j) {
     montarSelect(selEscola, 'Escolha a escola…', (j.escolas || []).map(function (e) { return { v: e, t: e }; }));
@@ -249,7 +248,7 @@ function initCascade() {
   selEscola.addEventListener('change', function () {
     if (!selEscola.value) return;
     selProf.innerHTML = '<option value="" disabled selected>Carregando…</option>'; selProf.disabled = true;
-    selTurma.innerHTML = '<option value="" disabled selected>Turma…</option>'; selTurma.disabled = true; btn.disabled = true;
+    selTurma.innerHTML = '<option value="" disabled selected>Turma…</option>'; selTurma.disabled = true;
     ind('indProf', 'spin'); ind('indTurma', '');
     api({ fn: 'profs', escola: selEscola.value }).then(function (j) {
       montarSelect(selProf, 'Escolha o professor(a)…', (j.profs || []).map(function (p) { return { v: p, t: p }; }));
@@ -258,20 +257,20 @@ function initCascade() {
   });
   selProf.addEventListener('change', function () {
     if (!selProf.value) return;
-    selTurma.innerHTML = '<option value="" disabled selected>Carregando…</option>'; selTurma.disabled = true; btn.disabled = true;
+    selTurma.innerHTML = '<option value="" disabled selected>Carregando…</option>'; selTurma.disabled = true;
     ind('indTurma', 'spin');
     api({ fn: 'turmas', escola: selEscola.value, prof: selProf.value }).then(function (j) {
       montarSelect(selTurma, 'Escolha a turma…', (j.turmas || []).map(function (t) { return { v: t.linhaTitulo, t: t.titulo }; }));
       ind('indTurma', 'ok');
     }).catch(function (e) { ind('indTurma', ''); statusCard('⚠️ ' + e.message, 'err'); });
   });
-  selTurma.addEventListener('change', function () { btn.disabled = !selTurma.value; });
-  btn.addEventListener('click', function () {
+  /* ao escolher a turma (último dropdown), carrega automaticamente */
+  selTurma.addEventListener('change', function () {
     if (!selTurma.value) return;
-    btn.disabled = true; btn.textContent = '⏳ Carregando…'; statusCard('🔄 Lendo a turma ao vivo…');
+    ind('indTurma', 'spin'); statusCard('🔄 Lendo a turma ao vivo…');
     api({ fn: 'turma', escola: selEscola.value, prof: selProf.value, linha: selTurma.value })
-      .then(onTurma).catch(function (e) { statusCard('⚠️ ' + e.message, 'err'); })
-      .then(function () { btn.disabled = false; btn.textContent = 'Carregar turma'; });
+      .then(function (d) { ind('indTurma', 'ok'); onTurma(d); })
+      .catch(function (e) { ind('indTurma', ''); statusCard('⚠️ ' + e.message, 'err'); });
   });
 }
 function initFragment() {
@@ -347,6 +346,8 @@ function preencherPainelAluno() {
   $('statusMsg').textContent = '';
   $('painelAluno').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
+/* provas editáveis: o professor digita as notas mesmo sem boletim no card;
+   se o card já tiver as notas, elas vêm preenchidas e podem ser ajustadas. */
 function renderProvas() {
   var provas = [
     { k: 'escrita', rot: 'Prova Escrita', v: alunoSel.escrita },
@@ -354,9 +355,20 @@ function renderProvas() {
   ];
   $('provas').innerHTML = provas.map(function (p) {
     var baixa = num(p.v) && p.v < MIN;
-    return '<div class="prova' + (baixa ? ' alerta' : '') + '"><span>' + p.rot + '</span><b>' + fmtNota(p.v) + '</b>' +
-      (baixa ? '<div class="rf">refazer esta prova</div>' : '') + '</div>';
+    return '<div class="prova' + (baixa ? ' alerta' : '') + '" data-k="' + p.k + '">' +
+      '<span>' + p.rot + '</span>' +
+      '<input class="prova-in" inputmode="decimal" placeholder="–" value="' + (num(p.v) ? fmtNota(p.v) : '') + '">' +
+      '<div class="rf" style="visibility:' + (baixa ? 'visible' : 'hidden') + '">refazer esta prova</div></div>';
   }).join('');
+  $('provas').querySelectorAll('.prova-in').forEach(function (inp) {
+    inp.addEventListener('input', function () {
+      var box = inp.closest('.prova'), k = box.dataset.k;
+      alunoSel[k] = notaDe(inp.value);
+      var baixa = num(alunoSel[k]) && alunoSel[k] < MIN;
+      box.classList.toggle('alerta', baixa);
+      box.querySelector('.rf').style.visibility = baixa ? 'visible' : 'hidden';
+    });
+  });
 }
 
 /* ---- sugestões de recuperação (clicáveis) + texto livre ---- */
@@ -435,23 +447,20 @@ $('btnLivre').addEventListener('click', function () {
   $('painelTurma').hidden = true;
   $('camposLivre').hidden = false;
   $('nomeAluno').textContent = 'Preenchimento manual';
-  $('provas').innerHTML = '';
-  ['fNome', 'fEscrita', 'fAuditiva', 'fProf', 'fEstagio', 'fTurma', 'fLicoes'].forEach(function (id) { $(id).value = ''; });
-  $('msg').value = '';
+  ['fNome', 'fProf', 'fEstagio', 'fTurma', 'fLicoes'].forEach(function (id) { $(id).value = ''; });
+  renderProvas();
+  $('msg').value = montarMensagem();
   $('painelAluno').hidden = false;
   $('preview').hidden = true;
-  statusCard('✍️ Modo manual: preencha os dados e as notas das provas.');
+  statusCard('✍️ Modo manual: preencha o nome e digite as notas das provas nos blocos.');
 });
 function sincronizarLivre() {
   if (!modoLivre) return;
   alunoSel.nome = ($('fNome').value || '').trim();
   alunoSel.estagio = ($('fEstagio').value || '').trim();
-  alunoSel.escrita = notaDe($('fEscrita').value);
-  alunoSel.auditiva = notaDe($('fAuditiva').value);
-  renderProvas();
 }
 function notaDe(v) { var s = String(v || '').trim().replace(',', '.'); if (s === '') return undefined; var n = +s; return isNaN(n) ? undefined : Math.max(0, Math.min(10, n)); }
-['fNome', 'fEscrita', 'fAuditiva'].forEach(function (id) { $(id).addEventListener('input', function () { sincronizarLivre(); if (id === 'fNome') $('msg').value = montarMensagem(); }); });
+$('fNome').addEventListener('input', function () { sincronizarLivre(); $('msg').value = montarMensagem(); });
 $('fProf').addEventListener('input', function () { $('msg').value = montarMensagem(); });
 
 /* ============ PDF AZUL (paleta do boletim de jovens e adultos) ============ */
@@ -636,8 +645,10 @@ async function gerarPDF() {
     var bytes = await doc.save();
     var blob = new Blob([bytes], { type: 'application/pdf' });
     var url = URL.createObjectURL(blob);
+    var dataFile = ('0' + hoje.getDate()).slice(-2) + '-' + ('0' + (hoje.getMonth() + 1)).slice(-2) + '-' + hoje.getFullYear();
+    var nomeArq = (nome || 'aluno').replace(/[\\/:*?"<>|]+/g, '').trim();
     var a = document.createElement('a');
-    a.href = url; a.download = 'Comunicado 2nd Chance - ' + (nome || 'aluno') + '.pdf'; a.click();
+    a.href = url; a.download = '2nd Chance - ' + nomeArq + ' - ' + dataFile + '.pdf'; a.click();
     $('preview').src = url; $('preview').hidden = false;
   } catch (e) {
     alert('Não consegui gerar o PDF: ' + e.message);
