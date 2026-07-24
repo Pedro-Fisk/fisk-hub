@@ -60,6 +60,9 @@
   .metr .chip.bad{background:var(--alta-soft);color:var(--alta)}
   .aluno .sug{grid-column:2;font-size:.86rem;color:var(--blue-ink);line-height:1.4}
   .aluno .sug b{color:var(--blue-pill)}
+  .aluno .aviso{grid-column:2;font-size:.8rem;color:#8a5a00;background:#fff4e0;border:1px solid #f0d28a;
+    border-radius:8px;padding:.35rem .6rem;margin-top:.4rem;line-height:1.35}
+  body.theme-dark .aluno .aviso{color:#f0c477;background:#3a2e12;border-color:#5c4a1e}
   .tag{grid-row:1;grid-column:3;align-self:center;font-size:.7rem;font-weight:900;padding:.2rem .6rem;
        border-radius:99px;white-space:nowrap;text-transform:uppercase;letter-spacing:.02em}
   .tag.alta{background:var(--alta);color:#fff}
@@ -118,7 +121,7 @@
 <main>
   <!-- 1 · conexão com o card -->
   <div class="painel">
-    <h2>🔗 Conectar ao card</h2>
+    <h2 id="tituloConectar">🔗 Conectar ao card</h2>
     <p class="sub">Escolha a turma: a ferramenta lê a trajetória de cada aluno ao vivo (última lição feita × lição prevista + faltas) e monta a <b>fila de atendimento</b> da próxima aula — quem você atende primeiro.</p>
     <div id="origem" class="row" hidden>
       <div style="flex:1 1 170px">
@@ -324,6 +327,7 @@ function onTurma(dados) {
   carregarNotas();
   ordenarPorPrioridade();
   $('painelTurma').hidden = false;
+  if (turma.nomePlanilha) $('tituloConectar').textContent = '🔗 Conectar ao card — ' + turma.nomePlanilha;
   $('tituloTurma').textContent = 'Fila de atendimento — ' + (turma.turma || '');
   statusCard('✓ Turma lida ao vivo. Fila montada por prioridade.', 'ok');
   renderFila();
@@ -400,7 +404,8 @@ function renderFila() {
         '<span class="tag ' + nv + '">' + ROT[nv] + '</span>' +
         '<div class="metr">' + chips(a) + '</div>' +
         '<div class="sug">' + sugestao(a) + '</div>' +
-        '<textarea class="nota-in" data-i="' + i + '" rows="1" placeholder="✏️ anotação do professor (ex.: entregar prova corrigida · fazer Movie e Song)">' + esc(nota) + '</textarea>' +
+        (a.atrasoAproximado ? '<div class="aviso">⚠ Conta aproximada: a última aula do aluno (“' + esc(a.ultimaAula || '') + '”) está fora do gabarito; o atraso foi medido pela última lição reconhecida (' + esc(a.ultimaLicao || '?') + '). Confira no card.</div>' : '') +
+        '<textarea class="nota-in" data-i="' + i + '" rows="1" placeholder="✏️ anotação do professor (ex.: explanation, checking, entregar written task…)">' + esc(nota) + '</textarea>' +
       '</div>';
     }).join('');
     ligarLinhas();
@@ -552,6 +557,19 @@ $('btnCopiar').addEventListener('click', function () {
     else window.prompt('Copie o roteiro (Ctrl/Cmd+C, Enter):', txt);
   });
 });
+
+/* ---- confirmação ao voltar ao Hub (não perder a fila reordenada) ---- */
+(function () {
+  var voltar = document.querySelector('.back-link');
+  if (!voltar) return;
+  voltar.addEventListener('click', function (e) {
+    if (turma && estado.manual) {
+      if (!window.confirm('Voltar ao Hub? A ordem da fila que você ajustou vai se perder. (As anotações ficam salvas neste navegador.)')) {
+        e.preventDefault();
+      }
+    }
+  });
+})();
 
 /* ============ BOOT ============ */
 (function boot() {
