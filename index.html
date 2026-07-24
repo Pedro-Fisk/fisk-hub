@@ -857,6 +857,7 @@
         sel.innerHTML = '<option value="" disabled selected>' + tr('pg-loading') + '</option>';
         fetch(EP + '?action=profList').then(function(r){ return r.json(); }).then(function(res){
           var ps = (res && res.profs) || [];
+          ps.sort(function(a, b){ return String(a.name).localeCompare(String(b.name), 'pt-BR'); });
           sel.innerHTML = '<option value="" disabled selected>' + tr('pg-name-ph') + '</option>' +
             ps.map(function(p){
               var nm = String(p.name).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
