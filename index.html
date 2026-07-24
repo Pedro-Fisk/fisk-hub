@@ -69,10 +69,6 @@
       <img class="pg-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
       <h1 class="pg-title" data-i18n="pg-title">Portal do Professor</h1>
       <p class="pg-sub" data-i18n="pg-sub">Acesse o Fisk Hub com seu nome e senha</p>
-      <div class="pg-tabs">
-        <button type="button" id="pgTabLogin" class="pg-tab is-active" data-i18n="pg-tab-login">Entrar</button>
-        <button type="button" id="pgTabReg" class="pg-tab" data-i18n="pg-tab-register">Criar conta</button>
-      </div>
       <label class="pg-label" data-i18n="pg-name">Seu nome</label>
       <select id="pgNome" class="pg-input"></select>
       <div id="pgFullWrap" hidden>
@@ -87,7 +83,7 @@
       </div>
       <button type="button" id="pgSubmit" class="pg-btn">Entrar</button>
       <p id="pgMsg" class="pg-msg"></p>
-      <p class="pg-help" data-i18n="pg-help">Seu nome não aparece? Fale com a direção.</p>
+      <p class="pg-help" data-i18n="pg-help">Sem usuário ou esqueceu a senha? Fale com a direção.</p>
     </div>
   </div>
 
@@ -344,7 +340,7 @@
         'pg-tab-login':'Entrar','pg-tab-register':'Criar conta','pg-name':'Seu nome',
         'pg-name-ph':'Selecione seu nome…','pg-fullname':'Nome completo (opcional)',
         'pg-fullname-ph':'Ex.: Maria Fernanda Silva','pg-pass':'Senha','pg-pass2':'Confirmar senha',
-        'pg-help':'Seu nome não aparece? Fale com a direção.','pg-logout':'Sair','pg-loading':'Carregando…',
+        'pg-help':'Sem usuário ou esqueceu a senha? Fale com a direção.','pg-logout':'Sair','pg-loading':'Carregando…',
         'pg-pick-name':'Selecione seu nome.','pg-need-pass':'Digite sua senha.','pg-wait':'Aguarde…',
         'pg-short':'Senha muito curta (mínimo 4).','pg-nomatch':'As senhas não conferem.',
         'pg-err':'Erro de conexão. Tente de novo.','pg-hello':'Olá',
@@ -400,7 +396,7 @@
         'pg-tab-login':'Sign in','pg-tab-register':'Create account','pg-name':'Your name',
         'pg-name-ph':'Select your name…','pg-fullname':'Full name (optional)',
         'pg-fullname-ph':'e.g., Maria Fernanda Silva','pg-pass':'Password','pg-pass2':'Confirm password',
-        'pg-help':"Don't see your name? Talk to the office.",'pg-logout':'Log out','pg-loading':'Loading…',
+        'pg-help':"No account or forgot your password? Talk to the office.",'pg-logout':'Log out','pg-loading':'Loading…',
         'pg-pick-name':'Select your name.','pg-need-pass':'Enter your password.','pg-wait':'Please wait…',
         'pg-short':'Password too short (min. 4).','pg-nomatch':"Passwords don't match.",
         'pg-err':'Connection error. Try again.','pg-hello':'Hi',
@@ -456,7 +452,7 @@
         'pg-tab-login':'Entrar','pg-tab-register':'Crear cuenta','pg-name':'Tu nombre',
         'pg-name-ph':'Selecciona tu nombre…','pg-fullname':'Nombre completo (opcional)',
         'pg-fullname-ph':'Ej.: María Fernanda Silva','pg-pass':'Contraseña','pg-pass2':'Confirmar contraseña',
-        'pg-help':'¿No ves tu nombre? Habla con la dirección.','pg-logout':'Salir','pg-loading':'Cargando…',
+        'pg-help':'¿Sin usuario u olvidaste tu contraseña? Habla con la dirección.','pg-logout':'Salir','pg-loading':'Cargando…',
         'pg-pick-name':'Selecciona tu nombre.','pg-need-pass':'Escribe tu contraseña.','pg-wait':'Espera…',
         'pg-short':'Contraseña muy corta (mín. 4).','pg-nomatch':'Las contraseñas no coinciden.',
         'pg-err':'Error de conexión. Inténtalo de nuevo.','pg-hello':'Hola',
@@ -910,14 +906,11 @@
         }).catch(function(){ sel.innerHTML = '<option value="" disabled selected>—</option>'; });
       }
 
+      // Só login: o cadastro/senha agora é feito e entregue pela direção.
       function setMode(m){
-        mode = m;
-        $('pgTabLogin').classList.toggle('is-active', m === 'login');
-        $('pgTabReg').classList.toggle('is-active', m === 'register');
-        $('pgPass2Wrap').hidden = m !== 'register';
-        $('pgFullWrap').hidden = m !== 'register';
-        sub.textContent = m === 'login' ? tr('pg-tab-login') : tr('pg-tab-register');
-        $('pgPass').setAttribute('autocomplete', m === 'login' ? 'current-password' : 'new-password');
+        mode = 'login';
+        sub.textContent = tr('pg-tab-login');
+        $('pgPass').setAttribute('autocomplete', 'current-password');
         msg.textContent = '';
       }
 
@@ -946,8 +939,6 @@
         }).catch(function(){ sub.disabled = false; msg.textContent = tr('pg-err'); });
       }
 
-      $('pgTabLogin').addEventListener('click', function(){ setMode('login'); });
-      $('pgTabReg').addEventListener('click', function(){ setMode('register'); });
       sub.addEventListener('click', submit);
       $('pgPass').addEventListener('keydown', function(e){ if (e.key === 'Enter') submit(); });
       $('pgPass2').addEventListener('keydown', function(e){ if (e.key === 'Enter') submit(); });
