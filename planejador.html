@@ -816,7 +816,7 @@ $('btnDrive').addEventListener('click', function () {
     var dp = dadosPlano();
     var bytes = await montarPDFplano(dp);
     return {
-      endpoint: API_URL, key: API_KEY, tipo: 'turma',
+      key: API_KEY, tipo: 'turma',
       escola: turma.escola || '', professor: turma.professor || turma.aba || '',
       turma: turma.turma || '', filename: nomeArquivoPlano(dp), bytes: bytes
     };

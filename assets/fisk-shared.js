@@ -71,6 +71,12 @@ function fiskInitBeforeUnloadGuard(hasUnsavedChangesFn) {
    devolve code:'pasta_nao_encontrada' e o professor é avisado.
    ============================================================ */
 
+/* URL do App da Web do endpoint de salvamento (projeto Apps Script SEPARADO
+   "fisk-hub-backend" — NÃO é o API_URL do card). Preencha depois de publicar
+   o apps-script/salvar-no-drive.gs. Enquanto estiver vazio, os botões de
+   salvar avisam que falta configurar. */
+var FISK_SAVE_URL = '';
+
 /** Converte um Uint8Array em base64 (em blocos, evita estourar a pilha). */
 function fiskBytesToBase64(bytes) {
   var bin = '', chunk = 0x8000;
@@ -88,6 +94,8 @@ function fiskBytesToBase64(bytes) {
  * ser 'pasta_nao_encontrada'.
  */
 async function fiskSalvarNoDrive(opts) {
+  var endpoint = opts.endpoint || FISK_SAVE_URL;
+  if (!endpoint) { var ec = new Error('URL de salvamento não configurada (defina FISK_SAVE_URL em fisk-shared.js após publicar o endpoint)'); ec.code = 'sem_endpoint'; throw ec; }
   var payload = {
     fn: 'salvarPdf', key: opts.key, tipo: opts.tipo,
     escola: opts.escola || '', professor: opts.professor || '',
@@ -96,7 +104,7 @@ async function fiskSalvarNoDrive(opts) {
     dados: fiskBytesToBase64(opts.bytes)
   };
   // corpo como string simples (text/plain) evita preflight CORS no Apps Script
-  var resp = await fetch(opts.endpoint, { method: 'POST', body: JSON.stringify(payload) });
+  var resp = await fetch(endpoint, { method: 'POST', body: JSON.stringify(payload) });
   var j;
   try { j = await resp.json(); }
   catch (e) { throw new Error('resposta inválida do servidor (o doPost já foi publicado no Apps Script?)'); }
@@ -130,7 +138,9 @@ async function fiskEnviarParaPasta(buttonEl, getOpts) {
   } catch (e) {
     buttonEl.textContent = old; buttonEl.disabled = false;
     var ondeAlvo = (opts && opts.tipo === 'turma') ? 'da turma' : 'do aluno';
-    if (e.code === 'pasta_nao_encontrada') {
+    if (e.code === 'sem_endpoint') {
+      alert('⚙️ O salvamento no Drive ainda não foi configurado.\n\nPublique o endpoint (apps-script/salvar-no-drive.gs) e cole a URL em FISK_SAVE_URL (assets/fisk-shared.js).');
+    } else if (e.code === 'pasta_nao_encontrada') {
       alert('⚠️ ATENÇÃO: a pasta ' + ondeAlvo + ' NÃO foi encontrada no drive compartilhado.\n\n' +
             'O documento NÃO foi salvo. Baixe o PDF manualmente (botão de gerar/baixar) ou ' +
             'confira/crie a pasta no Drive e tente de novo.' + (e.message ? '\n\n(' + e.message + ')' : ''));

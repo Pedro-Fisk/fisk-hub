@@ -465,7 +465,7 @@ $('btnDrive').addEventListener('click', function () {
   if (!ultimoPDF) { alert('Gere o PDF primeiro.'); return; }
   if (typeof fiskEnviarParaPasta !== 'function') { alert('Helper de Drive não carregou (fisk-shared.js).'); return; }
   fiskEnviarParaPasta($('btnDrive'), {
-    endpoint: API_URL, key: API_KEY, tipo: 'aluno',
+    key: API_KEY, tipo: 'aluno',
     escola: (turma && turma.escola) || '',
     professor: ($('fProf').value || (turma && (turma.professor || turma.aba)) || '').trim(),
     turma: ($('fTurma').value || (turma && turma.turma) || '').trim(),

@@ -466,7 +466,7 @@ document.getElementById('btnDrive').addEventListener('click', function () {
   if (typeof fiskEnviarParaPasta !== 'function') { alert('Helper de Drive não carregou (fisk-shared.js).'); return; }
   var fProf = document.getElementById('fProf');
   fiskEnviarParaPasta(document.getElementById('btnDrive'), {
-    endpoint: API_URL, key: API_KEY, tipo: 'aluno',
+    key: API_KEY, tipo: 'aluno',
     escola: (payload && payload.escola) || '',
     professor: ((fProf && fProf.value) || (payload && (payload.professor || payload.aba)) || '').trim(),
     turma: (payload && payload.turma ? String(payload.turma).split('\n')[0] : '').trim(),
