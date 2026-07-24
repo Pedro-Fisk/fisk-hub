@@ -11,6 +11,90 @@
 </head>
 <body>
 <script>/* aplica o tema salvo antes da primeira pintura, para o modo escuro persistir entre as páginas sem piscar */try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
+<script>/* porteira do professor: decide antes da 1ª pintura se mostra o login ou o hub (sem flash) */try{document.body.classList.add(localStorage.getItem("fisk_prof")?"prof-in":"prof-out");}catch(e){document.body.classList.add("prof-out");}</script>
+
+  <style>
+    /* ===== Porteira do Portal do Professor ===== */
+    #profGate{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;
+      justify-content:flex-start;padding:24px 16px;overflow:auto;background:#eef2f9;}
+    body.theme-dark #profGate{background:#0b1220;}
+    body.prof-in #profGate{display:none;}
+    #profGate .pg-top{width:100%;display:flex;justify-content:flex-end;max-width:440px;margin:0 auto 8px;}
+    .pg-card{width:100%;max-width:440px;margin:auto;background:#fff;border-radius:20px;
+      box-shadow:0 12px 40px rgba(16,24,40,.12);padding:32px 28px;text-align:center;}
+    body.theme-dark .pg-card{background:#141c2b;box-shadow:0 12px 40px rgba(0,0,0,.5);}
+    .pg-logo{height:44px;width:auto;margin:0 auto 14px;display:block;}
+    .pg-title{font-size:1.7rem;margin:0 0 4px;color:#101828;font-weight:800;}
+    body.theme-dark .pg-title{color:#f4f6fb;}
+    .pg-sub{margin:0 0 20px;color:#667085;font-size:.95rem;}
+    body.theme-dark .pg-sub{color:#98a2b3;}
+    .pg-tabs{display:flex;gap:8px;background:#f2f4f7;border-radius:12px;padding:4px;margin-bottom:20px;}
+    body.theme-dark .pg-tabs{background:#1f2937;}
+    .pg-tab{flex:1;border:0;background:transparent;padding:10px;border-radius:9px;font-weight:700;
+      cursor:pointer;color:#667085;font-size:.95rem;}
+    .pg-tab.is-active{background:#fff;color:#2563EB;box-shadow:0 1px 3px rgba(16,24,40,.1);}
+    body.theme-dark .pg-tab{color:#98a2b3;}
+    body.theme-dark .pg-tab.is-active{background:#0b1220;color:#6ea8ff;}
+    .pg-label{display:block;text-align:left;font-size:.82rem;font-weight:600;color:#475467;
+      margin:12px 2px 6px;}
+    body.theme-dark .pg-label{color:#98a2b3;}
+    .pg-input{width:100%;box-sizing:border-box;padding:13px 14px;border:1.5px solid #d0d5dd;border-radius:12px;
+      font-size:1rem;background:#fff;color:#101828;font-family:inherit;}
+    .pg-input:focus{outline:none;border-color:#2563EB;box-shadow:0 0 0 3px rgba(37,99,235,.15);}
+    body.theme-dark .pg-input{background:#0b1220;border-color:#344054;color:#f4f6fb;}
+    .pg-btn{width:100%;margin-top:20px;padding:14px;border:0;border-radius:12px;background:#2563EB;color:#fff;
+      font-size:1.05rem;font-weight:800;cursor:pointer;font-family:inherit;transition:background .15s;}
+    .pg-btn:hover{background:#1d4ed8;}
+    .pg-btn:disabled{opacity:.6;cursor:default;}
+    .pg-msg{min-height:1.2em;margin:12px 0 0;font-size:.9rem;color:#d92d20;font-weight:600;}
+    .pg-help{margin:16px 0 0;font-size:.82rem;color:#98a2b3;}
+    .prof-bar{position:fixed;top:12px;left:12px;z-index:60;display:flex;align-items:center;gap:8px;
+      background:rgba(255,255,255,.9);border:1px solid #e4e7ec;border-radius:999px;padding:6px 12px;
+      font-size:.85rem;color:#344054;box-shadow:0 2px 8px rgba(16,24,40,.08);backdrop-filter:blur(6px);}
+    body.theme-dark .prof-bar{background:rgba(20,28,43,.9);border-color:#344054;color:#e4e7ec;}
+    .prof-bar button{border:0;background:transparent;color:#2563EB;font-weight:700;cursor:pointer;font-size:.85rem;font-family:inherit;}
+    body.theme-dark .prof-bar button{color:#6ea8ff;}
+    body.prof-out .prof-bar{display:none;}
+  </style>
+
+  <div id="profGate">
+    <div class="pg-top">
+      <div class="lang-toggle" id="langTogglePg">
+        <button class="lang-btn is-active" data-lang="pt" aria-label="Português">🇧🇷 PT</button>
+        <button class="lang-btn" data-lang="en" aria-label="English">🇺🇸 EN</button>
+        <button class="lang-btn" data-lang="es" aria-label="Español">🇪🇸 ES</button>
+      </div>
+    </div>
+    <div class="pg-card">
+      <img class="pg-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+      <h1 class="pg-title" data-i18n="pg-title">Portal do Professor</h1>
+      <p class="pg-sub" data-i18n="pg-sub">Acesse o Fisk Hub com seu nome e senha</p>
+      <div class="pg-tabs">
+        <button type="button" id="pgTabLogin" class="pg-tab is-active" data-i18n="pg-tab-login">Entrar</button>
+        <button type="button" id="pgTabReg" class="pg-tab" data-i18n="pg-tab-register">Criar conta</button>
+      </div>
+      <label class="pg-label" data-i18n="pg-name">Seu nome</label>
+      <select id="pgNome" class="pg-input"></select>
+      <div id="pgFullWrap" hidden>
+        <label class="pg-label" data-i18n="pg-fullname">Nome completo (opcional)</label>
+        <input id="pgFull" class="pg-input" type="text">
+      </div>
+      <label class="pg-label" data-i18n="pg-pass">Senha</label>
+      <input id="pgPass" class="pg-input" type="password" autocomplete="current-password">
+      <div id="pgPass2Wrap" hidden>
+        <label class="pg-label" data-i18n="pg-pass2">Confirmar senha</label>
+        <input id="pgPass2" class="pg-input" type="password" autocomplete="new-password">
+      </div>
+      <button type="button" id="pgSubmit" class="pg-btn">Entrar</button>
+      <p id="pgMsg" class="pg-msg"></p>
+      <p class="pg-help" data-i18n="pg-help">Seu nome não aparece? Fale com a direção.</p>
+    </div>
+  </div>
+
+  <div class="prof-bar" id="profBar">
+    <span id="profBarName"></span>
+    <button type="button" id="profLogout" data-i18n="pg-logout">Sair</button>
+  </div>
 
 
   <header class="hero">
@@ -232,6 +316,14 @@
     const T = {
       pt: {
         subtitle:          'Ferramentas rápidas para o seu dia a dia em sala de aula',
+        'pg-title':'Portal do Professor','pg-sub':'Acesse o Fisk Hub com seu nome e senha',
+        'pg-tab-login':'Entrar','pg-tab-register':'Criar conta','pg-name':'Seu nome',
+        'pg-name-ph':'Selecione seu nome…','pg-fullname':'Nome completo (opcional)',
+        'pg-fullname-ph':'Ex.: Maria Fernanda Silva','pg-pass':'Senha','pg-pass2':'Confirmar senha',
+        'pg-help':'Seu nome não aparece? Fale com a direção.','pg-logout':'Sair','pg-loading':'Carregando…',
+        'pg-pick-name':'Selecione seu nome.','pg-need-pass':'Digite sua senha.','pg-wait':'Aguarde…',
+        'pg-short':'Senha muito curta (mínimo 4).','pg-nomatch':'As senhas não conferem.',
+        'pg-err':'Erro de conexão. Tente de novo.','pg-hello':'Olá',
         'card-planner-h2': 'Criador de Planners',
         'card-planner-p':  'Crie o PPT / Planner do aluno com as datas corretas',
         'card-conv-h2':    'Conversation Maker',
@@ -274,6 +366,14 @@
       },
       en: {
         subtitle:          'Quick tools for your day-to-day in the classroom',
+        'pg-title':'Teacher Portal','pg-sub':'Access Fisk Hub with your name and password',
+        'pg-tab-login':'Sign in','pg-tab-register':'Create account','pg-name':'Your name',
+        'pg-name-ph':'Select your name…','pg-fullname':'Full name (optional)',
+        'pg-fullname-ph':'e.g., Maria Fernanda Silva','pg-pass':'Password','pg-pass2':'Confirm password',
+        'pg-help':"Don't see your name? Talk to the office.",'pg-logout':'Log out','pg-loading':'Loading…',
+        'pg-pick-name':'Select your name.','pg-need-pass':'Enter your password.','pg-wait':'Please wait…',
+        'pg-short':'Password too short (min. 4).','pg-nomatch':"Passwords don't match.",
+        'pg-err':'Connection error. Try again.','pg-hello':'Hi',
         'card-planner-h2': 'Planner Creator',
         'card-planner-p':  'Create student planners with the correct dates',
         'card-conv-h2':    'Conversation Maker',
@@ -316,6 +416,14 @@
       },
       es: {
         subtitle:          'Herramientas rápidas para tu día a día en el aula',
+        'pg-title':'Portal del Profesor','pg-sub':'Accede a Fisk Hub con tu nombre y contraseña',
+        'pg-tab-login':'Entrar','pg-tab-register':'Crear cuenta','pg-name':'Tu nombre',
+        'pg-name-ph':'Selecciona tu nombre…','pg-fullname':'Nombre completo (opcional)',
+        'pg-fullname-ph':'Ej.: María Fernanda Silva','pg-pass':'Contraseña','pg-pass2':'Confirmar contraseña',
+        'pg-help':'¿No ves tu nombre? Habla con la dirección.','pg-logout':'Salir','pg-loading':'Cargando…',
+        'pg-pick-name':'Selecciona tu nombre.','pg-need-pass':'Escribe tu contraseña.','pg-wait':'Espera…',
+        'pg-short':'Contraseña muy corta (mín. 4).','pg-nomatch':'Las contraseñas no coinciden.',
+        'pg-err':'Error de conexión. Inténtalo de nuevo.','pg-hello':'Hola',
         'card-planner-h2': 'Creador de Planners',
         'card-planner-p':  'Crea planners del alumno con las fechas correctas',
         'card-conv-h2':    'Conversation Maker',
@@ -712,6 +820,102 @@
         var btn = e.target.closest('.lang-btn');
         if (btn) applyLang(btn.dataset.lang);
       });
+    })();
+
+    /* ════════════════════════════════════════════════
+       PORTA DE ACESSO DO PROFESSOR (login por nome + senha)
+       Backend: Fisk Hub — Dados (Apps Script). Senha só como hash no servidor.
+    ════════════════════════════════════════════════ */
+    (function profGate(){
+      var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
+      var $ = function(id){ return document.getElementById(id); };
+      var sel = $('pgNome'), msg = $('pgMsg'), sub = $('pgSubmit');
+      var mode = 'login';
+
+      function saved(){ try{ return JSON.parse(localStorage.getItem('fisk_prof')||'null'); }catch(e){ return null; } }
+
+      function setPlaceholders(){
+        $('pgFull').placeholder = tr('pg-fullname-ph');
+        var first = sel.options[0];
+        if (first && first.disabled) first.textContent = tr('pg-name-ph');
+      }
+
+      function fillBar(prof){
+        if (prof) $('profBarName').textContent = '👤 ' + (prof.name || '') + (prof.escola ? ' · ' + prof.escola : '');
+      }
+
+      function enter(prof){
+        try{ localStorage.setItem('fisk_prof', JSON.stringify(prof)); }catch(e){}
+        document.body.classList.remove('prof-out');
+        document.body.classList.add('prof-in');
+        fillBar(prof);
+      }
+
+      function loadProfs(){
+        sel.innerHTML = '<option value="" disabled selected>' + tr('pg-loading') + '</option>';
+        fetch(EP + '?action=profList').then(function(r){ return r.json(); }).then(function(res){
+          var ps = (res && res.profs) || [];
+          sel.innerHTML = '<option value="" disabled selected>' + tr('pg-name-ph') + '</option>' +
+            ps.map(function(p){
+              var nm = String(p.name).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+              return '<option value="' + nm + '">' + nm + ' · ' + p.escola + (p.registered ? '  ✓' : '') + '</option>';
+            }).join('');
+        }).catch(function(){ sel.innerHTML = '<option value="" disabled selected>—</option>'; });
+      }
+
+      function setMode(m){
+        mode = m;
+        $('pgTabLogin').classList.toggle('is-active', m === 'login');
+        $('pgTabReg').classList.toggle('is-active', m === 'register');
+        $('pgPass2Wrap').hidden = m !== 'register';
+        $('pgFullWrap').hidden = m !== 'register';
+        sub.textContent = m === 'login' ? tr('pg-tab-login') : tr('pg-tab-register');
+        $('pgPass').setAttribute('autocomplete', m === 'login' ? 'current-password' : 'new-password');
+        msg.textContent = '';
+      }
+
+      function post(body){
+        return fetch(EP, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+          body: JSON.stringify(body) }).then(function(r){ return r.json(); });
+      }
+
+      function submit(){
+        var name = sel.value, pass = $('pgPass').value;
+        if (!name){ msg.textContent = tr('pg-pick-name'); return; }
+        if (!pass){ msg.textContent = tr('pg-need-pass'); return; }
+        var p;
+        if (mode === 'register'){
+          if (pass.length < 4){ msg.textContent = tr('pg-short'); return; }
+          if (pass !== $('pgPass2').value){ msg.textContent = tr('pg-nomatch'); return; }
+          p = post({ action:'profRegister', name:name, password:pass, fullName:$('pgFull').value });
+        } else {
+          p = post({ action:'profLogin', name:name, password:pass });
+        }
+        sub.disabled = true; msg.textContent = tr('pg-wait');
+        p.then(function(res){
+          sub.disabled = false;
+          if (res && res.ok){ msg.textContent = ''; enter(res.prof); }
+          else { msg.textContent = (res && res.error) || tr('pg-err'); }
+        }).catch(function(){ sub.disabled = false; msg.textContent = tr('pg-err'); });
+      }
+
+      $('pgTabLogin').addEventListener('click', function(){ setMode('login'); });
+      $('pgTabReg').addEventListener('click', function(){ setMode('register'); });
+      sub.addEventListener('click', submit);
+      $('pgPass').addEventListener('keydown', function(e){ if (e.key === 'Enter') submit(); });
+      $('pgPass2').addEventListener('keydown', function(e){ if (e.key === 'Enter') submit(); });
+      $('langTogglePg').addEventListener('click', function(e){
+        var b = e.target.closest('.lang-btn'); if (!b) return;
+        applyLang(b.dataset.lang); setMode(mode); setPlaceholders();
+      });
+      $('profLogout').addEventListener('click', function(){
+        try{ localStorage.removeItem('fisk_prof'); }catch(e){}
+        location.reload();
+      });
+
+      var s = saved();
+      if (s){ fillBar(s); }        // já logado (classe prof-in veio do pre-paint)
+      else { loadProfs(); setMode('login'); setPlaceholders(); }
     })();
   </script>
 </body>
