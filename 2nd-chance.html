@@ -197,17 +197,24 @@ function api(params) {
     .then(function (j) { if (j && j.erro) throw new Error(j.erro); return j; });
 }
 
-/* ---- lê as provas A (auditiva) e B (escrita) da célula do card ----
-   Só a última linha ("A8 B7,5 ...") é lida (o "A1" de "TRA1" fica de fora). */
+/* ---- lê as provas de escuta (auditiva) e escrita da célula do card ----
+   Aceita o formato NOVO ("prova de escuta: X" / "prova de escrita: Y") e, por
+   compatibilidade, o ANTIGO (última linha "A8 B7,5 ..."). */
 function parseProvas(cellText) {
   if (!cellText || !String(cellText).trim()) return null;
-  var lines = String(cellText).split('\n');
-  var noteLine = lines[lines.length - 1];
-  var res = {};
-  var re = /(?:^|\s)([AB])\s*([0-9]+(?:[.,][0-9]+)?)/g, m;
-  while ((m = re.exec(noteLine))) { res[m[1]] = parseFloat(m[2].replace(',', '.')); }
-  if (res.A === undefined && res.B === undefined) return null;
-  return { auditiva: res.A, escrita: res.B }; // A = Escuta/Listening/Auditiva · B = Escrita/Written
+  var txt = String(cellText), auditiva, escrita;
+  var mE = txt.match(/prova de escuta:\s*([0-9]+(?:[.,][0-9]+)?)/i);
+  var mW = txt.match(/prova de escrita:\s*([0-9]+(?:[.,][0-9]+)?)/i);
+  if (mE) auditiva = parseFloat(mE[1].replace(',', '.'));
+  if (mW) escrita = parseFloat(mW[1].replace(',', '.'));
+  if (auditiva === undefined && escrita === undefined) { // formato antigo "A.. B.."
+    var lines = txt.split('\n'), noteLine = lines[lines.length - 1], res = {};
+    var re = /(?:^|\s)([AB])\s*([0-9]+(?:[.,][0-9]+)?)/g, m;
+    while ((m = re.exec(noteLine))) { res[m[1]] = parseFloat(m[2].replace(',', '.')); }
+    auditiva = res.A; escrita = res.B;
+  }
+  if (auditiva === undefined && escrita === undefined) return null;
+  return { auditiva: auditiva, escrita: escrita }; // escuta = Auditiva/Listening · escrita = Written
 }
 function num(v) { return (typeof v === 'number' && !isNaN(v)); }
 function fmtNota(v) { return num(v) ? v.toFixed(1).replace('.', ',') : '-'; }
