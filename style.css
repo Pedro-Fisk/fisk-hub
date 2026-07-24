@@ -67,6 +67,33 @@
 .card-met          { --accent: #0EA5A0; } /* teal dos eventos MET no calendário */
 .card-overview     { --accent: #7C3AED; } /* roxo do panorama estatístico */
 
+/* ── Mini-dash do professor (topo do Hub, só logado) ── */
+.mini-dash{max-width:1100px;width:100%;margin:1.4rem auto 0;padding:0 1.5rem;
+  display:flex;gap:.7rem;align-items:stretch;flex-wrap:wrap;box-sizing:border-box}
+.md-cta{flex:0 0 160px;display:flex;flex-direction:column;justify-content:center;gap:.18rem;
+  background:#7C3AED;color:#fff;border-radius:14px;padding:.8rem .95rem;text-decoration:none;
+  transition:transform .12s,background .12s}
+.md-cta:hover{background:#6b2fd6;transform:translateY(-2px)}
+.md-cta .md-ic{font-size:1.15rem}
+.md-cta b{font-family:var(--font-heading);font-size:.98rem;line-height:1.15}
+.md-cta .md-go{font-size:.7rem;font-weight:800;opacity:.85}
+.md-kpis{flex:1;display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:.55rem;min-width:240px}
+.md-kpi{background:var(--white);border:1.5px solid var(--gray-light);border-radius:12px;
+  padding:.5rem .4rem;text-align:center;display:flex;flex-direction:column;justify-content:center}
+.md-kpi b{display:block;font-family:var(--font-heading);font-size:1.25rem;line-height:1.1;color:#223e5a}
+.md-kpi span{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.02em;color:var(--gray)}
+.md-kpi.emdia b{color:#27866e}
+.md-kpi.media b{color:#b8860b}
+.md-kpi.alta b{color:#c0392b}
+.md-kpi.roxa b{color:#7C3AED}
+.md-status{grid-column:1/-1;font-size:.78rem;font-weight:700;color:var(--gray);align-self:center;padding:.6rem 0}
+body.theme-dark .md-kpi b{color:#dbe7f2}
+body.theme-dark .md-kpi.emdia b{color:#5fc4a5}
+body.theme-dark .md-kpi.media b{color:#e0b45a}
+body.theme-dark .md-kpi.alta b{color:#e57668}
+body.theme-dark .md-kpi.roxa b{color:#b795f8}
+@media(max-width:640px){.md-cta{flex:1 1 100%}}
+
 .icon{
   width: 64px;
   height: 64px;

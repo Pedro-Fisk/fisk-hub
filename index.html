@@ -109,6 +109,16 @@
     <p data-i18n="subtitle">Ferramentas rápidas para o seu dia a dia em sala de aula</p>
   </header>
 
+  <!-- resumo instantâneo das turmas do professor logado (dados do card, cache 30 min) -->
+  <section class="mini-dash" id="miniDash" hidden>
+    <a class="md-cta" href="visao-geral.html">
+      <span class="md-ic">📊</span>
+      <b data-i18n="md-title">Visão Geral</b>
+      <span class="md-go" data-i18n="md-more">ver análise completa →</span>
+    </a>
+    <div class="md-kpis" id="mdKpis"></div>
+  </section>
+
   <main class="grid">
 
     <a class="card card-planner" href="https://pedro-fisk.github.io/planner-fisk/" target="_blank" rel="noopener">
@@ -338,6 +348,10 @@
         'pg-pick-name':'Selecione seu nome.','pg-need-pass':'Digite sua senha.','pg-wait':'Aguarde…',
         'pg-short':'Senha muito curta (mínimo 4).','pg-nomatch':'As senhas não conferem.',
         'pg-err':'Erro de conexão. Tente de novo.','pg-hello':'Olá',
+        'md-title':'Visão Geral','md-more':'ver análise completa →','md-alunos':'Alunos',
+        'md-emdia':'Em dia','md-atras':'Atrasados','md-crit':'Críticos',
+        'md-faltas':'Faltas médias','md-nota':'Média de notas','md-turmas':'turmas',
+        'md-load':'analisando suas turmas…',
         'card-planner-h2': 'Criador de Planners',
         'card-planner-p':  'Crie o PPT / Planner do aluno com as datas corretas',
         'card-conv-h2':    'Conversation Maker',
@@ -390,6 +404,10 @@
         'pg-pick-name':'Select your name.','pg-need-pass':'Enter your password.','pg-wait':'Please wait…',
         'pg-short':'Password too short (min. 4).','pg-nomatch':"Passwords don't match.",
         'pg-err':'Connection error. Try again.','pg-hello':'Hi',
+        'md-title':'Overview','md-more':'see full analysis →','md-alunos':'Students',
+        'md-emdia':'On track','md-atras':'Behind','md-crit':'Critical',
+        'md-faltas':'Avg. absences','md-nota':'Avg. grade','md-turmas':'classes',
+        'md-load':'analyzing your classes…',
         'card-planner-h2': 'Planner Creator',
         'card-planner-p':  'Create student planners with the correct dates',
         'card-conv-h2':    'Conversation Maker',
@@ -442,6 +460,10 @@
         'pg-pick-name':'Selecciona tu nombre.','pg-need-pass':'Escribe tu contraseña.','pg-wait':'Espera…',
         'pg-short':'Contraseña muy corta (mín. 4).','pg-nomatch':'Las contraseñas no coinciden.',
         'pg-err':'Error de conexión. Inténtalo de nuevo.','pg-hello':'Hola',
+        'md-title':'Visión General','md-more':'ver análisis completo →','md-alunos':'Alumnos',
+        'md-emdia':'Al día','md-atras':'Atrasados','md-crit':'Críticos',
+        'md-faltas':'Faltas medias','md-nota':'Nota media','md-turmas':'grupos',
+        'md-load':'analizando tus grupos…',
         'card-planner-h2': 'Creador de Planners',
         'card-planner-p':  'Crea planners del alumno con las fechas correctas',
         'card-conv-h2':    'Conversation Maker',
@@ -871,6 +893,7 @@
         document.body.classList.remove('prof-out');
         document.body.classList.add('prof-in');
         fillBar(prof);
+        setTimeout(function(){ if (window._mdLoad) window._mdLoad(); }, 0);
       }
 
       function loadProfs(){
@@ -959,6 +982,104 @@
       var s = saved();
       if (s){ fillBar(s); }        // já logado (classe prof-in veio do pre-paint)
       else { loadProfs(); setMode('login'); setPlaceholders(); }
+    })();
+
+    /* ════════════════════════════════════════════════
+       MINI-DASH DO PROFESSOR — resumo instantâneo das turmas do
+       professor logado no topo do Hub (mesma API/regras da página
+       Visão Geral). Cache de 30 min p/ não pesar a home.
+    ════════════════════════════════════════════════ */
+    (function miniDash(){
+      var API = 'https://script.google.com/macros/s/AKfycbxb3s3zSUoaFO9ytEQ4W6r-5xJ3hiA9fbFhugnbd9gyX-m3KGNNM8DeyGgNWPReYEwU/exec';
+      var KEY = 'fisk-cards-2026-vX7q3nT';
+      var LIM = 4, TTL = 30 * 60 * 1000;
+      var sec = document.getElementById('miniDash'), box = document.getElementById('mdKpis');
+      var dataCache = null;
+
+      function sess(){ try{ return JSON.parse(localStorage.getItem('fisk_prof')||'null'); }catch(e){ return null; } }
+      function api(p){
+        var qs = Object.keys(p).map(function(k){ return k+'='+encodeURIComponent(p[k]); }).join('&');
+        return fetch(API+'?key='+KEY+'&'+qs).then(function(r){ return r.json(); })
+          .then(function(j){ if (j && j.erro) throw new Error(j.erro); return j; });
+      }
+      function notaDe(c){
+        if (c == null || c === '') return null;
+        var s = String(c), m = s.match(/m[eé]dia\s*([0-9]+(?:[.,][0-9]+)?)/i);
+        if (m) return parseFloat(m[1].replace(',', '.'));
+        var m2 = s.trim().match(/^([0-9]+(?:[.,][0-9]+)?)$/);
+        return m2 ? parseFloat(m2[1].replace(',', '.')) : null;
+      }
+
+      function agg(alunos, nTurmas){
+        var an = 0, emdia = 0, atras = 0, crit = 0, fs = [], ns = [];
+        alunos.forEach(function(a){
+          var at = (typeof a.aulasAtraso === 'number' && !isNaN(a.aulasAtraso)) ? a.aulasAtraso : null;
+          if (at != null){ an++; if (at >= LIM) crit++; else if (at >= 1) atras++; else emdia++; }
+          if (typeof a.pctFaltas === 'number' && !isNaN(a.pctFaltas)) fs.push(a.pctFaltas);
+          var n1 = notaDe(a.notasAv1), n2 = notaDe(a.notasAv2);
+          var n = (n1 != null && n2 != null) ? (n1+n2)/2 : (n2 != null ? n2 : n1);
+          if (n != null) ns.push(n);
+        });
+        return {
+          tot: alunos.length, turmas: nTurmas, an: an, emdia: emdia, atras: atras, crit: crit,
+          mf: fs.length ? fs.reduce(function(s,v){ return s+v; },0)/fs.length : null,
+          mn: ns.length ? ns.reduce(function(s,v){ return s+v; },0)/ns.length : null
+        };
+      }
+
+      function tile(v, l, cls){ return '<div class="md-kpi'+(cls?' '+cls:'')+'"><b>'+v+'</b><span>'+l+'</span></div>'; }
+      function render(d){
+        box.innerHTML =
+          tile(d.tot, tr('md-alunos')) +
+          tile(d.an ? d.emdia : '—', tr('md-emdia'), 'emdia') +
+          tile(d.an ? d.atras : '—', tr('md-atras'), 'media') +
+          tile(d.an ? d.crit : '—', tr('md-crit'), 'alta') +
+          tile(d.mf == null ? '—' : Math.round(d.mf)+'%', tr('md-faltas')) +
+          tile(d.mn == null ? '—' : (Math.round(d.mn*10)/10).toFixed(1).replace('.',','), tr('md-nota'), 'roxa');
+      }
+
+      function load(){
+        var s = sess();
+        if (!s || !s.name){ sec.hidden = true; return; }
+        try{
+          var c = JSON.parse(localStorage.getItem('fisk_minidash')||'null');
+          if (c && c.prof === s.name && Date.now() - c.t < TTL){ dataCache = c.d; sec.hidden = false; render(c.d); return; }
+        }catch(e){}
+        sec.hidden = false;
+        box.innerHTML = '<div class="md-status">⏳ '+tr('md-load')+'</div>';
+        var escolas = String(s.escolas || s.escola || '').split(',').map(function(x){ return x.trim(); }).filter(Boolean);
+        if (!escolas.length){ sec.hidden = true; return; }
+        Promise.all(escolas.map(function(esc){
+          return api({ fn:'turmas', escola:esc, prof:s.name })
+            .then(function(j){ return (j.turmas||[]).map(function(t){ return { esc:esc, linha:t.linhaTitulo }; }); })
+            .catch(function(){ return []; });
+        })).then(function(lists){
+          var all = [].concat.apply([], lists);
+          if (!all.length){ sec.hidden = true; return; } // sem turmas (ex.: conta da direção)
+          var alunos = [];
+          (function lote(i){
+            if (i >= all.length){
+              var d = agg(alunos, all.length);
+              dataCache = d;
+              try{ localStorage.setItem('fisk_minidash', JSON.stringify({ prof:s.name, t:Date.now(), d:d })); }catch(e){}
+              render(d); return;
+            }
+            Promise.all(all.slice(i, i+4).map(function(t){
+              return api({ fn:'turma', escola:t.esc, prof:s.name, linha:t.linha }).catch(function(){ return null; });
+            })).then(function(rs){
+              rs.forEach(function(d){ if (d) (d.alunos||[]).forEach(function(a){ if (a && a.nome) alunos.push(a); }); });
+              lote(i+4);
+            });
+          })(0);
+        }).catch(function(){ sec.hidden = true; });
+      }
+
+      window._mdLoad = load;
+      /* troca de idioma re-renderiza os rótulos dos KPIs */
+      document.getElementById('langToggle').addEventListener('click', function(){
+        setTimeout(function(){ if (dataCache && !sec.hidden) render(dataCache); }, 0);
+      });
+      if (document.body.classList.contains('prof-in')) load();
     })();
   </script>
 </body>
