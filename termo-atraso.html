@@ -287,6 +287,31 @@ if (!temHashPayload && location.hash.indexOf('#t=') !== 0) {
         .catch(mostrarErroApi)
         .finally(function () { btn.disabled = false; btn.textContent = 'Carregar turma'; });
     });
+
+    /* Pré-seleção vinda do painel lateral (?escola=&prof=): escolhe escola→professor
+       automaticamente; a turma (e o botão Carregar) ficam para o usuário. */
+    (function prefillFromURL() {
+      var q = new URLSearchParams(location.search);
+      var escola = q.get('escola'), prof = q.get('prof');
+      if (!escola && !prof) return;
+      var t0 = Date.now();
+      var has = function (sel, val) { return [].some.call(sel.options, function (o) { return o.value === val; }); };
+      var i1 = setInterval(function () {
+        if (Date.now() - t0 > 15000) { clearInterval(i1); return; }
+        if (escola && has(selEscola, escola)) {
+          clearInterval(i1);
+          selEscola.value = escola; selEscola.dispatchEvent(new Event('change'));
+          if (!prof) return;
+          var i2 = setInterval(function () {
+            if (Date.now() - t0 > 15000) { clearInterval(i2); return; }
+            if (has(selProf, prof)) {
+              clearInterval(i2);
+              selProf.value = prof; selProf.dispatchEvent(new Event('change'));
+            }
+          }, 200);
+        }
+      }, 200);
+    })();
   } else {
     document.getElementById('statusCard').textContent =
       '⚠️ Abra esta ferramenta pelo botão FISK HUB dentro do card (o acesso direto será liberado quando a API for publicada).';

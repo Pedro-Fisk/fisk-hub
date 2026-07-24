@@ -572,9 +572,35 @@ $('btnCopiar').addEventListener('click', function () {
 })();
 
 /* ============ BOOT ============ */
+/* Pré-seleção vinda do painel lateral (?escola=&prof=): espera as opções
+   carregarem, escolhe escola→professor e dispara os eventos. Só falta a turma. */
+function prefillFromURL() {
+  var q = new URLSearchParams(location.search);
+  var escola = q.get('escola'), prof = q.get('prof');
+  if (!escola && !prof) return;
+  var selEscola = $('selEscola'), selProf = $('selProf');
+  var t0 = Date.now();
+  var has = function (sel, val) { return [].some.call(sel.options, function (o) { return o.value === val; }); };
+  var i1 = setInterval(function () {
+    if (Date.now() - t0 > 15000) { clearInterval(i1); return; }
+    if (escola && has(selEscola, escola)) {
+      clearInterval(i1);
+      selEscola.value = escola; selEscola.dispatchEvent(new Event('change'));
+      if (!prof) return;
+      var i2 = setInterval(function () {
+        if (Date.now() - t0 > 15000) { clearInterval(i2); return; }
+        if (has(selProf, prof)) {
+          clearInterval(i2);
+          selProf.value = prof; selProf.dispatchEvent(new Event('change'));
+        }
+      }, 200);
+    }
+  }, 200);
+}
+
 (function boot() {
   if (location.hash.indexOf('#t=') === 0) initFragment();
-  else initCascade();
+  else { initCascade(); prefillFromURL(); }
   if (typeof fiskInitThemeToggle === 'function') fiskInitThemeToggle('themeToggle');
 })();
 </script>
