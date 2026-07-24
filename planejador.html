@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planejador de Aula Personalizada — FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css">
+<meta name="theme-color" content="#161414">
+<style>
+  /* Acentos na tela ecoam a paleta AZUL das ferramentas do card
+     (termo de atraso / 2nd chance / boletim de jovens e adultos). */
+  :root{ --blue:#2b4d70; --blue-mid:#3d6b93; --blue-pill:#223e5a; --blue-soft:#e9eff5;
+         --blue-ink:#1d3349; --blue-bd:#a9bccd;
+         --alta:#c0392b; --alta-soft:#fbeae7; --media:#b8860b; --media-soft:#fbf3df;
+         --emdia:#27866e; --emdia-soft:#e6f4ef; }
+  [hidden]{ display:none !important; }
+  main{max-width:820px;margin:0 auto;padding:1.2rem;width:100%}
+  .painel{background:var(--white);border:1px solid var(--surface-border-color);
+          border-radius:var(--surface-radius);box-shadow:var(--surface-shadow);
+          padding:1.1rem 1.2rem;margin-bottom:1rem}
+  .painel h2{margin:0 0 .5rem;font-size:1.05rem;color:var(--blue)}
+  .painel .sub{font-size:.85rem;color:var(--gray);margin:0 0 .8rem;line-height:1.45}
+  .row{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center}
+  select{width:100%;padding:.5rem .6rem;border:1px solid var(--gray-light);border-radius:9px;
+    font-family:var(--font-body);font-size:.92rem;background:var(--white);color:var(--black);cursor:pointer}
+  .ind{display:inline-block;width:13px;height:13px;margin-left:.35rem;vertical-align:-2px}
+  .ind.spin{border:2px solid var(--gray-light);border-top-color:var(--blue);border-radius:50%;
+            animation:gira .7s linear infinite}
+  .ind.ok::after{content:'✓';color:var(--green);font-weight:900;font-size:.9rem}
+  @keyframes gira{to{transform:rotate(360deg)}}
+  .status{font-size:.86rem;font-weight:700;color:var(--gray);margin-top:.5rem}
+  .status.err{color:#c0392b}.status.ok{color:var(--green)}
+  /* resumo */
+  .resumo{display:flex;flex-wrap:wrap;gap:.5rem;margin:.2rem 0 .8rem}
+  .kpi{flex:1 1 120px;background:var(--blue-soft);border:1.5px solid var(--blue-bd);
+       border-radius:12px;padding:.55rem .7rem;text-align:center}
+  .kpi b{display:block;font-family:var(--font-heading);font-size:1.5rem;line-height:1.1;color:var(--blue-pill)}
+  .kpi span{font-size:.72rem;font-weight:800;color:var(--blue-ink);text-transform:uppercase;letter-spacing:.02em}
+  .kpi.alta{background:var(--alta-soft);border-color:#e6b3ab}.kpi.alta b{color:var(--alta)}
+  .kpi.media{background:var(--media-soft);border-color:#e6d29a}.kpi.media b{color:var(--media)}
+  .kpi.emdia{background:var(--emdia-soft);border-color:#a9d6c8}.kpi.emdia b{color:var(--emdia)}
+  .barra{display:flex;justify-content:space-between;align-items:center;gap:.7rem;flex-wrap:wrap;margin-bottom:.6rem}
+  .chk{display:inline-flex;gap:.4rem;align-items:center;font-size:.85rem;font-weight:700;color:var(--gray);cursor:pointer}
+  .btn{border:0;border-radius:11px;font-weight:800;cursor:pointer;font-family:var(--font-heading)}
+  .btn-ghost{background:var(--blue-soft);color:var(--blue-pill);padding:.55rem 1rem;font-size:.88rem}
+  .btn-ghost:hover{background:#dbe6f0}
+  /* lista ordenada */
+  .lista{display:flex;flex-direction:column;gap:.55rem}
+  .aluno{display:grid;grid-template-columns:auto 1fr auto;gap:.2rem .8rem;align-items:start;
+         padding:.7rem .85rem;border:1px solid var(--gray-light);border-radius:12px;background:var(--white)}
+  .aluno .rank{grid-row:1 / span 3;align-self:center;font-family:var(--font-heading);font-weight:800;
+       font-size:1.15rem;color:var(--blue-pill);background:var(--blue-soft);border-radius:10px;
+       width:2rem;height:2rem;display:flex;align-items:center;justify-content:center}
+  .aluno .nome{font-weight:800;font-size:.98rem;color:var(--black)}
+  .aluno .book{font-size:.78rem;color:var(--gray);font-weight:700}
+  .aluno .metr{grid-column:2;display:flex;flex-wrap:wrap;gap:.35rem;margin:.25rem 0}
+  .metr .chip{font-size:.72rem;font-weight:800;padding:.12rem .5rem;border-radius:99px;
+       background:var(--blue-soft);color:var(--blue-ink);white-space:nowrap}
+  .metr .chip.warn{background:var(--media-soft);color:var(--media)}
+  .metr .chip.bad{background:var(--alta-soft);color:var(--alta)}
+  .aluno .sug{grid-column:2;font-size:.86rem;color:var(--blue-ink);line-height:1.4}
+  .aluno .sug b{color:var(--blue-pill)}
+  .tag{grid-row:1;grid-column:3;align-self:center;font-size:.7rem;font-weight:900;padding:.2rem .6rem;
+       border-radius:99px;white-space:nowrap;text-transform:uppercase;letter-spacing:.02em}
+  .tag.alta{background:var(--alta);color:#fff}
+  .tag.media{background:var(--media);color:#fff}
+  .tag.emdia{background:var(--emdia);color:#fff}
+  .tag.semdados{background:var(--gray-light);color:var(--gray)}
+  .aluno.is-alta{border-color:#e6b3ab}.aluno.is-media{border-color:#e6d29a}
+  /* campo de anotação do professor */
+  .aluno .nota-in{grid-column:2;width:100%;margin-top:.45rem;padding:.4rem .6rem;
+    border:1px dashed var(--blue-bd);border-radius:9px;background:var(--blue-soft);
+    font-family:var(--font-body);font-size:.85rem;color:var(--blue-ink);
+    resize:none;overflow:hidden;line-height:1.35}
+  .aluno .nota-in::placeholder{color:#8aa2b8;font-style:italic}
+  .aluno .nota-in:focus{outline:none;border-style:solid;border-color:var(--blue)}
+  /* arrastar para reordenar */
+  .aluno .rank{cursor:grab}
+  .aluno .rank:active{cursor:grabbing}
+  .aluno.dragging{opacity:.45}
+  .aluno.over-top{box-shadow:inset 0 3px 0 0 var(--blue)}
+  .aluno.over-bot{box-shadow:inset 0 -3px 0 0 var(--blue)}
+  .dica{font-size:.8rem;color:var(--gray);margin:.1rem 0 .6rem}
+  .reordInfo{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;justify-content:space-between;
+    background:var(--media-soft);border:1px solid #e6d29a;border-radius:10px;
+    padding:.4rem .7rem;margin-bottom:.6rem;font-size:.84rem;font-weight:800;color:var(--media)}
+  .reordInfo .btn{font-size:.82rem;padding:.4rem .8rem}
+  .foranote{font-size:.8rem;color:var(--gray);margin-top:.8rem;padding-top:.7rem;border-top:1px dashed var(--gray-light)}
+  .hintbox{background:var(--blue-soft);border-radius:10px;padding:.55rem .8rem;font-size:.8rem;
+           color:var(--blue-ink);margin-top:.6rem;line-height:1.45}
+  @media(max-width:520px){
+    .aluno{grid-template-columns:auto 1fr}
+    .tag{grid-row:2;grid-column:2;justify-self:start;margin-top:.15rem}
+  }
+  /* modo escuro: texto que fica direto no card (fundo escuro) precisa clarear.
+     KPIs, chips, etiquetas e hintbox têm fundo claro próprio, então não mudam. */
+  body.theme-dark .painel h2{color:#8fb4d8}
+  body.theme-dark .aluno .rank{background:#24405c;color:#dbe7f2}
+  body.theme-dark .aluno .sug{color:#cdd9e6}
+  body.theme-dark .aluno .sug b{color:#eaf1f8}
+  /* o campo de anotação tem fundo azul-claro fixo; garante texto escuro legível
+     nele mesmo no dark, inclusive no foco. */
+  body.theme-dark .aluno .nota-in,
+  body.theme-dark .aluno .nota-in:focus{color:#1d3349}
+</style>
+</head>
+<body>
+<script>try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
+
+<header class="hero">
+  <a class="back-link" href="index.html">&larr; Voltar ao Hub</a>
+  <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
+  <img id="brandLogo" class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+  <h1>Planejador de Aula Personalizada</h1>
+  <p>Ordem de prioridade de atendimento &middot; método personalizado</p>
+</header>
+
+<main>
+  <!-- 1 · conexão com o card -->
+  <div class="painel">
+    <h2>🔗 Conectar ao card</h2>
+    <p class="sub">Escolha a turma: a ferramenta lê a trajetória de cada aluno ao vivo (última lição feita × lição prevista + faltas) e monta a <b>fila de atendimento</b> da próxima aula — quem você atende primeiro.</p>
+    <div id="origem" class="row" hidden>
+      <div style="flex:1 1 170px">
+        <select id="selEscola" disabled><option value="" disabled selected>Escola…</option></select><span id="indEscola" class="ind"></span>
+      </div>
+      <div style="flex:1 1 190px">
+        <select id="selProf" disabled><option value="" disabled selected>Professor(a)…</option></select><span id="indProf" class="ind"></span>
+      </div>
+      <div style="flex:1 1 200px">
+        <select id="selTurma" disabled><option value="" disabled selected>Turma…</option></select><span id="indTurma" class="ind"></span>
+      </div>
+    </div>
+    <div class="status" id="statusCard"></div>
+  </div>
+
+  <!-- 2 · fila de atendimento -->
+  <div class="painel" id="painelTurma" hidden>
+    <h2 id="tituloTurma">Fila de atendimento</h2>
+    <div class="resumo" id="resumo"></div>
+    <div class="barra">
+      <label class="chk"><input type="checkbox" id="soAtencao"> só quem precisa de atenção</label>
+      <button type="button" class="btn btn-ghost" id="btnCopiar">📋 Copiar roteiro</button>
+    </div>
+    <p class="dica">🖐️ Arraste o <b>número</b> de cada aluno para reordenar a fila do seu jeito — os números se atualizam ao soltar. 💾 As <b>anotações ficam salvas</b> neste navegador entre as aulas.</p>
+    <div class="reordInfo" id="reordInfo" hidden>
+      <span>✋ Ordem ajustada manualmente.</span>
+      <button type="button" class="btn btn-ghost" id="reordRestaurar">↺ Restaurar ordem por prioridade</button>
+    </div>
+    <div class="lista" id="lista"></div>
+    <div class="foranote" id="foraNote" hidden></div>
+    <div class="hintbox">
+      <b>Como a ordem é calculada:</b> a prioridade vem <b>só do atraso de conteúdo</b>
+      (distância entre a última lição feita e a lição prevista no gabarito) —
+      <b>Alta</b> = 4+ aulas de atraso, <b>Média</b> = 1 a 3, <b>Em dia</b> = sem atraso.
+      Quem vem sempre mas está mais atrasado tem prioridade sobre quem falta e está
+      menos atrasado. As <b>faltas</b> são um <b>alerta secundário</b>: aparecem
+      sinalizadas e só desempatam alunos com o mesmo atraso — nunca passam na frente.
+      Só leitura — nada é gravado no card.
+    </div>
+  </div>
+</main>
+
+<footer style="text-align:center;font-size:.75rem;color:var(--gray);padding:1.5rem 1rem">
+  Ferramenta interna das escolas Fisk Taubaté · Caçapava.
+</footer>
+
+<script src="assets/fisk-shared.js"></script>
+<script>
+/* ============================================================
+   Planejador de Aula Personalizada — lê fn=turma do card (mesma
+   API/engrenagem do termo e do 2nd chance) e ordena os alunos do
+   método personalizado por prioridade de atendimento:
+   núcleo = aulas de atraso (placeholder previsto × conteúdo feito),
+   fator secundário = faltas. Só leitura. Entrega: lista na tela +
+   sugestão do que fazer com cada aluno + roteiro copiável.
+   Kids/teens sem placeholder ficam fora desta análise.
+   ============================================================ */
+var API_URL = 'https://script.google.com/macros/s/AKfycbxb3s3zSUoaFO9ytEQ4W6r-5xJ3hiA9fbFhugnbd9gyX-m3KGNNM8DeyGgNWPReYEwU/exec';
+var API_KEY = 'fisk-cards-2026-vX7q3nT';
+
+var LIMITE_ATRASO = 4;   // 4+ aulas de atraso = prioridade alta (mesma regra do termo)
+var FALTA_ALTA = 30;     // % de faltas para "alta"
+var FALTA_MEDIA = 15;    // % de faltas para "média"
+
+var $ = function (id) { return document.getElementById(id); };
+var turma = null;
+// estado.fila = alunos elegíveis na ORDEM DE EXIBIÇÃO (o professor pode
+// rearranjar arrastando); estado.fora = kids/teens sem placeholder;
+// estado.manual = true depois que o professor mexeu na ordem.
+var estado = { fila: [], fora: [], manual: false };
+
+function statusCard(msg, kind) { var s = $('statusCard'); s.textContent = msg || ''; s.className = 'status' + (kind ? ' ' + kind : ''); }
+function ind(id, estado) { $(id).className = 'ind' + (estado ? ' ' + estado : ''); }
+
+function api(params) {
+  var qs = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
+  return fetch(API_URL + '?key=' + encodeURIComponent(API_KEY) + '&' + qs)
+    .then(function (r) { return r.json(); })
+    .then(function (j) { if (j && j.erro) throw new Error(j.erro); return j; });
+}
+
+/* ============ CASCATA (escola → prof → turma) + #t= ============ */
+function montarSelect(sel, ph, itens) {
+  sel.innerHTML = '<option value="" disabled selected>' + ph + '</option>' +
+    itens.map(function (i) { return '<option value="' + i.v + '">' + String(i.t).replace(/</g, '&lt;') + '</option>'; }).join('');
+  sel.disabled = false;
+}
+function initCascade() {
+  $('origem').hidden = false;
+  statusCard('Escolha escola, professor(a) e turma — os dados vêm ao vivo do card.');
+  var selEscola = $('selEscola'), selProf = $('selProf'), selTurma = $('selTurma');
+  ind('indEscola', 'spin');
+  api({ fn: 'escolas' }).then(function (j) {
+    montarSelect(selEscola, 'Escolha a escola…', (j.escolas || []).map(function (e) { return { v: e, t: e }; }));
+    ind('indEscola', 'ok');
+  }).catch(function (e) { ind('indEscola', ''); statusCard('⚠️ ' + e.message, 'err'); });
+
+  selEscola.addEventListener('change', function () {
+    if (!selEscola.value) return;
+    selProf.innerHTML = '<option value="" disabled selected>Carregando…</option>'; selProf.disabled = true;
+    selTurma.innerHTML = '<option value="" disabled selected>Turma…</option>'; selTurma.disabled = true;
+    ind('indProf', 'spin'); ind('indTurma', '');
+    api({ fn: 'profs', escola: selEscola.value }).then(function (j) {
+      montarSelect(selProf, 'Escolha o professor(a)…', (j.profs || []).map(function (p) { return { v: p, t: p }; }));
+      ind('indProf', 'ok');
+    }).catch(function (e) { ind('indProf', ''); statusCard('⚠️ ' + e.message, 'err'); });
+  });
+  selProf.addEventListener('change', function () {
+    if (!selProf.value) return;
+    selTurma.innerHTML = '<option value="" disabled selected>Carregando…</option>'; selTurma.disabled = true;
+    ind('indTurma', 'spin');
+    api({ fn: 'turmas', escola: selEscola.value, prof: selProf.value }).then(function (j) {
+      montarSelect(selTurma, 'Escolha a turma…', (j.turmas || []).map(function (t) { return { v: t.linhaTitulo, t: t.titulo }; }));
+      ind('indTurma', 'ok');
+    }).catch(function (e) { ind('indTurma', ''); statusCard('⚠️ ' + e.message, 'err'); });
+  });
+  selTurma.addEventListener('change', function () {
+    if (!selTurma.value) return;
+    ind('indTurma', 'spin'); statusCard('🔄 Lendo a turma ao vivo…');
+    api({ fn: 'turma', escola: selEscola.value, prof: selProf.value, linha: selTurma.value })
+      .then(function (d) { ind('indTurma', 'ok'); onTurma(d); })
+      .catch(function (e) { ind('indTurma', ''); statusCard('⚠️ ' + e.message, 'err'); });
+  });
+}
+function initFragment() {
+  var ref = decodeURIComponent(location.hash.slice(3)).split('|'); // escola|prof|linha
+  statusCard('🔄 Lendo a turma do card…');
+  api({ fn: 'turma', escola: ref[0], prof: ref[1], linha: ref[2] })
+    .then(onTurma).catch(function (e) { statusCard('⚠️ ' + e.message + ' — use a cascata.', 'err'); initCascade(); });
+}
+
+/* ============ PRIORIZAÇÃO ============ */
+var isNum = function (v) { return typeof v === 'number' && !isNaN(v); };
+
+/** score: o ATRASO DE CONTEÚDO domina de forma absoluta; as faltas só
+ *  desempatam entre alunos com o MESMO atraso (nunca passam na frente de
+ *  quem está mais atrasado — quem vem sempre e está atrasado tem prioridade
+ *  sobre quem falta mas está menos atrasado). */
+function score(a) {
+  var atraso = isNum(a.aulasAtraso) ? a.aulasAtraso : 0;
+  var pct = isNum(a.pctFaltas) ? a.pctFaltas : 0;
+  return atraso * 1000 + pct; // atraso estritamente dominante; faltas = desempate
+}
+/** nível: definido SÓ pelo atraso de conteúdo. 'alta' | 'media' | 'emdia' | 'semdados' */
+function nivel(a) {
+  if (!isNum(a.aulasAtraso)) return 'semdados';
+  if (a.aulasAtraso >= LIMITE_ATRASO) return 'alta';
+  if (a.aulasAtraso >= 1) return 'media';
+  return 'emdia';
+}
+/** faltas são um alerta à parte (não mudam a prioridade, mas merecem atenção). */
+function faltasAltas(a) { return (isNum(a.pctFaltas) ? a.pctFaltas : 0) >= FALTA_ALTA; }
+
+/* ---- anotações salvas LOCALMENTE (persistem entre aulas, por aluno, neste
+   navegador). Chave estável por escola+professor+turma+nome do aluno. Não
+   toca no card. Obs.: no iframe da sidebar o armazenamento é particionado
+   pelo navegador, mas continua persistente naquele contexto. ---- */
+function chaveNota(a) {
+  return 'planejador.nota::' + (turma.escola || '') + '::' + (turma.professor || '') +
+         '::' + (turma.linhaTitulo || '') + '::' + (a.nome || '');
+}
+function carregarNotas() {
+  try {
+    (turma.alunos || []).forEach(function (a) {
+      var v = localStorage.getItem(chaveNota(a));
+      if (v != null) a._nota = v;
+    });
+  } catch (e) { /* localStorage indisponível — segue sem persistência */ }
+}
+function salvarNota(a) {
+  try {
+    if ((a._nota || '').trim()) localStorage.setItem(chaveNota(a), a._nota);
+    else localStorage.removeItem(chaveNota(a));
+  } catch (e) {}
+}
+var ROT = { alta: 'Prioridade alta', media: 'Prioridade média', emdia: 'Em dia', semdados: 'Sem dados' };
+
+/** sugestão do que fazer com o aluno na próxima aula. */
+function sugestao(a) {
+  var ul = a.ultimaLicao ? String(a.ultimaLicao) : null;
+  var lp = a.licaoPrevista ? String(a.licaoPrevista) : null;
+  var s;
+  if (!isNum(a.aulasAtraso)) {
+    if (!ul) s = 'Ainda sem aula registrada nesta linha — conferir o card antes de planejar.';
+    else if (!lp) s = 'Sem placeholder à frente (pode ter concluído o previsto). Definir o próximo passo no card.';
+    else s = 'Não deu para medir o atraso (gabarito do book não localizado). Retomar de <b>' + ul + '</b>.';
+  } else if (a.aulasAtraso >= LIMITE_ATRASO) {
+    s = 'Atraso alto (' + a.aulasAtraso + ' aulas). Retomar de <b>' + (ul || '?') + '</b> e puxar rumo a <b>' + (lp || '?') + '</b>. Vale agendar tutoria.';
+  } else if (a.aulasAtraso >= 1) {
+    s = 'Retomar de <b>' + (ul || '?') + '</b> rumo a <b>' + (lp || '?') + '</b> (' + a.aulasAtraso + ' de atraso).';
+  } else {
+    s = 'Em dia. Seguir para <b>' + (lp || 'a próxima lição prevista') + '</b>.';
+  }
+  var pct = isNum(a.pctFaltas) ? a.pctFaltas : 0;
+  if (pct >= FALTA_ALTA) s += ' Faltas altas (' + pct + '%) — conversar sobre assiduidade.';
+  else if (pct >= FALTA_MEDIA) s += ' Atenção às faltas (' + pct + '%).';
+  return s;
+}
+
+/* ============ RENDER ============ */
+function onTurma(dados) {
+  turma = dados;
+  carregarNotas();
+  ordenarPorPrioridade();
+  $('painelTurma').hidden = false;
+  $('tituloTurma').textContent = 'Fila de atendimento — ' + (turma.turma || '');
+  statusCard('✓ Turma lida ao vivo. Fila montada por prioridade.', 'ok');
+  renderFila();
+  $('painelTurma').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/** (re)monta estado.fila na ordem de prioridade — usado ao carregar e no
+ *  botão "restaurar ordem". Preserva as anotações (ficam no próprio aluno). */
+function ordenarPorPrioridade() {
+  var p = particiona();
+  estado.fila = p.elegiveis;
+  estado.fora = p.fora;
+  estado.manual = false;
+}
+
+/** separa elegíveis (método personalizado, temPlaceholder) dos de fora (kids/teens). */
+function particiona() {
+  var todos = (turma.alunos || []).filter(function (a) { return a && a.nome; });
+  var elegiveis = [], fora = [];
+  todos.forEach(function (a) {
+    // elegível = está no método personalizado (tem placeholder na linha OU já dá para medir atraso)
+    if (a.temPlaceholder || isNum(a.aulasAtraso)) elegiveis.push(a);
+    else fora.push(a);
+  });
+  // ordena por FAIXA de prioridade primeiro (alta > média > em dia > sem dados)
+  // e, dentro da faixa, pelo score (atraso dominante + faltas) — assim a
+  // posição na fila sempre bate com a etiqueta.
+  var ORDEM_NIVEL = { alta: 0, media: 1, emdia: 2, semdados: 3 };
+  elegiveis.sort(function (x, y) {
+    var nb = ORDEM_NIVEL[nivel(x)] - ORDEM_NIVEL[nivel(y)];
+    if (nb) return nb;
+    var d = score(y) - score(x);
+    if (d) return d;
+    if ((y.pctFaltas || 0) - (x.pctFaltas || 0)) return (y.pctFaltas || 0) - (x.pctFaltas || 0);
+    return String(x.nome).localeCompare(String(y.nome), 'pt-BR');
+  });
+  return { elegiveis: elegiveis, fora: fora };
+}
+
+// alunos atualmente exibidos, na ordem exibida (usado por drag e copiar)
+var visiveis = [];
+
+function renderFila() {
+  var fila = estado.fila, fora = estado.fora;
+
+  // resumo
+  var cont = { alta: 0, media: 0, emdia: 0, semdados: 0 };
+  fila.forEach(function (a) { cont[nivel(a)]++; });
+  $('resumo').innerHTML =
+    kpi(fila.length, 'no método', '') +
+    kpi(cont.alta, 'prioridade alta', 'alta') +
+    kpi(cont.media, 'prioridade média', 'media') +
+    kpi(cont.emdia + cont.semdados, 'em dia / s. dados', 'emdia');
+
+  // ordem manual? mostra o aviso + botão restaurar
+  $('reordInfo').hidden = !estado.manual;
+
+  // lista (respeita o filtro "só quem precisa")
+  var soAtencao = $('soAtencao').checked;
+  // "precisa de atenção" = tem atraso OU falta muito (o faltoso em dia no
+  // conteúdo continua visível sob o filtro, sinalizado).
+  visiveis = fila.filter(function (a) { return soAtencao ? (nivel(a) !== 'emdia' || faltasAltas(a)) : true; });
+  if (!visiveis.length) {
+    $('lista').innerHTML = '<div class="sub" style="padding:.5rem">Nenhum aluno' +
+      (soAtencao ? ' precisando de atenção' : '') + ' nesta turma.</div>';
+  } else {
+    $('lista').innerHTML = visiveis.map(function (a, i) {
+      var nv = nivel(a);
+      var nota = a._nota || '';
+      return '<div class="aluno is-' + nv + '" data-i="' + i + '" draggable="false">' +
+        '<div class="rank" title="Arraste para reordenar">' + (i + 1) + '</div>' +
+        '<div><div class="nome">' + esc(a.nome) + '</div>' +
+          '<div class="book">' + esc(a.book || 'sem book') + '</div></div>' +
+        '<span class="tag ' + nv + '">' + ROT[nv] + '</span>' +
+        '<div class="metr">' + chips(a) + '</div>' +
+        '<div class="sug">' + sugestao(a) + '</div>' +
+        '<textarea class="nota-in" data-i="' + i + '" rows="1" placeholder="✏️ anotação do professor (ex.: entregar prova corrigida · fazer Movie e Song)">' + esc(nota) + '</textarea>' +
+      '</div>';
+    }).join('');
+    ligarLinhas();
+  }
+
+  // fora da análise
+  if (fora.length) {
+    $('foraNote').hidden = false;
+    $('foraNote').innerHTML = '↪︎ <b>' + fora.length + '</b> aluno(s) fora desta análise (sem placeholder do método personalizado — turmas kids/teens ou sem plano aplicado): ' +
+      fora.map(function (a) { return esc(a.nome); }).join(', ') + '.';
+  } else { $('foraNote').hidden = true; }
+}
+
+/* ---- liga anotação + arrastar-para-reordenar em cada linha ---- */
+var arrastado = null;
+function ligarLinhas() {
+  $('lista').querySelectorAll('.aluno').forEach(function (row) {
+    var a = visiveis[+row.dataset.i];
+    // anotação: guarda no próprio aluno (sobrevive a filtro/reordenação)
+    var ta = row.querySelector('.nota-in');
+    autoAltura(ta);
+    ta.addEventListener('input', function () { a._nota = ta.value; autoAltura(ta); salvarNota(a); });
+
+    // handle (o número) habilita o arrasto só ao pegar nele
+    var handle = row.querySelector('.rank');
+    handle.addEventListener('mousedown', function () { row.setAttribute('draggable', 'true'); });
+    row.addEventListener('mouseup', function () { row.setAttribute('draggable', 'false'); });
+
+    row.addEventListener('dragstart', function (e) {
+      arrastado = a; row.classList.add('dragging');
+      try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', a.nome); } catch (x) {}
+    });
+    row.addEventListener('dragend', function () {
+      row.setAttribute('draggable', 'false'); row.classList.remove('dragging');
+      $('lista').querySelectorAll('.aluno').forEach(function (r) { r.classList.remove('over-top', 'over-bot'); });
+      arrastado = null;
+    });
+    row.addEventListener('dragover', function (e) {
+      if (!arrastado || arrastado === a) return;
+      e.preventDefault();
+      var rect = row.getBoundingClientRect();
+      var depois = e.clientY > rect.top + rect.height / 2;
+      row.classList.toggle('over-bot', depois);
+      row.classList.toggle('over-top', !depois);
+    });
+    row.addEventListener('dragleave', function () { row.classList.remove('over-top', 'over-bot'); });
+    row.addEventListener('drop', function (e) {
+      e.preventDefault();
+      if (!arrastado || arrastado === a) return;
+      var rect = row.getBoundingClientRect();
+      var depois = e.clientY > rect.top + rect.height / 2;
+      moverNaFila(arrastado, a, depois);
+      estado.manual = true;
+      renderFila();
+    });
+  });
+}
+/** move 'arr' para antes/depois de 'alvo' dentro de estado.fila. */
+function moverNaFila(arr, alvo, depois) {
+  var f = estado.fila;
+  var i = f.indexOf(arr); if (i < 0) return;
+  f.splice(i, 1);
+  var j = f.indexOf(alvo);
+  if (depois) j += 1;
+  f.splice(j, 0, arr);
+}
+function autoAltura(ta) { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 120) + 'px'; }
+
+function kpi(n, rot, cls) {
+  return '<div class="kpi' + (cls ? ' ' + cls : '') + '"><b>' + n + '</b><span>' + rot + '</span></div>';
+}
+function chips(a) {
+  var out = [];
+  if (isNum(a.aulasAtraso)) {
+    var cls = a.aulasAtraso >= LIMITE_ATRASO ? 'bad' : (a.aulasAtraso >= 1 ? 'warn' : '');
+    out.push('<span class="chip ' + cls + '">' + a.aulasAtraso + ' ' + (a.aulasAtraso === 1 ? 'aula de atraso' : 'aulas de atraso') + '</span>');
+  } else {
+    out.push('<span class="chip">atraso não medido</span>');
+  }
+  var pct = isNum(a.pctFaltas) ? a.pctFaltas : 0;
+  var fcls = pct >= FALTA_ALTA ? 'bad' : (pct >= FALTA_MEDIA ? 'warn' : '');
+  out.push('<span class="chip ' + fcls + '">' + (a.faltas || 0) + ' ' + ((a.faltas || 0) === 1 ? 'falta' : 'faltas') + ' (' + pct + '%)</span>');
+  if (a.ultimaLicao) out.push('<span class="chip">feita: ' + esc(a.ultimaLicao) + '</span>');
+  if (a.licaoPrevista) out.push('<span class="chip">prevista: ' + esc(a.licaoPrevista) + '</span>');
+  return out.join('');
+}
+function esc(t) { return String(t == null ? '' : t).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
+
+/** atividade da lição SEM métricas (não cita atraso nem faltas) — vai pro copiar. */
+function atividadeTexto(a) {
+  var ul = a.ultimaLicao ? String(a.ultimaLicao) : null;
+  var lp = a.licaoPrevista ? String(a.licaoPrevista) : null;
+  if (!isNum(a.aulasAtraso)) {
+    if (!ul) return 'Conferir o ponto do aluno no card antes da aula.';
+    if (!lp) return 'Definir o próximo passo (concluiu o previsto).';
+    return 'Retomar de ' + ul + '.';
+  }
+  if (a.aulasAtraso === 0) return 'Seguir para ' + (lp || 'a próxima lição prevista') + '.';
+  return 'Retomar de ' + (ul || '?') + ' rumo a ' + (lp || '?') + '.';
+}
+/* ---- roteiro em texto (copiar) — só NOME + ATIVIDADES + ANOTAÇÃO,
+   na ordem exibida na tela (respeita a reordenação e o filtro). ---- */
+function roteiroTexto() {
+  var hoje = new Date();
+  var data = ('0' + hoje.getDate()).slice(-2) + '/' + ('0' + (hoje.getMonth() + 1)).slice(-2) + '/' + hoje.getFullYear();
+  var linhas = [];
+  linhas.push('PLANO DE ATENDIMENTO — ' + (turma.turma || '') + '  (' + data + ')');
+  linhas.push('');
+  visiveis.forEach(function (a, i) {
+    linhas.push((i + 1) + '. ' + a.nome);
+    linhas.push('   • ' + atividadeTexto(a));
+    var nota = (a._nota || '').trim();
+    if (nota) nota.split('\n').forEach(function (l) { l = l.trim(); if (l) linhas.push('   • ' + l); });
+    linhas.push('');
+  });
+  return linhas.join('\n').replace(/\n+$/, '\n');
+}
+
+/* ============ EVENTOS ============ */
+$('soAtencao').addEventListener('change', function () { if (turma) renderFila(); });
+$('reordRestaurar').addEventListener('click', function () {
+  if (!turma) return;
+  ordenarPorPrioridade();  // anotações ficam nos alunos, então sobrevivem
+  renderFila();
+});
+/** cópia robusta — funciona também dentro do iframe da sidebar do card, onde
+ *  navigator.clipboard pode estar bloqueado: cai para execCommand e, por fim,
+ *  para um prompt manual. */
+function copiarFeedback() {
+  var b = $('btnCopiar'), old = b.textContent;
+  b.textContent = '✓ Roteiro copiado';
+  setTimeout(function () { b.textContent = old; }, 1800);
+}
+function copiarExec(txt) {
+  var ta = document.createElement('textarea');
+  ta.value = txt; ta.setAttribute('readonly', '');
+  ta.style.position = 'fixed'; ta.style.top = '0'; ta.style.left = '0'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  var ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
+  document.body.removeChild(ta); return ok;
+}
+$('btnCopiar').addEventListener('click', function () {
+  if (!turma) return;
+  var txt = roteiroTexto();
+  var viaApi = (navigator.clipboard && navigator.clipboard.writeText)
+    ? navigator.clipboard.writeText(txt) : Promise.reject();
+  viaApi.then(copiarFeedback).catch(function () {
+    if (copiarExec(txt)) copiarFeedback();
+    else window.prompt('Copie o roteiro (Ctrl/Cmd+C, Enter):', txt);
+  });
+});
+
+/* ============ BOOT ============ */
+(function boot() {
+  if (location.hash.indexOf('#t=') === 0) initFragment();
+  else initCascade();
+  if (typeof fiskInitThemeToggle === 'function') fiskInitThemeToggle('themeToggle');
+})();
+</script>
+</body>
+</html>
