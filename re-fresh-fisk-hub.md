@@ -62,13 +62,16 @@ Apps Script (o "card") via `API_URL` + `API_KEY`.
    `@v1.0.0`), `window.ultimoPDF` em `script.js`, botão ligado em `card-sync.js`.
    Só aparece com vínculo ao card E com PDF gerado.
 
+4. ✅ **NO AR.** As duas branches foram mergeadas na `main` e publicadas pelo GitHub
+   Pages em 24/07: `pedro-fisk.github.io/fisk-hub` (planejador + 2ª chance + termo) e
+   `pedro-fisk.github.io/boletim-fisk` (botão do boletim). Confirmado buscando o
+   `FISK_SAVE_URL` e o `fisk-drive.js` nos sites live. O arquivo de teste foi para a
+   lixeira e a pasta do Alex voltou ao estado original.
+
 ## Próximos passos
-1. **Publicar**: as duas branches estão pushadas mas **NÃO** mergeadas na `main` — ou
-   seja, nada disso está no ar para os professores ainda (GitHub Pages publica da main).
-   Decisão do Pedro, pendente.
-2. **Apagar o arquivo de teste** `TESTE Fisk Hub - pode apagar (24-07).pdf` da pasta
-   `2ª/4ª 17:30 às 18:45 - ADV` do Alex (Caçapava).
-3. **Transferências** (pedido do Pedro, para depois): mover pasta de aluno e de turma
+1. **Refazer a varredura** (`match.py` → `?action=driveMatch`) quando as pastas que
+   faltam existirem, para ver a taxa subir sem mexer em código.
+2. **Transferências** (pedido do Pedro, para depois): mover pasta de aluno e de turma
    entre professores, como feature do **Painel do Diretor**, liberada por login
    individual de secretária. O escopo `auth/drive` já permite mover — falta a camada de
    permissão e a UI (simular → confirmar item a item → registrar quem/quando/de onde
