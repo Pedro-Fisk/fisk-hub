@@ -187,7 +187,7 @@
       </div>
       <div class="fin-conversa">
         <div class="fin-conversa-tit">💬 Conversação do dia
-          <span class="fin-hint">— entra no PDF (auto-preenchimento pelo calendário em breve)</span></div>
+          <span class="fin-hint">— preenchida pelo calendário conforme a data (você pode editar)</span></div>
         <label>1ª aula (conversação mais formal)
           <input type="text" id="conv1" placeholder="ex.: Everyday Life (Buddy Talks)"></label>
         <label>2ª aula (do livro / conversation booklet / material complementar)
@@ -380,6 +380,7 @@ function onTurma(dados) {
     var h = new Date();
     di.value = h.getFullYear() + '-' + ('0' + (h.getMonth() + 1)).slice(-2) + '-' + ('0' + h.getDate()).slice(-2);
   }
+  aplicarConversaAuto();  // pré-preenche a conversação do dia pelo calendário
   $('painelTurma').hidden = false;
   if (turma.nomePlanilha) $('tituloConectar').textContent = '🔗 Conectar ao card — ' + turma.nomePlanilha;
   $('tituloTurma').textContent = 'Fila de atendimento — ' + (turma.turma || '');
@@ -569,6 +570,47 @@ function dataAulaStr() {
   return ('0' + h.getDate()).slice(-2) + '/' + ('0' + (h.getMonth() + 1)).slice(-2) + '/' + h.getFullYear();
 }
 
+/* ============ CONVERSAÇÃO DO DIA — calendário institucional ============
+   Planejamento de atividades comunicativas (aba AGOSTO/2026, tabela à direita
+   do calendário). Em agosto, todas as colunas de nível (Basic, Basic+18,
+   Advanced+Inter, Espanhol) têm a MESMA atividade por semana, então basta a
+   data → semana. Cada semana traz a 1ª aula (conversação mais formal) e a 2ª
+   aula (livro/booklet/material). Extraído da planilha do calendário 2026.
+   Para adicionar outros meses depois, é só estender CONV_CAL. */
+var CONV_CAL = {
+  '2026-08': [
+    { d: 1,  a1: 'Conversation Maker - Warm Up',          a2: '' },
+    { d: 3,  a1: 'Conversation Maker - Criado pelo prof', a2: 'Pair Work do livro' },
+    { d: 10, a1: 'Quick Practice - Fisk Hub',             a2: 'Conv. Booklet' },
+    { d: 17, a1: 'Projeto',                               a2: 'Uso do Material Complementar' },
+    { d: 24, a1: 'Movies & Series',                       a2: 'Pair Work do livro' },
+    { d: 31, a1: 'Buddy Talks',                           a2: '' }
+  ]
+};
+/** conversação prevista para a data planejada (ou null se o mês não estiver
+ *  no calendário). Retorna a semana que contém/precede o dia. */
+function conversaDaData() {
+  var v = ($('dataAula') && $('dataAula').value) || '';
+  var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v);
+  if (!m) return null;
+  var semanas = CONV_CAL[m[1] + '-' + m[2]];
+  if (!semanas) return null;
+  var dia = +m[3], w = null;
+  semanas.forEach(function (x) { if (x.d <= dia) w = x; });
+  return w ? { conv1: w.a1, conv2: w.a2 } : null;
+}
+/* últimos valores auto-preenchidos — para não sobrescrever o que o professor
+   digitou à mão (só troca o que ainda está vazio ou veio do auto). */
+var convAuto = { c1: '', c2: '' };
+function aplicarConversaAuto() {
+  var c = conversaDaData();
+  var i1 = $('conv1'), i2 = $('conv2');
+  if (!c) return;
+  if (i1 && (i1.value === '' || i1.value === convAuto.c1)) i1.value = c.conv1;
+  if (i2 && (i2.value === '' || i2.value === convAuto.c2)) i2.value = c.conv2;
+  convAuto.c1 = c.conv1; convAuto.c2 = c.conv2;
+}
+
 /* ---- roteiro em texto (copiar) — só NOME + ATIVIDADES + ANOTAÇÃO,
    na ordem exibida na tela (respeita a reordenação e o filtro). ---- */
 function roteiroTexto() {
@@ -588,6 +630,8 @@ function roteiroTexto() {
 
 /* ============ EVENTOS ============ */
 $('soAtencao').addEventListener('change', function () { if (turma) renderFila(); });
+// ao trocar a data planejada, atualiza a conversação do dia pelo calendário
+if ($('dataAula')) $('dataAula').addEventListener('change', aplicarConversaAuto);
 $('reordRestaurar').addEventListener('click', function () {
   if (!turma) return;
   ordenarPorPrioridade();  // anotações ficam nos alunos, então sobrevivem
