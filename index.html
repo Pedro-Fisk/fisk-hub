@@ -917,6 +917,25 @@
         location.reload();
       });
 
+      /* acesso master da direção: #dirtok=<token> emitido pelo Painel da Direção.
+         O token é validado no servidor (dirCheck) — nada de bypass por URL solta. */
+      var mDir = location.hash.match(/#dirtok=([^&]+)/);
+      if (mDir){
+        history.replaceState(null, '', location.pathname + location.search);
+        msg.textContent = tr('pg-wait');
+        post({ action:'dirCheck', token: decodeURIComponent(mDir[1]) }).then(function(res){
+          if (res && res.ok && res.director){ enter(res.director); }
+          else {
+            msg.textContent = (res && res.error) || tr('pg-err');
+            loadProfs(); setMode('login'); setPlaceholders();
+          }
+        }).catch(function(){
+          msg.textContent = tr('pg-err');
+          loadProfs(); setMode('login'); setPlaceholders();
+        });
+        return;
+      }
+
       var s = saved();
       if (s){ fillBar(s); }        // já logado (classe prof-in veio do pre-paint)
       else { loadProfs(); setMode('login'); setPlaceholders(); }
