@@ -28,11 +28,13 @@
 
 // ⚙️ ================= CONFIG — AJUSTE AQUI =================
 var FISK_CHAVE = 'fisk-cards-2026-vX7q3nT'; // mesma API_KEY das ferramentas
-// Pasta-raiz (ou ID do drive compartilhado) que contém as pastas das TURMAS:
-var RAIZ_TURMAS = 'COLE_AQUI_O_ID_DA_PASTA_RAIZ_DE_TURMAS';
-// Se as pastas de ALUNO ficam dentro da pasta da turma, deixe '' (o script
-// procura o aluno dentro da turma). Se houver uma raiz separada de alunos,
-// cole o ID dela aqui:
+// Pasta-raiz que contém as pastas das TURMAS (detectada no Drive do Pedro:
+// contém "3ª/5ª - 17h30 às 18h45 - Basic", "5ª 15:00-17:30 - Advanced", etc.).
+// ⚠️ CONFIRME que é a raiz certa; troque se usar outra conta/drive compartilhado.
+var RAIZ_TURMAS = '1dwNu5aku0lgUiPGNHtXvjJB7fwWAJi5B';
+// As pastas de ALUNO ficam DENTRO da pasta da turma (nome completo do aluno),
+// então deixe '' — o script procura o aluno dentro da turma. Se houver uma
+// raiz separada de alunos, cole o ID dela aqui:
 var RAIZ_ALUNOS = '';
 // =========================================================
 
