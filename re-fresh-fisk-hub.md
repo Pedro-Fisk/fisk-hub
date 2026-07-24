@@ -63,12 +63,24 @@ Apps Script (o "card") via `API_URL` + `API_KEY`.
   'https://script.google.com/macros/s/AKfycbxb3s3zSUoaFO9ytEQ4W6r-5xJ3hiA9fbFhugnbd9gyX-m3KGNNM8DeyGgNWPReYEwU/exec'`
   · `API_KEY = 'fisk-cards-2026-vX7q3nT'`. O salvamento usa **outra** URL (`FISK_SAVE_URL`),
   de propósito.
-- **Estrutura de pastas (drive compartilhado):**
-  `Planners <Escola>` → `"<n> - <Professor>"` → `"<n> - dia/horário - NÍVEL"` (turma) →
-  pastas de aluno (nome completo). Plano da turma → pasta da turma; doc do aluno → pasta do aluno.
+- **Estrutura de pastas (drive compartilhado)** — CONFERIDA no Drive real em 24/07/2026:
+  `Planners <Escola>` → pasta do professor → pasta da turma → pastas de aluno (nome completo).
   - Raiz **Taubaté** = `1c7vuwrRpINGx-ITgvhr65yD4cwbHodt2`
   - Raiz **Caçapava** = `1FJ8Fs677pq0tENiJ1PHLtZp8A0lmw-Gs`
-  (já fixadas em `salvar-no-drive.gs`).
+  - **Professor:** Caçapava usa só o primeiro nome (`Alex`, `Maria Fernanda`); Taubaté usa
+    `"<n> - Nome"` (`8 - Tamires`). Exato + "contém" cobre os dois.
+  - **Turma: o nome NÃO casa entre card e pasta — o nível chega a se contradizer.**
+    card `INTERMEDIATE - 2ª/4ª 18h45 às 20h` ↔ pasta `2ª/4ª 18h45 às 20h00 - Basic/Inter`
+    card `Basic/Interm (+18) - 3ª 8h30 às 11h` ↔ pasta `3ª 8:30 às 11h - All levels`
+    Único sinal confiável: **dia da semana + horário** (`acharPastaPorHorario_`). Horário
+    aparece como `17h30`/`17:30`/`17 30`/`20h`/`20h00` — tudo normalizado para minutos.
+    Empate entre pastas ⇒ recusa (ambiguidade não pode virar gravação no lugar errado).
+  - **Aluno:** o nome bate; o card às vezes traz sufixo (`Livia Cruz Santos (confirmar)`),
+    resolvido pelo "contém".
+  - Dentro da pasta da turma também existem `1 - Plano de aula`, `Bilhete de atraso` etc.
+  - Diagnóstico: `?action=driveDebug&key=TEACHER&escola=|pasta=<id>` lista o que o script
+    enxerga; `?action=driveMatch&key=TEACHER&escola=&professor=&turma=[&aluno=]` simula o
+    salvamento sem gravar nada.
 - **Níveis (trilha adultos):** Essentials→básico, Transitions→intermediário,
   Fluency/Focus→avançado. Colunas do calendário: Basic, Basic+18, Advanced+Inter, Espanhol.
   Kids/Teens ficam **fora** do método personalizado (o planejador já os filtra).
