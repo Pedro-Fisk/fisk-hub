@@ -55,6 +55,9 @@
     .prof-bar button{border:0;background:transparent;color:#2563EB;font-weight:700;cursor:pointer;font-size:.85rem;font-family:inherit;}
     body.theme-dark .prof-bar button{color:#6ea8ff;}
     body.prof-out .prof-bar{display:none;}
+    .prof-actas{border:1px solid #7C3AED;background:#f1eafd;color:#4c1d95;border-radius:999px;
+      padding:4px 10px;font-size:.8rem;font-weight:700;font-family:inherit;cursor:pointer;max-width:230px;}
+    body.theme-dark .prof-actas{background:#2a1b45;border-color:#7C3AED;color:#d7c4fb;}
   </style>
 
   <div id="profGate">
@@ -89,6 +92,7 @@
 
   <div class="prof-bar" id="profBar">
     <span id="profBarName"></span>
+    <select id="profActAs" class="prof-actas" hidden aria-label="Ver como professor"></select>
     <button type="button" id="profLogout" data-i18n="pg-logout">Sair</button>
   </div>
 
@@ -347,7 +351,7 @@
         'md-title':'Visão Geral','md-more':'ver análise completa →','md-alunos':'Alunos',
         'md-emdia':'Em dia','md-atras':'Atrasados','md-crit':'Críticos',
         'md-faltas':'Faltas médias','md-nota':'Média de notas','md-turmas':'turmas',
-        'md-load':'analisando suas turmas…',
+        'md-load':'analisando suas turmas…','md-pick':'Escolha um professor no seletor do topo para ver o painel dele.',
         'card-planner-h2': 'Criador de Planners',
         'card-planner-p':  'Crie o PPT / Planner do aluno com as datas corretas',
         'card-conv-h2':    'Conversation Maker',
@@ -403,7 +407,7 @@
         'md-title':'Overview','md-more':'see full analysis →','md-alunos':'Students',
         'md-emdia':'On track','md-atras':'Behind','md-crit':'Critical',
         'md-faltas':'Avg. absences','md-nota':'Avg. grade','md-turmas':'classes',
-        'md-load':'analyzing your classes…',
+        'md-load':'analyzing your classes…','md-pick':'Pick a teacher in the selector above to see their panel.',
         'card-planner-h2': 'Planner Creator',
         'card-planner-p':  'Create student planners with the correct dates',
         'card-conv-h2':    'Conversation Maker',
@@ -459,7 +463,7 @@
         'md-title':'Visión General','md-more':'ver análisis completo →','md-alunos':'Alumnos',
         'md-emdia':'Al día','md-atras':'Atrasados','md-crit':'Críticos',
         'md-faltas':'Faltas medias','md-nota':'Nota media','md-turmas':'grupos',
-        'md-load':'analizando tus grupos…',
+        'md-load':'analizando tus grupos…','md-pick':'Elige un profesor en el selector de arriba para ver su panel.',
         'card-planner-h2': 'Creador de Planners',
         'card-planner-p':  'Crea planners del alumno con las fechas correctas',
         'card-conv-h2':    'Conversation Maker',
@@ -884,11 +888,61 @@
         $('profBarName').textContent = '👤 ' + (prof.name || '') + (esc ? ' · ' + esc : '');
       }
 
+      /* ── Acesso master: diretor "veste a camisa" de um professor sem login ──
+         _actingProf() = quem os dashboards devem mostrar: o professor escolhido
+         no seletor (só p/ diretor) ou a própria conta (professor comum). */
+      var PROF_AWARE = ['planejador.html','2nd-chance.html','termo-atraso.html','visao-geral.html'];
+      function actingSaved(){ try{ return JSON.parse(localStorage.getItem('fisk_actas')||'null'); }catch(e){ return null; } }
+      window._actingProf = function(){
+        var sv = saved(); if (!sv) return null;
+        if (sv.master){ var a = actingSaved(); return (a && a.name) ? a : null; }
+        return sv;
+      };
+      // aponta os atalhos das ferramentas p/ o professor efetivo (pré-seleção; nunca trava)
+      function updateToolLinks(){
+        var p = window._actingProf();
+        document.querySelectorAll('main.grid a.card, .md-cta').forEach(function(a){
+          if (!a.getAttribute('data-base')){ a.setAttribute('data-base', (a.getAttribute('href')||'').split('?')[0].split('#')[0]); }
+          var base = a.getAttribute('data-base') || '';
+          if (PROF_AWARE.indexOf(base.split('/').pop()) === -1) return;
+          if (p && p.name){
+            var esc = String(p.escolas||p.escola||'').split(',')[0].trim();
+            a.href = base + '?escola=' + encodeURIComponent(esc) + '&prof=' + encodeURIComponent(p.name);
+          } else { a.href = base; }
+        });
+      }
+      function setupActAs(){
+        var sb = $('profActAs'); if (!sb) return;
+        sb.hidden = false;
+        fetch(EP+'?action=profList').then(function(r){return r.json();}).then(function(res){
+          var ps = ((res&&res.profs)||[]).filter(function(p){ return !p.director; })
+            .sort(function(a,b){ return String(a.name).localeCompare(String(b.name),'pt-BR'); });
+          var cur = (actingSaved()||{}).name || '';
+          sb.innerHTML = '<option value="">👥 Ver como professor…</option>' +
+            ps.map(function(p){
+              var nm = String(p.name).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+              return '<option value="'+nm+'" data-esc="'+String(p.escolas||'').replace(/"/g,'&quot;')+'"'+(p.name===cur?' selected':'')+'>'+nm+' · '+p.escolas+'</option>';
+            }).join('');
+        }).catch(function(){});
+        sb.onchange = function(){
+          var opt = sb.options[sb.selectedIndex];
+          try{
+            if (!sb.value) localStorage.removeItem('fisk_actas');
+            else localStorage.setItem('fisk_actas', JSON.stringify({ name:sb.value, escolas:opt.getAttribute('data-esc')||'' }));
+            localStorage.removeItem('fisk_minidash');
+          }catch(e){}
+          updateToolLinks();
+          if (window._mdLoad) window._mdLoad();
+        };
+      }
+
       function enter(prof){
         try{ localStorage.setItem('fisk_prof', JSON.stringify(prof)); }catch(e){}
         document.body.classList.remove('prof-out');
         document.body.classList.add('prof-in');
         fillBar(prof);
+        if (prof && prof.master) setupActAs();
+        updateToolLinks();
         setTimeout(function(){ if (window._mdLoad) window._mdLoad(); }, 0);
       }
 
@@ -947,7 +1001,7 @@
         applyLang(b.dataset.lang); setMode(mode); setPlaceholders();
       });
       $('profLogout').addEventListener('click', function(){
-        try{ localStorage.removeItem('fisk_prof'); }catch(e){}
+        try{ localStorage.removeItem('fisk_prof'); localStorage.removeItem('fisk_actas'); localStorage.removeItem('fisk_minidash'); }catch(e){}
         location.reload();
       });
 
@@ -958,7 +1012,7 @@
         history.replaceState(null, '', location.pathname + location.search);
         msg.textContent = tr('pg-wait');
         post({ action:'dirCheck', token: decodeURIComponent(mDir[1]) }).then(function(res){
-          if (res && res.ok && res.director){ enter(res.director); }
+          if (res && res.ok && res.director){ res.director.master = true; enter(res.director); }
           else {
             loadProfs(); setMode('login'); setPlaceholders();
             msg.textContent = (res && res.error) || tr('pg-err');
@@ -971,7 +1025,7 @@
       }
 
       var s = saved();
-      if (s){ fillBar(s); }        // já logado (classe prof-in veio do pre-paint)
+      if (s){ fillBar(s); if (s.master) setupActAs(); updateToolLinks(); }  // já logado (prof-in veio do pre-paint)
       else { loadProfs(); setMode('login'); setPlaceholders(); }
     })();
 
@@ -1030,7 +1084,13 @@
       }
 
       function load(){
-        var s = sess();
+        var raw = sess();
+        var s = (window._actingProf ? window._actingProf() : raw);
+        if (raw && raw.master && (!s || !s.name)){ // diretor sem professor escolhido
+          sec.hidden = false;
+          box.innerHTML = '<div class="md-status">👆 '+tr('md-pick')+'</div>';
+          return;
+        }
         if (!s || !s.name){ sec.hidden = true; return; }
         try{
           var c = JSON.parse(localStorage.getItem('fisk_minidash')||'null');
