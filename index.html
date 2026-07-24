@@ -841,7 +841,9 @@
       }
 
       function fillBar(prof){
-        if (prof) $('profBarName').textContent = '👤 ' + (prof.name || '') + (prof.escola ? ' · ' + prof.escola : '');
+        if (!prof) return;
+        var esc = String(prof.escolas || prof.escola || '').replace(/,/g, ' + ');
+        $('profBarName').textContent = '👤 ' + (prof.name || '') + (esc ? ' · ' + esc : '');
       }
 
       function enter(prof){
@@ -858,7 +860,8 @@
           sel.innerHTML = '<option value="" disabled selected>' + tr('pg-name-ph') + '</option>' +
             ps.map(function(p){
               var nm = String(p.name).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
-              return '<option value="' + nm + '">' + nm + ' · ' + p.escola + (p.registered ? '  ✓' : '') + '</option>';
+              var esc = String(p.escolas || '').replace(/,/g, ' + ');
+              return '<option value="' + nm + '">' + nm + (esc ? ' · ' + esc : '') + (p.registered ? '  ✓' : '') + '</option>';
             }).join('');
         }).catch(function(){ sel.innerHTML = '<option value="" disabled selected>—</option>'; });
       }
