@@ -65,6 +65,7 @@
 .card-spanish      { --accent: #CC7C08; }
 .card-simulado     { --accent: #7C3AED; }
 .card-met          { --accent: #0EA5A0; } /* teal dos eventos MET no calendário */
+.card-overview     { --accent: #7C3AED; } /* roxo do panorama estatístico */
 
 .icon{
   width: 64px;
