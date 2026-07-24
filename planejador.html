@@ -49,6 +49,8 @@
   .btn-ghost:hover{background:#dbe6f0}
   .btn-pdf{background:var(--blue);color:#fff;padding:.55rem 1.1rem;font-size:.9rem}
   .btn-pdf:hover{background:var(--blue-mid)}
+  .btn-drive{background:var(--emdia);color:#fff;padding:.55rem 1.1rem;font-size:.9rem}
+  .btn-drive:hover{filter:brightness(1.06)}
   .btn:disabled{opacity:.55;cursor:not-allowed}
   /* bloco de finalização (fim do processo): data + conversação + botões */
   .finalizar{margin-top:1.1rem;padding-top:.95rem;border-top:2px solid var(--blue-soft);
@@ -194,6 +196,7 @@
       <div class="fin-acoes">
         <button type="button" class="btn btn-ghost" id="btnCopiar">📋 Copiar roteiro</button>
         <button type="button" class="btn btn-pdf" id="btnPdf">📄 Gerar PDF do plano de aula</button>
+        <button type="button" class="btn btn-drive" id="btnDrive">📁 Enviar para pasta da turma</button>
       </div>
     </div>
 
@@ -759,6 +762,22 @@ async function gerarPDF() {
   }
 }
 $('btnPdf').addEventListener('click', gerarPDF);
+
+/* ---- enviar o PDF para a pasta da turma no drive compartilhado ---- */
+$('btnDrive').addEventListener('click', function () {
+  if (!turma) { alert('Carregue uma turma primeiro.'); return; }
+  if (!window.PDFLib) { alert('A biblioteca de PDF não carregou. Verifique a conexão e recarregue a página.'); return; }
+  if (typeof fiskEnviarParaPasta !== 'function') { alert('Helper de Drive não carregou (fisk-shared.js).'); return; }
+  fiskEnviarParaPasta($('btnDrive'), async function () {
+    var dp = dadosPlano();
+    var bytes = await montarPDFplano(dp);
+    return {
+      endpoint: API_URL, key: API_KEY, tipo: 'turma',
+      escola: turma.escola || '', professor: turma.professor || turma.aba || '',
+      turma: turma.turma || '', filename: nomeArquivoPlano(dp), bytes: bytes
+    };
+  }).catch(function () { /* feedback já tratado no helper */ });
+});
 
 /* ---- confirmação ao voltar ao Hub (não perder a fila reordenada) ---- */
 (function () {
