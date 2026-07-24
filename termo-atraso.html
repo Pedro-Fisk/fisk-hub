@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="assets/fisk-shared.css">
 <meta name="theme-color" content="#161414">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="assets/fisk-shared.js"></script>
 <style>
   /* específico da ferramenta (o kit compartilhado traz tokens e componentes).
      O DOCUMENTO gerado é azul (princípios do boletim de jovens e adultos);
@@ -152,6 +153,8 @@
 
   <section class="painel" hidden id="painelGerar">
     <button class="btn-generate" id="btnPdf">📄 Gerar Termo de Atraso (PDF)</button>
+    <button class="btn-generate" id="btnDrive" disabled title="Gere o PDF primeiro"
+      style="margin-top:.5rem;background:#27866e">📁 Salvar na pasta do aluno</button>
     <p class="aviso" style="margin:.6rem 0 0">O PDF sai fechado (não editável) e o card recebe automaticamente
     uma nota na célula da última aula do aluno registrando o termo.</p>
     <embed id="preview" type="application/pdf" hidden style="margin-top:.8rem">
@@ -456,6 +459,21 @@ function extrairHorario(titulo){
 /* ============ PDF (pdf-lib, documento FECHADO — sem campos editáveis) ============ */
 document.getElementById('btnPdf').addEventListener('click', gerarPDF);
 
+/* PDF gerado mais recentemente (para salvar na pasta do aluno no Drive) */
+var ultimoPDF = null;
+document.getElementById('btnDrive').addEventListener('click', function () {
+  if (!ultimoPDF) { alert('Gere o PDF primeiro.'); return; }
+  if (typeof fiskEnviarParaPasta !== 'function') { alert('Helper de Drive não carregou (fisk-shared.js).'); return; }
+  var fProf = document.getElementById('fProf');
+  fiskEnviarParaPasta(document.getElementById('btnDrive'), {
+    endpoint: API_URL, key: API_KEY, tipo: 'aluno',
+    escola: (payload && payload.escola) || '',
+    professor: ((fProf && fProf.value) || (payload && (payload.professor || payload.aba)) || '').trim(),
+    turma: (payload && payload.turma ? String(payload.turma).split('\n')[0] : '').trim(),
+    aluno: ultimoPDF.aluno, filename: ultimoPDF.filename, bytes: ultimoPDF.bytes
+  }).catch(function () {});
+});
+
 async function gerarPDF() {
   if (!alunoSel) return;
   if (modoLivre) {
@@ -652,6 +670,10 @@ async function gerarPDF() {
   aEl.click();
   var prev = document.getElementById('preview');
   prev.src = url; prev.hidden = false;
+  // guarda o PDF gerado para enviá-lo à pasta do aluno no Drive
+  ultimoPDF = { bytes: bytes, filename: aEl.download, aluno: (alunoSel.nome || '').trim() };
+  var bd = document.getElementById('btnDrive');
+  if (bd) { bd.disabled = false; bd.title = 'Salvar este PDF na pasta do aluno'; }
 
   /* registra no card (nota na célula da última aula do aluno) — prefere a API,
      que funciona em qualquer modo e respeita a turma trocada no seletor */
