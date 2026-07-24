@@ -1,22 +1,23 @@
 /**
  * FISK Hub — Salvar PDF na pasta da turma / do aluno (drive compartilhado)
  * =========================================================================
- * ⚠️ ONDE COLAR: este é um endpoint NOVO. Conforme a regra do próprio card
- * ("endpoints novos vão no projeto SEPARADO fisk-hub-backend"), NÃO cole
- * dentro do CardTools.gs — um projeto só pode ter UM doPost, e você já foi
- * avisado que editar o CardTools por outra sessão apaga trabalho.
+ * ✅ JÁ ESTÁ NO AR — este arquivo virou REFERÊNCIA/documentação.
+ * O código roda no projeto Apps Script "fisk-hub-backend"
+ * (script `1AlWF9j-indNvmh_A3Jk9k28mCC3uhF8eP_dj7C74BzX1wauT3b1VGFTm`, o mesmo
+ * backend do Portal do Aluno, versionado em ../fisk-hub-backend via clasp).
+ * Como aquele projeto já tinha um doPost — e um projeto só pode ter UM —, o
+ * conteúdo daqui foi MESCLADO no `Code.js` de lá como `salvarPdfNoDrive(req)`,
+ * despachado por `req.fn === 'salvarPdf'`. NÃO existe um projeto novo só disso,
+ * e NADA foi colado no CardTools.gs do card (regra do próprio card).
  *
- * PASSO A PASSO:
- *   1) Abra (ou crie) o projeto Apps Script SEPARADO "fisk-hub-backend"
- *      (script.google.com → Novo projeto). NÃO é o CardTools.
- *   2) Cole TODO este conteúdo num arquivo .gs desse projeto (pode ser o
- *      Code.gs padrão — substitua o conteúdo dele).
- *   3) Implantar → Nova implantação → tipo "App da Web":
- *        - Executar como: Eu
- *        - Quem tem acesso: Qualquer pessoa
- *   4) Copie a URL do App da Web (termina em /exec) e cole em
- *      assets/fisk-shared.js na constante FISK_SAVE_URL. (As ferramentas
- *      fazem POST para ESSA url, separada do API_URL do card.)
+ * ENDPOINT em uso (já colado em assets/fisk-shared.js → FISK_SAVE_URL):
+ *   https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec
+ *
+ * PARA ALTERAR: edite ../fisk-hub-backend/Code.js e publique com
+ *   clasp push -f && clasp deploy -i AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1 -d "vN"
+ * Mantenha este arquivo em sincronia com o de lá (é a cópia legível).
+ * ⚠️ DriveApp é escopo novo naquele projeto: depois do push, rode `setupDrive()`
+ * uma vez no editor para o dono da implantação autorizar o acesso ao Drive.
  *
  * As ferramentas fazem POST (JSON) com o corpo:
  *   { fn:'salvarPdf', key, tipo:'turma'|'aluno',
