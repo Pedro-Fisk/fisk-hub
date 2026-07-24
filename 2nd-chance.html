@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notificação 2nd Chance — FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css">
+<meta name="theme-color" content="#161414">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<style>
+  /* Acentos na tela ecoam a paleta AZUL do boletim de jovens e adultos
+     (sheet-adults): o PDF gerado usa exatamente esses azuis. */
+  :root{ --blue:#2b4d70; --blue-mid:#3d6b93; --blue-pill:#223e5a; --blue-soft:#e9eff5;
+         --blue-ink:#1d3349; --blue-bd:#a9bccd; }
+  [hidden]{ display:none !important; }
+  main{max-width:760px;margin:0 auto;padding:1.2rem;width:100%}
+  .painel{background:var(--white);border:1px solid var(--surface-border-color);
+          border-radius:var(--surface-radius);box-shadow:var(--surface-shadow);
+          padding:1.1rem 1.2rem;margin-bottom:1rem}
+  .painel h2{margin:0 0 .5rem;font-size:1.05rem;color:var(--blue)}
+  .painel .sub{font-size:.85rem;color:var(--gray);margin:0 0 .8rem}
+  .row{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center}
+  select,.campo input[type=text],.campo textarea{width:100%;padding:.5rem .6rem;
+    border:1px solid var(--gray-light);border-radius:9px;font-family:var(--font-body);
+    font-size:.92rem;background:var(--white);color:var(--black)}
+  select{cursor:pointer}
+  .campo{flex:1 1 200px}
+  .campo label{display:block;font-size:.78rem;font-weight:800;margin-bottom:.25rem}
+  .campo textarea{min-height:120px;resize:vertical;line-height:1.4}
+  .ind{display:inline-block;width:13px;height:13px;margin-left:.35rem;vertical-align:-2px}
+  .ind.spin{border:2px solid var(--gray-light);border-top-color:var(--blue);border-radius:50%;
+            animation:gira .7s linear infinite}
+  .ind.ok::after{content:'✓';color:var(--green);font-weight:900;font-size:.9rem}
+  @keyframes gira{to{transform:rotate(360deg)}}
+  .lista{display:flex;flex-direction:column;gap:.4rem;max-height:320px;overflow-y:auto}
+  .aluno{display:flex;align-items:center;gap:.6rem;padding:.5rem .7rem;
+         border:1px solid var(--gray-light);border-radius:10px;cursor:pointer;
+         font-size:.92rem;background:var(--white)}
+  .aluno:hover{border-color:var(--blue-mid)}
+  .aluno.sel{border-color:var(--blue);background:var(--blue-soft)}
+  .tag{margin-left:auto;font-size:.72rem;font-weight:800;padding:.15rem .55rem;
+       border-radius:99px;white-space:nowrap}
+  .tag.refazer{background:var(--blue);color:#fff}
+  .tag.ok{background:var(--gray-light);color:var(--gray)}
+  .tag.semnota{background:#f0e6d2;color:#8a6d1f}
+  .provas{display:flex;gap:.7rem;flex-wrap:wrap;margin:.4rem 0 .8rem}
+  .prova{flex:1 1 150px;background:var(--blue-soft);border-radius:12px;padding:.6rem .8rem;
+         text-align:center;border:1.5px solid var(--blue-bd)}
+  .prova b{display:block;font-size:1.5rem;font-family:var(--font-heading);color:var(--blue-pill)}
+  .prova span{font-size:.75rem;font-weight:800;color:var(--blue-ink)}
+  .prova.alerta{background:var(--blue-soft);border-color:var(--blue);border-width:2px}
+  .prova.alerta b{color:var(--blue-pill)}
+  .prova .rf{display:inline-block;margin-top:.2rem;font-size:.68rem;font-weight:800;
+             font-style:italic;color:var(--blue-pill)}
+  .sugs label{display:flex;gap:.5rem;align-items:flex-start;font-size:.9rem;padding:.5rem .7rem;
+              border:1.5px solid var(--gray-light);border-radius:10px;margin-bottom:.4rem;cursor:pointer;font-weight:600}
+  .sugs label:has(input:checked){border-color:var(--blue);background:var(--blue-soft)}
+  .pill-toggle{display:inline-flex;background:var(--blue-soft);border-radius:10px;padding:4px;gap:4px}
+  .pill-toggle button{border:none;background:transparent;padding:.45rem 1rem;border-radius:8px;
+    font-family:var(--font-heading);font-weight:700;font-size:.85rem;color:var(--gray);cursor:pointer}
+  .pill-toggle button.active{background:var(--blue);color:#fff}
+  .chk{display:inline-flex;gap:.4rem;align-items:center;font-size:.85rem;font-weight:700;color:var(--gray)}
+  .btn{border:0;border-radius:11px;font-weight:800;cursor:pointer;font-family:var(--font-heading)}
+  .btn-blue{background:var(--blue);color:#fff;padding:.7rem 1.3rem;font-size:1rem;width:100%}
+  .btn-blue:hover{background:var(--blue-pill)}
+  .btn-wa{background:#25d366;color:#0b3d1f;padding:.6rem 1rem;font-size:.9rem}
+  .btn-ghost{background:var(--blue-soft);color:var(--blue-pill);padding:.6rem 1rem;font-size:.9rem}
+  .status{font-size:.86rem;font-weight:700;color:var(--gray);margin-top:.5rem}
+  .status.err{color:#c0392b}.status.ok{color:var(--green)}
+  #preview{width:100%;height:560px;border:1px solid var(--gray-light);border-radius:10px;margin-top:.6rem}
+  .hintbox{background:var(--blue-soft);border-radius:10px;padding:.55rem .8rem;font-size:.82rem;
+           color:var(--blue-ink);margin-top:.5rem}
+</style>
+</head>
+<body>
+<script>try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
+
+<header class="hero">
+  <a class="back-link" href="index.html">&larr; Voltar ao Hub</a>
+  <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
+  <img id="brandLogo" class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+  <h1>Notificação 2nd Chance</h1>
+  <p>Aviso de refazimento de prova &middot; Jovens e Adultos</p>
+</header>
+
+<main>
+  <!-- 1 · conexão com o card -->
+  <div class="painel">
+    <h2>🔗 Conectar ao card</h2>
+    <p class="sub">Escolha a turma: a ferramenta lê as notas ao vivo e mostra quem tirou menos de 6,0 em alguma prova (Escrita ou Auditiva) — quem precisa de 2nd chance.</p>
+    <div id="origem" class="row" hidden>
+      <div style="flex:1 1 170px">
+        <select id="selEscola" disabled><option value="" disabled selected>Escola…</option></select><span id="indEscola" class="ind"></span>
+      </div>
+      <div style="flex:1 1 190px">
+        <select id="selProf" disabled><option value="" disabled selected>Professor(a)…</option></select><span id="indProf" class="ind"></span>
+      </div>
+      <div style="flex:1 1 200px">
+        <select id="selTurma" disabled><option value="" disabled selected>Turma…</option></select><span id="indTurma" class="ind"></span>
+      </div>
+      <button type="button" class="btn btn-ghost" id="btnCarregar" disabled>Carregar turma</button>
+    </div>
+    <div class="status" id="statusCard"></div>
+    <div class="row" style="margin-top:.7rem">
+      <button type="button" class="btn btn-ghost" id="btnLivre">✍️ Preencher à mão (sem card)</button>
+    </div>
+  </div>
+
+  <!-- 2 · avaliação + lista -->
+  <div class="painel" id="painelTurma" hidden>
+    <h2 id="tituloTurma">Alunos da turma</h2>
+    <div class="row" style="justify-content:space-between;margin-bottom:.7rem">
+      <div class="pill-toggle" id="avToggle">
+        <button data-av="1" class="active">1ª Avaliação</button>
+        <button data-av="2">2ª Avaliação</button>
+      </div>
+      <label class="chk"><input type="checkbox" id="soPrecisam" checked> só quem precisa de 2nd chance</label>
+    </div>
+    <div class="lista" id="lista"></div>
+  </div>
+
+  <!-- 3 · aluno selecionado -->
+  <div class="painel" id="painelAluno" hidden>
+    <h2 id="nomeAluno">Aluno</h2>
+    <div class="provas" id="provas"></div>
+
+    <div id="camposLivre" hidden>
+      <div class="row">
+        <div class="campo"><label>Nome completo do aluno</label><input type="text" id="fNome"></div>
+      </div>
+      <div class="row">
+        <div class="campo"><label>Prova Escrita (0–10)</label><input type="text" id="fEscrita" inputmode="decimal" placeholder="ex.: 5,0"></div>
+        <div class="campo"><label>Prova Auditiva (0–10)</label><input type="text" id="fAuditiva" inputmode="decimal" placeholder="ex.: 5,0"></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="campo"><label>Professor(a)</label><input type="text" id="fProf"></div>
+      <div class="campo"><label>Estágio</label><input type="text" id="fEstagio"></div>
+    </div>
+    <div class="row">
+      <div class="campo"><label>Turma / horário</label><input type="text" id="fTurma"></div>
+      <div class="campo"><label>Lições a estudar (para o PDF)</label><input type="text" id="fLicoes" placeholder="ex.: 1 a 5"></div>
+    </div>
+
+    <h2 style="margin-top:1rem">🎯 Para a recuperação <span style="font-size:12px;color:var(--gray);font-weight:600">(vira a lista do PDF)</span></h2>
+    <p class="sub">Marque o que o aluno deve fazer e/ou escreva livremente. As lições preenchidas acima também entram na lista.</p>
+    <div id="sugBoxes" class="sugs"></div>
+    <div class="campo" style="margin-top:.4rem"><label>Outros (escreva livremente — uma ideia por linha)</label><textarea id="sugLivre" placeholder="ex.: agendar a segunda chance para a próxima aula"></textarea></div>
+
+    <h2 style="margin-top:1rem">💬 Mensagem para o WhatsApp da família</h2>
+    <p class="sub">Texto leve, <b>sem citar notas</b> — só avisa que segue um comunicado e que o aluno vai refazer uma prova. Baixe o PDF abaixo e anexe na conversa.</p>
+    <div class="row" style="margin-bottom:.5rem;align-items:center;gap:.6rem">
+      <span style="font-size:.82rem;font-weight:800;color:var(--gray)">Aluno(a):</span>
+      <div class="pill-toggle" id="generoToggle">
+        <button type="button" data-g="f" class="active">Menina</button>
+        <button type="button" data-g="m">Menino</button>
+      </div>
+    </div>
+    <div class="campo"><textarea id="msg"></textarea></div>
+    <div class="row" style="margin-top:.5rem">
+      <button type="button" class="btn btn-ghost" id="btnCopiar">📋 Copiar mensagem</button>
+      <button type="button" class="btn btn-wa" id="btnWhats">🟢 Abrir no WhatsApp</button>
+      <span class="status" id="statusMsg"></span>
+    </div>
+
+    <h2 style="margin-top:1rem">📄 Comunicado em PDF (azul)</h2>
+    <div class="row"><button type="button" class="btn btn-blue" id="btnPDF">Gerar e baixar o PDF</button></div>
+    <div class="hintbox" id="hintPDF">O PDF mostra as duas provas e destaca a que precisa ser refeita, no padrão azul do boletim de jovens e adultos.</div>
+    <iframe id="preview" hidden></iframe>
+  </div>
+</main>
+
+<footer style="text-align:center;font-size:.75rem;color:var(--gray);padding:1.5rem 1rem">
+  Ferramenta interna das escolas Fisk Taubaté · Caçapava.
+</footer>
+
+<script src="assets/fisk-shared.js"></script>
+<script>
+/* ============================================================
+   Notificação 2nd Chance — lê as provas do card (mesma API do termo
+   e do boletim) e gera (1) uma mensagem leve de WhatsApp SEM notas e
+   (2) um comunicado em PDF azul (paleta do boletim de jovens e adultos).
+   Gatilho: nota individual < 6 nas provas Escrita (B) ou Auditiva (A);
+   o aluno refaz apenas a(s) prova(s) < 6.
+   ============================================================ */
+var API_URL = 'https://script.google.com/macros/s/AKfycbxb3s3zSUoaFO9ytEQ4W6r-5xJ3hiA9fbFhugnbd9gyX-m3KGNNM8DeyGgNWPReYEwU/exec';
+var API_KEY = 'fisk-cards-2026-vX7q3nT';
+var MIN = 6; // nota mínima exigida pela Fundação Fisk
+
+var $ = function (id) { return document.getElementById(id); };
+var turma = null;      // payload de fn=turma
+var avSel = '1';       // avaliação em foco (1 ou 2)
+var alunoSel = null;   // { nome, estagio, escrita, auditiva }
+var modoLivre = false;
+
+function statusCard(msg, kind) { var s = $('statusCard'); s.textContent = msg || ''; s.className = 'status' + (kind ? ' ' + kind : ''); }
+function ind(id, estado) { $(id).className = 'ind' + (estado ? ' ' + estado : ''); }
+
+/* ---- API ---- */
+function api(params) {
+  var qs = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
+  return fetch(API_URL + '?key=' + encodeURIComponent(API_KEY) + '&' + qs)
+    .then(function (r) { return r.json(); })
+    .then(function (j) { if (j && j.erro) throw new Error(j.erro); return j; });
+}
+
+/* ---- lê as provas A (auditiva) e B (escrita) da célula do card ----
+   Só a última linha ("A8 B7,5 ...") é lida (o "A1" de "TRA1" fica de fora). */
+function parseProvas(cellText) {
+  if (!cellText || !String(cellText).trim()) return null;
+  var lines = String(cellText).split('\n');
+  var noteLine = lines[lines.length - 1];
+  var res = {};
+  var re = /(?:^|\s)([AB])\s*([0-9]+(?:[.,][0-9]+)?)/g, m;
+  while ((m = re.exec(noteLine))) { res[m[1]] = parseFloat(m[2].replace(',', '.')); }
+  if (res.A === undefined && res.B === undefined) return null;
+  return { auditiva: res.A, escrita: res.B }; // A = Escuta/Listening/Auditiva · B = Escrita/Written
+}
+function num(v) { return (typeof v === 'number' && !isNaN(v)); }
+function fmtNota(v) { return num(v) ? v.toFixed(1).replace('.', ',') : '-'; }
+function primeiroNome(n) { return String(n || '').trim().split(/\s+/)[0] || 'o(a) aluno(a)'; }
+
+/* quais provas o aluno precisa refazer (as < 6 que existem) */
+function provasAbaixo(p) {
+  var out = [];
+  if (p && num(p.escrita) && p.escrita < MIN) out.push('escrita');
+  if (p && num(p.auditiva) && p.auditiva < MIN) out.push('auditiva');
+  return out;
+}
+function rotuloProva(k) { return k === 'escrita' ? 'Prova Escrita' : 'Prova Auditiva'; }
+
+/* ============ CASCATA (escola → prof → turma) + #t= ============ */
+function montarSelect(sel, ph, itens) {
+  sel.innerHTML = '<option value="" disabled selected>' + ph + '</option>' +
+    itens.map(function (i) { return '<option value="' + i.v + '">' + String(i.t).replace(/</g, '&lt;') + '</option>'; }).join('');
+  sel.disabled = false;
+}
+function initCascade() {
+  $('origem').hidden = false;
+  statusCard('Escolha escola, professor(a) e turma — os dados vêm ao vivo do card.');
+  var selEscola = $('selEscola'), selProf = $('selProf'), selTurma = $('selTurma'), btn = $('btnCarregar');
+  ind('indEscola', 'spin');
+  api({ fn: 'escolas' }).then(function (j) {
+    montarSelect(selEscola, 'Escolha a escola…', (j.escolas || []).map(function (e) { return { v: e, t: e }; }));
+    ind('indEscola', 'ok');
+  }).catch(function (e) { ind('indEscola', ''); statusCard('⚠️ ' + e.message, 'err'); });
+
+  selEscola.addEventListener('change', function () {
+    if (!selEscola.value) return;
+    selProf.innerHTML = '<option value="" disabled selected>Carregando…</option>'; selProf.disabled = true;
+    selTurma.innerHTML = '<option value="" disabled selected>Turma…</option>'; selTurma.disabled = true; btn.disabled = true;
+    ind('indProf', 'spin'); ind('indTurma', '');
+    api({ fn: 'profs', escola: selEscola.value }).then(function (j) {
+      montarSelect(selProf, 'Escolha o professor(a)…', (j.profs || []).map(function (p) { return { v: p, t: p }; }));
+      ind('indProf', 'ok');
+    }).catch(function (e) { ind('indProf', ''); statusCard('⚠️ ' + e.message, 'err'); });
+  });
+  selProf.addEventListener('change', function () {
+    if (!selProf.value) return;
+    selTurma.innerHTML = '<option value="" disabled selected>Carregando…</option>'; selTurma.disabled = true; btn.disabled = true;
+    ind('indTurma', 'spin');
+    api({ fn: 'turmas', escola: selEscola.value, prof: selProf.value }).then(function (j) {
+      montarSelect(selTurma, 'Escolha a turma…', (j.turmas || []).map(function (t) { return { v: t.linhaTitulo, t: t.titulo }; }));
+      ind('indTurma', 'ok');
+    }).catch(function (e) { ind('indTurma', ''); statusCard('⚠️ ' + e.message, 'err'); });
+  });
+  selTurma.addEventListener('change', function () { btn.disabled = !selTurma.value; });
+  btn.addEventListener('click', function () {
+    if (!selTurma.value) return;
+    btn.disabled = true; btn.textContent = '⏳ Carregando…'; statusCard('🔄 Lendo a turma ao vivo…');
+    api({ fn: 'turma', escola: selEscola.value, prof: selProf.value, linha: selTurma.value })
+      .then(onTurma).catch(function (e) { statusCard('⚠️ ' + e.message, 'err'); })
+      .then(function () { btn.disabled = false; btn.textContent = 'Carregar turma'; });
+  });
+}
+function initFragment() {
+  var ref = decodeURIComponent(location.hash.slice(3)).split('|'); // escola|prof|linha
+  statusCard('🔄 Lendo a turma do card…');
+  api({ fn: 'turma', escola: ref[0], prof: ref[1], linha: ref[2] })
+    .then(onTurma).catch(function (e) { statusCard('⚠️ ' + e.message + ' — use a cascata.', 'err'); initCascade(); });
+}
+
+/* ---- turma carregada: escolhe avaliação padrão e monta a lista ---- */
+function temNotas(av) { return (turma.alunos || []).some(function (a) { return parseProvas(av === '2' ? a.notasAv2 : a.notasAv1); }); }
+function onTurma(dados) {
+  turma = dados; modoLivre = false; alunoSel = null;
+  $('painelAluno').hidden = true;
+  // avaliação padrão: a mais recente que tem notas
+  avSel = temNotas('2') ? '2' : '1';
+  document.querySelectorAll('#avToggle button').forEach(function (b) { b.classList.toggle('active', b.dataset.av === avSel); });
+  $('tituloTurma').textContent = 'Alunos — ' + String(dados.turma || '').split('\n')[0];
+  $('painelTurma').hidden = false;
+  statusCard('Turma carregada. Avaliação em foco: ' + avSel + 'ª (troque no seletor).', 'ok');
+  renderLista();
+}
+function alunoProvas(a) { return parseProvas(avSel === '2' ? a.notasAv2 : a.notasAv1); }
+function renderLista() {
+  var alunos = (turma.alunos || []).filter(function (a) { return a && a.nome; });
+  var soPrecisam = $('soPrecisam').checked;
+  var html = '';
+  alunos.forEach(function (a, i) {
+    var p = alunoProvas(a);
+    var abaixo = provasAbaixo(p);
+    if (soPrecisam && abaixo.length === 0) return;
+    var tag = !p ? '<span class="tag semnota">sem notas</span>'
+      : abaixo.length ? '<span class="tag refazer">refazer: ' + abaixo.map(function (k) { return k === 'escrita' ? 'Escrita' : 'Auditiva'; }).join(' + ') + '</span>'
+      : '<span class="tag ok">provas ok</span>';
+    html += '<div class="aluno" data-i="' + i + '"><span>' + String(a.nome).replace(/</g, '&lt;') + '</span>' + tag + '</div>';
+  });
+  $('lista').innerHTML = html || '<p class="sub">Ninguém precisa de 2nd chance nesta avaliação. Desmarque o filtro para ver todos.</p>';
+  $('lista').querySelectorAll('.aluno').forEach(function (el) {
+    el.addEventListener('click', function () {
+      $('lista').querySelectorAll('.aluno').forEach(function (x) { x.classList.remove('sel'); });
+      el.classList.add('sel');
+      escolherAluno(alunos[+el.dataset.i]);
+    });
+  });
+}
+document.querySelectorAll('#avToggle button').forEach(function (b) {
+  b.addEventListener('click', function () {
+    avSel = b.dataset.av;
+    document.querySelectorAll('#avToggle button').forEach(function (x) { x.classList.toggle('active', x === b); });
+    $('painelAluno').hidden = true;
+    renderLista();
+  });
+});
+$('soPrecisam').addEventListener('change', renderLista);
+
+/* ============ ALUNO ESCOLHIDO ============ */
+function escolherAluno(a) {
+  var p = alunoProvas(a) || {};
+  alunoSel = { nome: a.nome, estagio: a.book || '', escrita: p.escrita, auditiva: p.auditiva };
+  modoLivre = false;
+  $('camposLivre').hidden = true;
+  preencherPainelAluno();
+}
+function preencherPainelAluno() {
+  $('nomeAluno').textContent = alunoSel.nome || 'Aluno';
+  $('fProf').value = turma ? (turma.professor || turma.aba || '') : $('fProf').value;
+  $('fEstagio').value = alunoSel.estagio || '';
+  $('fTurma').value = turma ? String(turma.turma || '').split('\n')[0] : $('fTurma').value;
+  renderProvas();
+  $('msg').value = montarMensagem();
+  $('painelAluno').hidden = false;
+  $('preview').hidden = true;
+  $('statusMsg').textContent = '';
+  $('painelAluno').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function renderProvas() {
+  var provas = [
+    { k: 'escrita', rot: 'Prova Escrita', v: alunoSel.escrita },
+    { k: 'auditiva', rot: 'Prova Auditiva', v: alunoSel.auditiva }
+  ];
+  $('provas').innerHTML = provas.map(function (p) {
+    var baixa = num(p.v) && p.v < MIN;
+    return '<div class="prova' + (baixa ? ' alerta' : '') + '"><span>' + p.rot + '</span><b>' + fmtNota(p.v) + '</b>' +
+      (baixa ? '<div class="rf">refazer esta prova</div>' : '') + '</div>';
+  }).join('');
+}
+
+/* ---- sugestões de recuperação (clicáveis) + texto livre ---- */
+var SUGESTOES = [
+  { k: 'refazer',   t: 'Refazer a(s) prova(s) abaixo de 6,0, buscando alcançar pelo menos 6,0.', on: true },
+  { k: 'tutoria',   t: 'Participar das tutorias (aulas extras, sem custo) para revisar o conteúdo.', on: true },
+  { k: 'duvidas',   t: 'Tirar as dúvidas com o professor durante as aulas.', on: true },
+  { k: 'audio',     t: 'Revisar o conteúdo em casa com o áudio.', on: false },
+  { k: 'tarefas',   t: 'Fazer as tarefas de casa para aproveitar melhor o tempo de aula.', on: false },
+  { k: 'plataforma',t: 'Praticar na plataforma online.', on: false },
+  { k: 'faltas',    t: 'Evitar faltas para acompanhar melhor o conteúdo.', on: false }
+];
+$('sugBoxes').innerHTML = SUGESTOES.map(function (s) {
+  return '<label><input type="checkbox" value="' + s.k + '"' + (s.on ? ' checked' : '') + '><span>' + s.t + '</span></label>';
+}).join('');
+/* monta a lista de itens do PDF a partir das lições + checkboxes + texto livre */
+function itensRecuperacao() {
+  var itens = [];
+  var lic = ($('fLicoes').value || '').trim();
+  if (lic) itens.push('Revisar e estudar as lições ' + lic + '.');
+  SUGESTOES.forEach(function (s) {
+    var cb = $('sugBoxes').querySelector('input[value="' + s.k + '"]');
+    if (!cb || !cb.checked) return;
+    if (s.k === 'refazer') {
+      var ab = provasAbaixo(alunoSel).map(rotuloProva);
+      itens.push(ab.length
+        ? ('Refazer ' + (ab.length === 2 ? 'a prova escrita e a prova auditiva' : ('a ' + ab[0].toLowerCase())) + ', buscando alcançar pelo menos 6,0.')
+        : s.t);
+    } else itens.push(s.t);
+  });
+  ($('sugLivre').value || '').split('\n').forEach(function (l) { l = l.trim(); if (l) itens.push(l); });
+  return itens;
+}
+
+/* ---- mensagem de WhatsApp: leve, SEM notas (texto do Pedro, à risca) ----
+   O seletor Menina/Menino só troca as 3 palavras de gênero (a/o, prepará-la/lo,
+   dela/dele); no padrão (Menina) o texto sai idêntico ao original. */
+var genero = 'f';
+function montarMensagem() {
+  var nome = (alunoSel.nome || '').trim();
+  var pr = primeiroNome(nome);
+  var prof = ($('fProf').value || '').trim();
+  var assina = prof ? ('Prof. ' + prof) : 'a professora / o professor';
+  var artigo = genero === 'm' ? 'o' : 'a';
+  var preparar = genero === 'm' ? 'prepará-lo' : 'prepará-la';
+  var dele = genero === 'm' ? 'dele' : 'dela';
+  return 'Olá, família! Tudo bem? 😊\n\n' +
+    'Aqui é ' + assina + ', da Fisk. Estou enviando em anexo um comunicado sobre as avaliações linguísticas de ' + (nome || 'seu/sua filho(a)') + '.\n\n' +
+    'Infelizmente, ' + artigo + ' ' + pr + ' não obteve a pontuação necessária na avaliação e, por isso, precisaremos realizar algumas revisões e ' + preparar + ' para prestar a prova novamente. Este tipo de desafio faz parte do processo de aprendizagem, e a escola vai apoiar em cada passo.\n\n' +
+    'Em virtude dessa revisão e recuperação de conteúdos para a segunda chance (Second Chance Test), o plano de curso ' + dele + ' se atrasará um pouco.\n\n' +
+    'No comunicado explico os detalhes e como podemos ajudar. Qualquer dúvida, estou à disposição. Conte comigo e com a escola! 🧡';
+}
+$('btnCopiar').addEventListener('click', function () {
+  var t = $('msg').value;
+  navigator.clipboard.writeText(t).then(function () {
+    $('statusMsg').textContent = '✓ Mensagem copiada.'; $('statusMsg').className = 'status ok';
+  }).catch(function () {
+    $('msg').select(); document.execCommand('copy');
+    $('statusMsg').textContent = '✓ Copiada.'; $('statusMsg').className = 'status ok';
+  });
+});
+$('btnWhats').addEventListener('click', function () {
+  window.open('https://wa.me/?text=' + encodeURIComponent($('msg').value), '_blank');
+});
+document.querySelectorAll('#generoToggle button').forEach(function (b) {
+  b.addEventListener('click', function () {
+    genero = b.dataset.g;
+    document.querySelectorAll('#generoToggle button').forEach(function (x) { x.classList.toggle('active', x === b); });
+    $('msg').value = montarMensagem();
+  });
+});
+
+/* ============ MODO LIVRE (sem card) ============ */
+$('btnLivre').addEventListener('click', function () {
+  modoLivre = true; alunoSel = { nome: '', estagio: '', escrita: undefined, auditiva: undefined };
+  $('painelTurma').hidden = true;
+  $('camposLivre').hidden = false;
+  $('nomeAluno').textContent = 'Preenchimento manual';
+  $('provas').innerHTML = '';
+  ['fNome', 'fEscrita', 'fAuditiva', 'fProf', 'fEstagio', 'fTurma', 'fLicoes'].forEach(function (id) { $(id).value = ''; });
+  $('msg').value = '';
+  $('painelAluno').hidden = false;
+  $('preview').hidden = true;
+  statusCard('✍️ Modo manual: preencha os dados e as notas das provas.');
+});
+function sincronizarLivre() {
+  if (!modoLivre) return;
+  alunoSel.nome = ($('fNome').value || '').trim();
+  alunoSel.estagio = ($('fEstagio').value || '').trim();
+  alunoSel.escrita = notaDe($('fEscrita').value);
+  alunoSel.auditiva = notaDe($('fAuditiva').value);
+  renderProvas();
+}
+function notaDe(v) { var s = String(v || '').trim().replace(',', '.'); if (s === '') return undefined; var n = +s; return isNaN(n) ? undefined : Math.max(0, Math.min(10, n)); }
+['fNome', 'fEscrita', 'fAuditiva'].forEach(function (id) { $(id).addEventListener('input', function () { sincronizarLivre(); if (id === 'fNome') $('msg').value = montarMensagem(); }); });
+$('fProf').addEventListener('input', function () { $('msg').value = montarMensagem(); });
+
+/* ============ PDF AZUL (paleta do boletim de jovens e adultos) ============ */
+$('btnPDF').addEventListener('click', gerarPDF);
+async function gerarPDF() {
+  if (modoLivre) sincronizarLivre();
+  if (!alunoSel || !(alunoSel.nome || '').trim()) { alert('Informe o nome do aluno.'); return; }
+  var abaixo = provasAbaixo(alunoSel);
+  if (!abaixo.length) {
+    if (!confirm('Nenhuma prova está abaixo de 6,0 para este aluno. Gerar o comunicado mesmo assim?')) return;
+  }
+  var btn = $('btnPDF'); btn.disabled = true; var lbl = btn.textContent; btn.textContent = '⏳ Gerando…';
+  try {
+    var PDF = PDFLib;
+    var doc = await PDF.PDFDocument.create();
+    var W = 595.28, H = 841.89, M = 42;
+    var page = doc.addPage([W, H]);
+    var helv = await doc.embedFont(PDF.StandardFonts.Helvetica);
+    var bold = await doc.embedFont(PDF.StandardFonts.HelveticaBold);
+    var italic = await doc.embedFont(PDF.StandardFonts.HelveticaOblique);
+
+    /* paleta azul — sheet-adults do boletim de jovens e adultos */
+    var BLUE = PDF.rgb(0.169, 0.302, 0.439);   // #2b4d70
+    var PILL = PDF.rgb(0.133, 0.243, 0.353);   // #223e5a
+    var SOFT = PDF.rgb(0.914, 0.937, 0.961);   // #e9eff5
+    var SOFT2 = PDF.rgb(0.949, 0.965, 0.98);   // #f2f6fa
+    var INK  = PDF.rgb(0.114, 0.200, 0.286);   // #1d3349
+    var SUB  = PDF.rgb(0.42, 0.47, 0.52);
+    var TEXT = PDF.rgb(0.16, 0.18, 0.20);
+    var LINE = PDF.rgb(0.66, 0.74, 0.82);      // #a9bccd
+    var WHITE = PDF.rgb(1, 1, 1);
+
+    /* rrect(x, TOP_y, w, h): canto arredondado com o TOPO em TOP_y, crescendo p/ baixo */
+    function rrect(x, yTop, w, h, r, opts) {
+      var p = 'M ' + r + ',0 H ' + (w - r) + ' A ' + r + ' ' + r + ' 0 0 1 ' + w + ' ' + r +
+        ' V ' + (h - r) + ' A ' + r + ' ' + r + ' 0 0 1 ' + (w - r) + ' ' + h +
+        ' H ' + r + ' A ' + r + ' ' + r + ' 0 0 1 0 ' + (h - r) +
+        ' V ' + r + ' A ' + r + ' ' + r + ' 0 0 1 ' + r + ' 0 Z';
+      page.drawSvgPath(p, Object.assign({ x: x, y: yTop }, opts));
+    }
+    function centro(t, y, size, font, color) { page.drawText(t, { x: (W - font.widthOfTextAtSize(t, size)) / 2, y: y, size: size, font: font, color: color }); }
+    function quebra(t, font, size, larg) {
+      var out = [];
+      String(t).split('\n').forEach(function (par) {
+        var cur = '';
+        par.split(' ').forEach(function (w) {
+          var s = cur ? cur + ' ' + w : w;
+          if (font.widthOfTextAtSize(s, size) > larg && cur) { out.push(cur); cur = w; } else cur = s;
+        });
+        out.push(cur);
+      });
+      return out;
+    }
+    /* parágrafo JUSTIFICADO (última linha do parágrafo alinhada à esquerda) */
+    function paragrafo(t, x, y, larg, size, font, color, lh) {
+      String(t).split('\n').forEach(function (par) {
+        var ls = quebra(par, font, size, larg);
+        ls.forEach(function (ln, i) {
+          var ws = ln.split(' ');
+          if (i === ls.length - 1 || ws.length === 1) {
+            page.drawText(ln, { x: x, y: y, size: size, font: font, color: color });
+          } else {
+            var wordsW = ws.reduce(function (s, w) { return s + font.widthOfTextAtSize(w, size); }, 0);
+            var extra = (larg - wordsW) / (ws.length - 1);
+            var cx = x;
+            ws.forEach(function (w, j) {
+              page.drawText(w, { x: cx, y: y, size: size, font: font, color: color });
+              cx += font.widthOfTextAtSize(w, size) + (j < ws.length - 1 ? extra : 0);
+            });
+          }
+          y -= lh;
+        });
+      });
+      return y;
+    }
+
+    var logoPng = null;
+    try { logoPng = await doc.embedPng(await fetch('assets/fisk-logo.png').then(function (r) { return r.arrayBuffer(); })); } catch (e) {}
+
+    var y = H - 42;
+
+    /* topo: logo (proporção preservada) à esquerda + pílula de data à direita */
+    if (logoPng) { var lh0 = 32, lw0 = logoPng.width * (lh0 / logoPng.height); page.drawImage(logoPng, { x: M, y: y - lh0, width: lw0, height: lh0 }); }
+    else page.drawText('FISK', { x: M, y: y - 24, size: 22, font: bold, color: PDF.rgb(0.847, 0.122, 0.149) });
+    var hoje = new Date();
+    var dataStr = ('0' + hoje.getDate()).slice(-2) + '/' + ('0' + (hoje.getMonth() + 1)).slice(-2) + '/' + hoje.getFullYear();
+    rrect(W - M - 132, y - 6, 132, 21, 10.5, { color: SOFT, borderColor: LINE, borderWidth: 1 });
+    page.drawText('Data: ' + dataStr, { x: W - M - 118, y: y - 20, size: 9.5, font: bold, color: PILL });
+    y -= 52;
+
+    /* título centralizado */
+    centro('COMUNICADO DE SEGUNDA CHANCE', y, 16.5, bold, INK);
+    y -= 19;
+    centro('Second Chance Test  ·  Comunicado aos pais ou responsáveis', y, 10, italic, SUB);
+    y -= 24;
+
+    /* moldura de identificação (fundo suave); TOPO em y */
+    var idH = 66, halfW = (W - 2 * M) / 2;
+    rrect(M, y, W - 2 * M, idH, 14, { color: SOFT2, borderColor: BLUE, borderWidth: 1.5 });
+    function idCampo(rot, val, x, yy, larg) {
+      page.drawText(rot, { x: x, y: yy, size: 9, font: bold, color: PILL });
+      var lx = x + bold.widthOfTextAtSize(rot, 9) + 6;
+      page.drawLine({ start: { x: lx, y: yy - 2.5 }, end: { x: x + larg, y: yy - 2.5 }, thickness: 0.8, color: LINE });
+      page.drawText(String(val || ''), { x: lx + 3, y: yy, size: 9.5, font: helv, color: TEXT });
+    }
+    var colL = M + 22, colR = M + halfW + 6;
+    idCampo('Aluno(a):', alunoSel.nome, colL, y - 24, halfW - 34);
+    idCampo('Estágio:', $('fEstagio').value, colR, y - 24, halfW - 44);
+    idCampo('Professor(a):', $('fProf').value, colL, y - 48, halfW - 34);
+    idCampo('Turma:', $('fTurma').value, colR, y - 48, halfW - 44);
+    y -= idH + 22;
+
+    /* carta acolhedora, justificada, sem travessão */
+    var nome = (alunoSel.nome || '').trim(), pr = primeiroNome(nome);
+    var abaixoRot = abaixo.map(rotuloProva);
+    var fraseProvas = abaixoRot.length === 2 ? 'nas provas escrita e auditiva'
+      : abaixoRot.length === 1 ? ('na ' + abaixoRot[0].toLowerCase())
+      : 'na avaliação';
+    var carta =
+      'Prezada família,\n' +
+      'Escrevemos para compartilhar como foi o desempenho de ' + nome + ' nas avaliações deste período e, ' +
+      'principalmente, para reforçar que estamos juntos nessa caminhada. ' + pr + ' não atingiu a nota mínima ' +
+      '(6,0) ' + fraseProvas + ', e queremos dizer com tranquilidade que isso faz parte do aprendizado e ' +
+      'acontece com muitos alunos. O mais importante é o próximo passo: a Fisk oferece tutorias (aulas extras, ' +
+      'sem custo), revisão do conteúdo e espaço para tirar todas as dúvidas, para que ' + pr + ' possa refazer a ' +
+      'avaliação e alcançar um resultado ainda melhor. Contamos com a parceria de vocês para incentivar ' + pr +
+      ' nesse reforço.';
+    y = paragrafo(carta, M + 2, y, W - 2 * M - 4, 10.5, helv, TEXT, 15.5) - 12;
+
+    /* seção helper (pílula PILL + caixa de fundo suave, TOPO em y) */
+    function secao(titulo, alturaCaixa) {
+      var pw = bold.widthOfTextAtSize(titulo, 10) + 32;
+      rrect(M, y, pw, 21, 10.5, { color: PILL });
+      page.drawText(titulo, { x: M + 16, y: y - 15, size: 10, font: bold, color: WHITE });
+      y -= 28;
+      rrect(M, y, W - 2 * M, alturaCaixa, 14, { color: SOFT2, borderColor: BLUE, borderWidth: 1.5 });
+    }
+
+    /* 1 · avaliações — 2 caixas brancas, notas "X,0" azuis (sem vermelho) */
+    var avH = 92;
+    secao('AVALIAÇÕES', avH);
+    var provas = [ { rot: 'PROVA ESCRITA', v: alunoSel.escrita }, { rot: 'PROVA AUDITIVA', v: alunoSel.auditiva } ];
+    var pad = 24, gap = 20, boxW = (W - 2 * M - 2 * pad - gap) / 2, boxH = 68;
+    var byTop = y - (avH - boxH) / 2;
+    provas.forEach(function (p, i) {
+      var bx = M + pad + i * (boxW + gap);
+      var refazer = num(p.v) && p.v < MIN;
+      rrect(bx, byTop, boxW, boxH, 12, { color: WHITE, borderColor: BLUE, borderWidth: refazer ? 2 : 1.2 });
+      var lw1 = bold.widthOfTextAtSize(p.rot, 9);
+      page.drawText(p.rot, { x: bx + (boxW - lw1) / 2, y: byTop - 20, size: 9, font: bold, color: PILL });
+      var val = fmtNota(p.v), vw = bold.widthOfTextAtSize(val, 24);
+      page.drawText(val, { x: bx + (boxW - vw) / 2, y: byTop - 46, size: 24, font: bold, color: INK });
+      if (refazer) { var t = 'refazer esta prova', tw = italic.widthOfTextAtSize(t, 7.5); page.drawText(t, { x: bx + (boxW - tw) / 2, y: byTop - 60, size: 7.5, font: italic, color: SUB }); }
+    });
+    y -= avH + 24;
+
+    /* 2 · para a recuperação — itens do formulário (checkboxes + lições + texto livre) */
+    var itens = itensRecuperacao();
+    if (!itens.length) itens = ['Revisar o conteúdo trabalhado no período e refazer a avaliação com o apoio da escola.'];
+    var contentH = itens.reduce(function (acc, it) { return acc + 13 * quebra(it, helv, 10, W - 2 * M - 60).length + 8; }, 0);
+    var recH = Math.max(84, contentH + 24);
+    secao('PARA A RECUPERAÇÃO', recH);
+    var yy = y - 22;
+    itens.forEach(function (it) {
+      page.drawCircle({ x: M + 26, y: yy + 3.2, size: 2.4, color: BLUE });
+      var wrapped = quebra(it, helv, 10, W - 2 * M - 60);
+      wrapped.forEach(function (ln, li) { page.drawText(ln, { x: M + 38, y: yy - li * 13, size: 10, font: helv, color: TEXT }); });
+      yy -= 13 * wrapped.length + 8;
+    });
+
+    /* assinatura ancorada perto do rodapé (documento ocupa a página) */
+    var ySig = 108;
+    page.drawText('Atenciosamente,', { x: W - M - 200, y: ySig + 22, size: 10, font: italic, color: SUB });
+    page.drawLine({ start: { x: W - M - 210, y: ySig }, end: { x: W - M, y: ySig }, thickness: 1, color: BLUE });
+    var prof = ($('fProf').value || '').trim();
+    page.drawText(prof ? ('Prof(a). ' + prof) : 'Professor(a) responsável', { x: W - M - 206, y: ySig - 13, size: 9, font: bold, color: PILL });
+    page.drawText('Fisk Taubaté · Caçapava', { x: W - M - 206, y: ySig - 25, size: 8.5, font: helv, color: SUB });
+
+    /* rodapé */
+    centro('Fisk · Comprometidos com o seu aprendizado', 40, 8.5, italic, SUB);
+
+    var bytes = await doc.save();
+    var blob = new Blob([bytes], { type: 'application/pdf' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'Comunicado 2nd Chance - ' + (nome || 'aluno') + '.pdf'; a.click();
+    $('preview').src = url; $('preview').hidden = false;
+  } catch (e) {
+    alert('Não consegui gerar o PDF: ' + e.message);
+  } finally { btn.disabled = false; btn.textContent = lbl; }
+}
+/* ============ BOOT ============ */
+(function boot() {
+  if (location.hash.indexOf('#t=') === 0) initFragment();
+  else initCascade();
+  if (typeof fiskInitThemeToggle === 'function') fiskInitThemeToggle('themeToggle');
+})();
+</script>
+</body>
+</html>
