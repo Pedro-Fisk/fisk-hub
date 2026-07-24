@@ -39,24 +39,41 @@ Apps Script (o "card") via `API_URL` + `API_KEY`.
    pasta, responde `code:'pasta_nao_encontrada'` e a ferramenta **avisa o professor**
    (nada de falso "salvo").
 
+## Concluído em 24/07/2026 (sessão local)
+1. ✅ **Endpoint ativo e testado gravando de verdade.** Não virou projeto novo: foi
+   mesclado no `fisk-hub-backend` (que já existia e já tinha um `doPost`) como
+   `salvarPdfNoDrive`, despachado por `fn:'salvarPdf'`. `FISK_SAVE_URL` já preenchida.
+   Implantação **@28**. Teste real: PDF gravado na pasta `2ª/4ª 17:30 às 18:45 - ADV`
+   do Alex, conferido no Drive.
+   ⚠️ **Autorização tem DUAS etapas** e a segunda não é óbvia: rodar `setupDrive()`
+   libera só LEITURA; a escrita falha depois, na hora de criar o arquivo, com a pasta
+   já localizada. Rodar `setupDriveEscrita()` no editor resolve. Se um dia der
+   "não tem permissão para chamar DriveApp.Folder.createFile", é isso.
+2. ✅ **Correspondência validada contra os dados reais** — varredura das duas escolas
+   com `?action=driveMatch` (simula sem gravar): **Caçapava 59/70, Taubaté 18/34**.
+   Ver "Estrutura de pastas" abaixo para as regras que os dados exigiram.
+   As falhas restantes **não são de código**: são pastas que ainda não existem
+   (professores sem pasta: Tamires e Maria Luiza em Caçapava; Erick, Mariana G. e
+   Matheus em Taubaté — a escola estava se reorganizando no recesso de julho).
+   Refazer a varredura quando as pastas existirem.
+3. ✅ **Boletim** — botão "📁 Salvar na pasta do aluno" implementado em
+   `pedro-fisk/boletim-fisk` (branch `claude/salvar-na-pasta-do-aluno`): `fisk-drive.js`
+   (cópia local dos helpers, porque lá o `fisk-shared.js` vem do jsDelivr pela tag fixa
+   `@v1.0.0`), `window.ultimoPDF` em `script.js`, botão ligado em `card-sync.js`.
+   Só aparece com vínculo ao card E com PDF gerado.
+
 ## Próximos passos
-1. **Ativar o endpoint** (bloqueado só nisto): o Pedro vai publicar o
-   `apps-script/salvar-no-drive.gs` num projeto Apps Script **SEPARADO** (`fisk-hub-backend`,
-   **não** o CardTools) como App da Web e mandar a **URL `/exec`**. Cole essa URL em
-   **`assets/fisk-shared.js` → `var FISK_SAVE_URL = '...'`**, commit e push. Aí os 3 botões
-   funcionam.
-2. **Validar a correspondência de nomes** turma→pasta e aluno→pasta com um teste real.
-   `acharPasta()` normaliza acento/caixa/pontuação e tenta igualdade e depois "contém".
-   Se um título do card (ex.: `turma.turma`) não casar com o nome da pasta
-   (ex.: `01 - 4° 18:45/21:15 - Basic`), ajuste `acharPasta`/normalização. O alerta de
-   "pasta não encontrada" cobre a falha sem risco de falso positivo.
-3. **Boletim** — o botão de salvar ainda **não** existe no gerador de boletim, que fica
-   em **outro repositório: `pedro-fisk/boletim-fisk`** (a `boletins.html` daqui é só um
-   menu que aponta para `pedro-fisk.github.io/boletim-fisk/`). Para implementar: trazer
-   esse repo para a sessão (`add_repo` / clonar), adicionar o mesmo botão
-   "Salvar na pasta do aluno" (tipo `aluno`) reusando o padrão do 2nd-chance/termo
-   (gerar PDF → `ultimoPDF` → `fiskEnviarParaPasta`). Precisa do `fisk-shared.js` lá
-   (ou embutir os helpers) e do `FISK_SAVE_URL`.
+1. **Publicar**: as duas branches estão pushadas mas **NÃO** mergeadas na `main` — ou
+   seja, nada disso está no ar para os professores ainda (GitHub Pages publica da main).
+   Decisão do Pedro, pendente.
+2. **Apagar o arquivo de teste** `TESTE Fisk Hub - pode apagar (24-07).pdf` da pasta
+   `2ª/4ª 17:30 às 18:45 - ADV` do Alex (Caçapava).
+3. **Transferências** (pedido do Pedro, para depois): mover pasta de aluno e de turma
+   entre professores, como feature do **Painel do Diretor**, liberada por login
+   individual de secretária. O escopo `auth/drive` já permite mover — falta a camada de
+   permissão e a UI (simular → confirmar item a item → registrar quem/quando/de onde
+   para onde). Respeitar as pastas `Alunos transferidos` / `0 - Transferências` que já
+   existem no Drive.
 
 ## Fatos-chave (não deduza de novo)
 - **Endpoint do card (leitura):** `API_URL =
