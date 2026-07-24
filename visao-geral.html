@@ -33,6 +33,10 @@
   .btn-main{background:var(--roxo);color:#fff;padding:.6rem 1.2rem;font-size:.92rem}
   .btn-main:hover{background:#6b2fd6}
   .btn-main[disabled]{opacity:.55;cursor:default}
+  .vg-actas{width:100%;max-width:340px;padding:.5rem .7rem;border:1.5px solid var(--roxo);
+    border-radius:9px;background:#f1eafd;color:#4c1d95;font-family:var(--font-body);
+    font-size:.92rem;font-weight:700;cursor:pointer}
+  body.theme-dark .vg-actas{background:#2a1b45;color:#d7c4fb}
   /* KPIs */
   .resumo{display:flex;flex-wrap:wrap;gap:.5rem;margin:.2rem 0 .4rem}
   .kpi{flex:1 1 118px;background:var(--blue-soft);border:1.5px solid var(--blue-bd);
@@ -103,6 +107,10 @@
     <h2>🔗 Suas turmas</h2>
     <p class="sub">A análise abre <b>nas suas turmas</b> automaticamente. Está substituindo alguém?
       Troque o professor no seletor — o acesso é livre, como nas outras ferramentas.</p>
+    <div id="vgActAsWrap" hidden style="margin-bottom:.7rem">
+      <label style="display:block;font-size:.78rem;font-weight:800;color:var(--roxo);margin-bottom:.25rem">👑 Acesso da direção — ver o painel de um professor:</label>
+      <select id="vgActAs" class="vg-actas"></select>
+    </div>
     <div class="row">
       <div style="flex:1 1 170px">
         <select id="selEscola" disabled><option value="" disabled selected>Escola…</option></select><span id="indEscola" class="ind"></span>
@@ -226,23 +234,14 @@ function initCascade() {
 }
 
 /* pré-seleção: 1º os parâmetros da URL (painel do card), senão o professor logado */
-function prefill() {
-  var q = new URLSearchParams(location.search);
-  var escola = q.get('escola'), prof = q.get('prof'), auto = false;
-  if (!escola && !prof) {
-    try {
-      var sess = JSON.parse(localStorage.getItem('fisk_prof') || 'null');
-      if (sess && sess.name) {
-        prof = sess.name;
-        escola = String(sess.escolas || sess.escola || '').split(',')[0].trim();
-        auto = true;
-      }
-    } catch (e) {}
-  } else { auto = true; }
-  if (!escola) { statusCard('Escolha a escola e o professor.'); return; }
+// backend do login (lista de professores/contas) — p/ o seletor da direção
+var EP_HUB = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
+
+// Seleciona escola→prof na cascata e (auto) dispara a análise.
+function selecionarNaCascata(escola, prof, auto) {
   var selEscola = $('selEscola'), selProf = $('selProf');
   var has = function (sel, val) { return [].some.call(sel.options, function (o) { return o.value === val; }); };
-  if (!has(selEscola, escola)) { statusCard('Escolha a escola e o professor.'); return; }
+  if (!escola || !has(selEscola, escola)) { statusCard('Escolha um professor.'); return; }
   selEscola.value = escola; selEscola.dispatchEvent(new Event('change'));
   if (!prof) return;
   var t0 = Date.now();
@@ -254,6 +253,49 @@ function prefill() {
       if (auto) analisar(escola, prof);
     }
   }, 200);
+}
+
+// Seletor "ver como professor" (só para a direção). Espelha o fisk_actas do Hub.
+function setupVgActAs() {
+  var wrap = $('vgActAsWrap'), sb = $('vgActAs');
+  wrap.hidden = false;
+  fetch(EP_HUB + '?action=profList').then(function (r) { return r.json(); }).then(function (res) {
+    var ps = ((res && res.profs) || []).filter(function (p) { return !p.director; })
+      .sort(function (a, b) { return String(a.name).localeCompare(String(b.name), 'pt-BR'); });
+    var cur = ''; try { cur = (JSON.parse(localStorage.getItem('fisk_actas') || 'null') || {}).name || ''; } catch (e) {}
+    sb.innerHTML = '<option value="">👥 Ver como professor…</option>' +
+      ps.map(function (p) {
+        var nm = esc(p.name);
+        return '<option value="' + nm.replace(/"/g, '&quot;') + '" data-esc="' + String(p.escolas || '').replace(/"/g, '&quot;') + '"' + (p.name === cur ? ' selected' : '') + '>' + nm + ' · ' + p.escolas + '</option>';
+      }).join('');
+  }).catch(function () {});
+  sb.onchange = function () {
+    var opt = sb.options[sb.selectedIndex];
+    if (!sb.value) { try { localStorage.removeItem('fisk_actas'); } catch (e) {} statusCard('Escolha um professor.'); return; }
+    var escs = opt.getAttribute('data-esc') || '';
+    try { localStorage.setItem('fisk_actas', JSON.stringify({ name: sb.value, escolas: escs })); } catch (e) {}
+    selecionarNaCascata(String(escs).split(',')[0].trim(), sb.value, true);
+  };
+}
+
+function prefill() {
+  var q = new URLSearchParams(location.search);
+  var escola = q.get('escola'), prof = q.get('prof');
+  var sess = null; try { sess = JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) {}
+  var master = sess && sess.master;
+  if (master) setupVgActAs();
+  // 1) veio da URL (atalho do Hub / painel do card) → usa e analisa
+  if (escola && prof) { selecionarNaCascata(escola, prof, true); return; }
+  // 2) direção: usa o professor escolhido (fisk_actas) ou pede pra escolher
+  if (master) {
+    var a = null; try { a = JSON.parse(localStorage.getItem('fisk_actas') || 'null'); } catch (e) {}
+    if (a && a.name) selecionarNaCascata(String(a.escolas || '').split(',')[0].trim(), a.name, true);
+    else statusCard('Escolha um professor no seletor "Ver como" acima.');
+    return;
+  }
+  // 3) professor comum → abre nas próprias turmas
+  if (sess && sess.name) { selecionarNaCascata(String(sess.escolas || sess.escola || '').split(',')[0].trim(), sess.name, true); return; }
+  statusCard('Escolha a escola e o professor.');
 }
 
 /* ============ ANÁLISE ============ */
