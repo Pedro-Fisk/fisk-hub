@@ -926,12 +926,12 @@
         post({ action:'dirCheck', token: decodeURIComponent(mDir[1]) }).then(function(res){
           if (res && res.ok && res.director){ enter(res.director); }
           else {
-            msg.textContent = (res && res.error) || tr('pg-err');
             loadProfs(); setMode('login'); setPlaceholders();
+            msg.textContent = (res && res.error) || tr('pg-err');
           }
         }).catch(function(){
-          msg.textContent = tr('pg-err');
           loadProfs(); setMode('login'); setPlaceholders();
+          msg.textContent = tr('pg-err');
         });
         return;
       }
