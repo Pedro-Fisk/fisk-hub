@@ -149,13 +149,6 @@
 
     <h2 style="margin-top:1rem">💬 Mensagem para o WhatsApp da família</h2>
     <p class="sub">Texto leve, <b>sem citar notas</b> — só avisa que segue um comunicado e que o aluno vai refazer uma prova. Baixe o PDF abaixo e anexe na conversa.</p>
-    <div class="row" style="margin-bottom:.5rem;align-items:center;gap:.6rem">
-      <span style="font-size:.82rem;font-weight:800;color:var(--gray)">Aluno(a):</span>
-      <div class="pill-toggle" id="generoToggle">
-        <button type="button" data-g="f" class="active">Menina</button>
-        <button type="button" data-g="m">Menino</button>
-      </div>
-    </div>
     <div class="campo"><textarea id="msg"></textarea></div>
     <div class="row" style="margin-top:.5rem">
       <button type="button" class="btn btn-ghost" id="btnCopiar">📋 Copiar mensagem</button>
@@ -363,6 +356,8 @@ function renderProvas() {
   $('provas').querySelectorAll('.prova-in').forEach(function (inp) {
     inp.addEventListener('input', function () {
       var box = inp.closest('.prova'), k = box.dataset.k;
+      var n = parseFloat(String(inp.value).replace(',', '.'));
+      if (!isNaN(n) && (n > 10 || n < 0)) inp.value = fmtNota(Math.max(0, Math.min(10, n))); // trava em 0–10
       alunoSel[k] = notaDe(inp.value);
       var baixa = num(alunoSel[k]) && alunoSel[k] < MIN;
       box.classList.toggle('alerta', baixa);
@@ -403,22 +398,16 @@ function itensRecuperacao() {
   return itens;
 }
 
-/* ---- mensagem de WhatsApp: leve, SEM notas (texto do Pedro, à risca) ----
-   O seletor Menina/Menino só troca as 3 palavras de gênero (a/o, prepará-la/lo,
-   dela/dele); no padrão (Menina) o texto sai idêntico ao original. */
-var genero = 'f';
+/* ---- mensagem de WhatsApp: leve, SEM notas (texto do Pedro, à risca) ---- */
 function montarMensagem() {
   var nome = (alunoSel.nome || '').trim();
   var pr = primeiroNome(nome);
   var prof = ($('fProf').value || '').trim();
   var assina = prof ? ('Prof. ' + prof) : 'a professora / o professor';
-  var artigo = genero === 'm' ? 'o' : 'a';
-  var preparar = genero === 'm' ? 'prepará-lo' : 'prepará-la';
-  var dele = genero === 'm' ? 'dele' : 'dela';
   return 'Olá, família! Tudo bem? 😊\n\n' +
     'Aqui é ' + assina + ', da Fisk. Estou enviando em anexo um comunicado sobre as avaliações linguísticas de ' + (nome || 'seu/sua filho(a)') + '.\n\n' +
-    'Infelizmente, ' + artigo + ' ' + pr + ' não obteve a pontuação necessária na avaliação e, por isso, precisaremos realizar algumas revisões e ' + preparar + ' para prestar a prova novamente. Este tipo de desafio faz parte do processo de aprendizagem, e a escola vai apoiar em cada passo.\n\n' +
-    'Em virtude dessa revisão e recuperação de conteúdos para a segunda chance (Second Chance Test), o plano de curso ' + dele + ' se atrasará um pouco.\n\n' +
+    'Infelizmente, a ' + pr + ' não obteve a pontuação necessária na avaliação e, por isso, precisaremos realizar algumas revisões e prepará-la para prestar a prova novamente. Este tipo de desafio faz parte do processo de aprendizagem, e a escola vai apoiar em cada passo.\n\n' +
+    'Em virtude dessa revisão e recuperação de conteúdos para a segunda chance (Second Chance Test), o plano de curso dela se atrasará um pouco.\n\n' +
     'No comunicado explico os detalhes e como podemos ajudar. Qualquer dúvida, estou à disposição. Conte comigo e com a escola! 🧡';
 }
 $('btnCopiar').addEventListener('click', function () {
@@ -432,13 +421,6 @@ $('btnCopiar').addEventListener('click', function () {
 });
 $('btnWhats').addEventListener('click', function () {
   window.open('https://wa.me/?text=' + encodeURIComponent($('msg').value), '_blank');
-});
-document.querySelectorAll('#generoToggle button').forEach(function (b) {
-  b.addEventListener('click', function () {
-    genero = b.dataset.g;
-    document.querySelectorAll('#generoToggle button').forEach(function (x) { x.classList.toggle('active', x === b); });
-    $('msg').value = montarMensagem();
-  });
 });
 
 /* ============ MODO LIVRE (sem card) ============ */

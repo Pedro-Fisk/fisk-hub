@@ -230,7 +230,10 @@ function montarSelect(sel, placeholder, itens) {
     itens.map(function (i) { return '<option value="' + i.v + '">' + i.t + '</option>'; }).join('');
   sel.disabled = false;
 }
-if (standalone && !temHashPayload && location.hash.indexOf('#t=') !== 0) {
+/* mostra a cascata quando não veio turma no fragmento nem payload — vale tanto
+   no acesso direto (tela cheia) quanto dentro da sidebar do card (iframe), já
+   que o Fisk Hub passou a ser um lançador e cada ferramenta escolhe a turma. */
+if (!temHashPayload && location.hash.indexOf('#t=') !== 0) {
   if (API_URL) {
     document.getElementById('origemStandalone').hidden = false;
     document.getElementById('statusCard').textContent = 'Escolha a escola, o professor e a turma — os dados vêm ao vivo do card.';
