@@ -603,16 +603,13 @@ $('btnCopiar').addEventListener('click', function () {
 });
 
 /* ============ PDF DO PLANO DE AULA ============
-   dadosPlano() coleta os dados relevantes na ORDEM exibida (respeita
-   reordenação e filtro): nome do professor, turma, data da aula planejada
-   e, por aluno, nome + atividade + anotação. Esses são os campos que o
-   Pedro pediu para lançar automaticamente no PDF.
-
-   ⚠️ PROVISÓRIO: por enquanto o PDF é montado do zero aqui embaixo. Assim
-   que chegar o MODELO ESTÁTICO oficial do plano de aula, troca-se só o
-   trecho de DESENHO por: carregar o template (PDFDocument.load) e estampar
-   os campos de dp (dp.professor, dp.data, dp.alunos[i].nome…). A coleta de
-   dados abaixo já fica pronta e é reaproveitada. */
+   Usa o MODELO ESTÁTICO oficial (assets/plano-personalizado-template.pdf,
+   540×780 pt) como fundo e ESTAMPA por cima os dados relevantes na ORDEM
+   exibida (respeita reordenação e filtro): nome do professor, turma, data
+   da aula planejada e, por aluno, nome + atividade + anotação — exatamente
+   os campos que o Pedro pediu para lançar automaticamente.
+   As coordenadas (TPL) foram calibradas sobre o template. Se o desenho do
+   template mudar, basta reajustar esses números. */
 function dadosPlano() {
   return {
     professor: (turma && turma.professor) ? String(turma.professor) : '',
@@ -624,6 +621,17 @@ function dadosPlano() {
   };
 }
 
+/* coordenadas calibradas sobre o template (pontos PDF, origem no canto
+   inferior-esquerdo). LINHAS = 11 linhas pré-impressas da tabela Aluno/Ativid. */
+var TPL = {
+  turmaX: 232, turmaY: 718, turmaW: 108,   // valor ao lado de "Turma:"
+  dataX: 395, dataY: 718, dataW: 108,      // valor ao lado de "Data:"
+  profEndX: 506, profY: 752, profW: 112,   // "Prof(a).: ..." dentro da faixa do título (direita)
+  alunoX: 88, alunoW: 242,                 // coluna Aluno
+  ativX: 345, ativW: 165,                  // coluna Atividades
+  row1Y: 458, rowStep: 25.6, rowCount: 11  // 1ª linha e passo entre linhas
+};
+
 async function gerarPDF() {
   if (!turma) { alert('Carregue uma turma primeiro.'); return; }
   if (!window.PDFLib) { alert('A biblioteca de PDF não carregou. Verifique a conexão e recarregue a página.'); return; }
@@ -632,81 +640,65 @@ async function gerarPDF() {
   try {
     var dp = dadosPlano();
     var PDF = PDFLib;
-    var doc = await PDF.PDFDocument.create();
-    var W = 595.28, H = 841.89, M = 44;
-    var page = doc.addPage([W, H]); // A4
-    var helv = await doc.embedFont(PDF.StandardFonts.Helvetica);
-    var bold = await doc.embedFont(PDF.StandardFonts.HelveticaBold);
-    var italic = await doc.embedFont(PDF.StandardFonts.HelveticaOblique);
-    var BLUE = PDF.rgb(0.169, 0.302, 0.439);  // #2b4d70 — mesmo azul da tela
-    var PILL = PDF.rgb(0.133, 0.243, 0.353);  // #223e5a
-    var SOFT = PDF.rgb(0.914, 0.937, 0.961);  // #e9eff5
-    var TEXT = PDF.rgb(0.121, 0.11, 0.11);
-    var GRAY = PDF.rgb(0.42, 0.467, 0.502);
 
-    function rrect(x, yTop, w, h, r, opts) {
-      var p = 'M ' + r + ',0 H ' + (w - r) + ' A ' + r + ' ' + r + ' 0 0 1 ' + w + ' ' + r +
-        ' V ' + (h - r) + ' A ' + r + ' ' + r + ' 0 0 1 ' + (w - r) + ' ' + h +
-        ' H ' + r + ' A ' + r + ' ' + r + ' 0 0 1 0 ' + (h - r) +
-        ' V ' + r + ' A ' + r + ' ' + r + ' 0 0 1 ' + r + ' 0 Z';
-      page.drawSvgPath(p, Object.assign({ x: x, y: yTop }, opts));
-    }
-    function quebrar(texto, font, size, larguraMax) {
-      var out = [];
-      String(texto).split('\n').forEach(function (par) {
-        var atual = '';
-        par.split(' ').forEach(function (pp) {
-          var t = atual ? atual + ' ' + pp : pp;
-          if (font.widthOfTextAtSize(t, size) > larguraMax) { out.push(atual); atual = pp; }
-          else atual = t;
-        });
-        out.push(atual);
-      });
-      return out;
-    }
-
-    var y = 812;
-    /* cabeçalho: logo + título */
-    try {
-      var img = await fetch('assets/fisk-logo.png').then(function (r) { return r.arrayBuffer(); });
-      var png = await doc.embedPng(img);
-      var lh = 26, lw = png.width * (lh / png.height);
-      page.drawImage(png, { x: W - M - lw, y: y - lh + 6, width: lw, height: lh });
-    } catch (e) {
-      page.drawText('FISK', { x: W - M - 52, y: y - 12, size: 22, font: bold, color: PDF.rgb(0.847, 0.122, 0.149) });
-    }
-    page.drawText('PLANO DE AULA', { x: M, y: y - 8, size: 17, font: bold, color: PILL });
-    page.drawText('Ordem de atendimento — método personalizado', { x: M, y: y - 24, size: 10, font: italic, color: GRAY });
-    y -= 46;
-
-    /* moldura de identificação: professor, data da aula e turma */
-    rrect(M, y, W - 2 * M, 44, 10, { borderColor: BLUE, borderWidth: 1.5 });
-    function idCampo(rotulo, valor, x, yy) {
-      page.drawText(rotulo, { x: x, y: yy, size: 9, font: bold, color: TEXT });
-      var lx = x + bold.widthOfTextAtSize(rotulo, 9) + 5;
-      page.drawText(String(valor || '—'), { x: lx, y: yy, size: 9.5, font: helv, color: TEXT });
-    }
-    idCampo('Professor(a):', dp.professor, M + 14, y - 17);
-    idCampo('Data da aula:', dp.data, M + 320, y - 17);
-    idCampo('Turma:', dp.turma, M + 14, y - 33);
-    y -= 62;
-
-    /* fila de alunos (na ordem exibida): nº + nome + atividade + anotação */
-    dp.alunos.forEach(function (al, i) {
-      var linhasAtiv = quebrar(al.atividade || '', helv, 9.5, W - 2 * M - 42);
-      var linhasNota = al.nota ? quebrar('Anotação: ' + al.nota, italic, 9, W - 2 * M - 42) : [];
-      var altura = 24 + linhasAtiv.length * 12 + linhasNota.length * 11;
-      if (y - altura < 60) { page = doc.addPage([W, H]); y = 800; }
-      rrect(M, y - altura, W - 2 * M, altura, 9, { color: SOFT, borderColor: BLUE, borderWidth: 1 });
-      page.drawText(String(i + 1) + '.', { x: M + 12, y: y - 17, size: 11, font: bold, color: PILL });
-      page.drawText(String(al.nome || ''), { x: M + 32, y: y - 17, size: 11, font: bold, color: TEXT });
-      var yy = y - 31;
-      linhasAtiv.forEach(function (l) { page.drawText(l, { x: M + 32, y: yy, size: 9.5, font: helv, color: TEXT }); yy -= 12; });
-      linhasNota.forEach(function (l) { page.drawText(l, { x: M + 32, y: yy, size: 9, font: italic, color: GRAY }); yy -= 11; });
-      y -= altura + 8;
+    // carrega o template estático oficial
+    var tplBytes = await fetch('assets/plano-personalizado-template.pdf').then(function (r) {
+      if (!r.ok) throw new Error('modelo do PDF não encontrado (assets/plano-personalizado-template.pdf)');
+      return r.arrayBuffer();
     });
 
-    var bytes = await doc.save();
+    var out = await PDF.PDFDocument.create();
+    var tplPages = await out.embedPdf(tplBytes, [0]);   // página do modelo como XObject reutilizável
+    var tpl = tplPages[0];
+    var helv = await out.embedFont(PDF.StandardFonts.Helvetica);
+    var bold = await out.embedFont(PDF.StandardFonts.HelveticaBold);
+    var ital = await out.embedFont(PDF.StandardFonts.HelveticaOblique);
+    var INK = PDF.rgb(0.12, 0.12, 0.12);
+    var BLUE = PDF.rgb(0.11, 0.23, 0.39);   // azul do título (para "Prof(a).:")
+    var GRAY = PDF.rgb(0.35, 0.40, 0.45);   // anotação
+
+    // encurta o texto com reticências até caber na largura máxima
+    function fit(txt, font, size, max) {
+      txt = String(txt == null ? '' : txt);
+      while (txt.length > 1 && font.widthOfTextAtSize(txt, size) > max) txt = txt.slice(0, -2) + '…';
+      return txt;
+    }
+
+    // desenha o cabeçalho (turma, data, professor) numa página já com o template
+    function cabecalho(page) {
+      page.drawText(fit(dp.turma, helv, 9, TPL.turmaW), { x: TPL.turmaX, y: TPL.turmaY, size: 9, font: helv, color: INK });
+      page.drawText(fit(dp.data, helv, 9, TPL.dataW), { x: TPL.dataX, y: TPL.dataY, size: 9, font: helv, color: INK });
+      if (dp.professor) {
+        var pf = fit('Prof(a).: ' + dp.professor, bold, 8, TPL.profW);
+        page.drawText(pf, { x: TPL.profEndX - bold.widthOfTextAtSize(pf, 8), y: TPL.profY, size: 8, font: bold, color: BLUE });
+      }
+    }
+
+    // uma linha da tabela: nome (col. Aluno) + atividade (+ anotação) (col. Atividades)
+    function linha(page, al, i) {
+      var y = TPL.row1Y - i * TPL.rowStep;
+      page.drawText(fit(al.nome, helv, 9, TPL.alunoW), { x: TPL.alunoX, y: y, size: 9, font: helv, color: INK });
+      if (al.nota) {
+        page.drawText(fit(al.atividade, helv, 7.5, TPL.ativW), { x: TPL.ativX, y: y + 4, size: 7.5, font: helv, color: INK });
+        page.drawText(fit(al.nota, ital, 7, TPL.ativW), { x: TPL.ativX, y: y - 5, size: 7, font: ital, color: GRAY });
+      } else {
+        page.drawText(fit(al.atividade, helv, 7.5, TPL.ativW), { x: TPL.ativX, y: y, size: 7.5, font: helv, color: INK });
+      }
+    }
+
+    // quebra a fila em páginas de 11 alunos (o template tem 11 linhas);
+    // sempre ao menos 1 página (modelo com o cabeçalho preenchido)
+    var porPagina = TPL.rowCount;
+    var nPaginas = Math.max(1, Math.ceil(dp.alunos.length / porPagina));
+    for (var pg = 0; pg < nPaginas; pg++) {
+      var page = out.addPage([540, 780]);
+      page.drawPage(tpl);           // fundo = modelo estático
+      cabecalho(page);
+      var ini = pg * porPagina;
+      dp.alunos.slice(ini, ini + porPagina).forEach(function (al, k) { linha(page, al, k); });
+    }
+
+    var bytes = await out.save();
     var blob = new Blob([bytes], { type: 'application/pdf' });
     var nomeArq = 'plano-de-aula-' + (dp.turma || 'turma').replace(/[^\w-]+/g, '-').toLowerCase() + '.pdf';
     var url = URL.createObjectURL(blob);
