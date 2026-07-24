@@ -67,6 +67,9 @@
   .btn-blue{background:var(--blue);color:#fff;padding:.7rem 1.3rem;font-size:1rem;width:100%}
   .btn-blue:hover{background:var(--blue-pill)}
   .btn-wa{background:#25d366;color:#0b3d1f;padding:.6rem 1rem;font-size:.9rem}
+  .btn-drive{background:#27866e;color:#fff;padding:.7rem 1.3rem;font-size:1rem;width:100%}
+  .btn-drive:hover{filter:brightness(1.08)}
+  .btn-drive:disabled{opacity:.5;cursor:not-allowed}
   .btn-ghost{background:var(--blue-soft);color:var(--blue-pill);padding:.6rem 1rem;font-size:.9rem}
   .status{font-size:.86rem;font-weight:700;color:var(--gray);margin-top:.5rem}
   .status.err{color:#c0392b}.status.ok{color:var(--green)}
@@ -157,7 +160,8 @@
     </div>
 
     <h2 style="margin-top:1rem">📄 Comunicado em PDF (azul)</h2>
-    <div class="row"><button type="button" class="btn btn-blue" id="btnPDF">Gerar e baixar o PDF</button></div>
+    <div class="row"><button type="button" class="btn btn-blue" id="btnPDF">Gerar e baixar o PDF</button>
+      <button type="button" class="btn btn-drive" id="btnDrive" disabled title="Gere o PDF primeiro">📁 Salvar na pasta do aluno</button></div>
     <div class="hintbox" id="hintPDF">O PDF mostra as duas provas e destaca a que precisa ser refeita, no padrão azul do boletim de jovens e adultos.</div>
     <iframe id="preview" hidden></iframe>
   </div>
@@ -454,6 +458,20 @@ $('fProf').addEventListener('input', function () { $('msg').value = montarMensag
 
 /* ============ PDF AZUL (paleta do boletim de jovens e adultos) ============ */
 $('btnPDF').addEventListener('click', gerarPDF);
+
+/* PDF gerado mais recentemente (para salvar na pasta do aluno no Drive) */
+var ultimoPDF = null;
+$('btnDrive').addEventListener('click', function () {
+  if (!ultimoPDF) { alert('Gere o PDF primeiro.'); return; }
+  if (typeof fiskEnviarParaPasta !== 'function') { alert('Helper de Drive não carregou (fisk-shared.js).'); return; }
+  fiskEnviarParaPasta($('btnDrive'), {
+    key: API_KEY, tipo: 'aluno',
+    escola: (turma && turma.escola) || '',
+    professor: ($('fProf').value || (turma && (turma.professor || turma.aba)) || '').trim(),
+    turma: ($('fTurma').value || (turma && turma.turma) || '').trim(),
+    aluno: ultimoPDF.aluno, filename: ultimoPDF.filename, bytes: ultimoPDF.bytes
+  }).catch(function () {});
+});
 async function gerarPDF() {
   if (modoLivre) sincronizarLivre();
   if (!alunoSel || !(alunoSel.nome || '').trim()) { alert('Informe o nome do aluno.'); return; }
@@ -639,6 +657,9 @@ async function gerarPDF() {
     var a = document.createElement('a');
     a.href = url; a.download = '2nd Chance - ' + nomeArq + ' - ' + dataFile + '.pdf'; a.click();
     $('preview').src = url; $('preview').hidden = false;
+    // guarda o PDF gerado para poder enviá-lo à pasta do aluno no Drive
+    ultimoPDF = { bytes: bytes, filename: a.download, aluno: (nome || '').trim() };
+    if ($('btnDrive')) { $('btnDrive').disabled = false; $('btnDrive').title = 'Salvar este PDF na pasta do aluno'; }
   } catch (e) {
     alert('Não consegui gerar o PDF: ' + e.message);
   } finally { btn.disabled = false; btn.textContent = lbl; }

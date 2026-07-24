@@ -6,6 +6,9 @@
 <title>Planejador da Próxima Aula — FISK</title>
 <link rel="stylesheet" href="assets/fisk-shared.css">
 <meta name="theme-color" content="#161414">
+<!-- pdf-lib: mesma lib usada pelo termo de atraso e pelo 2nd chance para gerar
+     o PDF localmente no navegador (sem servidor). -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <style>
   /* Acentos na tela ecoam a paleta AZUL das ferramentas do card
      (termo de atraso / 2nd chance / boletim de jovens e adultos). */
@@ -44,6 +47,28 @@
   .btn{border:0;border-radius:11px;font-weight:800;cursor:pointer;font-family:var(--font-heading)}
   .btn-ghost{background:var(--blue-soft);color:var(--blue-pill);padding:.55rem 1rem;font-size:.88rem}
   .btn-ghost:hover{background:#dbe6f0}
+  .btn-pdf{background:var(--blue);color:#fff;padding:.55rem 1.1rem;font-size:.9rem}
+  .btn-pdf:hover{background:var(--blue-mid)}
+  .btn-drive{background:var(--emdia);color:#fff;padding:.55rem 1.1rem;font-size:.9rem}
+  .btn-drive:hover{filter:brightness(1.06)}
+  .btn:disabled{opacity:.55;cursor:not-allowed}
+  /* bloco de finalização (fim do processo): data + conversação + botões */
+  .finalizar{margin-top:1.1rem;padding-top:.95rem;border-top:2px solid var(--blue-soft);
+    display:flex;flex-direction:column;gap:.9rem}
+  .fin-campos{display:flex;flex-wrap:wrap;gap:.8rem}
+  .fin-campos label,.fin-conversa label{display:flex;flex-direction:column;gap:.28rem;font-size:.72rem;
+    font-weight:800;color:var(--blue-ink);text-transform:uppercase;letter-spacing:.02em}
+  .fin-campos input,.fin-conversa input{padding:.48rem .6rem;border:1px solid var(--gray-light);border-radius:9px;
+    font-family:var(--font-body);font-size:.9rem;background:var(--white);color:var(--black)}
+  .fin-conversa{display:flex;flex-direction:column;gap:.5rem;background:var(--blue-soft);
+    border:1px solid var(--blue-bd);border-radius:10px;padding:.65rem .8rem}
+  .fin-conversa-tit{font-size:.82rem;font-weight:800;color:var(--blue-ink)}
+  .fin-conversa .fin-hint{font-weight:600;text-transform:none;letter-spacing:0;color:var(--gray);font-size:.72rem}
+  .fin-conversa label{text-transform:none;letter-spacing:0;font-size:.74rem}
+  .fin-conversa input{width:100%}
+  .fin-acoes{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+  body.theme-dark .fin-campos label,body.theme-dark .fin-conversa-tit,
+  body.theme-dark .fin-conversa label{color:#8fb4d8}
   /* lista ordenada */
   .lista{display:flex;flex-direction:column;gap:.55rem}
   .aluno{display:grid;grid-template-columns:auto 1fr auto;gap:.2rem .8rem;align-items:start;
@@ -143,7 +168,6 @@
     <div class="resumo" id="resumo"></div>
     <div class="barra">
       <label class="chk"><input type="checkbox" id="soAtencao"> só quem precisa de atenção</label>
-      <button type="button" class="btn btn-ghost" id="btnCopiar">📋 Copiar roteiro</button>
     </div>
     <p class="dica">🖐️ Arraste o <b>número</b> de cada aluno para reordenar a fila do seu jeito — os números se atualizam ao soltar. 💾 As <b>anotações ficam salvas</b> neste navegador entre as aulas.</p>
     <div class="reordInfo" id="reordInfo" hidden>
@@ -152,6 +176,30 @@
     </div>
     <div class="lista" id="lista"></div>
     <div class="foranote" id="foraNote" hidden></div>
+
+    <!-- FINALIZAÇÃO — fim do processo: define a data e a conversação do dia
+         e entrega o plano (copiar texto ou gerar PDF para imprimir). -->
+    <div class="finalizar" id="finalizar">
+      <div class="fin-campos">
+        <label>📅 Data desta aula planejada
+          <input type="date" id="dataAula">
+        </label>
+      </div>
+      <div class="fin-conversa">
+        <div class="fin-conversa-tit">💬 Conversação do dia
+          <span class="fin-hint">— preenchida pelo calendário conforme a data (você pode editar)</span></div>
+        <label>1ª aula (conversação mais formal)
+          <input type="text" id="conv1" placeholder="ex.: Everyday Life (Buddy Talks)"></label>
+        <label>2ª aula (do livro / conversation booklet / material complementar)
+          <input type="text" id="conv2" placeholder="ex.: Pair Work do livro + Conversation Booklet"></label>
+      </div>
+      <div class="fin-acoes">
+        <button type="button" class="btn btn-ghost" id="btnCopiar">📋 Copiar roteiro</button>
+        <button type="button" class="btn btn-pdf" id="btnPdf">📄 Gerar PDF do plano de aula</button>
+        <button type="button" class="btn btn-drive" id="btnDrive">📁 Enviar para pasta da turma</button>
+      </div>
+    </div>
+
     <div class="hintbox">
       <b>Como a ordem é calculada:</b> a prioridade vem <b>só do atraso de conteúdo</b>
       (distância entre a última lição feita e a lição prevista no gabarito) —
@@ -326,6 +374,13 @@ function onTurma(dados) {
   turma = dados;
   carregarNotas();
   ordenarPorPrioridade();
+  // data da aula planejada começa em hoje (formato yyyy-mm-dd exigido pelo input date)
+  var di = $('dataAula');
+  if (di && !di.value) {
+    var h = new Date();
+    di.value = h.getFullYear() + '-' + ('0' + (h.getMonth() + 1)).slice(-2) + '-' + ('0' + h.getDate()).slice(-2);
+  }
+  aplicarConversaAuto();  // pré-preenche a conversação do dia pelo calendário
   $('painelTurma').hidden = false;
   if (turma.nomePlanilha) $('tituloConectar').textContent = '🔗 Conectar ao card — ' + turma.nomePlanilha;
   $('tituloTurma').textContent = 'Fila de atendimento — ' + (turma.turma || '');
@@ -506,11 +561,60 @@ function atividadeTexto(a) {
   if (a.aulasAtraso === 0) return 'Seguir para ' + (lp || 'a próxima lição prevista') + '.';
   return 'Retomar de ' + (ul || '?') + ' rumo a ' + (lp || '?') + '.';
 }
+/** data da aula planejada escolhida pelo professor (input date), formatada
+ *  dd/mm/aaaa. Cai para hoje se o campo estiver vazio. Usada no roteiro e no PDF. */
+function dataAulaStr() {
+  var v = ($('dataAula') && $('dataAula').value) || '';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(v)) { var p = v.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+  var h = new Date();
+  return ('0' + h.getDate()).slice(-2) + '/' + ('0' + (h.getMonth() + 1)).slice(-2) + '/' + h.getFullYear();
+}
+
+/* ============ CONVERSAÇÃO DO DIA — calendário institucional ============
+   Planejamento de atividades comunicativas (aba AGOSTO/2026, tabela à direita
+   do calendário). Em agosto, todas as colunas de nível (Basic, Basic+18,
+   Advanced+Inter, Espanhol) têm a MESMA atividade por semana, então basta a
+   data → semana. Cada semana traz a 1ª aula (conversação mais formal) e a 2ª
+   aula (livro/booklet/material). Extraído da planilha do calendário 2026.
+   Para adicionar outros meses depois, é só estender CONV_CAL. */
+var CONV_CAL = {
+  '2026-08': [
+    { d: 1,  a1: 'Conversation Maker - Warm Up',          a2: '' },
+    { d: 3,  a1: 'Conversation Maker - Criado pelo prof', a2: 'Pair Work do livro' },
+    { d: 10, a1: 'Quick Practice - Fisk Hub',             a2: 'Conv. Booklet' },
+    { d: 17, a1: 'Projeto',                               a2: 'Uso do Material Complementar' },
+    { d: 24, a1: 'Movies & Series',                       a2: 'Pair Work do livro' },
+    { d: 31, a1: 'Buddy Talks',                           a2: '' }
+  ]
+};
+/** conversação prevista para a data planejada (ou null se o mês não estiver
+ *  no calendário). Retorna a semana que contém/precede o dia. */
+function conversaDaData() {
+  var v = ($('dataAula') && $('dataAula').value) || '';
+  var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v);
+  if (!m) return null;
+  var semanas = CONV_CAL[m[1] + '-' + m[2]];
+  if (!semanas) return null;
+  var dia = +m[3], w = null;
+  semanas.forEach(function (x) { if (x.d <= dia) w = x; });
+  return w ? { conv1: w.a1, conv2: w.a2 } : null;
+}
+/* últimos valores auto-preenchidos — para não sobrescrever o que o professor
+   digitou à mão (só troca o que ainda está vazio ou veio do auto). */
+var convAuto = { c1: '', c2: '' };
+function aplicarConversaAuto() {
+  var c = conversaDaData();
+  var i1 = $('conv1'), i2 = $('conv2');
+  if (!c) return;
+  if (i1 && (i1.value === '' || i1.value === convAuto.c1)) i1.value = c.conv1;
+  if (i2 && (i2.value === '' || i2.value === convAuto.c2)) i2.value = c.conv2;
+  convAuto.c1 = c.conv1; convAuto.c2 = c.conv2;
+}
+
 /* ---- roteiro em texto (copiar) — só NOME + ATIVIDADES + ANOTAÇÃO,
    na ordem exibida na tela (respeita a reordenação e o filtro). ---- */
 function roteiroTexto() {
-  var hoje = new Date();
-  var data = ('0' + hoje.getDate()).slice(-2) + '/' + ('0' + (hoje.getMonth() + 1)).slice(-2) + '/' + hoje.getFullYear();
+  var data = dataAulaStr();
   var linhas = [];
   linhas.push('PLANO DE ATENDIMENTO — ' + (turma.turma || '') + '  (' + data + ')');
   linhas.push('');
@@ -526,6 +630,8 @@ function roteiroTexto() {
 
 /* ============ EVENTOS ============ */
 $('soAtencao').addEventListener('change', function () { if (turma) renderFila(); });
+// ao trocar a data planejada, atualiza a conversação do dia pelo calendário
+if ($('dataAula')) $('dataAula').addEventListener('change', aplicarConversaAuto);
 $('reordRestaurar').addEventListener('click', function () {
   if (!turma) return;
   ordenarPorPrioridade();  // anotações ficam nos alunos, então sobrevivem
@@ -556,6 +662,165 @@ $('btnCopiar').addEventListener('click', function () {
     if (copiarExec(txt)) copiarFeedback();
     else window.prompt('Copie o roteiro (Ctrl/Cmd+C, Enter):', txt);
   });
+});
+
+/* ============ PDF DO PLANO DE AULA ============
+   PDF montado do zero (540×780 pt) no estilo azul da FISK. Estrutura:
+   cabeçalho (Professor / Turma / Data desta aula) · bloco "Conversação do
+   dia" (1ª + 2ª aula) · escala de prioridade dos alunos (nº colorido pela
+   prioridade + nome + atividade + anotação). Tudo na ORDEM exibida na tela
+   (respeita reordenação e filtro). Pagina automaticamente se a lista for
+   longa. Só leitura — nada é gravado no card. */
+function dadosPlano() {
+  return {
+    professor: (turma && turma.professor) ? String(turma.professor) : '',
+    turma: (turma && turma.turma) ? String(turma.turma) : '',
+    data: dataAulaStr(),
+    conv1: (($('conv1') && $('conv1').value) || '').trim(),
+    conv2: (($('conv2') && $('conv2').value) || '').trim(),
+    alunos: visiveis.map(function (a, i) {
+      return { rank: i + 1, nome: a.nome, nivel: nivel(a), atividade: atividadeTexto(a), nota: (a._nota || '').trim() };
+    })
+  };
+}
+
+/** monta o documento PDF do plano e devolve os bytes (Uint8Array). Reutilizado
+ *  pelo "gerar PDF" (download) e, futuramente, pelo "enviar para pasta da turma". */
+async function montarPDFplano(dp) {
+  var PDF = PDFLib;
+  var W = 540, H = 780, M = 26, CW = W - 2 * M;
+  var doc = await PDF.PDFDocument.create();
+  var helv = await doc.embedFont(PDF.StandardFonts.Helvetica);
+  var bold = await doc.embedFont(PDF.StandardFonts.HelveticaBold);
+  var ital = await doc.embedFont(PDF.StandardFonts.HelveticaOblique);
+  var PILL_L = PDF.rgb(0.855, 0.925, 0.98), BD = PDF.rgb(0.169, 0.302, 0.439),
+      DARK = PDF.rgb(0.133, 0.243, 0.353), SOFT = PDF.rgb(0.949, 0.965, 0.98),
+      INK = PDF.rgb(0.12, 0.12, 0.12), GRAY = PDF.rgb(0.42, 0.46, 0.5), WHITE = PDF.rgb(1, 1, 1),
+      C_ALTA = PDF.rgb(0.75, 0.22, 0.17), C_MEDIA = PDF.rgb(0.72, 0.53, 0.04), C_EMDIA = PDF.rgb(0.15, 0.53, 0.43);
+  var PRICO = { alta: C_ALTA, media: C_MEDIA, emdia: C_EMDIA, semdados: GRAY };
+  var page, y;
+
+  // drawSvgPath desenha PARA BAIXO a partir do y informado (y = topo da caixa).
+  function rrect(x, top, w, h, r, o) {
+    var p = 'M ' + r + ',0 H ' + (w - r) + ' A ' + r + ' ' + r + ' 0 0 1 ' + w + ' ' + r +
+      ' V ' + (h - r) + ' A ' + r + ' ' + r + ' 0 0 1 ' + (w - r) + ' ' + h +
+      ' H ' + r + ' A ' + r + ' ' + r + ' 0 0 1 0 ' + (h - r) +
+      ' V ' + r + ' A ' + r + ' ' + r + ' 0 0 1 ' + r + ' 0 Z';
+    page.drawSvgPath(p, Object.assign({ x: x, y: top }, o));
+  }
+  function centro(t, yy, s, f, c) { var w = f.widthOfTextAtSize(t, s); page.drawText(t, { x: (W - w) / 2, y: yy, size: s, font: f, color: c }); }
+  function fit(t, f, s, max) { t = String(t == null ? '' : t); while (t.length > 1 && f.widthOfTextAtSize(t, s) > max) t = t.slice(0, -2) + '…'; return t; }
+  function wrap(t, f, s, max) {
+    var out = [];
+    String(t).split('\n').forEach(function (par) {
+      var a = '';
+      par.split(' ').forEach(function (w) { var tt = a ? a + ' ' + w : w; if (f.widthOfTextAtSize(tt, s) > max) { if (a) out.push(a); a = w; } else a = tt; });
+      out.push(a);
+    });
+    return out;
+  }
+  function campo(x, top, w, rot, val) {
+    rrect(x, top, w, 22, 7, { borderColor: BD, borderWidth: 1.2 });
+    page.drawText(rot, { x: x + 12, y: top - 14.5, size: 8.5, font: bold, color: INK });
+    var lx = x + 12 + bold.widthOfTextAtSize(rot, 8.5) + 6;
+    page.drawText(fit(val, helv, 9, w - (lx - x) - 10), { x: lx, y: top - 14.5, size: 9, font: helv, color: INK });
+  }
+  function colHeader() {
+    rrect(M, y, CW, 15, 4, { color: PILL_L, borderColor: BD, borderWidth: 1 });
+    page.drawText('#', { x: M + 7, y: y - 10.5, size: 8, font: bold, color: DARK });
+    page.drawText('ALUNO', { x: M + 30, y: y - 10.5, size: 8, font: bold, color: DARK });
+    page.drawText('ATIVIDADES', { x: M + 232, y: y - 10.5, size: 8, font: bold, color: DARK });
+    y -= 15;
+  }
+  function novaPagina(primeira) {
+    page = doc.addPage([W, H]); y = H - M;
+    if (primeira) {
+      rrect(M, y, CW, 26, 13, { color: PILL_L, borderColor: BD, borderWidth: 1 });
+      centro('PLANEJAMENTO DE AULA PERSONALIZADA', y - 17, 12.5, bold, DARK); y -= 34;
+      campo(M, y, CW, 'Professor(a):', dp.professor); y -= 26;
+      var half = (CW - 10) / 2;
+      campo(M, y, half, 'Turma:', dp.turma); campo(M + half + 10, y, half, 'Data:', dp.data); y -= 32;
+      // conversação do dia
+      var a1 = wrap('1ª aula:  ' + (dp.conv1 || '—'), helv, 9, CW - 24);
+      var a2 = wrap('2ª aula:  ' + (dp.conv2 || '—'), helv, 9, CW - 24);
+      var boxH = 16 + 13 + (a1.length + a2.length) * 13 + 6;
+      rrect(M, y, CW, boxH, 8, { color: SOFT, borderColor: BD, borderWidth: 1.3 });
+      page.drawText('CONVERSAÇÃO DO DIA', { x: M + 12, y: y - 15, size: 9, font: bold, color: DARK });
+      var yy = y - 30;
+      a1.concat(a2).forEach(function (l, i) { var isHdr = (i === 0 || i === a1.length); page.drawText(l, { x: M + 12, y: yy, size: 9, font: isHdr ? bold : helv, color: INK }); yy -= 13; });
+      y -= boxH + 16;
+      page.drawText('ESCALA DE PRIORIDADE DE ATENDIMENTO', { x: M, y: y - 9, size: 9.5, font: bold, color: DARK });
+      var leg = [['alta', C_ALTA], ['média', C_MEDIA], ['em dia', C_EMDIA]], lx = M + 250;
+      leg.forEach(function (p) { page.drawCircle({ x: lx, y: y - 6, size: 3.2, color: p[1] }); page.drawText(p[0], { x: lx + 6, y: y - 8.5, size: 7.5, font: helv, color: GRAY }); lx += bold.widthOfTextAtSize(p[0], 7.5) + 34; });
+      y -= 20;
+    }
+    colHeader();
+  }
+  var rankX = M + 3, nomeX = M + 30, nomeW = 196, ativX = M + 232, ativW = CW - 232 - 6;
+  function linhaAluno(al, idx) {
+    var ativL = wrap(al.atividade || '', helv, 8, ativW), notaL = al.nota ? wrap(al.nota, ital, 7.5, ativW) : [];
+    var h = Math.max(26, 13 + ativL.length * 10 + notaL.length * 9 + 5);
+    if (y - h < M + 8) novaPagina(false);
+    if (idx % 2 === 1) rrect(M, y, CW, h, 4, { color: SOFT });
+    var bh = 17, by = y - (h - bh) / 2;
+    rrect(rankX, by, bh, bh, 5, { color: PRICO[al.nivel] || GRAY });
+    var rw = bold.widthOfTextAtSize(String(al.rank), 9);
+    page.drawText(String(al.rank), { x: rankX + (bh - rw) / 2, y: by - bh + 5.4, size: 9, font: bold, color: WHITE });
+    page.drawText(fit(al.nome, bold, 9.5, nomeW), { x: nomeX, y: y - 14, size: 9.5, font: bold, color: INK });
+    var yy = y - 14;
+    ativL.forEach(function (l) { page.drawText(l, { x: ativX, y: yy, size: 8, font: helv, color: INK }); yy -= 10; });
+    notaL.forEach(function (l) { page.drawText(l, { x: ativX, y: yy, size: 7.5, font: ital, color: GRAY }); yy -= 9; });
+    y -= h + 3;
+  }
+
+  novaPagina(true);
+  dp.alunos.forEach(function (al, i) { linhaAluno(al, i); });
+  return await doc.save();
+}
+
+function nomeArquivoPlano(dp) {
+  return 'plano-de-aula-' + (dp.turma || 'turma').replace(/[^\w-]+/g, '-').toLowerCase() + '.pdf';
+}
+
+async function gerarPDF() {
+  if (!turma) { alert('Carregue uma turma primeiro.'); return; }
+  if (!window.PDFLib) { alert('A biblioteca de PDF não carregou. Verifique a conexão e recarregue a página.'); return; }
+  var b = $('btnPdf'), old = b.textContent;
+  b.disabled = true; b.textContent = '⏳ Gerando…';
+  try {
+    var dp = dadosPlano();
+    var bytes = await montarPDFplano(dp);
+    var blob = new Blob([bytes], { type: 'application/pdf' });
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = url; link.download = nomeArquivoPlano(dp);
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+    b.textContent = '✓ PDF gerado';
+    setTimeout(function () { b.textContent = old; }, 1800);
+  } catch (e) {
+    alert('Não deu para gerar o PDF: ' + (e && e.message ? e.message : e));
+    b.textContent = old;
+  } finally {
+    b.disabled = false;
+  }
+}
+$('btnPdf').addEventListener('click', gerarPDF);
+
+/* ---- enviar o PDF para a pasta da turma no drive compartilhado ---- */
+$('btnDrive').addEventListener('click', function () {
+  if (!turma) { alert('Carregue uma turma primeiro.'); return; }
+  if (!window.PDFLib) { alert('A biblioteca de PDF não carregou. Verifique a conexão e recarregue a página.'); return; }
+  if (typeof fiskEnviarParaPasta !== 'function') { alert('Helper de Drive não carregou (fisk-shared.js).'); return; }
+  fiskEnviarParaPasta($('btnDrive'), async function () {
+    var dp = dadosPlano();
+    var bytes = await montarPDFplano(dp);
+    return {
+      key: API_KEY, tipo: 'turma',
+      escola: turma.escola || '', professor: turma.professor || turma.aba || '',
+      turma: turma.turma || '', filename: nomeArquivoPlano(dp), bytes: bytes
+    };
+  }).catch(function () { /* feedback já tratado no helper */ });
 });
 
 /* ---- confirmação ao voltar ao Hub (não perder a fila reordenada) ---- */

@@ -63,6 +63,96 @@ function fiskInitBeforeUnloadGuard(hasUnsavedChangesFn) {
   });
 }
 
+/* ============================================================
+   SALVAR PDF NO DRIVE (pasta da turma / do aluno)
+   Faz POST do PDF (base64) para o mesmo App da Web do card (API_URL).
+   O Apps Script (ver apps-script/salvar-no-drive.gs) localiza a pasta
+   por NOME no drive compartilhado e grava o arquivo; se não achar,
+   devolve code:'pasta_nao_encontrada' e o professor é avisado.
+   ============================================================ */
+
+/* URL do App da Web do endpoint de salvamento — projeto Apps Script SEPARADO
+   "fisk-hub-backend" (script 1AlWF9j-…, o mesmo backend do Portal do Aluno),
+   NÃO é o API_URL do card. O handler mora no doPost de lá, em `salvarPdfNoDrive`
+   (fonte documentada: apps-script/salvar-no-drive.gs). */
+var FISK_SAVE_URL = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
+
+/** Converte um Uint8Array em base64 (em blocos, evita estourar a pilha). */
+function fiskBytesToBase64(bytes) {
+  var bin = '', chunk = 0x8000;
+  for (var i = 0; i < bytes.length; i += chunk) {
+    bin += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+  }
+  return btoa(bin);
+}
+
+/**
+ * Envia um PDF para o App da Web salvar na pasta certa.
+ * opts: { endpoint, key, tipo:'turma'|'aluno', escola, professor, turma,
+ *         aluno, filename, bytes(Uint8Array) }
+ * Resolve com { ok:true, url, pasta }. Rejeita com Error cujo .code pode
+ * ser 'pasta_nao_encontrada'.
+ */
+async function fiskSalvarNoDrive(opts) {
+  var endpoint = opts.endpoint || FISK_SAVE_URL;
+  if (!endpoint) { var ec = new Error('URL de salvamento não configurada (defina FISK_SAVE_URL em fisk-shared.js após publicar o endpoint)'); ec.code = 'sem_endpoint'; throw ec; }
+  var payload = {
+    fn: 'salvarPdf', key: opts.key, tipo: opts.tipo,
+    escola: opts.escola || '', professor: opts.professor || '',
+    turma: opts.turma || '', aluno: opts.aluno || '',
+    filename: opts.filename || 'documento.pdf', mime: 'application/pdf',
+    dados: fiskBytesToBase64(opts.bytes)
+  };
+  // corpo como string simples (text/plain) evita preflight CORS no Apps Script
+  var resp = await fetch(endpoint, { method: 'POST', body: JSON.stringify(payload) });
+  var j;
+  try { j = await resp.json(); }
+  catch (e) { throw new Error('resposta inválida do servidor (o doPost já foi publicado no Apps Script?)'); }
+  if (!j || j.ok !== true) {
+    var err = new Error((j && j.erro) || 'falha ao salvar no Drive');
+    err.code = (j && j.code) || '';
+    throw err;
+  }
+  return j;
+}
+
+/**
+ * Liga um botão ao envio para o Drive, com feedback padrão e — o mais
+ * importante — NOTIFICA o professor de forma clara quando a pasta não é
+ * encontrada (para ele não achar que salvou sem ter salvo).
+ * getOpts() deve devolver as opts de fiskSalvarNoDrive (inclui bytes já
+ * gerados). Retorna Promise.
+ */
+async function fiskEnviarParaPasta(buttonEl, getOpts) {
+  if (!buttonEl) return;
+  var old = buttonEl.textContent;
+  buttonEl.disabled = true; buttonEl.textContent = '⏳ Enviando ao Drive…';
+  var opts;
+  try {
+    opts = (typeof getOpts === 'function') ? await getOpts() : getOpts;
+    if (!opts) { buttonEl.disabled = false; buttonEl.textContent = old; return; }
+    var r = await fiskSalvarNoDrive(opts);
+    // mostra ONDE salvou: a pasta é escolhida por aproximação (dia+horário no
+    // caso da turma), então o professor tem de conseguir conferir num relance
+    buttonEl.textContent = r && r.pasta ? '✓ Salvo em "' + r.pasta + '"' : '✓ Salvo na pasta';
+    setTimeout(function () { buttonEl.textContent = old; buttonEl.disabled = false; }, 4000);
+    return r;
+  } catch (e) {
+    buttonEl.textContent = old; buttonEl.disabled = false;
+    var ondeAlvo = (opts && opts.tipo === 'turma') ? 'da turma' : 'do aluno';
+    if (e.code === 'sem_endpoint') {
+      alert('⚙️ O salvamento no Drive ainda não foi configurado.\n\nPublique o endpoint (apps-script/salvar-no-drive.gs) e cole a URL em FISK_SAVE_URL (assets/fisk-shared.js).');
+    } else if (e.code === 'pasta_nao_encontrada') {
+      alert('⚠️ ATENÇÃO: a pasta ' + ondeAlvo + ' NÃO foi encontrada no drive compartilhado.\n\n' +
+            'O documento NÃO foi salvo. Baixe o PDF manualmente (botão de gerar/baixar) ou ' +
+            'confira/crie a pasta no Drive e tente de novo.' + (e.message ? '\n\n(' + e.message + ')' : ''));
+    } else {
+      alert('Não deu para salvar no Drive: ' + (e.message || e));
+    }
+    throw e;
+  }
+}
+
 /**
  * Desabilita o botão, troca o conteúdo por um spinner + rótulo enquanto
  * asyncFn roda, e restaura o botão ao final (sucesso ou erro).
