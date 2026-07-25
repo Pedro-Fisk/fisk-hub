@@ -619,7 +619,8 @@ function roteiroTexto() {
   linhas.push('PLANO DE ATENDIMENTO — ' + (turma.turma || '') + '  (' + data + ')');
   linhas.push('');
   visiveis.forEach(function (a, i) {
-    linhas.push((i + 1) + '. ' + a.nome);
+    // *nome* = negrito quando colado no WhatsApp
+    linhas.push((i + 1) + '. *' + a.nome + '*');
     linhas.push('   • ' + atividadeTexto(a));
     var nota = (a._nota || '').trim();
     if (nota) nota.split('\n').forEach(function (l) { l = l.trim(); if (l) linhas.push('   • ' + l); });
@@ -709,10 +710,16 @@ async function montarPDFplano(dp) {
     page.drawSvgPath(p, Object.assign({ x: x, y: top }, o));
   }
   function centro(t, yy, s, f, c) { var w = f.widthOfTextAtSize(t, s); page.drawText(t, { x: (W - w) / 2, y: yy, size: s, font: f, color: c }); }
-  function fit(t, f, s, max) { t = String(t == null ? '' : t); while (t.length > 1 && f.widthOfTextAtSize(t, s) > max) t = t.slice(0, -2) + '…'; return t; }
+  // WinAnsi (fonte padrão do pdf-lib) não codifica quebras de linha nem outros
+  // controles — e títulos de turma do card às vezes têm "\n" (ex.: "…\nSala 9").
+  // 1 linha: colapsa qualquer espaço/quebra num espaço só. Multi-linha: mantém
+  // só o "\n" real e remove os demais controles.
+  function umaLinha(t) { return String(t == null ? '' : t).replace(/\s+/g, ' ').trim(); }
+  function limpaMulti(t) { return String(t == null ? '' : t).replace(/\r/g, '').replace(/\t/g, '  ').replace(/[\x00-\x08\x0b-\x1f\x7f]/g, ''); }
+  function fit(t, f, s, max) { t = umaLinha(t); while (t.length > 1 && f.widthOfTextAtSize(t, s) > max) t = t.slice(0, -2) + '…'; return t; }
   function wrap(t, f, s, max) {
     var out = [];
-    String(t).split('\n').forEach(function (par) {
+    limpaMulti(t).split('\n').forEach(function (par) {
       var a = '';
       par.split(' ').forEach(function (w) { var tt = a ? a + ' ' + w : w; if (f.widthOfTextAtSize(tt, s) > max) { if (a) out.push(a); a = w; } else a = tt; });
       out.push(a);
