@@ -1047,7 +1047,14 @@
         history.replaceState(null, '', location.pathname + location.search);
         msg.textContent = tr('pg-wait');
         post({ action:'dirCheck', token: decodeURIComponent(mDir[1]) }).then(function(res){
-          if (res && res.ok && res.director){ res.director.master = true; enter(res.director); }
+          if (res && res.ok && res.director){
+            res.director.master = true;
+            /* o dirtok também vale como token SSO nas ferramentas externas
+               (profCheck aceita token de diretor) — sem ele o Conversation
+               Maker pediria login mesmo com o master logado */
+            res.director.token = decodeURIComponent(mDir[1]);
+            enter(res.director);
+          }
           else {
             loadProfs(); setMode('login'); setPlaceholders();
             msg.textContent = (res && res.error) || tr('pg-err');
