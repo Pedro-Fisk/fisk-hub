@@ -865,12 +865,21 @@
       loadEvents().then(evts => { _calEvents = evts; buildCalendar(); });
     })();
     /* O Conversation Maker fica em outro domínio (vercel.app) e não enxerga
-       o localStorage daqui — o tema atual vai na URL. */
+       o localStorage daqui — o tema atual vai na URL, e o token de sessão do
+       professor (SSO) vai no fragmento #proftok= (fragmento não chega a
+       servidores/logs; mesmo padrão do #dirtok= do Painel da Direção). */
     (function(){
       var cm=document.querySelector('a[href^="https://conversation-maker"]');
       if(!cm) return;
-      function sync(){ cm.href='https://conversation-maker.vercel.app/?theme='+(document.body.classList.contains('theme-dark')?'dark':'light'); }
-      sync();
+      function sync(){
+        var tok='';
+        try{
+          var s=JSON.parse(localStorage.getItem('fisk_prof')||'null');
+          if(s&&s.token) tok='#proftok='+encodeURIComponent(s.token);
+        }catch(e){}
+        cm.href='https://conversation-maker.vercel.app/?theme='+(document.body.classList.contains('theme-dark')?'dark':'light')+tok;
+      }
+      sync(); window._cmSync=sync;
       var tg=document.getElementById('themeToggle');
       if(tg) tg.addEventListener('click', function(){ setTimeout(sync, 0); });
     })();
@@ -962,6 +971,7 @@
         fillBar(prof);
         if (prof && prof.master) setupActAs();
         updateToolLinks();
+        if (window._cmSync) window._cmSync(); // re-monta o link do Conversation Maker com o token novo
         setTimeout(function(){ if (window._mdLoad) window._mdLoad(); }, 0);
       }
 
@@ -1007,7 +1017,13 @@
         sub.disabled = true; msg.textContent = tr('pg-wait');
         p.then(function(res){
           sub.disabled = false;
-          if (res && res.ok){ msg.textContent = ''; enter(res.prof); }
+          if (res && res.ok){
+            msg.textContent = '';
+            /* token de sessão SSO: viaja junto do perfil para as ferramentas
+               em outros domínios (ex.: Conversation Maker) via #proftok= */
+            if (res.token && res.prof) res.prof.token = res.token;
+            enter(res.prof);
+          }
           else { msg.textContent = (res && res.error) || tr('pg-err'); }
         }).catch(function(){ sub.disabled = false; msg.textContent = tr('pg-err'); });
       }
