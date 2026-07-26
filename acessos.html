@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acessos dos Alunos — FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css">
+<meta name="theme-color" content="#161414">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+<style>
+  :root{ --blue:#2b4d70; --blue-pill:#223e5a; --blue-soft:#e9eff5; --blue-ink:#1d3349; --blue-bd:#a9bccd;
+         --ok:#27866e; --ok-soft:#e6f4ef; --warn:#b8860b; --warn-soft:#fbf3df; --off:#c0392b; --off-soft:#fbeae7; }
+  [hidden]{ display:none !important; }
+  main{max-width:900px;margin:0 auto;padding:1.2rem;width:100%}
+  .painel{background:var(--white);border:1px solid var(--surface-border-color);
+          border-radius:var(--surface-radius);box-shadow:var(--surface-shadow);
+          padding:1.1rem 1.2rem;margin-bottom:1rem}
+  .painel h2{margin:0 0 .5rem;font-size:1.05rem;color:var(--blue)}
+  .painel .sub{font-size:.85rem;color:var(--gray);margin:0 0 .8rem;line-height:1.45}
+  .status{font-size:.88rem;font-weight:700;color:var(--gray)}
+  .status.err{color:#c0392b}
+  .kpis{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.9rem}
+  .kpi{flex:1 1 130px;background:var(--blue-soft);border:1.5px solid var(--blue-bd);
+       border-radius:12px;padding:.6rem .7rem;text-align:center}
+  .kpi b{display:block;font-family:var(--font-heading);font-size:1.6rem;line-height:1.1;color:var(--blue-pill)}
+  .kpi span{font-size:.7rem;font-weight:800;color:var(--blue-ink);text-transform:uppercase;letter-spacing:.02em}
+  .kpi.ok{background:var(--ok-soft);border-color:#a9d6c8}.kpi.ok b{color:var(--ok)}
+  .kpi.off{background:var(--off-soft);border-color:#e6b3ab}.kpi.off b{color:var(--off)}
+  .barra{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin-bottom:.7rem}
+  select,input[type=search]{padding:.5rem .6rem;border:1px solid var(--gray-light);border-radius:9px;
+    font-family:var(--font-body);font-size:.9rem;background:var(--white);color:var(--black)}
+  select{cursor:pointer;max-width:100%}
+  table{width:100%;border-collapse:collapse;font-size:.88rem}
+  th,td{padding:.55rem .6rem;text-align:left;border-bottom:1px solid var(--gray-light);vertical-align:middle}
+  th{font-family:var(--font-heading);font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--gray)}
+  tr:last-child td{border-bottom:none}
+  .nome{font-weight:800}
+  .turma{font-size:.76rem;color:var(--gray)}
+  .pill{display:inline-block;font-size:.72rem;font-weight:800;padding:.15rem .55rem;border-radius:99px;white-space:nowrap}
+  .pill.ok{background:var(--ok-soft);color:var(--ok)}
+  .pill.warn{background:var(--warn-soft);color:var(--warn)}
+  .pill.off{background:var(--off-soft);color:var(--off)}
+  .tbl-wrap{overflow-x:auto}
+  body.theme-dark .painel h2{color:#8fb4d8}
+  body.theme-dark th{color:#9fb0c0}
+</style>
+</head>
+<body>
+<script>try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
+
+<header class="hero">
+  <a class="back-link" href="index.html">&larr; Voltar ao Hub</a>
+  <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
+  <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+  <h1>Acessos dos Alunos</h1>
+  <p>Quem já entrou no Portal do Aluno &middot; suas turmas</p>
+</header>
+
+<main>
+  <div class="painel">
+    <div class="status" id="status">🔄 Carregando seus alunos…</div>
+  </div>
+
+  <div class="painel" id="painel" hidden>
+    <div class="kpis">
+      <div class="kpi"><b id="k-total">0</b><span>Alunos</span></div>
+      <div class="kpi ok"><b id="k-ent">0</b><span>Já entraram</span></div>
+      <div class="kpi off"><b id="k-nunca">0</b><span>Nunca entraram</span></div>
+      <div class="kpi"><b id="k-7d">0</b><span>Nos últimos 7 dias</span></div>
+    </div>
+    <div class="barra">
+      <select id="fTurma"><option value="">Todas as turmas</option></select>
+      <select id="fStatus">
+        <option value="">Todos</option>
+        <option value="sim">Só quem já entrou</option>
+        <option value="nao">Só quem nunca entrou</option>
+      </select>
+      <input type="search" id="fBusca" placeholder="Buscar aluno…">
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Aluno</th><th>Livro</th><th>Último acesso</th><th>Acessos</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <p class="sub" style="margin:.8rem 0 0">O aluno entra pelo Portal do Aluno com o código RAF: <b>portal-aluno-fisk.vercel.app</b></p>
+  </div>
+</main>
+
+<script src="assets/fisk-shared.js"></script>
+<script>
+fiskInitThemeToggle('themeToggle');
+
+var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
+var $ = function(id){ return document.getElementById(id); };
+var dados = [];
+
+function sessao(){ try{ return JSON.parse(localStorage.getItem('fisk_prof')||'null'); }catch(e){ return null; } }
+
+function quando(ts){
+  if(!ts) return null;
+  var dias = Math.floor((Date.now()-ts)/86400000);
+  if(dias <= 0) return 'hoje';
+  if(dias === 1) return 'ontem';
+  if(dias < 30) return 'há ' + dias + ' dias';
+  var d = new Date(ts), p = function(n){ return ('0'+n).slice(-2); };
+  return p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear();
+}
+
+function render(){
+  var t = $('fTurma').value, st = $('fStatus').value, q = $('fBusca').value.trim().toLowerCase();
+  var lista = dados.filter(function(a){
+    if(t && a.turma !== t) return false;
+    if(st === 'sim' && !a.last) return false;
+    if(st === 'nao' && a.last) return false;
+    if(q && a.name.toLowerCase().indexOf(q) === -1) return false;
+    return true;
+  });
+  var tb = $('tbody'); tb.innerHTML = '';
+  if(!lista.length){
+    tb.innerHTML = '<tr><td colspan="4" style="color:var(--gray);padding:1rem 0">Nenhum aluno com esses filtros.</td></tr>';
+    return;
+  }
+  lista.forEach(function(a){
+    var tr = document.createElement('tr');
+    var dias = a.last ? Math.floor((Date.now()-a.last)/86400000) : null;
+    var cls = a.last == null ? 'off' : (dias <= 7 ? 'ok' : 'warn');
+    var txt = a.last == null ? 'nunca entrou' : quando(a.last);
+    tr.innerHTML =
+      '<td><span class="nome"></span><br><span class="turma"></span></td>' +
+      '<td class="turma"></td>' +
+      '<td><span class="pill ' + cls + '"></span></td>' +
+      '<td>' + (a.count || 0) + '</td>';
+    tr.children[0].children[0].textContent = a.name;
+    tr.children[0].children[2].textContent = a.turma;
+    tr.children[1].textContent = a.book || '—';
+    tr.children[2].children[0].textContent = txt;
+    tb.appendChild(tr);
+  });
+}
+
+function kpis(){
+  var ent = dados.filter(function(a){ return a.last; });
+  var recentes = dados.filter(function(a){ return a.last && (Date.now()-a.last) < 7*86400000; });
+  $('k-total').textContent = dados.length;
+  $('k-ent').textContent = ent.length;
+  $('k-nunca').textContent = dados.length - ent.length;
+  $('k-7d').textContent = recentes.length;
+}
+
+function boot(){
+  var s = sessao();
+  if(!s || !s.token){
+    $('status').className = 'status err';
+    $('status').innerHTML = '⚠️ Entre no Fisk Hub com seu usuário e senha para ver os acessos dos seus alunos. <a href="index.html">Ir para o login</a>';
+    return;
+  }
+  fetch(EP, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+              body: JSON.stringify({ action:'acessosProf', token: s.token }) })
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      if(!res.ok){
+        $('status').className = 'status err';
+        $('status').textContent = '⚠️ ' + (res.error || 'Não consegui carregar.');
+        return;
+      }
+      dados = res.acessos || [];
+      $('status').textContent = '👩‍🏫 ' + res.prof + ' · ' + res.turmas + ' turma(s) · ' + dados.length + ' aluno(s)';
+      var turmas = {}; dados.forEach(function(a){ turmas[a.turma] = true; });
+      Object.keys(turmas).sort().forEach(function(t){
+        var o = document.createElement('option'); o.value = t; o.textContent = t; $('fTurma').appendChild(o);
+      });
+      kpis(); render();
+      $('painel').hidden = false;
+    })
+    .catch(function(){
+      $('status').className = 'status err';
+      $('status').textContent = '⚠️ Sem conexão com o servidor.';
+    });
+}
+
+['fTurma','fStatus','fBusca'].forEach(function(id){
+  $(id).addEventListener('input', render);
+  $(id).addEventListener('change', render);
+});
+boot();
+</script>
+</body>
+</html>
