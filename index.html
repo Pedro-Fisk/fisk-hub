@@ -55,6 +55,11 @@
     .prof-bar button{border:0;background:transparent;color:#2563EB;font-weight:700;cursor:pointer;font-size:.85rem;font-family:inherit;}
     body.theme-dark .prof-bar button{color:#6ea8ff;}
     body.prof-out .prof-bar{display:none;}
+    /* visão da direção "como professor": barra âmbar para não confundir com a sessão real */
+    .prof-bar.is-visita{background:#fff7e6;border-color:#f0c477;color:#7a5300;}
+    .prof-bar.is-visita button{color:#a05a00;}
+    body.theme-dark .prof-bar.is-visita{background:#3a2e12;border-color:#5c4a1e;color:#f0c477;}
+    body.theme-dark .prof-bar.is-visita button{color:#f0c477;}
     .prof-actas{border:1px solid #7C3AED;background:#f1eafd;color:#4c1d95;border-radius:999px;
       padding:4px 10px;font-size:.8rem;font-weight:700;font-family:inherit;cursor:pointer;max-width:230px;}
     body.theme-dark .prof-actas{background:#2a1b45;border-color:#7C3AED;color:#d7c4fb;}
@@ -931,7 +936,12 @@
       function fillBar(prof){
         if (!prof) return;
         var esc = String(prof.escolas || prof.escola || '').replace(/,/g, ' + ');
-        $('profBarName').textContent = '👤 ' + (prof.name || '') + (esc ? ' · ' + esc : '');
+        var visita = !!prof.viewingAs;
+        $('profBarName').textContent = (visita ? '👁 vendo como ' : '👤 ') + (prof.name || '') + (esc ? ' · ' + esc : '');
+        var bar = $('profBar');
+        if (bar) bar.classList.toggle('is-visita', visita);
+        var out = $('profLogout');
+        if (out) out.textContent = visita ? 'Sair da visão' : tr('pg-logout');
       }
 
       /* ── Acesso master: diretor "veste a camisa" de um professor sem login ──
@@ -1054,9 +1064,37 @@
         applyLang(b.dataset.lang); setMode(mode); setPlaceholders();
       });
       $('profLogout').addEventListener('click', function(){
+        var era = saved();
         try{ localStorage.removeItem('fisk_prof'); localStorage.removeItem('fisk_actas'); localStorage.removeItem('fisk_minidash'); }catch(e){}
+        // saindo de uma visita da direção: volta para o Painel da Direção
+        if (era && era.viewingAs){ location.href = 'https://portal-aluno-fisk.vercel.app/diretor.html'; return; }
         location.reload();
       });
+
+      /* "Ver como professor": #proftok=<token> de VISITA, emitido pelo Painel da
+         Direção (dirImpersonate, exige token de diretor). Validado no servidor
+         (profCheck) — a URL sozinha não abre nada. Não usa nem altera a senha
+         do professor, e a sessão dele nos aparelhos continua valendo. */
+      var mVis = location.hash.match(/#proftok=([^&]+)/);
+      if (mVis){
+        var tokVis = decodeURIComponent(mVis[1]);
+        history.replaceState(null, '', location.pathname + location.search);
+        msg.textContent = tr('pg-wait');
+        post({ action:'profCheck', token: tokVis }).then(function(res){
+          if (res && res.ok && res.prof){
+            res.prof.token = tokVis;
+            res.prof.viewingAs = true;   // barra mostra "vendo como" + "Sair da visão"
+            enter(res.prof);
+          } else {
+            loadProfs(); setMode('login'); setPlaceholders();
+            msg.textContent = (res && res.error) || tr('pg-err');
+          }
+        }).catch(function(){
+          loadProfs(); setMode('login'); setPlaceholders();
+          msg.textContent = tr('pg-err');
+        });
+        return;
+      }
 
       /* acesso master da direção: #dirtok=<token> emitido pelo Painel da Direção.
          O token é validado no servidor (dirCheck) — nada de bypass por URL solta. */
