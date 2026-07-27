@@ -178,3 +178,134 @@ async function fiskWithSpinner(buttonEl, asyncFn, opts) {
     buttonEl.innerHTML = originalHtml;
   }
 }
+
+/* ============================================================================
+   MENU DO PROFESSOR — mesmo canto, mesma cara, em toda ferramenta.
+   Mostra quem está logado e reúne os atalhos e o "Sair". Antes, só a home do
+   Hub tinha isso: quem entrava numa ferramenta perdia a identidade de vista e
+   não tinha como sair sem voltar.
+   Chame fiskInitUserMenu() no fim do script da página (o CSS vem deste kit).
+   ============================================================================ */
+
+/** Sessão do professor gravada pelo login do Hub. */
+function fiskSessao() {
+  try { return JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) { return null; }
+}
+
+/**
+ * Raiz do Fisk Hub a partir de QUALQUER ferramenta. As páginas do próprio
+ * repo carregam o kit por caminho relativo ('assets/…'); as de fora (boletim,
+ * planner, conversation maker) pegam do CDN. É esse detalhe que diz se os
+ * atalhos podem ser relativos ou precisam da URL de produção.
+ */
+function fiskHubBase() {
+  var link = document.querySelector('link[href*="fisk-shared.css"]');
+  var href = link ? link.getAttribute('href') || '' : '';
+  var externo = /^https?:/i.test(href);
+  return externo ? 'https://pedro-fisk.github.io/fisk-hub/' : '';
+}
+
+var FISK_IDIOMAS = [
+  { id: 'pt', rot: 'PT' },
+  { id: 'en', rot: 'EN' },
+  { id: 'es', rot: 'ES' }
+];
+
+/** Idioma escolhido no Hub — vale para todas as páginas. */
+function fiskIdioma() {
+  try { return localStorage.getItem('fisk_lang') || 'pt'; } catch (e) { return 'pt'; }
+}
+
+/**
+ * Monta o menu do professor no cabeçalho.
+ * opts.onIdioma(lang) — chamado quando o professor troca de idioma; se a
+ * página não passa nada, a escolha é só guardada e vale na próxima que souber
+ * traduzir (o idioma é do PROFESSOR, não da página).
+ */
+function fiskInitUserMenu(opts) {
+  opts = opts || {};
+  var hero = document.querySelector('.hero');
+  var s = fiskSessao();
+  if (!hero || !s || !s.name || document.querySelector('.fisk-user')) return null;
+
+  var base = fiskHubBase();
+  var primeiro = String(s.fullName || s.name).trim().split(/\s+/)[0];
+  var escolas = String(s.escolas || s.escola || '');
+
+  var wrap = document.createElement('div');
+  wrap.className = 'fisk-user';
+
+  var btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'fisk-user-btn';
+  btn.setAttribute('aria-haspopup', 'true');
+  btn.setAttribute('aria-expanded', 'false');
+  btn.innerHTML = '<span>👤 ' + fiskEsc(primeiro) + '</span><span class="fu-seta">▾</span>';
+
+  var menu = document.createElement('div');
+  menu.className = 'fisk-user-menu';
+  menu.setAttribute('role', 'menu');
+  menu.innerHTML =
+    '<div class="fu-head"><b>' + fiskEsc(s.fullName || s.name) + '</b>' +
+      (escolas ? '<span>' + fiskEsc(escolas.split(',').join(' + ')) + '</span>' : '') + '</div>' +
+    '<a class="fu-item" href="' + base + 'index.html">🏠 Fisk Hub</a>' +
+    '<a class="fu-item" href="' + base + 'visao-geral.html">📊 Minhas turmas</a>' +
+    '<a class="fu-item" href="' + base + 'treinamentos.html">🎓 Treinamentos</a>' +
+    /* o seletor de idioma só aparece onde a página SABE traduzir: um botão
+       que não muda nada na tela é pior do que não ter botão */
+    (typeof opts.onIdioma === 'function'
+      ? '<div class="fu-sep"></div><div class="fu-langs">' + FISK_IDIOMAS.map(function (l) {
+          return '<button type="button" class="fu-lang" data-lang="' + l.id + '">' + l.rot + '</button>';
+        }).join('') + '</div>'
+      : '') +
+    '<div class="fu-sep"></div>' +
+    '<button type="button" class="fu-item fu-sair">🚪 Sair desta conta</button>';
+
+  wrap.appendChild(btn); wrap.appendChild(menu);
+  hero.appendChild(wrap);
+
+  function marcarIdioma() {
+    var atual = fiskIdioma();
+    menu.querySelectorAll('.fu-lang').forEach(function (b) {
+      b.classList.toggle('is-on', b.getAttribute('data-lang') === atual);
+    });
+  }
+  marcarIdioma();
+
+  function fechar() { wrap.classList.remove('is-open'); btn.setAttribute('aria-expanded', 'false'); }
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var abrindo = !wrap.classList.contains('is-open');
+    wrap.classList.toggle('is-open', abrindo);
+    btn.setAttribute('aria-expanded', abrindo ? 'true' : 'false');
+  });
+  document.addEventListener('click', function (e) { if (!wrap.contains(e.target)) fechar(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') fechar(); });
+
+  menu.querySelectorAll('.fu-lang').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var lang = b.getAttribute('data-lang');
+      try { localStorage.setItem('fisk_lang', lang); } catch (x) {}
+      marcarIdioma();
+      if (typeof opts.onIdioma === 'function') opts.onIdioma(lang);
+      fechar();
+    });
+  });
+
+  menu.querySelector('.fu-sair').addEventListener('click', function () {
+    if (!window.confirm('Sair da sua conta neste computador?')) return;
+    try {
+      localStorage.removeItem('fisk_prof');
+      localStorage.removeItem('fisk_actas');
+      localStorage.removeItem('fisk_minidash');
+    } catch (x) {}
+    location.href = base + 'index.html';
+  });
+
+  return wrap;
+}
+
+function fiskEsc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}

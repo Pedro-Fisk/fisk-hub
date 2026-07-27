@@ -54,6 +54,22 @@
 
 *{ box-sizing: border-box; }
 
+/* Texto base um pouco maior em TODAS as ferramentas (pedido do Pedro: as
+   telas estavam miúdas). Vale por rem: como as ferramentas dimensionam quase
+   tudo em rem, subir a raiz de 16 para 17px aumenta a página inteira de forma
+   proporcional, sem mexer em regra nenhuma. Páginas do aluno (Quick Practice
+   e Simulador MET) não carregam este arquivo e ficam como estão. */
+html{ font-size: 17px; }
+
+/* Parágrafo de explicação é para ser lido em bloco: justificado, não
+   "escadinha" à direita. Só os textos corridos — nunca rótulo, chip ou
+   linha de tabela, que ficariam com espaçamento esquisito. */
+p.hint, p.sub, .hintbox, .soon-txt, .modal-text, .painel > p, .card > p{
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+}
+
 body{
   margin: 0;
   min-height: 100vh;
@@ -125,6 +141,101 @@ h1, h2, h3, .btn, .btn-generate, .modal-title{ font-family: var(--font-heading);
   transition: all 0.12s ease;
 }
 .theme-toggle:hover{ border-color: #ffffff; transform: translateY(-1px); }
+
+/* ---------- Menu do professor (topo direito, ao lado do tema) ----------
+   Mesmo lugar em TODA ferramenta: quem está logado, atalhos e o "Sair".
+   Montado por fiskInitUserMenu() (fisk-shared.js) — só aparece com sessão. */
+.fisk-user{
+  position: absolute;
+  top: 1.25rem;
+  right: 5.2rem;
+  z-index: 60;
+  text-align: left;
+}
+.fisk-user-btn{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  max-width: 15rem;
+  height: 2.6rem;
+  padding: 0 0.95rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.12s ease;
+}
+.fisk-user-btn:hover{ border-color: #ffffff; transform: translateY(-1px); }
+.fisk-user-btn .fu-seta{ font-size: 0.7rem; opacity: 0.8; }
+.fisk-user-menu{
+  display: none;
+  position: absolute;
+  top: 3.1rem;
+  right: 0;
+  min-width: 15rem;
+  background: var(--white);
+  color: var(--black);
+  border: 1.5px solid var(--surface-border-color);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.18);
+  padding: 0.45rem;
+  overflow: hidden;
+}
+.fisk-user.is-open .fisk-user-menu{ display: block; }
+.fu-head{
+  padding: 0.5rem 0.7rem 0.6rem;
+  border-bottom: 1px solid var(--gray-light);
+  margin-bottom: 0.35rem;
+}
+.fu-head b{ display: block; font-family: var(--font-heading); font-size: 0.92rem; }
+.fu-head span{ display: block; font-size: 0.74rem; color: var(--gray); font-weight: 700; margin-top: 0.1rem; }
+.fu-item{
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--black);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.fu-item:hover{ background: var(--ui-soft); color: var(--ui-dark); }
+.fu-item.fu-sair{ color: var(--red-dark); }
+.fu-item.fu-sair:hover{ background: #fbeae7; }
+.fu-sep{ height: 1px; background: var(--gray-light); margin: 0.35rem 0; }
+/* seletor de idioma dentro do menu */
+.fu-langs{ display: flex; gap: 0.3rem; padding: 0.15rem 0.7rem 0.5rem; }
+.fu-lang{
+  flex: 1;
+  padding: 0.35rem 0;
+  border: 1.5px solid var(--gray-light);
+  border-radius: 8px;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: var(--gray);
+  cursor: pointer;
+}
+.fu-lang.is-on{ border-color: var(--ui); background: var(--ui-soft); color: var(--ui-dark); }
+@media (max-width: 640px){
+  .fisk-user{ right: 4.6rem; top: 1rem; }
+  .fisk-user-btn{ max-width: 8.5rem; height: 2.3rem; font-size: 0.78rem; padding: 0 0.7rem; }
+}
 
 /* ---------- Badge ("Em breve" etc) ---------- */
 .badge{

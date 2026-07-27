@@ -28,6 +28,8 @@
   .painel{background:var(--white);border:2px solid var(--surface-border-color);
           border-radius:var(--surface-radius);box-shadow:var(--surface-shadow);
           padding:1.15rem 1.25rem;margin-bottom:1.1rem}
+  .doc-actions{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:flex-end}
+  .doc-actions .btn-generate,.doc-actions .btn-sec{margin:0}
   .painel h2{margin:0 0 .4rem;font-family:var(--font-heading);font-weight:700;
              font-size:1.05rem;color:var(--ui-dark,#223e5a)}
   .aviso{font-size:.85rem;color:var(--gray)}
@@ -161,11 +163,18 @@
   </section>
 
   <section class="painel" hidden id="painelGerar">
-    <button class="btn-generate" id="btnPdf">📄 Gerar Termo de Atraso (PDF)</button>
-    <button class="btn-generate" id="btnDrive" disabled title="Gere o PDF primeiro"
-      style="margin-top:.5rem;background:#27866e">📁 Salvar na pasta do aluno</button>
+    <h2>📄 Gerar o termo</h2>
+    <!-- mesma barra de ações das outras ferramentas, na mesma ordem -->
+    <div class="doc-actions">
+      <button type="button" class="btn-sec" id="btnLancar" hidden>📤 Lançar no card</button>
+      <button class="btn-generate" id="btnDrive" disabled title="Gere o PDF primeiro"
+        style="background:#27866e">📁 Salvar na pasta do aluno</button>
+      <a class="btn-sec" id="btnVerPasta" hidden target="_blank" rel="noopener">📂 Ver pasta</a>
+      <button class="btn-generate" id="btnPdf">📄 Gerar Termo de Atraso (PDF)</button>
+    </div>
+    <div class="status" id="statusDoc" style="margin-top:.5rem"></div>
     <p class="aviso" style="margin:.6rem 0 0">O PDF sai fechado (não editável) e o card recebe automaticamente
-    uma nota na célula da última aula do aluno registrando o termo.</p>
+    uma nota na célula da última aula do aluno registrando o termo, com data e hora.</p>
     <embed id="preview" type="application/pdf" hidden style="margin-top:.8rem">
   </section>
 
@@ -466,9 +475,38 @@ function extrairHorario(titulo){
 
 /* ============ PDF (pdf-lib, documento FECHADO — sem campos editáveis) ============ */
 document.getElementById('btnPdf').addEventListener('click', gerarPDF);
+document.getElementById('btnLancar').addEventListener('click', lancarNoCard);
 
 /* PDF gerado mais recentemente (para salvar na pasta do aluno no Drive) */
 var ultimoPDF = null;
+
+/* depois de gravar, o professor precisa CONFERIR onde caiu */
+function mostrarVerPasta(r) {
+  var b = document.getElementById('btnVerPasta'); if (!b) return;
+  var url = (r && (r.pastaUrl || r.url)) || '';
+  if (!url) { b.hidden = true; return; }
+  b.href = url; b.title = 'Abrir no Drive a pasta "' + ((r && r.pasta) || '') + '"';
+  b.hidden = false;
+}
+function statusDoc(msg, cor) {
+  var e = document.getElementById('statusDoc'); if (!e) return;
+  e.textContent = msg || ''; e.style.color = cor || '';
+}
+/* o registro no card já acontece sozinho ao gerar o PDF; o botão existe para
+   REFAZER quando a chamada falha (sem obrigar a gerar o PDF de novo) */
+function lancarNoCard() {
+  if (modoLivre || !alunoSel || alunoSel.linhaCard == null) {
+    statusDoc('Termo livre não tem aluno no card para marcar.', '#b8860b'); return;
+  }
+  if (alunoSel.ultimaPresencaIdx == null || alunoSel.ultimaPresencaIdx < 0) {
+    statusDoc('Este aluno ainda não tem aula registrada no card — não há célula para marcar.', '#b8860b'); return;
+  }
+  statusDoc('⏳ Registrando no card…');
+  api({ fn: 'registrarDoc', escola: payload.escola, prof: payload.aba, professor: payload.aba,
+        linhaCard: alunoSel.linhaCard, idx: alunoSel.ultimaPresencaIdx, tipo: 'termo' })
+    .then(function () { statusDoc('✓ Registrado no card, na célula da última aula (com data e hora).', '#1e8f4e'); })
+    .catch(function (e) { statusDoc('⚠️ ' + e.message, '#c0392b'); });
+}
 document.getElementById('btnDrive').addEventListener('click', function () {
   if (!ultimoPDF) { alert('Gere o PDF primeiro.'); return; }
   if (typeof fiskEnviarParaPasta !== 'function') { alert('Helper de Drive não carregou (fisk-shared.js).'); return; }
@@ -682,6 +720,8 @@ async function gerarPDF() {
   ultimoPDF = { bytes: bytes, filename: aEl.download, aluno: (alunoSel.nome || '').trim() };
   var bd = document.getElementById('btnDrive');
   if (bd) { bd.disabled = false; bd.title = 'Salvar este PDF na pasta do aluno'; }
+  var bl = document.getElementById('btnLancar');
+  if (bl) bl.hidden = !(!modoLivre && alunoSel && alunoSel.linhaCard != null);
 
   /* registra no card (nota na célula da última aula do aluno) — prefere a API,
      que funciona em qualquer modo e respeita a turma trocada no seletor */
@@ -691,7 +731,7 @@ async function gerarPDF() {
     api({ fn: 'registrarTermo', escola: payload.escola, prof: payload.aba,
           linhaCard: alunoSel.linhaCard, idx: alunoSel.ultimaPresencaIdx })
       .then(function () {
-        document.getElementById('statusCard').textContent = '📄 Termo registrado no card (nota na célula da última aula).';
+        statusDoc('✓ Registrado no card, na célula da última aula (com data e hora).', '#1e8f4e');
       }).catch(mostrarErroApi);
   } else if (!standalone) {
     window.parent.postMessage({ tipo: 'fisk-termo-gerado', nomeAluno: alunoSel.nome }, '*');
@@ -726,6 +766,8 @@ if (POLISH_URL) {
       });
   });
 }
+
+fiskInitUserMenu();
 </script>
 </body>
 </html>
