@@ -983,8 +983,41 @@ async function montarPDFplano(dp) {
   return await doc.save();
 }
 
+/* Nome do arquivo do plano (pedido do Pedro):
+     "Plano de aula do dia 27.07 - Prof Carlos Alberto.pdf"
+   A data é a da AULA PLANEJADA, não a de hoje — é ela que identifica o plano.
+   O nome do professor sai do card em caixa alta; vira Capitulado para o
+   arquivo não gritar na pasta. */
+function tituloNome(n) {
+  return String(n || '').toLowerCase().replace(/(^|[\s'’-])([a-zà-ÿ])/g, function (m, sep, c) {
+    return sep + c.toUpperCase();
+  }).trim();
+}
+function nomeProfPlano(dp) {
+  // tira o ponto final da abreviação ("Mariana G.") para não colar em ".pdf"
+  return tituloNome(dp.professor || (turma && (turma.professor || turma.aba)) || '').replace(/\.+$/, '');
+}
+/** "27/07/2026" → "27.07" */
+function diaMesPlano(dp) {
+  var m = String(dp.data || '').match(/^(\d{2})\/(\d{2})/);
+  if (m) return m[1] + '.' + m[2];
+  var h = new Date();
+  return ('0' + h.getDate()).slice(-2) + '.' + ('0' + (h.getMonth() + 1)).slice(-2);
+}
 function nomeArquivoPlano(dp) {
-  return 'plano-de-aula-' + (dp.turma || 'turma').replace(/[^\w-]+/g, '-').toLowerCase() + '.pdf';
+  var prof = nomeProfPlano(dp);
+  return 'Plano de aula do dia ' + diaMesPlano(dp) + (prof ? ' - Prof ' + prof : '') + '.pdf';
+}
+/* Como o nome carrega a data, cada plano novo teria um nome diferente e os
+   antigos se acumulariam na pasta da turma. Prefixo + sufixo dizem ao servidor
+   qual arquivo aposentar: o sufixo com o nome do professor é o que impede
+   apagar o plano de um colega numa turma que os dois atendem. */
+function padraoSubstituicaoPlano(dp) {
+  var prof = nomeProfPlano(dp);
+  return {
+    substituiPrefixo: 'Plano de aula do dia ',
+    substituiSufixo: prof ? (' - Prof ' + prof + '.pdf') : '.pdf'
+  };
 }
 
 async function gerarPDF() {
@@ -1030,10 +1063,12 @@ ligarAcao('.js-drive', function (ev) {
   fiskEnviarParaPasta(ev.currentTarget, async function () {
     var dp = dadosPlano();
     var bytes = await montarPDFplano(dp);
+    var sub = padraoSubstituicaoPlano(dp);
     return {
       key: API_KEY, tipo: 'turma',
       escola: turma.escola || '', professor: turma.professor || turma.aba || '',
-      turma: turma.turma || '', filename: nomeArquivoPlano(dp), bytes: bytes
+      turma: turma.turma || '', filename: nomeArquivoPlano(dp), bytes: bytes,
+      substituiPrefixo: sub.substituiPrefixo, substituiSufixo: sub.substituiSufixo
     };
   }).then(mostrarVerPasta).catch(function () { /* feedback já tratado no helper */ });
 });

@@ -103,6 +103,11 @@ async function fiskSalvarNoDrive(opts) {
     filename: opts.filename || 'documento.pdf', mime: 'application/pdf',
     dados: fiskBytesToBase64(opts.bytes)
   };
+  /* Substituição por padrão: usada quando o nome do arquivo muda a cada versão
+     (o plano de aula leva a data no nome). Sem isso, o servidor só troca
+     arquivos de nome IDÊNTICO e os antigos se acumulam na pasta. */
+  if (opts.substituiPrefixo) payload.substituiPrefixo = opts.substituiPrefixo;
+  if (opts.substituiSufixo) payload.substituiSufixo = opts.substituiSufixo;
   // corpo como string simples (text/plain) evita preflight CORS no Apps Script
   var resp = await fetch(endpoint, { method: 'POST', body: JSON.stringify(payload) });
   var j;
