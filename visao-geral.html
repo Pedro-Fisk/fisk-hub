@@ -76,8 +76,8 @@
   .rank{display:flex;flex-direction:column;gap:.4rem}
   .rank .r{display:grid;grid-template-columns:1fr 84px 34px;gap:.5rem;align-items:center;font-size:.78rem}
   .rank .rn{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--black)}
-  .rank .rt{height:9px;border-radius:99px;background:var(--gray-light);overflow:hidden}
-  .rank .rt i{display:block;height:100%;border-radius:99px}
+  .rt{height:9px;border-radius:99px;background:var(--gray-light);overflow:hidden}
+  .rt i{display:block;height:100%;border-radius:99px}
   .rank .rv{font-weight:800;text-align:right;font-variant-numeric:tabular-nums;color:var(--gray)}
   .viz-scatter{position:relative}
   .viz-scatter svg{width:100%;height:auto;display:block;overflow:visible}
@@ -212,6 +212,27 @@
       As notas vêm das avaliações lançadas no card — turmas sem nota lançada aparecem com “—”.
       Tudo é <b>só leitura</b>: nada é gravado no card.
     </div>
+  </div>
+
+  <!-- 4b · lançamento de notas -->
+  <div class="painel" id="painelNotas" hidden>
+    <h2>📝 Notas lançadas no card</h2>
+    <p class="sub">Quantos alunos de cada turma já têm a avaliação lançada — o que falta
+      preencher antes do fechamento. Lançar é pelo <a href="boletins.html">Gerador de Boletins</a>.</p>
+    <div class="table-wrap">
+      <table style="min-width:520px">
+        <thead><tr><th>Turma</th><th class="num">Alunos</th><th>1ª avaliação</th><th>2ª avaliação</th></tr></thead>
+        <tbody id="linhasNotas"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 4c · gatilho de 2ª chance -->
+  <div class="painel" id="painelSegunda" hidden>
+    <h2>🔁 Alunos que precisam de 2ª chance</h2>
+    <p class="sub">Prova de escuta ou de escrita <b>abaixo de 6</b> — o aluno refaz só a prova
+      que ficou baixa. O botão abre a ferramenta já com esse aluno carregado.</p>
+    <div class="atn" id="listaSegunda"></div>
   </div>
 
   <!-- 5 · acessos ao Portal do Aluno (era uma ferramenta separada no Hub) -->
@@ -523,6 +544,40 @@ function ligarTooltip(box, tip) {
   });
 }
 
+/* ============ NOTAS DAS PROVAS (mesmo parser do 2nd Chance) ============
+   A célula do card guarda o lançamento em texto; o formato mudou uma vez,
+   então os dois são aceitos: o atual ("prova de escuta: 8") e o antigo
+   ("A8 B7,5 ..." na última linha). */
+function parseProvas(cellText) {
+  if (!cellText || !String(cellText).trim()) return null;
+  var txt = String(cellText), auditiva, escrita;
+  var mE = txt.match(/prova de escuta:\s*([0-9]+(?:[.,][0-9]+)?)/i);
+  var mW = txt.match(/prova de escrita:\s*([0-9]+(?:[.,][0-9]+)?)/i);
+  if (mE) auditiva = parseFloat(mE[1].replace(',', '.'));
+  if (mW) escrita = parseFloat(mW[1].replace(',', '.'));
+  if (auditiva === undefined && escrita === undefined) {
+    var lines = txt.split('\n'), noteLine = lines[lines.length - 1], res = {};
+    var re = /(?:^|\s)([AB])\s*([0-9]+(?:[.,][0-9]+)?)/g, m;
+    while ((m = re.exec(noteLine))) { res[m[1]] = parseFloat(m[2].replace(',', '.')); }
+    auditiva = res.A; escrita = res.B;
+  }
+  if (auditiva === undefined && escrita === undefined) return null;
+  return { auditiva: auditiva, escrita: escrita };
+}
+var NOTA_MINIMA = 6;
+function temNota(v) { return !!(v && String(v).trim()); }
+
+/* medidor "12/14" — proporção contra um limite, não série: uma cor só */
+function medidor(feitos, total) {
+  var pct = total ? feitos / total * 100 : 0;
+  var cor = !total ? 'var(--gray-light)' : (feitos === total ? 'var(--viz-emdia)'
+            : feitos ? 'var(--viz-media)' : 'var(--viz-alta)');
+  return '<div style="display:flex;align-items:center;gap:.5rem">' +
+    '<span class="rt" style="flex:1;min-width:70px"><i style="width:' + pct + '%;background:' + cor + '"></i></span>' +
+    '<b style="font-size:.78rem;font-variant-numeric:tabular-nums;white-space:nowrap">' +
+    feitos + '/' + total + '</b></div>';
+}
+
 function render(escola, prof, dados) {
   var alunos = [];        // todos, com referência da turma
   var porTurma = [];
@@ -531,10 +586,14 @@ function render(escola, prof, dados) {
     var t = {
       titulo: String(d._titulo || d.turma || '').split('\n')[0],
       n: lista.length, emdia: 0, atras: 0, crit: 0, semdados: 0,
-      faltas: [], notas: []
+      faltas: [], notas: [], av1: 0, av2: 0,
+      linhaTitulo: d.linhaTitulo, aba: d.aba || d.professor
     };
     lista.forEach(function (a) {
       a._turma = t.titulo;
+      a._linhaTitulo = t.linhaTitulo; a._aba = t.aba;   // p/ o link do 2nd Chance
+      if (temNota(a.notasAv1)) t.av1++;
+      if (temNota(a.notasAv2)) t.av2++;
       var at = (typeof a.aulasAtraso === 'number' && !isNaN(a.aulasAtraso)) ? a.aulasAtraso : null;
       a._atraso = at;
       if (at == null) t.semdados++;
@@ -639,6 +698,43 @@ function render(escola, prof, dados) {
   var totSem = porTurma.reduce(function (s, t) { return s + (t.emdia + t.atras + t.crit ? 0 : t.n); }, 0);
   $('foraNote').hidden = !totSem;
   if (totSem) $('foraNote').innerHTML = '👶 <b>' + totSem + '</b> aluno(s) em turmas sem cronograma de placeholders (kids/teens) — para elas valem faltas e notas, sem análise de atraso.';
+
+  /* lançamento de notas: o que falta preencher antes do fechamento */
+  $('linhasNotas').innerHTML = porTurma.map(function (t) {
+    return '<tr><td><span class="tnome">' + esc(t.titulo) + '</span></td>' +
+      '<td class="num">' + t.n + '</td>' +
+      '<td>' + medidor(t.av1, t.n) + '</td>' +
+      '<td>' + medidor(t.av2, t.n) + '</td></tr>';
+  }).join('');
+  $('painelNotas').hidden = !porTurma.length;
+
+  /* gatilho da 2ª chance: prova de escuta OU de escrita abaixo de 6.
+     É a nota INDIVIDUAL da prova, não a média — o aluno refaz só o que
+     ficou baixo. Um botão por aluno, que abre a ferramenta já no aluno. */
+  var segunda = [];
+  alunos.forEach(function (a) {
+    [['1ª', a.notasAv1], ['2ª', a.notasAv2]].forEach(function (par) {
+      var p = parseProvas(par[1]); if (!p) return;
+      var baixas = [];
+      if (typeof p.auditiva === 'number' && p.auditiva < NOTA_MINIMA) baixas.push({ q: 'escuta', v: p.auditiva });
+      if (typeof p.escrita === 'number' && p.escrita < NOTA_MINIMA) baixas.push({ q: 'escrita', v: p.escrita });
+      if (baixas.length) segunda.push({ aluno: a, av: par[0], baixas: baixas });
+    });
+  });
+  $('listaSegunda').innerHTML = segunda.length ? segunda.map(function (s) {
+    var a = s.aluno;
+    var link = '2nd-chance.html#t=' + encodeURIComponent(escola) + '|' +
+      encodeURIComponent(a._aba || prof) + '|' + a._linhaTitulo + '|' + a.linhaCard;
+    return '<div class="a is-alta"><span class="nome">' + esc(a.nome) + '</span>' +
+      '<span class="info">' + esc(a._turma) + ' · ' + s.av + ' avaliação</span>' +
+      '<span class="chips">' +
+      s.baixas.map(function (b) {
+        return '<span class="chip bad">prova de ' + b.q + ': ' + fmtNota(b.v) + '</span>';
+      }).join('') +
+      '<a class="chip" style="background:var(--roxo);color:#fff;text-decoration:none" href="' + link +
+      '">Gerar 2ª chance ↗</a></span></div>';
+  }).join('') : '<p class="sub">Nenhum aluno com prova abaixo de 6 nas avaliações lançadas até agora.</p>';
+  $('painelSegunda').hidden = false;
 
   /* lista de atenção */
   var top = alunos.filter(function (a) { return a._atraso != null && a._atraso >= 1; })

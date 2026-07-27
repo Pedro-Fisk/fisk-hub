@@ -92,7 +92,17 @@ body.theme-dark .md-kpi.emdia b{color:#5fc4a5}
 body.theme-dark .md-kpi.media b{color:#e0b45a}
 body.theme-dark .md-kpi.alta b{color:#e57668}
 body.theme-dark .md-kpi.roxa b{color:#b795f8}
-@media(max-width:640px){.md-cta{flex:1 1 100%}}
+/* No celular o mini-dash encolhe: ele é o resumo, não o assunto — quem abre o
+   Hub quer chegar nas ferramentas sem rolar. 3 colunas em vez de 2. */
+@media(max-width:640px){
+  .mini-dash{padding:0 .9rem;gap:.5rem;margin-top:1rem}
+  .md-cta{flex:1 1 100%;padding:.6rem .8rem}
+  .md-cta b{font-size:.9rem}
+  .md-kpis{grid-template-columns:repeat(3,minmax(0,1fr));gap:.4rem;min-width:0}
+  .md-kpi{padding:.4rem .25rem}
+  .md-kpi b{font-size:1.05rem}
+  .md-kpi span{font-size:.54rem;line-height:1.15}
+}
 
 .icon{
   width: 64px;
@@ -524,31 +534,48 @@ body.theme-dark .cal-event-item{ background: rgba(255,255,255,.04); }
     padding: 0.4rem 0.1rem;
   }
 
+  /* No celular os cards viram QUADRADOS em duas colunas: cabe o dobro de
+     ferramentas na primeira tela, que é o que o professor quer ver ao abrir.
+     A altura segue o conteúdo se ele passar do quadrado — nada é cortado. */
   .grid{
-    grid-template-columns: 1fr;
-    padding: 1.75rem 1rem 2.5rem;
-    gap: 1.1rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 1.5rem 0.9rem 2.5rem;
+    gap: 0.7rem;
   }
 
   .card{
-    padding: 1.5rem 1.25rem;
+    aspect-ratio: 1 / 1;
+    padding: 0.95rem 0.85rem;
     min-height: 0;
-    gap: 0.75rem;
+    gap: 0.5rem;
+    justify-content: center;
+    border-radius: 16px;
   }
 
-  .card h2{ font-size: 1.25rem; }
-  .card p{ font-size: 0.92rem; }
+  .card h2{ font-size: 0.95rem; line-height: 1.22; }
+  .card p{
+    font-size: 0.72rem;
+    line-height: 1.32;
+    /* a chamada é apoio: se não couber no quadrado, corta em 3 linhas em vez
+       de esticar o card e desalinhar a grade */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 
   .icon{
-    width: 52px;
-    height: 52px;
-    border-radius: 12px;
+    width: 42px;
+    height: 42px;
+    border-radius: 11px;
   }
-  .icon svg{ width: 28px; height: 28px; }
+  .icon svg{ width: 24px; height: 24px; }
 
   .badge{
-    top: 0.9rem;
-    right: 0.9rem;
+    top: 0.5rem;
+    right: 0.5rem;
+    font-size: 0.58rem;
+    padding: 0.16rem 0.45rem;
   }
 
   .links-section{ padding: 0 1rem 2.5rem; }

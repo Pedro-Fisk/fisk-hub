@@ -397,10 +397,26 @@ function initCascade() {
   };
 }
 function initFragment() {
-  var ref = decodeURIComponent(location.hash.slice(3)).split('|'); // escola|prof|linha
+  // escola|prof|linha[|linhaCard] — o 4º campo é opcional e vem da Visão Geral,
+  // que lista os alunos com prova baixa e manda direto para o aluno certo
+  var ref = decodeURIComponent(location.hash.slice(3)).split('|');
   statusCard('🔄 Lendo a turma do card…');
   api({ fn: 'turma', escola: ref[0], prof: ref[1], linha: ref[2] })
-    .then(onTurma).catch(function (e) { statusCard('⚠️ ' + e.message + ' — use a cascata.', 'err'); initCascade(); });
+    .then(function (d) { onTurma(d); if (ref[3]) abrirAlunoPorLinha(+ref[3]); })
+    .catch(function (e) { statusCard('⚠️ ' + e.message + ' — use a cascata.', 'err'); initCascade(); });
+}
+
+/** Seleciona o aluno daquela linha do card (e marca o item na lista). */
+function abrirAlunoPorLinha(linhaCard) {
+  var alunos = (turma.alunos || []).filter(function (a) { return a && a.nome; });
+  var i = -1;
+  alunos.forEach(function (a, idx) { if (+a.linhaCard === linhaCard) i = idx; });
+  if (i < 0) return;
+  // a lista pode estar filtrada em "só quem precisa": o aluno que veio pelo
+  // link tem prova baixa, então ele aparece de qualquer jeito
+  var el = $('lista').querySelector('.aluno[data-i="' + i + '"]');
+  if (el) { el.classList.add('sel'); el.scrollIntoView({ block: 'center' }); }
+  escolherAluno(alunos[i]);
 }
 
 /* ---- turma carregada: escolhe avaliação padrão e monta a lista ---- */
