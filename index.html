@@ -55,6 +55,7 @@
     .prof-bar button{border:0;background:transparent;color:#2563EB;font-weight:700;cursor:pointer;font-size:.85rem;font-family:inherit;}
     body.theme-dark .prof-bar button{color:#6ea8ff;}
     body.prof-out .prof-bar{display:none;}
+    .prof-bar.is-oculta{display:none;}
     /* visão da direção "como professor": barra âmbar para não confundir com a sessão real */
     .prof-bar.is-visita{background:#fff7e6;border-color:#f0c477;color:#7a5300;}
     .prof-bar.is-visita button{color:#a05a00;}
@@ -103,11 +104,6 @@
 
 
   <header class="hero">
-    <div class="lang-toggle" id="langToggle">
-      <button class="lang-btn is-active" data-lang="pt" aria-label="Português">🇧🇷 PT</button>
-      <button class="lang-btn" data-lang="en" aria-label="English">🇺🇸 EN</button>
-      <button class="lang-btn" data-lang="es" aria-label="Español">🇪🇸 ES</button>
-    </div>
     <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
     <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
     <h1>Fisk Hub</h1>
@@ -897,10 +893,8 @@
 
     (function initLang() {
       applyLang(_lang);
-      document.getElementById('langToggle').addEventListener('click', function(e) {
-        var btn = e.target.closest('.lang-btn');
-        if (btn) applyLang(btn.dataset.lang);
-      });
+      /* o seletor do hero virou item do menu do professor; o do login (que
+         aparece antes de existir sessão) continua onde estava */
     })();
 
     /* ════════════════════════════════════════════════
@@ -928,6 +922,10 @@
         $('profBarName').textContent = (visita ? '👁 vendo como ' : '👤 ') + (prof.name || '') + (esc ? ' · ' + esc : '');
         var bar = $('profBar');
         if (bar) bar.classList.toggle('is-visita', visita);
+        /* Identidade e "sair" agora vivem no menu do topo, igual às ferramentas.
+           Esta barra só continua na tela quando tem algo que o menu não faz:
+           avisar que é uma VISITA da direção, ou oferecer o "ver como". */
+        if (bar) bar.classList.toggle('is-oculta', !visita && !prof.master);
         var out = $('profLogout');
         if (out) out.textContent = visita ? 'Sair da visão' : tr('pg-logout');
       }
@@ -985,6 +983,14 @@
         document.body.classList.remove('prof-out');
         document.body.classList.add('prof-in');
         fillBar(prof);
+        /* mesmo menu das ferramentas, no mesmo canto — aqui ele também troca o
+           idioma (o Hub sabe traduzir) e respeita o "sair da visão" da direção */
+        if (typeof fiskInitUserMenu === 'function') {
+          fiskInitUserMenu({
+            onIdioma: function(lang){ applyLang(lang); },
+            onSair: function(){ $('profLogout').click(); }
+          });
+        }
         if (prof && prof.master) setupActAs();
         updateToolLinks();
         if (window._cmSync) window._cmSync(); // re-monta o link do Conversation Maker com o token novo
@@ -1111,7 +1117,16 @@
       }
 
       var s = saved();
-      if (s){ fillBar(s); if (s.master) setupActAs(); updateToolLinks(); }  // já logado (prof-in veio do pre-paint)
+      if (s){
+        fillBar(s); if (s.master) setupActAs(); updateToolLinks();  // já logado (prof-in veio do pre-paint)
+        // quem já estava logado não passa pelo enter(): o menu é montado aqui
+        if (typeof fiskInitUserMenu === 'function') {
+          fiskInitUserMenu({
+            onIdioma: function(lang){ applyLang(lang); },
+            onSair: function(){ $('profLogout').click(); }
+          });
+        }
+      }
       else { loadProfs(); setMode('login'); setPlaceholders(); }
     })();
 

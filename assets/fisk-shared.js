@@ -221,6 +221,8 @@ function fiskIdioma() {
  * opts.onIdioma(lang) — chamado quando o professor troca de idioma; se a
  * página não passa nada, a escolha é só guardada e vale na próxima que souber
  * traduzir (o idioma é do PROFESSOR, não da página).
+ * opts.onSair() — substitui o "sair" padrão. O Hub usa para tratar o modo
+ * visita da direção, que volta ao painel do diretor em vez do login.
  */
 function fiskInitUserMenu(opts) {
   opts = opts || {};
@@ -293,6 +295,7 @@ function fiskInitUserMenu(opts) {
   });
 
   menu.querySelector('.fu-sair').addEventListener('click', function () {
+    if (typeof opts.onSair === 'function') { fechar(); opts.onSair(); return; }
     if (!window.confirm('Sair da sua conta neste computador?')) return;
     try {
       localStorage.removeItem('fisk_prof');
