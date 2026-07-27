@@ -72,11 +72,24 @@
   .btn-drive:hover{filter:brightness(1.08)}
   .btn-drive:disabled{opacity:.5;cursor:not-allowed}
   .btn-ghost{background:var(--blue-soft);color:var(--blue-pill);padding:.6rem 1rem;font-size:.9rem}
+  .btn-sm{padding:.35rem .75rem;font-size:.78rem;border-radius:9px}
   .status{font-size:.86rem;font-weight:700;color:var(--gray);margin-top:.5rem}
   .status.err{color:#c0392b}.status.ok{color:var(--green)}
   #preview{width:100%;height:560px;border:1px solid var(--gray-light);border-radius:10px;margin-top:.6rem}
   .hintbox{background:var(--blue-soft);border-radius:10px;padding:.55rem .8rem;font-size:.82rem;
            color:var(--blue-ink);margin-top:.5rem}
+  /* sessão do Hub: “sou eu” + trocar professor(a) (o seletor nunca trava) */
+  .eusou{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-bottom:.7rem}
+  .eusou b{font-size:.9rem}
+  .eusou .esc{font-size:.78rem;color:var(--gray);font-weight:700}
+  /* barra de ações do documento — a MESMA no topo e no fim do painel do aluno */
+  .painel-head{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center;justify-content:space-between}
+  .painel-head h2{margin:0}
+  .doc-actions{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:flex-end}
+  .doc-actions .btn{width:auto;padding:.55rem 1rem;font-size:.88rem;
+                    display:inline-flex;align-items:center;gap:.35rem;text-decoration:none}
+  .doc-actions .btn:disabled{opacity:.5;cursor:not-allowed}
+  .doc-actions .status{margin-top:0;flex:1 1 100%;text-align:right}
 </style>
 </head>
 <body>
@@ -95,15 +108,28 @@
   <div class="painel">
     <h2>🔗 Conectar ao card</h2>
     <p class="sub">Escolha a turma: a ferramenta lê as notas ao vivo e mostra quem tirou menos de 6,0 em alguma prova (Escrita ou Auditiva) — quem precisa de 2nd chance.</p>
-    <div id="origem" class="row" hidden>
-      <div style="flex:1 1 170px">
-        <select id="selEscola" disabled><option value="" disabled selected>Escola…</option></select><span id="indEscola" class="ind"></span>
+    <div id="origem" hidden>
+      <!-- logado pelo Fisk Hub: escola e professor(a) vêm da sessão e só sobra a turma -->
+      <div id="euSou" class="eusou" hidden>
+        <b>👤 <span id="euNome"></span></b>
+        <span class="esc" id="euEscola"></span>
+        <button type="button" class="btn btn-ghost btn-sm" id="btnTrocarProf">trocar professor(a)</button>
       </div>
-      <div style="flex:1 1 190px">
-        <select id="selProf" disabled><option value="" disabled selected>Professor(a)…</option></select><span id="indProf" class="ind"></span>
-      </div>
-      <div style="flex:1 1 200px">
-        <select id="selTurma" disabled><option value="" disabled selected>Turma…</option></select><span id="indTurma" class="ind"></span>
+      <!-- padrão do Hub (termo-atraso): rótulo em cima e o indicador de
+           carregamento AO LADO DO RÓTULO, igual nos três campos -->
+      <div class="row" style="align-items:flex-start">
+        <div class="campo" id="wrapEscola" style="flex:1 1 170px">
+          <label>Escola<span id="indEscola" class="ind"></span></label>
+          <select id="selEscola" disabled><option value="" disabled selected>Escola…</option></select>
+        </div>
+        <div class="campo" id="wrapProf" style="flex:1 1 190px">
+          <label>Professor(a)<span id="indProf" class="ind"></span></label>
+          <select id="selProf" disabled><option value="" disabled selected>Professor(a)…</option></select>
+        </div>
+        <div class="campo" style="flex:2 1 240px">
+          <label>Turma<span id="indTurma" class="ind"></span></label>
+          <select id="selTurma" disabled><option value="" disabled selected>Turma…</option></select>
+        </div>
       </div>
     </div>
     <div class="status" id="statusCard"></div>
@@ -127,7 +153,17 @@
 
   <!-- 3 · aluno selecionado -->
   <div class="painel" id="painelAluno" hidden>
-    <h2 id="nomeAluno">Aluno</h2>
+    <div class="painel-head">
+      <h2 id="nomeAluno">Aluno</h2>
+      <!-- mesma barra de ações que fica no fim do painel, para não obrigar a rolar -->
+      <div class="doc-actions">
+        <button type="button" class="btn btn-ghost" id="btnLancarTopo" hidden>📤 Lançar no card</button>
+        <button type="button" class="btn btn-drive" id="btnDriveTopo" disabled title="Gere o PDF primeiro">📁 Salvar na pasta do aluno</button>
+        <a class="btn btn-ghost" id="btnVerPastaTopo" hidden target="_blank" rel="noopener">📂 Ver pasta</a>
+        <button type="button" class="btn btn-blue" id="btnPDFTopo">📄 Gerar PDF</button>
+        <span class="status" id="statusDocTopo"></span>
+      </div>
+    </div>
     <div class="provas" id="provas"></div>
 
     <div id="camposLivre" hidden>
@@ -161,10 +197,20 @@
     </div>
 
     <h2 style="margin-top:1rem">📄 Comunicado em PDF (azul)</h2>
-    <div class="row"><button type="button" class="btn btn-blue" id="btnPDF">Gerar e baixar o PDF</button>
-      <button type="button" class="btn btn-drive" id="btnDrive" disabled title="Gere o PDF primeiro">📁 Salvar na pasta do aluno</button></div>
+    <div class="doc-actions">
+      <button type="button" class="btn btn-ghost" id="btnLancar" hidden>📤 Lançar no card</button>
+      <button type="button" class="btn btn-drive" id="btnDrive" disabled title="Gere o PDF primeiro">📁 Salvar na pasta do aluno</button>
+      <a class="btn btn-ghost" id="btnVerPasta" hidden target="_blank" rel="noopener">📂 Ver pasta</a>
+      <button type="button" class="btn btn-blue" id="btnPDF">📄 Gerar PDF</button>
+      <span class="status" id="statusDoc"></span>
+    </div>
     <div class="hintbox" id="hintPDF">O PDF mostra as duas provas e destaca a que precisa ser refeita, no padrão azul do boletim de jovens e adultos.</div>
-    <iframe id="preview" hidden></iframe>
+
+    <div id="previewWrap" hidden>
+      <h2 style="margin-top:1rem">👁️ Documento gerado</h2>
+      <p class="sub">Confira aqui antes de mandar para a família — o arquivo também foi baixado para o seu computador.</p>
+      <iframe id="preview" title="Pré-visualização do comunicado"></iframe>
+    </div>
   </div>
 </main>
 
@@ -240,43 +286,115 @@ function montarSelect(sel, ph, itens) {
     itens.map(function (i) { return '<option value="' + i.v + '">' + String(i.t).replace(/</g, '&lt;') + '</option>'; }).join('');
   sel.disabled = false;
 }
+function resetSel(sel, ph) {
+  sel.innerHTML = '<option value="" disabled selected>' + ph + '</option>';
+  sel.disabled = true;
+}
+/* escolher a turma (último dropdown) já carrega a turma — sem botão */
+function carregarTurma(escola, prof, linha) {
+  ind('indTurma', 'spin'); statusCard('🔄 Lendo a turma ao vivo…');
+  return api({ fn: 'turma', escola: escola, prof: prof, linha: linha })
+    .then(function (d) { ind('indTurma', 'ok'); onTurma(d); })
+    .catch(function (e) { ind('indTurma', ''); statusCard('⚠️ ' + e.message, 'err'); });
+}
+
+/* ---- sessão do professor vinda do Hub (mesmo origin, mesmo localStorage) ---- */
+function sessao() { try { return JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) { return null; } }
+function actingSaved() { try { return JSON.parse(localStorage.getItem('fisk_actas') || 'null'); } catch (e) { return null; } }
+/* quem a ferramenta assume: o professor logado ou, no acesso da direção
+   (master), aquele escolhido em "Ver como professor" no Hub. */
+function profDaSessao() {
+  var s = sessao(); if (!s || !s.name) return null;
+  if (s.master) { var a = actingSaved(); return (a && a.name) ? { name: a.name, escolas: a.escolas || '' } : null; }
+  return { name: s.name, escolas: String(s.escolas || s.escola || '') };
+}
+
+/* ============ MODO LOGADO: só a turma ============
+   Pré-seleção NUNCA trava o seletor: "trocar professor(a)" reabre a cascata
+   inteira, porque substituições são frequentes e todo professor precisa
+   alcançar a turma de qualquer colega. */
+function initSessao(p) {
+  var escolas = String(p.escolas || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+  if (!escolas.length) { initCascade(); return; }
+
+  $('origem').hidden = false;
+  $('wrapEscola').hidden = true; $('wrapProf').hidden = true;
+  $('euSou').hidden = false;
+  $('euNome').textContent = p.name;
+  $('euEscola').textContent = escolas.join(' · ');
+  statusCard('Escolha a turma — escola e professor(a) já vêm do seu login.');
+
+  var selTurma = $('selTurma');
+  resetSel(selTurma, 'Turma…'); ind('indTurma', 'spin');
+  Promise.all(escolas.map(function (esc) {
+    return api({ fn: 'turmas', escola: esc, prof: p.name })
+      .then(function (j) {
+        return (j.turmas || []).map(function (t) { return { escola: esc, linha: t.linhaTitulo, titulo: t.titulo }; });
+      })
+      .catch(function () { return []; });   // escola sem aba desse professor não derruba a outra
+  })).then(function (listas) {
+    var todas = [].concat.apply([], listas);
+    if (!todas.length) {
+      /* nome da sessão sem aba correspondente no card (professor novo, aba
+         renomeada): cai na cascata completa em vez de deixar a tela travada */
+      ind('indTurma', '');
+      $('euSou').hidden = true;
+      initCascade();
+      statusCard('Não achei turmas de "' + p.name + '" no card — escolha na mão.', 'err');
+      return;
+    }
+    /* duas escolas entram no MESMO dropdown, com o nome da escola no rótulo */
+    montarSelect(selTurma, 'Turma…', todas.map(function (t) {
+      return { v: t.escola + '|' + t.linha, t: (escolas.length > 1 ? t.escola + ' · ' : '') + t.titulo };
+    }));
+    ind('indTurma', 'ok');
+    selTurma.onchange = function () {
+      if (!selTurma.value) return;
+      var ref = selTurma.value.split('|');
+      carregarTurma(ref[0], p.name, ref[1]);
+    };
+  });
+
+  $('btnTrocarProf').onclick = function () { $('euSou').hidden = true; initCascade(); };
+}
+
+/* ============ CASCATA COMPLETA (escola → prof → turma) ============ */
 function initCascade() {
   $('origem').hidden = false;
+  $('wrapEscola').hidden = false; $('wrapProf').hidden = false;
   statusCard('Escolha escola, professor(a) e turma — os dados vêm ao vivo do card.');
   var selEscola = $('selEscola'), selProf = $('selProf'), selTurma = $('selTurma');
+  resetSel(selProf, 'Professor(a)…'); resetSel(selTurma, 'Turma…');
+  ind('indProf', ''); ind('indTurma', '');
+
   ind('indEscola', 'spin');
   api({ fn: 'escolas' }).then(function (j) {
-    montarSelect(selEscola, 'Escolha a escola…', (j.escolas || []).map(function (e) { return { v: e, t: e }; }));
+    montarSelect(selEscola, 'Escola…', (j.escolas || []).map(function (e) { return { v: e, t: e }; }));
     ind('indEscola', 'ok');
   }).catch(function (e) { ind('indEscola', ''); statusCard('⚠️ ' + e.message, 'err'); });
 
-  selEscola.addEventListener('change', function () {
+  selEscola.onchange = function () {
     if (!selEscola.value) return;
-    selProf.innerHTML = '<option value="" disabled selected>Carregando…</option>'; selProf.disabled = true;
-    selTurma.innerHTML = '<option value="" disabled selected>Turma…</option>'; selTurma.disabled = true;
+    resetSel(selProf, 'Carregando…'); resetSel(selTurma, 'Turma…');
     ind('indProf', 'spin'); ind('indTurma', '');
     api({ fn: 'profs', escola: selEscola.value }).then(function (j) {
-      montarSelect(selProf, 'Escolha o professor(a)…', (j.profs || []).map(function (p) { return { v: p, t: p }; }));
+      montarSelect(selProf, 'Professor(a)…', (j.profs || []).map(function (p) { return { v: p, t: p }; }));
       ind('indProf', 'ok');
     }).catch(function (e) { ind('indProf', ''); statusCard('⚠️ ' + e.message, 'err'); });
-  });
-  selProf.addEventListener('change', function () {
+  };
+  selProf.onchange = function () {
     if (!selProf.value) return;
-    selTurma.innerHTML = '<option value="" disabled selected>Carregando…</option>'; selTurma.disabled = true;
-    ind('indTurma', 'spin');
+    resetSel(selTurma, 'Carregando…'); ind('indTurma', 'spin');
     api({ fn: 'turmas', escola: selEscola.value, prof: selProf.value }).then(function (j) {
-      montarSelect(selTurma, 'Escolha a turma…', (j.turmas || []).map(function (t) { return { v: t.linhaTitulo, t: t.titulo }; }));
+      montarSelect(selTurma, 'Turma…', (j.turmas || []).map(function (t) { return { v: t.linhaTitulo, t: t.titulo }; }));
       ind('indTurma', 'ok');
     }).catch(function (e) { ind('indTurma', ''); statusCard('⚠️ ' + e.message, 'err'); });
-  });
+  };
   /* ao escolher a turma (último dropdown), carrega automaticamente */
-  selTurma.addEventListener('change', function () {
+  selTurma.onchange = function () {
     if (!selTurma.value) return;
-    ind('indTurma', 'spin'); statusCard('🔄 Lendo a turma ao vivo…');
-    api({ fn: 'turma', escola: selEscola.value, prof: selProf.value, linha: selTurma.value })
-      .then(function (d) { ind('indTurma', 'ok'); onTurma(d); })
-      .catch(function (e) { ind('indTurma', ''); statusCard('⚠️ ' + e.message, 'err'); });
-  });
+    carregarTurma(selEscola.value, selProf.value, selTurma.value);
+  };
 }
 function initFragment() {
   var ref = decodeURIComponent(location.hash.slice(3)).split('|'); // escola|prof|linha
@@ -290,6 +408,7 @@ function temNotas(av) { return (turma.alunos || []).some(function (a) { return p
 function onTurma(dados) {
   turma = dados; modoLivre = false; alunoSel = null;
   $('painelAluno').hidden = true;
+  ultimoPDF = null; esconderPreview(); esconderVerPasta(); statusDoc(''); syncAcoes();
   // avaliação padrão: a mais recente que tem notas
   avSel = temNotas('2') ? '2' : '1';
   document.querySelectorAll('#avToggle button').forEach(function (b) { b.classList.toggle('active', b.dataset.av === avSel); });
@@ -334,7 +453,11 @@ $('soPrecisam').addEventListener('change', renderLista);
 /* ============ ALUNO ESCOLHIDO ============ */
 function escolherAluno(a) {
   var p = alunoProvas(a) || {};
-  alunoSel = { nome: a.nome, estagio: a.book || '', escrita: p.escrita, auditiva: p.auditiva };
+  /* linhaCard e idx (última aula feita) vêm junto: são o endereço da célula
+     onde o "Lançar no card" escreve a nota do documento. */
+  alunoSel = { nome: a.nome, estagio: a.book || '', escrita: p.escrita, auditiva: p.auditiva,
+               linhaCard: (a.linhaCard == null ? null : a.linhaCard),
+               idx: (a.ultimaPresencaIdx == null ? null : a.ultimaPresencaIdx) };
   modoLivre = false;
   $('camposLivre').hidden = true;
   preencherPainelAluno();
@@ -347,7 +470,8 @@ function preencherPainelAluno() {
   renderProvas();
   $('msg').value = montarMensagem();
   $('painelAluno').hidden = false;
-  $('preview').hidden = true;
+  /* trocou de aluno: o PDF em memória é do anterior — zera tudo que depende dele */
+  ultimoPDF = null; esconderPreview(); esconderVerPasta(); statusDoc(''); syncAcoes();
   $('statusMsg').textContent = '';
   $('painelAluno').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -391,6 +515,23 @@ var SUGESTOES = [
 $('sugBoxes').innerHTML = SUGESTOES.map(function (s) {
   return '<label><input type="checkbox" value="' + s.k + '"' + (s.on ? ' checked' : '') + '><span>' + s.t + '</span></label>';
 }).join('');
+/* ---- elegância mínima do texto livre: maiúscula no começo e ponto no fim ----
+   Sem IA: só arruma o que o professor digitou correndo (uma ideia por linha). */
+function polirLinha(s) {
+  s = String(s == null ? '' : s).trim().replace(/\s+/g, ' ');
+  if (!s) return '';
+  s = s.charAt(0).toUpperCase() + s.slice(1);
+  if (/[,;:]$/.test(s)) s = s.slice(0, -1) + '.';        // vírgula/ponto-e-vírgula solto vira ponto
+  else if (!/[.!?…]$/.test(s)) s += '.';                 // sem pontuação final: fecha com ponto
+  return s;
+}
+function polirTextarea(el) {
+  var linhas = String(el.value || '').split('\n').map(polirLinha).filter(function (l) { return l; });
+  el.value = linhas.join('\n');
+}
+/* ao sair do campo o professor já vê o texto arrumado (e é assim que vai ao PDF) */
+$('sugLivre').addEventListener('blur', function () { polirTextarea($('sugLivre')); });
+
 /* monta a lista de itens do PDF a partir das lições + checkboxes + texto livre */
 function itensRecuperacao() {
   var itens = [];
@@ -406,7 +547,7 @@ function itensRecuperacao() {
         : s.t);
     } else itens.push(s.t);
   });
-  ($('sugLivre').value || '').split('\n').forEach(function (l) { l = l.trim(); if (l) itens.push(l); });
+  ($('sugLivre').value || '').split('\n').forEach(function (l) { l = polirLinha(l); if (l) itens.push(l); });
   return itens;
 }
 
@@ -437,7 +578,8 @@ $('btnWhats').addEventListener('click', function () {
 
 /* ============ MODO LIVRE (sem card) ============ */
 $('btnLivre').addEventListener('click', function () {
-  modoLivre = true; alunoSel = { nome: '', estagio: '', escrita: undefined, auditiva: undefined };
+  modoLivre = true;
+  alunoSel = { nome: '', estagio: '', escrita: undefined, auditiva: undefined, linhaCard: null, idx: null };
   $('painelTurma').hidden = true;
   $('camposLivre').hidden = false;
   $('nomeAluno').textContent = 'Preenchimento manual';
@@ -445,7 +587,7 @@ $('btnLivre').addEventListener('click', function () {
   renderProvas();
   $('msg').value = montarMensagem();
   $('painelAluno').hidden = false;
-  $('preview').hidden = true;
+  ultimoPDF = null; esconderPreview(); esconderVerPasta(); statusDoc(''); syncAcoes();
   statusCard('✍️ Modo manual: preencha o nome e digite as notas das provas nos blocos.');
 });
 function sincronizarLivre() {
@@ -457,22 +599,88 @@ function notaDe(v) { var s = String(v || '').trim().replace(',', '.'); if (s ===
 $('fNome').addEventListener('input', function () { sincronizarLivre(); $('msg').value = montarMensagem(); });
 $('fProf').addEventListener('input', function () { $('msg').value = montarMensagem(); });
 
-/* ============ PDF AZUL (paleta do boletim de jovens e adultos) ============ */
-$('btnPDF').addEventListener('click', gerarPDF);
+/* ============ BARRA DE AÇÕES DO DOCUMENTO ============
+   Os mesmos quatro botões no topo e no fim do painel do aluno; os dois pares
+   andam sempre juntos (mesmo estado, mesmo handler). */
+var ultimoPDF = null;   // PDF gerado mais recentemente (Drive + preview)
 
-/* PDF gerado mais recentemente (para salvar na pasta do aluno no Drive) */
-var ultimoPDF = null;
-$('btnDrive').addEventListener('click', function () {
-  if (!ultimoPDF) { alert('Gere o PDF primeiro.'); return; }
+function pares(id) { return [$(id), $(id + 'Topo')].filter(Boolean); }
+function statusDoc(msg, kind) {
+  ['statusDoc', 'statusDocTopo'].forEach(function (id) {
+    var s = $(id); if (!s) return;
+    s.textContent = msg || '';
+    s.className = 'status' + (kind ? ' ' + kind : '');
+  });
+}
+/* "Lançar no card" só faz sentido com aluno vindo do card E com o PDF já
+   gerado (a nota registra que o comunicado existe). */
+function syncAcoes() {
+  var ligadoAoCard = !!(alunoSel && alunoSel.linhaCard != null && turma && turma.escola);
+  pares('btnLancar').forEach(function (b) { b.hidden = !(ligadoAoCard && ultimoPDF); });
+  pares('btnDrive').forEach(function (b) {
+    b.disabled = !ultimoPDF;
+    b.title = ultimoPDF ? 'Salvar este PDF na pasta do aluno' : 'Gere o PDF primeiro';
+  });
+}
+/* a pasta é achada por aproximação: o professor precisa poder conferir onde caiu */
+function mostrarVerPasta(r) {
+  var url = (r && (r.pastaUrl || r.url)) || '';
+  pares('btnVerPasta').forEach(function (b) {
+    if (!url) { b.hidden = true; return; }
+    b.href = url;
+    b.title = 'Abrir no Drive a pasta "' + ((r && r.pasta) || '') + '"';
+    b.hidden = false;
+  });
+}
+function esconderVerPasta() { pares('btnVerPasta').forEach(function (b) { b.hidden = true; b.removeAttribute('href'); }); }
+function mostrarPreview(url) { $('preview').src = url; $('previewWrap').hidden = false; }
+function esconderPreview() { $('previewWrap').hidden = true; }
+
+/* ---- 📁 salvar na pasta do aluno (Drive) ---- */
+function salvarNaPasta(btn) {
+  if (!ultimoPDF) { statusDoc('Gere o PDF primeiro — é ele que vai para a pasta.', 'err'); return; }
   if (typeof fiskEnviarParaPasta !== 'function') { alert('Helper de Drive não carregou (fisk-shared.js).'); return; }
-  fiskEnviarParaPasta($('btnDrive'), {
+  fiskEnviarParaPasta(btn, {
     key: API_KEY, tipo: 'aluno',
     escola: (turma && turma.escola) || '',
     professor: ($('fProf').value || (turma && (turma.professor || turma.aba)) || '').trim(),
     turma: ($('fTurma').value || (turma && turma.turma) || '').trim(),
     aluno: ultimoPDF.aluno, filename: ultimoPDF.filename, bytes: ultimoPDF.bytes
-  }).catch(function () {});
-});
+  }).then(function (r) {
+    statusDoc('✓ Salvo na pasta "' + ((r && r.pasta) || ultimoPDF.aluno) + '".', 'ok');
+    mostrarVerPasta(r);
+  }).catch(function () { /* o helper já avisou o professor no alert */ });
+}
+
+/* ---- 📤 lançar no card (nota na célula da última aula do aluno) ---- */
+function lancarNoCard() {
+  if (!alunoSel || alunoSel.linhaCard == null || !turma || !turma.escola) {
+    statusDoc('Este comunicado não está ligado a um aluno do card.', 'err'); return;
+  }
+  if (alunoSel.idx == null || alunoSel.idx < 0) {
+    statusDoc('⚠️ Não há aula registrada para ' + primeiroNome(alunoSel.nome) +
+              ' no card — sem célula de aula para marcar. Baixe o PDF e anote na mão.', 'err');
+    return;
+  }
+  var btns = pares('btnLancar');
+  btns.forEach(function (b) { b.disabled = true; });
+  statusDoc('⏳ Lançando no card…');
+  api({
+    fn: 'registrarDoc', escola: turma.escola, prof: turma.aba || turma.professor || '',
+    linhaCard: alunoSel.linhaCard, idx: alunoSel.idx, tipo: '2nd',
+    professor: ($('fProf').value || turma.professor || turma.aba || '').trim()
+  }).then(function () {
+    statusDoc('✓ Lançado no card, na célula da última aula de ' + primeiroNome(alunoSel.nome) + '.', 'ok');
+  }).catch(function (e) {
+    statusDoc('⚠️ ' + e.message, 'err');
+  }).finally(function () { btns.forEach(function (b) { b.disabled = false; }); });
+}
+
+pares('btnPDF').forEach(function (b) { b.addEventListener('click', gerarPDF); });
+pares('btnDrive').forEach(function (b) { b.addEventListener('click', function () { salvarNaPasta(b); }); });
+pares('btnLancar').forEach(function (b) { b.addEventListener('click', lancarNoCard); });
+
+/* ============ PDF AZUL (paleta do boletim de jovens e adultos) ============ */
 async function gerarPDF() {
   if (modoLivre) sincronizarLivre();
   if (!alunoSel || !(alunoSel.nome || '').trim()) { alert('Informe o nome do aluno.'); return; }
@@ -480,7 +688,8 @@ async function gerarPDF() {
   if (!abaixo.length) {
     if (!confirm('Nenhuma prova está abaixo de 6,0 para este aluno. Gerar o comunicado mesmo assim?')) return;
   }
-  var btn = $('btnPDF'); btn.disabled = true; var lbl = btn.textContent; btn.textContent = '⏳ Gerando…';
+  var btnsPDF = pares('btnPDF'), lbl = btnsPDF.length ? btnsPDF[0].textContent : '📄 Gerar PDF';
+  btnsPDF.forEach(function (b) { b.disabled = true; b.textContent = '⏳ Gerando…'; });
   try {
     var PDF = PDFLib;
     var doc = await PDF.PDFDocument.create();
@@ -657,13 +866,15 @@ async function gerarPDF() {
     var nomeArq = (nome || 'aluno').replace(/[\\/:*?"<>|]+/g, '').trim();
     var a = document.createElement('a');
     a.href = url; a.download = '2nd Chance - ' + nomeArq + ' - ' + dataFile + '.pdf'; a.click();
-    $('preview').src = url; $('preview').hidden = false;
     // guarda o PDF gerado para poder enviá-lo à pasta do aluno no Drive
     ultimoPDF = { bytes: bytes, filename: a.download, aluno: (nome || '').trim() };
-    if ($('btnDrive')) { $('btnDrive').disabled = false; $('btnDrive').title = 'Salvar este PDF na pasta do aluno'; }
+    esconderVerPasta();          // a pasta ainda não recebeu ESTE arquivo
+    mostrarPreview(url);
+    syncAcoes();
+    statusDoc('✓ PDF gerado e baixado — confira na pré-visualização abaixo.', 'ok');
   } catch (e) {
     alert('Não consegui gerar o PDF: ' + e.message);
-  } finally { btn.disabled = false; btn.textContent = lbl; }
+  } finally { btnsPDF.forEach(function (b) { b.disabled = false; b.textContent = lbl; }); }
 }
 /* ============ BOOT ============ */
 /* Pré-seleção vinda do painel lateral (?escola=&prof=): espera as opções
@@ -694,7 +905,12 @@ function prefillFromURL() {
 
 (function boot() {
   if (location.hash.indexOf('#t=') === 0) initFragment();
-  else { initCascade(); prefillFromURL(); }
+  else {
+    var eu = profDaSessao();
+    if (eu) initSessao(eu);                    // logado no Hub: só falta a turma
+    else { initCascade(); prefillFromURL(); }
+  }
+  syncAcoes();
   if (typeof fiskInitThemeToggle === 'function') fiskInitThemeToggle('themeToggle');
 })();
 </script>

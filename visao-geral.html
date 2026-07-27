@@ -55,6 +55,38 @@
   .distrib .seg{height:100%}
   .distrib .leg{display:flex;flex-wrap:wrap;gap:.9rem;margin-top:.45rem;font-size:.76rem;font-weight:800;color:var(--gray)}
   .leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:.3rem;vertical-align:-1px}
+  /* ---- gráficos ----------------------------------------------------------
+     Tons próprios das marcas: os do texto/pílulas são claros demais para
+     área pintada (o verde da interface fica acinzentado em tela pequena).
+     Trio conferido para daltonismo (separação mínima ΔE 9,5). */
+  :root{ --viz-emdia:#0d8a68; --viz-media:#b8860b; --viz-alta:#c0392b; --viz-nd:#a9a3a3;
+         --viz-grid:#e4e0e0; --viz-ink:#6f6a6a; }
+  body.theme-dark{ --viz-grid:#33393f; --viz-ink:#9aa6b1; }
+  .viz-row{display:flex;flex-wrap:wrap;gap:.9rem;margin:.9rem 0 .2rem}
+  .viz-card{flex:1 1 260px;min-width:0}
+  .viz-card h3{margin:0 0 .1rem;font-family:var(--font-heading);font-size:.74rem;font-weight:800;
+    letter-spacing:.05em;text-transform:uppercase;color:var(--gray)}
+  .viz-card .viz-sub{font-size:.74rem;color:var(--gray);margin:0 0 .5rem}
+  .viz-donut{display:flex;align-items:center;gap:.9rem;flex-wrap:wrap}
+  .viz-donut svg{flex:0 0 auto}
+  .viz-legenda{display:flex;flex-direction:column;gap:.28rem;font-size:.78rem;font-weight:700;color:var(--gray)}
+  .viz-legenda span{display:flex;align-items:center;gap:.4rem;white-space:nowrap}
+  .viz-legenda i{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
+  .viz-legenda b{color:var(--black);font-family:var(--font-heading)}
+  .rank{display:flex;flex-direction:column;gap:.4rem}
+  .rank .r{display:grid;grid-template-columns:1fr 84px 34px;gap:.5rem;align-items:center;font-size:.78rem}
+  .rank .rn{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--black)}
+  .rank .rt{height:9px;border-radius:99px;background:var(--gray-light);overflow:hidden}
+  .rank .rt i{display:block;height:100%;border-radius:99px}
+  .rank .rv{font-weight:800;text-align:right;font-variant-numeric:tabular-nums;color:var(--gray)}
+  .viz-scatter{position:relative}
+  .viz-scatter svg{width:100%;height:auto;display:block;overflow:visible}
+  .viz-scatter .pt{cursor:pointer}
+  .viz-tip{position:absolute;z-index:5;pointer-events:none;background:var(--blue-ink);color:#fff;
+    border-radius:9px;padding:.4rem .6rem;font-size:.75rem;font-weight:700;line-height:1.35;
+    box-shadow:0 6px 18px rgba(0,0,0,.22);max-width:220px;display:none}
+  .quad{font-size:9.5px;font-weight:800;fill:var(--viz-ink);opacity:.75;font-family:var(--font-body)}
+  .vaxis{font-size:10px;fill:var(--viz-ink);font-family:var(--font-body)}
   /* tabela por turma */
   .table-wrap{overflow-x:auto}
   table{width:100%;border-collapse:collapse;font-size:.85rem;min-width:640px}
@@ -99,7 +131,7 @@
   <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
   <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
   <h1>Visão Geral das Turmas</h1>
-  <p>Panorama estatístico dos seus alunos &middot; atraso, faltas e notas</p>
+  <p>Atraso, faltas, notas e acessos ao Portal &middot; todas as suas turmas</p>
 </header>
 
 <main>
@@ -128,7 +160,28 @@
   <div class="painel" id="painelGeral" hidden>
     <h2 id="tituloGeral">Panorama geral</h2>
     <div class="resumo" id="kpis"></div>
+    <div class="viz-row" id="vizRow">
+      <div class="viz-card">
+        <h3>Situação de conteúdo</h3>
+        <p class="viz-sub">quanto da sua turma está em dia com o cronograma</p>
+        <div class="viz-donut" id="vizDonut"></div>
+      </div>
+      <div class="viz-card">
+        <h3>Turmas que mais pedem atenção</h3>
+        <p class="viz-sub">% de alunos em dia — da que mais precisa para a que menos precisa</p>
+        <div class="rank" id="vizRank"></div>
+      </div>
+    </div>
     <div class="distrib" id="distrib"></div>
+  </div>
+
+  <!-- 2b · faltas × atraso -->
+  <div class="painel" id="painelDisp" hidden>
+    <h2>Falta ou ritmo?</h2>
+    <p class="sub">Cada ponto é um aluno. Quem está no alto e à <b>esquerda</b> vem às aulas e mesmo
+      assim está atrasado — é atraso de ritmo, não de presença, e costuma ser o atendimento mais
+      urgente. Quem está à direita falta muito: aí a conversa é sobre assiduidade.</p>
+    <div class="viz-scatter" id="vizDisp"><div class="viz-tip" id="vizTip"></div></div>
   </div>
 
   <!-- 3 · por turma -->
@@ -158,6 +211,40 @@
       no cronograma (mesma régua do Planejador e do Termo de Atraso: <b>4+ aulas = crítico</b>).
       As notas vêm das avaliações lançadas no card — turmas sem nota lançada aparecem com “—”.
       Tudo é <b>só leitura</b>: nada é gravado no card.
+    </div>
+  </div>
+
+  <!-- 5 · acessos ao Portal do Aluno (era uma ferramenta separada no Hub) -->
+  <div class="painel" id="painelAcessos">
+    <h2>🔑 Acessos dos alunos ao Portal</h2>
+    <p class="sub">Quem já entrou no Portal do Aluno com o código RAF — e quem ainda nem abriu.
+      Vem das <b>suas</b> turmas, pelo seu login no Hub.</p>
+    <div class="status" id="acStatus">🔄 Carregando…</div>
+    <div id="acCorpo" hidden>
+      <div class="resumo" style="margin-top:.7rem">
+        <div class="kpi"><b id="ac-total">0</b><span>Alunos</span></div>
+        <div class="kpi emdia"><b id="ac-ent">0</b><span>Já entraram</span></div>
+        <div class="kpi alta"><b id="ac-nunca">0</b><span>Nunca entraram</span></div>
+        <div class="kpi"><b id="ac-7d">0</b><span>Últimos 7 dias</span></div>
+      </div>
+      <div class="row" style="margin:.7rem 0 .5rem">
+        <div style="flex:1 1 200px"><select id="acTurma"><option value="">Todas as turmas</option></select></div>
+        <div style="flex:1 1 170px"><select id="acFiltro">
+          <option value="">Todos</option>
+          <option value="sim">Só quem já entrou</option>
+          <option value="nao">Só quem nunca entrou</option>
+        </select></div>
+        <div style="flex:1 1 170px"><input type="search" id="acBusca" placeholder="Buscar aluno…"
+          style="width:100%;padding:.5rem .6rem;border:1px solid var(--gray-light);border-radius:9px;
+                 font-family:var(--font-body);font-size:.92rem;background:var(--white);color:var(--black)"></div>
+      </div>
+      <div class="table-wrap">
+        <table style="min-width:520px">
+          <thead><tr><th>Aluno</th><th>Livro</th><th>Último acesso</th><th class="num">Acessos</th></tr></thead>
+          <tbody id="acLinhas"></tbody>
+        </table>
+      </div>
+      <p class="sub" style="margin:.8rem 0 0">O aluno entra em <b>portal-aluno-fisk.vercel.app</b> usando o RAF.</p>
     </div>
   </div>
 </main>
@@ -326,6 +413,116 @@ function analisar(escola, prof) {
   }).catch(function (e) { statusCard('⚠️ ' + e.message, 'err'); btn.disabled = false; });
 }
 
+/* ============ GRÁFICOS (SVG na mão — a página não carrega biblioteca) ============ */
+
+/* Rosca de parte-do-todo com o número que interessa no meio. 3 a 4 fatias,
+   sempre com legenda escrita ao lado: a cor nunca é a única pista. */
+function donutSVG(segs, centroNum, centroRot) {
+  var R = 54, W = 22, C = 2 * Math.PI * R;
+  var tot = segs.reduce(function (s, x) { return s + x.n; }, 0) || 1;
+  var vis = segs.filter(function (s) { return s.n > 0; });
+  var off = 0, arcs = '';
+  vis.forEach(function (s) {
+    var len = s.n / tot * C;
+    var gap = vis.length > 1 ? 2 : 0;              // 2px de respiro entre fatias
+    var dash = Math.max(len - gap, 0.8);
+    arcs += '<circle cx="70" cy="70" r="' + R + '" fill="none" stroke="' + s.cor + '" stroke-width="' + W + '"' +
+            ' stroke-dasharray="' + dash + ' ' + (C - dash) + '" stroke-dashoffset="' + (-off) + '">' +
+            '<title>' + s.rot + ': ' + s.n + '</title></circle>';
+    off += len;
+  });
+  return '<svg width="140" height="140" viewBox="0 0 140 140" role="img" aria-label="Distribuição dos alunos por situação de conteúdo">' +
+    '<circle cx="70" cy="70" r="' + R + '" fill="none" stroke="var(--viz-grid)" stroke-width="' + W + '"/>' +
+    '<g transform="rotate(-90 70 70)">' + arcs + '</g>' +
+    '<text x="70" y="68" text-anchor="middle" font-family="var(--font-heading)" font-size="28" font-weight="800" fill="currentColor">' + centroNum + '</text>' +
+    '<text x="70" y="85" text-anchor="middle" font-size="9.5" font-weight="800" fill="var(--viz-ink)">' + centroRot + '</text></svg>';
+}
+
+function legendaHTML(segs, tot) {
+  return '<div class="viz-legenda">' + segs.filter(function (s) { return s.n > 0; }).map(function (s) {
+    return '<span><i style="background:' + s.cor + '"></i>' + s.rot +
+      ' <b>' + s.n + '</b> · ' + Math.round(s.n / (tot || 1) * 100) + '%</span>';
+  }).join('') + '</div>';
+}
+
+/* Ranking de turmas por % em dia — uma cor só: o comprimento da barra já é o
+   dado, pintar por valor seria dizer a mesma coisa duas vezes. */
+function rankHTML(porTurma) {
+  var linhas = porTurma.map(function (t) {
+    var a = t.emdia + t.atras + t.crit;
+    return a ? { nome: t.titulo, pct: t.emdia / a * 100, crit: t.crit } : null;
+  }).filter(Boolean).sort(function (x, y) { return x.pct - y.pct; });
+  if (!linhas.length) return '<p class="viz-sub">Nenhuma turma com cronograma para comparar.</p>';
+  return linhas.map(function (l) {
+    return '<div class="r"><span class="rn" title="' + esc(l.nome) + '">' + esc(l.nome) + '</span>' +
+      '<span class="rt"><i style="width:' + Math.max(l.pct, 1.5) + '%;background:var(--blue-mid)"></i></span>' +
+      '<span class="rv">' + Math.round(l.pct) + '%</span></div>';
+  }).join('');
+}
+
+/* Dispersão faltas × atraso: separa "falta muito" de "vem e não rende" —
+   a distinção que decide o tipo de conversa com o aluno. */
+function dispersaoSVG(alunos) {
+  var pts = alunos.filter(function (a) {
+    return a._atraso != null && typeof a.pctFaltas === 'number' && !isNaN(a.pctFaltas);
+  });
+  if (pts.length < 2) return '';
+  var W = 640, H = 250, L = 40, Rr = 14, T = 12, B = 32;
+  var maxA = Math.max(6, Math.ceil(Math.max.apply(null, pts.map(function (p) { return p._atraso; })) / 2) * 2);
+  var maxF = Math.max(30, Math.ceil(Math.max.apply(null, pts.map(function (p) { return p.pctFaltas; })) / 10) * 10);
+  var px = function (f) { return L + (f / maxF) * (W - L - Rr); };
+  var py = function (a) { return H - B - (a / maxA) * (H - T - B); };
+
+  var g = '';
+  for (var i = 0; i <= 4; i++) {                      // grade horizontal, traço fino e discreto
+    var v = Math.round(maxA / 4 * i), y = py(v);
+    g += '<line x1="' + L + '" y1="' + y + '" x2="' + (W - Rr) + '" y2="' + y + '" stroke="var(--viz-grid)" stroke-width="1"/>' +
+         '<text class="vaxis" x="' + (L - 7) + '" y="' + (y + 3.5) + '" text-anchor="end">' + v + '</text>';
+  }
+  for (var f = 0; f <= maxF; f += (maxF > 60 ? 20 : 10)) {
+    g += '<text class="vaxis" x="' + px(f) + '" y="' + (H - B + 15) + '" text-anchor="middle">' + f + '%</text>';
+  }
+  // limiares: 4+ aulas dispara termo · 15% de faltas já é sinal de assiduidade
+  g += '<line x1="' + L + '" y1="' + py(LIMITE_ATRASO) + '" x2="' + (W - Rr) + '" y2="' + py(LIMITE_ATRASO) +
+       '" stroke="var(--viz-alta)" stroke-width="1" opacity=".45"/>' +
+       '<text class="quad" x="' + (W - Rr) + '" y="' + (py(LIMITE_ATRASO) - 5) + '" text-anchor="end">4+ aulas → termo</text>' +
+       '<line x1="' + px(15) + '" y1="' + T + '" x2="' + px(15) + '" y2="' + (H - B) +
+       '" stroke="var(--viz-media)" stroke-width="1" opacity=".45"/>' +
+       '<text class="quad" x="' + (px(15) + 5) + '" y="' + (T + 10) + '">15% de faltas</text>';
+
+  var marcas = pts.map(function (p) {
+    var cor = p._atraso >= LIMITE_ATRASO ? 'var(--viz-alta)' : (p._atraso >= 1 ? 'var(--viz-media)' : 'var(--viz-emdia)');
+    return '<circle class="pt" cx="' + px(p.pctFaltas).toFixed(1) + '" cy="' + py(p._atraso).toFixed(1) + '" r="5.5"' +
+      ' fill="' + cor + '" stroke="var(--white)" stroke-width="2"' +
+      ' data-n="' + esc(p.nome) + '" data-t="' + esc(p._turma || '') + '"' +
+      ' data-a="' + p._atraso + '" data-f="' + Math.round(p.pctFaltas) + '"><title>' +
+      esc(p.nome) + ' — ' + p._atraso + ' de atraso, ' + Math.round(p.pctFaltas) + '% de faltas</title></circle>';
+  }).join('');
+
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Faltas por atraso de conteúdo, um ponto por aluno">' +
+    g + marcas +
+    '<text class="vaxis" x="' + L + '" y="' + (H - 2) + '" font-weight="800">% de faltas →</text>' +
+    '<text class="vaxis" x="' + (L - 30) + '" y="' + (T + 4) + '" font-weight="800" transform="rotate(-90 ' + (L - 30) + ' ' + (T + 4) + ')">aulas de atraso →</text>' +
+    '</svg>';
+}
+
+/* o ponto é pequeno demais para ser a única forma de ler o valor: além do
+   <title> nativo, uma caixinha maior segue o mouse */
+function ligarTooltip(box, tip) {
+  box.addEventListener('mouseover', function (ev) {
+    var c = ev.target.closest ? ev.target.closest('.pt') : null; if (!c) return;
+    tip.innerHTML = '<b>' + c.getAttribute('data-n') + '</b><br>' + esc(c.getAttribute('data-t')) +
+      '<br>' + c.getAttribute('data-a') + ' aula(s) de atraso · ' + c.getAttribute('data-f') + '% de faltas';
+    tip.style.display = 'block';
+    var r = box.getBoundingClientRect(), b = c.getBoundingClientRect();
+    tip.style.left = Math.min(Math.max(b.left - r.left - 90, 4), r.width - 200) + 'px';
+    tip.style.top = (b.top - r.top - tip.offsetHeight - 8) + 'px';
+  });
+  box.addEventListener('mouseout', function (ev) {
+    if (ev.target.closest && ev.target.closest('.pt')) tip.style.display = 'none';
+  });
+}
+
 function render(escola, prof, dados) {
   var alunos = [];        // todos, com referência da turma
   var porTurma = [];
@@ -379,17 +576,42 @@ function render(escola, prof, dados) {
     '<div class="kpi"><b>' + fmtPct(mFaltas) + '</b><span>Faltas médias</span><small>% por aluno</small></div>' +
     '<div class="kpi roxa"><b>' + fmtNota(mNotas) + '</b><span>Média de notas</span><small>' + (notasAll.length ? notasAll.length + ' com nota' : 'nenhuma lançada') + '</small></div>';
 
-  /* barra de distribuição */
-  var base = comAtraso.length || 1;
-  function seg(n, cor) { return n ? '<i class="seg" style="width:' + (n / base * 100) + '%;background:' + cor + '"></i>' : ''; }
-  $('distrib').innerHTML = comAtraso.length
-    ? '<div class="track">' + seg(emdia, 'var(--emdia)') + seg(atras, 'var(--media)') + seg(crit, 'var(--alta)') + '</div>' +
-      '<div class="leg"><span><i style="background:var(--emdia)"></i>Em dia (' + emdia + ')</span>' +
-      '<span><i style="background:var(--media)"></i>Atrasados (' + atras + ')</span>' +
-      '<span><i style="background:var(--alta)"></i>Críticos (' + crit + ')</span>' +
-      (semdados ? '<span><i style="background:#c7c2c2"></i>Sem análise de conteúdo (' + semdados + ')</span>' : '') + '</div>'
+  /* rosca + ranking de turmas (substituem a antiga barra empilhada: mesma
+     informação, mas com o número que importa em destaque) */
+  /* quem não tem cronograma fica FORA da rosca: não é uma fatia do mesmo
+     bolo, é aluno que não dá para medir. Vai como nota embaixo da legenda,
+     assim o número do meio e os da legenda falam da mesma base. */
+  var segs = [
+    { n: emdia, cor: 'var(--viz-emdia)', rot: 'Em dia' },
+    { n: atras, cor: 'var(--viz-media)', rot: 'Atrasados (1–3)' },
+    { n: crit,  cor: 'var(--viz-alta)',  rot: 'Críticos (4+)' }
+  ];
+  var temViz = comAtraso.length > 0;
+  $('vizRow').hidden = !temViz;
+  if (temViz) {
+    $('vizDonut').innerHTML =
+      donutSVG(segs, Math.round(emdia / comAtraso.length * 100) + '%', 'EM DIA') +
+      '<div>' + legendaHTML(segs, comAtraso.length) +
+      (semdados ? '<p class="viz-sub" style="margin:.45rem 0 0">+ ' + semdados +
+                  ' sem análise de conteúdo (kids/teens)</p>' : '') + '</div>';
+    $('vizRank').innerHTML = rankHTML(porTurma);
+  }
+  $('distrib').innerHTML = temViz ? ''
     : '<p class="sub">Estas turmas não têm cronograma com placeholders (ex.: kids) — análise de atraso indisponível; faltas e notas seguem valendo.</p>';
   $('painelGeral').hidden = false;
+
+  /* dispersão faltas × atraso */
+  var svgDisp = temViz ? dispersaoSVG(alunos) : '';
+  $('painelDisp').hidden = !svgDisp;
+  if (svgDisp) {
+    var box = $('vizDisp');
+    box.innerHTML = svgDisp + '<div class="viz-tip" id="vizTip"></div>' +
+      '<div class="viz-legenda" style="flex-direction:row;gap:1rem;flex-wrap:wrap;margin-top:.5rem">' +
+      '<span><i style="background:var(--viz-emdia)"></i>Em dia</span>' +
+      '<span><i style="background:var(--viz-media)"></i>1 a 3 aulas</span>' +
+      '<span><i style="background:var(--viz-alta)"></i>4+ aulas</span></div>';
+    ligarTooltip(box, $('vizTip'));
+  }
 
   /* tabela por turma */
   $('linhasTurmas').innerHTML = porTurma.map(function (t) {
@@ -434,6 +656,72 @@ function render(escola, prof, dados) {
   }).join('') : '<p class="sub">🎉 Nenhum aluno atrasado nas turmas analisadas.</p>';
   $('painelAtencao').hidden = false;
 }
+
+/* ============ ACESSOS AO PORTAL DO ALUNO ============
+   Era uma ferramenta à parte no Hub; virou um card daqui porque a
+   informação é da turma, não do professor. Usa o token do login (SSO) —
+   nenhuma chave no front, que este repo é público. */
+(function acessos() {
+  var EP_HUB2 = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
+  var lista = [];
+  function sess() { try { return JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) { return null; } }
+  function quando(ts) {
+    if (!ts) return null;
+    var dias = Math.floor((Date.now() - ts) / 86400000);
+    if (dias <= 0) return 'hoje';
+    if (dias === 1) return 'ontem';
+    if (dias < 30) return 'há ' + dias + ' dias';
+    var d = new Date(ts), p = function (n) { return ('0' + n).slice(-2); };
+    return p(d.getDate()) + '/' + p(d.getMonth() + 1) + '/' + d.getFullYear();
+  }
+  function pinta() {
+    var t = $('acTurma').value, st = $('acFiltro').value, q = $('acBusca').value.trim().toLowerCase();
+    var vis = lista.filter(function (a) {
+      if (t && a.turma !== t) return false;
+      if (st === 'sim' && !a.last) return false;
+      if (st === 'nao' && a.last) return false;
+      if (q && String(a.name).toLowerCase().indexOf(q) === -1) return false;
+      return true;
+    });
+    $('acLinhas').innerHTML = vis.length ? vis.map(function (a) {
+      var dias = a.last ? Math.floor((Date.now() - a.last) / 86400000) : null;
+      var cls = a.last == null ? 'alta' : (dias <= 7 ? 'emdia' : 'media');
+      return '<tr><td><span class="tnome">' + esc(a.name) + '</span><div class="tsub">' + esc(a.turma || '') + '</div></td>' +
+        '<td>' + esc(a.book || '—') + '</td>' +
+        '<td><span class="pill ' + cls + '">' + (a.last == null ? 'nunca entrou' : quando(a.last)) + '</span></td>' +
+        '<td class="num">' + (a.count || 0) + '</td></tr>';
+    }).join('') : '<tr><td colspan="4" style="color:var(--gray);padding:1rem 0">Nenhum aluno com esses filtros.</td></tr>';
+  }
+  var s = sess();
+  if (!s || !s.token) {
+    $('acStatus').className = 'status err';
+    $('acStatus').innerHTML = '⚠️ Entre no Fisk Hub com seu usuário e senha para ver os acessos. <a href="index.html">Ir para o login</a>';
+    return;
+  }
+  fetch(EP_HUB2, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                   body: JSON.stringify({ action: 'acessosProf', token: s.token }) })
+    .then(function (r) { return r.json(); })
+    .then(function (res) {
+      if (!res.ok) { $('acStatus').className = 'status err'; $('acStatus').textContent = '⚠️ ' + (res.error || 'Não consegui carregar.'); return; }
+      lista = res.acessos || [];
+      var ent = lista.filter(function (a) { return a.last; });
+      var rec = lista.filter(function (a) { return a.last && (Date.now() - a.last) < 7 * 86400000; });
+      $('ac-total').textContent = lista.length;
+      $('ac-ent').textContent = ent.length;
+      $('ac-nunca').textContent = lista.length - ent.length;
+      $('ac-7d').textContent = rec.length;
+      var turmas = {}; lista.forEach(function (a) { turmas[a.turma] = true; });
+      Object.keys(turmas).sort().forEach(function (t) {
+        var o = document.createElement('option'); o.value = t; o.textContent = t; $('acTurma').appendChild(o);
+      });
+      $('acStatus').className = 'status ok';
+      $('acStatus').textContent = '👩‍🏫 ' + res.prof + ' · ' + res.turmas + ' turma(s) · ' + lista.length + ' aluno(s)';
+      ['acTurma', 'acFiltro', 'acBusca'].forEach(function (id) { $(id).addEventListener('input', pinta); });
+      pinta();
+      $('acCorpo').hidden = false;
+    })
+    .catch(function () { $('acStatus').className = 'status err'; $('acStatus').textContent = '⚠️ Sem conexão com o servidor.'; });
+})();
 
 initCascade();
 </script>
