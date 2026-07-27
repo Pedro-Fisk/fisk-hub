@@ -14,7 +14,7 @@
 <script>/* porteira do professor: decide antes da 1ª pintura se mostra o login ou o hub (sem flash) */try{document.body.classList.add(localStorage.getItem("fisk_prof")?"prof-in":"prof-out");}catch(e){document.body.classList.add("prof-out");}</script>
 
   <style>
-    /* ===== Porteira do Portal do Professor ===== */
+    /* ===== Porteira de acesso do Fisk Hub ===== */
     #profGate{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;
       justify-content:flex-start;padding:24px 16px;overflow:auto;background:#eef2f9;}
     body.theme-dark #profGate{background:#0b1220;}
@@ -75,7 +75,7 @@
     </div>
     <div class="pg-card">
       <img class="pg-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
-      <h1 class="pg-title" data-i18n="pg-title">Portal do Professor</h1>
+      <h1 class="pg-title" data-i18n="pg-title">Fisk Hub</h1>
       <p class="pg-sub" data-i18n="pg-sub">Acesse o Fisk Hub com seu nome e senha</p>
       <label class="pg-label" data-i18n="pg-name">Seu nome</label>
       <select id="pgNome" class="pg-input"></select>
@@ -370,7 +370,7 @@
     const T = {
       pt: {
         subtitle:          'Ferramentas rápidas para o seu dia a dia em sala de aula',
-        'pg-title':'Portal do Professor','pg-sub':'Acesse o Fisk Hub com seu nome e senha',
+        'pg-title':'Fisk Hub','pg-sub':'Entre com seu nome e senha',
         'pg-tab-login':'Entrar','pg-tab-register':'Criar conta','pg-name':'Seu nome',
         'pg-name-ph':'Selecione seu nome…','pg-fullname':'Nome completo (opcional)',
         'pg-fullname-ph':'Ex.: Maria Fernanda Silva','pg-pass':'Senha','pg-pass2':'Confirmar senha',
@@ -430,7 +430,7 @@
       },
       en: {
         subtitle:          'Quick tools for your day-to-day in the classroom',
-        'pg-title':'Teacher Portal','pg-sub':'Access Fisk Hub with your name and password',
+        'pg-title':'Fisk Hub','pg-sub':'Sign in with your name and password',
         'pg-tab-login':'Sign in','pg-tab-register':'Create account','pg-name':'Your name',
         'pg-name-ph':'Select your name…','pg-fullname':'Full name (optional)',
         'pg-fullname-ph':'e.g., Maria Fernanda Silva','pg-pass':'Password','pg-pass2':'Confirm password',
@@ -490,7 +490,7 @@
       },
       es: {
         subtitle:          'Herramientas rápidas para tu día a día en el aula',
-        'pg-title':'Portal del Profesor','pg-sub':'Accede a Fisk Hub con tu nombre y contraseña',
+        'pg-title':'Fisk Hub','pg-sub':'Entra con tu nombre y contraseña',
         'pg-tab-login':'Entrar','pg-tab-register':'Crear cuenta','pg-name':'Tu nombre',
         'pg-name-ph':'Selecciona tu nombre…','pg-fullname':'Nombre completo (opcional)',
         'pg-fullname-ph':'Ej.: María Fernanda Silva','pg-pass':'Contraseña','pg-pass2':'Confirmar contraseña',
