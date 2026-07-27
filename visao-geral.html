@@ -302,6 +302,7 @@ var LIMITE_ATRASO = 4; // mesma régua do termo/planejador
 var $ = function (id) { return document.getElementById(id); };
 fiskInitThemeToggle('themeToggle');
 fiskInitUserMenu();
+fiskRegistrarUso("Visão Geral");
 
 function statusCard(msg, kind) { var s = $('statusCard'); s.textContent = msg || ''; s.className = 'status' + (kind ? ' ' + kind : ''); }
 function ind(id, st) { $(id).className = 'ind' + (st ? ' ' + st : ''); }

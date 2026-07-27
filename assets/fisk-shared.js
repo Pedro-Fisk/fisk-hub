@@ -317,3 +317,24 @@ function fiskEsc(s) {
   return String(s == null ? '' : s)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
+
+
+/* ============================================================================
+   REGISTRO DE USO DA FERRAMENTA (log do professor, visão da direção)
+   Cada página avisa o backend que foi aberta. É um retrato do uso — uma linha
+   por professor, com as ferramentas da sessão — não um rastro de navegação.
+   Silencioso de propósito: se falhar, a ferramenta segue funcionando.
+   ============================================================================ */
+var FISK_HUB_EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
+
+function fiskRegistrarUso(ferramenta) {
+  try {
+    var s = fiskSessao();
+    if (!s || !s.token || !ferramenta) return;
+    fetch(FISK_HUB_EP, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'usoFerramenta', token: s.token, ferramenta: ferramenta })
+    }).catch(function () {});
+  } catch (e) {}
+}
