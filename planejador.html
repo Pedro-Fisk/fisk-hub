@@ -15,8 +15,11 @@
      (termo de atraso / 2nd chance / boletim de jovens e adultos). */
   /* A cor do chrome vem do kit compartilhado (--ui*, em fisk-shared.css):
      os nomes locais viram apelidos para a página não ter uma paleta própria. */
-  :root{ --blue:var(--ui); --blue-mid:var(--ui-mid); --blue-pill:var(--ui-pill);
-         --blue-soft:var(--ui-soft); --blue-ink:var(--ui-ink); --blue-bd:var(--ui-bd); }
+  /* Com fallback de propósito: se o navegador do professor ainda tiver o kit
+     compartilhado ANTIGO em cache, --ui não existe e a cor viraria "nenhuma"
+     (botão branco no branco). O valor literal segura até o cache virar. */
+  :root{ --blue:var(--ui,#2b4d70); --blue-mid:var(--ui-mid,#3d6b93); --blue-pill:var(--ui-pill,#1d3349);
+         --blue-soft:var(--ui-soft,#e9eff5); --blue-ink:var(--ui-ink,#1d3349); --blue-bd:var(--ui-bd,#9db6cb); }
   :root{ --alta:#c0392b; --alta-soft:#fbeae7; --media:#b8860b; --media-soft:#fbf3df;
          --emdia:#27866e; --emdia-soft:#e6f4ef; }
   [hidden]{ display:none !important; }
@@ -27,7 +30,7 @@
           border-radius:var(--surface-radius);box-shadow:var(--surface-shadow);
           padding:1.15rem 1.25rem;margin-bottom:1.1rem}
   .painel h2{margin:0 0 .4rem;font-family:var(--font-heading);font-weight:700;
-             font-size:1.05rem;color:var(--ui-dark)}
+             font-size:1.05rem;color:var(--ui-dark,#223e5a)}
   .painel .sub{font-size:.85rem;color:var(--gray);margin:0 0 .8rem;line-height:1.45}
   .row{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center}
   select{width:100%;padding:.5rem .6rem;border:1px solid var(--gray-light);border-radius:9px;
@@ -108,12 +111,57 @@
     resize:none;overflow:hidden;line-height:1.35}
   .aluno .nota-in::placeholder{color:#8aa2b8;font-style:italic}
   .aluno .nota-in:focus{outline:none;border-style:solid;border-color:var(--blue)}
-  /* arrastar para reordenar */
-  .aluno .rank{cursor:grab}
-  .aluno .rank:active{cursor:grabbing}
-  .aluno.dragging{opacity:.45}
-  .aluno.over-top{box-shadow:inset 0 3px 0 0 var(--blue)}
-  .aluno.over-bot{box-shadow:inset 0 -3px 0 0 var(--blue)}
+  /* arrastar para reordenar — o card INTEIRO é a alça, menos a anotação
+     (que precisa receber o clique para ser editada) */
+  .aluno{cursor:grab}
+  .aluno:active{cursor:grabbing}
+  .aluno .nota-in{cursor:text}
+  .aluno.dragging{opacity:.4}
+  /* os vizinhos deslizam para abrir espaço enquanto se arrasta (FLIP) */
+  .aluno{transition:transform .18s ease}
+  .aluno.dragging{transition:none}
+
+  /* ── barra fixa: data da aula + ações ─────────────────────────────── */
+  .topbar{position:sticky;top:0;z-index:20;display:flex;flex-wrap:wrap;gap:.7rem;
+    align-items:flex-end;justify-content:space-between;background:var(--white);
+    border-bottom:1.5px solid var(--ui-line,#a8bfd2);padding:.55rem 0 .6rem;margin-bottom:.7rem}
+  .topdata{display:flex;flex-direction:column;gap:.28rem;font-size:.72rem;font-weight:800;
+    text-transform:uppercase;letter-spacing:.03em;color:var(--ui-dark,#223e5a)}
+  .topdata input{padding:.48rem .6rem;border:1.5px solid var(--ui-bd,#9db6cb);border-radius:9px;
+    font-family:var(--font-body);font-size:.92rem;background:var(--white);color:var(--black);
+    font-weight:700}
+  .doc-actions{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:flex-end}
+  .doc-actions .btn{padding:.5rem .9rem;font-size:.85rem;display:inline-flex;align-items:center;
+    gap:.3rem;text-decoration:none}
+
+  /* ── card "em breve": recolhido, cinza e travado ──────────────────── */
+  .soon-card{background:var(--gray-light);border:1.5px dashed var(--ui-bd,#9db6cb);border-radius:12px;
+    margin-bottom:.8rem;opacity:.85}
+  .soon-card summary{cursor:pointer;list-style:none;padding:.55rem .8rem;font-size:.86rem;
+    font-weight:800;color:var(--gray);display:flex;align-items:center;gap:.5rem}
+  .soon-card summary::-webkit-details-marker{display:none}
+  .soon-card summary::before{content:'▸';font-size:.9rem;transition:transform .15s ease}
+  .soon-card[open] summary::before{transform:rotate(90deg)}
+  .soon-badge{font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;
+    background:var(--gray);color:var(--white);border-radius:99px;padding:.12rem .5rem}
+  .soon-body{padding:0 .8rem .8rem;display:flex;flex-direction:column;gap:.5rem}
+  .soon-txt{font-size:.78rem;color:var(--gray);margin:0;line-height:1.45;text-align:justify}
+  .soon-body label{display:flex;flex-direction:column;gap:.25rem;font-size:.74rem;
+    font-weight:700;color:var(--gray)}
+  .soon-body input{padding:.45rem .6rem;border:1px solid var(--gray-light);border-radius:8px;
+    background:#f4f4f4;color:var(--gray);font-family:var(--font-body);font-size:.85rem}
+  body.theme-dark .soon-body input{background:#2a2626}
+
+  /* ── agrupamento por lições vizinhas ──────────────────────────────
+     Cards consecutivos do mesmo book e com lições a no máximo 1 de
+     distância ganham uma moldura comum: são a mesma explicação. */
+  .aluno.grp{border-left:4px solid var(--ui-mid,#3d6b93);background:var(--ui-soft,#e9eff5)}
+  .aluno.grp-ini{border-top-left-radius:12px}
+  .aluno.grp-fim{border-bottom-left-radius:12px}
+  .grp-rot{display:flex;align-items:center;gap:.4rem;font-size:.72rem;font-weight:800;
+    color:var(--ui-dark,#223e5a);background:var(--ui-soft,#e9eff5);border:1px solid var(--ui-bd,#9db6cb);
+    border-bottom:none;border-radius:10px 10px 0 0;padding:.28rem .7rem;margin-bottom:-.5rem;
+    width:fit-content;margin-left:.2rem}
   .dica{font-size:.8rem;color:var(--gray);margin:.1rem 0 .6rem}
   .reordInfo{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;justify-content:space-between;
     background:var(--media-soft);border:1px solid #e6d29a;border-radius:10px;
@@ -170,11 +218,41 @@
   <!-- 2 · fila de atendimento -->
   <div class="painel" id="painelTurma" hidden>
     <h2 id="tituloTurma">📋 Fila de atendimento</h2>
+
+    <!-- Barra fixa: a data da aula que está sendo planejada fica sempre à
+         vista (o professor rola uma lista longa e não pode perder de vista
+         PARA QUANDO ele está planejando), e as ações do plano ficam à direita. -->
+    <div class="topbar" id="topbar">
+      <label class="topdata">📅 Data desta aula planejada
+        <input type="date" id="dataAula"></label>
+      <div class="doc-actions">
+        <button type="button" class="btn btn-ghost js-copiar">📋 Copiar roteiro</button>
+        <button type="button" class="btn btn-pdf js-pdf">📄 Gerar PDF</button>
+        <button type="button" class="btn btn-drive js-drive">📁 Enviar para pasta da turma</button>
+        <a class="btn btn-ghost js-verpasta" hidden target="_blank" rel="noopener">📂 Ver pasta</a>
+      </div>
+    </div>
+
+    <!-- Conversação do dia: funcionalidade prevista, ainda não em uso.
+         Fica travada e recolhida para não ocupar espaço nem sugerir que já
+         funciona — o professor abre se quiser ver o que vem por aí. -->
+    <details class="soon-card" id="cardConversa">
+      <summary>💬 Conversação do dia <span class="soon-badge">Em breve</span></summary>
+      <div class="soon-body">
+        <p class="soon-txt">A ideia é o calendário preencher sozinho a conversação da semana.
+          Ainda não está valendo — por enquanto os campos ficam só de amostra.</p>
+        <label>1ª aula (conversação mais formal)
+          <input type="text" id="conv1" disabled placeholder="ex.: Everyday Life (Buddy Talks)"></label>
+        <label>2ª aula (do livro / conversation booklet / material complementar)
+          <input type="text" id="conv2" disabled placeholder="ex.: Pair Work do livro + Conversation Booklet"></label>
+      </div>
+    </details>
+
     <div class="resumo" id="resumo"></div>
     <div class="barra">
       <label class="chk"><input type="checkbox" id="soAtencao"> só quem precisa de atenção</label>
     </div>
-    <p class="dica">🖐️ Arraste o <b>número</b> de cada aluno para reordenar a fila do seu jeito — os números se atualizam ao soltar. 💾 As <b>anotações ficam salvas</b> neste navegador entre as aulas.</p>
+    <p class="dica">🖐️ Arraste o <b>card do aluno</b> (por qualquer parte, menos a anotação) para reordenar a fila — os números se atualizam ao soltar. 🔗 Alunos em <b>lições vizinhas</b> aparecem agrupados: dá para explicar a mesma lição para todos de uma vez. 💾 As <b>anotações ficam salvas</b> neste navegador.</p>
     <div class="reordInfo" id="reordInfo" hidden>
       <span>✋ Ordem ajustada manualmente.</span>
       <button type="button" class="btn btn-ghost" id="reordRestaurar">↺ Restaurar ordem por prioridade</button>
@@ -184,24 +262,14 @@
 
     <!-- FINALIZAÇÃO — fim do processo: define a data e a conversação do dia
          e entrega o plano (copiar texto ou gerar PDF para imprimir). -->
+    <!-- as MESMAS ações repetidas no fim: quem terminou de ajustar a fila
+         está aqui embaixo e não deve ter de subir para entregar o plano -->
     <div class="finalizar" id="finalizar">
-      <div class="fin-campos">
-        <label>📅 Data desta aula planejada
-          <input type="date" id="dataAula">
-        </label>
-      </div>
-      <div class="fin-conversa">
-        <div class="fin-conversa-tit">💬 Conversação do dia
-          <span class="fin-hint">— preenchida pelo calendário conforme a data (você pode editar)</span></div>
-        <label>1ª aula (conversação mais formal)
-          <input type="text" id="conv1" placeholder="ex.: Everyday Life (Buddy Talks)"></label>
-        <label>2ª aula (do livro / conversation booklet / material complementar)
-          <input type="text" id="conv2" placeholder="ex.: Pair Work do livro + Conversation Booklet"></label>
-      </div>
-      <div class="fin-acoes">
-        <button type="button" class="btn btn-ghost" id="btnCopiar">📋 Copiar roteiro</button>
-        <button type="button" class="btn btn-pdf" id="btnPdf">📄 Gerar PDF do plano de aula</button>
-        <button type="button" class="btn btn-drive" id="btnDrive">📁 Enviar para pasta da turma</button>
+      <div class="doc-actions">
+        <button type="button" class="btn btn-ghost js-copiar">📋 Copiar roteiro</button>
+        <button type="button" class="btn btn-pdf js-pdf">📄 Gerar PDF do plano de aula</button>
+        <button type="button" class="btn btn-drive js-drive">📁 Enviar para pasta da turma</button>
+        <a class="btn btn-ghost js-verpasta" hidden target="_blank" rel="noopener">📂 Ver pasta</a>
       </div>
     </div>
 
@@ -398,9 +466,38 @@ function onTurma(dados) {
  *  botão "restaurar ordem". Preserva as anotações (ficam no próprio aluno). */
 function ordenarPorPrioridade() {
   var p = particiona();
-  estado.fila = p.elegiveis;
+  estado.fila = agruparNaFila(p.elegiveis);
   estado.fora = p.fora;
   estado.manual = false;
+}
+
+/**
+ * Junta na fila os alunos que dá para atender com a MESMA explicação (mesmo
+ * book, lição igual ou a uma de distância). É critério de ordenação, não só
+ * enfeite: o professor trabalha por blocos.
+ *
+ * A prioridade continua mandando — o bloco fica na posição do seu aluno mais
+ * urgente, e os companheiros sobem para logo depois dele. Ninguém "fura a
+ * fila": quem sobe já viria depois de qualquer jeito.
+ */
+function agruparNaFila(fila) {
+  var out = [], usado = [], i, j;
+  for (i = 0; i < fila.length; i++) usado.push(false);
+  for (i = 0; i < fila.length; i++) {
+    if (usado[i]) continue;
+    out.push(fila[i]); usado[i] = true;
+    var base = licaoNum(fila[i]);
+    if (base == null) continue;      // sem lição numerada não forma bloco
+    for (j = i + 1; j < fila.length; j++) {
+      if (usado[j]) continue;
+      var n = licaoNum(fila[j]);
+      if (n == null) continue;
+      if (bookNorm(fila[j]) !== bookNorm(fila[i])) continue;   // L10 de Fluency 1 ≠ L10 de Fluency 2
+      if (Math.abs(n - base) > 1) continue;
+      out.push(fila[j]); usado[j] = true;
+    }
+  }
+  return out;
 }
 
 /** separa elegíveis (método personalizado, temPlaceholder) dos de fora (kids/teens). */
@@ -454,10 +551,17 @@ function renderFila() {
     $('lista').innerHTML = '<div class="sub" style="padding:.5rem">Nenhum aluno' +
       (soAtencao ? ' precisando de atenção' : '') + ' nesta turma.</div>';
   } else {
+    var grupos = calcularGrupos(visiveis);
     $('lista').innerHTML = visiveis.map(function (a, i) {
       var nv = nivel(a);
       var nota = a._nota || '';
-      return '<div class="aluno is-' + nv + '" data-i="' + i + '" draggable="false">' +
+      var g = grupos[i];
+      var ini = g > -1 && (i === 0 || grupos[i - 1] !== g);
+      var fim = g > -1 && (i === visiveis.length - 1 || grupos[i + 1] !== g);
+      return (ini ? rotuloGrupo(visiveis, grupos, i) : '') +
+        '<div class="aluno is-' + nv + (g > -1 ? ' grp' : '') +
+        (ini ? ' grp-ini' : '') + (fim ? ' grp-fim' : '') +
+        '" data-i="' + i + '" draggable="false">' +
         '<div class="rank" title="Arraste para reordenar">' + (i + 1) + '</div>' +
         '<div><div class="nome">' + esc(a.nome) + '</div>' +
           '<div class="book">' + esc(a.book || 'sem book') + '</div></div>' +
@@ -479,59 +583,144 @@ function renderFila() {
   } else { $('foraNote').hidden = true; }
 }
 
+/* ============ AGRUPAMENTO POR LIÇÕES VIZINHAS ============
+   O método personalizado atende aluno a aluno, mas a mesma explicação
+   serve para quem está na mesma lição ou a uma lição de distância. O
+   agrupamento mostra esses blocos para o professor explicar uma vez só.
+   Só vale para cards CONSECUTIVOS na fila: se ele arrasta um aluno para
+   longe, o grupo se desfaz sozinho (é recalculado da ordem exibida). */
+function licaoNum(a) {
+  // só lições numeradas entram: revisão, teste e data extra (RW1, CHP2I,
+  // DT4) não são "a mesma explicação" de uma lição
+  var m = String(a.ultimaLicao || '').trim().toUpperCase().match(/^L\s*(\d+)$/);
+  return m ? +m[1] : null;
+}
+function bookNorm(a) { return String(a.book || '').trim().toLowerCase(); }
+
+function calcularGrupos(lista) {
+  var g = [], i, j;
+  for (i = 0; i < lista.length; i++) g.push(-1);
+  var id = 0;
+  for (i = 0; i < lista.length; i++) {
+    if (g[i] !== -1) continue;
+    var base = licaoNum(lista[i]);
+    if (base == null) continue;
+    var membros = [i];
+    for (j = i + 1; j < lista.length; j++) {
+      var n = licaoNum(lista[j]);
+      // distância medida contra o PRIMEIRO do bloco: sem isso, L4·L5·L6·L7…
+      // encadearia a turma inteira num grupo só
+      if (n == null || bookNorm(lista[j]) !== bookNorm(lista[i]) || Math.abs(n - base) > 1) break;
+      membros.push(j);
+    }
+    if (membros.length >= 2) {
+      for (j = 0; j < membros.length; j++) g[membros[j]] = id;
+      id++;
+    }
+  }
+  return g;
+}
+
+function rotuloGrupo(lista, grupos, iIni) {
+  var g = grupos[iIni], nums = [], n = 0;
+  for (var i = iIni; i < lista.length && grupos[i] === g; i++) { nums.push(licaoNum(lista[i])); n++; }
+  var min = Math.min.apply(null, nums), max = Math.max.apply(null, nums);
+  var licoes = (min === max) ? ('L' + min) : ('L' + min + '–L' + max);
+  return '<div class="grp-rot">🔗 ' + n + ' alunos ' +
+    (min === max ? 'na mesma lição' : 'em lições vizinhas') + ' (' + licoes + ') — dá para explicar junto</div>';
+}
+
 /* ---- liga anotação + arrastar-para-reordenar em cada linha ---- */
-var arrastado = null;
+var elArrastado = null;
+
+/** o agrupamento é decoração da ordem atual: some assim que o arrasto começa
+    e volta recalculado quando o professor solta */
+function limparGrupos() {
+  var l = $('lista');
+  l.querySelectorAll('.grp-rot').forEach(function (r) { r.remove(); });
+  l.querySelectorAll('.aluno').forEach(function (r) { r.classList.remove('grp', 'grp-ini', 'grp-fim'); });
+}
+
+/** move o card e faz os vizinhos deslizarem até o lugar novo (técnica FLIP:
+    mede antes, move, aplica o deslocamento invertido e deixa a transição
+    do CSS levar de volta a zero). */
+function moverComAnimacao(lista, el, antesDe) {
+  var cards = [].slice.call(lista.querySelectorAll('.aluno'));
+  var topos = cards.map(function (c) { return c.getBoundingClientRect().top; });
+  lista.insertBefore(el, antesDe);
+  cards.forEach(function (c, i) {
+    if (c === el) return;
+    var d = topos[i] - c.getBoundingClientRect().top;
+    if (!d) return;
+    c.style.transition = 'none';
+    c.style.transform = 'translateY(' + d + 'px)';
+    requestAnimationFrame(function () { c.style.transition = ''; c.style.transform = ''; });
+  });
+}
+
+/** grava no estado a ordem que está na tela. Os alunos escondidos pelo filtro
+    mantêm as posições que tinham — só as visíveis são reordenadas. */
+function comitarOrdem() {
+  var novaVis = [].map.call($('lista').querySelectorAll('.aluno'), function (r) {
+    return visiveis[+r.dataset.i];
+  }).filter(Boolean);
+  if (novaVis.length !== visiveis.length) return;   // algo fora do lugar: não mexe
+  var k = 0;
+  estado.fila = estado.fila.map(function (a) {
+    return visiveis.indexOf(a) > -1 ? novaVis[k++] : a;
+  });
+  estado.manual = true;
+  renderFila();
+}
+
 function ligarLinhas() {
-  $('lista').querySelectorAll('.aluno').forEach(function (row) {
+  var lista = $('lista');
+  lista.querySelectorAll('.aluno').forEach(function (row) {
     var a = visiveis[+row.dataset.i];
     // anotação: guarda no próprio aluno (sobrevive a filtro/reordenação)
     var ta = row.querySelector('.nota-in');
     autoAltura(ta);
     ta.addEventListener('input', function () { a._nota = ta.value; autoAltura(ta); salvarNota(a); });
 
-    // handle (o número) habilita o arrasto só ao pegar nele
-    var handle = row.querySelector('.rank');
-    handle.addEventListener('mousedown', function () { row.setAttribute('draggable', 'true'); });
+    // o card INTEIRO arrasta; a anotação não, senão não dá para escrever nela
+    row.addEventListener('mousedown', function (e) {
+      row.setAttribute('draggable', e.target.closest('.nota-in') ? 'false' : 'true');
+    });
     row.addEventListener('mouseup', function () { row.setAttribute('draggable', 'false'); });
 
     row.addEventListener('dragstart', function (e) {
-      arrastado = a; row.classList.add('dragging');
+      elArrastado = row;
+      limparGrupos();
+      // a classe entra no próximo quadro: aplicada agora, o navegador tira a
+      // "foto" do card já esmaecido e o fantasma do arrasto some
+      setTimeout(function () { row.classList.add('dragging'); }, 0);
       try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', a.nome); } catch (x) {}
     });
     row.addEventListener('dragend', function () {
       row.setAttribute('draggable', 'false'); row.classList.remove('dragging');
-      $('lista').querySelectorAll('.aluno').forEach(function (r) { r.classList.remove('over-top', 'over-bot'); });
-      arrastado = null;
+      elArrastado = null;
     });
     row.addEventListener('dragover', function (e) {
-      if (!arrastado || arrastado === a) return;
+      if (!elArrastado || elArrastado === row) return;
       e.preventDefault();
       var rect = row.getBoundingClientRect();
       var depois = e.clientY > rect.top + rect.height / 2;
-      row.classList.toggle('over-bot', depois);
-      row.classList.toggle('over-top', !depois);
-    });
-    row.addEventListener('dragleave', function () { row.classList.remove('over-top', 'over-bot'); });
-    row.addEventListener('drop', function (e) {
-      e.preventDefault();
-      if (!arrastado || arrastado === a) return;
-      var rect = row.getBoundingClientRect();
-      var depois = e.clientY > rect.top + rect.height / 2;
-      moverNaFila(arrastado, a, depois);
-      estado.manual = true;
-      renderFila();
+      var alvo = depois ? row.nextElementSibling : row;
+      if (alvo === elArrastado) return;                       // já está no lugar
+      moverComAnimacao(lista, elArrastado, alvo);
     });
   });
 }
-/** move 'arr' para antes/depois de 'alvo' dentro de estado.fila. */
-function moverNaFila(arr, alvo, depois) {
-  var f = estado.fila;
-  var i = f.indexOf(arr); if (i < 0) return;
-  f.splice(i, 1);
-  var j = f.indexOf(alvo);
-  if (depois) j += 1;
-  f.splice(j, 0, arr);
-}
+
+/* soltar em qualquer ponto da lista fecha a conta: a ordem já está na tela.
+   Registrado UMA vez — o elemento #lista sobrevive aos re-renders (só o
+   innerHTML troca), então ligar isso dentro de ligarLinhas() empilharia um
+   listener a cada render e comitaria a ordem várias vezes por soltada. */
+(function ligarSoltar() {
+  var lista = $('lista'); if (!lista) return;
+  lista.addEventListener('dragover', function (e) { if (elArrastado) e.preventDefault(); });
+  lista.addEventListener('drop', function (e) { e.preventDefault(); if (elArrastado) comitarOrdem(); });
+})();
 function autoAltura(ta) { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 120) + 'px'; }
 
 function kpi(n, rot, cls) {
@@ -646,10 +835,14 @@ $('reordRestaurar').addEventListener('click', function () {
 /** cópia robusta — funciona também dentro do iframe da sidebar do card, onde
  *  navigator.clipboard pode estar bloqueado: cai para execCommand e, por fim,
  *  para um prompt manual. */
+function acoes(cls) { return [].slice.call(document.querySelectorAll(cls)); }
+function ligarAcao(cls, fn) { acoes(cls).forEach(function (b) { b.addEventListener('click', fn); }); }
 function copiarFeedback() {
-  var b = $('btnCopiar'), old = b.textContent;
-  b.textContent = '✓ Roteiro copiado';
-  setTimeout(function () { b.textContent = old; }, 1800);
+  acoes('.js-copiar').forEach(function (b) {
+    var old = b.textContent;
+    b.textContent = '✓ Roteiro copiado';
+    setTimeout(function () { b.textContent = old; }, 1800);
+  });
 }
 function copiarExec(txt) {
   var ta = document.createElement('textarea');
@@ -659,7 +852,7 @@ function copiarExec(txt) {
   var ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
   document.body.removeChild(ta); return ok;
 }
-$('btnCopiar').addEventListener('click', function () {
+ligarAcao('.js-copiar', function () {
   if (!turma) return;
   var txt = roteiroTexto();
   var viaApi = (navigator.clipboard && navigator.clipboard.writeText)
@@ -797,8 +990,8 @@ function nomeArquivoPlano(dp) {
 async function gerarPDF() {
   if (!turma) { alert('Carregue uma turma primeiro.'); return; }
   if (!window.PDFLib) { alert('A biblioteca de PDF não carregou. Verifique a conexão e recarregue a página.'); return; }
-  var b = $('btnPdf'), old = b.textContent;
-  b.disabled = true; b.textContent = '⏳ Gerando…';
+  var bs = acoes('.js-pdf'), old = bs.length ? bs[0].textContent : '';
+  bs.forEach(function (b) { b.disabled = true; b.textContent = '⏳ Gerando…'; });
   try {
     var dp = dadosPlano();
     var bytes = await montarPDFplano(dp);
@@ -808,23 +1001,33 @@ async function gerarPDF() {
     link.href = url; link.download = nomeArquivoPlano(dp);
     document.body.appendChild(link); link.click(); document.body.removeChild(link);
     setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
-    b.textContent = '✓ PDF gerado';
-    setTimeout(function () { b.textContent = old; }, 1800);
+    bs.forEach(function (b) { b.textContent = '✓ PDF gerado'; });
+    setTimeout(function () { bs.forEach(function (b) { b.textContent = old; }); }, 1800);
   } catch (e) {
     alert('Não deu para gerar o PDF: ' + (e && e.message ? e.message : e));
-    b.textContent = old;
+    bs.forEach(function (b) { b.textContent = old; });
   } finally {
-    b.disabled = false;
+    bs.forEach(function (b) { b.disabled = false; });
   }
 }
-$('btnPdf').addEventListener('click', gerarPDF);
+ligarAcao('.js-pdf', gerarPDF);
 
 /* ---- enviar o PDF para a pasta da turma no drive compartilhado ---- */
-$('btnDrive').addEventListener('click', function () {
+/** depois de gravar, o professor precisa CONFERIR onde caiu: a pasta da turma
+    é achada por dia+horário, então um clique tem de levar até lá. */
+function mostrarVerPasta(r) {
+  var url = (r && (r.turmaUrl || r.pastaUrl || r.url)) || '';
+  acoes('.js-verpasta').forEach(function (b) {
+    if (!url) { b.hidden = true; return; }
+    b.href = url; b.title = 'Abrir no Drive a pasta "' + ((r && r.turma) || '') + '"';
+    b.hidden = false;
+  });
+}
+ligarAcao('.js-drive', function (ev) {
   if (!turma) { alert('Carregue uma turma primeiro.'); return; }
   if (!window.PDFLib) { alert('A biblioteca de PDF não carregou. Verifique a conexão e recarregue a página.'); return; }
   if (typeof fiskEnviarParaPasta !== 'function') { alert('Helper de Drive não carregou (fisk-shared.js).'); return; }
-  fiskEnviarParaPasta($('btnDrive'), async function () {
+  fiskEnviarParaPasta(ev.currentTarget, async function () {
     var dp = dadosPlano();
     var bytes = await montarPDFplano(dp);
     return {
@@ -832,7 +1035,7 @@ $('btnDrive').addEventListener('click', function () {
       escola: turma.escola || '', professor: turma.professor || turma.aba || '',
       turma: turma.turma || '', filename: nomeArquivoPlano(dp), bytes: bytes
     };
-  }).catch(function () { /* feedback já tratado no helper */ });
+  }).then(mostrarVerPasta).catch(function () { /* feedback já tratado no helper */ });
 });
 
 /* ---- confirmação ao voltar ao Hub (não perder a fila reordenada) ---- */

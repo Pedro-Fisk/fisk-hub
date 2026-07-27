@@ -11,8 +11,11 @@
   /* Mesma linguagem visual do Planejador (semáforo: alta/média/em dia). */
   /* A cor do chrome vem do kit compartilhado (--ui*, em fisk-shared.css):
      os nomes locais viram apelidos para a página não ter uma paleta própria. */
-  :root{ --blue:var(--ui); --blue-mid:var(--ui-mid); --blue-pill:var(--ui-pill);
-         --blue-soft:var(--ui-soft); --blue-ink:var(--ui-ink); --blue-bd:var(--ui-bd); }
+  /* Com fallback de propósito: se o navegador do professor ainda tiver o kit
+     compartilhado ANTIGO em cache, --ui não existe e a cor viraria "nenhuma"
+     (botão branco no branco). O valor literal segura até o cache virar. */
+  :root{ --blue:var(--ui,#2b4d70); --blue-mid:var(--ui-mid,#3d6b93); --blue-pill:var(--ui-pill,#1d3349);
+         --blue-soft:var(--ui-soft,#e9eff5); --blue-ink:var(--ui-ink,#1d3349); --blue-bd:var(--ui-bd,#9db6cb); }
   :root{ --roxo:#7C3AED;
          --alta:#c0392b; --alta-soft:#fbeae7; --media:#b8860b; --media-soft:#fbf3df;
          --emdia:#27866e; --emdia-soft:#e6f4ef; }
@@ -24,7 +27,7 @@
           border-radius:var(--surface-radius);box-shadow:var(--surface-shadow);
           padding:1.15rem 1.25rem;margin-bottom:1.1rem}
   .painel h2{margin:0 0 .4rem;font-family:var(--font-heading);font-weight:700;
-             font-size:1.05rem;color:var(--ui-dark)}
+             font-size:1.05rem;color:var(--ui-dark,#223e5a)}
   .painel .sub{font-size:.85rem;color:var(--gray);margin:0 0 .8rem;line-height:1.45}
   .row{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center}
   select{width:100%;padding:.5rem .6rem;border:1px solid var(--gray-light);border-radius:9px;
