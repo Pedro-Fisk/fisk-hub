@@ -9,16 +9,22 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <style>
   /* Mesma linguagem visual do Planejador (semáforo: alta/média/em dia). */
-  :root{ --blue:#2b4d70; --blue-mid:#3d6b93; --blue-pill:#223e5a; --blue-soft:#e9eff5;
-         --blue-ink:#1d3349; --blue-bd:#a9bccd; --roxo:#7C3AED;
+  /* A cor do chrome vem do kit compartilhado (--ui*, em fisk-shared.css):
+     os nomes locais viram apelidos para a página não ter uma paleta própria. */
+  :root{ --blue:var(--ui); --blue-mid:var(--ui-mid); --blue-pill:var(--ui-pill);
+         --blue-soft:var(--ui-soft); --blue-ink:var(--ui-ink); --blue-bd:var(--ui-bd); }
+  :root{ --roxo:#7C3AED;
          --alta:#c0392b; --alta-soft:#fbeae7; --media:#b8860b; --media-soft:#fbf3df;
          --emdia:#27866e; --emdia-soft:#e6f4ef; }
   [hidden]{ display:none !important; }
   main{max-width:900px;margin:0 auto;padding:1.2rem;width:100%}
-  .painel{background:var(--white);border:1px solid var(--surface-border-color);
+  /* bloco = card, no molde do Gerador de Boletins (referência estética do
+     ecossistema): borda de 2px, título em Poppins e subtítulo em cinza. */
+  .painel{background:var(--white);border:2px solid var(--surface-border-color);
           border-radius:var(--surface-radius);box-shadow:var(--surface-shadow);
-          padding:1.1rem 1.2rem;margin-bottom:1rem}
-  .painel h2{margin:0 0 .5rem;font-size:1.05rem;color:var(--blue)}
+          padding:1.15rem 1.25rem;margin-bottom:1.1rem}
+  .painel h2{margin:0 0 .4rem;font-family:var(--font-heading);font-weight:700;
+             font-size:1.05rem;color:var(--ui-dark)}
   .painel .sub{font-size:.85rem;color:var(--gray);margin:0 0 .8rem;line-height:1.45}
   .row{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center}
   select{width:100%;padding:.5rem .6rem;border:1px solid var(--gray-light);border-radius:9px;
@@ -119,7 +125,6 @@
   .hintbox{background:var(--blue-soft);border-radius:10px;padding:.55rem .8rem;font-size:.8rem;
            color:var(--blue-ink);margin-top:.8rem;line-height:1.45}
   .foranote{font-size:.8rem;color:var(--gray);margin-top:.8rem;padding-top:.7rem;border-top:1px dashed var(--gray-light)}
-  body.theme-dark .painel h2{color:#8fb4d8}
   body.theme-dark td .tsub{color:#9aa6b1}
 </style>
 </head>
@@ -158,7 +163,7 @@
 
   <!-- 2 · panorama -->
   <div class="painel" id="painelGeral" hidden>
-    <h2 id="tituloGeral">Panorama geral</h2>
+    <h2 id="tituloGeral">📊 Panorama geral</h2>
     <div class="resumo" id="kpis"></div>
     <div class="viz-row" id="vizRow">
       <div class="viz-card">
@@ -177,7 +182,7 @@
 
   <!-- 2b · faltas × atraso -->
   <div class="painel" id="painelDisp" hidden>
-    <h2>Falta ou ritmo?</h2>
+    <h2>🎯 Falta ou ritmo?</h2>
     <p class="sub">Cada ponto é um aluno. Quem está no alto e à <b>esquerda</b> vem às aulas e mesmo
       assim está atrasado — é atraso de ritmo, não de presença, e costuma ser o atendimento mais
       urgente. Quem está à direita falta muito: aí a conversa é sobre assiduidade.</p>
@@ -186,7 +191,7 @@
 
   <!-- 3 · por turma -->
   <div class="painel" id="painelTurmas" hidden>
-    <h2>Por turma</h2>
+    <h2>🏫 Por turma</h2>
     <div class="table-wrap">
       <table>
         <thead><tr>
@@ -624,7 +629,7 @@ function render(escola, prof, dados) {
   var mNotas = notasAll.length ? notasAll.reduce(function (s, v) { return s + v; }, 0) / notasAll.length : null;
 
   statusCard('✓ ' + dados.length + ' turmas analisadas · ' + tot + ' alunos.', 'ok');
-  $('tituloGeral').textContent = 'Panorama geral — ' + prof + ' · ' + escola;
+  $('tituloGeral').textContent = '📊 Panorama geral — ' + prof + ' · ' + escola;
 
   /* KPIs */
   $('kpis').innerHTML =

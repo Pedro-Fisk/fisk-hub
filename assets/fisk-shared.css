@@ -28,10 +28,28 @@
   --font-heading: 'Poppins', 'Helvetica Neue', Arial, sans-serif;
   --font-body: 'Nunito', 'Helvetica Neue', Arial, sans-serif;
 
+  /* ── CHROME DAS FERRAMENTAS — azul escuro ──────────────────────────────
+     Decisão do Pedro (27/07/2026): o vermelho fica reservado para a MARCA
+     (logo, faixa do hero) e para ERRO. Em ambiente acadêmico ele lê como
+     "errado", e as ferramentas do professor não são um contexto de erro.
+     Toda ferramenta usa estes tokens no formulário: título de bloco, borda
+     de card, pílulas, foco de campo, barras de progresso.
+     A referência visual é o Gerador de Boletins de Jovens e Adultos.
+     NÃO se aplica às páginas do ALUNO (Quick Practice, Simulador MET), que
+     têm identidade própria, nem às folhas impressas dos boletins. */
+  --ui: #2b4d70;
+  --ui-dark: #223e5a;
+  --ui-mid: #3d6b93;
+  --ui-pill: #1d3349;
+  --ui-ink: #1d3349;
+  --ui-soft: #e9eff5;
+  --ui-bd: #9db6cb;      /* borda de elemento interno (pílula, caixa) */
+  --ui-line: #a8bfd2;    /* borda dos cards de bloco */
+
   /* receita de "superfície" (card/painel) usada pelo style.css local de cada ferramenta */
   --surface-radius: 16px;
-  --surface-border-color: var(--gray-light);
-  --surface-shadow: 0 4px 14px rgba(22, 20, 20, 0.07);
+  --surface-border-color: var(--ui-line);
+  --surface-shadow: 0 4px 14px rgba(43, 77, 112, 0.09);
 }
 
 *{ box-sizing: border-box; }
@@ -252,6 +270,15 @@ body.theme-dark{
   --gray: #b0aaaa;
   --gray-light: #443f3f;
   background: #171414;
+  /* o azul do chrome clareia no escuro: o tom de tela clara some no fundo */
+  --ui: #5b90c0;
+  --ui-dark: #8fb4d8;
+  --ui-mid: #4a7ba8;
+  --ui-pill: #3d6b93;
+  --ui-ink: #cfe0ee;
+  --ui-soft: #16283a;
+  --ui-bd: #3a5a78;
+  --ui-line: #2f4459;
 }
 body.theme-dark .hero{ background: #0d0b0b; color: #f2efef; }
 body.theme-dark .modal-overlay{ background: rgba(0,0,0,.65); }

@@ -13,16 +13,21 @@
 <style>
   /* Acentos na tela ecoam a paleta AZUL das ferramentas do card
      (termo de atraso / 2nd chance / boletim de jovens e adultos). */
-  :root{ --blue:#2b4d70; --blue-mid:#3d6b93; --blue-pill:#223e5a; --blue-soft:#e9eff5;
-         --blue-ink:#1d3349; --blue-bd:#a9bccd;
-         --alta:#c0392b; --alta-soft:#fbeae7; --media:#b8860b; --media-soft:#fbf3df;
+  /* A cor do chrome vem do kit compartilhado (--ui*, em fisk-shared.css):
+     os nomes locais viram apelidos para a página não ter uma paleta própria. */
+  :root{ --blue:var(--ui); --blue-mid:var(--ui-mid); --blue-pill:var(--ui-pill);
+         --blue-soft:var(--ui-soft); --blue-ink:var(--ui-ink); --blue-bd:var(--ui-bd); }
+  :root{ --alta:#c0392b; --alta-soft:#fbeae7; --media:#b8860b; --media-soft:#fbf3df;
          --emdia:#27866e; --emdia-soft:#e6f4ef; }
   [hidden]{ display:none !important; }
   main{max-width:820px;margin:0 auto;padding:1.2rem;width:100%}
-  .painel{background:var(--white);border:1px solid var(--surface-border-color);
+  /* bloco = card, no molde do Gerador de Boletins (referência estética do
+     ecossistema): borda de 2px, título em Poppins e subtítulo em cinza. */
+  .painel{background:var(--white);border:2px solid var(--surface-border-color);
           border-radius:var(--surface-radius);box-shadow:var(--surface-shadow);
-          padding:1.1rem 1.2rem;margin-bottom:1rem}
-  .painel h2{margin:0 0 .5rem;font-size:1.05rem;color:var(--blue)}
+          padding:1.15rem 1.25rem;margin-bottom:1.1rem}
+  .painel h2{margin:0 0 .4rem;font-family:var(--font-heading);font-weight:700;
+             font-size:1.05rem;color:var(--ui-dark)}
   .painel .sub{font-size:.85rem;color:var(--gray);margin:0 0 .8rem;line-height:1.45}
   .row{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center}
   select{width:100%;padding:.5rem .6rem;border:1px solid var(--gray-light);border-radius:9px;
@@ -123,7 +128,6 @@
   }
   /* modo escuro: texto que fica direto no card (fundo escuro) precisa clarear.
      KPIs, chips, etiquetas e hintbox têm fundo claro próprio, então não mudam. */
-  body.theme-dark .painel h2{color:#8fb4d8}
   body.theme-dark .aluno .rank{background:#24405c;color:#dbe7f2}
   body.theme-dark .aluno .sug{color:#cdd9e6}
   body.theme-dark .aluno .sug b{color:#eaf1f8}
@@ -165,7 +169,7 @@
 
   <!-- 2 · fila de atendimento -->
   <div class="painel" id="painelTurma" hidden>
-    <h2 id="tituloTurma">Fila de atendimento</h2>
+    <h2 id="tituloTurma">📋 Fila de atendimento</h2>
     <div class="resumo" id="resumo"></div>
     <div class="barra">
       <label class="chk"><input type="checkbox" id="soAtencao"> só quem precisa de atenção</label>
@@ -384,7 +388,7 @@ function onTurma(dados) {
   aplicarConversaAuto();  // pré-preenche a conversação do dia pelo calendário
   $('painelTurma').hidden = false;
   if (turma.nomePlanilha) $('tituloConectar').textContent = '🔗 Conectar ao card — ' + turma.nomePlanilha;
-  $('tituloTurma').textContent = 'Fila de atendimento — ' + (turma.turma || '');
+  $('tituloTurma').textContent = '📋 Fila de atendimento — ' + (turma.turma || '');
   statusCard('✓ Turma lida ao vivo. Fila montada por prioridade.', 'ok');
   renderFila();
   $('painelTurma').scrollIntoView({ behavior: 'smooth', block: 'start' });

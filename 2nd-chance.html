@@ -11,14 +11,19 @@
 <style>
   /* Acentos na tela ecoam a paleta AZUL do boletim de jovens e adultos
      (sheet-adults): o PDF gerado usa exatamente esses azuis. */
-  :root{ --blue:#2b4d70; --blue-mid:#3d6b93; --blue-pill:#223e5a; --blue-soft:#e9eff5;
-         --blue-ink:#1d3349; --blue-bd:#a9bccd; }
+  /* A cor do chrome vem do kit compartilhado (--ui*, em fisk-shared.css):
+     os nomes locais viram apelidos para a página não ter uma paleta própria. */
+  :root{ --blue:var(--ui); --blue-mid:var(--ui-mid); --blue-pill:var(--ui-pill);
+         --blue-soft:var(--ui-soft); --blue-ink:var(--ui-ink); --blue-bd:var(--ui-bd); }
   [hidden]{ display:none !important; }
   main{max-width:760px;margin:0 auto;padding:1.2rem;width:100%}
-  .painel{background:var(--white);border:1px solid var(--surface-border-color);
+  /* bloco = card, no molde do Gerador de Boletins (referência estética do
+     ecossistema): borda de 2px, título em Poppins e subtítulo em cinza. */
+  .painel{background:var(--white);border:2px solid var(--surface-border-color);
           border-radius:var(--surface-radius);box-shadow:var(--surface-shadow);
-          padding:1.1rem 1.2rem;margin-bottom:1rem}
-  .painel h2{margin:0 0 .5rem;font-size:1.05rem;color:var(--blue)}
+          padding:1.15rem 1.25rem;margin-bottom:1.1rem}
+  .painel h2{margin:0 0 .4rem;font-family:var(--font-heading);font-weight:700;
+             font-size:1.05rem;color:var(--ui-dark)}
   .painel .sub{font-size:.85rem;color:var(--gray);margin:0 0 .8rem}
   .row{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center}
   select,.campo input[type=text],.campo textarea{width:100%;padding:.5rem .6rem;
@@ -140,7 +145,7 @@
 
   <!-- 2 · avaliação + lista -->
   <div class="painel" id="painelTurma" hidden>
-    <h2 id="tituloTurma">Alunos da turma</h2>
+    <h2 id="tituloTurma">👥 Alunos da turma</h2>
     <div class="row" style="justify-content:space-between;margin-bottom:.7rem">
       <div class="pill-toggle" id="avToggle">
         <button data-av="1" class="active">1ª Avaliação</button>
@@ -428,7 +433,7 @@ function onTurma(dados) {
   // avaliação padrão: a mais recente que tem notas
   avSel = temNotas('2') ? '2' : '1';
   document.querySelectorAll('#avToggle button').forEach(function (b) { b.classList.toggle('active', b.dataset.av === avSel); });
-  $('tituloTurma').textContent = 'Alunos — ' + String(dados.turma || '').split('\n')[0];
+  $('tituloTurma').textContent = '👥 Alunos — ' + String(dados.turma || '').split('\n')[0];
   $('painelTurma').hidden = false;
   statusCard('Turma carregada. Avaliação em foco: ' + avSel + 'ª (troque no seletor).', 'ok');
   renderLista();

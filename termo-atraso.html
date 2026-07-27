@@ -13,14 +13,20 @@
   /* específico da ferramenta (o kit compartilhado traz tokens e componentes).
      O DOCUMENTO gerado é azul (princípios do boletim de jovens e adultos);
      os acentos azuis abaixo antecipam essa identidade na tela. */
-  :root{ --blue:#0b5394; --blue-mid:#3d85c6; --blue-pill:#073763; --blue-soft:#e8f1fa; }
+  /* A cor do chrome vem do kit compartilhado (--ui*, em fisk-shared.css):
+     os nomes locais viram apelidos para a página não ter uma paleta própria. */
+  :root{ --blue:var(--ui); --blue-mid:var(--ui-mid); --blue-pill:var(--ui-pill);
+         --blue-soft:var(--ui-soft); --blue-ink:var(--ui-ink); --blue-bd:var(--ui-bd); }
   /* garante que hidden vença as classes com display próprio (ex.: .linha-campos) */
   [hidden]{ display:none !important; }
   main{max-width:760px;margin:0 auto;padding:1.2rem;width:100%}
-  .painel{background:var(--white);border:1px solid var(--surface-border-color);
+  /* bloco = card, no molde do Gerador de Boletins (referência estética do
+     ecossistema): borda de 2px, título em Poppins e subtítulo em cinza. */
+  .painel{background:var(--white);border:2px solid var(--surface-border-color);
           border-radius:var(--surface-radius);box-shadow:var(--surface-shadow);
-          padding:1.1rem 1.2rem;margin-bottom:1rem}
-  .painel h2{margin:0 0 .7rem;font-size:1.05rem;color:var(--blue)}
+          padding:1.15rem 1.25rem;margin-bottom:1.1rem}
+  .painel h2{margin:0 0 .4rem;font-family:var(--font-heading);font-weight:700;
+             font-size:1.05rem;color:var(--ui-dark)}
   .aviso{font-size:.85rem;color:var(--gray)}
   .lista-alunos{display:flex;flex-direction:column;gap:.4rem;max-height:300px;overflow-y:auto}
   .aluno-item{display:flex;align-items:center;gap:.6rem;padding:.5rem .7rem;
@@ -76,7 +82,7 @@
 <main>
 
   <section class="painel" id="painelTurma">
-    <h2>1 · Aluno</h2>
+    <h2>🔗 Conectar ao card</h2>
     <p class="aviso" id="statusCard">⏳ Aguardando os dados da turma (abra pela sidebar do card)…</p>
     <div class="linha-campos" id="origemStandalone" hidden style="margin:.6rem 0">
       <div class="campo"><label>Escola<span class="ind" id="indEscola"></span></label>
@@ -89,7 +95,6 @@
         <select id="selTurma" disabled style="width:100%;padding:.45rem .6rem;border:1px solid var(--gray-light);border-radius:8px;font-family:var(--font-body)"></select>
       </div>
       <div class="campo" style="flex:0 0 auto;align-self:flex-end">
-        <button class="btn-sec" id="btnCarregar">Carregar turma</button>
       </div>
     </div>
     <!-- troca rápida de turma (aparece quando os dados vêm do card, via sidebar ou tela cheia) -->
@@ -105,7 +110,7 @@
   </section>
 
   <section class="painel" hidden id="painelSituacao">
-    <h2>2 · Situação do aluno <span class="aviso">(calculada automaticamente — ajuste se precisar)</span></h2>
+    <h2>📊 Situação do aluno <span class="aviso">(calculada automaticamente — ajuste se precisar)</span></h2>
     <div class="metricas">
       <div class="metrica" id="mAtraso"><b>–</b><span>aulas de atraso</span></div>
       <div class="metrica" id="mFaltas"><b>–</b><span>faltas</span></div>
@@ -127,7 +132,7 @@
   </section>
 
   <section class="painel" hidden id="painelMotivos">
-    <h2>3 · Motivos do atraso</h2>
+    <h2>📌 Motivos do atraso</h2>
     <div class="motivos" id="listaMotivos">
       <label><input type="checkbox" value="Dificuldade em acompanhar as atividades do plano de curso"> Dificuldade em acompanhar as atividades do plano de curso</label>
       <label><input type="checkbox" value="Faltas às aulas"> Faltas às aulas</label>
@@ -138,7 +143,7 @@
   </section>
 
   <section class="painel" hidden id="painelSugestoes">
-    <h2>4 · Sugestões para compensação <span class="aviso">(clique para incluir)</span></h2>
+    <h2>🎯 Sugestões para compensação <span class="aviso">(clique para incluir)</span></h2>
     <div id="listaSugestoes">
       <label class="sugg-chk"><input type="checkbox" value="Participar das tutorias semanais (aulas extras, sem custo adicional)"> Participar das tutorias semanais (aulas extras, sem custo adicional)</label>
       <label class="sugg-chk"><input type="checkbox" value="Revisar em casa as lições em atraso, com o áudio do livro"> Revisar em casa as lições em atraso, com o áudio do livro</label>
@@ -280,20 +285,19 @@ if (!temHashPayload && location.hash.indexOf('#t=') !== 0) {
       }).catch(function (e) { ind('indTurma', ''); mostrarErroApi(e); });
     });
 
-    document.getElementById('btnCarregar').addEventListener('click', function () {
+    /* escolher a turma JÁ carrega — o botão "Carregar turma" era um clique a mais
+       sem decisão nenhuma pelo caminho (padrão do Hub em todas as ferramentas) */
+    selTurma.addEventListener('change', function () {
       if (!selTurma.value) return;
-      var btn = document.getElementById('btnCarregar');
-      btn.disabled = true;
-      btn.textContent = '⏳ Carregando alunos…';
+      ind('indTurma', 'spin');
       document.getElementById('statusCard').textContent = '🔄 Lendo a turma ao vivo…';
       api({ fn: 'turma', escola: selEscola.value, prof: selProf.value, linha: selTurma.value })
-        .then(function (dados) { payload = dados; montarLista(); })
-        .catch(mostrarErroApi)
-        .finally(function () { btn.disabled = false; btn.textContent = 'Carregar turma'; });
+        .then(function (dados) { ind('indTurma', 'ok'); payload = dados; montarLista(); })
+        .catch(function (e) { ind('indTurma', ''); mostrarErroApi(e); });
     });
 
     /* Pré-seleção vinda do painel lateral (?escola=&prof=): escolhe escola→professor
-       automaticamente; a turma (e o botão Carregar) ficam para o usuário. */
+       automaticamente; a turma fica para o usuário (e carrega ao ser escolhida). */
     (function prefillFromURL() {
       var q = new URLSearchParams(location.search);
       var escola = q.get('escola'), prof = q.get('prof');
