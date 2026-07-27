@@ -81,8 +81,9 @@ Apps Script (o "card") via `API_URL` + `API_KEY`.
 ## Fatos-chave (não deduza de novo)
 - **Endpoint do card (leitura):** `API_URL =
   'https://script.google.com/macros/s/AKfycbxb3s3zSUoaFO9ytEQ4W6r-5xJ3hiA9fbFhugnbd9gyX-m3KGNNM8DeyGgNWPReYEwU/exec'`
-  · `API_KEY = 'fisk-cards-2026-vX7q3nT'`. O salvamento usa **outra** URL (`FISK_SAVE_URL`),
-  de propósito.
+  · `API_KEY`: o valor está nos arquivos HTML das ferramentas (não repetir a chave
+  em documentação — este repositório já foi público). O salvamento usa **outra**
+  URL (`FISK_SAVE_URL`), de propósito.
 - **Estrutura de pastas (drive compartilhado)** — CONFERIDA no Drive real em 24/07/2026:
   `Planners <Escola>` → pasta do professor → pasta da turma → pastas de aluno (nome completo).
   - Raiz **Taubaté** = `1c7vuwrRpINGx-ITgvhr65yD4cwbHodt2`
