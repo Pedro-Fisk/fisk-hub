@@ -30,6 +30,8 @@
              font-size:1.05rem;color:var(--ui-dark,#223e5a)}
   .painel .sub{font-size:.85rem;color:var(--gray);margin:0 0 .8rem;line-height:1.45}
   .row{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center}
+  /* rótulo + indicador ao lado dele: mesmo padrão do termo de atraso */
+  .rot{display:block;font-size:.78rem;font-weight:800;color:var(--gray);margin-bottom:.25rem}
   select{width:100%;padding:.5rem .6rem;border:1px solid var(--gray-light);border-radius:9px;
     font-family:var(--font-body);font-size:.92rem;background:var(--white);color:var(--black);cursor:pointer}
   .ind{display:inline-block;width:13px;height:13px;margin-left:.35rem;vertical-align:-2px}
@@ -152,12 +154,14 @@
       <label style="display:block;font-size:.78rem;font-weight:800;color:var(--roxo);margin-bottom:.25rem">👑 Acesso da direção — ver o painel de um professor:</label>
       <select id="vgActAs" class="vg-actas"></select>
     </div>
-    <div class="row">
+    <div class="row" style="align-items:flex-end">
       <div style="flex:1 1 170px">
-        <select id="selEscola" disabled><option value="" disabled selected>Escola…</option></select><span id="indEscola" class="ind"></span>
+        <label class="rot">Escola<span id="indEscola" class="ind"></span></label>
+        <select id="selEscola" disabled><option value="" disabled selected>Escola…</option></select>
       </div>
       <div style="flex:1 1 190px">
-        <select id="selProf" disabled><option value="" disabled selected>Professor(a)…</option></select><span id="indProf" class="ind"></span>
+        <label class="rot">Professor(a)<span id="indProf" class="ind"></span></label>
+        <select id="selProf" disabled><option value="" disabled selected>Professor(a)…</option></select>
       </div>
       <button type="button" class="btn btn-main" id="btnAnalisar" disabled>📊 Analisar</button>
     </div>
