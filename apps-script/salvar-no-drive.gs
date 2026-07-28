@@ -57,7 +57,9 @@
      (turma) → [pastas de aluno por nome completo].
    ══════════════════════════════════════════════════════════════════════ */
 
-const FISK_CHAVE = 'fisk-cards-2026-vX7q3nT';  // mesma API_KEY das ferramentas do Hub
+const FISK_CHAVE = 'COLE_AQUI_A_API_KEY';  // mesma API_KEY das ferramentas do Hub —
+                                           // valor real só no Apps Script publicado
+                                           // (não repetir a chave neste repositório)
 const RAIZ_ESCOLA = {                          // pastas "Planners ..." no drive compartilhado
   taubate:  '1c7vuwrRpINGx-ITgvhr65yD4cwbHodt2',
   cacapava: '1FJ8Fs677pq0tENiJ1PHLtZp8A0lmw-Gs'

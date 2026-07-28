@@ -1,0 +1,6 @@
+# Ferramenta interna de professores: nenhum buscador deve indexar.
+# Obs.: no GitHub Pages de projeto este arquivo não tem efeito (ele precisa
+# estar na raiz do domínio) — a proteção que vale é a meta "robots" que está
+# em cada página. Se o site for hospedado na Vercel, este arquivo passa a valer.
+User-agent: *
+Disallow: /
