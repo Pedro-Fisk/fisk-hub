@@ -1,0 +1,69 @@
+/* Visualizador de Answer Keys — compartilhado entre answer-keys-livro.html e
+   answer-keys-provas.html. Depende de style.css (.card, .icon, .grid). */
+
+/* ── Faixas / cabeçalhos de seção ─────────────────────────────────────────── */
+.ak-secao{max-width:860px;width:100%;margin:0 auto;padding:0 1.5rem;box-sizing:border-box;}
+.ak-secao h2{font-size:1.05rem;margin:2.2rem 0 .2rem;color:var(--black);}
+body.theme-dark .ak-secao h2{color:#f2efef;}
+.ak-secao p.ak-sub{margin:.15rem 0 0;font-size:.85rem;color:var(--gray);}
+.ak-grid{padding-top:1rem;padding-bottom:0;}
+.ak-grid:last-of-type{padding-bottom:3rem;}
+
+/* O card é um link de verdade (abre no Drive) — o JS só intercepta para mostrar
+   o PDF aqui dentro. Sem JS, ainda funciona. */
+.ak-card h2{font-size:1.02rem;margin:0;}
+.ak-card .ak-arquivo{font-size:.78rem;color:var(--gray);margin:0;}
+
+/* ── Trilha de navegação da página de provas ──────────────────────────────── */
+.ak-trilha{max-width:860px;width:100%;margin:1.6rem auto 0;padding:0 1.5rem;
+  box-sizing:border-box;display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;
+  font-size:.85rem;color:var(--gray);}
+.ak-trilha button{font-family:inherit;font-size:.85rem;font-weight:700;border:0;
+  background:transparent;color:#2563EB;cursor:pointer;padding:.15rem .1rem;}
+.ak-trilha button:hover{text-decoration:underline;}
+body.theme-dark .ak-trilha button{color:#6ea8ff;}
+.ak-trilha .ak-atual{font-weight:700;color:var(--black);}
+body.theme-dark .ak-trilha .ak-atual{color:#f2efef;}
+
+/* ── Visualizador em tela cheia ───────────────────────────────────────────── */
+.ak-viewer{position:fixed;inset:0;z-index:9998;background:#0d1117;
+  display:flex;flex-direction:column;}
+.ak-viewer[hidden]{display:none;}
+.ak-bar{display:flex;align-items:center;gap:.75rem;padding:.65rem 1rem;
+  background:#161414;color:#fff;flex:0 0 auto;}
+.ak-bar strong{font-family:var(--font-heading);font-size:1rem;flex:1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ak-bar a,.ak-bar button{font-family:inherit;font-size:.85rem;font-weight:700;
+  border:0;border-radius:999px;padding:.45rem .9rem;cursor:pointer;
+  background:rgba(255,255,255,.14);color:#fff;text-decoration:none;
+  transition:background .15s;}
+.ak-bar a:hover,.ak-bar button:hover{background:rgba(255,255,255,.26);}
+.ak-bar button{padding:.45rem .75rem;}
+
+/* Zoom: o PDF do gabarito tem letra pequena e cada professor usa um monitor. */
+.ak-zoomctrl{display:flex;align-items:center;gap:.15rem;flex:0 0 auto;
+  background:rgba(255,255,255,.14);border-radius:999px;padding:.15rem .3rem;}
+.ak-zoomctrl svg{width:16px;height:16px;margin:0 .25rem 0 .35rem;opacity:.8;}
+.ak-zoomctrl button{background:transparent;padding:.25rem .5rem;font-size:1.05rem;line-height:1;}
+.ak-zoomctrl button:hover{background:rgba(255,255,255,.2);}
+.ak-zoomctrl button:disabled{opacity:.35;cursor:default;background:transparent;}
+.ak-zoomctrl span{font-size:.78rem;font-weight:700;min-width:3.1em;text-align:center;
+  font-variant-numeric:tabular-nums;}
+
+.ak-palco{flex:1;min-height:0;overflow:auto;}
+/* O zoom aumenta a LARGURA do iframe (não um transform): o visualizador do Drive
+   redesenha a página maior, então o texto cresce nítido em vez de borrado. */
+.ak-palco iframe{width:100%;height:100%;border:0;display:block;}
+/* Faixa fina no rodapé em vez de fundo atrás do iframe: a tela de login do Google
+   é transparente e o texto de fundo aparecia por baixo dela. */
+.ak-aviso{flex:0 0 auto;margin:0;padding:.55rem 1rem;text-align:center;
+  background:#161414;color:#9aa4b2;font-size:.78rem;line-height:1.4;}
+.ak-aviso a{color:#8ab4ff;font-weight:700;text-decoration:underline;}
+
+@media(max-width:640px){
+  .ak-bar{gap:.4rem;padding:.55rem .6rem;}
+  .ak-bar strong{font-size:.9rem;}
+  .ak-bar a{padding:.45rem .7rem;font-size:.8rem;}
+  .ak-bar a .ak-lbl{display:none;}
+  .ak-zoomctrl svg{display:none;}
+}

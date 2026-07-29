@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Answer Keys do livro — FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="assets/fisk-ak.css">
+<meta name="theme-color" content="#161414">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+<script>/* aplica o tema salvo antes da primeira pintura, para o modo escuro persistir entre as páginas sem piscar */try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
+
+  <header class="hero">
+    <a class="back-link" href="answer-keys.html">&larr; Voltar aos Answer Keys</a>
+    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
+    <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+    <h1>Answer Keys do livro</h1>
+    <p>Gabarito completo do livro de cada estágio</p>
+  </header>
+
+  <section class="ak-secao">
+    <h2>Inglês — Jovens e Adultos</h2>
+    <p class="ak-sub">Do Essentials ao In Focus</p>
+  </section>
+
+  <main class="grid boletins-grid ak-grid" id="gradeIngles"></main>
+
+  <section class="ak-secao">
+    <h2>Espanhol</h2>
+    <p class="ak-sub">Claves — Inmediato</p>
+  </section>
+
+  <main class="grid boletins-grid ak-grid" id="gradeEspanhol"></main>
+
+  <footer>
+    <p>Ferramenta desenvolvida exclusivamente para uso interno das escolas Fisk. A utilização deste sistema e de seu conteúdo por pessoas ou instituições não autorizadas, incluindo professores particulares, é proibida. Desenvolvido por @fiskcacapava e @taubatefisk</p>
+  </footer>
+
+  <script src="assets/fisk-shared.js"></script>
+  <script src="assets/fisk-ak.js"></script>
+  <script>
+fiskInitThemeToggle('themeToggle');
+fiskInitUserMenu();
+fiskRegistrarUso("Answer Keys");
+
+/* Gabaritos do LIVRO — pasta "09 - Answer Keys dos estágios" do drive pedagógico.
+   Um PDF por estágio, o livro inteiro. */
+var AK_LIVRO = [
+  {id:'ess1',  grade:'gradeIngles',   nome:'Essentials 1',  arq:'01. Essentials 1 — Answer Key',  cor:'#15803D', drive:'1ODRH6xMFQjcbfMePiRFkdldh7kJe3eQW'},
+  {id:'ess2',  grade:'gradeIngles',   nome:'Essentials 2',  arq:'02. Essentials 2 — Answer Key',  cor:'#15803D', drive:'1OTzdal0SoP3hCzDe8Zzgs-WjhE7Fq0qD'},
+  {id:'tra1',  grade:'gradeIngles',   nome:'Transitions 1', arq:'03. Transitions 1 — Answer Key', cor:'#B45309', drive:'1Oabw2Cm3-f2BgVM_pm9A3FsZIgdpSLFR'},
+  {id:'tra2',  grade:'gradeIngles',   nome:'Transitions 2', arq:'04. Transitions 2 — Answer Key', cor:'#B45309', drive:'1OCuH8SkIFK4RMVrlDLvZRmKiFojXo7DJ'},
+  {id:'flu1',  grade:'gradeIngles',   nome:'Fluency 1',     arq:'05. Fluency 1 — Answer Key',     cor:'#4338CA', drive:'1OEkYRLqmRWy6HBrll05uP4rIU5gbo7t-'},
+  {id:'flu2',  grade:'gradeIngles',   nome:'Fluency 2',     arq:'06. Fluency 2 — Answer Key',     cor:'#4338CA', drive:'1O_ZWr5hcWdBbODlqx5roZZQh-9QAB-J5'},
+  {id:'focus', grade:'gradeIngles',   nome:'In Focus',      arq:'07. In Focus — Answer Key',      cor:'#7C3AED', drive:'1Oad_6ykdOrHxUcMXd2AH8llGMyVLvz1V'},
+  {id:'inm1',  grade:'gradeEspanhol', nome:'Inmediato 1',   arq:'05. Inmediato 1 — Claves',       cor:'#CC7C08', drive:'1YRFehGY-SaDn-jCXjaL8S3Jk1GMsUAm_'},
+  {id:'inm2',  grade:'gradeEspanhol', nome:'Inmediato 2',   arq:'06. Inmediato 2 — Claves',       cor:'#CC7C08', drive:'1YXQjvUnFOosQBxhX28B53fPqzMf5cm6L'},
+  {id:'inm3',  grade:'gradeEspanhol', nome:'Inmediato 3',   arq:'07. Inmediato 3 — Claves',       cor:'#CC7C08', drive:'1YOYT007UoXOw46kMJ4ltH0-Xm240iaJ9'}
+];
+
+(function () {
+  var html = {gradeIngles: '', gradeEspanhol: ''};
+  for (var i = 0; i < AK_LIVRO.length; i++) {
+    var e = AK_LIVRO[i];
+    html[e.grade] +=
+      '<a class="ak-card card" id="' + e.id + '" style="--accent:' + e.cor + '" ' +
+      'target="_blank" rel="noopener" data-ak="' + e.drive + '" ' +
+      'data-titulo="' + akEsc(e.nome + ' — Answer Key do livro') + '" ' +
+      'href="https://drive.google.com/file/d/' + e.drive + '/view">' +
+      akIconeDoc() +
+      '<h2>' + akEsc(e.nome) + '</h2>' +
+      '<p class="ak-arquivo">' + akEsc(e.arq) + '</p>' +
+      '</a>';
+  }
+  document.getElementById('gradeIngles').innerHTML = html.gradeIngles;
+  document.getElementById('gradeEspanhol').innerHTML = html.gradeEspanhol;
+
+  /* Liga os cliques ANTES do akViewerInit para poder cuidar do hash da URL:
+     answer-keys-livro.html#tra2 abre direto o gabarito de Transitions 2, então o
+     professor consegue mandar o link de um estágio específico. */
+  var cards = document.querySelectorAll('.ak-card');
+  for (var j = 0; j < cards.length; j++) {
+    cards[j].setAttribute('data-ak-ligado', '1');
+    cards[j].addEventListener('click', function (ev) {
+      if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button !== 0) return;
+      ev.preventDefault();
+      abrirEstagio(this);
+    });
+  }
+
+  function abrirEstagio(card) {
+    if (location.hash !== '#' + card.id) history.replaceState(null, '', '#' + card.id);
+    akAbrir(card.getAttribute('data-ak'), card.getAttribute('data-titulo'), function () {
+      history.replaceState(null, '', location.pathname + location.search);
+      card.focus();
+    });
+  }
+
+  akViewerInit();
+
+  if (location.hash.length > 1) {
+    var alvo = document.getElementById(location.hash.slice(1));
+    if (alvo && alvo.classList.contains('ak-card')) abrirEstagio(alvo);
+  }
+})();
+  </script>
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Answer Keys das provas — FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="assets/fisk-ak.css">
+<meta name="theme-color" content="#161414">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+<script>/* aplica o tema salvo antes da primeira pintura, para o modo escuro persistir entre as páginas sem piscar */try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
+
+  <header class="hero">
+    <a class="back-link" href="answer-keys.html">&larr; Voltar aos Answer Keys</a>
+    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
+    <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+    <h1>Answer Keys das provas</h1>
+    <p id="subtituloHero">Escolha o estágio para chegar ao gabarito da prova</p>
+  </header>
+
+  <nav class="ak-trilha" id="trilha" aria-label="Onde você está"></nav>
+
+  <section class="ak-secao" id="cabecalho"></section>
+
+  <main class="grid boletins-grid ak-grid" id="grade"></main>
+
+  <footer>
+    <p>Ferramenta desenvolvida exclusivamente para uso interno das escolas Fisk. A utilização deste sistema e de seu conteúdo por pessoas ou instituições não autorizadas, incluindo professores particulares, é proibida. Desenvolvido por @fiskcacapava e @taubatefisk</p>
+  </footer>
+
+  <script src="assets/fisk-shared.js"></script>
+  <script src="assets/fisk-ak.js"></script>
+  <script>
+fiskInitThemeToggle('themeToggle');
+fiskInitUserMenu();
+fiskRegistrarUso("Answer Keys");
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Gabaritos das PROVAS — pasta "06 - Testes online e Keys" do drive pedagógico.
+   Estágio → teste (1 e 2) → forma (A/B) → escuta + escrita.
+   Cada estágio só declara o que existe de verdade no Drive: Wings of Freedom,
+   Inmediato 2 e Inmediato 3 só têm Forma A, e em Inmediato 1 a Forma B tem
+   apenas a prova de escuta.
+   ═══════════════════════════════════════════════════════════════════════════ */
+var AK_PROVAS = [
+  {id:'ess1', nome:'Essentials 1', cor:'#15803D', idioma:'ing', testes:[
+    {id:'t1', nome:'Teste 1', licoes:'Lições 1–5', formas:[
+      {id:'a', nome:'Form A', docs:[
+        {tipo:'escuta',  drive:'14ckVHXKAA8ViDJAeiEkgWPIM4pcLeIW7'},
+        {tipo:'escrita', drive:'1QpEW_w1QWCeabRyUF2tSpujPUeewtCcf'}]},
+      {id:'b', nome:'Form B', docs:[
+        {tipo:'escuta',  drive:'1es42bSoM5zxpnB6vLZmZCYEoM0vBldFJ'},
+        {tipo:'escrita', drive:'1g4BSXAguiJyLXQhifR65pCVpuofyG8W8'}]}]},
+    {id:'t2', nome:'Teste 2', licoes:'Lições 6–10', formas:[
+      {id:'a', nome:'Form A', docs:[
+        {tipo:'escuta',  drive:'18ZLD048ha6DXywSk7uSQCie2lXCfjM-T'},
+        {tipo:'escrita', drive:'1_82wXrkGdCmBC6YxuFdvVBGjXe6akAFa'}]},
+      {id:'b', nome:'Form B', docs:[
+        {tipo:'escuta',  drive:'1esPMqHQiAJLbRzZaSp5cdAWIP0LKDW3S'},
+        {tipo:'escrita', drive:'1g666okmdd35UyGTuoJXNO4DuiKhtZLVi'}]}]}]},
+
+  {id:'ess2', nome:'Essentials 2', cor:'#15803D', idioma:'ing', testes:[
+    {id:'t1', nome:'Teste 1', licoes:'Lições 1–5', formas:[
+      {id:'a', nome:'Form A', docs:[
+        {tipo:'escuta',  drive:'1Bu8rREUi_TXGEzFHG1RSey-uDMtLUCR3'},
+        {tipo:'escrita', drive:'156XEod3LFN3q1abVgT76aOlREMlhONV0'}]},
+      {id:'b', nome:'Form B', docs:[
+        {tipo:'escuta',  drive:'1fEgAqzVrmaGnRM1q3--VBb4fsph5753W'},
+        {tipo:'escrita', drive:'1g7avOPrRCNQTefMDKP670_PoC7qiG8u7'}]}]},
+    {id:'t2', nome:'Teste 2', licoes:'Lições 6–10', formas:[
+      {id:'a', nome:'Form A', docs:[
+        {tipo:'escuta',  drive:'1VXwel_btRxnfWE3rYXKybdVOc7qRI9VO'},
+        {tipo:'escrita', drive:'1rMnhjO9RXfuBfWXrr9foqEX1P7XWSRDB'}]},
+      {id:'b', nome:'Form B', docs:[
+        {tipo:'escuta',  drive:'1fJAupamaMpx9q12LcIZnbtw12t0uatAg'},
+        {tipo:'escrita', drive:'1g9t_T-BjRbYZJPsmSVTNkwj4zZtdK2KH'}]}]}]},
+
+  {id:'tra1', nome:'Transitions 1', cor:'#B45309', idioma:'ing', testes:[
+    {id:'t1', nome:'Teste 1', licoes:'Lições 1–5', formas:[
+      {id:'a', nome:'Form A', docs:[
+        {tipo:'escuta',  drive:'12PNoazEVSzqTB-U445zIPjhdQZ47d5xj'},
+        {tipo:'escrita', drive:'1z-cxlgfPSXpLpj3IBvFxPYt5yJwOkKER'}]},
+      {id:'b', nome:'Form B', docs:[
+        {tipo:'escuta',  drive:'1fU8hcPlVf04IkMar3cDCjzpfv_esNrHo'},
+        {tipo:'escrita', drive:'1gJb__ic_vsj2EZHlo6dhG0ls4dhmA11K'}]}]},
+    {id:'t2', nome:'Teste 2', licoes:'Lições 6–10', formas:[
+      {id:'a', nome:'Form A', docs:[
+        {tipo:'escuta',  drive:'1bzU2k0KsdnpqMm_L2IekSU0T8ed5DPC-'},
+        {tipo:'escrita', drive:'1ENa2k8lbo1RQ-8ZJkeMjwTaQacry7LwI'}]},
+      {id:'b', nome:'Form B', docs:[
+        {tipo:'escuta',  drive:'1fZl_RLU3oAgjcYe4N68UOKhU7OqConN0'},
+        {tipo:'escrita', drive:'1gK_H4S5P5Xvr25FzdQpIZ7f9OcOuAYWa'}]}]}]},
+
+  {id:'tra2', nome:'Transitions 2', cor:'#B45309', idioma:'ing', testes:[
+    {id:'t1', nome:'Teste 1', licoes:'Lições 1–5', formas:[
+      {id:'a', nome:'Form A', docs:[
+        {tipo:'escuta',  drive:'1TS5lU4RfCdyoAQXsgE_8p-4zwZnjTErT'},
+        {tipo:'escrita', drive:'1Jgck4GZxPv5_3jWcVgZQlii6a8EU_OwG'}]},
+      {id:'b', nome:'Form B', docs:[
+        {tipo:'escuta',  drive:'1ff4ooPvsgYqNrZIGwJloLKWwNW97jCi2'},
+        {tipo:'escrita', drive:'1gYPYkohlGJC5syL6ZHe9_mVRfLCAmwsL'}]}]},
+    {id:'t2', nome:'Teste 2', licoes:'Lições 6–10', formas:[
+      {id:'a', nome:'Form A', docs:[
+        {tipo:'escuta',  drive:'1EMcAVeGJ-NkenOEKh0D0kCrjTv9s8IK8'},
+        {tipo:'escrita', drive:'16UclzWUc5cxc7V6pEM7PPKuLh3OWFGZ5'}]},
+      {id:'b', nome:'Form B', docs:[
+        {tipo:'escuta',  drive:'1fj0tqE46-hs7GJsAoxQlAOpNtv3H2EqG'},
+        {tipo:'escrita', drive:'1gar3KaP-kR_wcJDAdI2SoaPLf1NUDdeL'}]}]}]},
+
+  {id:'flu1', nome:'Fluency 1', cor:'#4338CA', idioma:'ing', testes:[
+    {id:'t1', nome:'Teste 1', licoes:'Lições 1–5', formas:[
+      {id:'a', nome:'Form A', docs:[
+        {tipo:'escuta',  drive:'1YSCa-Muh9A-spkMZ17QS8VrviyXB0TE2'},
+        {tipo:'escrita', drive:'1pohLEKBgSTAv6Xu86v5pNe2np-YXlUI1'}]},
+      {id:'b', nome:'Form B', docs:[
+        {tipo:'escuta',  drive:'1ftQgTpFsWM-R6duPzXdT2_bq0HcIhrnS'},
+        {tipo:'escrita', drive:'1gxwRr-D7velWniuv1hYuhyFPZazX2aH1'}]}]},
+    {id:'t2', nome:'Teste 2', licoes:'Lições 6–10', formas:[
+      {id:'a', nome:'Form A', docs:[
+        {tipo:'escuta',  drive:'1nJZg1UPIxdDkgi0d4pgr-urYDa_XOuWA'},
+        {tipo:'escrita', drive:'1r_3e1Cf5XcRL-YNPdNFKEq3EHIWWYNlq'}]},
+      {id:'b', nome:'Form B', docs:[
+        {tipo:'escuta',  drive:'1fyXJn_9UwzAs3nTpadaNKEIw5tpKZ7cB'},
+        {tipo:'escrita', drive:'1hEwOAcsnCynBEU9oF31bGmMGKkMLNDtq'}]}]}]},
+
+  {id:'flu2', nome:'Fluency 2', cor:'#4338CA', idioma:'ing', testes:[
+    {id:'t1', nome:'Teste 1', licoes:'Lições 1–5', formas:[
+      {id:'a', nome:'Form A', docs:[
+        {tipo:'escuta',  drive:'1ZKNqf-my4YG8l1P4e34vxtcDS8_yxG3k'},
+        {tipo:'escrita', drive:'1iaRcwpsg12XezQlqqvUaD9LYrqcTRCLR'}]},
+      {id:'b', nome:'Form B', docs:[
+        {tipo:'escuta',  drive:'1g1Mda4pEDoAIt8Xid8PLxQxJL1uKbtGW'},
+        {tipo:'escrita', drive:'1hMHdy2k1L0-9AViqlZ9DoXprP6tDDcEz'}]}]},
+    {id:'t2', nome:'Teste 2', licoes:'Lições 6–10', formas:[
+      {id:'a', nome:'Form A', docs:[
+        {tipo:'escuta',  drive:'1gkw3md4UoOEnyxspp-sMxjik-BT31UV9'},
+        {tipo:'escrita', drive:'1kXOjiWroBBWDwHFkOW73w9Jkx_5LMg7n'}]},
+      {id:'b', nome:'Form B', docs:[
+        {tipo:'escuta',  drive:'1g28OKs6K9DjLeQvsmNCA1R6buiBHX-IN'},
+        {tipo:'escrita', drive:'1hdQTuIwi_MsGxG_Pgs8N9VTL7gJ5ZUj-'}]}]}]},
+
+  /* No Drive esta pasta se chama "07 Wings of Freedom" — é o material de prova do
+     estágio In Focus. As lições vão de 1 a 12 e só existe Forma A. */
+  {id:'focus', nome:'In Focus', sub:'Wings of Freedom', cor:'#7C3AED', idioma:'ing', testes:[
+    {id:'t1', nome:'Teste 1', licoes:'Lições 1–6', formas:[
+      {id:'a', nome:'Form A', docs:[
+        {tipo:'escuta',  drive:'1pkT0wUblfIjBR8sOv20mzlEWWULLdGId'},
+        {tipo:'escrita', drive:'1o_7JeTygSzjmqCoiWDImgv3aWeU0tsZv'}]}]},
+    {id:'t2', nome:'Teste 2', licoes:'Lições 7–12', formas:[
+      {id:'a', nome:'Form A', docs:[
+        {tipo:'escuta',  drive:'13G1juMMaaN1hpraAl7-1RH_x6yTsbl0S'},
+        {tipo:'escrita', drive:'1Pj4DnaEx3PhQ-NfwvJCeQgSxs69c8-zo'}]}]}]},
+
+  {id:'inm1', nome:'Inmediato 1', cor:'#CC7C08', idioma:'esp', testes:[
+    {id:'t1', nome:'Teste 1', licoes:'Lecciones 1–5', formas:[
+      {id:'a', nome:'Forma A', docs:[
+        {tipo:'escuta',  drive:'1HzKHefUaOiE2FZWZ3DBUp9kJSQiUCpYP'},
+        {tipo:'escrita', drive:'1e2krT-rMAu_ywz_1ATE3-vz4uD5Ht-G3'},
+        {tipo:'script',  drive:'1ETh1TdGNHT9VcTAUafNnbjw1gVlcbLNy'}]},
+      {id:'b', nome:'Forma B', docs:[
+        {tipo:'escuta',  drive:'1OL6UjKyp-zsQOViC5A2TLdjE37ggHrCy'}]}]},
+    {id:'t2', nome:'Teste 2', licoes:'Lecciones 6–10', formas:[
+      {id:'a', nome:'Forma A', docs:[
+        {tipo:'escuta',  drive:'1YEdbYbi5F_zpyqRB8s9exPOhFKdkP2MB'},
+        {tipo:'escrita', drive:'1MEYVKRdxywULIFVcE_nyHHKH-4d_t4IM'},
+        {tipo:'script',  drive:'1nRrMHNnw22K3Nf_Z_6bYo4o0c9aCJZaw'}]},
+      {id:'b', nome:'Forma B', docs:[
+        {tipo:'escuta',  drive:'1RP7W87U3QZuEyVsjuqsOQvIfVt1ZxomG'}]}]}]},
+
+  {id:'inm2', nome:'Inmediato 2', cor:'#CC7C08', idioma:'esp', testes:[
+    {id:'t1', nome:'Teste 1', licoes:'Lecciones 1–5', formas:[
+      {id:'a', nome:'Forma A', docs:[
+        {tipo:'escuta',  drive:'14VZOFTijwq-XZL1N20JFHGzKnj-FbWW6'},
+        {tipo:'escrita', drive:'1V02wXIfDFjnQ5Ybv3B3VV0I7C0CBGz32'},
+        {tipo:'script',  drive:'122-7zAatcHDuZqGWpPFR2CoNHls1aW9M'}]}]},
+    {id:'t2', nome:'Teste 2', licoes:'Lecciones 6–10', formas:[
+      {id:'a', nome:'Forma A', docs:[
+        {tipo:'escuta',  drive:'1dUv2w9gtgFtBAi-E0nMiNXqaw3hP1BZZ'},
+        {tipo:'escrita', drive:'1A53rQrWcwxg9mtmrkVaow9dVxnhldPIw'},
+        {tipo:'script',  drive:'1DcsE2pNlwKpDAUrbfnmSHg7Jj5ADGKou'}]}]}]},
+
+  {id:'inm3', nome:'Inmediato 3', cor:'#CC7C08', idioma:'esp', testes:[
+    {id:'t1', nome:'Teste 1', licoes:'Lecciones 1–5', formas:[
+      {id:'a', nome:'Forma A', docs:[
+        {tipo:'escuta',  drive:'1EeZQOROXig00kwZ0cOgNj6lAKnfaKCSC'},
+        {tipo:'escrita', drive:'1NowcsIrLcpU1ivQol9bzC79ZII1G2ACQ'},
+        {tipo:'script',  drive:'1qYO1xwhAM8vNUC4NUFPafL-lFM8zfQbF'}]}]},
+    {id:'t2', nome:'Teste 2', licoes:'Lecciones 6–10', formas:[
+      {id:'a', nome:'Forma A', docs:[
+        {tipo:'escuta',  drive:'11Q6bPodGhSDzjjtJtWtLgDNp5NJ1THrZ'},
+        {tipo:'escrita', drive:'1mhJMg3mlR8dgZDtUE8_SYo1GefQ-2WBz'},
+        {tipo:'script',  drive:'1zRuOXhr8URviUysJHkRLS7XN0djOVrKz'}]}]}]}
+];
+
+/* Rótulo de cada tipo de documento, por idioma do estágio. */
+var AK_TIPOS = {
+  ing: {
+    escuta:  {nome:'Prova de escuta',  desc:'Listening — gabarito'},
+    escrita: {nome:'Prova escrita',    desc:'Written — gabarito'},
+    script:  {nome:'Transcrição',      desc:'Texto dos áudios'}
+  },
+  esp: {
+    escuta:  {nome:'Prova de escuta',  desc:'Test de Escucha — clave'},
+    escrita: {nome:'Prova escrita',    desc:'Test Escrito — clave'},
+    script:  {nome:'Transcrição',      desc:'Script / transcripción de los audios'}
+  }
+};
+
+(function () {
+  var grade  = document.getElementById('grade');
+  var cabec  = document.getElementById('cabecalho');
+  var trilha = document.getElementById('trilha');
+  var subHero = document.getElementById('subtituloHero');
+
+  function acharEstagio(id) {
+    for (var i = 0; i < AK_PROVAS.length; i++) if (AK_PROVAS[i].id === id) return AK_PROVAS[i];
+    return null;
+  }
+  function acharPorId(lista, id) {
+    for (var i = 0; i < lista.length; i++) if (lista[i].id === id) return lista[i];
+    return null;
+  }
+
+  /* Um card genérico: `alvo` vira o hash; sem alvo, é um documento (abre o PDF). */
+  function cardHTML(opts) {
+    var attrs = opts.doc
+      ? ' class="ak-card card" target="_blank" rel="noopener"' +
+        ' data-ak="' + opts.doc + '" data-titulo="' + akEsc(opts.titulo) + '"' +
+        ' href="https://drive.google.com/file/d/' + opts.doc + '/view"'
+      : ' class="card ak-nav" href="#' + opts.alvo + '"';
+    return '<a' + attrs + ' style="--accent:' + opts.cor + '">' +
+      akIconeDoc() +
+      '<h2>' + akEsc(opts.h2) + '</h2>' +
+      (opts.p ? '<p class="ak-arquivo">' + akEsc(opts.p) + '</p>' : '') +
+      '</a>';
+  }
+
+  function montarTrilha(partes) {
+    var h = '';
+    for (var i = 0; i < partes.length; i++) {
+      if (i) h += '<span aria-hidden="true">›</span>';
+      if (partes[i].alvo != null) {
+        h += '<button type="button" data-ir="' + partes[i].alvo + '">' + akEsc(partes[i].texto) + '</button>';
+      } else {
+        h += '<span class="ak-atual">' + akEsc(partes[i].texto) + '</span>';
+      }
+    }
+    trilha.innerHTML = h;
+    var bts = trilha.querySelectorAll('button');
+    for (var j = 0; j < bts.length; j++) {
+      bts[j].addEventListener('click', function () { ir(this.getAttribute('data-ir')); });
+    }
+  }
+
+  function ir(rota) {
+    location.hash = rota ? '#' + rota : '';
+    if (!rota) render();   /* limpar o hash nem sempre dispara hashchange */
+  }
+
+  /* ── As quatro telas ───────────────────────────────────────────────────── */
+
+  function telaEstagios() {
+    subHero.textContent = 'Escolha o estágio para chegar ao gabarito da prova';
+    montarTrilha([{texto:'Estágios'}]);
+    cabec.innerHTML = '<h2>Escolha o estágio</h2>' +
+      '<p class="ak-sub">Inglês de jovens e adultos e Espanhol</p>';
+    var h = '';
+    for (var i = 0; i < AK_PROVAS.length; i++) {
+      var e = AK_PROVAS[i];
+      h += cardHTML({alvo:e.id, cor:e.cor, h2:e.nome,
+        p: e.sub ? e.sub : (e.idioma === 'esp' ? 'Espanhol' : 'Inglês')});
+    }
+    grade.innerHTML = h;
+  }
+
+  function telaTestes(e) {
+    subHero.textContent = e.nome;
+    montarTrilha([{texto:'Estágios', alvo:''}, {texto:e.nome}]);
+    cabec.innerHTML = '<h2>' + akEsc(e.nome) + '</h2><p class="ak-sub">Escolha o teste</p>';
+    var h = '';
+    for (var i = 0; i < e.testes.length; i++) {
+      var t = e.testes[i];
+      h += cardHTML({alvo:e.id + '/' + t.id, cor:e.cor, h2:t.nome, p:t.licoes});
+    }
+    grade.innerHTML = h;
+  }
+
+  function telaFormas(e, t) {
+    subHero.textContent = e.nome + ' · ' + t.nome;
+    montarTrilha([{texto:'Estágios', alvo:''}, {texto:e.nome, alvo:e.id}, {texto:t.nome}]);
+    cabec.innerHTML = '<h2>' + akEsc(e.nome + ' · ' + t.nome) + '</h2>' +
+      '<p class="ak-sub">' + akEsc(t.licoes) + ' — escolha a forma da prova</p>';
+    var h = '';
+    for (var i = 0; i < t.formas.length; i++) {
+      var f = t.formas[i];
+      h += cardHTML({alvo:e.id + '/' + t.id + '/' + f.id, cor:e.cor, h2:f.nome,
+        p: f.docs.length + (f.docs.length === 1 ? ' gabarito' : ' gabaritos')});
+    }
+    grade.innerHTML = h;
+  }
+
+  function telaDocumentos(e, t, f, pulouForma) {
+    var rotulo = e.nome + ' · ' + t.nome + ' · ' + f.nome;
+    subHero.textContent = rotulo;
+    /* quando o estágio só tem uma forma, o passo da forma é pulado — mas ela
+       continua escrita na trilha, para o professor saber qual prova está vendo */
+    montarTrilha([{texto:'Estágios', alvo:''}, {texto:e.nome, alvo:e.id},
+      {texto:t.nome, alvo: pulouForma ? e.id : e.id + '/' + t.id}, {texto:f.nome}]);
+    cabec.innerHTML = '<h2>' + akEsc(rotulo) + '</h2>' +
+      '<p class="ak-sub">' + akEsc(t.licoes) + '</p>';
+    var tipos = AK_TIPOS[e.idioma] || AK_TIPOS.ing;
+    var h = '';
+    for (var i = 0; i < f.docs.length; i++) {
+      var d = f.docs[i];
+      var info = tipos[d.tipo] || {nome:d.tipo, desc:''};
+      h += cardHTML({doc:d.drive, cor:e.cor, h2:info.nome, p:info.desc,
+        titulo: rotulo + ' — ' + info.nome});
+    }
+    grade.innerHTML = h;
+    akLigarCards(grade);
+  }
+
+  /* ── Roteador por hash: #ess1/t1/a ─────────────────────────────────────── */
+
+  function render() {
+    var rota = location.hash.replace(/^#/, '').split('/');
+    var e = rota[0] ? acharEstagio(rota[0]) : null;
+    if (!e) { telaEstagios(); rolarAoTopo(); return; }
+
+    var t = rota[1] ? acharPorId(e.testes, rota[1]) : null;
+    if (!t) { telaTestes(e); rolarAoTopo(); return; }
+
+    /* uma forma só (Wings of Freedom, Inmediato 2 e 3): pular a escolha */
+    if (t.formas.length === 1) {
+      telaDocumentos(e, t, t.formas[0], true);
+      rolarAoTopo();
+      return;
+    }
+
+    var f = rota[2] ? acharPorId(t.formas, rota[2]) : null;
+    if (!f) { telaFormas(e, t); rolarAoTopo(); return; }
+
+    telaDocumentos(e, t, f, false);
+    rolarAoTopo();
+  }
+
+  function rolarAoTopo() {
+    if (window.scrollY > 220) window.scrollTo(0, 0);
+  }
+
+  akViewerInit();
+  window.addEventListener('hashchange', render);
+  render();
+})();
+  </script>
+</body>
+</html>
