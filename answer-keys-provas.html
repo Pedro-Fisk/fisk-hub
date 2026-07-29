@@ -40,119 +40,135 @@ fiskRegistrarUso("Answer Keys");
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Gabaritos das PROVAS — pasta "06 - Testes online e Keys" do drive pedagógico.
-   Estágio → teste (1 e 2) → forma (A/B) → escuta + escrita.
-   Cada estágio só declara o que existe de verdade no Drive: Wings of Freedom,
-   Inmediato 2 e Inmediato 3 só têm Forma A, e em Inmediato 1 a Forma B tem
-   apenas a prova de escuta.
+   Estágio → teste (1 e 2) → forma (A/B) → escuta + escrita + transcrição.
+   Cada estágio só declara o que existe de verdade no Drive: Inmediato 2 e
+   Inmediato 3 só têm Forma A, e em Inmediato 1 a Forma B tem apenas a prova
+   de escuta (e nenhuma transcrição).
    ═══════════════════════════════════════════════════════════════════════════ */
 var AK_PROVAS = [
   {id:'ess1', nome:'Essentials 1', cor:'#15803D', idioma:'ing', testes:[
     {id:'t1', nome:'Teste 1', licoes:'Lições 1–5', formas:[
       {id:'a', nome:'Form A', docs:[
         {tipo:'escuta',  drive:'14ckVHXKAA8ViDJAeiEkgWPIM4pcLeIW7'},
-        {tipo:'escrita', drive:'1QpEW_w1QWCeabRyUF2tSpujPUeewtCcf'}]},
+        {tipo:'escrita', drive:'1QpEW_w1QWCeabRyUF2tSpujPUeewtCcf'},
+        {tipo:'script',  drive:'10pk4lzIlFZoD8z-U0H3CtyUHS3ikyRbK'}]},
       {id:'b', nome:'Form B', docs:[
         {tipo:'escuta',  drive:'1es42bSoM5zxpnB6vLZmZCYEoM0vBldFJ'},
-        {tipo:'escrita', drive:'1g4BSXAguiJyLXQhifR65pCVpuofyG8W8'}]}]},
+        {tipo:'escrita', drive:'1g4BSXAguiJyLXQhifR65pCVpuofyG8W8'},
+        {tipo:'script',  drive:'1LgPKuhWXsc4S53oL7cJoUq2X1fcheS4m'}]}]},
     {id:'t2', nome:'Teste 2', licoes:'Lições 6–10', formas:[
       {id:'a', nome:'Form A', docs:[
         {tipo:'escuta',  drive:'18ZLD048ha6DXywSk7uSQCie2lXCfjM-T'},
-        {tipo:'escrita', drive:'1_82wXrkGdCmBC6YxuFdvVBGjXe6akAFa'}]},
+        {tipo:'escrita', drive:'1_82wXrkGdCmBC6YxuFdvVBGjXe6akAFa'},
+        {tipo:'script',  drive:'1wASJ2T0v20e7kM-0zin3MtOtZObBFrZs'}]},
       {id:'b', nome:'Form B', docs:[
         {tipo:'escuta',  drive:'1esPMqHQiAJLbRzZaSp5cdAWIP0LKDW3S'},
-        {tipo:'escrita', drive:'1g666okmdd35UyGTuoJXNO4DuiKhtZLVi'}]}]}]},
+        {tipo:'escrita', drive:'1g666okmdd35UyGTuoJXNO4DuiKhtZLVi'},
+        {tipo:'script',  drive:'1-UOYXhscXtTqIMZz15qf6dnr58p534AO'}]}]}]},
 
   {id:'ess2', nome:'Essentials 2', cor:'#15803D', idioma:'ing', testes:[
     {id:'t1', nome:'Teste 1', licoes:'Lições 1–5', formas:[
       {id:'a', nome:'Form A', docs:[
         {tipo:'escuta',  drive:'1Bu8rREUi_TXGEzFHG1RSey-uDMtLUCR3'},
-        {tipo:'escrita', drive:'156XEod3LFN3q1abVgT76aOlREMlhONV0'}]},
+        {tipo:'escrita', drive:'156XEod3LFN3q1abVgT76aOlREMlhONV0'},
+        {tipo:'script',  drive:'1N9xhOTrbCz-UpPhJZaXsVuLz2_3F_ZAv'}]},
       {id:'b', nome:'Form B', docs:[
         {tipo:'escuta',  drive:'1fEgAqzVrmaGnRM1q3--VBb4fsph5753W'},
-        {tipo:'escrita', drive:'1g7avOPrRCNQTefMDKP670_PoC7qiG8u7'}]}]},
+        {tipo:'escrita', drive:'1g7avOPrRCNQTefMDKP670_PoC7qiG8u7'},
+        {tipo:'script',  drive:'125-qwzVba4md6VDDmQPc0autkxXbcU11'}]}]},
     {id:'t2', nome:'Teste 2', licoes:'Lições 6–10', formas:[
       {id:'a', nome:'Form A', docs:[
         {tipo:'escuta',  drive:'1VXwel_btRxnfWE3rYXKybdVOc7qRI9VO'},
-        {tipo:'escrita', drive:'1rMnhjO9RXfuBfWXrr9foqEX1P7XWSRDB'}]},
+        {tipo:'escrita', drive:'1rMnhjO9RXfuBfWXrr9foqEX1P7XWSRDB'},
+        {tipo:'script',  drive:'1Xh4OpmEzDfsrfe8MYzndp7Ycj5NobyOS'}]},
       {id:'b', nome:'Form B', docs:[
         {tipo:'escuta',  drive:'1fJAupamaMpx9q12LcIZnbtw12t0uatAg'},
-        {tipo:'escrita', drive:'1g9t_T-BjRbYZJPsmSVTNkwj4zZtdK2KH'}]}]}]},
+        {tipo:'escrita', drive:'1g9t_T-BjRbYZJPsmSVTNkwj4zZtdK2KH'},
+        {tipo:'script',  drive:'1T8QU_u1uaFBUH8fafjlEmUsOy_xICKtG'}]}]}]},
 
   {id:'tra1', nome:'Transitions 1', cor:'#B45309', idioma:'ing', testes:[
     {id:'t1', nome:'Teste 1', licoes:'Lições 1–5', formas:[
       {id:'a', nome:'Form A', docs:[
         {tipo:'escuta',  drive:'12PNoazEVSzqTB-U445zIPjhdQZ47d5xj'},
-        {tipo:'escrita', drive:'1z-cxlgfPSXpLpj3IBvFxPYt5yJwOkKER'}]},
+        {tipo:'escrita', drive:'1z-cxlgfPSXpLpj3IBvFxPYt5yJwOkKER'},
+        {tipo:'script',  drive:'1zFgKxHsAMb2ZeTGnqbzPvgiN7RITdJ9E'}]},
       {id:'b', nome:'Form B', docs:[
         {tipo:'escuta',  drive:'1fU8hcPlVf04IkMar3cDCjzpfv_esNrHo'},
-        {tipo:'escrita', drive:'1gJb__ic_vsj2EZHlo6dhG0ls4dhmA11K'}]}]},
+        {tipo:'escrita', drive:'1gJb__ic_vsj2EZHlo6dhG0ls4dhmA11K'},
+        {tipo:'script',  drive:'1REcrUbnk4fpf3lSDz2aZom-G6B4A6yUm'}]}]},
     {id:'t2', nome:'Teste 2', licoes:'Lições 6–10', formas:[
       {id:'a', nome:'Form A', docs:[
         {tipo:'escuta',  drive:'1bzU2k0KsdnpqMm_L2IekSU0T8ed5DPC-'},
-        {tipo:'escrita', drive:'1ENa2k8lbo1RQ-8ZJkeMjwTaQacry7LwI'}]},
+        {tipo:'escrita', drive:'1ENa2k8lbo1RQ-8ZJkeMjwTaQacry7LwI'},
+        {tipo:'script',  drive:'1qX2r5IXFwkCQBT_iq9tsdH__gTxYzvck'}]},
       {id:'b', nome:'Form B', docs:[
         {tipo:'escuta',  drive:'1fZl_RLU3oAgjcYe4N68UOKhU7OqConN0'},
-        {tipo:'escrita', drive:'1gK_H4S5P5Xvr25FzdQpIZ7f9OcOuAYWa'}]}]}]},
+        {tipo:'escrita', drive:'1gK_H4S5P5Xvr25FzdQpIZ7f9OcOuAYWa'},
+        {tipo:'script',  drive:'1lAaVTSzNUK0qq7GD6dsTXKpG7dewCzmd'}]}]}]},
 
   {id:'tra2', nome:'Transitions 2', cor:'#B45309', idioma:'ing', testes:[
     {id:'t1', nome:'Teste 1', licoes:'Lições 1–5', formas:[
       {id:'a', nome:'Form A', docs:[
         {tipo:'escuta',  drive:'1TS5lU4RfCdyoAQXsgE_8p-4zwZnjTErT'},
-        {tipo:'escrita', drive:'1Jgck4GZxPv5_3jWcVgZQlii6a8EU_OwG'}]},
+        {tipo:'escrita', drive:'1Jgck4GZxPv5_3jWcVgZQlii6a8EU_OwG'},
+        {tipo:'script',  drive:'1EjGAuUZd9Kr2Nf8KcHfUH5mKMtCLB-4X'}]},
       {id:'b', nome:'Form B', docs:[
         {tipo:'escuta',  drive:'1ff4ooPvsgYqNrZIGwJloLKWwNW97jCi2'},
-        {tipo:'escrita', drive:'1gYPYkohlGJC5syL6ZHe9_mVRfLCAmwsL'}]}]},
+        {tipo:'escrita', drive:'1gYPYkohlGJC5syL6ZHe9_mVRfLCAmwsL'},
+        {tipo:'script',  drive:'1hwnvLn3QVu5owaVGc0_ux3JNTQ4KfqoC'}]}]},
     {id:'t2', nome:'Teste 2', licoes:'Lições 6–10', formas:[
       {id:'a', nome:'Form A', docs:[
         {tipo:'escuta',  drive:'1EMcAVeGJ-NkenOEKh0D0kCrjTv9s8IK8'},
-        {tipo:'escrita', drive:'16UclzWUc5cxc7V6pEM7PPKuLh3OWFGZ5'}]},
+        {tipo:'escrita', drive:'16UclzWUc5cxc7V6pEM7PPKuLh3OWFGZ5'},
+        {tipo:'script',  drive:'1gK4IYG9s0ON41RV9ixPGLT0pxhkywKF4'}]},
       {id:'b', nome:'Form B', docs:[
         {tipo:'escuta',  drive:'1fj0tqE46-hs7GJsAoxQlAOpNtv3H2EqG'},
-        {tipo:'escrita', drive:'1gar3KaP-kR_wcJDAdI2SoaPLf1NUDdeL'}]}]}]},
+        {tipo:'escrita', drive:'1gar3KaP-kR_wcJDAdI2SoaPLf1NUDdeL'},
+        {tipo:'script',  drive:'1BDU3ExhlWpDHaxD7uSxhko0sxst_rJxN'}]}]}]},
 
   {id:'flu1', nome:'Fluency 1', cor:'#4338CA', idioma:'ing', testes:[
     {id:'t1', nome:'Teste 1', licoes:'Lições 1–5', formas:[
       {id:'a', nome:'Form A', docs:[
         {tipo:'escuta',  drive:'1YSCa-Muh9A-spkMZ17QS8VrviyXB0TE2'},
-        {tipo:'escrita', drive:'1pohLEKBgSTAv6Xu86v5pNe2np-YXlUI1'}]},
+        {tipo:'escrita', drive:'1pohLEKBgSTAv6Xu86v5pNe2np-YXlUI1'},
+        {tipo:'script',  drive:'1qu8vx8f91hPp0nqEiICEbqwOxSnax2Mg'}]},
       {id:'b', nome:'Form B', docs:[
         {tipo:'escuta',  drive:'1ftQgTpFsWM-R6duPzXdT2_bq0HcIhrnS'},
-        {tipo:'escrita', drive:'1gxwRr-D7velWniuv1hYuhyFPZazX2aH1'}]}]},
+        {tipo:'escrita', drive:'1gxwRr-D7velWniuv1hYuhyFPZazX2aH1'},
+        {tipo:'script',  drive:'1NQlPMKvTMtDBbRl_HlE8oDhR6WH1DLIr'}]}]},
     {id:'t2', nome:'Teste 2', licoes:'Lições 6–10', formas:[
       {id:'a', nome:'Form A', docs:[
         {tipo:'escuta',  drive:'1nJZg1UPIxdDkgi0d4pgr-urYDa_XOuWA'},
-        {tipo:'escrita', drive:'1r_3e1Cf5XcRL-YNPdNFKEq3EHIWWYNlq'}]},
+        {tipo:'escrita', drive:'1r_3e1Cf5XcRL-YNPdNFKEq3EHIWWYNlq'},
+        {tipo:'script',  drive:'1uBoaJlng7rcbkRwOLdMYL5hvvXbzzxG0'}]},
       {id:'b', nome:'Form B', docs:[
         {tipo:'escuta',  drive:'1fyXJn_9UwzAs3nTpadaNKEIw5tpKZ7cB'},
-        {tipo:'escrita', drive:'1hEwOAcsnCynBEU9oF31bGmMGKkMLNDtq'}]}]}]},
+        {tipo:'escrita', drive:'1hEwOAcsnCynBEU9oF31bGmMGKkMLNDtq'},
+        {tipo:'script',  drive:'1l6m0DZdsTBdV3iBza_w7kbczETMQAaLZ'}]}]}]},
 
   {id:'flu2', nome:'Fluency 2', cor:'#4338CA', idioma:'ing', testes:[
     {id:'t1', nome:'Teste 1', licoes:'Lições 1–5', formas:[
       {id:'a', nome:'Form A', docs:[
         {tipo:'escuta',  drive:'1ZKNqf-my4YG8l1P4e34vxtcDS8_yxG3k'},
-        {tipo:'escrita', drive:'1iaRcwpsg12XezQlqqvUaD9LYrqcTRCLR'}]},
+        {tipo:'escrita', drive:'1iaRcwpsg12XezQlqqvUaD9LYrqcTRCLR'},
+        {tipo:'script',  drive:'1vp7WAhKxGekCLuJIgUt6Dg_xXpJtsti-'}]},
       {id:'b', nome:'Form B', docs:[
         {tipo:'escuta',  drive:'1g1Mda4pEDoAIt8Xid8PLxQxJL1uKbtGW'},
-        {tipo:'escrita', drive:'1hMHdy2k1L0-9AViqlZ9DoXprP6tDDcEz'}]}]},
+        {tipo:'escrita', drive:'1hMHdy2k1L0-9AViqlZ9DoXprP6tDDcEz'},
+        {tipo:'script',  drive:'1dMam7GWtIGbG-YJFwwGJv0qgeN2SKuqC'}]}]},
     {id:'t2', nome:'Teste 2', licoes:'Lições 6–10', formas:[
       {id:'a', nome:'Form A', docs:[
         {tipo:'escuta',  drive:'1gkw3md4UoOEnyxspp-sMxjik-BT31UV9'},
-        {tipo:'escrita', drive:'1kXOjiWroBBWDwHFkOW73w9Jkx_5LMg7n'}]},
+        {tipo:'escrita', drive:'1kXOjiWroBBWDwHFkOW73w9Jkx_5LMg7n'},
+        {tipo:'script',  drive:'1Y_B_TTTn9ciDmA14f-83V4H6S2pICBRy'}]},
       {id:'b', nome:'Form B', docs:[
         {tipo:'escuta',  drive:'1g28OKs6K9DjLeQvsmNCA1R6buiBHX-IN'},
-        {tipo:'escrita', drive:'1hdQTuIwi_MsGxG_Pgs8N9VTL7gJ5ZUj-'}]}]}]},
+        {tipo:'escrita', drive:'1hdQTuIwi_MsGxG_Pgs8N9VTL7gJ5ZUj-'},
+        {tipo:'script',  drive:'1DF7bLn4F-G996vzcCn_TrxoHyXP8qMu7'}]}]}]},
 
-  /* No Drive esta pasta se chama "07 Wings of Freedom" — é o material de prova do
-     estágio In Focus. As lições vão de 1 a 12 e só existe Forma A. */
-  {id:'focus', nome:'In Focus', sub:'Wings of Freedom', cor:'#7C3AED', idioma:'ing', testes:[
-    {id:'t1', nome:'Teste 1', licoes:'Lições 1–6', formas:[
-      {id:'a', nome:'Form A', docs:[
-        {tipo:'escuta',  drive:'1pkT0wUblfIjBR8sOv20mzlEWWULLdGId'},
-        {tipo:'escrita', drive:'1o_7JeTygSzjmqCoiWDImgv3aWeU0tsZv'}]}]},
-    {id:'t2', nome:'Teste 2', licoes:'Lições 7–12', formas:[
-      {id:'a', nome:'Form A', docs:[
-        {tipo:'escuta',  drive:'13G1juMMaaN1hpraAl7-1RH_x6yTsbl0S'},
-        {tipo:'escrita', drive:'1Pj4DnaEx3PhQ-NfwvJCeQgSxs69c8-zo'}]}]}]},
+  /* In Focus não entra: a única pasta de provas dele no Drive é a do
+     "Wings of Freedom", livro fora de uso há muito tempo. O gabarito do LIVRO
+     de In Focus continua em answer-keys-livro.html. */
 
   {id:'inm1', nome:'Inmediato 1', cor:'#CC7C08', idioma:'esp', testes:[
     {id:'t1', nome:'Teste 1', licoes:'Lecciones 1–5', formas:[
@@ -199,15 +215,19 @@ var AK_PROVAS = [
 var AK_TIPOS = {
   ing: {
     escuta:  {nome:'Prova de escuta',  desc:'Listening — gabarito'},
-    escrita: {nome:'Prova escrita',    desc:'Written — gabarito'},
-    script:  {nome:'Transcrição',      desc:'Texto dos áudios'}
+    script:  {nome:'Transcrição do áudio', desc:'Script — o que é falado na prova de escuta'},
+    escrita: {nome:'Prova escrita',    desc:'Written — gabarito'}
   },
   esp: {
     escuta:  {nome:'Prova de escuta',  desc:'Test de Escucha — clave'},
-    escrita: {nome:'Prova escrita',    desc:'Test Escrito — clave'},
-    script:  {nome:'Transcrição',      desc:'Script / transcripción de los audios'}
+    script:  {nome:'Transcrição do áudio', desc:'Script — o que é falado na prova de escuta'},
+    escrita: {nome:'Prova escrita',    desc:'Test Escrito — clave'}
   }
 };
+
+/* A transcrição pertence à prova de escuta, então vem logo depois dela — mesmo
+   que a lista do estágio declare os documentos em outra ordem. */
+var AK_ORDEM = ['escuta', 'script', 'escrita'];
 
 (function () {
   var grade  = document.getElementById('grade');
@@ -312,9 +332,12 @@ var AK_TIPOS = {
     cabec.innerHTML = '<h2>' + akEsc(rotulo) + '</h2>' +
       '<p class="ak-sub">' + akEsc(t.licoes) + '</p>';
     var tipos = AK_TIPOS[e.idioma] || AK_TIPOS.ing;
+    var docs = f.docs.slice().sort(function (x, y) {
+      return AK_ORDEM.indexOf(x.tipo) - AK_ORDEM.indexOf(y.tipo);
+    });
     var h = '';
-    for (var i = 0; i < f.docs.length; i++) {
-      var d = f.docs[i];
+    for (var i = 0; i < docs.length; i++) {
+      var d = docs[i];
       var info = tipos[d.tipo] || {nome:d.tipo, desc:''};
       h += cardHTML({doc:d.drive, cor:e.cor, h2:info.nome, p:info.desc,
         titulo: rotulo + ' — ' + info.nome});
