@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Answer Keys — FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css">
+<link rel="stylesheet" href="style.css">
+<meta name="theme-color" content="#161414">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+<script>/* aplica o tema salvo antes da primeira pintura, para o modo escuro persistir entre as páginas sem piscar */try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
+
+  <style>
+    /* ── Faixas de estágio ───────────────────────────────────────────────── */
+    .ak-secao{max-width:860px;width:100%;margin:0 auto;padding:0 1.5rem;box-sizing:border-box;}
+    .ak-secao h2{font-size:1.05rem;margin:2.2rem 0 .2rem;color:var(--black);}
+    body.theme-dark .ak-secao h2{color:#f2efef;}
+    .ak-secao p.ak-sub{margin:.15rem 0 0;font-size:.85rem;color:var(--gray);}
+    .ak-grid{padding-top:1rem;padding-bottom:0;}
+    .ak-grid:last-of-type{padding-bottom:3rem;}
+
+    /* O card é um link de verdade (abre no Drive) — o JS só intercepta para
+       mostrar o PDF aqui dentro. Sem JS, ainda funciona. */
+    .ak-card h2{font-size:1.02rem;margin:0;}
+    .ak-card .ak-arquivo{font-size:.78rem;color:var(--gray);margin:0;}
+
+    /* ── Visualizador embutido ───────────────────────────────────────────── */
+    .ak-viewer{position:fixed;inset:0;z-index:9998;background:#0d1117;
+      display:flex;flex-direction:column;}
+    .ak-viewer[hidden]{display:none;}
+    .ak-bar{display:flex;align-items:center;gap:.75rem;padding:.65rem 1rem;
+      background:#161414;color:#fff;flex:0 0 auto;}
+    .ak-bar strong{font-family:var(--font-heading);font-size:1rem;flex:1;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .ak-bar a,.ak-bar button{font-family:inherit;font-size:.85rem;font-weight:700;
+      border:0;border-radius:999px;padding:.45rem .9rem;cursor:pointer;
+      background:rgba(255,255,255,.14);color:#fff;text-decoration:none;
+      transition:background .15s;}
+    .ak-bar a:hover,.ak-bar button:hover{background:rgba(255,255,255,.26);}
+    .ak-bar button{padding:.45rem .75rem;}
+    /* Zoom: o PDF do gabarito tem letra pequena e cada professor usa um monitor. */
+    .ak-zoomctrl{display:flex;align-items:center;gap:.15rem;flex:0 0 auto;
+      background:rgba(255,255,255,.14);border-radius:999px;padding:.15rem .3rem;}
+    .ak-zoomctrl svg{width:16px;height:16px;margin:0 .25rem 0 .35rem;opacity:.8;}
+    .ak-zoomctrl button{background:transparent;padding:.25rem .5rem;font-size:1.05rem;line-height:1;}
+    .ak-zoomctrl button:hover{background:rgba(255,255,255,.2);}
+    .ak-zoomctrl button:disabled{opacity:.35;cursor:default;background:transparent;}
+    .ak-zoomctrl span{font-size:.78rem;font-weight:700;min-width:3.1em;text-align:center;
+      font-variant-numeric:tabular-nums;}
+    .ak-palco{flex:1;min-height:0;overflow:auto;}
+    /* O zoom aumenta a LARGURA do iframe (não um transform): o visualizador do
+       Drive redesenha a página maior, então o texto cresce nítido em vez de borrado. */
+    .ak-palco iframe{width:100%;height:100%;border:0;display:block;}
+    /* Faixa fina no rodapé em vez de fundo atrás do iframe: a tela de login do
+       Google é transparente e o texto de fundo aparecia por baixo dela. */
+    .ak-aviso{flex:0 0 auto;margin:0;padding:.55rem 1rem;text-align:center;
+      background:#161414;color:#9aa4b2;font-size:.78rem;line-height:1.4;}
+    @media(max-width:640px){
+      .ak-bar{gap:.4rem;padding:.55rem .6rem;}
+      .ak-bar strong{font-size:.9rem;}
+      .ak-bar a{padding:.45rem .7rem;font-size:.8rem;}
+      .ak-bar a .ak-lbl{display:none;}
+      .ak-zoomctrl svg{display:none;}
+    }
+  </style>
+
+  <header class="hero">
+    <a class="back-link" href="index.html">&larr; Voltar aos recursos</a>
+    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
+    <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+    <h1>Answer Keys</h1>
+    <p>Gabaritos das provas dos estágios, para consultar sem sair do Hub</p>
+  </header>
+
+  <section class="ak-secao">
+    <h2>Inglês — Jovens e Adultos</h2>
+    <p class="ak-sub">Do Essentials ao In Focus</p>
+  </section>
+
+  <main class="grid boletins-grid ak-grid">
+
+    <a class="ak-card card" style="--accent:#15803D" target="_blank" rel="noopener"
+       data-ak="1ODRH6xMFQjcbfMePiRFkdldh7kJe3eQW" data-titulo="Essentials 1 — Answer Key" id="ess1"
+       href="https://drive.google.com/file/d/1ODRH6xMFQjcbfMePiRFkdldh7kJe3eQW/view">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 4.5A1.5 1.5 0 016.5 3H14l5 5v11.5a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 015 19.5v-15z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M13.8 3.2V8.2h5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M8.5 14.2l2 2 4.2-4.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>Essentials 1</h2>
+      <p class="ak-arquivo">01. Essentials 1 — Answer Key</p>
+    </a>
+
+    <a class="ak-card card" style="--accent:#15803D" target="_blank" rel="noopener"
+       data-ak="1OTzdal0SoP3hCzDe8Zzgs-WjhE7Fq0qD" data-titulo="Essentials 2 — Answer Key" id="ess2"
+       href="https://drive.google.com/file/d/1OTzdal0SoP3hCzDe8Zzgs-WjhE7Fq0qD/view">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 4.5A1.5 1.5 0 016.5 3H14l5 5v11.5a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 015 19.5v-15z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M13.8 3.2V8.2h5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M8.5 14.2l2 2 4.2-4.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>Essentials 2</h2>
+      <p class="ak-arquivo">02. Essentials 2 — Answer Key</p>
+    </a>
+
+    <a class="ak-card card" style="--accent:#B45309" target="_blank" rel="noopener"
+       data-ak="1Oabw2Cm3-f2BgVM_pm9A3FsZIgdpSLFR" data-titulo="Transitions 1 — Answer Key" id="tra1"
+       href="https://drive.google.com/file/d/1Oabw2Cm3-f2BgVM_pm9A3FsZIgdpSLFR/view">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 4.5A1.5 1.5 0 016.5 3H14l5 5v11.5a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 015 19.5v-15z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M13.8 3.2V8.2h5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M8.5 14.2l2 2 4.2-4.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>Transitions 1</h2>
+      <p class="ak-arquivo">03. Transitions 1 — Answer Key</p>
+    </a>
+
+    <a class="ak-card card" style="--accent:#B45309" target="_blank" rel="noopener"
+       data-ak="1OCuH8SkIFK4RMVrlDLvZRmKiFojXo7DJ" data-titulo="Transitions 2 — Answer Key" id="tra2"
+       href="https://drive.google.com/file/d/1OCuH8SkIFK4RMVrlDLvZRmKiFojXo7DJ/view">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 4.5A1.5 1.5 0 016.5 3H14l5 5v11.5a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 015 19.5v-15z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M13.8 3.2V8.2h5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M8.5 14.2l2 2 4.2-4.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>Transitions 2</h2>
+      <p class="ak-arquivo">04. Transitions 2 — Answer Key</p>
+    </a>
+
+    <a class="ak-card card" style="--accent:#4338CA" target="_blank" rel="noopener"
+       data-ak="1OEkYRLqmRWy6HBrll05uP4rIU5gbo7t-" data-titulo="Fluency 1 — Answer Key" id="flu1"
+       href="https://drive.google.com/file/d/1OEkYRLqmRWy6HBrll05uP4rIU5gbo7t-/view">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 4.5A1.5 1.5 0 016.5 3H14l5 5v11.5a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 015 19.5v-15z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M13.8 3.2V8.2h5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M8.5 14.2l2 2 4.2-4.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>Fluency 1</h2>
+      <p class="ak-arquivo">05. Fluency 1 — Answer Key</p>
+    </a>
+
+    <a class="ak-card card" style="--accent:#4338CA" target="_blank" rel="noopener"
+       data-ak="1O_ZWr5hcWdBbODlqx5roZZQh-9QAB-J5" data-titulo="Fluency 2 — Answer Key" id="flu2"
+       href="https://drive.google.com/file/d/1O_ZWr5hcWdBbODlqx5roZZQh-9QAB-J5/view">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 4.5A1.5 1.5 0 016.5 3H14l5 5v11.5a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 015 19.5v-15z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M13.8 3.2V8.2h5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M8.5 14.2l2 2 4.2-4.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>Fluency 2</h2>
+      <p class="ak-arquivo">06. Fluency 2 — Answer Key</p>
+    </a>
+
+    <a class="ak-card card" style="--accent:#7C3AED" target="_blank" rel="noopener"
+       data-ak="1Oad_6ykdOrHxUcMXd2AH8llGMyVLvz1V" data-titulo="In Focus — Answer Key" id="focus"
+       href="https://drive.google.com/file/d/1Oad_6ykdOrHxUcMXd2AH8llGMyVLvz1V/view">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 4.5A1.5 1.5 0 016.5 3H14l5 5v11.5a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 015 19.5v-15z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M13.8 3.2V8.2h5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M8.5 14.2l2 2 4.2-4.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>In Focus</h2>
+      <p class="ak-arquivo">07. In Focus — Answer Key</p>
+    </a>
+
+  </main>
+
+  <section class="ak-secao">
+    <h2>Espanhol</h2>
+    <p class="ak-sub">Claves — Inmediato</p>
+  </section>
+
+  <main class="grid boletins-grid ak-grid">
+
+    <a class="ak-card card" style="--accent:#CC7C08" target="_blank" rel="noopener"
+       data-ak="1YRFehGY-SaDn-jCXjaL8S3Jk1GMsUAm_" data-titulo="Inmediato 1 — Claves" id="inm1"
+       href="https://drive.google.com/file/d/1YRFehGY-SaDn-jCXjaL8S3Jk1GMsUAm_/view">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 4.5A1.5 1.5 0 016.5 3H14l5 5v11.5a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 015 19.5v-15z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M13.8 3.2V8.2h5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M8.5 14.2l2 2 4.2-4.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>Inmediato 1</h2>
+      <p class="ak-arquivo">05. Inmediato 1 — Claves</p>
+    </a>
+
+    <a class="ak-card card" style="--accent:#CC7C08" target="_blank" rel="noopener"
+       data-ak="1YXQjvUnFOosQBxhX28B53fPqzMf5cm6L" data-titulo="Inmediato 2 — Claves" id="inm2"
+       href="https://drive.google.com/file/d/1YXQjvUnFOosQBxhX28B53fPqzMf5cm6L/view">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 4.5A1.5 1.5 0 016.5 3H14l5 5v11.5a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 015 19.5v-15z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M13.8 3.2V8.2h5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M8.5 14.2l2 2 4.2-4.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>Inmediato 2</h2>
+      <p class="ak-arquivo">06. Inmediato 2 — Claves</p>
+    </a>
+
+    <a class="ak-card card" style="--accent:#CC7C08" target="_blank" rel="noopener"
+       data-ak="1YOYT007UoXOw46kMJ4ltH0-Xm240iaJ9" data-titulo="Inmediato 3 — Claves" id="inm3"
+       href="https://drive.google.com/file/d/1YOYT007UoXOw46kMJ4ltH0-Xm240iaJ9/view">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 4.5A1.5 1.5 0 016.5 3H14l5 5v11.5a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 015 19.5v-15z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M13.8 3.2V8.2h5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M8.5 14.2l2 2 4.2-4.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>Inmediato 3</h2>
+      <p class="ak-arquivo">07. Inmediato 3 — Claves</p>
+    </a>
+
+  </main>
+
+  <div class="ak-viewer" id="akViewer" hidden role="dialog" aria-modal="true" aria-label="Answer Key">
+    <div class="ak-bar">
+      <strong id="akTitulo"></strong>
+      <div class="ak-zoomctrl" role="group" aria-label="Zoom">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M15.4 15.4L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <button type="button" id="akZoomOut" title="Diminuir zoom (tecla −)" aria-label="Diminuir zoom">−</button>
+        <span id="akZoomPct">100%</span>
+        <button type="button" id="akZoomIn" title="Aumentar zoom (tecla +)" aria-label="Aumentar zoom">+</button>
+      </div>
+      <a id="akDrive" href="#" target="_blank" rel="noopener"><span class="ak-lbl">Abrir no Drive </span>↗</a>
+      <button type="button" id="akFechar" aria-label="Fechar">✕<span class="ak-lbl"> Fechar</span></button>
+    </div>
+    <div class="ak-palco" id="akPalco">
+      <!-- sandbox sem allow-top-navigation: sem ele, quando o professor não está
+           logado no Google, a tela de login do Drive sequestra a aba inteira e o
+           Hub some. Aqui ela fica presa dentro do quadro. -->
+      <iframe id="akFrame" title="Answer Key" allowfullscreen
+              sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-downloads"></iframe>
+    </div>
+    <p class="ak-aviso">Use o zoom da lupa para aproximar · se pedir login, entre com a sua conta Google da Fisk (a mesma do drive pedagógico)</p>
+  </div>
+
+  <footer>
+    <p>Ferramenta desenvolvida exclusivamente para uso interno das escolas Fisk. A utilização deste sistema e de seu conteúdo por pessoas ou instituições não autorizadas, incluindo professores particulares, é proibida. Desenvolvido por @fiskcacapava e @taubatefisk</p>
+  </footer>
+
+  <script src="assets/fisk-shared.js"></script>
+  <script>
+fiskInitThemeToggle('themeToggle');
+fiskInitUserMenu();
+fiskRegistrarUso("Answer Keys");
+
+(function () {
+  var viewer = document.getElementById('akViewer');
+  var frame  = document.getElementById('akFrame');
+  var titulo = document.getElementById('akTitulo');
+  var linkDr = document.getElementById('akDrive');
+  var palco  = document.getElementById('akPalco');
+  var pct    = document.getElementById('akZoomPct');
+  var btnMais  = document.getElementById('akZoomIn');
+  var btnMenos = document.getElementById('akZoomOut');
+  var cards  = document.querySelectorAll('.ak-card');
+  var aberto = '';
+
+  /* ── Zoom ────────────────────────────────────────────────────────────────
+     Em vez de esticar a imagem (transform), o iframe fica maior e o Drive
+     redesenha o PDF nesse tamanho — o texto cresce nítido. O palco vira a
+     área de rolagem. */
+  var ZOOMS = [1, 1.25, 1.5, 1.75, 2, 2.5, 3];
+  var zi = 0, baseW = 0, baseH = 0;
+
+  function medirBase() {
+    frame.style.width = '100%';
+    frame.style.height = '100%';
+    baseW = palco.clientWidth;
+    baseH = palco.clientHeight;
+  }
+
+  function aplicarZoom() {
+    var z = ZOOMS[zi];
+    if (z === 1) {
+      frame.style.width = '100%';
+      frame.style.height = '100%';
+    } else {
+      frame.style.width = Math.round(baseW * z) + 'px';
+      frame.style.height = Math.round(baseH * z) + 'px';
+    }
+    pct.textContent = Math.round(z * 100) + '%';
+    btnMenos.disabled = (zi === 0);
+    btnMais.disabled = (zi === ZOOMS.length - 1);
+    /* documento centralizado: ao aproximar, o interesse está no meio da página */
+    palco.scrollLeft = Math.max(0, (palco.scrollWidth - palco.clientWidth) / 2);
+  }
+
+  function zoom(passo) {
+    var novo = zi + passo;
+    if (novo < 0 || novo >= ZOOMS.length) return;
+    zi = novo;
+    aplicarZoom();
+  }
+
+  btnMais.addEventListener('click', function () { zoom(1); });
+  btnMenos.addEventListener('click', function () { zoom(-1); });
+  window.addEventListener('resize', function () {
+    if (viewer.hidden) return;
+    medirBase();
+    aplicarZoom();
+  });
+
+  function abrir(card) {
+    var id = card.getAttribute('data-ak');
+    aberto = card.id;
+    titulo.textContent = card.getAttribute('data-titulo');
+    linkDr.href = 'https://drive.google.com/file/d/' + id + '/view';
+    frame.src = 'https://drive.google.com/file/d/' + id + '/preview';
+    viewer.hidden = false;
+    document.body.style.overflow = 'hidden';
+    zi = 0;
+    medirBase();
+    aplicarZoom();
+    /* hash na URL: o professor consegue mandar o link de um gabarito específico */
+    if (location.hash !== '#' + aberto) history.replaceState(null, '', '#' + aberto);
+    document.getElementById('akFechar').focus();
+  }
+
+  function fechar() {
+    viewer.hidden = true;
+    frame.src = 'about:blank';   /* solta o PDF da memória e para o carregamento */
+    document.body.style.overflow = '';
+    if (aberto) {
+      var volta = document.getElementById(aberto);
+      history.replaceState(null, '', location.pathname + location.search);
+      if (volta) volta.focus();
+      aberto = '';
+    }
+  }
+
+  for (var i = 0; i < cards.length; i++) {
+    cards[i].addEventListener('click', function (ev) {
+      /* deixa passar ctrl/cmd//meio-clique: quem quer outra aba, tem outra aba */
+      if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button !== 0) return;
+      ev.preventDefault();
+      abrir(this);
+    });
+  }
+
+  document.getElementById('akFechar').addEventListener('click', fechar);
+  document.addEventListener('keydown', function (ev) {
+    if (viewer.hidden) return;
+    if (ev.key === 'Escape') { fechar(); return; }
+    /* atalhos valem enquanto o foco está no Hub; depois de clicar dentro do PDF
+       o teclado passa a ser do Drive — por isso os botões da lupa existem */
+    if (ev.key === '+' || ev.key === '=') { ev.preventDefault(); zoom(1); }
+    else if (ev.key === '-' || ev.key === '_') { ev.preventDefault(); zoom(-1); }
+    else if (ev.key === '0') { ev.preventDefault(); zi = 0; aplicarZoom(); }
+  });
+
+  /* ctrl/⌘ + roda sobre as bordas do palco também aproxima (o gesto que o
+     professor já usa no navegador) */
+  palco.addEventListener('wheel', function (ev) {
+    if (!ev.ctrlKey && !ev.metaKey) return;
+    ev.preventDefault();
+    zoom(ev.deltaY < 0 ? 1 : -1);
+  }, { passive: false });
+
+  /* link direto: answer-keys.html#tra2 já abre o gabarito de Transitions 2 */
+  if (location.hash.length > 1) {
+    var alvo = document.getElementById(location.hash.slice(1));
+    if (alvo && alvo.classList.contains('ak-card')) abrir(alvo);
+  }
+})();
+  </script>
+</body>
+</html>
