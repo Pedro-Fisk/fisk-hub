@@ -11,12 +11,19 @@
  *   · Cada atividade paga a base uma única vez; teto diário de F$ 300
  *   · Começa do zero: nada retroativo.
  *
+ * Bônus de acesso (29/07/2026):
+ *   · F$ 5 só por entrar no portal, para premiar o hábito de voltar
+ *   · No máximo 3 vezes por dia, com 3h de intervalo entre uma e outra
+ *     (senão bastaria sair e entrar de novo para imprimir dinheiro)
+ *   · Vem junto com o check-in: no 1º acesso do dia o aluno leva 5 + 5
+ *
  * Planilhas (criadas automaticamente na primeira execução):
  *   _carteira   → RAF | Saldo | Atualizado
  *   _extrato    → Quando | RAF | Atividade | Tipo | Detalhe | Valor | Saldo
  *   _progresso  → RAF | Atividade | MelhorPct | BasePaga
  *   _streak     → RAF | Dias | Recorde | UltimoDia
  *   _conquistas → RAF | Badge | Quando
+ *   _acessos    → RAF | Dia | VezesHoje | Ultimo
  *
  * ── INTEGRAÇÃO (fisk-hub-backend) ────────────────────────────────────────
  * 1. Cole este arquivo no projeto do Apps Script.
@@ -40,6 +47,9 @@ var FD = {
   CONCLUSAO: 30,         // primeira vez que fecha a atividade
   MELHORA_POR_PP: 1,     // por ponto percentual de melhora ao refazer
   CHECKIN: 5,            // check-in diário
+  ACESSO: 5,             // só por entrar no portal
+  ACESSO_INTERVALO_H: 3, // horas mínimas entre dois acessos pagos
+  ACESSO_MAX_DIA: 3,     // quantas entradas pagam por dia (manhã/tarde/noite)
   // bônus extra nos marcos da sequência (dias seguidos → F$)
   MARCOS: { 3: 10, 5: 15, 7: 25, 14: 40, 30: 100 },
   // 1 = dias estritamente consecutivos. Suba para 2/3 se quiser tolerar
@@ -123,6 +133,42 @@ function fdStreakDe_(raf) {
   return { dias: 0, recorde: 0, ultimo: '' };
 }
 
+/**
+ * Bônus por entrar no portal — o "pouquinho" que o aluno leva só por aparecer.
+ * Paga FD.ACESSO no máximo FD.ACESSO_MAX_DIA vezes ao dia, exigindo
+ * FD.ACESSO_INTERVALO_H horas entre uma entrada paga e a seguinte: o que
+ * queremos premiar é voltar ao portal, não clicar em sair e entrar de novo.
+ * Roda dentro do lock do check-in — não chamar por fora sem lock.
+ */
+function fdAcesso_(raf, hoje) {
+  var sh = fdSheet_('_acessos', ['RAF', 'Dia', 'VezesHoje', 'Ultimo']);
+  var vals = sh.getDataRange().getValues();
+  var row = -1, dia = '', vezes = 0, ultimo = 0;
+  for (var i = 1; i < vals.length; i++) {
+    if (String(vals[i][0]).trim() === raf) {
+      row = i + 1;
+      dia = String(vals[i][1] || '');
+      vezes = Number(vals[i][2]) || 0;
+      ultimo = vals[i][3] ? new Date(vals[i][3]).getTime() : 0;
+      break;
+    }
+  }
+  if (dia !== hoje) vezes = 0;            // virou o dia → a contagem recomeça
+  if (vezes >= FD.ACESSO_MAX_DIA) return { credito: 0, vezes: vezes };
+  var agora = new Date();
+  if (ultimo && (agora.getTime() - ultimo) < FD.ACESSO_INTERVALO_H * 36e5) {
+    return { credito: 0, vezes: vezes };  // ainda dentro do intervalo
+  }
+  var r = fdCredita_(raf, 'acesso:' + hoje, 'acesso',
+    'entrada no portal (' + (vezes + 1) + 'ª de ' + FD.ACESSO_MAX_DIA + ' hoje)', FD.ACESSO);
+  // se o teto diário comeu o crédito, não gasta a vez nem começa o intervalo
+  if (r.credito <= 0) return { credito: 0, vezes: vezes };
+  vezes++;
+  if (row < 0) sh.appendRow([raf, hoje, vezes, agora]);
+  else sh.getRange(row, 2, 1, 3).setValues([[hoje, vezes, agora]]);
+  return { credito: r.credito, vezes: vezes };
+}
+
 /** Conquistas do aluno + avaliação de novas (grava as que desbloqueou). */
 function fdAvaliaBadges_(raf) {
   var sh = fdSheet_('_conquistas', ['RAF', 'Badge', 'Quando']);
@@ -196,7 +242,11 @@ function fdWallet_(raf) {
   return { ok: true, saldo: saldo, extrato: linhas, streak: { dias: streak.dias, recorde: streak.recorde }, badges: badges.todas };
 }
 
-/** Check-in diário: mantém a sequência e paga o bônus do dia. Idempotente. */
+/**
+ * Check-in diário: mantém a sequência e paga o bônus do dia. Idempotente.
+ * Paga também o bônus de acesso, que pode cair em entradas seguintes do
+ * mesmo dia — por isso o portal chama isto em TODA entrada, não só na 1ª.
+ */
 function fdCheckin_(raf) {
   raf = String(raf || '').trim();
   if (!raf) return { ok: false, error: 'RAF vazio' };
@@ -225,6 +275,7 @@ function fdCheckin_(raf) {
       var r = fdCredita_(raf, 'checkin:' + hoje, 'check-in', detalhe, credito);
       credito = r.credito;
     }
+    var acesso = fdAcesso_(raf, hoje);
     var badges = fdAvaliaBadges_(raf);
     var cart = fdSheet_('_carteira', ['RAF', 'Saldo', 'Atualizado']);
     var cvals = cart.getDataRange().getValues();
@@ -232,7 +283,7 @@ function fdCheckin_(raf) {
     for (var k = 1; k < cvals.length; k++) {
       if (String(cvals[k][0]).trim() === raf) { saldo = Number(cvals[k][1]) || 0; break; }
     }
-    return { ok: true, credito: credito, saldo: saldo, streak: { dias: dias, recorde: recorde }, badges: badges.todas, novasBadges: badges.novas };
+    return { ok: true, credito: credito, acesso: acesso, saldo: saldo, streak: { dias: dias, recorde: recorde }, badges: badges.todas, novasBadges: badges.novas };
   } finally {
     lock.releaseLock();
   }
