@@ -31,7 +31,24 @@
  *        fd = fdEarn_(body.data.raf, body.tool + ':' + (body.data.s || ''), Number(body.data.c || 0), Number(body.data.q || 0));
  *      }
  *      // ...inclua `fd: fd` no JSON que essa rota já devolve.
- * 5. Nova implantação do Web App (mesma URL).
+ * 5. PAINEL DA DIREÇÃO (carteiras): as três rotas abaixo mexem no saldo dos
+ *    alunos, então TÊM de ficar atrás da sessão de diretor. Cole no doPost,
+ *    trocando `dirCheck_` pelo validador de sessão que este backend já usa
+ *    na rota 'dirCheck' — o texto "Sessão" no erro é o que faz o painel
+ *    deslogar sozinho quando o token vence:
+ *
+ *      if (body.action === 'dirFdSaldos' || body.action === 'dirFdSet' ||
+ *          body.action === 'dirFdReset'  || body.action === 'dirFdResetTudo') {
+ *        var dir = dirCheck_(String(body.token || ''));
+ *        if (!dir || !dir.ok) return fdJson_({ ok: false, error: 'Sessão expirada — entre de novo.' });
+ *        if (body.action === 'dirFdSaldos')    return fdJson_(fdDirSaldos_());
+ *        if (body.action === 'dirFdSet')       return fdJson_(fdDirSet_(String(body.raf || ''), body.saldo, String(body.motivo || '')));
+ *        if (body.action === 'dirFdReset')     return fdJson_(fdDirReset_(String(body.raf || '')));
+ *        if (body.action === 'dirFdResetTudo') return fdJson_(fdDirResetTudo_());
+ *      }
+ *
+ * 6. Nova implantação do Web App (EDITAR a implantação existente, para a URL
+ *    não mudar — nunca criar outra).
  */
 
 var FD = {
@@ -74,7 +91,9 @@ function fdHoje_() {
   return Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
 }
 
-/** Soma creditada HOJE (para o teto diário). O extrato é cronológico. */
+/** Soma creditada HOJE (para o teto diário). O extrato é cronológico.
+ *  Ajustes da direção ficam de fora: o teto mede o que o ALUNO ganhou no dia,
+ *  e um ajuste negativo não pode virar "crédito sobrando" para ele. */
 function fdGanhoHoje_(raf) {
   var ext = fdSheet_('_extrato', ['Quando', 'RAF', 'Atividade', 'Tipo', 'Detalhe', 'Valor', 'Saldo']);
   var evals = ext.getDataRange().getValues();
@@ -82,6 +101,7 @@ function fdGanhoHoje_(raf) {
   var hoje = 0;
   for (var j = evals.length - 1; j >= 1; j--) {
     if (new Date(evals[j][0]) < d0) break;
+    if (String(evals[j][3]) === 'ajuste') continue;
     if (String(evals[j][1]).trim() === raf) hoje += Number(evals[j][5]) || 0;
   }
   return hoje;
@@ -280,6 +300,150 @@ function fdEarn_(raf, activityId, correct, total) {
     r = fdCredita_(raf, activityId, tipo, detalhe.join(' · '), credito);
     var badges = fdAvaliaBadges_(raf);
     return { ok: true, credito: r.credito, saldo: r.saldo, detalhe: detalhe.join(' · '), novasBadges: badges.novas };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PAINEL DA DIREÇÃO — manutenção das carteiras
+
+   Para que serve: durante os testes do portal a direção entra com o RAF de
+   alunos reais, e o que ela ganha testando fica no nome do aluno. Antes de
+   começar o semestre isso precisa sair.
+
+   Zerar o SALDO não basta. A aba _progresso guarda "BasePaga = sim" por
+   atividade, e é ela que impede pagar a mesma atividade duas vezes. Se só o
+   saldo for zerado, o aluno faz a atividade de verdade no primeiro dia de
+   aula e não recebe nada — a base já consta como paga pelo teste. Por isso
+   fdDirReset_ apaga as CINCO abas do aluno (carteira, extrato, progresso,
+   streak e conquistas): ele volta a ser um aluno que nunca usou o portal.
+
+   Ajuste de saldo (fdDirSet_) é outra coisa: mexe só no número, mantém o
+   histórico e deixa a linha do ajuste no extrato, para a conta fechar depois.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+var FD_ABAS = [
+  { nome: '_carteira',   cab: ['RAF', 'Saldo', 'Atualizado'],                                        col: 0 },
+  { nome: '_extrato',    cab: ['Quando', 'RAF', 'Atividade', 'Tipo', 'Detalhe', 'Valor', 'Saldo'],   col: 1 },
+  { nome: '_progresso',  cab: ['RAF', 'Atividade', 'MelhorPct', 'BasePaga'],                         col: 0 },
+  { nome: '_streak',     cab: ['RAF', 'Dias', 'Recorde', 'UltimoDia'],                               col: 0 },
+  { nome: '_conquistas', cab: ['RAF', 'Badge', 'Quando'],                                            col: 0 }
+];
+
+/** Apaga, de baixo para cima, as linhas de um RAF numa aba. Devolve quantas. */
+function fdApagaLinhas_(aba, raf) {
+  var sh = fdSheet_(aba.nome, aba.cab);
+  var vals = sh.getDataRange().getValues();
+  var n = 0;
+  for (var i = vals.length - 1; i >= 1; i--) {
+    if (String(vals[i][aba.col]).trim() === raf) { sh.deleteRow(i + 1); n++; }
+  }
+  return n;
+}
+
+/** Uma linha por aluno com carteira: saldo + o tamanho do rastro dos testes. */
+function fdDirSaldos_() {
+  var carteira = fdSheet_('_carteira', FD_ABAS[0].cab).getDataRange().getValues();
+  var mapa = {}, ordem = [];
+  for (var i = 1; i < carteira.length; i++) {
+    var raf = String(carteira[i][0]).trim();
+    if (!raf) continue;
+    if (!mapa[raf]) { mapa[raf] = { raf: raf, saldo: 0, atualizado: null, eventos: 0, atividades: 0, badges: 0, dias: 0, recorde: 0 }; ordem.push(raf); }
+    mapa[raf].saldo = Number(carteira[i][1]) || 0;
+    mapa[raf].atualizado = carteira[i][2] ? new Date(carteira[i][2]).getTime() : null;
+  }
+  function conta(aba, campo) {
+    var vals = fdSheet_(aba.nome, aba.cab).getDataRange().getValues();
+    for (var j = 1; j < vals.length; j++) {
+      var r = String(vals[j][aba.col]).trim();
+      if (!r) continue;
+      if (!mapa[r]) { mapa[r] = { raf: r, saldo: 0, atualizado: null, eventos: 0, atividades: 0, badges: 0, dias: 0, recorde: 0 }; ordem.push(r); }
+      mapa[r][campo]++;
+    }
+  }
+  conta(FD_ABAS[1], 'eventos');
+  conta(FD_ABAS[2], 'atividades');
+  conta(FD_ABAS[4], 'badges');
+
+  var streak = fdSheet_('_streak', FD_ABAS[3].cab).getDataRange().getValues();
+  for (var s = 1; s < streak.length; s++) {
+    var rs = String(streak[s][0]).trim();
+    if (mapa[rs]) { mapa[rs].dias = Number(streak[s][1]) || 0; mapa[rs].recorde = Number(streak[s][2]) || 0; }
+  }
+  var lista = ordem.map(function (r) { return mapa[r]; })
+                   .sort(function (a, b) { return b.saldo - a.saldo; });
+  return { ok: true, carteiras: lista, total: lista.length };
+}
+
+/** Define o saldo exato de um aluno, deixando o ajuste registrado no extrato. */
+function fdDirSet_(raf, saldo, motivo) {
+  raf = String(raf || '').trim();
+  var novo = Math.round(Number(saldo));
+  if (!raf) return { ok: false, error: 'Informe o RAF do aluno.' };
+  if (!isFinite(novo) || novo < 0) return { ok: false, error: 'Saldo inválido — use um número igual ou maior que zero.' };
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var cart = fdSheet_('_carteira', FD_ABAS[0].cab);
+    var vals = cart.getDataRange().getValues();
+    var row = -1, antes = 0;
+    for (var i = 1; i < vals.length; i++) {
+      if (String(vals[i][0]).trim() === raf) { row = i + 1; antes = Number(vals[i][1]) || 0; break; }
+    }
+    if (row < 0) cart.appendRow([raf, novo, new Date()]);
+    else cart.getRange(row, 2, 1, 2).setValues([[novo, new Date()]]);
+
+    var delta = novo - antes;
+    if (delta !== 0) {
+      fdSheet_('_extrato', FD_ABAS[1].cab)
+        .appendRow([new Date(), raf, 'ajuste-direcao', 'ajuste',
+                    (motivo || 'ajuste manual da direção') + ' · de F$ ' + antes + ' para F$ ' + novo,
+                    delta, novo]);
+    }
+    return { ok: true, raf: raf, antes: antes, saldo: novo, delta: delta };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** Apaga TUDO de um aluno nas cinco abas — ele volta a nunca ter usado. */
+function fdDirReset_(raf) {
+  raf = String(raf || '').trim();
+  if (!raf) return { ok: false, error: 'Informe o RAF do aluno.' };
+  var lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    var apagadas = {};
+    for (var i = 0; i < FD_ABAS.length; i++) {
+      apagadas[FD_ABAS[i].nome] = fdApagaLinhas_(FD_ABAS[i], raf);
+    }
+    return { ok: true, raf: raf, apagadas: apagadas };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** Zera a economia inteira: esvazia as cinco abas, preservando o cabeçalho. */
+function fdDirResetTudo_() {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    var apagadas = {}, alunos = {};
+    for (var i = 0; i < FD_ABAS.length; i++) {
+      var aba = FD_ABAS[i];
+      var sh = fdSheet_(aba.nome, aba.cab);
+      var vals = sh.getDataRange().getValues();
+      for (var j = 1; j < vals.length; j++) {
+        var r = String(vals[j][aba.col]).trim();
+        if (r) alunos[r] = 1;
+      }
+      var n = sh.getLastRow() - 1;
+      if (n > 0) sh.deleteRows(2, n);
+      apagadas[aba.nome] = Math.max(0, n);
+    }
+    return { ok: true, apagadas: apagadas, alunos: Object.keys(alunos).length };
   } finally {
     lock.releaseLock();
   }
