@@ -265,7 +265,7 @@
 
     <!-- O professor precisa ver a plataforma pelos olhos do aluno: é assim que
          ele orienta a turma a usá-la. Abre em aba nova (outro domínio). -->
-    <a class="card card-portal" href="https://portal-aluno-fisk.vercel.app/" target="_blank" rel="noopener">
+    <a class="card card-portal" href="https://portalfisk.com.br/" target="_blank" rel="noopener">
       <div class="icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="2.5" y="4" width="19" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/>
@@ -1121,7 +1121,7 @@
         var era = saved();
         try{ localStorage.removeItem('fisk_prof'); localStorage.removeItem('fisk_actas'); localStorage.removeItem('fisk_minidash'); }catch(e){}
         // saindo de uma visita da direção: volta para o Painel da Direção
-        if (era && era.viewingAs){ location.href = 'https://portal-aluno-fisk.vercel.app/diretor.html'; return; }
+        if (era && era.viewingAs){ location.href = 'https://portalfisk.com.br/diretor.html'; return; }
         location.reload();
       });
 
