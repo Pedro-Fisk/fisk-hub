@@ -17,6 +17,10 @@
  *     (senão bastaria sair e entrar de novo para imprimir dinheiro)
  *   · Vem junto com o check-in: no 1º acesso do dia o aluno leva 5 + 5
  *
+ * Bônus avulsos (fdBonus_):
+ *   · F$ 30 por concluir o tour da home ('tour-portal'), uma vez por aluno
+ *   · Só paga bonusId que esteja em FD.BONUS — a rota é pública
+ *
  * Planilhas (criadas automaticamente na primeira execução):
  *   _carteira   → RAF | Saldo | Atualizado
  *   _extrato    → Quando | RAF | Atividade | Tipo | Detalhe | Valor | Saldo
@@ -24,6 +28,7 @@
  *   _streak     → RAF | Dias | Recorde | UltimoDia
  *   _conquistas → RAF | Badge | Quando
  *   _acessos    → RAF | Dia | VezesHoje | Ultimo
+ *   _bonus      → RAF | BonusId | Quando
  *
  * ── INTEGRAÇÃO (fisk-hub-backend) ────────────────────────────────────────
  * 1. Cole este arquivo no projeto do Apps Script.
@@ -32,6 +37,9 @@
  * 3. No doPost:
  *      if (body.action === 'fdEarn')    return fdJson_(fdEarn_(String(body.raf || ''), String(body.activityId || ''), Number(body.correct || 0), Number(body.total || 0)));
  *      if (body.action === 'fdCheckin') return fdJson_(fdCheckin_(String(body.raf || '')));
+ *      if (body.action === 'fdBonus')   return fdJson_(fdBonus_(String(body.raf || ''), String(body.bonusId || '')));
+ *    ⚠ Esta última faltava: o portal já chamava 'fdBonus' desde o tour, e sem
+ *      ela o bônus de boas-vindas nunca foi pago (o portal engole o erro).
  * 4. ONDE O RESULTADO DE QP/MET É SALVO (após validar appKey):
  *      var fd = null;
  *      if (body.data && body.data.raf && body.data.q) {
@@ -50,6 +58,9 @@ var FD = {
   ACESSO: 5,             // só por entrar no portal
   ACESSO_INTERVALO_H: 3, // horas mínimas entre dois acessos pagos
   ACESSO_MAX_DIA: 3,     // quantas entradas pagam por dia (manhã/tarde/noite)
+  // bônus avulsos, pagos uma única vez por aluno. A chave é o bonusId que o
+  // portal manda; id fora desta lista não paga nada (a rota é pública).
+  BONUS: { 'tour-portal': 30 },
   // bônus extra nos marcos da sequência (dias seguidos → F$)
   MARCOS: { 3: 10, 5: 15, 7: 25, 14: 40, 30: 100 },
   // 1 = dias estritamente consecutivos. Suba para 2/3 se quiser tolerar
@@ -97,11 +108,15 @@ function fdGanhoHoje_(raf) {
   return hoje;
 }
 
-/** Escreve um crédito (aplica teto diário) e devolve {credito, saldo}. */
-function fdCredita_(raf, atividade, tipo, detalhe, valor) {
+/**
+ * Escreve um crédito (aplica teto diário) e devolve {credito, saldo}.
+ * ignoraTeto: só para bônus pagos uma vez na vida, que não dá para farmar e
+ * que o aluno perderia para sempre se caíssem num dia de teto cheio.
+ */
+function fdCredita_(raf, atividade, tipo, detalhe, valor, ignoraTeto) {
   valor = Math.max(0, Math.round(Number(valor) || 0));
-  var hoje = fdGanhoHoje_(raf);
-  if (valor > 0 && hoje + valor > FD.TETO_DIARIO) {
+  var hoje = ignoraTeto ? 0 : fdGanhoHoje_(raf);
+  if (!ignoraTeto && valor > 0 && hoje + valor > FD.TETO_DIARIO) {
     valor = Math.max(0, FD.TETO_DIARIO - hoje);
     detalhe = (detalhe ? detalhe + ' · ' : '') + 'teto diário aplicado';
   }
@@ -284,6 +299,47 @@ function fdCheckin_(raf) {
       if (String(cvals[k][0]).trim() === raf) { saldo = Number(cvals[k][1]) || 0; break; }
     }
     return { ok: true, credito: credito, acesso: acesso, saldo: saldo, streak: { dias: dias, recorde: recorde }, badges: badges.todas, novasBadges: badges.novas };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/**
+ * Bônus avulso, pago uma única vez por aluno (dedupe por RAF + bonusId).
+ * Hoje só o 'tour-portal' (boas-vindas por concluir o tour da home), mas serve
+ * para qualquer bônus pontual que a gente queira lançar depois.
+ * Devolve {ok, credito, saldo} — credito 0 quando já havia sido pago.
+ */
+function fdBonus_(raf, bonusId) {
+  raf = String(raf || '').trim();
+  bonusId = String(bonusId || '').trim();
+  if (!raf || !bonusId) return { ok: false, error: 'dados incompletos' };
+  var valor = FD.BONUS[bonusId];
+  // id desconhecido não paga: qualquer um pode chamar esta rota
+  if (!valor) return { ok: false, error: 'bônus desconhecido' };
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var sh = fdSheet_('_bonus', ['RAF', 'BonusId', 'Quando']);
+    var vals = sh.getDataRange().getValues();
+    var saldo = 0, i;
+    for (i = 1; i < vals.length; i++) {
+      if (String(vals[i][0]).trim() === raf && String(vals[i][1]).trim() === bonusId) {
+        // já pago: devolve o saldo atual, sem creditar de novo
+        var cart = fdSheet_('_carteira', ['RAF', 'Saldo', 'Atualizado']).getDataRange().getValues();
+        for (var k = 1; k < cart.length; k++) {
+          if (String(cart[k][0]).trim() === raf) { saldo = Number(cart[k][1]) || 0; break; }
+        }
+        return { ok: true, credito: 0, saldo: saldo };
+      }
+    }
+    // fora do teto diário de propósito: é uma vez na vida, não dá para farmar,
+    // e cair num dia de teto cheio faria o aluno perder o bônus para sempre
+    var r = fdCredita_(raf, 'bonus:' + bonusId, 'bônus', 'bônus avulso · ' + bonusId, valor, true);
+    sh.appendRow([raf, bonusId, new Date()]);
+    var badges = fdAvaliaBadges_(raf);
+    return { ok: true, credito: r.credito, saldo: r.saldo, novasBadges: badges.novas };
   } finally {
     lock.releaseLock();
   }
