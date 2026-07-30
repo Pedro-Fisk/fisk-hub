@@ -91,6 +91,22 @@ function fdHoje_() {
   return Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
 }
 
+/**
+ * Dia gravado na planilha, sempre como texto 'yyyy-MM-dd'.
+ *
+ * O Sheets converte sozinho a string '2026-07-28' numa data de verdade ao
+ * gravar. Na leitura seguinte voltava um Date, e String(Date) é
+ * "Tue Jul 28 2026 00:00:00 GMT-0300 (...)" — que nunca é igual a
+ * '2026-07-28'. Resultado: o check-in achava que o aluno não tinha entrado
+ * hoje e pagava de novo A CADA acesso, subindo a sequência junto (foi assim
+ * que um aluno chegou a "sequência de 16" em três dias). Normalizando na
+ * leitura, o valor antigo e o novo passam a comparar igual.
+ */
+function fdDiaTexto_(v) {
+  if (v instanceof Date) return Utilities.formatDate(v, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  return String(v == null ? '' : v).trim();
+}
+
 /** Soma creditada HOJE (para o teto diário). O extrato é cronológico.
  *  Ajustes da direção ficam de fora: o teto mede o que o ALUNO ganhou no dia,
  *  e um ajuste negativo não pode virar "crédito sobrando" para ele. */
@@ -137,7 +153,7 @@ function fdStreakDe_(raf) {
   var vals = sh.getDataRange().getValues();
   for (var i = 1; i < vals.length; i++) {
     if (String(vals[i][0]).trim() === raf) {
-      return { dias: Number(vals[i][1]) || 0, recorde: Number(vals[i][2]) || 0, ultimo: String(vals[i][3] || '') };
+      return { dias: Number(vals[i][1]) || 0, recorde: Number(vals[i][2]) || 0, ultimo: fdDiaTexto_(vals[i][3]) };
     }
   }
   return { dias: 0, recorde: 0, ultimo: '' };
@@ -228,7 +244,7 @@ function fdCheckin_(raf) {
     var row = -1, dias = 0, recorde = 0, ultimo = '';
     for (var i = 1; i < vals.length; i++) {
       if (String(vals[i][0]).trim() === raf) {
-        row = i + 1; dias = Number(vals[i][1]) || 0; recorde = Number(vals[i][2]) || 0; ultimo = String(vals[i][3] || '');
+        row = i + 1; dias = Number(vals[i][1]) || 0; recorde = Number(vals[i][2]) || 0; ultimo = fdDiaTexto_(vals[i][3]);
         break;
       }
     }
