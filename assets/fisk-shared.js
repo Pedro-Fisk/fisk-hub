@@ -66,7 +66,7 @@ function fiskInitBeforeUnloadGuard(hasUnsavedChangesFn) {
 /* ============================================================
    SALVAR PDF NO DRIVE (pasta da turma / do aluno)
    Faz POST do PDF (base64) para o mesmo App da Web do card (API_URL).
-   O Apps Script (ver apps-script/salvar-no-drive.gs) localiza a pasta
+   O Apps Script (ver apps-script/Code.gs, em `salvarPdfNoDrive`) localiza a pasta
    por NOME no drive compartilhado e grava o arquivo; se não achar,
    devolve code:'pasta_nao_encontrada' e o professor é avisado.
    ============================================================ */
@@ -74,7 +74,7 @@ function fiskInitBeforeUnloadGuard(hasUnsavedChangesFn) {
 /* URL do App da Web do endpoint de salvamento — projeto Apps Script SEPARADO
    "fisk-hub-backend" (script 1AlWF9j-…, o mesmo backend do Portal do Aluno),
    NÃO é o API_URL do card. O handler mora no doPost de lá, em `salvarPdfNoDrive`
-   (fonte documentada: apps-script/salvar-no-drive.gs). */
+   (fonte documentada: apps-script/Code.gs). */
 var FISK_SAVE_URL = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
 
 /** Converte um Uint8Array em base64 (em blocos, evita estourar a pilha). */
@@ -146,7 +146,7 @@ async function fiskEnviarParaPasta(buttonEl, getOpts) {
     buttonEl.textContent = old; buttonEl.disabled = false;
     var ondeAlvo = (opts && opts.tipo === 'turma') ? 'da turma' : 'do aluno';
     if (e.code === 'sem_endpoint') {
-      alert('⚙️ O salvamento no Drive ainda não foi configurado.\n\nPublique o endpoint (apps-script/salvar-no-drive.gs) e cole a URL em FISK_SAVE_URL (assets/fisk-shared.js).');
+      alert('⚙️ O salvamento no Drive ainda não foi configurado.\n\nPublique o endpoint (apps-script/Code.gs) e cole a URL em FISK_SAVE_URL (assets/fisk-shared.js).');
     } else if (e.code === 'pasta_nao_encontrada') {
       alert('⚠️ ATENÇÃO: a pasta ' + ondeAlvo + ' NÃO foi encontrada no drive compartilhado.\n\n' +
             'O documento NÃO foi salvo. Baixe o PDF manualmente (botão de gerar/baixar) ou ' +
