@@ -27,6 +27,7 @@ Cinco blocos:
 | 📞 **Fila de atendimento** | Quem está com faltas altas (padrão ≥ 30%) ou atraso de conteúdo (padrão ≥ 4 aulas, o gatilho do termo de atraso), com telefone, botão de WhatsApp e registro de "liguei / não atendeu / retornar em". |
 | ➕ **Matrícula e ⛔ baixa** | Matrícula preenche a primeira linha livre da turma no card e cria a pasta do aluno no Drive. Baixa (desistência, trancamento, transferência para fora) desmarca o ATIVO, grava o motivo e leva a pasta para "Alunos transferidos". |
 | 🧾 **Movimentações** | Log de tudo, com quem fez e quando. Transferência tem botão de desfazer. |
+| 🧩 **Padronização dos cards** | Só direção. Mostra, aba por aba, onde cada escola foge do padrão canônico de colunas, e alinha a planilha pelo Apps Script — com backup obrigatório e simulação antes. Ver `padronizacao-dos-cards.md`. |
 
 ---
 
@@ -38,9 +39,18 @@ Abrir no Chrome, **conta `/u/1`**:
 https://script.google.com/u/1/home/projects/1AlWF9j-indNvmh_A3Jk9k28mCC3uhF8eP_dj7C74BzX1wauT3b1VGFTm/edit
 ```
 
-**1a.** Com o `Code.gs` aberto: **Ctrl+End**, Enter, e colar o conteúdo inteiro de
-`fisk-hub/apps-script/painel-secretaria.gs`. O bloco é **aditivo** — não redefine
-nada. Ele reaproveita o que já está lá (`json`, `getProfs`, `acharProfLinha_`,
+**1a.** Com o `Code.gs` aberto: **Ctrl+End**, Enter, e colar **os dois** blocos,
+um depois do outro (a ordem entre eles não importa):
+
+1. `fisk-hub/apps-script/padronizacao-cards.gs` — a camada canônica de leitura
+   dos cards, a auditoria e o normalizador. **Este bloco também corrige um bug
+   que já está no ar**: o livro do aluno de Taubaté era lido da coluna errada,
+   e 142 dos 630 alunos da `_alunos` estavam sem estágio por causa disso. Ver
+   `padronizacao-dos-cards.md`. Ele redefine `syncRosterFromCards` de propósito
+   (em JavaScript a última declaração vence), então basta colar — não precisa
+   caçar e editar a versão antiga lá em cima.
+2. `fisk-hub/apps-script/painel-secretaria.gs` — o portal em si. Este é
+   **aditivo**: não redefine nada. Ele reaproveita o que já está lá (`json`, `getProfs`, `acharProfLinha_`,
 `hashSenha_`, `profPublico_`, `normNome`, `ehDiretor_`, `normRaf`, `CARD_IDS`,
 `lerGabaritoCard_`, `seqDoBookCard_`, `getAcessos`, `fdWallet_`, `rootDaEscola`,
 `acharPasta`, `acharTurmaPasta_`, `acharPastaDoAluno_`, `listarSubpastas_`,
@@ -145,6 +155,14 @@ só precisam ter o cargo ajustado.
   alguém comparar as duas listas e achar diferença, é por isso.
 - Aluno sem RAF aparece no card e no portal, mas fica sem saldo de Fisk Dólares e
   sem histórico de acesso — ele ainda não existe para o Portal do Aluno.
+
+## As duas escolas não montam o card igual
+
+Isso mereceu documento próprio: **`padronizacao-dos-cards.md`**. O resumo é que
+Caçapava usa 28 colunas de aluno e Taubaté 16, com `BOOK` e `Observação`
+trocadas de lugar entre as duas — e que o portal contorna isso lendo as colunas
+pelo NOME, com dicionário de sinônimos, em vez de por posição. Padronizar as
+planilhas é opcional: nada no sistema depende disso para funcionar.
 
 ## Como conferir o leitor do card sem subir nada
 

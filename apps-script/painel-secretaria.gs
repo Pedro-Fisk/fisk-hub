@@ -135,6 +135,13 @@ function secRota_(req) {
   if (acao === 'secCheck') return secCheck(req);
 
   return secGuard(req, function (r, quem) {
+    /* Padronização dos cards: só a direção. São as únicas ações que MOVEM
+       coluna na planilha da escola — não é trabalho de balcão. */
+    if (acao.indexOf('secPadroniza') === 0 || acao === 'secCardBackup' || acao === 'secNormalizarCard') {
+      if (!ehDiretor_(quem)) return json({ ok: false, error: 'Só a direção mexe na estrutura do card.' });
+      var resp = cardRota_(r, quem);
+      return json(resp || { ok: false, error: 'ação desconhecida: ' + acao });
+    }
     switch (acao) {
       /* leitura */
       case 'secBusca':      return json(secBusca_(r));
@@ -176,44 +183,35 @@ function secNorm_(s) {
 }
 
 /**
- * Mapeia as colunas do bloco pelos RÓTULOS, não por posição fixa.
- * Motivo: "Telefone" aparece DUAS vezes (aluno e responsável) e a única
- * coisa que as distingue é a linha de grupo logo acima ("ALUNO" /
- * "RESPONSÁVEL"). Ler por rótulo também sobrevive a uma coluna nova no
- * meio do card, que quebraria índices fixos calados.
+ * Mapeia as colunas do bloco. Quem faz o trabalho é o `cardMapa_` do
+ * padronizacao-cards.gs — o mesmo mapeador que a auditoria e o
+ * syncRosterFromCards usam, para que os três enxerguem o card do mesmo jeito.
+ *
+ * Aqui só se traduz o resultado para o formato que o resto deste arquivo
+ * espera, com -1 no lugar de "não existe". É por isso que o portal funciona
+ * nas duas escolas apesar de Taubaté chamar BOOK de "Livro" e ter a coluna
+ * numa posição diferente.
  */
 function secColunas_(rotulos, grupos) {
-  var c = { ativo: 1, nome: 2, status: 3, obs: 4, book: 5, bookComprado: 6, raf: 7,
-            nascimento: -1, idade: -1, anoEscolar: -1, email: -1, telAluno: -1,
-            respNome: -1, respTel: -1, respWhats: -1, ultimaAdm: 7 };
-  for (var i = 0; i < rotulos.length; i++) {
-    var r = secNorm_(rotulos[i]);
-    var g = secNorm_(grupos && grupos[i]);
-    if (!r) continue;
-    if (r === 'ativo') c.ativo = i;
-    else if (r === 'alunos') c.nome = i;
-    else if (r === 'status') c.status = i;
-    else if (r.indexOf('observ') === 0) c.obs = i;
-    else if (r.indexOf('book comprado') === 0) c.bookComprado = i;
-    else if (r === 'book') c.book = i;
-    else if (r === 'raf') c.raf = i;
-    else if (r.indexOf('data de nascimento') === 0) c.nascimento = i;
-    else if (r.indexOf('idade') === 0) c.idade = i;
-    else if (r.indexOf('ano escolar') === 0) c.anoEscolar = i;
-    else if (r.indexOf('email') === 0 || r.indexOf('e-mail') === 0) c.email = i;
-    else if (r.indexOf('telefone') === 0) {
-      if (g.indexOf('respons') >= 0) c.respTel = i; else c.telAluno = i;
-    } else if (r.indexOf('whatsapp') === 0) c.respWhats = i;
-    else if (r === 'nome' && g.indexOf('respons') >= 0) c.respNome = i;
-  }
+  var m = cardMapa_(rotulos, grupos).mapa;
+  function em(campo, padrao) { return m[campo] == null ? padrao : m[campo]; }
+
+  var c = {
+    ativo: em('ativo', 1), nome: em('nome', 2), status: em('status', 3),
+    obs: em('obs', 4), book: em('book', -1), bookComprado: em('bookComprado', -1),
+    raf: em('raf', 7), nascimento: em('nascimento', -1), idade: em('idade', -1),
+    anoEscolar: em('anoEscolar', -1), email: em('email', -1),
+    telAluno: em('telAluno', -1), respNome: em('respNome', -1),
+    respTel: em('respTel', -1), respWhats: em('respWhats', -1),
+    aditamento: em('aditamento', -1), ultimaAdm: 7
+  };
   /* Última coluna "administrativa": é até ela que a transferência copia a
      linha. Depois dela começa o cronograma, que é da TURMA (as datas de
      uma turma não valem para outra) e por isso nunca acompanha o aluno. */
   var fim = c.raf;
-  ['nascimento', 'idade', 'anoEscolar', 'email', 'telAluno',
-   'respNome', 'respTel', 'respWhats'].forEach(function (k) {
-    if (c[k] > fim) fim = c[k];
-  });
+  for (var k in c) {
+    if (c.hasOwnProperty(k) && k !== 'ultimaAdm' && c[k] > fim) fim = c[k];
+  }
   c.ultimaAdm = fim;
   return c;
 }
@@ -290,8 +288,15 @@ function secLerEscola_(escola) {
         var nome = String(vals[k][cols.nome] || '').trim();
         if (!nome) { turma.vagas.push(k + 1); continue; }
 
-        var book = String(vals[k][cols.book] || '').trim();
-        var raf  = String(vals[k][cols.raf] || '').trim();
+        var book = cols.book < 0 ? '' : String(vals[k][cols.book] || '').trim();
+        /* Turma que só tem "Livro a ser comprado para o 2º sem" no lugar do
+           BOOK: é esse o livro que vale. Sem isso o aluno fica sem estágio,
+           e sem estágio ele some da escada de níveis do Portal do Aluno. */
+        if (!book && cols.bookComprado >= 0) {
+          var alt = String(vals[k][cols.bookComprado] || '').trim();
+          if (alt && alt.toLowerCase() !== 'true' && alt.toLowerCase() !== 'false') book = alt;
+        }
+        var raf  = cols.raf < 0 ? '' : String(vals[k][cols.raf] || '').trim();
         var celulas = vals[k].slice(grade.ini, grade.fim).map(function (v) {
           return String(v == null ? '' : v).trim();
         });
