@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Termo de Atraso — FISK</title>
+<title>Termo de Atraso, FISK</title>
 <link rel="stylesheet" href="assets/fisk-shared.css">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
@@ -81,7 +81,7 @@
   <a class="back-link" href="index.html">&larr; Voltar aos recursos</a>
   <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
   <h1>Termo de Atraso</h1>
-  <p>Comunicado de atraso no plano de curso — gerado com os dados vivos do card</p>
+  <p>Comunicado de atraso no plano de curso, gerado com os dados vivos do card</p>
 </header>
 
 <main>
@@ -115,7 +115,7 @@
   </section>
 
   <section class="painel" hidden id="painelSituacao">
-    <h2>📊 Situação do aluno <span class="aviso">(calculada automaticamente — ajuste se precisar)</span></h2>
+    <h2>📊 Situação do aluno <span class="aviso">(calculada automaticamente, ajuste se precisar)</span></h2>
     <div class="metricas">
       <div class="metrica" id="mAtraso"><b>–</b><span>aulas de atraso</span></div>
       <div class="metrica" id="mFaltas"><b>–</b><span>faltas</span></div>
@@ -271,14 +271,14 @@ function montarSelect(sel, placeholder, itens) {
 if (!temHashPayload && location.hash.indexOf('#t=') !== 0) {
   if (API_URL) {
     document.getElementById('origemStandalone').hidden = false;
-    document.getElementById('statusCard').textContent = 'Escolha a escola, o professor e a turma — os dados vêm ao vivo do card.';
+    document.getElementById('statusCard').textContent = 'Escolha a escola, o professor e a turma, os dados vêm ao vivo do card.';
     var selEscola = document.getElementById('selEscola');
     var selProf = document.getElementById('selProf');
     var selTurma = document.getElementById('selTurma');
     selEscola.innerHTML = '<option value="" disabled selected>Carregando escolas…</option>';
     selEscola.disabled = true;
-    selProf.innerHTML = '<option value="" disabled selected>—</option>';
-    selTurma.innerHTML = '<option value="" disabled selected>—</option>';
+    selProf.innerHTML = '<option value="" disabled selected></option>';
+    selTurma.innerHTML = '<option value="" disabled selected></option>';
     ind('indEscola', 'spin');
     api({ fn: 'escolas' }).then(function (j) {
       montarSelect(selEscola, 'Escolha a escola…', j.escolas.map(function (e) { return { v: e, t: e }; }));
@@ -289,7 +289,7 @@ if (!temHashPayload && location.hash.indexOf('#t=') !== 0) {
       if (!selEscola.value) return;
       selProf.innerHTML = '<option value="" disabled selected>Carregando professores…</option>';
       selProf.disabled = true;
-      selTurma.innerHTML = '<option value="" disabled selected>—</option>';
+      selTurma.innerHTML = '<option value="" disabled selected></option>';
       selTurma.disabled = true;
       ind('indProf', 'spin'); ind('indTurma', '');
       api({ fn: 'profs', escola: selEscola.value }).then(function (j) {
@@ -432,7 +432,7 @@ function montarLista() {
   initTrocaTurma();
   var pend = payload.alunos.filter(function (a) { return a.precisaTermo; }).length;
   document.getElementById('statusCard').textContent =
-    '✅ ' + payload.turma.split('\n')[0] + ' — ' + payload.alunos.length + ' alunos, ' +
+    '✅ ' + payload.turma.split('\n')[0] + ' - ' + payload.alunos.length + ' alunos, ' +
     (pend ? pend + ' sinalizado(s) para termo de atraso.' : 'nenhum termo pendente.');
   var ul = document.getElementById('listaAlunos');
   ul.innerHTML = '';
@@ -513,7 +513,7 @@ function lancarNoCard() {
     statusDoc('Termo livre não tem aluno no card para marcar.', '#b8860b'); return;
   }
   if (alunoSel.ultimaPresencaIdx == null || alunoSel.ultimaPresencaIdx < 0) {
-    statusDoc('Este aluno ainda não tem aula registrada no card — não há célula para marcar.', '#b8860b'); return;
+    statusDoc('Este aluno ainda não tem aula registrada no card. Não há célula para marcar.', '#b8860b'); return;
   }
   statusDoc('⏳ Registrando no card…');
   api({ fn: 'registrarDoc', escola: payload.escola, prof: payload.aba, professor: payload.aba,
@@ -630,8 +630,8 @@ async function gerarPDF() {
     'Prezada família,\n' +
     'Queremos manter vocês próximos da jornada de ' + nome + ' aqui na Fisk. Notamos que ' + primeiro +
     ' está ' + nAtraso + ' aula(s) atrasado(a) em relação ao plano de curso, e nosso objetivo é ajudá-lo(a) a ' +
-    'retomar o ritmo com tranquilidade. Para isso, convidamos ' + primeiro + ' a participar das tutorias — ' +
-    'aulas extras, sem nenhum custo adicional — para que possa concluir seu livro (estágio) na data prevista. ' +
+    'retomar o ritmo com tranquilidade. Para isso, convidamos ' + primeiro + 'a participar das tutorias,' +
+    'aulas extras, sem nenhum custo adicional. Para que possa concluir seu livro (estágio) na data prevista.' +
     'É nosso compromisso oferecer todas as oportunidades para que cada aluno avance no seu melhor potencial, ' +
     'e contamos com a parceria de vocês nessa caminhada.';
   quebrar(carta, helv, 9.8, W - 2 * M - 8).forEach(function (l) {
@@ -673,7 +673,7 @@ async function gerarPDF() {
     document.querySelectorAll('#listaMotivos input'),
     function (c) { return { texto: c.value, marcado: c.checked }; });
   var outros = valorDe('moOutros').trim();
-  motivos.push({ texto: 'Outros: ' + (outros || '—'), marcado: !!outros });
+  motivos.push({ texto: 'Outros: ' + (outros || '-'), marcado: !!outros });
   var altM = motivos.length * 16 + 18;
   secao('MOTIVOS DO ATRASO NO CURSO', altM);
   var my = y - 20;
@@ -699,7 +699,7 @@ async function gerarPDF() {
   secao('SUGESTÕES PARA COMPENSAÇÃO', altS);
   var sy = y - 20;
   if (!sugestoes.length && !linhasLivres.length) {
-    page.drawText('—', { x: M + 14, y: sy, size: 9.2, font: helv, color: TEXT });
+    page.drawText('-', { x: M + 14, y: sy, size: 9.2, font: helv, color: TEXT });
   }
   sugestoes.forEach(function (s) {
     page.drawCircle({ x: M + 18, y: sy + 3, size: 1.7, color: BLUE });

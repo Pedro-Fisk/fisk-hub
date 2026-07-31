@@ -46,7 +46,7 @@ const TRAININGS = [
         pdf: "",
       },
       {
-        titulo: "Checklist de Explicação — Procedimentos de Exploração",
+        titulo: "Checklist de Explicação, Procedimentos de Exploração",
         video: "",
         pdf: "https://drive.google.com/file/d/16_Xk31PJOV8ineWby2zQZhtcncsMRBj6/view",
       },
@@ -56,7 +56,7 @@ const TRAININGS = [
     categoria: "Atividade Comunicativa",
     itens: [
       {
-        titulo: "Tipos de Atividades — videos, songs, trailer, speak up",
+        titulo: "Tipos de Atividades, videos, songs, trailer, speak up",
         video: "https://drive.google.com/file/d/1OMxNmOXiz8xXny-kKJ_JQYzkuMWmvlxr/view",
         pdf: "",
       },
@@ -66,7 +66,7 @@ const TRAININGS = [
     categoria: "Aula Acadêmica",
     itens: [
       {
-        titulo: "Texto — About Teaching Teenagers",
+        titulo: "Texto, About Teaching Teenagers",
         video: "",
         pdf: "https://drive.google.com/file/d/1YpqBEog0ZM4S0kTN4W4euaOjpbYMAMk2/view",
       },

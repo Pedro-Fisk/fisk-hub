@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Answer Keys das provas — FISK</title>
+<title>Answer Keys das provas, FISK</title>
 <link rel="stylesheet" href="assets/fisk-shared.css">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="assets/fisk-ak.css">
@@ -214,14 +214,14 @@ var AK_PROVAS = [
 /* Rótulo de cada tipo de documento, por idioma do estágio. */
 var AK_TIPOS = {
   ing: {
-    escuta:  {nome:'Prova de escuta',  desc:'Listening — gabarito'},
-    script:  {nome:'Transcrição do áudio', desc:'Script — o que é falado na prova de escuta'},
-    escrita: {nome:'Prova escrita',    desc:'Written — gabarito'}
+    escuta:  {nome:'Prova de escuta',  desc:'Listening, gabarito'},
+    script:  {nome:'Transcrição do áudio', desc:'Script. O que é falado na prova de escuta'},
+    escrita: {nome:'Prova escrita',    desc:'Written, gabarito'}
   },
   esp: {
-    escuta:  {nome:'Prova de escuta',  desc:'Test de Escucha — clave'},
-    script:  {nome:'Transcrição do áudio', desc:'Script — o que é falado na prova de escuta'},
-    escrita: {nome:'Prova escrita',    desc:'Test Escrito — clave'}
+    escuta:  {nome:'Prova de escuta',  desc:'Test de Escucha, clave'},
+    script:  {nome:'Transcrição do áudio', desc:'Script. O que é falado na prova de escuta'},
+    escrita: {nome:'Prova escrita',    desc:'Test Escrito, clave'}
   }
 };
 
@@ -312,7 +312,7 @@ var AK_ORDEM = ['escuta', 'script', 'escrita'];
     subHero.textContent = e.nome + ' · ' + t.nome;
     montarTrilha([{texto:'Estágios', alvo:''}, {texto:e.nome, alvo:e.id}, {texto:t.nome}]);
     cabec.innerHTML = '<h2>' + akEsc(e.nome + ' · ' + t.nome) + '</h2>' +
-      '<p class="ak-sub">' + akEsc(t.licoes) + ' — escolha a forma da prova</p>';
+      '<p class="ak-sub">' + akEsc(t.licoes) + ', escolha a forma da prova</p>';
     var h = '';
     for (var i = 0; i < t.formas.length; i++) {
       var f = t.formas[i];
@@ -340,7 +340,7 @@ var AK_ORDEM = ['escuta', 'script', 'escrita'];
       var d = docs[i];
       var info = tipos[d.tipo] || {nome:d.tipo, desc:''};
       h += cardHTML({doc:d.drive, cor:e.cor, h2:info.nome, p:info.desc,
-        titulo: rotulo + ' — ' + info.nome});
+        titulo: rotulo + ' - ' + info.nome});
     }
     grade.innerHTML = h;
     akLigarCards(grade);

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Notificação 2nd Chance — FISK</title>
+<title>Notificação 2nd Chance, FISK</title>
 <link rel="stylesheet" href="assets/fisk-shared.css">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
@@ -115,7 +115,7 @@
   <!-- 1 · conexão com o card -->
   <div class="painel">
     <h2>🔗 Conectar ao card</h2>
-    <p class="sub">Escolha a turma: a ferramenta lê as notas ao vivo e mostra quem tirou menos de 6,0 em alguma prova (Escrita ou Auditiva) — quem precisa de 2nd chance.</p>
+    <p class="sub">Escolha a turma: a ferramenta lê as notas ao vivo e mostra quem tirou menos de 6,0 em alguma prova (Escrita ou Auditiva). Quem precisa de 2nd chance.</p>
     <div id="origem" hidden>
       <!-- logado pelo Fisk Hub: escola e professor(a) vêm da sessão e só sobra a turma -->
       <div id="euSou" class="eusou" hidden>
@@ -179,7 +179,7 @@
         <div class="campo"><label>Nome completo do aluno</label><input type="text" id="fNome"></div>
       </div>
     </div>
-    <p class="sub" id="provasHint" style="margin:-.2rem 0 .6rem">Digite as notas das provas nos blocos acima (0 a 10). Se o aluno já tem boletim lançado no card, elas vêm preenchidas — mas você pode ajustar.</p>
+    <p class="sub" id="provasHint" style="margin:-.2rem 0 .6rem">Digite as notas das provas nos blocos acima (0 a 10). Se o aluno já tem boletim lançado no card, elas vêm preenchidas, mas você pode ajustar.</p>
 
     <div class="row">
       <div class="campo"><label>Professor(a)</label><input type="text" id="fProf"></div>
@@ -193,10 +193,10 @@
     <h2 style="margin-top:1rem">🎯 Para a recuperação <span style="font-size:12px;color:var(--gray);font-weight:600">(vira a lista do PDF)</span></h2>
     <p class="sub">Marque o que o aluno deve fazer e/ou escreva livremente. As lições preenchidas acima também entram na lista.</p>
     <div id="sugBoxes" class="sugs"></div>
-    <div class="campo" style="margin-top:.4rem"><label>Outros (escreva livremente — uma ideia por linha)</label><textarea id="sugLivre" placeholder="ex.: agendar a segunda chance para a próxima aula"></textarea></div>
+    <div class="campo" style="margin-top:.4rem"><label>Outros (escreva livremente, uma ideia por linha)</label><textarea id="sugLivre" placeholder="ex.: agendar a segunda chance para a próxima aula"></textarea></div>
 
     <h2 style="margin-top:1rem">💬 Mensagem para o WhatsApp da família</h2>
-    <p class="sub">Texto leve, <b>sem citar notas</b> — só avisa que segue um comunicado e que o aluno vai refazer uma prova. Baixe o PDF abaixo e anexe na conversa.</p>
+    <p class="sub">Texto leve, <b>sem citar notas</b>. Só avisa que segue um comunicado e que o aluno vai refazer uma prova. Baixe o PDF abaixo e anexe na conversa.</p>
     <div class="campo"><textarea id="msg"></textarea></div>
     <div class="row" style="margin-top:.5rem">
       <button type="button" class="btn btn-ghost" id="btnCopiar">📋 Copiar mensagem</button>
@@ -216,7 +216,7 @@
 
     <div id="previewWrap" hidden>
       <h2 style="margin-top:1rem">👁️ Documento gerado</h2>
-      <p class="sub">Confira aqui antes de mandar para a família — o arquivo também foi baixado para o seu computador.</p>
+      <p class="sub">Confira aqui antes de mandar para a família. O arquivo também foi baixado para o seu computador.</p>
       <iframe id="preview" title="Pré-visualização do comunicado"></iframe>
     </div>
   </div>
@@ -344,7 +344,7 @@ function initSessao(p) {
   $('euSou').hidden = false;
   $('euNome').textContent = p.name;
   $('euEscola').textContent = escolas.join(' · ');
-  statusCard('Escolha a turma — escola e professor(a) já vêm do seu login.');
+  statusCard('Escolha a turma, escola e professor(a) já vêm do seu login.');
 
   var selTurma = $('selTurma');
   resetSel(selTurma, 'Turma…'); ind('indTurma', 'spin');
@@ -362,7 +362,7 @@ function initSessao(p) {
       ind('indTurma', '');
       $('euSou').hidden = true;
       initCascade();
-      statusCard('Não achei turmas de "' + p.name + '" no card — escolha na mão.', 'err');
+      statusCard('Não achei turmas de "' + p.name + '" no card, escolha na mão.', 'err');
       return;
     }
     /* duas escolas entram no MESMO dropdown, com o nome da escola no rótulo */
@@ -384,7 +384,7 @@ function initSessao(p) {
 function initCascade() {
   $('origem').hidden = false;
   $('wrapEscola').hidden = false; $('wrapProf').hidden = false;
-  statusCard('Escolha escola, professor(a) e turma — os dados vêm ao vivo do card.');
+  statusCard('Escolha escola, professor(a) e turma, os dados vêm ao vivo do card.');
   var selEscola = $('selEscola'), selProf = $('selProf'), selTurma = $('selTurma');
   resetSel(selProf, 'Professor(a)…'); resetSel(selTurma, 'Turma…');
   ind('indProf', ''); ind('indTurma', '');
@@ -425,7 +425,7 @@ function initFragment() {
   statusCard('🔄 Lendo a turma do card…');
   api({ fn: 'turma', escola: ref[0], prof: ref[1], linha: ref[2] })
     .then(function (d) { onTurma(d); if (ref[3]) abrirAlunoPorLinha(+ref[3]); })
-    .catch(function (e) { statusCard('⚠️ ' + e.message + ' — use a cascata.', 'err'); initCascade(); });
+    .catch(function (e) { statusCard('⚠️ ' + e.message + ', use a cascata.', 'err'); initCascade(); });
 }
 
 /** Seleciona o aluno daquela linha do card (e marca o item na lista). */
@@ -450,7 +450,7 @@ function onTurma(dados) {
   // avaliação padrão: a mais recente que tem notas
   avSel = temNotas('2') ? '2' : '1';
   document.querySelectorAll('#avToggle button').forEach(function (b) { b.classList.toggle('active', b.dataset.av === avSel); });
-  $('tituloTurma').textContent = '👥 Alunos — ' + String(dados.turma || '').split('\n')[0];
+  $('tituloTurma').textContent = '👥 Alunos,' + String(dados.turma || '').split('\n')[0];
   $('painelTurma').hidden = false;
   statusCard('Turma carregada. Avaliação em foco: ' + avSel + 'ª (troque no seletor).', 'ok');
   renderLista();
@@ -676,7 +676,7 @@ function esconderPreview() { $('previewWrap').hidden = true; }
 
 /* ---- 📁 salvar na pasta do aluno (Drive) ---- */
 function salvarNaPasta(btn) {
-  if (!ultimoPDF) { statusDoc('Gere o PDF primeiro — é ele que vai para a pasta.', 'err'); return; }
+  if (!ultimoPDF) { statusDoc('Gere o PDF primeiro. É ele que vai para a pasta.', 'err'); return; }
   if (typeof fiskEnviarParaPasta !== 'function') { alert('Helper de Drive não carregou (fisk-shared.js).'); return; }
   fiskEnviarParaPasta(btn, {
     token: tokenSessao(), tipo: 'aluno',
@@ -697,7 +697,7 @@ function lancarNoCard() {
   }
   if (alunoSel.idx == null || alunoSel.idx < 0) {
     statusDoc('⚠️ Não há aula registrada para ' + primeiroNome(alunoSel.nome) +
-              ' no card — sem célula de aula para marcar. Baixe o PDF e anote na mão.', 'err');
+              'no card, sem célula de aula para marcar. Baixe o PDF e anote na mão.', 'err');
     return;
   }
   var btns = pares('btnLancar');
@@ -909,7 +909,7 @@ async function gerarPDF() {
     esconderVerPasta();          // a pasta ainda não recebeu ESTE arquivo
     mostrarPreview(url);
     syncAcoes();
-    statusDoc('✓ PDF gerado e baixado — confira na pré-visualização abaixo.', 'ok');
+    statusDoc('✓ PDF gerado e baixado, confira na pré-visualização abaixo.', 'ok');
   } catch (e) {
     alert('Não consegui gerar o PDF: ' + e.message);
   } finally { btnsPDF.forEach(function (b) { b.disabled = false; b.textContent = lbl; }); }

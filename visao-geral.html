@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Visão Geral das Turmas — FISK</title>
+<title>Visão Geral das Turmas, FISK</title>
 <link rel="stylesheet" href="assets/fisk-shared.css">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
@@ -151,7 +151,7 @@
     <p class="sub">A análise abre <b>nas suas turmas</b> automaticamente. Está substituindo alguém?
       Troque o professor no seletor — o acesso é livre, como nas outras ferramentas.</p>
     <div id="vgActAsWrap" hidden style="margin-bottom:.7rem">
-      <label style="display:block;font-size:.78rem;font-weight:800;color:var(--roxo);margin-bottom:.25rem">👑 Acesso da direção — ver o painel de um professor:</label>
+      <label style="display:block;font-size:.78rem;font-weight:800;color:var(--roxo);margin-bottom:.25rem">👑 Acesso da direção, ver o painel de um professor:</label>
       <select id="vgActAs" class="vg-actas"></select>
     </div>
     <div class="row" style="align-items:flex-end">
@@ -180,7 +180,7 @@
       </div>
       <div class="viz-card">
         <h3>Turmas que mais pedem atenção</h3>
-        <p class="viz-sub">% de alunos em dia — da que mais precisa para a que menos precisa</p>
+        <p class="viz-sub">% de alunos em dia. Da que mais precisa para a que menos precisa</p>
         <div class="rank" id="vizRank"></div>
       </div>
     </div>
@@ -338,8 +338,8 @@ function notaDe(cell) {
   var m2 = s.trim().match(/^([0-9]+(?:[.,][0-9]+)?)$/);
   return m2 ? parseFloat(m2[1].replace(',', '.')) : null;
 }
-function fmtNota(n){ return n == null ? '—' : (Math.round(n*10)/10).toFixed(1).replace('.', ','); }
-function fmtPct(n){ return n == null ? '—' : Math.round(n) + '%'; }
+function fmtNota(n){ return n == null ? '-' : (Math.round(n*10)/10).toFixed(1).replace('.', ','); }
+function fmtPct(n){ return n == null ? '-' : Math.round(n) + '%'; }
 
 /* ============ CASCATA (escola → professor, turma NÃO — pega todas) ============ */
 function montarSelect(sel, ph, itens) {
@@ -545,7 +545,7 @@ function dispersaoSVG(alunos) {
       ' fill="' + cor + '" stroke="var(--white)" stroke-width="2"' +
       ' data-n="' + esc(p.nome) + '" data-t="' + esc(p._turma || '') + '"' +
       ' data-a="' + p._atraso + '" data-f="' + Math.round(p.pctFaltas) + '"><title>' +
-      esc(p.nome) + ' — ' + p._atraso + ' de atraso, ' + Math.round(p.pctFaltas) + '% de faltas</title></circle>';
+      esc(p.nome) + ' - ' + p._atraso + ' de atraso, ' + Math.round(p.pctFaltas) + '% de faltas</title></circle>';
   }).join('');
 
   return '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Faltas por atraso de conteúdo, um ponto por aluno">' +
@@ -652,12 +652,12 @@ function render(escola, prof, dados) {
   var mNotas = notasAll.length ? notasAll.reduce(function (s, v) { return s + v; }, 0) / notasAll.length : null;
 
   statusCard('✓ ' + dados.length + ' turmas analisadas · ' + tot + ' alunos.', 'ok');
-  $('tituloGeral').textContent = '📊 Panorama geral — ' + prof + ' · ' + escola;
+  $('tituloGeral').textContent = '📊 Panorama geral,' + prof + ' · ' + escola;
 
   /* KPIs */
   $('kpis').innerHTML =
     '<div class="kpi"><b>' + tot + '</b><span>Alunos</span><small>' + dados.length + ' turmas</small></div>' +
-    '<div class="kpi emdia"><b>' + emdia + '</b><span>Em dia</span><small>' + (comAtraso.length ? Math.round(emdia / comAtraso.length * 100) + '% dos analisáveis' : '—') + '</small></div>' +
+    '<div class="kpi emdia"><b>' + emdia + '</b><span>Em dia</span><small>' + (comAtraso.length ? Math.round(emdia / comAtraso.length * 100) + '% dos analisáveis' : '-') + '</small></div>' +
     '<div class="kpi media"><b>' + atras + '</b><span>Atrasados</span><small>1 a 3 aulas</small></div>' +
     '<div class="kpi alta"><b>' + crit + '</b><span>Críticos</span><small>4+ aulas (termo)</small></div>' +
     '<div class="kpi"><b>' + fmtPct(mFaltas) + '</b><span>Faltas médias</span><small>% por aluno</small></div>' +
@@ -684,7 +684,7 @@ function render(escola, prof, dados) {
     $('vizRank').innerHTML = rankHTML(porTurma);
   }
   $('distrib').innerHTML = temViz ? ''
-    : '<p class="sub">Estas turmas não têm cronograma com placeholders (ex.: kids) — análise de atraso indisponível; faltas e notas seguem valendo.</p>';
+    : '<p class="sub">Estas turmas não têm cronograma com placeholders (ex.: kids). Análise de atraso indisponível; faltas e notas seguem valendo.</p>';
   $('painelGeral').hidden = false;
 
   /* dispersão faltas × atraso */
@@ -715,9 +715,9 @@ function render(escola, prof, dados) {
       : '';
     return '<tr><td><span class="tnome">' + esc(t.titulo) + '</span>' + (t.semdados && analis ? '<div class="tsub">' + t.semdados + ' sem análise</div>' : '') + '</td>' +
       '<td class="num">' + t.n + '</td>' +
-      '<td class="num">' + (analis ? t.emdia : '—') + '</td>' +
-      '<td class="num">' + (analis ? t.atras : '—') + '</td>' +
-      '<td class="num">' + (analis ? t.crit : '—') + '</td>' +
+      '<td class="num">' + (analis ? t.emdia : '-') + '</td>' +
+      '<td class="num">' + (analis ? t.atras : '-') + '</td>' +
+      '<td class="num">' + (analis ? t.crit : '-') + '</td>' +
       '<td class="num">' + fmtPct(t.mFaltas) + '</td>' +
       '<td class="num"><b>' + fmtNota(t.mNotas) + '</b></td>' +
       '<td>' + situ + (bar ? '<div style="margin-top:.25rem">' + bar + '</div>' : '') + '</td></tr>';
@@ -725,7 +725,7 @@ function render(escola, prof, dados) {
   $('painelTurmas').hidden = false;
   var totSem = porTurma.reduce(function (s, t) { return s + (t.emdia + t.atras + t.crit ? 0 : t.n); }, 0);
   $('foraNote').hidden = !totSem;
-  if (totSem) $('foraNote').innerHTML = '👶 <b>' + totSem + '</b> aluno(s) em turmas sem cronograma de placeholders (kids/teens) — para elas valem faltas e notas, sem análise de atraso.';
+  if (totSem) $('foraNote').innerHTML = '👶 <b>' + totSem + '</b> aluno(s) em turmas sem cronograma de placeholders (kids/teens). Para elas valem faltas e notas, sem análise de atraso.';
 
   /* lançamento de notas: o que falta preencher antes do fechamento */
   $('linhasNotas').innerHTML = porTurma.map(function (t) {
@@ -811,7 +811,7 @@ function render(escola, prof, dados) {
       var dias = a.last ? Math.floor((Date.now() - a.last) / 86400000) : null;
       var cls = a.last == null ? 'alta' : (dias <= 7 ? 'emdia' : 'media');
       return '<tr><td><span class="tnome">' + esc(a.name) + '</span><div class="tsub">' + esc(a.turma || '') + '</div></td>' +
-        '<td>' + esc(a.book || '—') + '</td>' +
+        '<td>' + esc(a.book || '-') + '</td>' +
         '<td><span class="pill ' + cls + '">' + (a.last == null ? 'nunca entrou' : quando(a.last)) + '</span></td>' +
         '<td class="num">' + (a.count || 0) + '</td></tr>';
     }).join('') : '<tr><td colspan="4" style="color:var(--gray);padding:1rem 0">Nenhum aluno com esses filtros.</td></tr>';
