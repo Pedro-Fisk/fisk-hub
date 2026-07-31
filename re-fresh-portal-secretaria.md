@@ -80,6 +80,18 @@ acrescentar **uma** linha:
 Uma linha só porque todas as rotas do portal começam com `sec` e o `secGuard`
 cuida da sessão. Nenhuma ação existente começa com `sec`, então não há conflito.
 
+**1b-bis.** Aproveite que o editor está aberto: **Ctrl+F** → `DIRETORES`. Para o
+Davi ter Painel da Direção e Padronização dos cards, o nome dele precisa entrar
+nessa lista — e ela é um `const`, então tem de ser editada aqui mesmo, não dá
+para vir num bloco aditivo (redeclarar `const` no mesmo escopo derruba o backend
+inteiro). Use exatamente o mesmo nome cadastrado no `_profs`:
+
+```js
+const DIRETORES = ['PEDRO (DIREÇÃO)', 'DAVI (DIREÇÃO)'];
+```
+
+Ver `onboarding-davi.md` para o resto dos acessos que ele precisa.
+
 **1c.** **Ctrl+S** → **Implantar → Gerenciar implantações → lápis → Versão: Nova
 versão → Implantar**. **Nunca** "Nova implantação" (troca a URL e derruba Hub,
 Portal e Painel). A URL tem de continuar sendo
