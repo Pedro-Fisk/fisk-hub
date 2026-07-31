@@ -141,6 +141,10 @@ async function fiskEnviarParaPasta(buttonEl, getOpts) {
     // caso da turma), então o professor tem de conseguir conferir num relance
     buttonEl.textContent = r && r.pasta ? '✓ Salvo em "' + r.pasta + '"' : '✓ Salvo na pasta';
     setTimeout(function () { buttonEl.textContent = old; buttonEl.disabled = false; }, 4000);
+    /* Salvou, MAS fora do lugar previsto pelo card (aluno que trocou de turma
+       ou de professor e a pasta não acompanhou). O documento chegou ao aluno —
+       por isso é aviso e não erro —, e quem organiza as pastas precisa saber. */
+    if (r && r.aviso) fiskAvisoDePasta(buttonEl, r.aviso);
     return r;
   } catch (e) {
     buttonEl.textContent = old; buttonEl.disabled = false;
@@ -337,4 +341,28 @@ function fiskRegistrarUso(ferramenta) {
       body: JSON.stringify({ action: 'usoFerramenta', token: s.token, ferramenta: ferramenta })
     }).catch(function () {});
   } catch (e) {}
+}
+
+/**
+ * Aviso de pasta fora do lugar, mostrado ao lado do botão que salvou.
+ * NÃO usa alert de propósito: o salvamento deu certo, e um pop-up depois do
+ * sucesso treina o professor a fechar sem ler. Fica visível na página, some
+ * sozinho na próxima tentativa e serve a todas as ferramentas, porque todas
+ * salvam por aqui.
+ */
+function fiskAvisoDePasta(buttonEl, texto) {
+  try {
+    var id = 'fisk-aviso-pasta';
+    var box = document.getElementById(id);
+    if (!box) {
+      box = document.createElement('div');
+      box.id = id;
+      box.style.cssText = 'margin-top:.6rem;padding:.6rem .75rem;border-radius:8px;' +
+        'border:1px solid #e3c07a;background:#fdf6e6;color:#7a5a12;' +
+        'font-size:12.5px;line-height:1.45;font-weight:600;max-width:52ch';
+      (buttonEl.parentNode || document.body).insertBefore(box, buttonEl.nextSibling);
+    }
+    box.textContent = '⚠️ ' + texto;
+    box.hidden = false;
+  } catch (e) { /* aviso nunca pode derrubar o salvamento */ }
 }
