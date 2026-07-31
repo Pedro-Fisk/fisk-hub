@@ -26,6 +26,48 @@ global.CacheService = { getScriptCache: () => ({ get: () => null, put: () => {},
 global.PropertiesService = { getScriptProperties: () => ({ getProperty: () => null, setProperty: () => {} }) };
 const GABARITO = { 'Teens Connect 2': ['L1', 'L2', 'L3', 'L4', 'DT1', 'L5', 'L6'],
                    'Essentials 1': ['E1', 'E2', 'E3', 'E4'] };
+/* copiados verbatim do Code.gs: a fusão de turmas depende de ler dia e
+   horário do NOME da turma, e um stub simplificado não provaria nada */
+global.txtBase_ = function (s) {
+  return String(s || '').split('\n')[0].toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '');
+};
+global.diasDe_ = function (s) {
+  const t = txtBase_(s).replace(/\([^)]*\)/g, ' ');
+  const dias = {};
+  let m;
+  const reOrdinal = /([2-6])\s*[ªº°]/g;   // 2ª · 5º · 2°
+  while ((m = reOrdinal.exec(t))) dias[m[1]] = 1;
+  // "2 e 4ª" / "2/4ª" / "3 e 5°": só o SEGUNDO dígito leva o ª — o primeiro
+  // ficaria de fora se a gente exigisse o marcador dele também
+  const rePar = /\b([2-6])\s*(?:e|\/|,)\s*([2-6])\s*[ªº°]/g;
+  while ((m = rePar.exec(t))) { dias[m[1]] = 1; dias[m[2]] = 1; }
+  const reLetra = /\b([2-6])a\b/g;        // 2a/4a · "3a Terça"
+  while ((m = reLetra.exec(t))) dias[m[1]] = 1;
+  // por extenso: tem professor que nomeia a pasta de "Quarta"/"Quinta"/"Sabado"
+  // enquanto o card manda "4ª"/"5ª"/"Sáb"
+  const POREXTENSO = [['domingo', '1'], ['dom', '1'], ['segunda', '2'], ['terca', '3'],
+                      ['quarta', '4'], ['quinta', '5'], ['sexta', '6'],
+                      ['sabado', '7'], ['sab', '7']];
+  for (let i = 0; i < POREXTENSO.length; i++) {
+    if (t.indexOf(POREXTENSO[i][0]) >= 0) dias[POREXTENSO[i][1]] = 1;
+  }
+  return Object.keys(dias).sort();
+};
+global.horasDe_ = function (s) {
+  let t = txtBase_(s);
+  const set = {};
+  function add(h, mi) {
+    h = +h; mi = +mi;
+    if (h >= 0 && h <= 23 && mi >= 0 && mi <= 59) set[h * 60 + mi] = 1;
+  }
+  // ordem importa: primeiro os formatos com separador, depois "20h", por último "18 45"
+  t = t.replace(/(\d{1,2})\s*[h:]\s*(\d{2})/g, function (_, h, mi) { add(h, mi); return ' '; });
+  t = t.replace(/(\d{1,2})\s*h/g, function (_, h) { add(h, 0); return ' '; });
+  t = t.replace(/\b(\d{1,2})\s+(\d{2})\b/g, function (_, h, mi) { add(h, mi); return ' '; });
+  return Object.keys(set).map(Number).sort(function (a, b) { return a - b; });
+};
+
 global.lerGabaritoCard_ = () => GABARITO;
 global.seqDoBookCard_ = (gab, book) => gab[book] || null;
 
@@ -93,7 +135,12 @@ const abaTbt = bloco(1, 'Básico (+18) - 4ª 18h45/21h15', TBT_ROT, TBT_GRP, '2�
   { cols: { 1: true, 2: 'Pietro de Almeida Kita - (MD 2º sem ok)', 3: false, 4: 'Matriculados',
             6: 'Essentials 1', 10: '18/09/2017', 11: 8, 14: 'Renata', 15: '(12) 97777-1111' },
     grade: ['', '', '', '', '', '', '', ''] },
-], 2, false);
+], 2, false).concat(bloco(2, 'Essentials 1 Acad (-18) - 4ª 15h/17h30', TBT_ROT, TBT_GRP, '2º sem', [
+  { cols: { 1: true, 2: 'Bruno Tavares', 3: true, 4: 'Matriculado', 6: 'Essentials 1',
+            7: 'D001-500', 10: '05/12/2005', 11: 20, 13: 'bruno@ex.com',
+            14: 'Sonia', 15: '(12) 96666-2222' },
+    grade: ['', '', '', '', '', '', '', ''] },
+], 5, false));
 
 function fakeSheet(nome, linhas) {
   const largura = Math.max(...linhas.map(l => l.length));
@@ -179,7 +226,7 @@ ok(lais.respTel === '(12) 98888-7777' && lais.telefone === '',
 
 syncRosterFromCards();
 const porRaf = Object.fromEntries(ROSTER.map(r => [r[0], r]));
-ok(ROSTER.length === 4, 'a _alunos recebeu os 4 alunos das duas escolas', ROSTER.length);
+ok(ROSTER.length === 5, 'a _alunos recebeu os 5 alunos com RAF das duas escolas', ROSTER.length);
 ok(porRaf['Z012-935'] && porRaf['Z012-935'][3] === 'Essentials 1',
    'syncRosterFromCards grava o Book certo para Taubaté', porRaf['Z012-935']);
 ok(porRaf['B004-722'] && porRaf['B004-722'][3] === 'Teens Connect 2',
@@ -304,6 +351,40 @@ ok(secNomeLimpo_('Olivia Barbosa -  Pagou ME anual (MD 2º sem ok)') === 'Olivia
 ok(val.totais.statusEstranho === 1, '"Matriculados" (no plural) acusado como status fora da lista',
    val.achados.statusEstranho.map(x => x.valor));
 ok(val.totais.rafDuplicado === 0 && val.totais.alunoEmDuasTurmas === 0, 'sem duplicidade nesta base');
+
+console.log('\n══ limpeza de nomes e alertas ══');
+const sujos = secNomesSujos_({});
+ok(sujos.nomes.length === 1 && sujos.nomes[0].nome.indexOf('Pietro') === 0,
+   'acha o nome com anotação embutida', sujos.nomes.map(x => x.nome));
+ok(sujos.nomes[0].limpo === 'Pietro de Almeida Kita', 'propõe o nome limpo', sujos.nomes[0].limpo);
+ok(sujos.nomes[0].anotacao.indexOf('MD 2º sem ok') >= 0, 'e separa a anotação', sujos.nomes[0].anotacao);
+ok(sujos.nomes[0].tipo === 'material didático',
+   '"MD 2º sem ok" é classificado como material, não como alerta', sujos.nomes[0].tipo);
+ok(sujos.nomes[0].precisaOlhar === false, 'este caso não precisa de olho humano', sujos.nomes[0].precisaOlhar);
+ok(secTipoDaAnotacao_('Aluno celiaco - intolerância a farinha') === 'saúde',
+   'anotação de saúde é reconhecida como saúde', secTipoDaAnotacao_('Aluno celiaco - intolerância a farinha'));
+ok(secTipoDaAnotacao_('Bolsista') === 'financeiro', '"Bolsista" cai em financeiro');
+ok(secTipoDaAnotacao_('Vai pular do FLU2 para In Focus') === 'pedagógico', 'salto de estágio é pedagógico');
+
+console.log('\n══ fusão de turmas ══');
+const fus = secFusoes_({ limite: 4 });
+const basico = fus.turmas.find(t => t.turma.indexOf('Básico') === 0);
+ok(basico && basico.candidatas.length >= 1, 'a turma pequena recebe sugestão de fusão',
+   basico && basico.candidatas.map(c => c.turma));
+ok(basico.candidatas[0].turma.indexOf('Essentials 1 Acad') === 0,
+   'a sugerida é a do mesmo livro e mesmo dia', basico.candidatas[0]);
+ok(basico.candidatas[0].porques.indexOf('mesmo livro (Essentials 1)') >= 0,
+   'e diz por quê', basico.candidatas[0].porques);
+ok(basico.candidatas[0].livres >= basico.ocupadas,
+   'só sugere turma com vaga para TODOS os alunos', { livres: basico.candidatas[0].livres, ocup: basico.ocupadas });
+ok(fus.turmas.every(t => t.candidatas.every(c => c.escola === t.escola)),
+   'nunca sugere fusão entre escolas diferentes');
+
+console.log('\n══ acesso ao Portal do Aluno ══');
+const ac = secSemAcesso_({});
+ok(ac.nunca.length === 5, 'os 5 alunos com RAF nunca entraram (a _acessos está vazia no teste)', ac.nunca.length);
+ok(ac.semRaf === 1, 'e 1 aluno sequer tem RAF — esse nem existe para o portal', ac.semRaf);
+ok(ac.nunca[0].respTel !== undefined, 'a lista já vem com o contato de quem avisar');
 
 console.log('\n══ fila e busca ══');
 const fila = secFila_({ minFaltas: 30, minAtraso: 4 }).fila;

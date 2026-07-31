@@ -30,6 +30,12 @@ Cinco blocos:
 | ✅ **Prontidão do semestre** | O que falta em cada aluno para a turma começar redonda: livro comprado, RAF, contrato aditado, contato e cadastro — com edição direto no portal, gravando no card. Nasceu do que os cards mostraram: 89 alunos com livro não comprado, 36 sem RAF, 38 sem telefone nenhum, 43 sem responsável (numa base 85% menor de 18) e 33 contratos não aditados em Taubaté. |
 | 🎂 **Aniversariantes** | Do mês, com o contato do responsável — que é quem de fato recebe a mensagem. |
 | 🩺 **Conferência do cadastro** | Data de nascimento escrita ao contrário (10 casos; a coluna Idade é fórmula, então a idade fica errada), anotação enfiada dentro do nome do aluno (52 casos), RAF repetido, aluno em duas turmas e status fora da lista. |
+| ⚠️ **Alerta do aluno** | Saúde, restrição alimentar, acordo com a família. Aparece em vermelho no topo da ficha. Existe porque o card não tinha onde guardar isso — e a escola guardou assim mesmo: "Aluno celíaco - intolerância a farinha" estava escrito dentro do nome de uma criança. Fica numa aba do portal, sem mexer na estrutura de nenhum dos dois cards. |
+| 🧹 **Limpeza dos nomes** | Os 52 alunos com anotação embutida no nome, com o nome limpo proposto e a anotação indo para alerta ou para OBSERVAÇÕES. Conferido no Drive: as pastas dos alunos usam o nome limpo, então limpar **melhora** o casamento com a pasta. |
+| 🧷 **Turmas pequenas e fusão** | As turmas com 4 alunos ou menos e para onde esses alunos caberiam: mesma escola, vaga para todos, mesmo livro, dia em comum, horário próximo. Uma turma do card já se chama "FECHAR TURMA". |
+| 🎒 **Reposição e experimental** | Agenda com data, professor e baixa. Hoje isso vive como texto solto ("faltando a 1ª aula para compensar no LC", "fará uma aula experimental" dentro do nome). |
+| 🔗 **Acesso ao Portal do Aluno** | Quem nunca entrou e quem sumiu, com o contato de quem avisar. É a secretaria que entrega o RAF no balcão. |
+| 🎁 **Balcão do Fisk Dólares** | Resgate de prêmio na ficha: debita o saldo e lança no extrato com o nome de quem entregou. |
 | 🧩 **Padronização dos cards** | Só direção. Mostra, aba por aba, onde cada escola foge do padrão canônico de colunas, e alinha a planilha pelo Apps Script — com backup obrigatório e simulação antes. Ver `padronizacao-dos-cards.md`. |
 
 ---

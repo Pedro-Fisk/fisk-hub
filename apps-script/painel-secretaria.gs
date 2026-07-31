@@ -153,6 +153,11 @@ function secRota_(req) {
       case 'secAniversarios':   return json(secAniversarios_(r));
       case 'secValidar':    return json(secValidarCadastro_(r));
       case 'secBoletins':   return json(secBoletins_(r));
+      case 'secAlertas':    return json(secAlertas_(r));
+      case 'secNomesSujos': return json(secNomesSujos_(r));
+      case 'secFusoes':     return json(secFusoes_(r));
+      case 'secAgenda':     return json(secAgenda_(r));
+      case 'secSemAcesso':  return json(secSemAcesso_(r));
       case 'secAuditoria':  return json(secAuditoria_(r));
       case 'secContatos':   return json(secContatos_(r));
       /* escrita */
@@ -160,6 +165,11 @@ function secRota_(req) {
       case 'secBaixa':      return json(secBaixa_(r, quem));
       case 'secMatricular': return json(secMatricular_(r, quem));
       case 'secAtualizarAluno': return json(secAtualizarAluno_(r, quem));
+      case 'secSalvarAlerta':  return json(secSalvarAlerta_(r, quem));
+      case 'secLimparNome':    return json(secLimparNome_(r, quem));
+      case 'secAgendar':       return json(secAgendar_(r, quem));
+      case 'secAgendaSituacao': return json(secAgendaSituacao_(r, quem));
+      case 'secFdResgate':     return json(secFdResgate_(r, quem));
       case 'secContato':    return json(secRegistrarContato_(r, quem));
       case 'secSalvarPdf':  return json(secSalvarPdf_(r, quem));
       case 'secDesfazer':   return json(secDesfazer_(r, quem));
@@ -494,6 +504,10 @@ function secFicha_(req) {
       ficha.carteira = { saldo: (w && w.saldo) || 0 };
     } catch (err2) { ficha.carteira = null; }
   }
+
+  /* Alerta vem antes de tudo na tela: alergia e acordo com a família não
+     podem depender de alguém rolar a ficha até o fim. */
+  ficha.alertas = secAlertasDe_(a.raf, a.nome);
 
   /* Pasta no Drive: link direto poupa a secretária de caçar no Drive. */
   ficha.drive = secPastaDoAluno_(a);
@@ -1322,6 +1336,371 @@ function secSalvarPdf_(req, quem) {
     return { ok: true, url: arq.getUrl(), pasta: p.pasta, pastaUrl: p.url };
   } catch (err) {
     return { ok: false, error: String(err) };
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   ALERTAS DO ALUNO
+
+   Existem porque o card não tem onde guardar isso, e a escola precisou
+   guardar assim mesmo: "Aluno celíaco - intolerância a farinha" estava
+   escrito DENTRO do nome de uma criança. Alergia, acordo com a família e
+   restrição não podem depender de alguém ler o nome inteiro até o fim.
+
+   Ficam numa aba do portal, não numa coluna nova do card, porque assim
+   funcionam hoje nas duas escolas sem mexer na estrutura de nenhuma.
+   ══════════════════════════════════════════════════════════════════════ */
+
+var SEC_ALERTAS_ABA = '_secAlertas';
+var SEC_ALERTAS_CAB = ['Quando', 'Quem', 'RAF', 'Aluno', 'Escola', 'Tipo', 'Alerta', 'Ativo'];
+var SEC_ALERTA_TIPOS = ['saúde', 'restrição alimentar', 'acordo com a família',
+                        'pedagógico', 'financeiro', 'material didático', 'outro'];
+
+/** Chave do aluno nos alertas: o RAF quando existe, senão o nome limpo. */
+function secChaveAluno_(raf, nome) {
+  var r = normRaf(raf);
+  return r || secNorm_(secNomeLimpo_(nome));
+}
+
+function secAlertasDe_(raf, nome) {
+  var alvo = secChaveAluno_(raf, nome);
+  if (!alvo) return [];
+  var out = [];
+  try {
+    var vals = secAba_(SEC_ALERTAS_ABA, SEC_ALERTAS_CAB).getDataRange().getValues();
+    for (var i = 1; i < vals.length; i++) {
+      if (String(vals[i][7]).toLowerCase() === 'não') continue;
+      if (secChaveAluno_(vals[i][2], vals[i][3]) !== alvo) continue;
+      out.push({ linha: i + 1, quando: vals[i][0] ? new Date(vals[i][0]).toISOString() : null,
+                 quem: String(vals[i][1] || ''), tipo: String(vals[i][5] || ''),
+                 alerta: String(vals[i][6] || '') });
+    }
+  } catch (err) {}
+  return out;
+}
+
+function secAlertas_(req) {
+  if (req.raf || req.nome) {
+    return { ok: true, alertas: secAlertasDe_(req.raf, req.nome), tipos: SEC_ALERTA_TIPOS };
+  }
+  var vals = secAba_(SEC_ALERTAS_ABA, SEC_ALERTAS_CAB).getDataRange().getValues();
+  var lista = [];
+  for (var i = 1; i < vals.length; i++) {
+    if (!vals[i][3] || String(vals[i][7]).toLowerCase() === 'não') continue;
+    lista.push({ linha: i + 1, quando: vals[i][0] ? new Date(vals[i][0]).toISOString() : null,
+                 quem: String(vals[i][1] || ''), raf: String(vals[i][2] || ''),
+                 aluno: String(vals[i][3] || ''), escola: String(vals[i][4] || ''),
+                 tipo: String(vals[i][5] || ''), alerta: String(vals[i][6] || '') });
+  }
+  return { ok: true, alertas: lista, tipos: SEC_ALERTA_TIPOS };
+}
+
+function secSalvarAlerta_(req, quem) {
+  var sh = secAba_(SEC_ALERTAS_ABA, SEC_ALERTAS_CAB);
+  /* Remover não apaga a linha: marca "Ativo = não". Alerta de saúde que
+     alguém tirou por engano precisa poder ser reencontrado. */
+  if (req.remover === true) {
+    var linha = Number(req.linha || 0);
+    if (linha < 2 || linha > sh.getLastRow()) return { ok: false, error: 'Alerta não encontrado.' };
+    sh.getRange(linha, 8).setValue('não');
+    return { ok: true, removido: true };
+  }
+  var texto = String(req.alerta || '').trim();
+  if (!texto) return { ok: false, error: 'Escreva o alerta.' };
+  sh.appendRow([new Date(), quem, String(req.raf || ''), String(req.nome || ''),
+                String(req.escola || ''), String(req.tipo || 'outro'), texto, 'sim']);
+  secLog_(quem, 'alerta · ' + String(req.tipo || 'outro'), String(req.escola || ''),
+          String(req.raf || ''), String(req.nome || ''), '', texto, '', null);
+  return { ok: true };
+}
+
+/* ── Limpeza dos nomes ────────────────────────────────────────────────
+   Confirmado no Drive em 31/07/2026: as pastas dos alunos usam o nome
+   LIMPO ("Miguel Machado Da Silva Fleckenstein"), então tirar a anotação
+   do card melhora o casamento com a pasta em vez de piorar. */
+
+/** Que tipo de alerta a anotação parece ser. Sugestão, não decisão. */
+function secTipoDaAnotacao_(txt) {
+  var t = secNorm_(txt);
+  if (/celiac|alerg|intoleran|diabet|asma|remedio|laudo|tdah|autis/.test(t)) return 'saúde';
+  if (/farinha|gluten|lactose|alimenta/.test(t)) return 'restrição alimentar';
+  if (/bolsis|bolsa|pagou|mensalidade|anual|desconto/.test(t)) return 'financeiro';
+  /* "MD 2º sem ok" é o mais comum de todos (39 alunos): é controle de
+     material entregue, não alerta — a tela manda esse para OBSERVAÇÕES. */
+  if (/\bmd\b|material|livro|book/.test(t)) return 'material didático';
+  if (/pular|revisao|nivel|met|exame|estagio/.test(t)) return 'pedagógico';
+  return 'outro';
+}
+
+/**
+ * Alunos com anotação embutida no nome, com o nome limpo proposto e o
+ * destino sugerido para a anotação. Não escreve nada.
+ */
+function secNomesSujos_(req) {
+  var idx = secIndice_(req.escola ? [req.escola] : null);
+  var lista = [];
+  idx.alunos.forEach(function (a) {
+    var anot = secAnotacaoDoNome_(a.nome);
+    if (!anot) return;
+    var limpo = secNomeLimpo_(a.nome);
+    lista.push({
+      escola: a.escola, professor: a.professor, turma: a.turma, linha: a.linha,
+      nome: a.nome, raf: a.raf, limpo: limpo, anotacao: anot,
+      tipo: secTipoDaAnotacao_(anot),
+      /* Quando o traço sobra com texto que o limpador não reconhece, o nome
+         proposto ainda tem "coisa" — a tela avisa que ali é preciso decidir. */
+      precisaOlhar: /\s-\s/.test(limpo)
+    });
+  });
+  return { ok: true, nomes: lista, tipos: SEC_ALERTA_TIPOS, erros: idx.erros };
+}
+
+/**
+ * Grava o nome limpo no card e leva a anotação para onde ela deveria estar:
+ * um alerta do aluno, a coluna OBSERVAÇÕES, ou as duas. O nome que a tela
+ * mandou é reconferido contra a linha antes de gravar.
+ */
+function secLimparNome_(req, quem) {
+  var novo = String(req.limpo || '').trim();
+  if (!novo) return { ok: false, error: 'O nome limpo não pode ficar vazio.' };
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    var b = secAbrirBloco_(String(req.escola || ''), String(req.professor || ''), String(req.turma || ''));
+    if (b.erro) return { ok: false, error: b.erro };
+    var linha = Number(req.linha || 0);
+    var erro = secConfereLinha_(b, linha, req.nome, req.raf);
+    if (erro) return { ok: false, error: erro };
+
+    var antes = String(b.vals[linha - 1][b.cols.nome] || '');
+    b.sh.getRange(linha, b.cols.nome + 1).setValue(novo);
+
+    var anot = String(req.anotacao || '').trim();
+    if (anot && req.paraAlerta === true) {
+      secSalvarAlerta_({ raf: req.raf, nome: novo, escola: req.escola,
+                         tipo: String(req.tipo || 'outro'), alerta: anot }, quem);
+    }
+    if (anot && req.paraObs === true && b.cols.obs >= 0) {
+      b.sh.getRange(linha, b.cols.obs + 1)
+        .setValue(secConcat_(b.vals[linha - 1][b.cols.obs], anot));
+    }
+
+    secInvalida_(req.escola);
+    secLog_(quem, 'limpeza de nome', req.escola, String(req.raf || ''), novo,
+            antes, novo, anot, { linha: linha, antes: antes,
+                                 escola: req.escola, professor: req.professor, turma: b.turma });
+    return { ok: true, nome: novo };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   TURMAS PEQUENAS E SUGESTÃO DE FUSÃO
+
+   O card já traz a decisão escrita no nome de duas turmas ("FECHAR TURMA",
+   "KIDS (Multilevel?)"). Aqui ela vira número: quem está pequena, e para
+   onde esses alunos caberiam sem perder dia, horário nem estágio.
+   ══════════════════════════════════════════════════════════════════════ */
+
+function secBookPrincipal_(t) {
+  var melhor = '', n = 0;
+  for (var b in t.books) if (t.books.hasOwnProperty(b) && t.books[b] > n) { melhor = b; n = t.books[b]; }
+  return melhor;
+}
+
+function secFusoes_(req) {
+  var limite = req.limite == null ? 4 : Number(req.limite);
+  var idx = secIndice_(req.escola ? [req.escola] : null);
+
+  var pequenas = idx.turmas.filter(function (t) { return t.ocupadas > 0 && t.ocupadas <= limite; });
+  var lista = pequenas.map(function (t) {
+    var bookT = secBookPrincipal_(t);
+    var diasT = diasDe_(t.turma).map(String), horasT = horasDe_(t.turma);
+
+    var candidatas = idx.turmas.filter(function (c) {
+      if (c === t || c.escola !== t.escola) return false;
+      if (c.turma === t.turma && c.professor === t.professor) return false;
+      return c.livres >= t.ocupadas;      // sem vaga para todos, não é fusão
+    }).map(function (c) {
+      var pontos = 0, porques = [];
+      if (bookT && c.books[bookT]) { pontos += 3; porques.push('mesmo livro (' + bookT + ')'); }
+      var diasC = diasDe_(c.turma).map(String);
+      var comum = diasT.filter(function (d) { return diasC.indexOf(d) >= 0; });
+      if (comum.length) { pontos += 2; porques.push('dia em comum'); }
+      var horasC = horasDe_(c.turma);
+      var perto = null;
+      horasT.forEach(function (h1) {
+        horasC.forEach(function (h2) {
+          var d = Math.abs(h1 - h2);
+          if (perto == null || d < perto) perto = d;
+        });
+      });
+      if (perto != null && perto <= 90) { pontos += 2; porques.push('horário a ' + perto + ' min'); }
+      if (c.professor === t.professor) { pontos += 1; porques.push('mesmo professor'); }
+      return { escola: c.escola, professor: c.professor, turma: c.turma,
+               ocupadas: c.ocupadas, livres: c.livres, book: secBookPrincipal_(c),
+               pontos: pontos, porques: porques };
+    }).filter(function (c) { return c.pontos >= 3; })
+      .sort(function (x, y) { return y.pontos - x.pontos; })
+      .slice(0, 4);
+
+    return { escola: t.escola, professor: t.professor, turma: t.turma,
+             ocupadas: t.ocupadas, livres: t.livres, book: bookT,
+             /* o próprio nome da turma às vezes já traz a decisão */
+             marcada: /fechar|encerrar|cancelad/i.test(t.turma),
+             candidatas: candidatas };
+  }).sort(function (x, y) { return x.ocupadas - y.ocupadas; });
+
+  return { ok: true, limite: limite, turmas: lista, erros: idx.erros };
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   AGENDA DE REPOSIÇÃO E AULA EXPERIMENTAL
+
+   Hoje isso vive como texto solto: "Está faltando a 1a aula para compensar
+   no LC" na observação, e "Aluna de 2a 18h45 Mari, fará uma aula ex..."
+   dentro do nome. É atendimento de secretaria e merece lugar próprio.
+   ══════════════════════════════════════════════════════════════════════ */
+
+var SEC_AGENDA_ABA = '_secAgenda';
+var SEC_AGENDA_CAB = ['Criado', 'Quem', 'Tipo', 'Aluno', 'RAF', 'Escola', 'Professor',
+                      'Turma', 'Data', 'Hora', 'Situação', 'Observação'];
+var SEC_AGENDA_TIPOS = ['reposição', 'aula experimental', 'aula avulsa', 'prova de nivelamento'];
+
+function secAgendar_(req, quem) {
+  var aluno = String(req.aluno || '').trim();
+  var data = String(req.data || '').trim();
+  if (!aluno) return { ok: false, error: 'Informe o aluno.' };
+  if (!data) return { ok: false, error: 'Informe a data.' };
+  secAba_(SEC_AGENDA_ABA, SEC_AGENDA_CAB).appendRow([
+    new Date(), quem, String(req.tipo || SEC_AGENDA_TIPOS[0]), aluno, String(req.raf || ''),
+    String(req.escola || ''), String(req.professor || ''), String(req.turma || ''),
+    data, String(req.hora || ''), 'marcada', String(req.obs || '')
+  ]);
+  secLog_(quem, 'agenda · ' + String(req.tipo || ''), String(req.escola || ''),
+          String(req.raf || ''), aluno, '', data + ' ' + String(req.hora || ''),
+          String(req.professor || ''), null);
+  return { ok: true };
+}
+
+function secAgenda_(req) {
+  var vals = secAba_(SEC_AGENDA_ABA, SEC_AGENDA_CAB).getDataRange().getValues();
+  var hoje = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  var lista = [];
+  for (var i = 1; i < vals.length; i++) {
+    if (!vals[i][3]) continue;
+    var data = vals[i][8];
+    var dataTxt = Object.prototype.toString.call(data) === '[object Date]'
+      ? Utilities.formatDate(data, Session.getScriptTimeZone(), 'yyyy-MM-dd')
+      : String(data || '').trim();
+    var situacao = String(vals[i][10] || 'marcada');
+    /* O padrão é mostrar o que ainda vai acontecer e o que ficou para trás
+       sem baixa — que é justamente o que a secretaria precisa perseguir. */
+    if (req.todas !== true && situacao !== 'marcada') continue;
+    lista.push({ linha: i + 1, tipo: String(vals[i][2] || ''), aluno: String(vals[i][3] || ''),
+                 raf: String(vals[i][4] || ''), escola: String(vals[i][5] || ''),
+                 professor: String(vals[i][6] || ''), turma: String(vals[i][7] || ''),
+                 data: dataTxt, hora: String(vals[i][9] || ''), situacao: situacao,
+                 obs: String(vals[i][11] || ''), atrasada: dataTxt && dataTxt < hoje });
+  }
+  lista.sort(function (a, b) { return a.data < b.data ? -1 : (a.data > b.data ? 1 : 0); });
+  return { ok: true, agenda: lista, tipos: SEC_AGENDA_TIPOS };
+}
+
+function secAgendaSituacao_(req, quem) {
+  var sh = secAba_(SEC_AGENDA_ABA, SEC_AGENDA_CAB);
+  var linha = Number(req.linha || 0);
+  if (linha < 2 || linha > sh.getLastRow()) return { ok: false, error: 'Agendamento não encontrado.' };
+  var nova = String(req.situacao || '').trim() || 'realizada';
+  sh.getRange(linha, 11).setValue(nova);
+  sh.getRange(linha, 12).setValue(secConcat_(sh.getRange(linha, 12).getValue(),
+                                             nova + ' por ' + quem + ' em ' + secHoje_()));
+  return { ok: true, situacao: nova };
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   ACESSO AO PORTAL DO ALUNO
+
+   Quem nunca entrou. É a secretaria que entrega o RAF no balcão, então é
+   ela que precisa da lista — com o contato de quem avisar junto.
+   ══════════════════════════════════════════════════════════════════════ */
+
+function secSemAcesso_(req) {
+  var acessos = {};
+  try {
+    var av = getAcessos().getDataRange().getValues();
+    for (var i = 1; i < av.length; i++) {
+      var r = normRaf(av[i][0]);
+      if (r) acessos[r] = { total: Number(av[i][5]) || 0,
+                            ultimo: av[i][4] ? new Date(av[i][4]).getTime() : null };
+    }
+  } catch (err) {}
+
+  var idx = secIndice_(req.escola ? [req.escola] : null);
+  var dias = req.dias == null ? 30 : Number(req.dias);
+  var corte = Date.now() - dias * 864e5;
+  var nunca = [], sumidos = [];
+
+  idx.alunos.forEach(function (a) {
+    if (!a.raf) return;                       // sem RAF nem existe para o portal
+    var ac = acessos[normRaf(a.raf)];
+    var base = { nome: a.nome, raf: a.raf, escola: a.escola, professor: a.professor,
+                 turma: a.turma, book: a.book, telefone: a.telefone,
+                 respNome: a.respNome, respTel: a.respTel, respWhats: a.respWhats };
+    if (!ac || !ac.total) { nunca.push(base); return; }
+    if (ac.ultimo && ac.ultimo < corte) {
+      base.ultimo = new Date(ac.ultimo).toISOString();
+      base.total = ac.total;
+      sumidos.push(base);
+    }
+  });
+  sumidos.sort(function (x, y) { return x.ultimo < y.ultimo ? -1 : 1; });
+  var semRaf = idx.alunos.filter(function (a) { return !a.raf; }).length;
+  return { ok: true, nunca: nunca, sumidos: sumidos, dias: dias,
+           semRaf: semRaf, total: idx.alunos.length, erros: idx.erros };
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   BALCÃO DO FISK DÓLARES
+
+   Quem entrega o prêmio é a secretária; o débito precisava sair do mesmo
+   lugar. Lança valor NEGATIVO no extrato, que é o formato que o teto
+   diário e as conquistas já ignoram.
+   ══════════════════════════════════════════════════════════════════════ */
+
+function secFdResgate_(req, quem) {
+  var raf = normRaf(req.raf);
+  var valor = Math.round(Number(req.valor));
+  var item = String(req.item || '').trim();
+  if (!raf) return { ok: false, error: 'Informe o RAF do aluno.' };
+  if (!isFinite(valor) || valor <= 0) return { ok: false, error: 'Informe quantos Fisk Dólares ele está gastando.' };
+  if (!item) return { ok: false, error: 'Diga o que o aluno está levando.' };
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(15000);
+  try {
+    var cart = fdSheet_('_carteira', ['RAF', 'Saldo', 'Atualizado']);
+    var vals = cart.getDataRange().getValues();
+    var row = -1, saldo = 0;
+    for (var i = 1; i < vals.length; i++) {
+      if (String(vals[i][0]).trim() === raf) { row = i + 1; saldo = Number(vals[i][1]) || 0; break; }
+    }
+    if (row < 0) return { ok: false, error: 'Esse aluno ainda não tem carteira de Fisk Dólares.' };
+    if (saldo < valor) {
+      return { ok: false, error: 'Saldo insuficiente: o aluno tem F$ ' + saldo + ' e o item custa F$ ' + valor + '.' };
+    }
+    var novo = saldo - valor;
+    cart.getRange(row, 2, 1, 2).setValues([[novo, new Date()]]);
+    fdSheet_('_extrato', ['Quando', 'RAF', 'Atividade', 'Tipo', 'Detalhe', 'Valor', 'Saldo'])
+      .appendRow([new Date(), raf, 'resgate-balcao', 'resgate',
+                  item + ' · entregue por ' + quem, -valor, novo]);
+    secLog_(quem, 'resgate F$', String(req.escola || ''), raf, String(req.nome || ''),
+            'F$ ' + saldo, 'F$ ' + novo, item, null);
+    return { ok: true, antes: saldo, saldo: novo, item: item };
+  } finally {
+    lock.releaseLock();
   }
 }
 
