@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    ESPELHO do Code.gs que roda em produção (projeto Apps Script "Fisk Hub —
-   Dados"), na versão implantada @62 — 30/07/2026.
+   Dados"), na versão implantada @72 — 30/07/2026.
 
    Existe para que a próxima sessão parta do código certo: as cópias parciais
    deste diretório (fisk-dolares.gs, salvar-no-drive.gs) ficaram para trás do
@@ -39,8 +39,18 @@
  * Para segurança forte no futuro, migrar para senha própria / Supabase (o front não muda).
  */
 
-const APP_KEY = '<APP_KEY — valor real só no fisk-hub-backend local>';     // gravação (embutida nas ferramentas)
-const TEACHER_KEY = '<TEACHER_KEY — valor real só no fisk-hub-backend local>'; // leitura total (só professores)
+/* CHAVES — vivem nas Propriedades do Script, nunca no código-fonte.
+   Em 28/07/2026 este arquivo foi commitado num repo PÚBLICO (fisk-hub,
+   commit bd7bde5) e a TEACHER_KEY ficou exposta; por isso ela foi trocada
+   em 30/07/2026 e as duas saíram daqui. Para ver/trocar: editor do Apps
+   Script → Configurações do projeto → Propriedades do script.
+   A TEACHER_KEY NÃO tem fallback de propósito: se a propriedade sumir, o
+   servidor recusa tudo (falha fechada) em vez de voltar a uma chave velha.
+   A APP_KEY mantém o valor no código porque ela é pública por desenho —
+   está embutida nos simuladores, que são páginas abertas. */
+const PROPS_ = PropertiesService.getScriptProperties();
+const APP_KEY = PROPS_.getProperty('APP_KEY') || '<APP_KEY — valor real só no fisk-hub-backend local>';     // gravação (embutida nas ferramentas, pública por desenho)
+const TEACHER_KEY = PROPS_.getProperty('TEACHER_KEY');                            // leitura total + admin (só direção/professor)
 
 const HEADERS = ['Data', 'Aluno', 'Simulado', 'Acertos', 'Total', 'CEFR L', 'CEFR R&G', 'CEFR Geral', 'Teste', 'JSON'];
 const ROSTER = '_alunos';
@@ -103,6 +113,11 @@ function doPost(e) {
     if (req.action === 'fdCheckin') return fdJson_(fdCheckin_(String(req.raf || '')));
     if (req.action === 'fdBonus')   return fdJson_(fdBonus_(String(req.raf || ''), String(req.bonusId || '')));
     if (req.action && req.action.indexOf('dirFd') === 0) return dirGuard(req, fdDirRota_);
+    // Treinamentos internos: leitura aberta (a página só devolve título e link,
+    // os mesmos que já estavam no treinamentos-data.js público); publicar e
+    // remover exigem token de diretor — módulo no fim do arquivo
+    if (req.action === 'tnList') return json(tnList_());
+    if (req.action && req.action.indexOf('dirTn') === 0) return dirGuard(req, tnDirRota_);
     if (req.key !== APP_KEY) return json({ ok: false, error: 'chave inválida' });
     const d = req.data || {};
     const sheet = getTab(toolName(req.tool));
@@ -130,6 +145,8 @@ function doPost(e) {
 function doGet(e) {
   try {
     const p = e.parameter || {};
+    // Sessão inteira do aluno numa execução (login + F$ + situação + histórico)
+    if (p.action === 'bootstrap') return studentBootstrap(p);
     if (p.action === 'login') return studentLogin(p);
     if (p.action === 'history') return studentHistory(p);
     // Fisk Dólares: saldo + extrato + streak + conquistas (dashboard da home)
@@ -239,6 +256,27 @@ function seqDoBookCard_(gabarito, book) {
 // Card do 1º semestre: só para VALIDAR a análise (tem dados reais preenchidos).
 // Nunca entra na busca normal — exige TEACHER_KEY (?teste=1&key=…).
 const CARD_TESTE = { 'Caçapava (1º sem)': '1x2SC10w0G7sbY-2zo7X8eS06XMMnzzq0zvm6ovm5oPk' };
+
+/* A situação é a parte cara da sessão: abre os cards das duas escolas e varre
+   a turma do aluno (~5,4s medidos, contra ~3,2s das outras partes juntas).
+   O card, porém, muda no ritmo da aula — no máximo uma vez por dia por turma.
+   Guardar 3h corta esse custo de quase toda visita: só a primeira do turno
+   paga. Se o professor lançar a aula agora, o aluno vê em até 3h.
+   Falha no cache nunca derruba a resposta: no pior caso, calcula de novo. */
+const SITU_TTL_S = 3 * 60 * 60;
+
+function situacaoCache_(raf) {
+  var chave = 'situ:' + String(raf || '').toUpperCase();
+  var cache = null;
+  try { cache = CacheService.getScriptCache(); } catch (e) {}
+  if (cache) {
+    var hit = cache.get(chave);
+    if (hit) { try { return JSON.parse(hit); } catch (e) {} }
+  }
+  var s = situacaoAluno_(raf, null);
+  if (cache && s) { try { cache.put(chave, JSON.stringify(s), SITU_TTL_S); } catch (e) {} }
+  return s;
+}
 
 function situacaoAluno_(raf, fonte) {
   const alvo = normRaf(raf);
@@ -411,6 +449,12 @@ function studentHistory(p) {
   const st = findStudent(p.raf);
   if (!st) return json({ ok: false, error: 'RAF não encontrado' });
   st.raf = normRaf(p.raf);
+  return json({ ok: true, student: st, results: historyDe_(st) });
+}
+
+/* Varre as abas de ferramenta atrás dos resultados do aluno. Extraído de
+   studentHistory para o bootstrap reusar sem refazer a busca na matrícula. */
+function historyDe_(st) {
   const ss = SpreadsheetApp.getActive();
   const out = [];
   ss.getSheets().forEach(function (sh) {
@@ -421,7 +465,50 @@ function studentHistory(p) {
     });
   });
   out.sort(function (a, b) { return (b.t || 0) - (a.t || 0); });
-  return json({ ok: true, student: st, results: out });
+  return out;
+}
+
+/* ── bootstrap: a sessão inteira do aluno numa execução só ─────────────────
+ * O portal fazia CINCO chamadas por sessão (login, fdCheckin, wallet,
+ * history, situacao). Cada chamada é uma execução do Apps Script, e a medição
+ * de 30/07/2026 achou o teto: 25 simultâneas já quadruplicam a latência e 50
+ * derrubam 10% com "Muitos pedidos simultâneos: Planilhas". Com uma turma
+ * inteira entrando junto, cinco chamadas por aluno estouravam o limite muito
+ * antes dos 500 alunos da escola.
+ *
+ * Juntando aqui, a busca na matrícula acontece UMA vez em vez de três, e a
+ * escola cabe folgada no mesmo backend.
+ *
+ * Cada parte tem try/catch próprio de propósito: com chamadas separadas, uma
+ * falha derrubava só o bloco dela na tela (o dashboard de situação, por
+ * exemplo, já se escondia sozinho). Esse comportamento tinha de sobreviver à
+ * junção — o aluno entra mesmo que o card esteja fora do ar.
+ */
+function studentBootstrap(p) {
+  try { maybeSyncRoster_(); } catch (e) {}
+  const st = findStudent(p.raf);
+  if (!st) return json({ ok: false, error: 'RAF não encontrado' });
+  st.raf = normRaf(p.raf);
+  try { registrarAcesso_(st); } catch (e) {}
+
+  const out = { ok: true, student: st };
+
+  // Fisk Dólares. A ORDEM importa: o check-in credita, cobra a inatividade e
+  // segura a sequência; só depois o extrato é lido, para já sair com o
+  // lançamento de hoje dentro.
+  try {
+    const chk = fdCheckin_(st.raf);
+    out.fd = chk && chk.ok ? {
+      ok: true, saldo: chk.saldo, streak: chk.streak, badges: chk.badges,
+      credito: chk.credito, acesso: chk.acesso, penalidade: chk.penalidade,
+      novasBadges: chk.novasBadges, extrato: fdExtratoDe_(st.raf)
+    } : fdWallet_(st.raf);
+  } catch (e) { out.fd = { ok: false, error: String(e) }; }
+
+  try { out.situacao = situacaoCache_(st.raf); } catch (e) { out.situacao = null; }
+  try { out.results = historyDe_(st); } catch (e) { out.results = []; }
+
+  return json(out);
 }
 
 /* ── util ── */
@@ -1203,7 +1290,7 @@ function dirSetPass(p) {
      (turma) → [pastas de aluno por nome completo].
    ══════════════════════════════════════════════════════════════════════ */
 
-const FISK_CHAVE = '<FISK_CHAVE — valor real só no fisk-hub-backend local>';  // mesma API_KEY das ferramentas do Hub
+const FISK_CHAVE = 'fisk-cards-2026-vX7q3nT';  // mesma API_KEY das ferramentas do Hub
 const RAIZ_ESCOLA = {                          // pastas "Planners ..." no drive compartilhado
   taubate:  '1c7vuwrRpINGx-ITgvhr65yD4cwbHodt2',
   cacapava: '1FJ8Fs677pq0tENiJ1PHLtZp8A0lmw-Gs'
@@ -1826,6 +1913,22 @@ function fdAvaliaBadges_(raf) {
 }
 
 /** Saldo + extrato + streak + conquistas (alimenta o dashboard da home). */
+/* Últimos lançamentos do aluno, do mais novo para o mais velho. Separado do
+   fdWallet_ para o bootstrap pegar só o extrato: lá o saldo, a sequência e as
+   medalhas já vêm frescos do check-in, e reavaliá-los custaria leituras de
+   planilha à toa — que é justamente o recurso escasso. */
+function fdExtratoDe_(raf) {
+  var ext = fdSheet_('_extrato', ['Quando', 'RAF', 'Atividade', 'Tipo', 'Detalhe', 'Valor', 'Saldo']);
+  var evals = ext.getDataRange().getValues();
+  var linhas = [];
+  for (var j = evals.length - 1; j >= 1 && linhas.length < FD.EXTRATO_MAX; j--) {
+    if (String(evals[j][1]).trim() === raf) {
+      linhas.push({ t: new Date(evals[j][0]).getTime(), atividade: evals[j][2], tipo: evals[j][3], detalhe: evals[j][4], valor: Number(evals[j][5]) || 0 });
+    }
+  }
+  return linhas;
+}
+
 function fdWallet_(raf) {
   raf = String(raf || '').trim();
   if (!raf) return { ok: false, error: 'RAF vazio' };
@@ -1835,14 +1938,7 @@ function fdWallet_(raf) {
   for (var i = 1; i < vals.length; i++) {
     if (String(vals[i][0]).trim() === raf) { saldo = Number(vals[i][1]) || 0; break; }
   }
-  var ext = fdSheet_('_extrato', ['Quando', 'RAF', 'Atividade', 'Tipo', 'Detalhe', 'Valor', 'Saldo']);
-  var evals = ext.getDataRange().getValues();
-  var linhas = [];
-  for (var j = evals.length - 1; j >= 1 && linhas.length < FD.EXTRATO_MAX; j--) {
-    if (String(evals[j][1]).trim() === raf) {
-      linhas.push({ t: new Date(evals[j][0]).getTime(), atividade: evals[j][2], tipo: evals[j][3], detalhe: evals[j][4], valor: Number(evals[j][5]) || 0 });
-    }
-  }
+  var linhas = fdExtratoDe_(raf);
   var streak = fdStreakDe_(raf);
   // se o último acesso ficou para trás, a sequência exibida zera
   if (streak.ultimo && streak.ultimo !== fdHoje_()) {
@@ -2226,5 +2322,175 @@ function fdDirRota_(req) {
   if (acao === 'dirFdSet')       return fdJson_(fdDirSet_(String(req.raf || ''), req.saldo, String(req.motivo || '')));
   if (acao === 'dirFdReset')     return fdJson_(fdPurgeRaf_(String(req.raf || '')));
   if (acao === 'dirFdResetTudo') return fdJson_(fdDirResetTudo_());
+  return json({ ok: false, error: 'ação desconhecida: ' + acao });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TREINAMENTOS INTERNOS — catálogo alimentado pelo Painel da Direção
+
+   Antes deste bloco, a página treinamentos.html do Fisk Hub lia SÓ o arquivo
+   estático treinamentos-data.js: para publicar um vídeo novo era preciso
+   editar o repositório. Agora a direção cola o link da gravação no painel e
+   ele aparece para os professores na hora.
+
+   Dois TIPOS de vídeo, que é a distinção pedida:
+   - 'reuniao'      → gravação de reunião de professores. Vai para uma faixa
+                      própria ("Gravações de Reuniões"), ordenada da mais
+                      recente para a mais antiga.
+   - 'treinamento'  → treinamento de verdade. Vai para uma das categorias
+                      temáticas do catálogo (ou uma categoria nova).
+
+   O catálogo estático continua valendo: a página junta os dois. Nada do que
+   já existe em treinamentos-data.js precisa ser migrado.
+
+   Rotas:
+   - tnList      (aberta)  → o que a página de treinamentos lê
+   - dirTnList / dirTnAdd / dirTnRemove (token de diretor, via dirGuard)
+
+   Bloco ADITIVO: usa fdSheet_, fdDiaStr_, fdHoje_ e json, que já existem.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+var TN_ABA = '_treinamentos';
+var TN_CAB = ['ID', 'Tipo', 'Categoria', 'Titulo', 'Video', 'PDF', 'Quando', 'Criado', 'Por', 'Ativo'];
+
+/* As categorias do catálogo estático (treinamentos-data.js). Ficam aqui só
+   para o painel sugerir os mesmos nomes na hora de publicar — assim um
+   treinamento novo cai DENTRO da faixa que já existe, em vez de criar uma
+   faixa quase igual. Se uma categoria for criada só no repositório, basta
+   acrescentá-la nesta lista para ela voltar a aparecer na sugestão. */
+var TN_CATEGORIAS_BASE = [
+  'Realidade Individual', 'Exploration e Checking', 'Atividade Comunicativa',
+  'Aula Acadêmica', 'Gamificação'
+];
+
+function tnSheet_() { return fdSheet_(TN_ABA, TN_CAB); }
+
+/** Quem está logado no painel (o dirGuard já validou o token antes). */
+function tnQuem_(req) {
+  return CacheService.getScriptCache().get('dirtok_' + String((req && req.token) || '')) || 'direção';
+}
+
+/**
+ * Aceita link de arquivo do Drive ou de vídeo do YouTube.
+ * Devolve '' para vazio e null para link que não serve — pasta do Drive é o
+ * caso clássico: as pastas são restritas, só os arquivos têm liberação
+ * individual de visualização para os professores.
+ */
+function tnLink_(u) {
+  u = String(u == null ? '' : u).trim();
+  if (!u) return '';
+  if (!/^https:\/\//i.test(u)) return null;
+  if (/drive\.google\.com\/drive\/folders/i.test(u)) return null;
+  return u;
+}
+
+/** Uma linha da aba vira o objeto que o front-end consome. */
+function tnItem_(linha) {
+  return {
+    id: String(linha[0] || ''),
+    tipo: String(linha[1] || 'treinamento'),
+    categoria: String(linha[2] || ''),
+    titulo: String(linha[3] || ''),
+    video: String(linha[4] || ''),
+    pdf: String(linha[5] || ''),
+    quando: fdDiaStr_(linha[6]),
+    criado: linha[7] ? new Date(linha[7]).getTime() : null,
+    por: String(linha[8] || '')
+  };
+}
+
+/**
+ * Lê a aba inteira. Só devolve o que está ativo — remover no painel marca
+ * 'nao' na coluna Ativo em vez de apagar a linha, para o histórico de quem
+ * publicou o quê não sumir.
+ */
+function tnLer_() {
+  var vals = tnSheet_().getDataRange().getValues();
+  var itens = [];
+  for (var i = 1; i < vals.length; i++) {
+    if (!String(vals[i][0] || '').trim()) continue;
+    if (String(vals[i][9] || 'sim').toLowerCase() === 'nao') continue;
+    itens.push(tnItem_(vals[i]));
+  }
+  /* reuniões: da mais recente para a mais antiga (é o que a direção espera
+     ver no topo). Sem data, cai para a hora da publicação. */
+  itens.sort(function (a, b) {
+    var da = a.quando || '', db = b.quando || '';
+    if (da !== db) return db.localeCompare(da);
+    return (b.criado || 0) - (a.criado || 0);
+  });
+  return itens;
+}
+
+/** Rota aberta: é o que a página de treinamentos do Hub lê ao abrir. */
+function tnList_() {
+  return { ok: true, itens: tnLer_() };
+}
+
+function tnAdd_(req) {
+  var tipo = String(req.tipo || '').trim().toLowerCase();
+  if (tipo !== 'reuniao' && tipo !== 'treinamento') {
+    return { ok: false, error: 'Escolha se é gravação de reunião ou treinamento.' };
+  }
+  var titulo = String(req.titulo || '').trim();
+  if (!titulo) return { ok: false, error: 'Dê um título ao vídeo.' };
+
+  var video = tnLink_(req.video);
+  var pdf = tnLink_(req.pdf);
+  if (video === null) return { ok: false, error: 'O link do vídeo precisa ser de um ARQUIVO do Drive (ou do YouTube) — link de pasta não abre para os professores.' };
+  if (pdf === null) return { ok: false, error: 'O link do material precisa ser de um ARQUIVO do Drive — link de pasta não abre para os professores.' };
+  if (!video && !pdf) return { ok: false, error: 'Cole pelo menos o link do vídeo.' };
+
+  var categoria = tipo === 'reuniao' ? '' : String(req.categoria || '').trim();
+  if (tipo === 'treinamento' && !categoria) {
+    return { ok: false, error: 'Escolha a categoria do treinamento.' };
+  }
+
+  var quando = String(req.quando || '').trim().slice(0, 10);
+  if (quando && !/^\d{4}-\d{2}-\d{2}$/.test(quando)) quando = '';
+  if (tipo === 'reuniao' && !quando) quando = fdHoje_();
+
+  var id = 'tn' + Utilities.getUuid().slice(0, 8);
+  tnSheet_().appendRow([
+    id, tipo, categoria, titulo, video, pdf, quando,
+    new Date(), tnQuem_(req), 'sim'
+  ]);
+  return { ok: true, id: id };
+}
+
+/** Remoção é lógica: a linha fica, a coluna Ativo vira 'nao'. */
+function tnRemove_(req) {
+  var id = String(req.id || '').trim();
+  if (!id) return { ok: false, error: 'Informe qual vídeo remover.' };
+  var sh = tnSheet_();
+  var vals = sh.getDataRange().getValues();
+  for (var i = 1; i < vals.length; i++) {
+    if (String(vals[i][0]).trim() === id) {
+      sh.getRange(i + 1, 10).setValue('nao');
+      return { ok: true };
+    }
+  }
+  return { ok: false, error: 'Vídeo não encontrado (talvez já tenha sido removido).' };
+}
+
+/**
+ * Roteador do painel. Chamado pelo dirGuard, ou seja, só roda com token de
+ * diretor válido — o painel não carrega chave nenhuma.
+ */
+function tnDirRota_(req) {
+  var acao = String((req && req.action) || '');
+  if (acao === 'dirTnList') {
+    var itens = tnLer_();
+    var cats = {}, lista = [];
+    TN_CATEGORIAS_BASE.forEach(function (c) { cats[c] = 1; lista.push(c); });
+    itens.forEach(function (it) {
+      if (it.tipo === 'treinamento' && it.categoria && !cats[it.categoria]) {
+        cats[it.categoria] = 1; lista.push(it.categoria);
+      }
+    });
+    return json({ ok: true, itens: itens, categorias: lista });
+  }
+  if (acao === 'dirTnAdd')    return json(tnAdd_(req));
+  if (acao === 'dirTnRemove') return json(tnRemove_(req));
   return json({ ok: false, error: 'ação desconhecida: ' + acao });
 }

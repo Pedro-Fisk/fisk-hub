@@ -41,6 +41,9 @@
   .tn-play svg{width:20px;height:20px}
   .tn-chip{margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;letter-spacing:.5px;color:#e8edf0;background:#31383e;border-radius:6px;padding:4px 9px}
   .tn-chip svg{width:12px;height:12px}
+  /* a data da reunião fica colada no play, não no canto: quem procura uma
+     gravação procura pela data, então ela vem antes dos selos de material */
+  .tn-chip.data{margin-left:0;background:transparent;color:#a8b3bb;padding:4px 0;letter-spacing:.02em}
 
   /* gradientes dos cards (rotação por item, como na EXPO) */
   .g0{background:linear-gradient(120deg,#b3002d,#f5772b)}
@@ -58,6 +61,8 @@
   .tn-arrow[hidden]{display:none}
 
   .tn-empty{padding:40px 28px;color:#8b969e;font-size:15px;display:none}
+  .tn-carregando{padding:0 28px 10px;color:#8b969e;font-size:13px}
+  @media (max-width:640px){ .tn-carregando{padding:0 14px 10px} }
 
   /* player */
   .tn-modal{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.82);align-items:center;justify-content:center;padding:24px}
@@ -120,6 +125,7 @@
   </nav>
 
   <main id="tnMain"></main>
+  <p class="tn-carregando" id="tnCarregando" hidden>Buscando os vídeos publicados pela direção…</p>
   <p class="tn-empty" id="tnEmpty">Nenhum treinamento encontrado com esse termo.</p>
 
   <div class="tn-modal" id="tnModal">
@@ -172,6 +178,38 @@
 (function(){
   const main=document.getElementById('tnMain');
 
+  /* ── Catálogo ──────────────────────────────────────────────────────────────
+     Duas fontes, juntadas aqui:
+     1. treinamentos-data.js — o catálogo fixo, versionado no repositório;
+     2. a aba _treinamentos do backend — o que a direção publica pelo painel,
+        colando o link de uma gravação do Drive.
+
+     Os vídeos publicados pelo painel têm TIPO: 'reuniao' cai na faixa
+     "Gravações de Reuniões" (que aparece no topo, da mais recente para a mais
+     antiga) e 'treinamento' entra na faixa temática escolhida — a mesma que
+     já existe no catálogo fixo, quando o nome bate.
+     Se o backend não responder, a página continua mostrando o catálogo fixo. */
+  const EP='https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
+  const CAT_REUNIOES='🎥 Gravações de Reuniões';
+
+  /* cópia rasa por item: a fusão acrescenta itens às categorias, e mexer no
+     TRAININGS original faria a segunda renderização duplicar tudo */
+  let catalogo=TRAININGS.map(c=>({categoria:c.categoria,itens:c.itens.slice()}));
+
+  function juntar(remotos){
+    const base=TRAININGS.map(c=>({categoria:c.categoria,itens:c.itens.slice()}));
+    const reunioes=[];
+    (remotos||[]).forEach(function(it){
+      const item={titulo:it.titulo,video:it.video||'',pdf:it.pdf||'',quando:it.quando||''};
+      if(it.tipo==='reuniao'){ reunioes.push(item); return; }
+      const alvo=base.find(c=>c.categoria===it.categoria);
+      if(alvo) alvo.itens.push(item);
+      else base.push({categoria:it.categoria||'Outros treinamentos',itens:[item]});
+    });
+    /* o backend já devolve em ordem decrescente de data */
+    return reunioes.length ? [{categoria:CAT_REUNIOES,itens:reunioes}].concat(base) : base;
+  }
+
   /* converte links do Drive/YouTube para a versão embutível */
   function embedUrl(u){
     let m=u.match(/drive\.google\.com\/file\/d\/([\w-]+)/);
@@ -185,23 +223,34 @@
   const ICON_PDF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 2.5h8l4.5 4.5v14a.9.9 0 0 1-1 1H6a.9.9 0 0 1-1-1v-17.5a.9.9 0 0 1 1-1z"/><path d="M14 2.5V7h4.5"/></svg>';
   const ICON_CHEV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';
 
+  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+  /* '2026-07-30' → '30/07/2026', sem passar por new Date(): a string crua não
+     tem fuso, e o construtor a leria como UTC e voltaria um dia atrás aqui */
+  function dataBr(iso){
+    const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso||''));
+    return m ? m[3]+'/'+m[2]+'/'+m[1] : '';
+  }
+
   let g=0; // rotação dos gradientes
-  function cardHtml(item){
+  function cardHtml(item,ci,ii){
     const grad='g'+(g++%6);
     const chips=[];
+    const d=dataBr(item.quando);
+    if(d) chips.push('<span class="tn-chip data">'+d+'</span>');
     if(item.pdf) chips.push('<span class="tn-chip">'+ICON_PDF+' PDF</span>');
     const foot=(item.video?'<span class="tn-play">'+ICON_PLAY+'</span>':'')+chips.join('');
-    return '<button type="button" class="tn-card" data-title="'+item.titulo.replace(/"/g,'&quot;')+'">'
-      +'<span class="tn-thumb '+grad+'"><b>'+item.titulo+'</b></span>'
+    return '<button type="button" class="tn-card" data-k="'+ci+':'+ii+'" data-title="'+esc(item.titulo)+'">'
+      +'<span class="tn-thumb '+grad+'"><b>'+esc(item.titulo)+'</b></span>'
       +'<span class="tn-foot">'+(foot||'<span class="tn-chip">EM BREVE</span>')+'</span></button>';
   }
 
   function render(){
-    main.innerHTML=TRAININGS.map((cat,ci)=>
-      '<section class="tn-row" data-cat="'+ci+'"><h2>'+cat.categoria+'</h2>'
+    g=0;
+    main.innerHTML=catalogo.map((cat,ci)=>
+      '<section class="tn-row" data-cat="'+ci+'"><h2>'+esc(cat.categoria)+'</h2>'
       +'<div class="tn-strip">'
       +'<button type="button" class="tn-arrow tn-prev" style="transform:translateY(-50%) rotate(180deg)">'+ICON_CHEV+'</button>'
-      +'<div class="tn-scroller">'+cat.itens.map(cardHtml).join('')+'</div>'
+      +'<div class="tn-scroller">'+cat.itens.map((it,ii)=>cardHtml(it,ci,ii)).join('')+'</div>'
       +'<button type="button" class="tn-arrow tn-next">'+ICON_CHEV+'</button>'
       +'</div></section>').join('');
 
@@ -216,7 +265,8 @@
 
     // clique nos cards
     main.querySelectorAll('.tn-card').forEach(card=>{
-      const item=findItem(card.dataset.title);
+      const item=findItem(card.dataset.k);
+      if(!item) return;
       card.onclick=()=>{
         if(item.video) openModal(item);
         else if(item.pdf) window.open(item.pdf,'_blank','noopener');
@@ -224,15 +274,19 @@
     });
   }
 
-  function findItem(title){
-    for(const c of TRAININGS){ for(const i of c.itens){ if(i.titulo===title) return i; } }
-    return null;
+  /* pela posição, não pelo título: duas gravações de reunião podem se chamar
+     igual ("Reunião de professores") e caíam sempre no vídeo da primeira */
+  function findItem(k){
+    const p=String(k||'').split(':');
+    const cat=catalogo[+p[0]];
+    return cat ? cat.itens[+p[1]] : null;
   }
 
   /* ---- player ---- */
   const modal=document.getElementById('tnModal'), frame=document.getElementById('tnFrame');
   function openModal(item){
-    document.getElementById('tnModalTitle').textContent=item.titulo;
+    const d=dataBr(item.quando);
+    document.getElementById('tnModalTitle').textContent=item.titulo+(d?' · '+d:'');
     const pdf=document.getElementById('tnModalPdf');
     pdf.hidden=!item.pdf; if(item.pdf) pdf.href=item.pdf;
     document.getElementById('tnModalOpen').href=item.video;
@@ -245,9 +299,10 @@
   document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
 
   /* ---- busca ---- */
+  const busca=document.getElementById('tnSearch');
   const norm=s=>s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
-  document.getElementById('tnSearch').addEventListener('input',e=>{
-    const q=norm(e.target.value.trim());
+  function filtrar(){
+    const q=norm(busca.value.trim());
     let any=false;
     main.querySelectorAll('.tn-row').forEach(row=>{
       let rowAny=false;
@@ -260,9 +315,27 @@
       if(rowAny) any=true;
     });
     document.getElementById('tnEmpty').style.display=any?'none':'block';
-  });
+  }
+  busca.addEventListener('input',filtrar);
 
+  /* ---- carga ----
+     Pinta o catálogo fixo na hora (nada de tela em branco esperando a rede) e
+     repinta quando as publicações da direção chegam. */
   render();
+
+  const aviso=document.getElementById('tnCarregando');
+  aviso.hidden=false;
+  fetch(EP,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+            body:JSON.stringify({action:'tnList'})})
+    .then(r=>r.json())
+    .then(res=>{
+      aviso.hidden=true;
+      if(!res||!res.ok||!res.itens||!res.itens.length) return;
+      catalogo=juntar(res.itens);
+      render();
+      filtrar();   // a busca em curso continua valendo depois de repintar
+    })
+    .catch(()=>{ aviso.textContent='Não deu para buscar os vídeos publicados pela direção — abaixo está o catálogo fixo.'; });
 })();
 </script>
 </body>

@@ -3,8 +3,18 @@
    Fonte: Planner de Treinamento de Equipe, aba "3. MONITORES E
    PROFESSORES", coluna LINKS.
 
-   Para adicionar um treinamento, copie um bloco {titulo: ...} e cole
+   ⚠️ Este é o catálogo FIXO. Para publicar um vídeo no dia a dia, use o
+   Painel da Direção (card "🎥 Treinamentos e Gravações"): lá basta colar o
+   link do Drive e escolher se é uma gravação de reunião ou um treinamento —
+   ele aparece nesta mesma página na hora, sem mexer no repositório. Este
+   arquivo continua valendo e aparece junto; edite-o quando quiser fixar algo
+   no catálogo base ou criar uma categoria nova.
+
+   Para adicionar um treinamento aqui, copie um bloco {titulo: ...} e cole
    na categoria certa (ou crie uma categoria nova no mesmo formato).
+   Ao criar uma categoria nova, acrescente o nome dela também na lista
+   TN_CATEGORIAS_BASE do backend (Code.gs) — é de lá que o painel tira as
+   opções de categoria na hora de publicar.
 
    Campos de cada item (todos os links são do Google Drive/YouTube):
    - titulo: nome exibido no card (obrigatório)
