@@ -88,13 +88,18 @@
     .tn-arrow{display:none}
   }
 
-  /* ── Gate de senha ── */
+  /* ── Gate: login do professor ── */
   #pw-gate{position:fixed;inset:0;z-index:200;background:#14181b;display:flex;align-items:center;justify-content:center;padding:1.5rem}
   #pw-gate.hidden{display:none}
   .pw-box{background:#191e22;border-radius:16px;padding:2.5rem 2rem;width:min(380px,100%);box-shadow:0 18px 60px rgba(0,0,0,.6);text-align:center}
   .pw-logo{font-family:'Poppins';font-weight:800;font-size:1.5rem;color:#fff;margin-bottom:.25rem}.pw-logo span{color:#d81f26}
-  .pw-sub{color:#8b969e;font-size:.88rem;margin-bottom:2rem}
+  .pw-sub{color:#8b969e;font-size:.88rem;margin-bottom:1.6rem}
   .pw-field{width:100%;background:#22282d;border:1.5px solid #313a41;border-radius:10px;padding:.85rem 1.1rem;color:#f2efef;font-family:inherit;font-size:1rem;outline:none;text-align:center;letter-spacing:.08em;transition:border-color .15s}
+  /* o nome é escolhido numa lista, não digitado: é a mesma porta do Hub, e
+     assim ninguém erra a grafia do próprio nome de acesso */
+  select.pw-field{letter-spacing:normal;margin-bottom:.7rem;cursor:pointer;
+    appearance:none;-webkit-appearance:none;text-align-last:center}
+  select.pw-field option{background:#22282d;color:#f2efef}
   .pw-field:focus{border-color:#d81f26}
   .pw-field.shake{animation:shake .35s ease}
   @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
@@ -109,7 +114,8 @@
     <div class="pw-box">
       <div class="pw-logo">FISK <span>TREINAMENTOS</span></div>
       <p class="pw-sub">Área restrita a professores internos</p>
-      <input class="pw-field" id="pw-input" type="password" placeholder="Senha de acesso" autocomplete="current-password">
+      <select class="pw-field" id="pw-nome"><option value="" disabled selected>Carregando…</option></select>
+      <input class="pw-field" id="pw-input" type="password" placeholder="Sua senha do Fisk Hub" autocomplete="current-password">
       <button class="pw-btn" id="pw-btn">Entrar</button>
       <p class="pw-err" id="pw-err"></p>
     </div>
@@ -146,32 +152,81 @@
 
 <script src="treinamentos-data.js"></script>
 <script>
+/* ── Porta de entrada ───────────────────────────────────────────────────────
+   A senha é a do PROFESSOR, a mesma do login do Fisk Hub, validada no
+   servidor (profLogin). Antes havia uma senha única escrita aqui no código —
+   e este repositório é público, então ela estava à vista de qualquer um; além
+   disso, trocá-la exigia publicar o site de novo e avisar a equipe inteira.
+   Agora quem manda é a _profs: a direção troca a senha de alguém no painel e
+   vale na hora, aqui inclusive.
+
+   Quem já entrou no Hub não digita nada: a sessão fica em localStorage
+   (fisk_prof) e o token é conferido no servidor (profCheck) — é o mesmo SSO
+   que as outras ferramentas usam.
+   ─────────────────────────────────────────────────────────────────────────── */
+var TN_EP='https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
 (function(){
   const gate=document.getElementById('pw-gate');
+  const sel=document.getElementById('pw-nome');
   const inp=document.getElementById('pw-input');
   const err=document.getElementById('pw-err');
-  const PW='Masterksif';
-  const KEY='fisk_tn_auth';
+  const btn=document.getElementById('pw-btn');
 
+  function post(body){
+    return fetch(TN_EP,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify(body)}).then(r=>r.json());
+  }
   function unlock(){ gate.classList.add('hidden'); }
-
-  if(sessionStorage.getItem(KEY)==='1') { unlock(); }
-
-  function attempt(){
-    if(inp.value===PW){
-      sessionStorage.setItem(KEY,'1');
-      unlock();
-    } else {
-      err.textContent='Senha incorreta. Tente novamente.';
-      inp.classList.add('shake');
-      inp.value='';
-      setTimeout(()=>inp.classList.remove('shake'),400);
-      inp.focus();
-    }
+  function recusa(msg){
+    err.textContent=msg;
+    inp.classList.add('shake'); inp.value='';
+    setTimeout(()=>inp.classList.remove('shake'),400);
+    inp.focus();
   }
 
-  document.getElementById('pw-btn').addEventListener('click', attempt);
-  inp.addEventListener('keydown', e=>{ if(e.key==='Enter') attempt(); });
+  /* 1. já logado no Hub? entra direto, sem pedir nada */
+  var sess=null;
+  try{ sess=JSON.parse(localStorage.getItem('fisk_prof')||'null'); }catch(e){}
+  if(sess&&sess.token){
+    post({action:'profCheck',token:sess.token}).then(function(res){
+      if(res&&res.ok) unlock(); else listar();
+    }).catch(listar);
+  } else listar();
+
+  /* 2. senão, a mesma lista de nomes da porta do Hub */
+  function listar(){
+    fetch(TN_EP+'?action=profList').then(r=>r.json()).then(function(res){
+      var ps=((res&&res.profs)||[]).filter(function(p){ return !p.director; });
+      ps.sort(function(a,b){ return String(a.name).localeCompare(String(b.name),'pt-BR'); });
+      sel.innerHTML='<option value="" disabled selected>Seu nome de acesso</option>'+
+        ps.map(function(p){
+          var nm=String(p.name).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+          var es=String(p.escolas||'').replace(/,/g,' + ');
+          return '<option value="'+nm+'">'+nm+(es?' · '+es:'')+'</option>';
+        }).join('');
+    }).catch(function(){
+      sel.innerHTML='<option value="" disabled selected>Não deu para carregar a lista</option>';
+    });
+  }
+
+  function entrar(){
+    if(!sel.value){ err.textContent='Escolha o seu nome na lista.'; return; }
+    if(!inp.value){ err.textContent='Digite a sua senha.'; return; }
+    btn.disabled=true; err.textContent='Verificando…';
+    post({action:'profLogin',name:sel.value,password:inp.value}).then(function(res){
+      btn.disabled=false;
+      if(res&&res.ok){
+        /* grava a mesma sessão do Hub: quem entra por aqui já entra logado lá */
+        if(res.token&&res.prof) res.prof.token=res.token;
+        try{ localStorage.setItem('fisk_prof',JSON.stringify(res.prof)); }catch(e){}
+        err.textContent=''; unlock();
+      } else recusa((res&&res.error)||'Não deu para entrar. Tente de novo.');
+    }).catch(function(){ btn.disabled=false; recusa('Erro de conexão.'); });
+  }
+
+  btn.addEventListener('click', entrar);
+  inp.addEventListener('keydown', e=>{ if(e.key==='Enter') entrar(); });
+  sel.addEventListener('change', ()=>{ err.textContent=''; inp.focus(); });
 })();
 </script>
 <script>
@@ -189,7 +244,7 @@
      antiga) e 'treinamento' entra na faixa temática escolhida — a mesma que
      já existe no catálogo fixo, quando o nome bate.
      Se o backend não responder, a página continua mostrando o catálogo fixo. */
-  const EP='https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
+  const EP=TN_EP;   // mesmo backend do login, declarado no script da porta
   const CAT_REUNIOES='🎥 Gravações de Reuniões';
 
   /* cópia rasa por item: a fusão acrescenta itens às categorias, e mexer no
