@@ -1290,7 +1290,7 @@ function dirSetPass(p) {
      (turma) → [pastas de aluno por nome completo].
    ══════════════════════════════════════════════════════════════════════ */
 
-const FISK_CHAVE = 'fisk-cards-2026-vX7q3nT';  // mesma API_KEY das ferramentas do Hub
+const FISK_CHAVE = '<valor real só no fisk-hub-backend / Propriedades do Script>';  // NUNCA o valor aqui: este repo é público
 const RAIZ_ESCOLA = {                          // pastas "Planners ..." no drive compartilhado
   taubate:  '1c7vuwrRpINGx-ITgvhr65yD4cwbHodt2',
   cacapava: '1FJ8Fs677pq0tENiJ1PHLtZp8A0lmw-Gs'

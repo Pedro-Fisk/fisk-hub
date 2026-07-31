@@ -1196,16 +1196,30 @@
        Visão Geral). Cache de 30 min p/ não pesar a home.
     ════════════════════════════════════════════════ */
     (function miniDash(){
-      var API = 'https://script.google.com/macros/s/AKfycbxb3s3zSUoaFO9ytEQ4W6r-5xJ3hiA9fbFhugnbd9gyX-m3KGNNM8DeyGgNWPReYEwU/exec';
-      var KEY = 'fisk-cards-2026-vX7q3nT';
+      var API = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
       var LIM = 4, TTL = 30 * 60 * 1000;
       var sec = document.getElementById('miniDash'), box = document.getElementById('mdKpis');
       var dataCache = null;
 
       function sess(){ try{ return JSON.parse(localStorage.getItem('fisk_prof')||'null'); }catch(e){ return null; } }
+      /* A CHAVE DO CARD NÃO VIVE MAIS AQUI. Este repositório é público: enquanto
+         ela estava neste arquivo, qualquer pessoa na internet lia nome, notas e
+         faltas de todas as turmas — e escrevia nota. Quem fala com o card agora é
+         o backend (action=card), que valida a sessão e só então carimba a chave.
+         Ver cardProxy_ no fisk-hub-backend. NUNCA reintroduzir a chave aqui. */
+      function tokenSessao() {
+        try { var s = JSON.parse(localStorage.getItem('fisk_prof') || 'null'); return (s && s.token) || ''; }
+        catch (e) { return ''; }
+      }
+      function comSessao(p) {
+        var o = { action: 'card', token: tokenSessao() };
+        Object.keys(p).forEach(function (k) { o[k] = p[k]; });
+        return o;
+      }
       function api(p){
-        var qs = Object.keys(p).map(function(k){ return k+'='+encodeURIComponent(p[k]); }).join('&');
-        return fetch(API+'?key='+KEY+'&'+qs).then(function(r){ return r.json(); })
+        var P = comSessao(p);
+        var qs = Object.keys(P).map(function(k){ return k+'='+encodeURIComponent(P[k]); }).join('&');
+        return fetch(API+'?'+qs).then(function(r){ return r.json(); })
           .then(function(j){ if (j && j.erro) throw new Error(j.erro); return j; });
       }
       function notaDe(c){

@@ -295,8 +295,7 @@
    Só leitura. Abre pré-selecionada no professor logado (fisk_prof),
    mas o seletor fica livre (substituições são frequentes).
    ============================================================ */
-var API_URL = 'https://script.google.com/macros/s/AKfycbxb3s3zSUoaFO9ytEQ4W6r-5xJ3hiA9fbFhugnbd9gyX-m3KGNNM8DeyGgNWPReYEwU/exec';
-var API_KEY = 'fisk-cards-2026-vX7q3nT';
+var API_URL = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
 var LIMITE_ATRASO = 4; // mesma régua do termo/planejador
 
 var $ = function (id) { return document.getElementById(id); };
@@ -308,9 +307,24 @@ function statusCard(msg, kind) { var s = $('statusCard'); s.textContent = msg ||
 function ind(id, st) { $(id).className = 'ind' + (st ? ' ' + st : ''); }
 function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
+/* A CHAVE DO CARD NÃO VIVE MAIS AQUI. Este repositório é público: enquanto
+   ela estava neste arquivo, qualquer pessoa na internet lia nome, notas e
+   faltas de todas as turmas — e escrevia nota. Quem fala com o card agora é
+   o backend (action=card), que valida a sessão e só então carimba a chave.
+   Ver cardProxy_ no fisk-hub-backend. NUNCA reintroduzir a chave aqui. */
+function tokenSessao() {
+  try { var s = JSON.parse(localStorage.getItem('fisk_prof') || 'null'); return (s && s.token) || ''; }
+  catch (e) { return ''; }
+}
+function comSessao(p) {
+  var o = { action: 'card', token: tokenSessao() };
+  Object.keys(p).forEach(function (k) { o[k] = p[k]; });
+  return o;
+}
 function api(params) {
+  params = comSessao(params);   // action=card + token da sessão
   var qs = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
-  return fetch(API_URL + '?key=' + encodeURIComponent(API_KEY) + '&' + qs)
+  return fetch(API_URL + '?' + qs)
     .then(function (r) { return r.json(); })
     .then(function (j) { if (j && j.erro) throw new Error(j.erro); return j; });
 }

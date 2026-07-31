@@ -191,8 +191,7 @@
  *    buscando na API do Apps Script (Web App), sempre ao vivo da planilha.
  * Preencher API_URL após publicar a implantação do App da Web no card.
  */
-var API_URL = 'https://script.google.com/macros/s/AKfycbxb3s3zSUoaFO9ytEQ4W6r-5xJ3hiA9fbFhugnbd9gyX-m3KGNNM8DeyGgNWPReYEwU/exec';
-var API_KEY = 'fisk-cards-2026-vX7q3nT'; // mesma API_KEY das propriedades do script
+var API_URL = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
 var POLISH_URL = '';  // endpoint da lapidação com IA (ex.: https://conversation-maker.vercel.app/api/polish-text)
 var POLISH_CODE = ''; // mesmo ACCESS_CODE que os professores usam na Conversation Maker
 
@@ -231,11 +230,26 @@ if (temHashTurma && API_URL) {
 }
 
 /* ---- modo standalone: dropdowns alimentados pela API ---- */
+/* A CHAVE DO CARD NÃO VIVE MAIS AQUI. Este repositório é público: enquanto
+   ela estava neste arquivo, qualquer pessoa na internet lia nome, notas e
+   faltas de todas as turmas — e escrevia nota. Quem fala com o card agora é
+   o backend (action=card), que valida a sessão e só então carimba a chave.
+   Ver cardProxy_ no fisk-hub-backend. NUNCA reintroduzir a chave aqui. */
+function tokenSessao() {
+  try { var s = JSON.parse(localStorage.getItem('fisk_prof') || 'null'); return (s && s.token) || ''; }
+  catch (e) { return ''; }
+}
+function comSessao(p) {
+  var o = { action: 'card', token: tokenSessao() };
+  Object.keys(p).forEach(function (k) { o[k] = p[k]; });
+  return o;
+}
 function api(params) {
-  var qs = Object.keys(params).map(function (k) {
-    return k + '=' + encodeURIComponent(params[k]);
+  var P = comSessao(params);
+  var qs = Object.keys(P).map(function (k) {
+    return k + '=' + encodeURIComponent(P[k]);
   }).join('&');
-  return fetch(API_URL + '?key=' + encodeURIComponent(API_KEY) + '&' + qs)
+  return fetch(API_URL + '?' + qs)
     .then(function (r) { return r.json(); })
     .then(function (j) { if (j.erro) throw new Error(j.erro); return j; });
 }
@@ -512,7 +526,7 @@ document.getElementById('btnDrive').addEventListener('click', function () {
   if (typeof fiskEnviarParaPasta !== 'function') { alert('Helper de Drive não carregou (fisk-shared.js).'); return; }
   var fProf = document.getElementById('fProf');
   fiskEnviarParaPasta(document.getElementById('btnDrive'), {
-    key: API_KEY, tipo: 'aluno',
+    token: tokenSessao(), tipo: 'aluno',
     escola: (payload && payload.escola) || '',
     professor: ((fProf && fProf.value) || (payload && (payload.professor || payload.aba)) || '').trim(),
     turma: (payload && payload.turma ? String(payload.turma).split('\n')[0] : '').trim(),

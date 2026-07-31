@@ -300,8 +300,7 @@
    sugestão do que fazer com cada aluno + roteiro copiável.
    Kids/teens sem placeholder ficam fora desta análise.
    ============================================================ */
-var API_URL = 'https://script.google.com/macros/s/AKfycbxb3s3zSUoaFO9ytEQ4W6r-5xJ3hiA9fbFhugnbd9gyX-m3KGNNM8DeyGgNWPReYEwU/exec';
-var API_KEY = 'fisk-cards-2026-vX7q3nT';
+var API_URL = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
 
 var LIMITE_ATRASO = 4;   // 4+ aulas de atraso = prioridade alta (mesma regra do termo)
 var FALTA_ALTA = 30;     // % de faltas para "alta"
@@ -317,9 +316,24 @@ var estado = { fila: [], fora: [], manual: false };
 function statusCard(msg, kind) { var s = $('statusCard'); s.textContent = msg || ''; s.className = 'status' + (kind ? ' ' + kind : ''); }
 function ind(id, estado) { $(id).className = 'ind' + (estado ? ' ' + estado : ''); }
 
+/* A CHAVE DO CARD NÃO VIVE MAIS AQUI. Este repositório é público: enquanto
+   ela estava neste arquivo, qualquer pessoa na internet lia nome, notas e
+   faltas de todas as turmas — e escrevia nota. Quem fala com o card agora é
+   o backend (action=card), que valida a sessão e só então carimba a chave.
+   Ver cardProxy_ no fisk-hub-backend. NUNCA reintroduzir a chave aqui. */
+function tokenSessao() {
+  try { var s = JSON.parse(localStorage.getItem('fisk_prof') || 'null'); return (s && s.token) || ''; }
+  catch (e) { return ''; }
+}
+function comSessao(p) {
+  var o = { action: 'card', token: tokenSessao() };
+  Object.keys(p).forEach(function (k) { o[k] = p[k]; });
+  return o;
+}
 function api(params) {
+  params = comSessao(params);   // action=card + token da sessão
   var qs = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
-  return fetch(API_URL + '?key=' + encodeURIComponent(API_KEY) + '&' + qs)
+  return fetch(API_URL + '?' + qs)
     .then(function (r) { return r.json(); })
     .then(function (j) { if (j && j.erro) throw new Error(j.erro); return j; });
 }
@@ -1065,7 +1079,7 @@ ligarAcao('.js-drive', function (ev) {
     var bytes = await montarPDFplano(dp);
     var sub = padraoSubstituicaoPlano(dp);
     return {
-      key: API_KEY, tipo: 'turma',
+      token: tokenSessao(), tipo: 'turma',
       escola: turma.escola || '', professor: turma.professor || turma.aba || '',
       turma: turma.turma || '', filename: nomeArquivoPlano(dp), bytes: bytes,
       substituiPrefixo: sub.substituiPrefixo, substituiSufixo: sub.substituiSufixo
