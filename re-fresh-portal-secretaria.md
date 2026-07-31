@@ -27,6 +27,9 @@ Cinco blocos:
 | 📞 **Fila de atendimento** | Quem está com faltas altas (padrão ≥ 30%) ou atraso de conteúdo (padrão ≥ 4 aulas, o gatilho do termo de atraso), com telefone, botão de WhatsApp e registro de "liguei / não atendeu / retornar em". |
 | ➕ **Matrícula e ⛔ baixa** | Matrícula preenche a primeira linha livre da turma no card e cria a pasta do aluno no Drive. Baixa (desistência, trancamento, transferência para fora) desmarca o ATIVO, grava o motivo e leva a pasta para "Alunos transferidos". |
 | 🧾 **Movimentações** | Log de tudo, com quem fez e quando. Transferência tem botão de desfazer. |
+| ✅ **Prontidão do semestre** | O que falta em cada aluno para a turma começar redonda: livro comprado, RAF, contrato aditado, contato e cadastro — com edição direto no portal, gravando no card. Nasceu do que os cards mostraram: 89 alunos com livro não comprado, 36 sem RAF, 38 sem telefone nenhum, 43 sem responsável (numa base 85% menor de 18) e 33 contratos não aditados em Taubaté. |
+| 🎂 **Aniversariantes** | Do mês, com o contato do responsável — que é quem de fato recebe a mensagem. |
+| 🩺 **Conferência do cadastro** | Data de nascimento escrita ao contrário (10 casos; a coluna Idade é fórmula, então a idade fica errada), anotação enfiada dentro do nome do aluno (52 casos), RAF repetido, aluno em duas turmas e status fora da lista. |
 | 🧩 **Padronização dos cards** | Só direção. Mostra, aba por aba, onde cada escola foge do padrão canônico de colunas, e alinha a planilha pelo Apps Script — com backup obrigatório e simulação antes. Ver `padronizacao-dos-cards.md`. |
 
 ---
@@ -139,6 +142,19 @@ só precisam ter o cargo ajustado.
    de inserir linha, porque inserir deslocaria os blocos de baixo e quebraria as
    células mescladas da coluna A do card. Abrir linhas no card continua sendo
    trabalho manual, de propósito.
+
+## A aba `Atrasados` do card agora é alimentada pelo portal
+
+Ela já existia nas duas escolas, preenchida à mão, com exatamente as perguntas
+da fila de atendimento — inclusive "Aluno/responsável comunicado?". Ao registrar
+um contato, o portal passa a gravar lá também: data de verificação, quem
+verificou, a lição em que o aluno deveria estar, a em que está, as aulas em
+atraso e o resultado do contato. Se o aluno já tem linha na aba, a linha é
+atualizada em vez de duplicada — a aba é o retrato do estado de cada aluno; o
+histórico completo continua na `_secContatos`.
+
+A coluna `CH atual SGF (X/60)` fica em branco: essa carga horária vem do sistema
+da franqueadora, que o portal não lê.
 
 ## Limites conhecidos
 

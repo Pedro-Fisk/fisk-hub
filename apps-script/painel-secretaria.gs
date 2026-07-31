@@ -148,6 +148,10 @@ function secRota_(req) {
       case 'secFicha':      return json(secFicha_(r));
       case 'secTurmas':     return json(secTurmas_(r));
       case 'secFila':       return json(secFila_(r));
+      case 'secProntidao':  return json(secProntidao_(r));
+      case 'secProntidaoDrive': return json(secProntidaoDrive_(r));
+      case 'secAniversarios':   return json(secAniversarios_(r));
+      case 'secValidar':    return json(secValidarCadastro_(r));
       case 'secBoletins':   return json(secBoletins_(r));
       case 'secAuditoria':  return json(secAuditoria_(r));
       case 'secContatos':   return json(secContatos_(r));
@@ -155,6 +159,7 @@ function secRota_(req) {
       case 'secTransferir': return json(secTransferir_(r, quem));
       case 'secBaixa':      return json(secBaixa_(r, quem));
       case 'secMatricular': return json(secMatricular_(r, quem));
+      case 'secAtualizarAluno': return json(secAtualizarAluno_(r, quem));
       case 'secContato':    return json(secRegistrarContato_(r, quem));
       case 'secSalvarPdf':  return json(secSalvarPdf_(r, quem));
       case 'secDesfazer':   return json(secDesfazer_(r, quem));
@@ -277,9 +282,18 @@ function secLerEscola_(escola) {
       var cols = secColunas_(vals[iTit + 2], vals[iTit + 1]);
       var grade = secGradeLimites_(vals, iTit, cols, lastCol);
       var nomeTurma = String(titulo).split('\n')[0].replace(/\s+/g, ' ').trim();
+      /* Quais campos canônicos ESTA turma tem. É o que permite ao portal
+         oferecer "marcar livro comprado" só onde a coluna existe — em
+         Taubaté ela não existe, e prometer um botão que não grava seria
+         pior do que não ter o botão. */
+      var campos = [];
+      ['bookComprado', 'aditamento', 'telAluno', 'respTel', 'respNome',
+       'email', 'nascimento', 'anoEscolar', 'raf', 'book'].forEach(function (k) {
+        if (cols[k] >= 0) campos.push(k);
+      });
       var turma = { escola: escola, professor: aba, turma: nomeTurma,
                     linhaTitulo: iTit + 1, ocupadas: 0, vagas: [], books: {},
-                    colunas: cols, grade: grade };
+                    colunas: cols, grade: grade, campos: campos };
 
       for (var k = iTit + 3; k < vals.length; k++) {
         var cnt = vals[k][0];
@@ -317,6 +331,10 @@ function secLerEscola_(escola) {
           respNome: cols.respNome >= 0 ? String(vals[k][cols.respNome] || '').trim() : '',
           respTel: cols.respTel >= 0 ? String(vals[k][cols.respTel] || '').trim() : '',
           respWhats: cols.respWhats >= 0 ? String(vals[k][cols.respWhats] || '').trim() : '',
+          /* Aditamento é caixa de seleção em Taubaté e não existe em
+             Caçapava: null significa "esta escola não controla isso aqui",
+             que é diferente de false ("falta aditar"). */
+          aditamento: cols.aditamento >= 0 ? (vals[k][cols.aditamento] === true) : null,
           aulas: frq.aulas, faltas: frq.faltas, pctFaltas: frq.pctFaltas,
           ultimaLicao: frq.ultimaLicao, licaoPrevista: frq.licaoPrevista,
           pctEstagio: frq.pctEstagio, atraso: frq.atraso
@@ -544,6 +562,9 @@ function secFila_(req) {
     var ult = a.raf ? contatos[normRaf(a.raf)] : null;
     return { escola: a.escola, professor: a.professor, turma: a.turma, nome: a.nome,
              raf: a.raf, book: a.book, linha: a.linha,
+             /* vão junto porque a aba "Atrasados" do card pede exatamente
+                isto: a lição em que o aluno deveria estar e em que está */
+             ultimaLicao: a.ultimaLicao, licaoPrevista: a.licaoPrevista,
              faltas: a.faltas, aulas: a.aulas, pctFaltas: a.pctFaltas, atraso: a.atraso,
              telefone: a.telefone, respNome: a.respNome, respTel: a.respTel,
              respWhats: a.respWhats, motivos: motivos, ultimoContato: ult || null };
@@ -554,6 +575,312 @@ function secFila_(req) {
   });
   return { ok: true, fila: fila, criterio: { minFaltas: minFaltas, minAtraso: minAtraso },
            erros: idx.erros };
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   PRONTIDÃO DO SEMESTRE
+
+   Uma linha por aluno, uma coluna por pendência. Nasceu do que os dois
+   cards mostraram em 31/07/2026, faltando três semanas para as aulas
+   começarem: 89 alunos com livro definido e não comprado, 36 sem RAF (e sem
+   RAF o aluno não entra no Portal do Aluno), 38 sem telefone nenhum, 43 sem
+   responsável — numa base em que 85% é menor de 18 —, e 33 contratos não
+   aditados em Taubaté. Tudo isso já estava no card; o que não existia era
+   uma tela que juntasse e deixasse resolver.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Interpreta a data de nascimento do card e diz se ela está invertida.
+ * O cabeçalho da coluna manda MM/DD/AAAA, mas 10 alunos estão em DD/MM —
+ * e como a coluna Idade é FÓRMULA em cima dessa data, a idade dessas
+ * pessoas está errada no card. Dia acima de 12 na primeira posição é a
+ * prova; quando os dois números cabem em mês, vale o que o cabeçalho diz.
+ */
+function secNasc_(txt) {
+  var m = String(txt == null ? '' : txt).trim().match(/^(\d{1,2})[\/\.\-](\d{1,2})[\/\.\-](\d{2,4})/);
+  if (!m) return null;
+  var a = Number(m[1]), b = Number(m[2]), ano = Number(m[3]);
+  if (ano < 100) ano += (ano > 30 ? 1900 : 2000);
+  var mes, dia, invertida = false;
+  if (a > 12 && b <= 12) { dia = a; mes = b; invertida = true; }
+  else { mes = a; dia = b; }
+  if (mes < 1 || mes > 12 || dia < 1 || dia > 31) return null;
+  return { mes: mes, dia: dia, ano: ano, invertida: invertida };
+}
+
+/** As pendências de um aluno, considerando o que a escola dele controla. */
+function secPendencias_(a, campos) {
+  function tem(k) { return campos.indexOf(k) > -1; }
+  var p = [];
+  if (tem('raf') && !a.raf) p.push('raf');
+  if (tem('book') && !a.book) p.push('livro');
+  /* Só cobra livro comprado onde a coluna é caixa de seleção. Em Taubaté ela
+     guarda o NOME do livro a comprar, e ali "não marcado" não quer dizer
+     "não pagou". */
+  if (tem('bookComprado') && a.book && a.bookComprado !== true) p.push('livroNaoComprado');
+  if (a.aditamento === false) p.push('contratoNaoAditado');
+  if (!a.telefone && !a.respTel) p.push('semContato');
+  if (tem('respNome') && !a.respNome && a.idade && Number(a.idade) < 18) p.push('semResponsavel');
+  if (tem('email') && !a.email) p.push('semEmail');
+  if (tem('nascimento')) {
+    var n = secNasc_(a.nascimento);
+    if (!a.nascimento) p.push('semNascimento');
+    else if (!n) p.push('nascimentoIlegivel');
+    else if (n.invertida) p.push('nascimentoInvertido');
+  }
+  return p;
+}
+
+function secProntidao_(req) {
+  var idx = secIndice_(req.escola ? [req.escola] : null);
+  var campoDaTurma = {};
+  idx.turmas.forEach(function (t) {
+    campoDaTurma[t.escola + '|' + t.professor + '|' + t.turma] = t.campos || [];
+  });
+
+  var filtro = secNorm_(req.turma || '');
+  var turmas = {}, ordem = [], resumo = {};
+
+  idx.alunos.forEach(function (a) {
+    var chave = a.escola + '|' + a.professor + '|' + a.turma;
+    if (filtro && secNorm_(a.turma).indexOf(filtro) < 0 &&
+        secNorm_(a.professor).indexOf(filtro) < 0) return;
+    var campos = campoDaTurma[chave] || [];
+    var pend = secPendencias_(a, campos);
+    if (req.soPendentes === true && !pend.length) return;
+
+    if (!turmas[chave]) {
+      turmas[chave] = { escola: a.escola, professor: a.professor, turma: a.turma,
+                        campos: campos, alunos: [], pendentes: 0 };
+      ordem.push(chave);
+    }
+    turmas[chave].alunos.push({
+      nome: a.nome, raf: a.raf, linha: a.linha, book: a.book,
+      bookComprado: a.bookComprado, aditamento: a.aditamento,
+      telefone: a.telefone, email: a.email, respNome: a.respNome, respTel: a.respTel,
+      nascimento: a.nascimento, idade: a.idade, anoEscolar: a.anoEscolar,
+      status: a.status, pendencias: pend
+    });
+    if (pend.length) turmas[chave].pendentes++;
+    pend.forEach(function (k) { resumo[k] = (resumo[k] || 0) + 1; });
+  });
+
+  var lista = ordem.map(function (k) { return turmas[k]; })
+                   .sort(function (x, y) { return y.pendentes - x.pendentes; });
+  return { ok: true, turmas: lista, resumo: resumo, erros: idx.erros };
+}
+
+/** Quem já tem pasta no Drive, numa turma. Uma leitura do Drive por turma. */
+function secProntidaoDrive_(req) {
+  try {
+    var raiz = rootDaEscola(String(req.escola || ''));
+    if (!raiz) return { ok: false, error: 'escola sem raiz de Drive configurada' };
+    var prof = acharPasta(raiz, String(req.professor || ''));
+    if (!prof) return { ok: false, error: 'pasta do professor "' + limpa_(req.professor) + '" não existe' };
+    var t = acharTurmaPasta_(prof.getId(), String(req.turma || ''));
+    if (!t) return { ok: false, error: 'a turma "' + limpa_(req.turma) + '" ainda não tem pasta' };
+    var nomes = (listarSubpastas_(t.pasta.getId()) || []).map(function (f) {
+      return { nome: f.getName(), norm: normPasta_(f.getName()), url: f.getUrl() };
+    });
+    return { ok: true, turmaUrl: t.pasta.getUrl(), pastas: nomes };
+  } catch (err) {
+    return { ok: false, error: String(err) };
+  }
+}
+
+/**
+ * Grava UM campo de UM aluno no card, direto do portal.
+ *
+ * Lista fechada de propósito: a secretaria resolve pendência de cadastro por
+ * aqui, mas nota, faltas e cronograma continuam sendo do professor. E cada
+ * escrita relê a linha antes, para nunca gravar em cima de outro aluno se o
+ * card tiver mudado enquanto a tela estava aberta.
+ */
+var SEC_EDITAVEIS = {
+  raf: 'texto', book: 'texto', bookComprado: 'sim/não', aditamento: 'sim/não',
+  email: 'texto', telefone: 'texto', respNome: 'texto', respTel: 'texto',
+  nascimento: 'texto', anoEscolar: 'texto', obs: 'texto', status: 'texto'
+};
+
+function secAtualizarAluno_(req, quem) {
+  var campo = String(req.campo || '');
+  if (!SEC_EDITAVEIS[campo]) return { ok: false, error: 'campo não editável por aqui: ' + campo };
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    var b = secAbrirBloco_(String(req.escola || ''), String(req.professor || ''), String(req.turma || ''));
+    if (b.erro) return { ok: false, error: b.erro };
+    var linha = Number(req.linha || 0);
+    var erro = secConfereLinha_(b, linha, req.nome, req.raf);
+    if (erro) return { ok: false, error: erro };
+
+    /* O nome interno do campo e o da coluna coincidem, menos telefone: no
+       mapeamento a do aluno se chama telAluno, para não se confundir com a
+       do responsável. */
+    var coluna = (campo === 'telefone') ? 'telAluno' : campo;
+    var col = b.cols[coluna];
+    if (col == null || col < 0) {
+      return { ok: false, code: 'coluna_inexistente',
+               error: 'O card de ' + req.escola + ' não tem a coluna desse campo nesta turma. ' +
+                      'Dá para criá-la pelo painel de Padronização dos cards.' };
+    }
+
+    var antes = b.vals[linha - 1][col];
+    var valor;
+    if (SEC_EDITAVEIS[campo] === 'sim/não') valor = req.valor === true;
+    else valor = String(req.valor == null ? '' : req.valor).trim();
+
+    if (campo === 'raf' && valor && !RAF_VALIDO.test(valor)) {
+      return { ok: false, error: 'RAF fora do formato esperado (ex.: B012-345).' };
+    }
+    if (campo === 'raf' && valor) {
+      /* RAF repetido faz o Portal do Aluno mostrar a turma errada: o _alunos
+         guarda a primeira ocorrência da planilha e ignora as outras. */
+      var idx = secIndice_(null);
+      for (var i = 0; i < idx.alunos.length; i++) {
+        var o = idx.alunos[i];
+        if (normRaf(o.raf) === normRaf(valor) && o.linha !== linha) {
+          return { ok: false, error: 'O RAF ' + valor + ' já é de "' + o.nome + '" (' +
+                                     o.professor + ' · ' + o.turma + ').' };
+        }
+      }
+    }
+
+    b.sh.getRange(linha, col + 1).setValue(valor);
+    secInvalida_(req.escola);
+    secLog_(quem, 'cadastro · ' + campo, req.escola, String(req.raf || ''), String(req.nome || ''),
+            String(antes == null ? '' : antes), String(valor), req.professor + ' · ' + b.turma, null);
+    return { ok: true, campo: campo, valor: valor };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   ANIVERSÁRIOS E VALIDAÇÃO DO CADASTRO
+   ══════════════════════════════════════════════════════════════════════ */
+
+var SEC_MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+                 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+
+/**
+ * Aniversariantes de um mês. Com 85% da base abaixo de 18 anos, quem recebe
+ * o parabéns na prática é a família — por isso vai junto o contato do
+ * responsável, não só o do aluno.
+ */
+function secAniversarios_(req) {
+  var mes = Number(req.mes || 0);
+  if (!mes || mes < 1 || mes > 12) mes = new Date().getMonth() + 1;
+  var idx = secIndice_(req.escola ? [req.escola] : null);
+  var hoje = new Date(), anoAtual = hoje.getFullYear();
+
+  var lista = [];
+  idx.alunos.forEach(function (a) {
+    var n = secNasc_(a.nascimento);
+    if (!n || n.mes !== mes) return;
+    lista.push({ nome: a.nome, escola: a.escola, professor: a.professor, turma: a.turma,
+                 dia: n.dia, mes: n.mes, nascimento: a.nascimento,
+                 invertida: n.invertida, fara: anoAtual - n.ano,
+                 telefone: a.telefone, respNome: a.respNome, respTel: a.respTel,
+                 respWhats: a.respWhats, raf: a.raf });
+  });
+  lista.sort(function (x, y) { return x.dia - y.dia; });
+  return { ok: true, mes: mes, nomeMes: SEC_MESES[mes - 1], aniversariantes: lista,
+           erros: idx.erros };
+}
+
+/**
+ * Varredura de qualidade do cadastro. Não corrige nada — aponta, com a
+ * coordenada exata (escola, professor, turma, linha) para a tela poder
+ * abrir a ficha e resolver.
+ */
+function secValidarCadastro_(req) {
+  var idx = secIndice_(req.escola ? [req.escola] : null);
+  var achados = { datasInvertidas: [], datasIlegiveis: [], rafDuplicado: [],
+                  alunoEmDuasTurmas: [], statusEstranho: [], nomeComAnotacao: [] };
+
+  var porRaf = {}, porNome = {};
+  var STATUS_OK = ['matriculado', 'rematriculado', 'aluno novo', 'transferido',
+                   'desistente', 'trancado', 'formado'];
+
+  idx.alunos.forEach(function (a) {
+    var onde = { nome: a.nome, escola: a.escola, professor: a.professor,
+                 turma: a.turma, linha: a.linha, raf: a.raf };
+
+    if (a.nascimento) {
+      var n = secNasc_(a.nascimento);
+      if (!n) achados.datasIlegiveis.push(secComValor_(onde, a.nascimento));
+      else if (n.invertida) {
+        /* A coluna Idade é fórmula sobre esta data: invertida, a idade do
+           card está errada — e é ela que separa menor de maior de idade. */
+        achados.datasInvertidas.push(secComValor_(onde, a.nascimento +
+          ' → deveria ser ' + secDoisDig_(n.mes) + '/' + secDoisDig_(n.dia) + '/' + n.ano));
+      }
+    }
+    if (a.status && STATUS_OK.indexOf(secNorm_(a.status)) < 0) {
+      achados.statusEstranho.push(secComValor_(onde, a.status));
+    }
+    /* Anotação entre parênteses no nome: além de virar dado escondido, o
+       nome é a chave que casa com a pasta do aluno no Drive, e a anotação
+       derruba o casamento exato. */
+    if (/[\(\[]/.test(a.nome) || /\s-\s*MD\b/i.test(a.nome)) {
+      achados.nomeComAnotacao.push(secComValor_(onde, secAnotacaoDoNome_(a.nome)));
+    }
+    if (a.raf) {
+      var k = normRaf(a.raf);
+      if (porRaf[k]) achados.rafDuplicado.push(secComValor_(onde, 'também em ' +
+        porRaf[k].professor + ' · ' + porRaf[k].turma));
+      else porRaf[k] = onde;
+    }
+    var chaveNome = secNorm_(secNomeLimpo_(a.nome));
+    if (chaveNome.length > 5) {
+      if (porNome[chaveNome] && porNome[chaveNome].turma !== a.turma) {
+        achados.alunoEmDuasTurmas.push(secComValor_(onde, 'também em ' +
+          porNome[chaveNome].professor + ' · ' + porNome[chaveNome].turma));
+      } else if (!porNome[chaveNome]) porNome[chaveNome] = onde;
+    }
+  });
+
+  var totais = {};
+  for (var k2 in achados) if (achados.hasOwnProperty(k2)) totais[k2] = achados[k2].length;
+  return { ok: true, achados: achados, totais: totais, alunos: idx.alunos.length,
+           erros: idx.erros };
+}
+
+function secComValor_(onde, valor) {
+  var o = {};
+  for (var k in onde) if (onde.hasOwnProperty(k)) o[k] = onde[k];
+  o.valor = valor;
+  return o;
+}
+function secDoisDig_(n) { return (n < 10 ? '0' : '') + n; }
+
+/**
+ * O nome sem a anotação — é ele que casa com a pasta do aluno no Drive.
+ *
+ * Trata o que é reconhecível com segurança: o que está entre parênteses ou
+ * colchetes, e o "- MD 2º sem ok". O separador que sobra ("Fulano - ") é
+ * removido no fim, senão o nome limpo continuaria sem casar com a pasta.
+ *
+ * NÃO tenta adivinhar texto solto depois de um traço ("Fulano - Pagou ME
+ * anual"): traço também aparece em nome de gente, e cortar por conta
+ * própria arriscaria mutilar o nome de alguém. Esses casos a tela mostra
+ * para a secretária confirmar.
+ */
+function secNomeLimpo_(nome) {
+  return String(nome || '')
+    .replace(/[\(\[][^)\]]*[)\]]/g, ' ')
+    .replace(/\s-\s*MD\s*\d?º?\s*sem.*$/i, ' ')
+    .replace(/\s+/g, ' ')
+    .replace(/^[\s\-–—,;:.]+/, '')
+    .replace(/[\s\-–—,;:.]+$/, '')
+    .trim();
+}
+/** Só a anotação, para a tela mostrar o que seria movido para outro campo. */
+function secAnotacaoDoNome_(nome) {
+  var partes = String(nome || '').match(/[\(\[][^)\]]*[)\]]|\s-\s*MD\s*\d?º?\s*sem[^,]*/gi) || [];
+  return partes.join(' ').replace(/\s+/g, ' ').trim();
 }
 
 /* ══════════════════════════════════════════════════════════════════════
@@ -1097,7 +1424,81 @@ function secRegistrarContato_(req, quem) {
     new Date(), quem, raf, nome, String(req.motivo || ''), String(req.resultado || ''),
     String(req.retornarEm || ''), String(req.obs || '')
   ]);
-  return { ok: true };
+  /* A aba "Atrasados" do card já existia, preenchida à mão nas duas escolas,
+     com exatamente estas perguntas — inclusive "Aluno/responsável
+     comunicado?". Continuar mantendo as duas coisas em paralelo seria pedir
+     para elas divergirem, então o portal passa a escrever lá também. */
+  var espelho = null;
+  if (req.escola) espelho = secAtrasadosGravar_(String(req.escola), req, quem);
+  return { ok: true, atrasados: espelho };
+}
+
+/**
+ * Espelha o contato na aba "Atrasados" da planilha da escola.
+ * Lê o cabeçalho pelos rótulos, como todo o resto — as duas escolas têm a
+ * aba, mas não garantidamente na mesma ordem. Se o aluno já tem linha lá, a
+ * linha é atualizada em vez de duplicada: a aba é um retrato do estado de
+ * cada aluno, não um histórico (o histórico fica na _secContatos).
+ */
+function secAtrasadosGravar_(escola, req, quem) {
+  try {
+    var ssId = CARD_IDS[escola];
+    if (!ssId) return { ok: false, erro: 'escola desconhecida' };
+    var sh = SpreadsheetApp.openById(ssId).getSheetByName('Atrasados');
+    if (!sh) return { ok: false, erro: 'a planilha de ' + escola + ' não tem a aba "Atrasados"' };
+
+    var lastRow = Math.max(sh.getLastRow(), 1), lastCol = Math.max(sh.getLastColumn(), 1);
+    var vals = sh.getRange(1, 1, lastRow, lastCol).getValues();
+
+    var cab = -1;
+    for (var r = 0; r < vals.length && cab < 0; r++) {
+      for (var c = 0; c < vals[r].length; c++) {
+        if (secNorm_(vals[r][c]) === 'aluno') { cab = r; break; }
+      }
+    }
+    if (cab < 0) return { ok: false, erro: 'não achei o cabeçalho da aba Atrasados' };
+
+    var col = {};
+    for (var c2 = 0; c2 < vals[cab].length; c2++) {
+      var n = secNorm_(vals[cab][c2]);
+      if (n === 'aluno') col.aluno = c2;
+      else if (n === 'professor') col.professor = c2;
+      else if (n.indexOf('data de verifica') === 0) col.data = c2;
+      else if (n.indexOf('verificado por') === 0) col.quem = c2;
+      else if (n.indexOf('licao que deveria') === 0) col.deveria = c2;
+      else if (n.indexOf('licao no planner') === 0) col.planner = c2;
+      else if (n.indexOf('aulas em atraso') === 0) col.atraso = c2;
+      else if (n.indexOf('link da pasta') === 0) col.pasta = c2;
+      else if (n.indexOf('comunicado') >= 0) col.comunicado = c2;
+    }
+    if (col.aluno == null) return { ok: false, erro: 'a aba Atrasados não tem coluna "Aluno"' };
+
+    var alvo = secNorm_(String(req.nome || ''));
+    var linha = -1, primeiraVazia = -1;
+    for (var i = cab + 1; i < vals.length; i++) {
+      var v = secNorm_(vals[i][col.aluno]);
+      if (v === alvo) { linha = i + 1; break; }
+      if (!v && primeiraVazia < 0) primeiraVazia = i + 1;
+    }
+    if (linha < 0) linha = primeiraVazia > 0 ? primeiraVazia : sh.getLastRow() + 1;
+
+    function grava(c, valor) {
+      if (c == null || valor === '' || valor == null) return;
+      sh.getRange(linha, c + 1).setValue(valor);
+    }
+    grava(col.aluno, String(req.nome || ''));
+    grava(col.professor, String(req.professor || ''));
+    grava(col.data, new Date());
+    grava(col.quem, quem);
+    grava(col.deveria, String(req.licaoPrevista || ''));
+    grava(col.planner, String(req.ultimaLicao || ''));
+    grava(col.atraso, req.atraso == null ? '' : Number(req.atraso));
+    grava(col.pasta, String(req.pastaUrl || ''));
+    grava(col.comunicado, String(req.resultado || ''));
+    return { ok: true, linha: linha, aba: 'Atrasados' };
+  } catch (err) {
+    return { ok: false, erro: String(err) };
+  }
 }
 
 /** Último contato de cada RAF, para a fila não mandar ligar de novo. */

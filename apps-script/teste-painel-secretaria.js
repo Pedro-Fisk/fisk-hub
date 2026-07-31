@@ -81,13 +81,18 @@ const abaCpv = bloco(1, 'Acadêmico Teens Connect 2 - 2ª/4ª 9h45 às 11h', CPV
 ], 3, true);
 
 const abaTbt = bloco(1, 'Básico (+18) - 4ª 18h45/21h15', TBT_ROT, TBT_GRP, '2º sem', [
-  { cols: { 1: true, 2: 'Laís de Jesus Oliveira', 3: 'ok', 4: 'Rematriculado',
+  { cols: { 1: true, 2: 'Laís de Jesus Oliveira', 3: true, 4: 'Rematriculado',
             5: 'Início em: 17/08', 6: 'Essentials 1', 7: 'Z012-935',
             10: '03/04/2001', 11: 25, 13: 'lais@ex.com', 14: 'Laís', 15: '(12) 98888-7777' },
     grade: ['E1', 'E2', 'a', 'E3', 'f', '', '', ''] },
-  { cols: { 1: true, 2: 'Alice Rodrigues', 4: 'Aluno novo',
+  { cols: { 1: true, 2: 'Alice Rodrigues', 3: false, 4: 'Aluno novo',
             5: 'Bolsa 50% 2º sem/26', 6: 'Essentials 1', 7: 'C025-270' },
     grade: ['E1', 'a', 'a', '', '', '', '', ''] },
+  // o caso real: data em DD/MM (a coluna Idade é fórmula em cima dela) e
+  // anotação enfiada dentro do nome, que é a chave da pasta no Drive
+  { cols: { 1: true, 2: 'Pietro de Almeida Kita - (MD 2º sem ok)', 3: false, 4: 'Matriculados',
+            6: 'Essentials 1', 10: '18/09/2017', 11: 8, 14: 'Renata', 15: '(12) 97777-1111' },
+    grade: ['', '', '', '', '', '', '', ''] },
 ], 2, false);
 
 function fakeSheet(nome, linhas) {
@@ -240,6 +245,65 @@ ok(shTbt.__mat[2][6] === 'Livro', 'a planilha NÃO foi tocada pela simulação',
 const aplicado = cardNormalizarAba_('Taubaté', 'CARLOS', true);
 ok(aplicado.ok === false && aplicado.code === 'sem_backup',
    'aplicar sem backup recente é recusado', aplicado.code);
+
+console.log('\n══ prontidão do semestre ══');
+const pr = secProntidao_({});
+const tTbt = pr.turmas.find(x => x.escola === 'Taubaté');
+const tCpv = pr.turmas.find(x => x.escola === 'Caçapava');
+const marinaP = tCpv.alunos.find(x => x.nome === 'Marina Petrucelli');
+const cathP = tCpv.alunos.find(x => x.nome === 'Catharina Pereira');
+ok(marinaP.pendencias.length === 0, 'Marina, com cadastro completo, não tem pendência', marinaP.pendencias);
+ok(cathP.pendencias.indexOf('livroNaoComprado') > -1 && cathP.pendencias.indexOf('semContato') > -1,
+   'Catharina: livro não comprado e sem contato', cathP.pendencias);
+const laisP = tTbt.alunos.find(x => x.nome.indexOf('Laís') === 0);
+const aliceP = tTbt.alunos.find(x => x.nome.indexOf('Alice') === 0);
+ok(laisP.pendencias.length === 0, 'Laís está pronta', laisP.pendencias);
+ok(aliceP.pendencias.indexOf('contratoNaoAditado') > -1, 'Alice: contrato não aditado', aliceP.pendencias);
+ok(laisP.pendencias.indexOf('livroNaoComprado') < 0,
+   'NÃO cobra livro comprado em Taubaté — lá a coluna não é caixa de seleção', laisP.pendencias);
+ok(tTbt.campos.indexOf('aditamento') > -1 && tCpv.campos.indexOf('aditamento') < 0,
+   'cada turma declara os campos que a escola dela tem', { t: tTbt.campos.length, c: tCpv.campos.length });
+ok(pr.resumo.semContato >= 2, 'o resumo soma as pendências das duas escolas', pr.resumo);
+
+console.log('\n══ datas de nascimento ══');
+ok(secNasc_('01/07/2016').mes === 1 && secNasc_('01/07/2016').invertida === false,
+   'MM/DD/AAAA lido como o cabeçalho manda', secNasc_('01/07/2016'));
+ok(secNasc_('18/09/2017').mes === 9 && secNasc_('18/09/2017').dia === 18 && secNasc_('18/09/2017').invertida === true,
+   '18/09/2017 é DD/MM: mês 9, dia 18, marcada como invertida', secNasc_('18/09/2017'));
+ok(secNasc_('') === null && secNasc_('não sei') === null, 'data vazia ou ilegível vira null');
+
+console.log('\n══ aniversariantes ══');
+const setembro = secAniversarios_({ mes: 9 });
+ok(setembro.nomeMes === 'setembro' && setembro.aniversariantes.length === 1,
+   'setembro tem 1 aniversariante', setembro.aniversariantes.map(x => x.nome));
+ok(setembro.aniversariantes[0].dia === 18 && setembro.aniversariantes[0].invertida === true,
+   'o Pietro, dia 18, com a data marcada como invertida', setembro.aniversariantes[0]);
+ok(setembro.aniversariantes[0].respTel === '(12) 97777-1111',
+   'e com o contato do RESPONSÁVEL, que é quem recebe o parabéns', setembro.aniversariantes[0].respTel);
+ok(secAniversarios_({ mes: 1 }).aniversariantes.length === 1,
+   'a Marina cai em JANEIRO: "01/07" em MM/DD é 7 de janeiro, não 1 de julho',
+   secAniversarios_({ mes: 1 }).aniversariantes.map(x => x.nome + ' dia ' + x.dia));
+ok(secAniversarios_({ mes: 7 }).aniversariantes.length === 0, 'e julho fica vazio');
+
+console.log('\n══ validador de cadastro ══');
+const val = secValidarCadastro_({});
+ok(val.totais.datasInvertidas === 1, '1 data invertida (idade errada no card)', val.achados.datasInvertidas);
+ok(val.achados.datasInvertidas[0].valor.indexOf('09/18/2017') > 0,
+   'e diz como deveria estar escrita', val.achados.datasInvertidas[0].valor);
+ok(val.totais.nomeComAnotacao === 1, '1 nome com anotação embutida', val.achados.nomeComAnotacao);
+ok(val.achados.nomeComAnotacao[0].valor.indexOf('MD 2º sem ok') >= 0,
+   'e mostra qual anotação sairia do nome', val.achados.nomeComAnotacao[0].valor);
+ok(secNomeLimpo_('Pietro de Almeida Kita - (MD 2º sem ok)') === 'Pietro de Almeida Kita',
+   'o nome limpo, sem o traço que sobrava, é o que casa com a pasta do Drive',
+   secNomeLimpo_('Pietro de Almeida Kita - (MD 2º sem ok)'));
+ok(secNomeLimpo_('Joaquim Guimarães Dias - MD 2ºsem ok') === 'Joaquim Guimarães Dias',
+   'limpa também a anotação sem parênteses', secNomeLimpo_('Joaquim Guimarães Dias - MD 2ºsem ok'));
+ok(secNomeLimpo_('Olivia Barbosa -  Pagou ME anual (MD 2º sem ok)') === 'Olivia Barbosa - Pagou ME anual',
+   'mas NÃO adivinha texto solto depois do traço — esse caso vai para confirmação humana',
+   secNomeLimpo_('Olivia Barbosa -  Pagou ME anual (MD 2º sem ok)'));
+ok(val.totais.statusEstranho === 1, '"Matriculados" (no plural) acusado como status fora da lista',
+   val.achados.statusEstranho.map(x => x.valor));
+ok(val.totais.rafDuplicado === 0 && val.totais.alunoEmDuasTurmas === 0, 'sem duplicidade nesta base');
 
 console.log('\n══ fila e busca ══');
 const fila = secFila_({ minFaltas: 30, minAtraso: 4 }).fila;
