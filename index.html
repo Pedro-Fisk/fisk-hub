@@ -1063,10 +1063,21 @@
         setTimeout(function(){ if (window._mdLoad) window._mdLoad(); }, 0);
       }
 
+      /* Este é o portal do PROFESSOR: a lista mostra só quem dá aula.
+         A secretaria tem o portal dela (secretaria.html), e misturar as duas
+         equipes numa lista só fazia cada um procurar o próprio nome no meio
+         do time inteiro da escola. Cargo em branco é professor — os primeiros
+         dezoito cadastros vieram antes de a coluna Cargo existir. A direção
+         continua na lista porque também usa as ferramentas do Hub. */
+      function ehProfessor(p){
+        var c = String((p && p.cargo) || '')
+          .normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+        return c.indexOf('secretar') !== 0;
+      }
       function loadProfs(){
         sel.innerHTML = '<option value="" disabled selected>' + tr('pg-loading') + '</option>';
         fetch(EP + '?action=profList').then(function(r){ return r.json(); }).then(function(res){
-          var ps = (res && res.profs) || [];
+          var ps = ((res && res.profs) || []).filter(ehProfessor);
           ps.sort(function(a, b){ return String(a.name).localeCompare(String(b.name), 'pt-BR'); });
           sel.innerHTML = '<option value="" disabled selected>' + tr('pg-name-ph') + '</option>' +
             ps.map(function(p){
