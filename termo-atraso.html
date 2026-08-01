@@ -508,10 +508,12 @@ function statusDoc(msg, cor) {
 }
 /* o registro no card já acontece sozinho ao gerar o PDF; o botão existe para
    REFAZER quando a chamada falha (sem obrigar a gerar o PDF de novo) */
+/* Quem escolhe a célula é o SERVIDOR, pela data: a aula mais próxima de hoje,
+   para trás ou para frente. A própria nota diz qual ("aula de hoje", "aula de
+   12/09, a mais recente", "próxima aula, 03/08"), então aqui a mensagem não
+   tenta adivinhar. */
 function msgRegistro() {
-  return (alunoSel && alunoSel.ultimaPresencaIdx >= 0)
-    ? '✓ Registrado no card, na célula da última aula (com data e hora).'
-    : '✓ Registrado no card, na célula da próxima aula (a turma ainda não teve aula).';
+  return '✓ Registrado no card, na aula mais próxima de hoje. A anotação diz qual.';
 }
 function lancarNoCard() {
   if (modoLivre || !alunoSel || alunoSel.linhaCard == null) {
