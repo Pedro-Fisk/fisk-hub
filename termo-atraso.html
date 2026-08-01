@@ -508,17 +508,23 @@ function statusDoc(msg, cor) {
 }
 /* o registro no card já acontece sozinho ao gerar o PDF; o botão existe para
    REFAZER quando a chamada falha (sem obrigar a gerar o PDF de novo) */
+function msgRegistro() {
+  return (alunoSel && alunoSel.ultimaPresencaIdx >= 0)
+    ? '✓ Registrado no card, na célula da última aula (com data e hora).'
+    : '✓ Registrado no card, na célula da próxima aula (a turma ainda não teve aula).';
+}
 function lancarNoCard() {
   if (modoLivre || !alunoSel || alunoSel.linhaCard == null) {
     statusDoc('Termo livre não tem aluno no card para marcar.', '#b8860b'); return;
   }
-  if (alunoSel.ultimaPresencaIdx == null || alunoSel.ultimaPresencaIdx < 0) {
-    statusDoc('Este aluno ainda não tem aula registrada no card. Não há célula para marcar.', '#b8860b'); return;
-  }
+  /* Sem aula dada, o servidor grava na PRÓXIMA aula planejada e marca a nota
+     como registro antecipado. Não bloqueamos mais aqui: no começo do semestre
+     NENHUMA turma tem aula dada (conferido no card em 31/07/2026), e era
+     justamente quando o professor precisava emitir o documento. */
   statusDoc('⏳ Registrando no card…');
   api({ fn: 'registrarDoc', escola: payload.escola, prof: payload.aba, professor: payload.aba,
         linhaCard: alunoSel.linhaCard, idx: alunoSel.ultimaPresencaIdx, tipo: 'termo' })
-    .then(function () { statusDoc('✓ Registrado no card, na célula da última aula (com data e hora).', '#1e8f4e'); })
+    .then(function () { statusDoc(msgRegistro(), '#1e8f4e'); })
     .catch(function (e) { statusDoc('⚠️ ' + e.message, '#c0392b'); });
 }
 document.getElementById('btnDrive').addEventListener('click', function () {
@@ -745,7 +751,7 @@ async function gerarPDF() {
     api({ fn: 'registrarTermo', escola: payload.escola, prof: payload.aba,
           linhaCard: alunoSel.linhaCard, idx: alunoSel.ultimaPresencaIdx })
       .then(function () {
-        statusDoc('✓ Registrado no card, na célula da última aula (com data e hora).', '#1e8f4e');
+        statusDoc(msgRegistro(), '#1e8f4e');
       }).catch(mostrarErroApi);
   } else if (!standalone) {
     window.parent.postMessage({ tipo: 'fisk-termo-gerado', nomeAluno: alunoSel.nome }, '*');
