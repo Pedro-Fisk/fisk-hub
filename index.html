@@ -458,6 +458,13 @@
         'evt-evento':      'Evento',
         'evt-simulado':    'Simulado',
         'evt-met':         'MET / Siele',
+        'evt-treinamento': 'Treinamento',
+        'evt-exame':       'Exame / Simulado',
+        'evt-familias':    'Alunos e famílias',
+        'evt-entrega':     'Entrega',
+        'evt-ferias':      'Férias',
+        'evt-feriado':     'Feriado',
+        'evt-letivo':      'Marco letivo',
         'links-title':     'Links Úteis',
         'link-sgf':        'Portal do Professor (SGF)',
         'link-expo':       'Treinamentos Fundação Fisk',
@@ -524,6 +531,13 @@
         'evt-evento':      'Event',
         'evt-simulado':    'Mock Exam',
         'evt-met':         'MET / SIELE',
+        'evt-treinamento': 'Training',
+        'evt-exame':       'Exam / Mock',
+        'evt-familias':    'Students & families',
+        'evt-entrega':     'Deadline',
+        'evt-ferias':      'Time off',
+        'evt-feriado':     'Holiday',
+        'evt-letivo':      'School milestone',
         'links-title':     'Useful Links',
         'link-sgf':        'Teacher Portal (SGF)',
         'link-expo':       'Fisk Foundation Training',
@@ -590,6 +604,13 @@
         'evt-evento':      'Evento',
         'evt-simulado':    'Simulacro',
         'evt-met':         'MET / SIELE',
+        'evt-treinamento': 'Capacitación',
+        'evt-exame':       'Examen / Simulacro',
+        'evt-familias':    'Alumnos y familias',
+        'evt-entrega':     'Entrega',
+        'evt-ferias':      'Vacaciones',
+        'evt-feriado':     'Feriado',
+        'evt-letivo':      'Hito escolar',
         'links-title':     'Links Útiles',
         'link-sgf':        'Portal del Profesor (SGF)',
         'link-expo':       'Capacitación Fundación Fisk',
@@ -630,15 +651,28 @@
        e substitua SHEET_CSV_URL pela URL gerada.
     ════════════════════════════════════════════════ */
     /* A planilha usa layout visual com células mescladas — CSV não é parseável
-       automaticamente. Para fetch dinâmico, crie uma aba "Eventos Hub" com
-       colunas Data (DD/MM/AAAA) | Título | Tipo e publique-a na web como CSV. */
-    const SHEET_CSV_URL = '';
+       automaticamente. Foi por isso que este calendário nasceu com a lista
+       transcrita à mão no FALLBACK_EVENTS logo abaixo.
+       Desde 08/2026 a fonte é o Calendário Institucional do Painel da Direção:
+       o backend guarda cada evento com tags de PÚBLICO (prof, sec, comercial,
+       gestão, sócios) e de UNIDADE, e aqui pedimos só os de público "prof".
+       O FALLBACK_EVENTS continua como rede de segurança para o dia em que o
+       Apps Script estiver fora do ar. */
+    const CAL_ENDPOINT = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
 
     const EVENT_TYPES = {
-      reuniao:  { label: 'Reunião',     color: '#2563EB' },
-      evento:   { label: 'Evento',      color: '#2563EB' },
-      simulado: { label: 'Simulado',    color: '#7C3AED' },
-      met:      { label: 'MET / Siele', color: '#0EA5A0' },
+      reuniao:     { label: 'Reunião',           color: '#2563EB' },
+      evento:      { label: 'Evento',            color: '#EC4899' },
+      simulado:    { label: 'Simulado',          color: '#7C3AED' },
+      met:         { label: 'MET / Siele',       color: '#0EA5A0' },
+      /* os tipos do Calendário Institucional */
+      treinamento: { label: 'Treinamento',       color: '#7C3AED' },
+      exame:       { label: 'Exame / Simulado',  color: '#0EA5A0' },
+      familias:    { label: 'Alunos e famílias', color: '#16A34A' },
+      entrega:     { label: 'Entrega',           color: '#EA580C' },
+      ferias:      { label: 'Férias',            color: '#0891B2' },
+      feriado:     { label: 'Feriado',           color: '#6f6a6a' },
+      letivo:      { label: 'Marco letivo',      color: '#c9922e' },
     };
 
     /* Calendário escolar 2026 — extraído manualmente da planilha Fisk.
@@ -674,8 +708,11 @@
     ];
 
     /* Semanas temáticas — destacam a semana inteira (não um único dia).
-       start/end em AAAA-MM-DD (inclusive). */
-    const WEEK_HIGHLIGHTS = [
+       start/end em AAAA-MM-DD (inclusive).
+       Vira `let` porque, quando o Calendário Institucional responde, esta
+       lista é substituída pelos eventos de vários dias que vierem de lá
+       (semana temática, congresso, semana de reuniões de pais). */
+    let WEEK_HIGHLIGHTS = [
       { start: '2026-08-24', end: '2026-08-28', title: 'Semana de Aniversário do Buddy · Taubaté', color: '#EC4899' },
       { start: '2026-08-31', end: '2026-09-04', title: 'Semana de Aniversário do Buddy · Caçapava', color: '#EC4899' },
     ];
@@ -686,28 +723,48 @@
       return `rgba(${(n>>16)&255}, ${(n>>8)&255}, ${n&255}, ${a})`;
     }
 
-    /* Converte CSV do Sheets para array de eventos.
-       Espera colunas: Data (DD/MM/AAAA), Título, Tipo (reuniao|evento|simulado|met) */
-    function parseSheetCSV(csv) {
-      const lines = csv.trim().split('\n').slice(1); // pula cabeçalho
-      return lines.map(line => {
-        const cols = line.split(',').map(c => c.replace(/^"|"$/g, '').trim());
-        const [rawDate, title, type] = cols;
-        if (!rawDate || !title) return null;
-        const [d, m, y] = rawDate.split('/');
-        if (!d || !m || !y) return null;
-        return { date: `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`, title, type: (type || '').toLowerCase() };
-      }).filter(Boolean);
+    /* Busca no Calendário Institucional os eventos marcados para o público
+       "prof" — o professor não vê reunião de secretaria, pauta comercial nem
+       férias de quem quer que seja, e ninguém precisa mais decidir isso na
+       mão: é o tag do evento que decide.
+       Traz o ano corrente e o seguinte, para dezembro não mostrar um
+       calendário que acaba no dia 31. */
+    async function fetchCalendario(ano) {
+      const res = await fetch(CAL_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'calList', publico: 'prof', ano: String(ano) })
+      });
+      const json = await res.json();
+      if (!json || !json.ok) throw new Error((json && json.error) || 'calList falhou');
+      return json.itens || [];
     }
 
     async function loadEvents() {
-      if (SHEET_CSV_URL) {
-        try {
-          const res = await fetch(SHEET_CSV_URL);
-          if (res.ok) return parseSheetCSV(await res.text());
-        } catch(e) {}
+      try {
+        const ano = new Date().getFullYear();
+        const lotes = await Promise.all([fetchCalendario(ano), fetchCalendario(ano + 1)]);
+        const itens = [].concat.apply([], lotes);
+        if (!itens.length) return FALLBACK_EVENTS;
+
+        /* Evento de vários dias vira faixa de semana; de um dia só vira ponto
+           no calendário. É a mesma separação que o Hub já fazia entre
+           WEEK_HIGHLIGHTS e a lista de eventos, só que agora vinda do dado. */
+        const cores = { tematica: '#EC4899', letivo: '#c9922e', ferias: '#0891B2' };
+        WEEK_HIGHLIGHTS = itens.filter(it => it.fim && it.fim !== it.inicio).map(it => ({
+          start: it.inicio, end: it.fim, title: it.titulo,
+          color: cores[it.tipo] || (EVENT_TYPES[it.tipo] || {}).color || '#EC4899'
+        }));
+        return itens.filter(it => !it.fim || it.fim === it.inicio).map(it => ({
+          date: it.inicio,
+          title: it.titulo + (it.hora ? ' · ' + it.hora : ''),
+          type: it.tipo
+        }));
+      } catch (e) {
+        /* servidor fora do ar: o professor continua vendo o calendário, com a
+           última lista que ficou escrita aqui */
+        return FALLBACK_EVENTS;
       }
-      return FALLBACK_EVENTS;
     }
 
     let _calEvents = [];
