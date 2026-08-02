@@ -724,7 +724,7 @@
     }
 
     /* Busca no Calendário Institucional os eventos marcados para o público
-       "prof" — o professor não vê reunião de secretaria, pauta comercial nem
+       "pedag" — o professor não vê reunião de secretaria, pauta comercial nem
        férias de quem quer que seja, e ninguém precisa mais decidir isso na
        mão: é o tag do evento que decide.
        Traz o ano corrente e o seguinte, para dezembro não mostrar um
@@ -733,7 +733,7 @@
       const res = await fetch(CAL_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'calList', publico: 'prof', ano: String(ano) })
+        body: JSON.stringify({ action: 'calList', publico: 'pedag', ano: String(ano) })
       });
       const json = await res.json();
       if (!json || !json.ok) throw new Error((json && json.error) || 'calList falhou');
