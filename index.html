@@ -1070,6 +1070,8 @@
          apareceria em lugar nenhum. */
       function registrarHome(){
         if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Fisk Hub (início)');
+        // campanha da direção, se houver alguma no ar para a equipe
+        if (typeof fiskCampanha === 'function') fiskCampanha();
       }
 
       /* Este é o portal do PROFESSOR: a lista mostra só quem dá aula.

@@ -398,3 +398,166 @@ function fiskAvisoDePasta(buttonEl, texto) {
     box.hidden = false;
   } catch (e) { /* aviso nunca pode derrubar o salvamento */ }
 }
+
+
+/* ============================================================================
+   CAMPANHAS DA DIREÇÃO (equipe)
+
+   A direção cria a pergunta no painel dela e ela aparece aqui — sem publicar
+   código. Mesmo desenho do pop-up do Portal do Aluno: um botão discreto no
+   canto e o card só quando o professor clica. Card fixo empurraria a
+   ferramenta para baixo todo dia, e a pergunta é de um minuto.
+
+   O voto vai autenticado pelo token da sessão do Hub. Não há bônus em F$ do
+   lado da equipe: carteira é coisa de aluno.
+   ============================================================================ */
+var FISK_CAMP_CACHE_MS = 30 * 60 * 1000;
+
+function fiskCampanha() {
+  var s = fiskSessao();
+  if (!s || !s.token || s.viewingAs) return;      // visita da direção não responde pela equipe
+
+  var cache = null;
+  try { cache = JSON.parse(localStorage.getItem('fisk_camps_equipe') || 'null'); } catch (e) {}
+  if (cache && Date.now() - cache.t < FISK_CAMP_CACHE_MS) return montar(cache.v || []);
+
+  fetch(FISK_HUB_EP, {
+    method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action: 'campAtivas', publico: 'equipe' })
+  }).then(function (r) { return r.json(); }).then(function (j) {
+    var lista = (j && j.ok && j.campanhas) ? j.campanhas : [];
+    try { localStorage.setItem('fisk_camps_equipe', JSON.stringify({ t: Date.now(), v: lista })); } catch (e) {}
+    montar(lista);
+  }).catch(function () {});
+
+  function jaRespondeu(c) {
+    try { return !!localStorage.getItem('fisk_camp_' + c.id); } catch (e) { return false; }
+  }
+
+  function montar(lista) {
+    if (!lista.length) return;
+    /* mais de uma no ar: a que fecha primeiro, para não perder o prazo */
+    var ordenada = lista.slice().sort(function (a, b) {
+      return String(a.ate || '9999').localeCompare(String(b.ate || '9999'));
+    });
+    var c = ordenada.filter(function (x) { return !jaRespondeu(x); })[0] || ordenada[0];
+
+    var estilo = document.createElement('style');
+    estilo.textContent =
+      '.fk-camp-fab{position:fixed;right:1rem;bottom:1rem;z-index:9990;border:none;border-radius:999px;' +
+      'background:#0EA5A0;color:#fff;font:inherit;font-weight:800;font-size:.88rem;padding:.65rem 1.1rem;' +
+      'box-shadow:0 8px 24px rgba(0,0,0,.25);cursor:pointer}' +
+      '.fk-camp-modal{position:fixed;inset:0;z-index:9991;background:rgba(15,12,12,.6);display:flex;' +
+      'align-items:center;justify-content:center;padding:1rem}' +
+      '.fk-camp-card{position:relative;background:var(--surface,#fff);color:var(--text,#161414);' +
+      'border-radius:16px;border-left:5px solid #0EA5A0;padding:1.2rem 1.3rem;max-width:32rem;width:100%;' +
+      'box-shadow:0 16px 44px rgba(0,0,0,.32);max-height:85vh;overflow:auto}' +
+      '.fk-camp-card h3{font-size:1.05rem;line-height:1.3;margin:0 0 .3rem}' +
+      '.fk-camp-card .d{font-size:.88rem;color:var(--text-soft,#6f6a6a);line-height:1.5}' +
+      '.fk-camp-opts{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.9rem}' +
+      '.fk-camp-opt{border:2px solid var(--border,#ececec);background:var(--surface-2,#f7f6f6);color:inherit;' +
+      'border-radius:999px;padding:.5rem .9rem;font:inherit;font-size:.88rem;font-weight:700;cursor:pointer}' +
+      '.fk-camp-opt.on{border-color:#0EA5A0;background:rgba(14,165,160,.14)}' +
+      '.fk-camp-txt{width:100%;margin-top:.7rem;border:2px solid var(--border,#ececec);border-radius:12px;' +
+      'padding:.6rem .8rem;font:inherit;font-size:.9rem;background:var(--surface-2,#f7f6f6);color:inherit}' +
+      '.fk-camp-foot{display:flex;justify-content:space-between;align-items:center;gap:.8rem;margin-top:.9rem}' +
+      '.fk-camp-ok{background:#0EA5A0;color:#fff;border:none;border-radius:12px;padding:.6rem 1.4rem;' +
+      'font:inherit;font-weight:800;cursor:pointer}.fk-camp-ok:disabled{opacity:.45;cursor:not-allowed}' +
+      '.fk-camp-x{position:absolute;top:.5rem;right:.7rem;background:none;border:none;font-size:1rem;' +
+      'color:var(--text-soft,#6f6a6a);cursor:pointer}';
+    document.head.appendChild(estilo);
+
+    var fab = document.createElement('button');
+    fab.className = 'fk-camp-fab';
+    fab.textContent = jaRespondeu(c) ? '📣 Resposta enviada' : '📣 ' + (c.titulo.length > 34 ? 'Responder à direção' : c.titulo);
+    document.body.appendChild(fab);
+
+    var modal = document.createElement('div');
+    modal.className = 'fk-camp-modal';
+    modal.hidden = true;
+    modal.innerHTML = '<div class="fk-camp-card"><button class="fk-camp-x" aria-label="Fechar">✕</button><div class="fk-camp-corpo"></div></div>';
+    document.body.appendChild(modal);
+    var corpo = modal.querySelector('.fk-camp-corpo');
+
+    function fechar() { modal.hidden = true; }
+    fab.addEventListener('click', function () { modal.hidden = false; desenhar(); });
+    modal.querySelector('.fk-camp-x').addEventListener('click', fechar);
+    modal.addEventListener('click', function (e) { if (e.target === modal) fechar(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') fechar(); });
+
+    var sel = [];
+    function desenhar() {
+      corpo.innerHTML = '';
+      if (jaRespondeu(c)) {
+        corpo.innerHTML = '<h3>' + fiskEsc(c.titulo) + '</h3>' +
+          '<p class="d" style="margin-top:.5rem">✅ Sua resposta foi registrada. Obrigado!</p>';
+        var trocar = document.createElement('button');
+        trocar.className = 'fk-camp-opt'; trocar.style.marginTop = '.8rem';
+        trocar.textContent = 'Mudar minha resposta';
+        trocar.addEventListener('click', function () {
+          try { localStorage.removeItem('fisk_camp_' + c.id); } catch (e) {}
+          sel = []; desenhar();
+        });
+        corpo.appendChild(trocar);
+        return;
+      }
+      corpo.innerHTML = '<h3>' + fiskEsc(c.titulo) + '</h3>' +
+        (c.texto ? '<div class="d">' + fiskEsc(c.texto) + '</div>' : '');
+      var opts = document.createElement('div');
+      opts.className = 'fk-camp-opts';
+      (c.opcoes || []).forEach(function (o) {
+        var b = document.createElement('button');
+        b.className = 'fk-camp-opt'; b.type = 'button';
+        b.textContent = (o.ic ? o.ic + ' ' : '') + o.t;
+        b.addEventListener('click', function () {
+          var i = sel.indexOf(o.id);
+          if (i >= 0) sel.splice(i, 1);
+          else if (sel.length < (c.max || 1)) sel.push(o.id);
+          else if ((c.max || 1) === 1) sel = [o.id];      // escolha única troca em vez de travar
+          else return;
+          pintar();
+        });
+        opts.appendChild(b);
+      });
+      corpo.appendChild(opts);
+      var txt = null;
+      if (c.outro !== false) {
+        txt = document.createElement('input');
+        txt.className = 'fk-camp-txt'; txt.type = 'text'; txt.maxLength = 300;
+        txt.placeholder = 'Quer escrever algo? (opcional)';
+        txt.addEventListener('input', pintar);
+        corpo.appendChild(txt);
+      }
+      var foot = document.createElement('div');
+      foot.className = 'fk-camp-foot';
+      var conta = document.createElement('span');
+      conta.className = 'd';
+      var ok = document.createElement('button');
+      ok.className = 'fk-camp-ok'; ok.type = 'button'; ok.textContent = 'Enviar';
+      foot.append(conta, ok); corpo.appendChild(foot);
+
+      function pintar() {
+        [].forEach.call(opts.children, function (b, i) {
+          b.classList.toggle('on', sel.indexOf((c.opcoes[i] || {}).id) >= 0);
+        });
+        conta.textContent = (c.opcoes || []).length ? sel.length + '/' + (c.max || 1) : '';
+        ok.disabled = !sel.length && !(txt && txt.value.trim());
+      }
+      pintar();
+
+      ok.addEventListener('click', function () {
+        ok.disabled = true; conta.textContent = 'enviando…';
+        fetch(FISK_HUB_EP, {
+          method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'campVotar', token: s.token, campanha: c.id,
+                                 opcoes: sel, outro: (txt && txt.value.trim()) || '' })
+        }).then(function (r) { return r.json(); }).then(function (j) {
+          if (!j || !j.ok) { ok.disabled = false; conta.textContent = (j && j.error) || 'não deu para enviar'; return; }
+          try { localStorage.setItem('fisk_camp_' + c.id, '1'); } catch (e) {}
+          fab.textContent = '📣 Resposta enviada';
+          desenhar();
+        }).catch(function () { ok.disabled = false; conta.textContent = 'erro de conexão'; });
+      });
+    }
+  }
+}
