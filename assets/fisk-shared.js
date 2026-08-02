@@ -325,11 +325,20 @@ function fiskEsc(s) {
 
 /* ============================================================================
    REGISTRO DE USO DA FERRAMENTA (log do professor, visão da direção)
-   Cada página avisa o backend que foi aberta. É um retrato do uso — uma linha
-   por professor, com as ferramentas da sessão — não um rastro de navegação.
-   Silencioso de propósito: se falhar, a ferramenta segue funcionando.
+   Cada página avisa o backend que foi aberta. Vira duas coisas: o retrato da
+   sessão atual (_acessos_prof, uma linha por professor) e o histórico que
+   alimenta o painel de uso da direção (_uso_ferramentas, uma linha por
+   abertura). Silencioso de propósito: se falhar, a ferramenta segue
+   funcionando.
+
+   O PULSO mede o tempo logado. Ele só sai quando a aba está VISÍVEL e houve
+   atividade de verdade nos últimos FISK_PULSO_OCIO minutos — uma aba
+   esquecida aberta a tarde inteira não pode virar "cinco horas de uso", nem
+   consumir a cota diária do Apps Script batendo no servidor à toa.
    ============================================================================ */
 var FISK_HUB_EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
+var FISK_PULSO_MIN = 5;    // de quanto em quanto tempo o pulso sai
+var FISK_PULSO_OCIO = 10;  // sem toque nenhum por este tempo, o pulso para
 
 function fiskRegistrarUso(ferramenta) {
   try {
@@ -340,7 +349,30 @@ function fiskRegistrarUso(ferramenta) {
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ action: 'usoFerramenta', token: s.token, ferramenta: ferramenta })
     }).catch(function () {});
+    fiskPulso(ferramenta);
   } catch (e) {}
+}
+
+function fiskPulso(ferramenta) {
+  if (window.__fiskPulso) return;          // uma página, um pulso
+  window.__fiskPulso = true;
+  var ultimoToque = Date.now();
+  ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(function (ev) {
+    window.addEventListener(ev, function () { ultimoToque = Date.now(); }, { passive: true });
+  });
+  setInterval(function () {
+    try {
+      if (document.visibilityState !== 'visible') return;
+      if (Date.now() - ultimoToque > FISK_PULSO_OCIO * 60000) return;
+      var s = fiskSessao();
+      if (!s || !s.token) return;
+      fetch(FISK_HUB_EP, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'usoPulso', token: s.token, ferramenta: ferramenta || '' })
+      }).catch(function () {});
+    } catch (e) {}
+  }, FISK_PULSO_MIN * 60000);
 }
 
 /**

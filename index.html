@@ -1061,6 +1061,15 @@
         updateToolLinks();
         if (window._cmSync) window._cmSync(); // re-monta o link do Conversation Maker com o token novo
         setTimeout(function(){ if (window._mdLoad) window._mdLoad(); }, 0);
+        registrarHome();
+      }
+
+      /* A home também é uma "ferramenta" no painel de uso da direção: sem ela
+         o tempo logado só começaria a contar quando o professor abrisse a
+         primeira ferramenta, e quem só passa para ver o mini-dash não
+         apareceria em lugar nenhum. */
+      function registrarHome(){
+        if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Fisk Hub (início)');
       }
 
       /* Este é o portal do PROFESSOR: a lista mostra só quem dá aula.
@@ -1196,6 +1205,7 @@
       var s = saved();
       if (s){
         fillBar(s); if (s.master) setupActAs(); updateToolLinks();  // já logado (prof-in veio do pre-paint)
+        registrarHome();
         // quem já estava logado não passa pelo enter(): o menu é montado aqui
         if (typeof fiskInitUserMenu === 'function') {
           fiskInitUserMenu({
