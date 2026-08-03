@@ -9,6 +9,8 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="assets/fisk-shared.js"></script>
+<!-- aviso de aluno fora do card -->
+<script src="fisk-fora-do-card.js"></script>
 <style>
   /* específico da ferramenta (o kit compartilhado traz tokens e componentes).
      O DOCUMENTO gerado é azul (princípios do boletim de jovens e adultos);
@@ -356,8 +358,34 @@ function mostrarErroApi(err) {
 }
 
 /* ---- modo livre: termo sem vínculo com turma (ex.: aluno ainda não
-   transferido no card). Tudo é preenchido à mão; nada é registrado no card. */
+   transferido no card). Tudo é preenchido à mão; nada é registrado no card.
+
+   O modo CONTINUA existindo de propósito: o aluno em transferência está na sala,
+   atrasado de verdade, e os pais precisam do termo — a transferência que a
+   secretaria ainda não concluiu não é problema do professor. O que passou a
+   existir é o aviso: a secretaria fica sabendo sozinha, pelo painel "Alunos
+   fora do card" do portal dela. Dedup é no servidor, por escola+turma+aluno. */
 var modoLivre = false;
+var JA_AVISOU = '';
+function avisarForaDoCard(documento) {
+  var nome = ((alunoSel && alunoSel.nome) || '').trim();
+  if (!nome || JA_AVISOU === nome.toLowerCase()) return;
+  JA_AVISOU = nome.toLowerCase();
+  if (typeof window.fiskAvisarForaDoCard !== 'function') return;
+  var g = function (id) { var e = document.getElementById(id); return e ? (e.value || '').trim() : ''; };
+  window.fiskAvisarForaDoCard({ documento: documento, aluno: nome,
+    escola: (payload && payload.escola) || '',
+    professor: g('fProf') || (payload && payload.aba) || '',
+    turma: g('fHorario') })
+    .then(function (r) {
+      var el = document.getElementById('statusCard'); if (!el) return;
+      el.textContent = r.avisado
+        ? '⚠️ Aluno fora do card: a secretaria foi avisada para arrumar o cadastro.'
+        : (r.motivo === 'sem_sessao'
+            ? '⚠️ Aluno fora do card. Você não está logado no Fisk Hub, então não deu para avisar a secretaria automaticamente — avise você mesmo.'
+            : '⚠️ Aluno fora do card. Não consegui avisar a secretaria automaticamente — avise você mesmo.');
+    });
+}
 document.getElementById('btnLivre').addEventListener('click', function () {
   modoLivre = true;
   alunoSel = { nome: '', book: '', ultimaLicao: null, licaoPrevista: null,
@@ -748,7 +776,8 @@ async function gerarPDF() {
   /* registra no card (nota na célula da última aula do aluno) — prefere a API,
      que funciona em qualquer modo e respeita a turma trocada no seletor */
   if (modoLivre || alunoSel.linhaCard == null) {
-    // termo livre: nada a registrar no card
+    // termo livre: nada a registrar no card, mas a secretaria é avisada
+    avisarForaDoCard('termo de atraso');
   } else if (API_URL && payload && payload.escola) {
     api({ fn: 'registrarTermo', escola: payload.escola, prof: payload.aba,
           linhaCard: alunoSel.linhaCard, idx: alunoSel.ultimaPresencaIdx })

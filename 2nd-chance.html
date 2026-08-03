@@ -227,6 +227,8 @@
 </footer>
 
 <script src="assets/fisk-shared.js"></script>
+<!-- aviso de aluno fora do card -->
+<script src="fisk-fora-do-card.js"></script>
 <script>
 /* ============================================================
    Notificação 2nd Chance — lê as provas do card (mesma API do termo
@@ -614,6 +616,30 @@ $('btnWhats').addEventListener('click', function () {
   window.open('https://wa.me/?text=' + encodeURIComponent($('msg').value), '_blank');
 });
 
+/* ---- aluno fora do card: aviso automático para a secretaria ----
+   O modo manual CONTINUA existindo: cadastro atrasado (matrícula ou
+   transferência que a secretaria ainda não concluiu) não pode travar o
+   professor, que tem o aluno na sala. Mas a secretaria precisa saber, então a
+   ferramenta avisa sozinha quando o documento sai. Dedup é no servidor, por
+   escola+turma+aluno. Ver fisk-fora-do-card.js. */
+var ONDE_ESTAVA = null;
+var JA_AVISOU = '';
+function avisarForaDoCard(documento) {
+  if (!modoLivre) return;
+  var nome = ((alunoSel && alunoSel.nome) || '').trim();
+  if (!nome || JA_AVISOU === nome.toLowerCase()) return;
+  JA_AVISOU = nome.toLowerCase();
+  if (typeof window.fiskAvisarForaDoCard !== 'function') return;
+  var onde = ONDE_ESTAVA || {};
+  window.fiskAvisarForaDoCard({ documento: documento, aluno: nome, escola: onde.escola,
+    professor: ($('fProf').value || '').trim() || onde.prof, turma: ($('fTurma').value || '').trim() || onde.turma })
+    .then(function (r) {
+      if (r.avisado) statusCard('⚠️ Aluno fora do card: a secretaria foi avisada para arrumar o cadastro.');
+      else if (r.motivo === 'sem_sessao') statusCard('⚠️ Aluno fora do card. Você não está logado no Fisk Hub, então não deu para avisar a secretaria automaticamente — avise você mesmo.');
+      else statusCard('⚠️ Aluno fora do card. Não consegui avisar a secretaria automaticamente — avise você mesmo.');
+    });
+}
+
 /* ============ MODO LIVRE (sem card) ============ */
 $('btnLivre').addEventListener('click', function () {
   modoLivre = true;
@@ -626,7 +652,11 @@ $('btnLivre').addEventListener('click', function () {
   $('msg').value = montarMensagem();
   $('painelAluno').hidden = false;
   ultimoPDF = null; esconderPreview(); esconderVerPasta(); statusDoc(''); syncAcoes();
-  statusCard('✍️ Modo manual: preencha o nome e digite as notas das provas nos blocos.');
+  /* De onde ele estava: entra no aviso para a secretaria saber onde procurar
+     o aluno. `turma` é o payload da turma carregada, quando havia uma. */
+  ONDE_ESTAVA = turma ? { escola: turma.escola, prof: turma.aba || turma.professor,
+                          turma: String(turma.turma || '').split('\n')[0] } : {};
+  statusCard('✍️ Modo manual: preencha o nome e digite as notas. ⚠️ Aluno fora do card — a secretaria será avisada para arrumar o cadastro.');
 });
 function sincronizarLivre() {
   if (!modoLivre) return;
@@ -910,6 +940,7 @@ async function gerarPDF() {
     mostrarPreview(url);
     syncAcoes();
     statusDoc('✓ PDF gerado e baixado, confira na pré-visualização abaixo.', 'ok');
+    avisarForaDoCard('2nd chance');
   } catch (e) {
     alert('Não consegui gerar o PDF: ' + e.message);
   } finally { btnsPDF.forEach(function (b) { b.disabled = false; b.textContent = lbl; }); }
