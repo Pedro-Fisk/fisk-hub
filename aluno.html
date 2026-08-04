@@ -12,23 +12,43 @@
      Gerado por scripts/build-atividades-index.js no portal-aluno-fisk. -->
 <script src="assets/atividades-index.js"></script>
 <style>
-  /* Cor do chrome vem do kit compartilhado; os nomes locais são apelidos.
-     Fallback literal de propósito: se o navegador do professor ainda tiver o
-     kit antigo em cache, --ui não existe e a cor viraria "nenhuma". */
+  /* Estética copiada da Visão Geral (pedido do Pedro): o bloco do professor
+     ficou melhor que o do dossiê, então o molde passa a ser o mesmo — mesma
+     borda de 2px, mesmo título em Poppins, mesmos KPIs e mesmas pílulas.
+     Com fallback literal de propósito: se o navegador ainda tiver o kit
+     compartilhado antigo em cache, --ui não existe e a cor sumiria. */
   :root{ --blue:var(--ui,#2b4d70); --blue-mid:var(--ui-mid,#3d6b93); --blue-pill:var(--ui-pill,#1d3349);
          --blue-soft:var(--ui-soft,#e9eff5); --blue-ink:var(--ui-ink,#1d3349); --blue-bd:var(--ui-bd,#9db6cb);
-         --blue-line:var(--ui-line,#a8bfd2);
-         --ok:#2f8f6b; --ok-soft:#e2f4ec; --med:#c98a1e; --med-soft:#fbf0d8;
-         --bad:#c0392b; --bad-soft:#fbe6e3; --roxo:#7C3AED; --roxo-soft:#f1e9ff; }
+         --blue-line:var(--ui-line,#a8bfd2); }
+  :root{ --roxo:#7C3AED;
+         --alta:#c0392b; --alta-soft:#fbeae7; --media:#b8860b; --media-soft:#fbf3df;
+         --emdia:#27866e; --emdia-soft:#e6f4ef; }
   [hidden]{ display:none !important; }
-  main{ max-width:1000px; margin:0 auto; padding:0 1rem 3rem; }
-  .painel{ background:var(--white); border:2px solid var(--blue-line); border-radius:var(--surface-radius,16px);
-           box-shadow:var(--surface-shadow,0 4px 14px rgba(43,77,112,.09)); padding:1.1rem 1.2rem; margin-top:1.1rem; }
-  .painel > h2{ font-family:var(--font-heading); font-size:1.05rem; font-weight:800; color:var(--blue);
-                margin:0 0 .2rem; display:flex; align-items:center; gap:.45rem; }
-  .sub{ font-size:.82rem; color:var(--gray); margin:0 0 .8rem; line-height:1.45; }
-  .status{ font-size:.85rem; color:var(--gray); margin-top:.6rem; }
-  .status.err{ color:var(--bad); font-weight:700; }
+  main{max-width:900px;margin:0 auto;padding:1.2rem;width:100%}
+  .painel{background:var(--white);border:2px solid var(--surface-border-color);
+          border-radius:var(--surface-radius);box-shadow:var(--surface-shadow);
+          padding:1.15rem 1.25rem;margin-bottom:1.1rem}
+  .painel h2{margin:0 0 .4rem;font-family:var(--font-heading);font-weight:700;
+             font-size:1.05rem;color:var(--ui-dark,#223e5a)}
+  .painel .sub{font-size:.85rem;color:var(--gray);margin:0 0 .8rem;line-height:1.45}
+  .status{font-size:.85rem;color:var(--gray);margin-top:.6rem}
+  .status.err{color:var(--alta);font-weight:700}
+  .resumo{display:flex;flex-wrap:wrap;gap:.5rem;margin:.2rem 0 .4rem}
+  .kpi{flex:1 1 118px;background:var(--blue-soft);border:1.5px solid var(--blue-bd);
+       border-radius:12px;padding:.55rem .7rem;text-align:center}
+  .kpi b{display:block;font-family:var(--font-heading);font-size:1.5rem;line-height:1.1;color:var(--blue-pill)}
+  .kpi b.txt{font-size:1rem;padding:.2rem 0}
+  .kpi small{display:block;font-size:.68rem;font-weight:700;color:var(--blue-ink);opacity:.75;margin-top:.1rem}
+  .kpi span{font-size:.7rem;font-weight:800;color:var(--blue-ink);text-transform:uppercase;letter-spacing:.02em}
+  .kpi.alta{background:var(--alta-soft);border-color:#e6b3ab}.kpi.alta b{color:var(--alta)}
+  .kpi.media{background:var(--media-soft);border-color:#e6d29a}.kpi.media b{color:var(--media)}
+  .kpi.emdia{background:var(--emdia-soft);border-color:#a9d6c8}.kpi.emdia b{color:var(--emdia)}
+  .kpi.roxa{background:#f1eafd;border-color:#cdb6f5}.kpi.roxa b{color:var(--roxo)}
+  .pill{display:inline-block;font-size:.7rem;font-weight:900;padding:.14rem .5rem;border-radius:99px;white-space:nowrap}
+  .pill.alta{background:var(--alta-soft);color:var(--alta)}
+  .pill.media{background:var(--media-soft);color:var(--media)}
+  .pill.emdia{background:var(--emdia-soft);color:var(--emdia)}
+  .pill.neutra{background:var(--blue-soft);color:var(--blue-ink)}
 
   /* ── busca ── */
   .buscabox{ display:flex; gap:.5rem; flex-wrap:wrap; }
@@ -43,6 +63,26 @@
   .achado b{ font-weight:800; }
   .achado span{ font-size:.78rem; color:var(--gray); margin-left:auto; text-align:right; }
 
+  /* ── turmas do professor (mesmo molde da Visão Geral) ── */
+  .tg{border:1.5px solid var(--gray-light);border-radius:12px;margin-bottom:.5rem;overflow:hidden}
+  .tg-cab{width:100%;display:flex;align-items:center;gap:.55rem;padding:.6rem .8rem;cursor:pointer;
+    background:var(--blue-soft);border:none;font-family:var(--font-body);font-size:.92rem;
+    color:var(--blue-ink);text-align:left}
+  .tg-cab:hover{filter:brightness(.97)}
+  .tg-seta{color:var(--gray);font-size:.8em;display:inline-block;transition:transform .15s ease}
+  .tg:not(.is-aberta) .tg-seta{transform:rotate(-90deg)}
+  .tg-n{color:var(--gray);font-size:.8rem;margin-left:auto}
+  .tg-corpo{padding:.55rem .8rem;display:flex;flex-direction:column;gap:.3rem}
+  .at-aluno{display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;font-size:.87rem}
+  .at-aluno .pill{min-width:118px;text-align:center}
+  .at-nome{font-weight:800;color:var(--blue-ink);background:none;border:none;cursor:pointer;
+    font-family:var(--font-body);font-size:.87rem;padding:0;text-align:left}
+  .at-nome:hover{text-decoration:underline}
+  .at-dados{color:var(--gray);font-size:.8rem;margin-left:auto}
+  body.theme-dark .tg-cab{background:#242424;color:#dce7f2}
+  body.theme-dark .tg{border-color:#3a3636}
+  body.theme-dark .at-nome{color:#dce7f2}
+
   /* ── cabeçalho do aluno ── */
   .aluno-head{ display:flex; align-items:center; gap:.9rem; flex-wrap:wrap; }
   .aluno-head .nome{ font-family:var(--font-heading); font-size:1.35rem; font-weight:800; color:var(--blue-ink); line-height:1.2; }
@@ -51,18 +91,8 @@
             padding:.45rem .9rem; font-weight:800; font-size:.95rem; white-space:nowrap; }
   .fd-pill small{ display:block; font-weight:600; font-size:.7rem; opacity:.8; }
 
-  /* ── faixa de resumo ── */
-  .kpis{ display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:.6rem; margin-top:.9rem; }
-  .kpi{ background:var(--blue-soft); border-radius:12px; padding:.6rem .7rem; text-align:center; }
-  .kpi b{ display:block; font-family:var(--font-heading); font-size:1.35rem; font-weight:800; color:var(--blue-ink); line-height:1.15; }
-  /* KPI cujo valor é texto ("há 8 min", "nunca") e não número: menor, para
-     não quebrar em duas linhas e desalinhar a faixa inteira. */
-  .kpi b.txt{ font-size:1rem; padding:.18rem 0; }
-  .kpi span{ font-size:.72rem; color:var(--gray); font-weight:700; text-transform:uppercase; letter-spacing:.02em; }
-  .kpi.ok b{ color:var(--ok); } .kpi.med b{ color:var(--med); } .kpi.bad b{ color:var(--bad); }
-
-  /* ── destaque "fez agora" ── */
-  .agora{ margin-top:.9rem; background:var(--ok-soft); border:2px solid var(--ok); border-radius:12px;
+  /* faixa de resumo — usa .resumo/.kpi, os mesmos da Visão Geral */
+  .agora{ margin-top:.9rem; background:var(--emdia-soft); border:2px solid var(--emdia); border-radius:12px;
           padding:.7rem .9rem; font-size:.92rem; color:#1e5c45; line-height:1.5; }
   .agora.vazio{ background:var(--gray-light); border-color:var(--gray-light); color:var(--gray); }
   .agora b{ font-weight:800; }
@@ -76,7 +106,7 @@
   .ativ-nome{ font-weight:800; color:var(--blue-ink); font-size:.95rem; }
   .ativ-sub{ font-size:.76rem; color:var(--gray); }
   .ativ-pct{ margin-left:auto; font-family:var(--font-heading); font-weight:800; font-size:1.05rem; }
-  .ativ-pct.ok{ color:var(--ok); } .ativ-pct.med{ color:var(--med); } .ativ-pct.bad{ color:var(--bad); }
+  .ativ-pct.emdia{ color:var(--emdia); } .ativ-pct.media{ color:var(--media); } .ativ-pct.alta{ color:var(--alta); }
   .ativ-quando{ font-size:.75rem; color:var(--gray); text-align:right; min-width:110px; }
   .ativ-corpo{ padding:.5rem .8rem .8rem; background:var(--blue-soft); font-size:.83rem; }
   .tent{ display:flex; gap:.6rem; padding:.25rem 0; border-bottom:1px dashed var(--blue-bd); }
@@ -88,6 +118,8 @@
   .topico .barra{ flex:1 1 80px; height:8px; border-radius:99px; background:var(--gray-light); overflow:hidden; max-width:180px; }
   .topico .barra i{ display:block; height:100%; }
   .topico .n{ font-size:.78rem; color:var(--gray); min-width:44px; text-align:right; }
+  /* tópicos ficam recuados sob a tentativa a que pertencem */
+  .topicos-da-tent{ padding:.25rem 0 .5rem 1.1rem; border-left:2px solid var(--blue-bd); margin:.1rem 0 .35rem .4rem; }
 
   table.dossie{ width:100%; border-collapse:collapse; margin-top:.5rem; font-size:.85rem; }
   table.dossie th{ text-align:left; font-size:.72rem; text-transform:uppercase; letter-spacing:.03em;
@@ -130,6 +162,14 @@
     <div class="status" id="stBusca"></div>
   </div>
 
+  <!-- 1b · navegar sem digitar -->
+  <div class="painel" id="pnTurmas" hidden>
+    <h2>👥 Minhas turmas</h2>
+    <p class="sub">Para quando você não lembra o nome. Abra a turma e clique no aluno.</p>
+    <div id="alTurmas"></div>
+    <div class="status" id="stTurmas"></div>
+  </div>
+
   <!-- 2 · dossiê -->
   <div class="painel" id="pnAluno" hidden>
     <div class="aluno-head">
@@ -138,25 +178,20 @@
         <div class="meta" id="alMeta"></div>
       </div>
       <div class="fd-pill" id="alFd" hidden></div>
+      <button type="button" class="btn-ver" id="btnPasta" hidden>📂 Pasta no Drive</button>
     </div>
+    <div class="status" id="stPasta"></div>
     <div class="agora" id="alAgora" hidden></div>
-    <div class="kpis" id="alKpis"></div>
+    <div class="resumo" id="alKpis"></div>
   </div>
 
-  <!-- 3 · atividades do portal -->
+  <!-- 3 · tudo o que o aluno fez, numa lista só -->
   <div class="painel" id="pnAtiv" hidden>
-    <h2>🎬 Atividades do Portal do Aluno</h2>
-    <p class="sub">Movie Program, Song Program, Mundo Fisk e Quick Practice. Clique numa atividade
-      para ver <b>tentativa por tentativa</b>, com data e hora.</p>
+    <h2>🎬 O que o aluno fez</h2>
+    <p class="sub">Movie Program, Song Program, Mundo Fisk e Quick Practice, em ordem de
+      quando aconteceu. Clique numa atividade para ver <b>tentativa por tentativa</b>, com
+      data e hora — e, nos simulados, o desempenho <b>por tópico gramatical</b>.</p>
     <div id="alAtiv"></div>
-  </div>
-
-  <!-- 4 · simulados com detalhe por tópico -->
-  <div class="painel" id="pnProvas" hidden>
-    <h2>📝 Simulados e Quick Practice</h2>
-    <p class="sub">Cada tentativa, com acertos e — quando o resultado traz o detalhamento — o
-      desempenho <b>por tópico gramatical</b>, que é o que se leva para o planejamento da aula.</p>
-    <div id="alProvas"></div>
   </div>
 
   <!-- 5 · notas (atrás de um clique, de propósito) -->
@@ -243,8 +278,10 @@ function haQuanto(ts){
   if (dias < 30) return 'há ' + dias + ' dias';
   return dataHora(ts).split(' às ')[0];
 }
-function classePct(p){ return p == null ? '' : (p >= 70 ? 'ok' : p >= 50 ? 'med' : 'bad'); }
-function corPct(p){ return p >= 70 ? 'var(--ok)' : p >= 50 ? 'var(--med)' : 'var(--bad)'; }
+/* Mesma régua de cor da Visão Geral, para o professor não ter de aprender
+   dois códigos de cor entre uma tela e outra. */
+function classePct(p){ return p == null ? '' : (p >= 70 ? 'emdia' : p >= 50 ? 'media' : 'alta'); }
+function corPct(p){ return p >= 70 ? 'var(--emdia)' : p >= 50 ? 'var(--media)' : 'var(--alta)'; }
 
 /* Nome legível da atividade. O índice cobre filme e música (gerado dos
    catálogos); Mundo Fisk e Quick Practice trazem o próprio rótulo no id. */
@@ -294,7 +331,8 @@ function abrir(raf){
   $('alNome').textContent = 'Carregando…';
   $('alMeta').textContent = ''; $('alKpis').innerHTML = '';
   $('alFd').hidden = true; $('alAgora').hidden = true;
-  $('pnAtiv').hidden = true; $('pnProvas').hidden = true; $('pnNotas').hidden = true;
+  $('btnPasta').hidden = true; $('btnPasta').disabled = false; $('stPasta').textContent = '';
+  $('pnAtiv').hidden = true; $('pnNotas').hidden = true;
   $('alNotas').innerHTML = ''; $('stNotas').textContent = '';
   $('btnNotas').disabled = false; $('btnNotas').textContent = 'Ver notas anteriores';
   $('pnAluno').scrollIntoView({ behavior:'smooth', block:'start' });
@@ -346,18 +384,66 @@ function render(d){
     kpi(media == null ? '—' : media + '%', 'Aproveitamento médio', classePct(media)) +
     kpi((d.acesso && d.acesso.count) || 0, 'Acessos ao portal') +
     kpi(d.acesso && d.acesso.last ? haQuanto(d.acesso.last) : 'nunca', 'Último acesso') +
-    (sit.faltas != null ? kpi(sit.faltas, 'Faltas', sit.faltas >= 4 ? 'bad' : sit.faltas >= 2 ? 'med' : 'ok') : '') +
+    (sit.faltas != null ? kpi(sit.faltas, 'Faltas', sit.faltas >= 4 ? 'alta' : sit.faltas >= 2 ? 'media' : 'emdia') : '') +
     (sit.pctEstagio != null ? kpi(sit.pctEstagio + '%', 'Progresso do estágio') : '') +
     (sit.ultimaLicao ? kpi(sit.ultimaLicao, 'Última lição dada') : '');
 
-  renderAtividades(ativ);
-  renderProvas(d.provas || []);
+  renderAtividades(fundir(ativ, d.provas || []));
   $('pnNotas').hidden = (d.escopo !== 'equipe');
+  $('btnPasta').hidden = (d.escopo !== 'equipe');   // a pasta é do professor, não do aluno
 }
 function kpi(v, l, cls){
   var texto = !/^[\d.,]+%?$/.test(String(v));   // "há 8 min" e "nunca" pedem corpo menor
   return '<div class="kpi'+(cls?' '+cls:'')+'"><b'+(texto?' class="txt"':'')+'>'+esc(v)+'</b>' +
          '<span>'+esc(l)+'</span></div>';
+}
+
+/* Junta as DUAS fontes numa lista só.
+ * Elas existiam em blocos separados e mostravam o mesmo Quick Practice duas
+ * vezes — uma vindo do progresso (quantas vezes, melhor %) e outra das abas
+ * de resultado (acertos, tópicos). Para quem lê a tela isso é ruído puro: é a
+ * mesma atividade contada de dois jeitos.
+ * A chave da junção é o activityId, que os dois lados montam igual
+ * ('qp:Essentials 1 · Practice'). Do progresso vem quantas vezes e o melhor
+ * desempenho; das abas vem o detalhe por tópico e o acerto de cada tentativa.
+ * Prova que nunca creditou (treino curto) não aparece no progresso, então
+ * entra aqui como item próprio — senão sumiria da tela. */
+function fundir(ativ, provas) {
+  var porId = {};
+  ativ.forEach(function (a) { porId[a.id] = a; });
+
+  provas.filter(function (x) { return x && x.q; }).forEach(function (x) {
+    var id = (x.tool || 'qp') + ':' + (x.s || '');
+    var alvo = porId[id];
+    if (!alvo) {
+      alvo = porId[id] = { id: id, tipo: 'qp', tentativas: [], vezes: 0,
+                           melhorPct: null, primeira: null, ultima: null };
+    }
+    var pct = Math.round((x.c || 0) / x.q * 100);
+    // a tentativa da aba é mais rica (traz acertos e tópicos): substitui a
+    // reconstruída, quando as duas descrevem o mesmo momento
+    var mesma = alvo.tentativas.filter(function (t) {
+      return Math.abs((t.t || 0) - (x.t || 0)) < 120000;   // 2 min de folga
+    })[0];
+    if (mesma) {
+      mesma.acertos = x.c; mesma.total = x.q; mesma.pct = pct;
+      mesma.topicos = x.topicos || mesma.topicos || null;
+    } else {
+      alvo.tentativas.push({ t: x.t, acertos: x.c, total: x.q, pct: pct,
+                             topicos: x.topicos || null, fonte: 'prova' });
+      alvo.vezes = alvo.tentativas.length;
+    }
+    if (alvo.melhorPct == null || pct > alvo.melhorPct) alvo.melhorPct = pct;
+    if (!alvo.ultima || (x.t || 0) > alvo.ultima) alvo.ultima = x.t;
+    if (!alvo.primeira || (x.t || 0) < alvo.primeira) alvo.primeira = x.t;
+  });
+
+  return Object.keys(porId).map(function (k) {
+    var a = porId[k];
+    a.tentativas.sort(function (p, q) { return (p.t || 0) - (q.t || 0); });
+    a.vezes = a.tentativas.length || a.vezes;
+    return a;
+  }).sort(function (a, b) { return (b.ultima || 0) - (a.ultima || 0); });
 }
 
 function renderAtividades(ativ){
@@ -366,12 +452,14 @@ function renderAtividades(ativ){
   $('alAtiv').innerHTML = ativ.map(function(a, i){
     var r = rotulo(a.id);
     var pct = a.melhorPct;
+    var comTopicos = a.tentativas.filter(function(t){ return t.topicos && t.topicos.length; }).length;
     return '<div class="ativ">' +
       '<button type="button" class="ativ-top" data-i="'+i+'">' +
         '<span class="ativ-ic">'+r.ic+'</span>' +
         '<span><span class="ativ-nome">'+esc(r.t)+'</span><br>' +
           '<span class="ativ-sub">'+esc(r.prog)+(r.livro?' · '+esc(r.livro):'')+
-          ' · fez '+a.vezes+(a.vezes===1?' vez':' vezes')+'</span></span>' +
+          ' · fez '+a.vezes+(a.vezes===1?' vez':' vezes')+
+          (comTopicos?' · com detalhe por tópico':'')+'</span></span>' +
         '<span class="ativ-pct '+classePct(pct)+'">'+(pct==null?'—':pct+'%')+'</span>' +
         '<span class="ativ-quando">'+haQuanto(a.ultima)+'<br><span style="opacity:.75">'+dataHora(a.ultima)+'</span></span>' +
       '</button>' +
@@ -383,42 +471,22 @@ function tentativas(a){
   if (!a.tentativas || !a.tentativas.length) return '<div class="vazio">Sem detalhe de tentativas.</div>';
   return a.tentativas.map(function(t, n){
     var acertos = (t.acertos != null && t.total != null) ? (t.acertos + ' de ' + t.total) : '—';
-    return '<div class="tent"><span>'+(n+1)+'ª tentativa</span>' +
-           '<span style="color:var(--gray)">'+dataHora(t.t)+'</span>' +
-           '<span class="t-q" style="color:'+corPct(t.pct)+'">'+acertos+' · '+t.pct+'%</span></div>';
+    var linha = '<div class="tent"><span>'+(n+1)+'ª tentativa</span>' +
+      '<span style="color:var(--gray)">'+dataHora(t.t)+'</span>' +
+      '<span class="t-q" style="color:'+corPct(t.pct)+'">'+acertos+' · '+t.pct+'%</span></div>';
+    /* O detalhe por tópico é o que o professor leva para a aula seguinte, e
+       por isso fica ABERTO junto da tentativa, sem mais um clique. */
+    if (t.topicos && t.topicos.length) {
+      var tops = t.topicos.slice().sort(function(x,y){ return (x.c/x.q) - (y.c/y.q); });
+      linha += '<div class="topicos-da-tent">'+topicos(tops)+'</div>';
+    }
+    return linha;
   }).join('');
 }
 $('alAtiv').addEventListener('click', function(e){
   var b = e.target.closest('.ativ-top'); if (!b) return;
   var c = $('ac' + b.dataset.i); if (c) c.hidden = !c.hidden;
 });
-
-/* Simulados: aqui mora o detalhamento por tópico, que é o que muda a aula
-   seguinte. Resultados anteriores a 03/08/2026 não têm `topicos` — a linha
-   aparece assim mesmo, só sem o desdobramento. */
-function renderProvas(provas){
-  var p = provas.filter(function(x){ return x && x.q; });
-  $('pnProvas').hidden = !p.length;
-  if (!p.length) return;
-  $('alProvas').innerHTML = p.map(function(x, i){
-    var pct = Math.round((x.c || 0) / x.q * 100);
-    var tops = (x.topicos || []).slice().sort(function(a,b){
-      return (a.c/a.q) - (b.c/b.q);   // pior primeiro: é o que o professor precisa ver
-    });
-    return '<div class="ativ">' +
-      '<button type="button" class="ativ-top" data-p="'+i+'">' +
-        '<span class="ativ-ic">'+(x.tool === 'met' ? '🎓' : x.tool === 'siele' ? '🇪🇸' : '⚡')+'</span>' +
-        '<span><span class="ativ-nome">'+esc(x.s || x.tool)+'</span><br>' +
-          '<span class="ativ-sub">'+(x.c||0)+' de '+x.q+' questões'+
-          (tops.length ? ' · '+tops.length+' tópicos' : ' · sem detalhe por tópico')+'</span></span>' +
-        '<span class="ativ-pct '+classePct(pct)+'">'+pct+'%</span>' +
-        '<span class="ativ-quando">'+haQuanto(x.t)+'<br><span style="opacity:.75">'+dataHora(x.t)+'</span></span>' +
-      '</button>' +
-      '<div class="ativ-corpo" hidden id="pv'+i+'">'+ (tops.length ? topicos(tops) :
-        '<div class="vazio">Este resultado é anterior ao registro por tópico.</div>') +'</div>' +
-    '</div>';
-  }).join('');
-}
 function topicos(tops){
   return tops.map(function(t){
     var pct = Math.round(t.c / t.q * 100);
@@ -428,10 +496,6 @@ function topicos(tops){
       '<span class="n" style="color:'+corPct(pct)+'">'+t.c+'/'+t.q+'</span></div>';
   }).join('');
 }
-$('alProvas').addEventListener('click', function(e){
-  var b = e.target.closest('.ativ-top'); if (!b) return;
-  var c = $('pv' + b.dataset.p); if (c) c.hidden = !c.hidden;
-});
 
 /* ── notas: só quando pedidas (Pedro não quer nota fácil de ver, e é a parte
       cara do backend — abre os cards das duas escolas) ── */
@@ -454,7 +518,7 @@ $('btnNotas').addEventListener('click', function(){
       linhas.map(function(b){
         var nota = function(v){
           if (v == null || v === '') return '<span style="color:var(--gray)">—</span>';
-          return '<b style="color:'+(Number(v) >= 6 ? 'var(--ok)' : 'var(--bad)')+'">'+
+          return '<b style="color:'+(Number(v) >= 6 ? 'var(--emdia)' : 'var(--alta)')+'">'+
                  esc(String(v).replace('.', ','))+'</b>';
         };
         return '<tr><td>'+esc(b.book || '—')+'</td>' +
@@ -466,6 +530,84 @@ $('btnNotas').addEventListener('click', function(){
   }).catch(function(){
     $('stNotas').className = 'status err'; $('stNotas').textContent = '⚠️ Não consegui ler as notas.';
     $('btnNotas').disabled = false;
+  });
+});
+
+/* ── Minhas turmas: navegar sem digitar ──────────────────────────────────
+   O professor raramente lembra o nome exato do aluno — ele lembra a TURMA.
+   Reusa o `acessosProf`, o mesmo que alimenta a Chamada do Portal na Visão
+   Geral, então não há endpoint novo nem consulta a mais no card. */
+var _turmasAbertas = {};
+function carregarTurmas(){
+  if (!token()) return;
+  var prof = '';
+  try { prof = (JSON.parse(localStorage.getItem('fisk_actas')||'null')||{}).name || ''; } catch(e){}
+  $('pnTurmas').hidden = false;
+  $('stTurmas').textContent = 'Carregando suas turmas…';
+  post({ action:'acessosProf', token: token(), prof: prof }).then(function(res){
+    if (!res.ok || !(res.acessos||[]).length){
+      // conta sem turma (direção, secretaria): o bloco some e a busca basta
+      $('pnTurmas').hidden = true; return;
+    }
+    $('stTurmas').textContent = '';
+    var porTurma = {}, ordem = [];
+    res.acessos.forEach(function(a){
+      var t = a.turma || 'Sem turma';
+      if (!porTurma[t]){ porTurma[t] = []; ordem.push(t); }
+      porTurma[t].push(a);
+    });
+    ordem.sort();
+    $('alTurmas').innerHTML = ordem.map(function(t){
+      var alunos = porTurma[t].slice().sort(function(a,b){ return String(a.name).localeCompare(String(b.name)); });
+      var parados = alunos.filter(function(a){ return !a.totalAtividades; }).length;
+      var aberta = _turmasAbertas[t] === true;   // fechadas por padrão: são muitas
+      return '<div class="tg'+(aberta?' is-aberta':'')+'">' +
+        '<button type="button" class="tg-cab" data-t="'+esc(t).replace(/"/g,'&quot;')+'">' +
+          '<span class="tg-seta">▾</span><b>'+esc(t)+'</b>' +
+          '<span class="tg-n">'+alunos.length+' aluno'+(alunos.length>1?'s':'')+'</span>' +
+          (parados?'<span class="pill alta">'+parados+' sem atividade</span>':'') +
+        '</button>' +
+        '<div class="tg-corpo"'+(aberta?'':' hidden')+'>' +
+          alunos.map(function(a){
+            var ua = a.ultimaAtividade || null;
+            var dias = ua ? Math.floor((Date.now()-ua)/86400000) : null;
+            var cls = ua == null ? 'alta' : (dias <= 7 ? 'emdia' : 'media');
+            var rot = ua == null ? (a.last ? 'entrou, não fez' : 'nunca entrou') : haQuanto(ua);
+            return '<div class="at-aluno">' +
+              '<span class="pill '+cls+'">'+rot+'</span>' +
+              '<button type="button" class="at-nome" data-raf="'+esc(a.raf)+'">'+esc(a.name)+'</button>' +
+              '<span class="at-dados">'+esc(a.book||'')+'</span></div>';
+          }).join('') +
+        '</div></div>';
+    }).join('');
+  }).catch(function(){ $('pnTurmas').hidden = true; });
+}
+$('alTurmas').addEventListener('click', function(ev){
+  var cab = ev.target.closest('.tg-cab');
+  if (cab){ var t = cab.getAttribute('data-t'); _turmasAbertas[t] = !_turmasAbertas[t]; carregarTurmas(); return; }
+  var al = ev.target.closest('.at-nome');
+  if (al) abrir(al.dataset.raf);
+});
+
+/* ── pasta do aluno no Drive ──────────────────────────────────────────────
+   Só busca quando o professor pede: achar a pasta é caro (varre o Drive) e
+   quase nunca é o motivo de abrir o dossiê. */
+$('btnPasta').addEventListener('click', function(){
+  if (!atual) return;
+  $('btnPasta').disabled = true;
+  $('stPasta').className = 'status'; $('stPasta').textContent = 'Procurando a pasta no Drive…';
+  post({ action:'alunoPasta', token: token(), raf: atual }).then(function(res){
+    $('btnPasta').disabled = false;
+    if (res && res.ok && res.url){
+      $('stPasta').textContent = '';
+      window.open(res.url, '_blank', 'noopener');
+      return;
+    }
+    $('stPasta').className = 'status err';
+    $('stPasta').textContent = '⚠️ ' + ((res && res.error) || 'Não achei a pasta.');
+  }).catch(function(){
+    $('btnPasta').disabled = false;
+    $('stPasta').className = 'status err'; $('stPasta').textContent = '⚠️ Erro de conexão.';
   });
 });
 
@@ -485,6 +627,7 @@ $('btnNotas').addEventListener('click', function(){
                             '<a href="index.html">Ir para o login</a>';
     return;
   }
+  carregarTurmas();
   $('q').focus();
 })();
 </script>

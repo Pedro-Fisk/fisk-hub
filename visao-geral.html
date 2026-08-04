@@ -130,6 +130,45 @@
   .hintbox{background:var(--blue-soft);border-radius:10px;padding:.55rem .8rem;font-size:.8rem;
            color:var(--blue-ink);margin-top:.8rem;line-height:1.45}
   .foranote{font-size:.8rem;color:var(--gray);margin-top:.8rem;padding-top:.7rem;border-top:1px dashed var(--gray-light)}
+  /* o nome do aluno leva ao dossiê: sublinhado só no hover, para a tabela não
+     virar um mar de links azuis */
+  /* ── Blocos colapsáveis ──────────────────────────────────────────────
+     Os DOIS primeiros ("Suas turmas" e "Panorama geral") ficam sempre
+     abertos de propósito: um é como se escolhe o que analisar e o outro é a
+     resposta — recolher qualquer um dos dois deixaria a tela sem sentido.
+     Do terceiro em diante o professor fecha o que não está usando, e a
+     escolha dele fica guardada por bloco. */
+  .painel.is-colapsavel > h2{cursor:pointer;user-select:none;display:flex;align-items:center;gap:.45rem}
+  .painel.is-colapsavel > h2::after{content:'▾';margin-left:auto;font-size:.85em;color:var(--gray);
+    transition:transform .15s ease}
+  .painel.is-colapsavel.is-fechado > h2::after{transform:rotate(-90deg)}
+  .painel.is-colapsavel.is-fechado > *:not(h2){display:none}
+  /* Turmas agrupadas no bloco "Meus alunos" */
+  .tg{border:1.5px solid var(--gray-light);border-radius:12px;margin-bottom:.5rem;overflow:hidden}
+  .tg-cab{width:100%;display:flex;align-items:center;gap:.55rem;padding:.6rem .8rem;cursor:pointer;
+    background:var(--blue-soft);border:none;font-family:var(--font-body);font-size:.92rem;
+    color:var(--blue-ink);text-align:left}
+  .tg-cab:hover{filter:brightness(.97)}
+  .tg-seta{color:var(--gray);font-size:.8em;display:inline-block;transition:transform .15s ease}
+  .tg:not(.is-aberta) .tg-seta{transform:rotate(-90deg)}
+  .tg-n{color:var(--gray);font-size:.8rem;margin-left:auto}
+  .tg-corpo{padding:.55rem .8rem;display:flex;flex-direction:column;gap:.3rem}
+  body.theme-dark .tg-cab{background:#242424;color:#dce7f2}
+  body.theme-dark .tg{border-color:#3a3636}
+  .tr-turma{cursor:pointer}
+  .tr-turma:hover{background:var(--blue-soft)}
+  .tt-seta{margin-left:.4rem;color:var(--gray);font-size:.8em;display:inline-block;transition:transform .15s ease}
+  .tr-turma.is-aberta .tt-seta{transform:rotate(180deg)}
+  .tr-alunos > td{background:var(--blue-soft);padding:.6rem .7rem}
+  .alunos-turma{display:flex;flex-direction:column;gap:.3rem}
+  .at-aluno{display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;font-size:.87rem}
+  .at-aluno .pill{min-width:118px;text-align:center}
+  .at-nome{font-weight:800;color:var(--blue-ink)}
+  .at-dados{color:var(--gray);font-size:.8rem;margin-left:auto}
+  body.theme-dark .tr-alunos > td{background:#242424}
+  body.theme-dark .at-nome{color:#dce7f2}
+  a.ac-link{color:inherit;text-decoration:none;border-bottom:1px dotted var(--blue-bd)}
+  a.ac-link:hover{color:var(--blue);border-bottom-style:solid}
   body.theme-dark td .tsub{color:#9aa6b1}
 </style>
 </head>
@@ -188,7 +227,7 @@
   </div>
 
   <!-- 2b · faltas × atraso -->
-  <div class="painel" id="painelDisp" hidden>
+  <div class="painel is-colapsavel" id="painelDisp" hidden>
     <h2>🎯 Falta ou ritmo?</h2>
     <p class="sub">Cada ponto é um aluno. Quem está no alto e à <b>esquerda</b> vem às aulas e mesmo
       assim está atrasado — é atraso de ritmo, não de presença, e costuma ser o atendimento mais
@@ -197,7 +236,7 @@
   </div>
 
   <!-- 3 · por turma -->
-  <div class="painel" id="painelTurmas" hidden>
+  <div class="painel is-colapsavel" id="painelTurmas" hidden>
     <h2>🏫 Por turma</h2>
     <div class="table-wrap">
       <table>
@@ -213,7 +252,7 @@
   </div>
 
   <!-- 4 · lista de atenção -->
-  <div class="painel" id="painelAtencao" hidden>
+  <div class="painel is-colapsavel" id="painelAtencao" hidden>
     <h2>⚠️ Alunos que pedem atenção</h2>
     <p class="sub">Os mais atrasados de todas as turmas analisadas — os mesmos que o
       <a href="planejador.html">Planejador</a> coloca no topo da fila.</p>
@@ -226,39 +265,19 @@
     </div>
   </div>
 
-  <!-- 4b · lançamento de notas -->
-  <div class="painel" id="painelNotas" hidden>
-    <h2>📝 Notas lançadas no card</h2>
-    <p class="sub">Quantos alunos de cada turma já têm a avaliação lançada — o que falta
-      preencher antes do fechamento. Lançar é pelo <a href="boletins.html">Gerador de Boletins</a>.</p>
-    <div class="table-wrap">
-      <table style="min-width:520px">
-        <thead><tr><th>Turma</th><th class="num">Alunos</th><th>1ª avaliação</th><th>2ª avaliação</th></tr></thead>
-        <tbody id="linhasNotas"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- 4c · gatilho de 2ª chance -->
-  <div class="painel" id="painelSegunda" hidden>
-    <h2>🔁 Alunos que precisam de 2ª chance</h2>
-    <p class="sub">Prova de escuta ou de escrita <b>abaixo de 6</b> — o aluno refaz só a prova
-      que ficou baixa. O botão abre a ferramenta já com esse aluno carregado.</p>
-    <div class="atn" id="listaSegunda"></div>
-  </div>
-
   <!-- 5 · acessos ao Portal do Aluno (era uma ferramenta separada no Hub) -->
-  <div class="painel" id="painelAcessos">
-    <h2>🔑 Acessos dos alunos ao Portal</h2>
-    <p class="sub">Quem já entrou no Portal do Aluno com o código RAF — e quem ainda nem abriu.
-      Vem das <b>suas</b> turmas, pelo seu login no Hub.</p>
+  <div class="painel is-colapsavel" id="painelAcessos">
+    <h2>👥 Meus alunos</h2>
+    <p class="sub">Todas as suas turmas, para bater o olho. Abra uma turma e clique no aluno
+      para ver o <b>dossiê</b> dele. A busca alcança a escola inteira, inclusive alunos de
+      outros professores.</p>
     <div class="status" id="acStatus">🔄 Carregando…</div>
     <div id="acCorpo" hidden>
       <div class="resumo" style="margin-top:.7rem">
         <div class="kpi"><b id="ac-total">0</b><span>Alunos</span></div>
         <div class="kpi emdia"><b id="ac-ent">0</b><span>Já entraram</span></div>
-        <div class="kpi alta"><b id="ac-nunca">0</b><span>Nunca entraram</span></div>
-        <div class="kpi"><b id="ac-7d">0</b><span>Últimos 7 dias</span></div>
+        <div class="kpi alta"><b id="ac-nunca">0</b><span>Nunca fizeram nada</span></div>
+        <div class="kpi"><b id="ac-7d">0</b><span>Ativos nos 7 dias</span></div>
       </div>
       <div class="row" style="margin:.7rem 0 .5rem">
         <div style="flex:1 1 200px"><select id="acTurma"><option value="">Todas as turmas</option></select></div>
@@ -266,18 +285,16 @@
           <option value="">Todos</option>
           <option value="sim">Só quem já entrou</option>
           <option value="nao">Só quem nunca entrou</option>
+          <option value="parado">Entrou, mas não fez nada</option>
+          <option value="sumido">Sem atividade há 7 dias</option>
         </select></div>
         <div style="flex:1 1 170px"><input type="search" id="acBusca" placeholder="Buscar aluno…"
           style="width:100%;padding:.5rem .6rem;border:1px solid var(--gray-light);border-radius:9px;
                  font-family:var(--font-body);font-size:.92rem;background:var(--white);color:var(--black)"></div>
       </div>
-      <div class="table-wrap">
-        <table style="min-width:520px">
-          <thead><tr><th>Aluno</th><th>Livro</th><th>Último acesso</th><th class="num">Acessos</th></tr></thead>
-          <tbody id="acLinhas"></tbody>
-        </table>
-      </div>
-      <p class="sub" style="margin:.8rem 0 0">O aluno entra em <b>portalfisk.com.br</b> usando o RAF.</p>
+      <div id="acLinhas"></div>
+      <p class="sub" style="margin:.8rem 0 0">O aluno entra em <b>portalfisk.com.br</b> usando o RAF.
+        <b>Entrar não é fazer</b>: a coluna de atividade conta exercício concluído, não visita.</p>
     </div>
   </div>
 </main>
@@ -412,6 +429,8 @@ function setupVgActAs() {
     var escs = opt.getAttribute('data-esc') || '';
     try { localStorage.setItem('fisk_actas', JSON.stringify({ name: sb.value, escolas: escs })); } catch (e) {}
     selecionarNaCascata(String(escs).split(',')[0].trim(), sb.value, true);
+    // a Chamada do Portal é servida por outra rota: só a cascata não a atualiza
+    if (window._acRecarregar) window._acRecarregar();
   };
 }
 
@@ -572,39 +591,7 @@ function ligarTooltip(box, tip) {
   });
 }
 
-/* ============ NOTAS DAS PROVAS (mesmo parser do 2nd Chance) ============
-   A célula do card guarda o lançamento em texto; o formato mudou uma vez,
-   então os dois são aceitos: o atual ("prova de escuta: 8") e o antigo
-   ("A8 B7,5 ..." na última linha). */
-function parseProvas(cellText) {
-  if (!cellText || !String(cellText).trim()) return null;
-  var txt = String(cellText), auditiva, escrita;
-  var mE = txt.match(/prova de escuta:\s*([0-9]+(?:[.,][0-9]+)?)/i);
-  var mW = txt.match(/prova de escrita:\s*([0-9]+(?:[.,][0-9]+)?)/i);
-  if (mE) auditiva = parseFloat(mE[1].replace(',', '.'));
-  if (mW) escrita = parseFloat(mW[1].replace(',', '.'));
-  if (auditiva === undefined && escrita === undefined) {
-    var lines = txt.split('\n'), noteLine = lines[lines.length - 1], res = {};
-    var re = /(?:^|\s)([AB])\s*([0-9]+(?:[.,][0-9]+)?)/g, m;
-    while ((m = re.exec(noteLine))) { res[m[1]] = parseFloat(m[2].replace(',', '.')); }
-    auditiva = res.A; escrita = res.B;
-  }
-  if (auditiva === undefined && escrita === undefined) return null;
-  return { auditiva: auditiva, escrita: escrita };
-}
-var NOTA_MINIMA = 6;
 function temNota(v) { return !!(v && String(v).trim()); }
-
-/* medidor "12/14" — proporção contra um limite, não série: uma cor só */
-function medidor(feitos, total) {
-  var pct = total ? feitos / total * 100 : 0;
-  var cor = !total ? 'var(--gray-light)' : (feitos === total ? 'var(--viz-emdia)'
-            : feitos ? 'var(--viz-media)' : 'var(--viz-alta)');
-  return '<div style="display:flex;align-items:center;gap:.5rem">' +
-    '<span class="rt" style="flex:1;min-width:70px"><i style="width:' + pct + '%;background:' + cor + '"></i></span>' +
-    '<b style="font-size:.78rem;font-variant-numeric:tabular-nums;white-space:nowrap">' +
-    feitos + '/' + total + '</b></div>';
-}
 
 function render(escola, prof, dados) {
   var alunos = [];        // todos, com referência da turma
@@ -615,7 +602,8 @@ function render(escola, prof, dados) {
       titulo: String(d._titulo || d.turma || '').split('\n')[0],
       n: lista.length, emdia: 0, atras: 0, crit: 0, semdados: 0,
       faltas: [], notas: [], av1: 0, av2: 0,
-      linhaTitulo: d.linhaTitulo, aba: d.aba || d.professor
+      linhaTitulo: d.linhaTitulo, aba: d.aba || d.professor,
+      alunos: lista           // guardados para a linha da turma poder expandir
     };
     lista.forEach(function (a) {
       a._turma = t.titulo;
@@ -700,8 +688,33 @@ function render(escola, prof, dados) {
     ligarTooltip(box, $('vizTip'));
   }
 
+  /* Alunos de uma turma, para a linha que expande. Ordem: quem precisa de
+     atenção primeiro — o professor abre a turma para achar problema, não
+     para ler a chamada em ordem alfabética. */
+  function alunosDaTurma(t) {
+    var alunos = (t.alunos || []).slice().sort(function (a, b) {
+      var A = a._atraso == null ? -1 : a._atraso, B = b._atraso == null ? -1 : b._atraso;
+      return B - A || String(a.nome).localeCompare(String(b.nome));
+    });
+    if (!alunos.length) return '<p class="sub" style="margin:.4rem 0">Turma sem alunos no card.</p>';
+    return '<div class="alunos-turma">' + alunos.map(function (a) {
+      var at = a._atraso;
+      var cls = at == null ? 'neutra' : at >= LIMITE_ATRASO ? 'alta' : at >= 1 ? 'media' : 'emdia';
+      var sit = at == null ? 'sem análise' : at === 0 ? 'em dia'
+              : at + ' aula' + (at > 1 ? 's' : '') + ' de atraso';
+      return '<div class="at-aluno">' +
+        '<span class="pill ' + cls + '">' + sit + '</span>' +
+        linkAluno(a.nome, 'at-nome') +
+        '<span class="at-dados">' +
+          (typeof a.pctFaltas === 'number' && !isNaN(a.pctFaltas)
+             ? Math.round(a.pctFaltas) + '% faltas' : '') +
+          (a._nota != null ? ' · nota ' + fmtNota(a._nota) : '') +
+        '</span></div>';
+    }).join('') + '</div>';
+  }
+
   /* tabela por turma */
-  $('linhasTurmas').innerHTML = porTurma.map(function (t) {
+  $('linhasTurmas').innerHTML = porTurma.map(function (t, i) {
     var analis = t.emdia + t.atras + t.crit;
     var situ = !analis ? '<span class="pill neutra">sem cronograma</span>'
       : t.crit ? '<span class="pill alta">' + t.crit + ' crítico' + (t.crit > 1 ? 's' : '') + '</span>'
@@ -713,56 +726,48 @@ function render(escola, prof, dados) {
         (t.atras ? '<i style="width:' + (t.atras / analis * 100) + '%;background:var(--media)"></i>' : '') +
         (t.crit ? '<i style="width:' + (t.crit / analis * 100) + '%;background:var(--alta)"></i>' : '') + '</div>'
       : '';
-    return '<tr><td><span class="tnome">' + esc(t.titulo) + '</span>' + (t.semdados && analis ? '<div class="tsub">' + t.semdados + ' sem análise</div>' : '') + '</td>' +
+    /* A linha da turma abre. O número "5 críticos" respondia QUANTOS mas
+       nunca QUEM, e era exatamente essa a pergunta seguinte do professor —
+       que só tinha como responder abrindo o card. Agora a turma expande e
+       lista os alunos, e cada aluno leva ao dossiê. */
+    return '<tr class="tr-turma" data-turma="' + i + '">' +
+      '<td><span class="tnome">' + esc(t.titulo) + '</span>' +
+        '<span class="tt-seta">▾</span>' +
+        (t.semdados && analis ? '<div class="tsub">' + t.semdados + ' sem análise</div>' : '') + '</td>' +
       '<td class="num">' + t.n + '</td>' +
       '<td class="num">' + (analis ? t.emdia : '-') + '</td>' +
       '<td class="num">' + (analis ? t.atras : '-') + '</td>' +
       '<td class="num">' + (analis ? t.crit : '-') + '</td>' +
       '<td class="num">' + fmtPct(t.mFaltas) + '</td>' +
       '<td class="num"><b>' + fmtNota(t.mNotas) + '</b></td>' +
-      '<td>' + situ + (bar ? '<div style="margin-top:.25rem">' + bar + '</div>' : '') + '</td></tr>';
+      '<td>' + situ + (bar ? '<div style="margin-top:.25rem">' + bar + '</div>' : '') + '</td></tr>' +
+      '<tr class="tr-alunos" id="turma-alunos-' + i + '" hidden><td colspan="8">' +
+        alunosDaTurma(t) + '</td></tr>';
   }).join('');
   $('painelTurmas').hidden = false;
+  (function ligarExpansaoTurmas() {
+    var tb = $('linhasTurmas');
+    if (tb._ligado) return;
+    tb._ligado = true;
+    tb.addEventListener('click', function (ev) {
+      // clique no NOME do aluno é navegação, não expansão
+      if (ev.target.closest('a')) return;
+      var tr = ev.target.closest('.tr-turma');
+      if (!tr) return;
+      var alvo = document.getElementById('turma-alunos-' + tr.dataset.turma);
+      if (!alvo) return;
+      alvo.hidden = !alvo.hidden;
+      tr.classList.toggle('is-aberta', !alvo.hidden);
+    });
+  })();
+  /* Os nomes só viram link quando a Chamada do Portal traz o RAF. Se ela
+     chegou depois desta renderização, repinta — senão os nomes ficariam em
+     texto puro até o professor analisar de novo. */
+  window._repintarLinks = function () { render(escola, prof, dados); };
   var totSem = porTurma.reduce(function (s, t) { return s + (t.emdia + t.atras + t.crit ? 0 : t.n); }, 0);
   $('foraNote').hidden = !totSem;
   if (totSem) $('foraNote').innerHTML = '👶 <b>' + totSem + '</b> aluno(s) em turmas sem cronograma de placeholders (kids/teens). Para elas valem faltas e notas, sem análise de atraso.';
 
-  /* lançamento de notas: o que falta preencher antes do fechamento */
-  $('linhasNotas').innerHTML = porTurma.map(function (t) {
-    return '<tr><td><span class="tnome">' + esc(t.titulo) + '</span></td>' +
-      '<td class="num">' + t.n + '</td>' +
-      '<td>' + medidor(t.av1, t.n) + '</td>' +
-      '<td>' + medidor(t.av2, t.n) + '</td></tr>';
-  }).join('');
-  $('painelNotas').hidden = !porTurma.length;
-
-  /* gatilho da 2ª chance: prova de escuta OU de escrita abaixo de 6.
-     É a nota INDIVIDUAL da prova, não a média — o aluno refaz só o que
-     ficou baixo. Um botão por aluno, que abre a ferramenta já no aluno. */
-  var segunda = [];
-  alunos.forEach(function (a) {
-    [['1ª', a.notasAv1], ['2ª', a.notasAv2]].forEach(function (par) {
-      var p = parseProvas(par[1]); if (!p) return;
-      var baixas = [];
-      if (typeof p.auditiva === 'number' && p.auditiva < NOTA_MINIMA) baixas.push({ q: 'escuta', v: p.auditiva });
-      if (typeof p.escrita === 'number' && p.escrita < NOTA_MINIMA) baixas.push({ q: 'escrita', v: p.escrita });
-      if (baixas.length) segunda.push({ aluno: a, av: par[0], baixas: baixas });
-    });
-  });
-  $('listaSegunda').innerHTML = segunda.length ? segunda.map(function (s) {
-    var a = s.aluno;
-    var link = '2nd-chance.html#t=' + encodeURIComponent(escola) + '|' +
-      encodeURIComponent(a._aba || prof) + '|' + a._linhaTitulo + '|' + a.linhaCard;
-    return '<div class="a is-alta"><span class="nome">' + esc(a.nome) + '</span>' +
-      '<span class="info">' + esc(a._turma) + ' · ' + s.av + ' avaliação</span>' +
-      '<span class="chips">' +
-      s.baixas.map(function (b) {
-        return '<span class="chip bad">prova de ' + b.q + ': ' + fmtNota(b.v) + '</span>';
-      }).join('') +
-      '<a class="chip" style="background:var(--roxo);color:#fff;text-decoration:none" href="' + link +
-      '">Gerar 2ª chance ↗</a></span></div>';
-  }).join('') : '<p class="sub">Nenhum aluno com prova abaixo de 6 nas avaliações lançadas até agora.</p>';
-  $('painelSegunda').hidden = false;
 
   /* lista de atenção */
   var top = alunos.filter(function (a) { return a._atraso != null && a._atraso >= 1; })
@@ -770,7 +775,7 @@ function render(escola, prof, dados) {
     .slice(0, 10);
   $('listaAtencao').innerHTML = top.length ? top.map(function (a) {
     var cls = a._atraso >= LIMITE_ATRASO ? ' is-alta' : '';
-    return '<div class="a' + cls + '"><span class="nome">' + esc(a.nome) + '</span>' +
+    return '<div class="a' + cls + '">' + linkAluno(a.nome, 'nome') +
       '<span class="info">' + esc(a._turma) + (a.book ? ' · ' + esc(a.book) : '') + '</span>' +
       '<span class="chips">' +
       '<span class="chip ' + (a._atraso >= LIMITE_ATRASO ? 'bad' : 'warn') + '">' + a._atraso + ' aula' + (a._atraso > 1 ? 's' : '') + ' de atraso</span>' +
@@ -779,6 +784,28 @@ function render(escola, prof, dados) {
       '</span></div>';
   }).join('') : '<p class="sub">🎉 Nenhum aluno atrasado nas turmas analisadas.</p>';
   $('painelAtencao').hidden = false;
+}
+
+/* ============ PONTE NOME → RAF ============
+   O card não conhece RAF: ele guarda nome, atraso e faltas. Quem tem a
+   correspondência é a matrícula do backend, que a Chamada do Portal já
+   carrega nesta mesma página. Guardando esse índice aqui, qualquer nome de
+   aluno na tela vira link para o dossiê — sem uma chamada a mais ao
+   servidor. Enquanto a Chamada não terminou de carregar, `rafDe` devolve
+   vazio e o nome fica em texto puro; quando ela chega, os blocos que
+   dependem disso são repintados. */
+var _rafPorNome = {};
+function chaveAluno(nome) {
+  return String(nome || '').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ').trim();
+}
+function rafDe(nome) { return _rafPorNome[chaveAluno(nome)] || ''; }
+/* nome do aluno como link para o dossiê — texto puro se ainda não sabemos o RAF */
+function linkAluno(nome, classe) {
+  var raf = rafDe(nome);
+  var txt = esc(nome);
+  if (!raf) return '<span class="' + (classe || '') + '">' + txt + '</span>';
+  return '<a class="' + (classe || '') + ' ac-link" href="aluno.html?raf=' + encodeURIComponent(raf) + '">' + txt + '</a>';
 }
 
 /* ============ ACESSOS AO PORTAL DO ALUNO ============
@@ -798,23 +825,84 @@ function render(escola, prof, dados) {
     var d = new Date(ts), p = function (n) { return ('0' + n).slice(-2); };
     return p(d.getDate()) + '/' + p(d.getMonth() + 1) + '/' + d.getFullYear();
   }
+  function semAtividade(a) { return !a.totalAtividades; }
+  var _turmasAbertas = {};
   function pinta() {
     var t = $('acTurma').value, st = $('acFiltro').value, q = $('acBusca').value.trim().toLowerCase();
     var vis = lista.filter(function (a) {
       if (t && a.turma !== t) return false;
       if (st === 'sim' && !a.last) return false;
       if (st === 'nao' && a.last) return false;
+      /* "parado" é o caso que não existia antes e é o mais útil: o aluno abre
+         o portal, passeia e não conclui nada. Ele não aparecia em "nunca
+         entrou", então ninguém percebia. */
+      if (st === 'parado' && !(a.last && !a.totalAtividades)) return false;
+      if (st === 'sumido' && (a.atividade7d || 0) > 0) return false;
       if (q && String(a.name).toLowerCase().indexOf(q) === -1) return false;
       return true;
     });
-    $('acLinhas').innerHTML = vis.length ? vis.map(function (a) {
-      var dias = a.last ? Math.floor((Date.now() - a.last) / 86400000) : null;
-      var cls = a.last == null ? 'alta' : (dias <= 7 ? 'emdia' : 'media');
-      return '<tr><td><span class="tnome">' + esc(a.name) + '</span><div class="tsub">' + esc(a.turma || '') + '</div></td>' +
-        '<td>' + esc(a.book || '-') + '</td>' +
-        '<td><span class="pill ' + cls + '">' + (a.last == null ? 'nunca entrou' : quando(a.last)) + '</span></td>' +
-        '<td class="num">' + (a.count || 0) + '</td></tr>';
-    }).join('') : '<tr><td colspan="4" style="color:var(--gray);padding:1rem 0">Nenhum aluno com esses filtros.</td></tr>';
+    /* AGRUPADO POR TURMA, e não uma tabela corrida. O professor não chega
+       aqui procurando um nome — ele chega querendo ver as turmas dele. Uma
+       tabela de 51 linhas exige saber de antemão quem procurar; a lista por
+       turma se lê de relance. A busca continua ali para quando ele já sabe o
+       nome, inclusive de aluno de outro professor. */
+    var porTurma = {}, ordem = [];
+    vis.forEach(function (a) {
+      var t = a.turma || 'Sem turma';
+      if (!porTurma[t]) { porTurma[t] = []; ordem.push(t); }
+      porTurma[t].push(a);
+    });
+    if (!ordem.length) {
+      $('acLinhas').innerHTML = '<p class="sub">Nenhum aluno com esses filtros.</p>';
+      return;
+    }
+    /* Ordem da turma: a que tem mais aluno parado primeiro — é onde o
+       professor precisa agir. */
+    ordem.sort(function (x, y) {
+      var px = porTurma[x].filter(semAtividade).length, py = porTurma[y].filter(semAtividade).length;
+      return py - px || x.localeCompare(y);
+    });
+    $('acLinhas').innerHTML = ordem.map(function (t, i) {
+      var alunos = porTurma[t].slice().sort(function (a, b) {
+        return (a.ultimaAtividade || 0) - (b.ultimaAtividade || 0);   // quem sumiu primeiro
+      });
+      var parados = alunos.filter(semAtividade).length;
+      var aberta = _turmasAbertas[t] !== false;   // abertas por padrão: é para bater o olho
+      return '<div class="tg' + (aberta ? ' is-aberta' : '') + '" data-turma="' + i + '">' +
+        '<button type="button" class="tg-cab" data-t="' + esc(t).replace(/"/g, '&quot;') + '">' +
+          '<span class="tg-seta">▾</span>' +
+          '<b>' + esc(t) + '</b>' +
+          '<span class="tg-n">' + alunos.length + ' aluno' + (alunos.length > 1 ? 's' : '') + '</span>' +
+          (parados ? '<span class="pill alta">' + parados + ' sem atividade</span>' : '') +
+        '</button>' +
+        '<div class="tg-corpo"' + (aberta ? '' : ' hidden') + '>' +
+          alunos.map(function (a) {
+            var ua = a.ultimaAtividade || null;
+            var dias = ua ? Math.floor((Date.now() - ua) / 86400000) : null;
+            var cls = ua == null ? 'alta' : (dias <= 7 ? 'emdia' : 'media');
+            var rot = ua == null ? (a.last ? 'entrou, não fez' : 'nunca entrou') : quando(ua);
+            return '<div class="at-aluno">' +
+              '<span class="pill ' + cls + '">' + rot + '</span>' +
+              '<a class="at-nome ac-link" href="aluno.html?raf=' + encodeURIComponent(a.raf) + '">' +
+                esc(a.name) + '</a>' +
+              '<span class="at-dados">' + esc(a.book || '') +
+                ((a.atividade7d || 0) ? ' · ' + a.atividade7d + ' nos 7 dias' : '') + '</span>' +
+            '</div>';
+          }).join('') +
+        '</div></div>';
+    }).join('');
+  }
+  /* Este bloco era o ÚNICO da página que não obedecia ao seletor "ver como
+     professor": ele mandava só o token, e o servidor resolvia o professor
+     pelo LOGIN. Para a direção isso aparecia como "PEDRO (DIREÇÃO) · 0
+     turma(s)" — não era rótulo errado, era a consulta inteira feita para a
+     pessoa errada. Agora vai o professor escolhido, e recarrega quando a
+     escolha muda. */
+  function profEscolhido() {
+    try {
+      var a = JSON.parse(localStorage.getItem('fisk_actas') || 'null');
+      return (a && a.name) || '';
+    } catch (e) { return ''; }
   }
   var s = sess();
   if (!s || !s.token) {
@@ -822,29 +910,81 @@ function render(escola, prof, dados) {
     $('acStatus').innerHTML = '⚠️ Entre no Fisk Hub com seu usuário e senha para ver os acessos. <a href="index.html">Ir para o login</a>';
     return;
   }
+  var ligado = false;
+  function carregar() {
+  $('acStatus').className = 'status';
+  $('acStatus').textContent = '⏳ Carregando…';
   fetch(EP_HUB2, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                   body: JSON.stringify({ action: 'acessosProf', token: s.token }) })
+                   body: JSON.stringify({ action: 'acessosProf', token: s.token, prof: profEscolhido() }) })
     .then(function (r) { return r.json(); })
     .then(function (res) {
       if (!res.ok) { $('acStatus').className = 'status err'; $('acStatus').textContent = '⚠️ ' + (res.error || 'Não consegui carregar.'); return; }
       lista = res.acessos || [];
+      lista.forEach(function (al) { if (al.raf && al.name) _rafPorNome[chaveAluno(al.name)] = al.raf; });
+      // agora os nomes das outras seções podem virar link
+      if (typeof window._repintarLinks === 'function') window._repintarLinks();
+      /* ENTROU ≠ FEZ. O terceiro número passou a ser "nunca fizeram nada",
+         que é a pergunta de verdade: aluno que abre o portal e não conclui
+         atividade nenhuma some da lista de "nunca entraram" e ninguém nota. */
       var ent = lista.filter(function (a) { return a.last; });
-      var rec = lista.filter(function (a) { return a.last && (Date.now() - a.last) < 7 * 86400000; });
+      var fez = lista.filter(function (a) { return a.totalAtividades > 0; });
+      var ativos7 = lista.filter(function (a) { return (a.atividade7d || 0) > 0; });
       $('ac-total').textContent = lista.length;
       $('ac-ent').textContent = ent.length;
-      $('ac-nunca').textContent = lista.length - ent.length;
-      $('ac-7d').textContent = rec.length;
+      $('ac-nunca').textContent = lista.length - fez.length;
+      $('ac-7d').textContent = ativos7.length;
       var turmas = {}; lista.forEach(function (a) { turmas[a.turma] = true; });
+      $('acTurma').innerHTML = '<option value="">Todas as turmas</option>';
       Object.keys(turmas).sort().forEach(function (t) {
         var o = document.createElement('option'); o.value = t; o.textContent = t; $('acTurma').appendChild(o);
       });
       $('acStatus').className = 'status ok';
       $('acStatus').textContent = '👩‍🏫 ' + res.prof + ' · ' + res.turmas + ' turma(s) · ' + lista.length + ' aluno(s)';
-      ['acTurma', 'acFiltro', 'acBusca'].forEach(function (id) { $(id).addEventListener('input', pinta); });
+      if (!ligado) {
+        ['acTurma', 'acFiltro', 'acBusca'].forEach(function (id) { $(id).addEventListener('input', pinta); });
+        $('acLinhas').addEventListener('click', function (ev) {
+          var cab = ev.target.closest('.tg-cab');
+          if (!cab) return;
+          var t = cab.getAttribute('data-t');
+          _turmasAbertas[t] = _turmasAbertas[t] === false;
+          pinta();
+        });
+        ligado = true;
+      }
       pinta();
       $('acCorpo').hidden = false;
     })
     .catch(function () { $('acStatus').className = 'status err'; $('acStatus').textContent = '⚠️ Sem conexão com o servidor.'; });
+  }
+  carregar();
+  // a direção troca de professor no seletor do topo: a chamada acompanha
+  window._acRecarregar = carregar;
+})();
+
+/* Recolher e reabrir bloco. A escolha fica no navegador, por bloco: o
+   professor que nunca usa um deles o fecha uma vez e não o vê mais. */
+(function colapsaveis() {
+  var CHAVE = 'fisk_vg_fechados';
+  var fechados = {};
+  try { fechados = JSON.parse(localStorage.getItem(CHAVE) || '{}') || {}; } catch (e) {}
+  document.querySelectorAll('.painel.is-colapsavel').forEach(function (p) {
+    var h = p.querySelector('h2');
+    if (!h) return;
+    if (fechados[p.id]) p.classList.add('is-fechado');
+    h.setAttribute('role', 'button');
+    h.setAttribute('tabindex', '0');
+    var alterna = function () {
+      var fechou = p.classList.toggle('is-fechado');
+      h.setAttribute('aria-expanded', String(!fechou));
+      fechados[p.id] = fechou;
+      try { localStorage.setItem(CHAVE, JSON.stringify(fechados)); } catch (e) {}
+    };
+    h.setAttribute('aria-expanded', String(!p.classList.contains('is-fechado')));
+    h.addEventListener('click', alterna);
+    h.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alterna(); }
+    });
+  });
 })();
 
 initCascade();
