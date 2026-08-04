@@ -79,6 +79,11 @@
 /* ── Mini-dash do professor (topo do Hub, só logado) ── */
 .mini-dash{max-width:1100px;width:100%;margin:1.4rem auto 0;padding:0 1.5rem;
   display:flex;gap:.7rem;align-items:stretch;flex-wrap:wrap;box-sizing:border-box}
+/* O `display:flex` acima vence o `[hidden]` da folha do navegador (mesma
+   especificidade, e folha do autor ganha), então `sec.hidden = true` no JS não
+   escondia nada — a seção só não aparecia porque a tela de login cobre a
+   página inteira. Passou a importar quando a busca de aluno entrou aqui. */
+.mini-dash[hidden],.md-cta[hidden]{display:none}
 .md-cta{flex:0 0 160px;display:flex;flex-direction:column;justify-content:center;gap:.18rem;
   background:#7C3AED;color:#fff;border-radius:14px;padding:.8rem .95rem;text-decoration:none;
   transition:transform .12s,background .12s}
@@ -96,6 +101,28 @@
 .md-kpi.alta b{color:#c0392b}
 .md-kpi.roxa b{color:#7C3AED}
 .md-status{grid-column:1/-1;font-size:.78rem;font-weight:700;color:var(--gray);align-self:center;padding:.6rem 0}
+
+/* ── Busca de aluno no mini-dash ──────────────────────────────────────────
+   Ocupa a linha inteira abaixo dos KPIs (flex-basis 100% no container que já
+   é wrap). Os resultados abrem SOBRE a grade, em posição absoluta, para a
+   página não pular enquanto o professor digita. */
+.md-busca{flex:1 0 100%;position:relative}
+.md-busca input{width:100%;font-family:var(--font-body);font-size:.92rem;padding:.55rem .8rem;
+  border:1.5px solid var(--gray-light);border-radius:12px;background:var(--white);color:var(--black)}
+.md-busca input:focus{outline:none;border-color:#7C3AED}
+.md-achados{position:absolute;z-index:30;left:0;right:0;top:calc(100% + .3rem);
+  background:var(--white);border:1.5px solid var(--gray-light);border-radius:12px;
+  box-shadow:0 8px 24px rgba(0,0,0,.14);max-height:280px;overflow:auto;padding:.3rem}
+.md-achado{display:flex;align-items:center;gap:.6rem;width:100%;text-align:left;cursor:pointer;
+  background:none;border:none;border-radius:9px;padding:.5rem .6rem;font-family:var(--font-body);
+  font-size:.88rem;color:var(--black)}
+.md-achado:hover{background:#f1e9ff}
+.md-achado b{font-weight:800}
+.md-achado span{margin-left:auto;font-size:.74rem;color:var(--gray);text-align:right}
+.md-achado.vazio{color:var(--gray);cursor:default}
+body.theme-dark .md-busca input,body.theme-dark .md-achados{background:#1e1c1c;border-color:#3a3636;color:#e8e8e8}
+body.theme-dark .md-achado{color:#e8e8e8}
+body.theme-dark .md-achado:hover{background:#2e2545}
 body.theme-dark .md-kpi b{color:#dbe7f2}
 body.theme-dark .md-kpi.emdia b{color:#5fc4a5}
 body.theme-dark .md-kpi.media b{color:#e0b45a}
@@ -655,3 +682,8 @@ body.theme-dark .card{
   color: #fff;
   border-color: rgba(255,255,255,0.42);
 }
+
+/* Mini-dash reduzido à busca (direção, secretaria, professor sem turma no
+   card): sem KPIs, a seção vira só o campo de busca — sem a moldura vazia. */
+.mini-dash.md-so-busca{margin-top:1rem}
+.mini-dash.md-so-busca .md-busca{flex:1 1 100%}

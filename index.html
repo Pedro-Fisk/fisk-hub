@@ -4,8 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fisk Hub</title>
-<link rel="stylesheet" href="assets/fisk-shared.css">
-<link rel="stylesheet" href="style.css">
+<!-- ?v= é carimbo de versão, não enfeite. O HTML muda a cada publicação e chega
+     fresco, mas o CSS fica em cache no navegador do professor: sem o carimbo,
+     regra nova de estilo simplesmente não aparece na tela dele — foi o que
+     aconteceu no teste da busca de aluno, com o campo saindo sem formatação.
+     MEXEU no style.css ou no kit? Suba a data aqui. -->
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-03">
+<link rel="stylesheet" href="style.css?v=2026-08-03">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 </head>
@@ -118,6 +123,15 @@
       <span class="md-go" data-i18n="md-more">ver análise completa →</span>
     </a>
     <div class="md-kpis" id="mdKpis"></div>
+    <!-- Busca de aluno. Fica AQUI, e não numa ferramenta a mais na grade,
+         porque a pergunta que ela responde é de meio de aula ("o aluno fez
+         mesmo a atividade?") — tem de estar a um campo de distância, não a
+         dois cliques. Leva ao dossiê (aluno.html). -->
+    <div class="md-busca">
+      <input id="mdQ" type="search" autocomplete="off" spellcheck="false"
+             data-i18n-ph="md-busca-ph" placeholder="🔎 Buscar aluno por nome ou RAF…">
+      <div class="md-achados" id="mdAchados" hidden></div>
+    </div>
   </section>
 
   <main class="grid">
@@ -414,6 +428,7 @@
         'md-emdia':'Em dia','md-atras':'Atrasados','md-crit':'Críticos',
         'md-faltas':'Faltas médias','md-nota':'Média de notas','md-turmas':'turmas',
         'md-load':'analisando suas turmas…','md-pick':'Escolha um professor no seletor do topo para ver o painel dele.',
+        'md-busca-ph':'🔎 Buscar aluno por nome ou RAF…','md-busca-nada':'Nenhum aluno com esse nome ou RAF.',
         'card-planner-h2': 'Abridor de Planners',
         'card-planner-p':  'Crie o PPT / Planner do aluno com as datas corretas',
         'card-conv-h2':    'Conversation Maker',
@@ -487,6 +502,7 @@
         'md-emdia':'On track','md-atras':'Behind','md-crit':'Critical',
         'md-faltas':'Avg. absences','md-nota':'Avg. grade','md-turmas':'classes',
         'md-load':'analyzing your classes…','md-pick':'Pick a teacher in the selector above to see their panel.',
+        'md-busca-ph':'🔎 Search student by name or RAF…','md-busca-nada':'No student with that name or RAF.',
         'card-planner-h2': 'Planner Opener',
         'card-planner-p':  'Create student planners with the correct dates',
         'card-conv-h2':    'Conversation Maker',
@@ -560,6 +576,7 @@
         'md-emdia':'Al día','md-atras':'Atrasados','md-crit':'Críticos',
         'md-faltas':'Faltas medias','md-nota':'Nota media','md-turmas':'grupos',
         'md-load':'analizando tus grupos…','md-pick':'Elige un profesor en el selector de arriba para ver su panel.',
+        'md-busca-ph':'🔎 Buscar alumno por nombre o RAF…','md-busca-nada':'Ningún alumno con ese nombre o RAF.',
         'card-planner-h2': 'Abridor de Planners',
         'card-planner-p':  'Crea planners del alumno con las fechas correctas',
         'card-conv-h2':    'Conversation Maker',
@@ -630,6 +647,11 @@
       document.querySelectorAll('[data-i18n]').forEach(function(el) {
         var val = tr(el.dataset.i18n);
         if (val && typeof val === 'string') el.textContent = val;
+      });
+      /* placeholder de campo: textContent não serve, é atributo */
+      document.querySelectorAll('[data-i18n-ph]').forEach(function(el) {
+        var val = tr(el.dataset.i18nPh);
+        if (val && typeof val === 'string') el.placeholder = val;
       });
       document.querySelectorAll('.lang-btn').forEach(function(btn) {
         btn.classList.toggle('is-active', btn.dataset.lang === lang);
@@ -1334,6 +1356,19 @@
       }
 
       function tile(v, l, cls){ return '<div class="md-kpi'+(cls?' '+cls:'')+'"><b>'+v+'</b><span>'+l+'</span></div>'; }
+
+      /* Sem turmas para resumir (conta da direção, secretaria, card fora do
+         ar) some com os KPIs e o botão da Visão Geral — mas NÃO com a seção,
+         porque a busca de aluno mora dentro dela e vale para todo mundo
+         logado. Antes daqui a seção inteira se escondia, e a direção, que é
+         justamente quem mais consulta aluno, ficava sem a busca. */
+      function semKpis(){
+        sec.hidden = false;
+        box.innerHTML = '';
+        var cta = sec.querySelector('.md-cta');
+        if (cta) cta.hidden = true;
+        sec.classList.add('md-so-busca');
+      }
       function render(d){
         box.innerHTML =
           tile(d.tot, tr('md-alunos')) +
@@ -1352,7 +1387,7 @@
           box.innerHTML = '<div class="md-status">👆 '+tr('md-pick')+'</div>';
           return;
         }
-        if (!s || !s.name){ sec.hidden = true; return; }
+        if (!s || !s.name){ semKpis(); return; }
         try{
           var c = JSON.parse(localStorage.getItem('fisk_minidash')||'null');
           if (c && c.prof === s.name && Date.now() - c.t < TTL){ dataCache = c.d; sec.hidden = false; render(c.d); return; }
@@ -1360,14 +1395,14 @@
         sec.hidden = false;
         box.innerHTML = '<div class="md-status">⏳ '+tr('md-load')+'</div>';
         var escolas = String(s.escolas || s.escola || '').split(',').map(function(x){ return x.trim(); }).filter(Boolean);
-        if (!escolas.length){ sec.hidden = true; return; }
+        if (!escolas.length){ semKpis(); return; }
         Promise.all(escolas.map(function(esc){
           return api({ fn:'turmas', escola:esc, prof:s.name })
             .then(function(j){ return (j.turmas||[]).map(function(t){ return { esc:esc, linha:t.linhaTitulo }; }); })
             .catch(function(){ return []; });
         })).then(function(lists){
           var all = [].concat.apply([], lists);
-          if (!all.length){ sec.hidden = true; return; } // sem turmas (ex.: conta da direção)
+          if (!all.length){ semKpis(); return; } // sem turmas (ex.: conta da direção)
           var alunos = [];
           (function lote(i){
             if (i >= all.length){
@@ -1383,12 +1418,55 @@
               lote(i+4);
             });
           })(0);
-        }).catch(function(){ sec.hidden = true; });
+        }).catch(function(){ semKpis(); });
       }
 
+      /* ── Busca de aluno ──────────────────────────────────────────────────
+         Responde à pergunta de meio de aula: "o aluno fez mesmo a atividade
+         que disse que fez?". Só monta a lista; quem conta a história é o
+         dossiê (aluno.html). Usa o token da sessão — nenhuma chave aqui, que
+         este repositório é público. */
+      (function buscaAluno(){
+        var inp = document.getElementById('mdQ'), cx = document.getElementById('mdAchados'), tmr = null;
+        if (!inp) return;
+        function fecha(){ cx.hidden = true; cx.innerHTML = ''; }
+        function busca(){
+          var q = inp.value.trim();
+          if (q.length < 2){ fecha(); return; }
+          fetch(API, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+                       body: JSON.stringify({ action:'alunoBusca', token: tokenSessao(), q: q }) })
+            .then(function(r){ return r.json(); })
+            .then(function(res){
+              cx.hidden = false;
+              var l = (res && res.alunos) || [];
+              if (!l.length){ cx.innerHTML = '<div class="md-achado vazio">'+tr('md-busca-nada')+'</div>'; return; }
+              cx.innerHTML = l.map(function(a){
+                var e = function(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); };
+                return '<button type="button" class="md-achado" data-raf="'+e(a.raf)+'">' +
+                       '<b>'+e(a.name)+'</b><span>'+e(a.turma||'')+'<br>'+e(a.raf)+'</span></button>';
+              }).join('');
+            }).catch(function(){ fecha(); });
+        }
+        inp.addEventListener('input', function(){ clearTimeout(tmr); tmr = setTimeout(busca, 320); });
+        cx.addEventListener('click', function(ev){
+          var b = ev.target.closest('.md-achado'); if (!b || !b.dataset.raf) return;
+          location.href = 'aluno.html?raf=' + encodeURIComponent(b.dataset.raf);
+        });
+        document.addEventListener('click', function(ev){
+          if (!ev.target.closest('.md-busca')) fecha();
+        });
+      })();
+
       window._mdLoad = load;
-      /* troca de idioma re-renderiza os rótulos dos KPIs */
-      document.getElementById('langToggle').addEventListener('click', function(){
+      /* Troca de idioma re-renderiza os rótulos dos KPIs.
+         O id é `langTogglePg` — apontava para um `langToggle` que não existe,
+         e o getElementById devolvia null: o addEventListener estourava e
+         levava junto a linha de baixo (a carga do mini-dash). Passava
+         despercebido porque o fillBar chama o _mdLoad de qualquer jeito ao
+         restaurar a sessão; o que realmente se perdia era a tradução dos
+         rótulos ao trocar de idioma. */
+      var lt = document.getElementById('langTogglePg');
+      if (lt) lt.addEventListener('click', function(){
         setTimeout(function(){ if (dataCache && !sec.hidden) render(dataCache); }, 0);
       });
       if (document.body.classList.contains('prof-in')) load();

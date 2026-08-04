@@ -273,6 +273,16 @@
       </div>
     </div>
 
+    <!-- Visualizador do documento gerado, como nas outras ferramentas: o
+         plano saía só como download, e conferir se ficou certo obrigava a
+         abrir o arquivo fora da página (e a gerar de novo a cada ajuste). -->
+    <div class="painel" id="previewWrap" hidden style="margin-top:1rem">
+      <h2>👁️ Plano de aula gerado</h2>
+      <p class="sub">Confira aqui mesmo. Ajustou a fila? Gere de novo — a prévia se atualiza.</p>
+      <iframe id="preview" title="Prévia do plano de aula"
+              style="width:100%;height:min(78vh,760px);border:1.5px solid var(--blue-bd);border-radius:12px;background:#fff"></iframe>
+    </div>
+
     <div class="hintbox">
       <b>Como a ordem é calculada:</b> a prioridade vem <b>só do atraso de conteúdo</b>
       (distância entre a última lição feita e a lição prevista no gabarito) —
@@ -1034,6 +1044,18 @@ function padraoSubstituicaoPlano(dp) {
   };
 }
 
+/* Prévia do plano gerado. Guarda a URL do blob para revogar na próxima
+   geração — sem isso, cada clique deixa um PDF inteiro preso na memória. */
+var _previaUrl = null;
+function mostrarPrevia(blob) {
+  var wrap = document.getElementById('previewWrap'), ifr = document.getElementById('preview');
+  if (!wrap || !ifr) return;
+  if (_previaUrl) URL.revokeObjectURL(_previaUrl);
+  _previaUrl = URL.createObjectURL(blob);
+  ifr.src = _previaUrl;
+  wrap.hidden = false;
+}
+
 async function gerarPDF() {
   if (!turma) { alert('Carregue uma turma primeiro.'); return; }
   if (!window.PDFLib) { alert('A biblioteca de PDF não carregou. Verifique a conexão e recarregue a página.'); return; }
@@ -1048,6 +1070,10 @@ async function gerarPDF() {
     link.href = url; link.download = nomeArquivoPlano(dp);
     document.body.appendChild(link); link.click(); document.body.removeChild(link);
     setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+    /* Prévia na própria página. URL PRÓPRIA, e não a do download: aquela é
+       revogada em 4s e o iframe ficaria em branco. A anterior é revogada aqui
+       para o professor poder gerar várias vezes sem acumular blobs. */
+    mostrarPrevia(blob);
     bs.forEach(function (b) { b.textContent = '✓ PDF gerado'; });
     setTimeout(function () { bs.forEach(function (b) { b.textContent = old; }); }, 1800);
   } catch (e) {
@@ -1077,6 +1103,9 @@ ligarAcao('.js-drive', function (ev) {
   fiskEnviarParaPasta(ev.currentTarget, async function () {
     var dp = dadosPlano();
     var bytes = await montarPDFplano(dp);
+    // o que subiu para a pasta é o que aparece na prévia — mesma exigência
+    // das outras ferramentas: nada sai daqui sem o professor poder conferir
+    mostrarPrevia(new Blob([bytes], { type: 'application/pdf' }));
     var sub = padraoSubstituicaoPlano(dp);
     return {
       token: tokenSessao(), tipo: 'turma',

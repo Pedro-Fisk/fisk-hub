@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dossiê do Aluno, FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css">
+<meta name="theme-color" content="#161414">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+<script src="assets/fisk-shared.js"></script>
+<!-- activityId → nome legível ("mp:essentials-1:frozen-1" → "Frozen · Part I").
+     Gerado por scripts/build-atividades-index.js no portal-aluno-fisk. -->
+<script src="assets/atividades-index.js"></script>
+<style>
+  /* Cor do chrome vem do kit compartilhado; os nomes locais são apelidos.
+     Fallback literal de propósito: se o navegador do professor ainda tiver o
+     kit antigo em cache, --ui não existe e a cor viraria "nenhuma". */
+  :root{ --blue:var(--ui,#2b4d70); --blue-mid:var(--ui-mid,#3d6b93); --blue-pill:var(--ui-pill,#1d3349);
+         --blue-soft:var(--ui-soft,#e9eff5); --blue-ink:var(--ui-ink,#1d3349); --blue-bd:var(--ui-bd,#9db6cb);
+         --blue-line:var(--ui-line,#a8bfd2);
+         --ok:#2f8f6b; --ok-soft:#e2f4ec; --med:#c98a1e; --med-soft:#fbf0d8;
+         --bad:#c0392b; --bad-soft:#fbe6e3; --roxo:#7C3AED; --roxo-soft:#f1e9ff; }
+  [hidden]{ display:none !important; }
+  main{ max-width:1000px; margin:0 auto; padding:0 1rem 3rem; }
+  .painel{ background:var(--white); border:2px solid var(--blue-line); border-radius:var(--surface-radius,16px);
+           box-shadow:var(--surface-shadow,0 4px 14px rgba(43,77,112,.09)); padding:1.1rem 1.2rem; margin-top:1.1rem; }
+  .painel > h2{ font-family:var(--font-heading); font-size:1.05rem; font-weight:800; color:var(--blue);
+                margin:0 0 .2rem; display:flex; align-items:center; gap:.45rem; }
+  .sub{ font-size:.82rem; color:var(--gray); margin:0 0 .8rem; line-height:1.45; }
+  .status{ font-size:.85rem; color:var(--gray); margin-top:.6rem; }
+  .status.err{ color:var(--bad); font-weight:700; }
+
+  /* ── busca ── */
+  .buscabox{ display:flex; gap:.5rem; flex-wrap:wrap; }
+  .buscabox input{ flex:1 1 260px; font-family:var(--font-body); font-size:1rem; padding:.6rem .8rem;
+                   border:2px solid var(--blue-bd); border-radius:10px; background:var(--white); color:var(--black); }
+  .buscabox input:focus{ outline:none; border-color:var(--blue); }
+  .achados{ margin-top:.7rem; display:flex; flex-direction:column; gap:.35rem; max-height:320px; overflow:auto; }
+  .achado{ display:flex; align-items:center; gap:.6rem; width:100%; text-align:left; cursor:pointer;
+           background:var(--blue-soft); border:1px solid transparent; border-radius:10px; padding:.5rem .7rem;
+           font-family:var(--font-body); font-size:.9rem; color:var(--blue-ink); }
+  .achado:hover{ border-color:var(--blue); }
+  .achado b{ font-weight:800; }
+  .achado span{ font-size:.78rem; color:var(--gray); margin-left:auto; text-align:right; }
+
+  /* ── cabeçalho do aluno ── */
+  .aluno-head{ display:flex; align-items:center; gap:.9rem; flex-wrap:wrap; }
+  .aluno-head .nome{ font-family:var(--font-heading); font-size:1.35rem; font-weight:800; color:var(--blue-ink); line-height:1.2; }
+  .aluno-head .meta{ font-size:.85rem; color:var(--gray); margin-top:.15rem; }
+  .fd-pill{ margin-left:auto; background:var(--gold-soft,#f7edd6); color:#8a6318; border-radius:999px;
+            padding:.45rem .9rem; font-weight:800; font-size:.95rem; white-space:nowrap; }
+  .fd-pill small{ display:block; font-weight:600; font-size:.7rem; opacity:.8; }
+
+  /* ── faixa de resumo ── */
+  .kpis{ display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:.6rem; margin-top:.9rem; }
+  .kpi{ background:var(--blue-soft); border-radius:12px; padding:.6rem .7rem; text-align:center; }
+  .kpi b{ display:block; font-family:var(--font-heading); font-size:1.35rem; font-weight:800; color:var(--blue-ink); line-height:1.15; }
+  /* KPI cujo valor é texto ("há 8 min", "nunca") e não número: menor, para
+     não quebrar em duas linhas e desalinhar a faixa inteira. */
+  .kpi b.txt{ font-size:1rem; padding:.18rem 0; }
+  .kpi span{ font-size:.72rem; color:var(--gray); font-weight:700; text-transform:uppercase; letter-spacing:.02em; }
+  .kpi.ok b{ color:var(--ok); } .kpi.med b{ color:var(--med); } .kpi.bad b{ color:var(--bad); }
+
+  /* ── destaque "fez agora" ── */
+  .agora{ margin-top:.9rem; background:var(--ok-soft); border:2px solid var(--ok); border-radius:12px;
+          padding:.7rem .9rem; font-size:.92rem; color:#1e5c45; line-height:1.5; }
+  .agora.vazio{ background:var(--gray-light); border-color:var(--gray-light); color:var(--gray); }
+  .agora b{ font-weight:800; }
+
+  /* ── atividades ── */
+  .ativ{ border:1px solid var(--blue-line); border-radius:12px; margin-top:.5rem; overflow:hidden; }
+  .ativ-top{ display:flex; align-items:center; gap:.7rem; padding:.6rem .8rem; cursor:pointer; background:var(--white); width:100%;
+             text-align:left; font-family:var(--font-body); border:none; }
+  .ativ-top:hover{ background:var(--blue-soft); }
+  .ativ-ic{ font-size:1.3rem; }
+  .ativ-nome{ font-weight:800; color:var(--blue-ink); font-size:.95rem; }
+  .ativ-sub{ font-size:.76rem; color:var(--gray); }
+  .ativ-pct{ margin-left:auto; font-family:var(--font-heading); font-weight:800; font-size:1.05rem; }
+  .ativ-pct.ok{ color:var(--ok); } .ativ-pct.med{ color:var(--med); } .ativ-pct.bad{ color:var(--bad); }
+  .ativ-quando{ font-size:.75rem; color:var(--gray); text-align:right; min-width:110px; }
+  .ativ-corpo{ padding:.5rem .8rem .8rem; background:var(--blue-soft); font-size:.83rem; }
+  .tent{ display:flex; gap:.6rem; padding:.25rem 0; border-bottom:1px dashed var(--blue-bd); }
+  .tent:last-child{ border-bottom:none; }
+  .tent .t-q{ margin-left:auto; font-weight:800; }
+
+  /* ── tópicos do Quick Practice ── */
+  .topico{ display:flex; align-items:center; gap:.5rem; padding:.25rem 0; }
+  .topico .barra{ flex:1 1 80px; height:8px; border-radius:99px; background:var(--gray-light); overflow:hidden; max-width:180px; }
+  .topico .barra i{ display:block; height:100%; }
+  .topico .n{ font-size:.78rem; color:var(--gray); min-width:44px; text-align:right; }
+
+  table.dossie{ width:100%; border-collapse:collapse; margin-top:.5rem; font-size:.85rem; }
+  table.dossie th{ text-align:left; font-size:.72rem; text-transform:uppercase; letter-spacing:.03em;
+                   color:var(--gray); border-bottom:2px solid var(--blue-line); padding:.35rem .4rem; }
+  table.dossie td{ padding:.4rem; border-bottom:1px solid var(--gray-light); vertical-align:top; }
+  .num{ text-align:right; font-variant-numeric:tabular-nums; }
+
+  .btn-ver{ background:var(--blue); color:var(--white); border:none; border-radius:999px; cursor:pointer;
+            font-family:var(--font-heading); font-weight:700; font-size:.85rem; padding:.5rem 1.1rem; }
+  .btn-ver:hover{ background:var(--blue-dark,#223e5a); }
+  .btn-ver[disabled]{ opacity:.6; cursor:default; }
+
+  .vazio{ color:var(--gray); font-size:.85rem; padding:.6rem 0; }
+  body.theme-dark .painel{ background:#1e1c1c; }
+  body.theme-dark .ativ-top{ background:#1e1c1c; }
+  body.theme-dark .aluno-head .nome{ color:#dce7f2; }
+</style>
+</head>
+<body>
+<script>try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
+
+<header class="hero">
+  <a class="back-link" href="index.html">&larr; Voltar ao Hub</a>
+  <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
+  <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+  <h1>Dossiê do Aluno</h1>
+  <p>O que o aluno fez no portal, quando, e com que aproveitamento</p>
+</header>
+
+<main>
+  <!-- 1 · busca (só equipe) -->
+  <div class="painel" id="pnBusca">
+    <h2>🔎 Encontrar o aluno</h2>
+    <p class="sub">Digite o <b>nome</b> ou o <b>RAF</b>. A busca alcança as duas escolas — substituição é
+      frequente, então nada de travar por turma.</p>
+    <div class="buscabox">
+      <input id="q" type="search" placeholder="Ex.: ana clara  ·  L123-456" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="achados" id="achados"></div>
+    <div class="status" id="stBusca"></div>
+  </div>
+
+  <!-- 2 · dossiê -->
+  <div class="painel" id="pnAluno" hidden>
+    <div class="aluno-head">
+      <div>
+        <div class="nome" id="alNome">—</div>
+        <div class="meta" id="alMeta"></div>
+      </div>
+      <div class="fd-pill" id="alFd" hidden></div>
+    </div>
+    <div class="agora" id="alAgora" hidden></div>
+    <div class="kpis" id="alKpis"></div>
+  </div>
+
+  <!-- 3 · atividades do portal -->
+  <div class="painel" id="pnAtiv" hidden>
+    <h2>🎬 Atividades do Portal do Aluno</h2>
+    <p class="sub">Movie Program, Song Program, Mundo Fisk e Quick Practice. Clique numa atividade
+      para ver <b>tentativa por tentativa</b>, com data e hora.</p>
+    <div id="alAtiv"></div>
+  </div>
+
+  <!-- 4 · simulados com detalhe por tópico -->
+  <div class="painel" id="pnProvas" hidden>
+    <h2>📝 Simulados e Quick Practice</h2>
+    <p class="sub">Cada tentativa, com acertos e — quando o resultado traz o detalhamento — o
+      desempenho <b>por tópico gramatical</b>, que é o que se leva para o planejamento da aula.</p>
+    <div id="alProvas"></div>
+  </div>
+
+  <!-- 5 · notas (atrás de um clique, de propósito) -->
+  <div class="painel" id="pnNotas" hidden>
+    <h2>🔒 Notas e boletins</h2>
+    <p class="sub">Fica fechado de propósito: nota não é para ficar à mostra na tela.
+      Abre com um clique, e só para quem está com sessão da equipe.</p>
+    <button type="button" class="btn-ver" id="btnNotas">Ver notas anteriores</button>
+    <div id="alNotas"></div>
+    <div class="status" id="stNotas"></div>
+  </div>
+</main>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   DOSSIÊ DO ALUNO — a resposta a "o aluno fez mesmo?"
+   ═══════════════════════════════════════════════════════════════════════════
+ * POR QUE ESTA PÁGINA EXISTE (03/08/2026). Havia dois painéis contando
+ * pedaços da história e nenhum contando a história: o de acessos dizia que o
+ * aluno ENTROU (e só a data), o de carteiras dizia quanto ele TEM de Fisk
+ * Dólares. O professor manda o aluno fazer um Movie em sala, dez minutos
+ * depois o aluno diz que fez — e não havia como conferir.
+ *
+ * Daí duas decisões que valem para a página inteira:
+ *   · SEM CACHE. O caso de uso é "ele acabou de fazer?" — um dado de dez
+ *     minutos atrás não serve. Toda abertura vai ao servidor.
+ *   · A HORA APARECE, não só a data. "Hoje" não responde a pergunta; "hoje às
+ *     14:32" responde.
+ *
+ * UMA PÁGINA, TRÊS PÚBLICOS. O mesmo endpoint serve professor, direção e o
+ * próprio aluno (com os pais do lado). Quem chega com token da equipe pode
+ * buscar qualquer aluno; quem chega só com RAF (?raf=) vê a si mesmo, e a
+ * busca some. */
+
+var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
+var IDX = window.ATIVIDADES_INDEX || {};
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+fiskInitThemeToggle('themeToggle');
+
+function sess(){ try{ return JSON.parse(localStorage.getItem('fisk_prof')||'null'); }catch(e){ return null; } }
+
+/* Token da URL (`#dirtok=`), o mesmo padrão com que o Painel da Direção já
+   abre o Fisk Hub e o Portal do Aluno. Serve para a direção cair direto no
+   dossiê de um aluno sem refazer login numa origem diferente — o painel vive
+   em portalfisk.com.br e esta página no github.io, então o localStorage de lá
+   não vale aqui. O backend aceita token de diretor como sessão de equipe
+   (profResolveLinha_), então nada mais é preciso; token inválido cai no
+   "Sessão expirada" normal. O hash é apagado logo depois: token não fica
+   pendurado na barra de endereço nem no histórico. */
+var TOK_URL = (function(){
+  var m = /[#&](?:dirtok|proftok)=([^&]+)/.exec(location.hash || '');
+  if (!m) return '';
+  var t = decodeURIComponent(m[1]);
+  try { history.replaceState(null, '', location.pathname + location.search); } catch(e) { location.hash = ''; }
+  return t;
+})();
+function token(){ if (TOK_URL) return TOK_URL; var s = sess(); return (s && s.token) || ''; }
+function post(body){
+  return fetch(EP, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+                     body: JSON.stringify(body) }).then(function(r){ return r.json(); });
+}
+
+/* ── datas ─────────────────────────────────────────────────────────────────
+   Duas leituras diferentes e as duas importam: "há 8 minutos" responde na
+   hora, "03/08 às 14:32" serve de prova depois. Por isso as duas aparecem. */
+function p2(n){ return ('0'+n).slice(-2); }
+function dataHora(ts){
+  if (!ts) return '—';
+  var d = new Date(ts);
+  return p2(d.getDate())+'/'+p2(d.getMonth()+1)+'/'+d.getFullYear()+' às '+p2(d.getHours())+':'+p2(d.getMinutes());
+}
+function haQuanto(ts){
+  if (!ts) return 'nunca';
+  var s = Math.floor((Date.now() - ts)/1000);
+  if (s < 90) return 'agora mesmo';
+  var m = Math.floor(s/60);
+  if (m < 60) return 'há ' + m + ' min';
+  var h = Math.floor(m/60);
+  if (h < 24) return 'há ' + h + 'h';
+  var dias = Math.floor(h/24);
+  if (dias === 1) return 'ontem';
+  if (dias < 30) return 'há ' + dias + ' dias';
+  return dataHora(ts).split(' às ')[0];
+}
+function classePct(p){ return p == null ? '' : (p >= 70 ? 'ok' : p >= 50 ? 'med' : 'bad'); }
+function corPct(p){ return p >= 70 ? 'var(--ok)' : p >= 50 ? 'var(--med)' : 'var(--bad)'; }
+
+/* Nome legível da atividade. O índice cobre filme e música (gerado dos
+   catálogos); Mundo Fisk e Quick Practice trazem o próprio rótulo no id. */
+function rotulo(id){
+  if (IDX[id]) return IDX[id];
+  var s = String(id||'');
+  if (s.indexOf('mundo-quiz-') === 0)
+    return { t: s.slice(11).replace(/-/g,' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); }),
+             livro:'', prog:'Mundo Fisk', ic:'🌍' };
+  if (s.indexOf('mundo-') === 0) return { t: s.slice(6).replace(/-/g,' '), livro:'', prog:'Mundo Fisk', ic:'🌍' };
+  if (s.indexOf('qp:') === 0)  return { t: s.slice(3), livro:'', prog:'Quick Practice', ic:'⚡' };
+  if (s.indexOf('met:') === 0) return { t: s.slice(4), livro:'', prog:'Treino MET', ic:'🎓' };
+  if (s.indexOf('siele:') === 0) return { t: s.slice(6), livro:'', prog:'Treino SIELE', ic:'🇪🇸' };
+  /* Atividade nova que o índice ainda não conhece: mostra o id cru em vez de
+     esconder a linha — sumir com o dado seria pior que mostrá-lo feio. */
+  return { t: s, livro:'', prog:'Atividade', ic:'📘' };
+}
+
+/* ── busca ── */
+var timer = null;
+function buscar(){
+  var q = $('q').value.trim();
+  $('achados').innerHTML = '';
+  if (q.length < 2){ $('stBusca').textContent = ''; return; }
+  $('stBusca').className = 'status'; $('stBusca').textContent = 'Procurando…';
+  post({ action:'alunoBusca', token: token(), q: q }).then(function(res){
+    if (!res.ok){ $('stBusca').className = 'status err'; $('stBusca').textContent = '⚠️ ' + (res.error || 'Não consegui buscar.'); return; }
+    var l = res.alunos || [];
+    $('stBusca').textContent = l.length ? (l.length + (l.length === 1 ? ' aluno' : ' alunos')) : 'Nenhum aluno com esse nome ou RAF.';
+    $('achados').innerHTML = l.map(function(a){
+      return '<button type="button" class="achado" data-raf="'+esc(a.raf)+'">'+
+             '<b>'+esc(a.name)+'</b><span>'+esc(a.turma||'')+' · '+esc(a.book||'')+'<br>'+esc(a.raf)+'</span></button>';
+    }).join('');
+  }).catch(function(){ $('stBusca').className = 'status err'; $('stBusca').textContent = '⚠️ Erro de conexão.'; });
+}
+$('q').addEventListener('input', function(){ clearTimeout(timer); timer = setTimeout(buscar, 320); });
+$('achados').addEventListener('click', function(e){
+  var b = e.target.closest('.achado'); if (!b) return;
+  abrir(b.dataset.raf);
+});
+
+/* ── dossiê ── */
+var atual = null;
+function abrir(raf){
+  atual = raf;
+  $('pnAluno').hidden = false;
+  $('alNome').textContent = 'Carregando…';
+  $('alMeta').textContent = ''; $('alKpis').innerHTML = '';
+  $('alFd').hidden = true; $('alAgora').hidden = true;
+  $('pnAtiv').hidden = true; $('pnProvas').hidden = true; $('pnNotas').hidden = true;
+  $('alNotas').innerHTML = ''; $('stNotas').textContent = '';
+  $('btnNotas').disabled = false; $('btnNotas').textContent = 'Ver notas anteriores';
+  $('pnAluno').scrollIntoView({ behavior:'smooth', block:'start' });
+
+  post({ action:'alunoDiagnostico', token: token(), raf: raf }).then(function(res){
+    if (!res.ok){ $('alNome').textContent = '⚠️ ' + (res.error || 'Não consegui abrir o aluno.'); return; }
+    render(res);
+  }).catch(function(){ $('alNome').textContent = '⚠️ Erro de conexão.'; });
+}
+
+function render(d){
+  var st = d.student || {};
+  $('alNome').textContent = st.name || '—';
+  $('alMeta').innerHTML = esc(st.turma || 'sem turma') + ' &middot; ' + esc(st.book || 'sem estágio') +
+                          ' &middot; <b>' + esc(st.raf) + '</b>';
+
+  if (d.fd){
+    $('alFd').hidden = false;
+    $('alFd').innerHTML = 'F$ ' + (d.fd.saldo || 0) +
+      '<small>' + ((d.fd.streak && d.fd.streak.dias) || 0) + ' dias seguidos · ' +
+      ((d.fd.badges || []).length) + ' medalhas</small>';
+  }
+
+  var ativ = (d.atividades || []).filter(function(a){ return a.vezes > 0; });
+  var pcts = ativ.map(function(a){ return a.melhorPct; }).filter(function(p){ return p != null; });
+  var media = pcts.length ? Math.round(pcts.reduce(function(s,v){ return s+v; },0)/pcts.length) : null;
+  var ultima = ativ.length ? ativ[0] : null;   // o backend já devolve por última vez, decrescente
+
+  /* A pergunta que o professor faz em sala vem primeiro, e em destaque. */
+  if (ultima){
+    var r = rotulo(ultima.id);
+    $('alAgora').hidden = false; $('alAgora').className = 'agora';
+    $('alAgora').innerHTML = '✅ Última atividade: <b>' + r.ic + ' ' + esc(r.t) + '</b> (' + esc(r.prog) + ') — ' +
+      '<b>' + haQuanto(ultima.ultima) + '</b>, em ' + dataHora(ultima.ultima) +
+      (ultima.melhorPct != null ? ' · aproveitamento <b>' + ultima.melhorPct + '%</b>' : '');
+  } else {
+    $('alAgora').hidden = false; $('alAgora').className = 'agora vazio';
+    $('alAgora').innerHTML = 'Este aluno ainda <b>não fez nenhuma atividade</b> no portal.' +
+      (d.acesso && d.acesso.last ? ' Ele já entrou (' + haQuanto(d.acesso.last) + '), mas não concluiu nada.'
+                                 : ' E nunca entrou no portal.');
+  }
+
+  /* Do card vem a situação em sala. Os campos são os do `situacaoAluno_`:
+     faltas (contagem), pctEstagio, ultimaLicao e licaoPrevista — não há
+     "aulas em atraso" pronta, o atraso se lê comparando as duas lições. */
+  var sit = d.situacao || {};
+  $('alKpis').innerHTML =
+    kpi(ativ.length, 'Atividades feitas') +
+    kpi(media == null ? '—' : media + '%', 'Aproveitamento médio', classePct(media)) +
+    kpi((d.acesso && d.acesso.count) || 0, 'Acessos ao portal') +
+    kpi(d.acesso && d.acesso.last ? haQuanto(d.acesso.last) : 'nunca', 'Último acesso') +
+    (sit.faltas != null ? kpi(sit.faltas, 'Faltas', sit.faltas >= 4 ? 'bad' : sit.faltas >= 2 ? 'med' : 'ok') : '') +
+    (sit.pctEstagio != null ? kpi(sit.pctEstagio + '%', 'Progresso do estágio') : '') +
+    (sit.ultimaLicao ? kpi(sit.ultimaLicao, 'Última lição dada') : '');
+
+  renderAtividades(ativ);
+  renderProvas(d.provas || []);
+  $('pnNotas').hidden = (d.escopo !== 'equipe');
+}
+function kpi(v, l, cls){
+  var texto = !/^[\d.,]+%?$/.test(String(v));   // "há 8 min" e "nunca" pedem corpo menor
+  return '<div class="kpi'+(cls?' '+cls:'')+'"><b'+(texto?' class="txt"':'')+'>'+esc(v)+'</b>' +
+         '<span>'+esc(l)+'</span></div>';
+}
+
+function renderAtividades(ativ){
+  $('pnAtiv').hidden = false;
+  if (!ativ.length){ $('alAtiv').innerHTML = '<div class="vazio">Nenhuma atividade concluída ainda.</div>'; return; }
+  $('alAtiv').innerHTML = ativ.map(function(a, i){
+    var r = rotulo(a.id);
+    var pct = a.melhorPct;
+    return '<div class="ativ">' +
+      '<button type="button" class="ativ-top" data-i="'+i+'">' +
+        '<span class="ativ-ic">'+r.ic+'</span>' +
+        '<span><span class="ativ-nome">'+esc(r.t)+'</span><br>' +
+          '<span class="ativ-sub">'+esc(r.prog)+(r.livro?' · '+esc(r.livro):'')+
+          ' · fez '+a.vezes+(a.vezes===1?' vez':' vezes')+'</span></span>' +
+        '<span class="ativ-pct '+classePct(pct)+'">'+(pct==null?'—':pct+'%')+'</span>' +
+        '<span class="ativ-quando">'+haQuanto(a.ultima)+'<br><span style="opacity:.75">'+dataHora(a.ultima)+'</span></span>' +
+      '</button>' +
+      '<div class="ativ-corpo" hidden id="ac'+i+'">'+ tentativas(a) +'</div>' +
+    '</div>';
+  }).join('');
+}
+function tentativas(a){
+  if (!a.tentativas || !a.tentativas.length) return '<div class="vazio">Sem detalhe de tentativas.</div>';
+  return a.tentativas.map(function(t, n){
+    var acertos = (t.acertos != null && t.total != null) ? (t.acertos + ' de ' + t.total) : '—';
+    return '<div class="tent"><span>'+(n+1)+'ª tentativa</span>' +
+           '<span style="color:var(--gray)">'+dataHora(t.t)+'</span>' +
+           '<span class="t-q" style="color:'+corPct(t.pct)+'">'+acertos+' · '+t.pct+'%</span></div>';
+  }).join('');
+}
+$('alAtiv').addEventListener('click', function(e){
+  var b = e.target.closest('.ativ-top'); if (!b) return;
+  var c = $('ac' + b.dataset.i); if (c) c.hidden = !c.hidden;
+});
+
+/* Simulados: aqui mora o detalhamento por tópico, que é o que muda a aula
+   seguinte. Resultados anteriores a 03/08/2026 não têm `topicos` — a linha
+   aparece assim mesmo, só sem o desdobramento. */
+function renderProvas(provas){
+  var p = provas.filter(function(x){ return x && x.q; });
+  $('pnProvas').hidden = !p.length;
+  if (!p.length) return;
+  $('alProvas').innerHTML = p.map(function(x, i){
+    var pct = Math.round((x.c || 0) / x.q * 100);
+    var tops = (x.topicos || []).slice().sort(function(a,b){
+      return (a.c/a.q) - (b.c/b.q);   // pior primeiro: é o que o professor precisa ver
+    });
+    return '<div class="ativ">' +
+      '<button type="button" class="ativ-top" data-p="'+i+'">' +
+        '<span class="ativ-ic">'+(x.tool === 'met' ? '🎓' : x.tool === 'siele' ? '🇪🇸' : '⚡')+'</span>' +
+        '<span><span class="ativ-nome">'+esc(x.s || x.tool)+'</span><br>' +
+          '<span class="ativ-sub">'+(x.c||0)+' de '+x.q+' questões'+
+          (tops.length ? ' · '+tops.length+' tópicos' : ' · sem detalhe por tópico')+'</span></span>' +
+        '<span class="ativ-pct '+classePct(pct)+'">'+pct+'%</span>' +
+        '<span class="ativ-quando">'+haQuanto(x.t)+'<br><span style="opacity:.75">'+dataHora(x.t)+'</span></span>' +
+      '</button>' +
+      '<div class="ativ-corpo" hidden id="pv'+i+'">'+ (tops.length ? topicos(tops) :
+        '<div class="vazio">Este resultado é anterior ao registro por tópico.</div>') +'</div>' +
+    '</div>';
+  }).join('');
+}
+function topicos(tops){
+  return tops.map(function(t){
+    var pct = Math.round(t.c / t.q * 100);
+    return '<div class="topico">' +
+      '<span style="flex:0 1 220px">'+esc(t.topico)+(t.licao != null ? ' <span style="color:var(--gray)">(lição '+t.licao+')</span>' : '')+'</span>' +
+      '<span class="barra"><i style="width:'+pct+'%;background:'+corPct(pct)+'"></i></span>' +
+      '<span class="n" style="color:'+corPct(pct)+'">'+t.c+'/'+t.q+'</span></div>';
+  }).join('');
+}
+$('alProvas').addEventListener('click', function(e){
+  var b = e.target.closest('.ativ-top'); if (!b) return;
+  var c = $('pv' + b.dataset.p); if (c) c.hidden = !c.hidden;
+});
+
+/* ── notas: só quando pedidas (Pedro não quer nota fácil de ver, e é a parte
+      cara do backend — abre os cards das duas escolas) ── */
+$('btnNotas').addEventListener('click', function(){
+  if (!atual) return;
+  $('btnNotas').disabled = true;
+  $('stNotas').className = 'status'; $('stNotas').textContent = 'Buscando nos cards…';
+  post({ action:'alunoDiagnostico', token: token(), raf: atual, notas: '1' }).then(function(res){
+    $('stNotas').textContent = '';
+    var n = res && res.notas;
+    var linhas = (n && n.boletins) || [];
+    if (!linhas.length){
+      $('alNotas').innerHTML = '<div class="vazio">Nenhuma nota lançada para este aluno ainda.</div>';
+      $('btnNotas').textContent = 'Nenhuma nota'; return;
+    }
+    /* Inclui o card do 1º semestre de propósito (o backend também) — é
+       histórico real do aluno, e some se filtrarmos pelo semestre corrente. */
+    $('alNotas').innerHTML = '<table class="dossie"><thead><tr><th>Estágio</th><th>Turma</th>' +
+      '<th class="num">1ª av.</th><th class="num">2ª av.</th><th class="num">Final</th></tr></thead><tbody>' +
+      linhas.map(function(b){
+        var nota = function(v){
+          if (v == null || v === '') return '<span style="color:var(--gray)">—</span>';
+          return '<b style="color:'+(Number(v) >= 6 ? 'var(--ok)' : 'var(--bad)')+'">'+
+                 esc(String(v).replace('.', ','))+'</b>';
+        };
+        return '<tr><td>'+esc(b.book || '—')+'</td>' +
+               '<td>'+esc(b.turma || '')+'<div class="ativ-sub">'+esc(b.escola || '')+'</div></td>' +
+               '<td class="num">'+nota(b.av1)+'</td><td class="num">'+nota(b.av2)+'</td>' +
+               '<td class="num">'+nota(b.final)+'</td></tr>';
+      }).join('') + '</tbody></table>';
+    $('btnNotas').hidden = true;
+  }).catch(function(){
+    $('stNotas').className = 'status err'; $('stNotas').textContent = '⚠️ Não consegui ler as notas.';
+    $('btnNotas').disabled = false;
+  });
+});
+
+/* ── entrada ────────────────────────────────────────────────────────────────
+   Três portas: `?raf=` abre direto (link do painel da direção, ou o próprio
+   aluno vendo o dele); com sessão da equipe, a busca; sem nenhum dos dois,
+   manda para o login em vez de mostrar uma tela quebrada. */
+(function inicio(){
+  var raf = new URLSearchParams(location.search).get('raf');
+  var equipe = !!token();
+  $('pnBusca').hidden = !equipe;
+  if (raf){ abrir(raf); return; }
+  if (!equipe){
+    $('pnAluno').hidden = false;
+    $('alNome').textContent = 'Entre para continuar';
+    $('alMeta').innerHTML = 'Faça login no Fisk Hub com seu usuário e senha. ' +
+                            '<a href="index.html">Ir para o login</a>';
+    return;
+  }
+  $('q').focus();
+})();
+</script>
+</body>
+</html>

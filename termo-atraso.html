@@ -30,8 +30,17 @@
   .painel{background:var(--white);border:2px solid var(--surface-border-color);
           border-radius:var(--surface-radius);box-shadow:var(--surface-shadow);
           padding:1.15rem 1.25rem;margin-bottom:1.1rem}
+  .painel-head{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center;justify-content:space-between}
+  .painel-head h2{margin:0}
   .doc-actions{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:flex-end}
   .doc-actions .btn-generate,.doc-actions .btn-sec{margin:0}
+  /* a barra do topo é a versão compacta: no cabeçalho do painel ela divide a
+     linha com o título, então os botões não podem ter o corpo do rodapé */
+  /* `width:auto` não é detalhe: o .btn-generate nasce com width:100%, e sem
+     isto cada botão da barra do topo ocuparia uma linha inteira. */
+  .painel-head .doc-actions .btn-generate,.painel-head .doc-actions .btn-sec{
+    width:auto;padding:.5rem .9rem;font-size:.85rem}
+  .painel-head .doc-actions .status{margin:0;flex:1 1 100%;text-align:right}
   .painel h2{margin:0 0 .4rem;font-family:var(--font-heading);font-weight:700;
              font-size:1.05rem;color:var(--ui-dark,#223e5a)}
   .aviso{font-size:.85rem;color:var(--gray)}
@@ -117,7 +126,21 @@
   </section>
 
   <section class="painel" hidden id="painelSituacao">
-    <h2>📊 Situação do aluno <span class="aviso">(calculada automaticamente, ajuste se precisar)</span></h2>
+    <div class="painel-head">
+      <h2>📊 Situação do aluno <span class="aviso">(calculada automaticamente, ajuste se precisar)</span></h2>
+      <!-- A MESMA barra de ações do fim do formulário, repetida aqui no topo
+           (padrão do 2nd chance): quem já sabe o que quer não precisa rolar a
+           página inteira para entregar o documento. Os dois conjuntos andam
+           juntos pelo helper `pares()`. -->
+      <div class="doc-actions">
+        <button type="button" class="btn-sec" id="btnLancarTopo" hidden>📤 Lançar no card</button>
+        <button type="button" class="btn-generate" id="btnDriveTopo" disabled title="Gere o PDF primeiro"
+          style="background:#27866e">📁 Salvar na pasta do aluno</button>
+        <a class="btn-sec" id="btnVerPastaTopo" hidden target="_blank" rel="noopener">📂 Ver pasta</a>
+        <button type="button" class="btn-generate" id="btnPdfTopo">📄 Gerar PDF</button>
+        <span class="status" id="statusDocTopo"></span>
+      </div>
+    </div>
     <div class="metricas">
       <div class="metrica" id="mAtraso"><b>–</b><span>aulas de atraso</span></div>
       <div class="metrica" id="mFaltas"><b>–</b><span>faltas</span></div>
@@ -516,23 +539,30 @@ function extrairHorario(titulo){
 }
 
 /* ============ PDF (pdf-lib, documento FECHADO — sem campos editáveis) ============ */
-document.getElementById('btnPdf').addEventListener('click', gerarPDF);
-document.getElementById('btnLancar').addEventListener('click', lancarNoCard);
+/* A barra de ações existe DUAS vezes (topo do painel e fim do formulário).
+   `pares()` devolve os dois botões de cada ação, para que ligar o clique e
+   mudar estado valha nos dois sem código duplicado — mesmo helper do 2nd
+   chance, de propósito: são a mesma barra, têm de se comportar igual. */
+function pares(id) { return [document.getElementById(id), document.getElementById(id + 'Topo')].filter(Boolean); }
+pares('btnPdf').forEach(function (b) { b.addEventListener('click', gerarPDF); });
+pares('btnLancar').forEach(function (b) { b.addEventListener('click', lancarNoCard); });
 
 /* PDF gerado mais recentemente (para salvar na pasta do aluno no Drive) */
 var ultimoPDF = null;
 
 /* depois de gravar, o professor precisa CONFERIR onde caiu */
 function mostrarVerPasta(r) {
-  var b = document.getElementById('btnVerPasta'); if (!b) return;
   var url = (r && (r.pastaUrl || r.url)) || '';
-  if (!url) { b.hidden = true; return; }
-  b.href = url; b.title = 'Abrir no Drive a pasta "' + ((r && r.pasta) || '') + '"';
-  b.hidden = false;
+  pares('btnVerPasta').forEach(function (b) {
+    if (!url) { b.hidden = true; return; }
+    b.href = url; b.title = 'Abrir no Drive a pasta "' + ((r && r.pasta) || '') + '"';
+    b.hidden = false;
+  });
 }
 function statusDoc(msg, cor) {
-  var e = document.getElementById('statusDoc'); if (!e) return;
-  e.textContent = msg || ''; e.style.color = cor || '';
+  pares('statusDoc').forEach(function (e) {
+    e.textContent = msg || ''; e.style.color = cor || '';
+  });
 }
 /* o registro no card já acontece sozinho ao gerar o PDF; o botão existe para
    REFAZER quando a chamada falha (sem obrigar a gerar o PDF de novo) */
@@ -557,18 +587,19 @@ function lancarNoCard() {
     .then(function () { statusDoc(msgRegistro(), '#1e8f4e'); })
     .catch(function (e) { statusDoc('⚠️ ' + e.message, '#c0392b'); });
 }
-document.getElementById('btnDrive').addEventListener('click', function () {
+pares('btnDrive').forEach(function (btn) { btn.addEventListener('click', function () {
   if (!ultimoPDF) { alert('Gere o PDF primeiro.'); return; }
   if (typeof fiskEnviarParaPasta !== 'function') { alert('Helper de Drive não carregou (fisk-shared.js).'); return; }
   var fProf = document.getElementById('fProf');
-  fiskEnviarParaPasta(document.getElementById('btnDrive'), {
+  // o helper dá o feedback NO botão clicado, então passa-se ele, e não um id fixo
+  fiskEnviarParaPasta(btn, {
     token: tokenSessao(), tipo: 'aluno',
     escola: (payload && payload.escola) || '',
     professor: ((fProf && fProf.value) || (payload && (payload.professor || payload.aba)) || '').trim(),
     turma: (payload && payload.turma ? String(payload.turma).split('\n')[0] : '').trim(),
     aluno: ultimoPDF.aluno, filename: ultimoPDF.filename, bytes: ultimoPDF.bytes
-  }).catch(function () {});
-});
+  }).then(mostrarVerPasta).catch(function () {});
+}); });
 
 async function gerarPDF() {
   if (!alunoSel) return;
@@ -768,10 +799,10 @@ async function gerarPDF() {
   prev.src = url; prev.hidden = false;
   // guarda o PDF gerado para enviá-lo à pasta do aluno no Drive
   ultimoPDF = { bytes: bytes, filename: aEl.download, aluno: (alunoSel.nome || '').trim() };
-  var bd = document.getElementById('btnDrive');
-  if (bd) { bd.disabled = false; bd.title = 'Salvar este PDF na pasta do aluno'; }
-  var bl = document.getElementById('btnLancar');
-  if (bl) bl.hidden = !(!modoLivre && alunoSel && alunoSel.linhaCard != null);
+  pares('btnDrive').forEach(function (b) { b.disabled = false; b.title = 'Salvar este PDF na pasta do aluno'; });
+  // "Lançar no card" só existe para aluno que veio do card (termo livre não tem célula)
+  var temCelulaNoCard = !modoLivre && alunoSel && alunoSel.linhaCard != null;
+  pares('btnLancar').forEach(function (b) { b.hidden = !temCelulaNoCard; });
 
   /* registra no card (nota na célula da última aula do aluno) — prefere a API,
      que funciona em qualquer modo e respeita a turma trocada no seletor */
