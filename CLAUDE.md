@@ -15,13 +15,24 @@ Google Apps Script.
 | `boletins.html`, `met.html`, `siele.html`, `quick-practice.html` | atalhos para ferramentas que vivem em **outros repositórios** |
 | `answer-keys*.html`, `treinamentos.html`, `visao-geral.html`, `acessos.html` | consulta e material do professor |
 | `assets/fisk-shared.js` / `.css` | helpers compartilhados (tema, menu de usuário, idioma, Drive, pulso de uso) |
-| `apps-script/` | **espelho** do backend `fisk-hub-backend` (`.gs`) — não é o que roda |
+| `apps-script/` | só um README: o backend **não mora aqui**, mora em `fisk-hub-backend` |
 | `conversation_maker/` | protótipo Python de geração de conteúdo (único código com dependências) |
 
 Documentos de contexto que valem mais que o código para entender o sistema:
-`re-fresh-fisk-hub.md` (Drive e casamento turma→pasta), `padronizacao-dos-cards.md`
-(por que as duas escolas montam o card diferente), `onboarding-davi.md` (todos os
-acessos que a plataforma exige), `re-fresh-portal-secretaria.md`.
+`handoff-portal-secretaria-davi.md` (**comece por ele** — o que foi conferido
+contra o sistema no ar está marcado como tal), `re-fresh-fisk-hub.md` (Drive e
+casamento turma→pasta), `padronizacao-dos-cards.md` (por que as duas escolas
+montam o card diferente), `onboarding-davi.md` (acessos que a plataforma exige),
+`re-fresh-portal-secretaria.md`.
+
+> ⚠️ **Os handoffs antigos contêm instruções erradas, confirmadas em
+> 04/08/2026.** `onboarding-davi.md` e `re-fresh-portal-secretaria.md` mandam
+> cadastrar o diretor como `'DAVI (DIREÇÃO)'` — não funciona, porque
+> `ehDiretor_` compara por igualdade e o nome na `_profs` é `Davi`. E
+> `re-fresh-portal-secretaria.md` descreve um bug do livro dos alunos que **não
+> existe** (os 758 alunos têm estágio); seguir aquilo levaria a mexer no
+> `CARD_ABAS_IGNORAR` e **sumir com aluno da lista**, tirando o acesso dele ao
+> Portal do Aluno. A seção 8 do handoff do Davi detalha as duas.
 
 ## Onde o sistema realmente roda
 
@@ -43,8 +54,15 @@ Duas URLs de Apps Script, de propósito diferentes:
   corrigido e não volta.
 - **Apps Script: sempre "editar a implantação existente → Nova versão".** Criar
   implantação nova troca a URL do Web App e derruba Hub, Portal e Painel de uma vez.
-- **O `Code.gs` de produção está à frente do que está versionado aqui.** Nunca
-  colar o repo por cima do editor; mudanças vão como bloco aditivo no fim.
+- **O backend tem UMA fonte: `Pedro-Fisk/fisk-hub-backend/Code.js`**, publicado
+  por `clasp push`. Não existe mais cópia do backend neste repositório, e
+  **nunca** volte a colar bloco à mão no editor do Apps Script: eram duas fontes
+  para um arquivo que não tem merge, e quem salvava por último apagava o
+  trabalho do outro sem aviso. Consolidado em 04/08/2026.
+- **Antes de um `clasp push`, veja se alguém criou arquivo direto no editor.**
+  O push sincroniza o projeto inteiro e apaga o que só existe lá. Confira com um
+  `clasp pull` para pasta temporária e `diff -rq`, comparando também a *lista*
+  de arquivos, não só o conteúdo.
 - **Não editar o `CardTools.gs`** do card — endpoints novos vão no
   `fisk-hub-backend`. Um projeto Apps Script só pode ter **um** `doPost`.
 - **Não transferir os repositórios para uma organização** antes de resolver os
@@ -68,7 +86,8 @@ Duas URLs de Apps Script, de propósito diferentes:
 node -e "new Function(require('fs').readFileSync('/dev/stdin','utf8'))" < bloco.js
 
 # leitura do card nas duas escolas (roda em Node, não toca em nada remoto)
-node apps-script/teste-painel-secretaria.js
+# mora no outro repositório, junto do código que ele testa
+node ../fisk-hub-backend/scripts/testes/secretaria/painel-secretaria.test.js
 ```
 
 O `conversation_maker/` é a exceção: Python, com `requirements.txt` próprio.
