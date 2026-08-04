@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Notificação 2nd Chance, FISK</title>
-<link rel="stylesheet" href="assets/fisk-shared.css">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
@@ -45,6 +45,8 @@
   .aluno{display:flex;align-items:center;gap:.6rem;padding:.5rem .7rem;
          border:1px solid var(--gray-light);border-radius:10px;cursor:pointer;
          font-size:.92rem;background:var(--white)}
+  a.dossie-link{color:inherit;text-decoration:none;border-bottom:1px dotted var(--blue-bd)}
+  a.dossie-link:hover{color:var(--blue);border-bottom-style:solid}
   .aluno:hover{border-color:var(--blue-mid)}
   .aluno.sel{border-color:var(--blue);background:var(--blue-soft)}
   .tag{margin-left:auto;font-size:.72rem;font-weight:800;padding:.15rem .55rem;
@@ -226,7 +228,7 @@
   Ferramenta interna das escolas Fisk Taubaté · Caçapava.
 </footer>
 
-<script src="assets/fisk-shared.js"></script>
+<script src="assets/fisk-shared.js?v=2026-08-04"></script>
 <!-- aviso de aluno fora do card -->
 <script src="fisk-fora-do-card.js"></script>
 <script>
@@ -383,6 +385,24 @@ function initSessao(p) {
 }
 
 /* ============ CASCATA COMPLETA (escola → prof → turma) ============ */
+/* Sessão expirada é o erro mais comum destas telas, e o único com conserto
+   óbvio — mas chegava como texto puro, e o professor tinha de descobrir
+   sozinho como voltar. Agora a mensagem vem com a porta. Os outros erros
+   continuam sugerindo a cascata, que é o contorno certo para eles. */
+function erroDeSessaoOuCascata(e) {
+  var msg = (e && e.message) || 'erro';
+  var el = document.getElementById('statusCard');
+  if (/sess[ãa]o/i.test(msg)) {
+    var base = (typeof fiskHubBase === 'function') ? fiskHubBase() : '';
+    el.className = 'status err';
+    el.innerHTML = '⚠️ ' + fiskEsc(msg) +
+      ' <a href="' + base + 'index.html" style="font-weight:800">Entrar de novo →</a>';
+    return;
+  }
+  statusCard('⚠️ ' + msg + ', use a cascata.', 'err');
+  initCascade();
+}
+
 function initCascade() {
   $('origem').hidden = false;
   $('wrapEscola').hidden = false; $('wrapProf').hidden = false;
@@ -427,7 +447,7 @@ function initFragment() {
   statusCard('🔄 Lendo a turma do card…');
   api({ fn: 'turma', escola: ref[0], prof: ref[1], linha: ref[2] })
     .then(function (d) { onTurma(d); if (ref[3]) abrirAlunoPorLinha(+ref[3]); })
-    .catch(function (e) { statusCard('⚠️ ' + e.message + ', use a cascata.', 'err'); initCascade(); });
+    .catch(function (e) { erroDeSessaoOuCascata(e); });
 }
 
 /** Seleciona o aluno daquela linha do card (e marca o item na lista). */
@@ -469,7 +489,7 @@ function renderLista() {
     var tag = !p ? '<span class="tag semnota">sem notas</span>'
       : abaixo.length ? '<span class="tag refazer">refazer: ' + abaixo.map(function (k) { return k === 'escrita' ? 'Escrita' : 'Auditiva'; }).join(' + ') + '</span>'
       : '<span class="tag ok">provas ok</span>';
-    html += '<div class="aluno" data-i="' + i + '"><span>' + String(a.nome).replace(/</g, '&lt;') + '</span>' + tag + '</div>';
+    html += '<div class="aluno" data-i="' + i + '"><span>' + nomeComDossie(a.nome) + '</span>' + tag + '</div>';
   });
   $('lista').innerHTML = html || '<p class="sub">Ninguém precisa de 2nd chance nesta avaliação. Desmarque o filtro para ver todos.</p>';
   $('lista').querySelectorAll('.aluno').forEach(function (el) {
@@ -489,6 +509,19 @@ document.querySelectorAll('#avToggle button').forEach(function (b) {
   });
 });
 $('soPrecisam').addEventListener('change', renderLista);
+
+/* ── Dossiê: o card não conhece RAF; a ponte vem do kit compartilhado ── */
+var IDX_ALUNOS = {};
+if (typeof fiskAlunosDoProf === 'function') {
+  fiskAlunosDoProf().then(function (idx) { IDX_ALUNOS = idx || {}; if (turma) renderLista(); });
+}
+function nomeComDossie(nome) {
+  var seguro = String(nome).replace(/</g, '&lt;');
+  var url = (typeof fiskLinkDossie === 'function') ? fiskLinkDossie(IDX_ALUNOS, nome) : '';
+  if (!url) return seguro;
+  return '<a class="dossie-link" href="' + url + '" title="Ver o dossiê deste aluno" ' +
+         'onclick="event.stopPropagation()">' + seguro + '</a>';
+}
 
 /* ============ ALUNO ESCOLHIDO ============ */
 function escolherAluno(a) {
@@ -512,6 +545,9 @@ function preencherPainelAluno() {
   $('painelAluno').hidden = false;
   /* trocou de aluno: o PDF em memória é do anterior — zera tudo que depende dele */
   ultimoPDF = null; esconderPreview(); esconderVerPasta(); statusDoc(''); syncAcoes();
+  // e as escolhas do aluno anterior, que também iriam para o PDF do próximo
+  renderSugestoes();
+  if ($('sugLivre')) $('sugLivre').value = '';
   $('statusMsg').textContent = '';
   $('painelAluno').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -552,9 +588,16 @@ var SUGESTOES = [
   { k: 'plataforma',t: 'Praticar na plataforma online.', on: false },
   { k: 'faltas',    t: 'Evitar faltas para acompanhar melhor o conteúdo.', on: false }
 ];
-$('sugBoxes').innerHTML = SUGESTOES.map(function (s) {
-  return '<label><input type="checkbox" value="' + s.k + '"' + (s.on ? ' checked' : '') + '><span>' + s.t + '</span></label>';
-}).join('');
+/* Vira função para poder ser REFEITA a cada aluno. Antes era montada uma vez
+   só no carregamento, então o que o professor marcasse para um aluno seguia
+   marcado para o próximo — e entrava calado no PDF dele. O `ultimoPDF` já
+   era zerado na troca; as sugestões não eram. */
+function renderSugestoes() {
+  $('sugBoxes').innerHTML = SUGESTOES.map(function (s) {
+    return '<label><input type="checkbox" value="' + s.k + '"' + (s.on ? ' checked' : '') + '><span>' + s.t + '</span></label>';
+  }).join('');
+}
+renderSugestoes();
 /* ---- elegância mínima do texto livre: maiúscula no começo e ponto no fim ----
    Sem IA: só arruma o que o professor digitou correndo (uma ideia por linha). */
 function polirLinha(s) {

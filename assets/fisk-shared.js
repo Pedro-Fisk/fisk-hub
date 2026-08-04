@@ -561,3 +561,89 @@ function fiskCampanha() {
     }
   }
 }
+
+/* ⚠️ MEXEU NESTE ARQUIVO? SUBA O `?v=` NAS PÁGINAS.
+   Todas as páginas do Hub carregam o kit com `?v=AAAA-MM-DD`. Sem subir esse
+   carimbo, o navegador do professor continua servindo a versão em cache e a
+   função nova simplesmente não existe lá — sem erro visível, porque quem
+   chama testa `typeof` antes. Já aconteceu com o CSS em 03/08/2026:
+   regra nova, campo sem formatação, e meia hora procurando no lugar errado.
+     grep -l 'fisk-shared.js?v=' *.html   → todas devem ter a MESMA data. */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PONTE NOME → RAF (+ atividade no portal)
+   ═══════════════════════════════════════════════════════════════════════════
+ * O card NÃO conhece RAF: ele guarda nome, atraso, faltas e notas. Quem tem
+ * a correspondência é a matrícula do backend. Sem essa ponte, nenhuma
+ * ferramenta que lista alunos consegue mandar o professor para o dossiê —
+ * que era exatamente o caso do Planejador, do Termo e do 2nd Chance: três
+ * telas cheias de nomes e nenhuma saída.
+ *
+ * Fica AQUI, no kit, e não copiada em cada ferramenta: são três consumidores
+ * com a mesma necessidade, e três cópias divergem — a primeira que alguém
+ * corrigir deixa as outras duas para trás.
+ *
+ * De brinde vem a ATIVIDADE de cada aluno (última atividade concluída e
+ * quantas nos últimos 7 dias), que é o mesmo `acessosProf` já usado pela
+ * Visão Geral. Uma chamada serve às duas coisas.
+ */
+var _fiskAlunos = null;          // promessa, para várias chamadas não repetirem o pedido
+
+function fiskChaveAluno(nome) {
+  return String(nome || '').toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * Carrega os alunos do professor logado (ou do escolhido no "ver como
+ * professor") e devolve um índice por nome normalizado.
+ * Falha de rede devolve índice VAZIO em vez de estourar: o nome fica em
+ * texto puro e a ferramenta continua funcionando — a ponte é um bônus, não
+ * um requisito para gerar documento.
+ */
+function fiskAlunosDoProf() {
+  if (_fiskAlunos) return _fiskAlunos;
+  var s = fiskSessao();
+  if (!s || !s.token) return (_fiskAlunos = Promise.resolve({}));
+  var prof = '';
+  try { prof = (JSON.parse(localStorage.getItem('fisk_actas') || 'null') || {}).name || ''; } catch (e) {}
+  _fiskAlunos = fetch(FISK_HUB_EP, {
+    method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action: 'acessosProf', token: s.token, prof: prof })
+  }).then(function (r) { return r.json(); }).then(function (res) {
+    var idx = {};
+    if (res && res.ok) {
+      (res.acessos || []).forEach(function (a) {
+        if (a && a.name && a.raf) idx[fiskChaveAluno(a.name)] = a;
+      });
+    }
+    return idx;
+  }).catch(function () { return {}; });
+  return _fiskAlunos;
+}
+
+/** URL do dossiê de um aluno, ou '' se ainda não sabemos o RAF dele. */
+function fiskLinkDossie(idx, nome) {
+  var a = idx && idx[fiskChaveAluno(nome)];
+  return a ? (fiskHubBase() + 'aluno.html?raf=' + encodeURIComponent(a.raf)) : '';
+}
+
+/** Rótulo curto do estudo em casa, para as telas que listam alunos. */
+function fiskEstudoEmCasa(idx, nome) {
+  var a = idx && idx[fiskChaveAluno(nome)];
+  if (!a) return null;
+  var ua = a.ultimaAtividade || null;
+  var dias = ua ? Math.floor((Date.now() - ua) / 86400000) : null;
+  return {
+    raf: a.raf,
+    fez: !!a.totalAtividades,
+    entrou: !!a.last,
+    dias: dias,
+    naSemana: a.atividade7d || 0,
+    /* 'sumido' é o caso que interessa ao professor: o aluno que está
+       atrasado E não faz nada em casa. Quem está atrasado mas estudando
+       precisa de tempo, não de cobrança — são situações diferentes. */
+    estado: !a.totalAtividades ? (a.last ? 'nada' : 'nunca')
+          : (dias != null && dias <= 7 ? 'ativo' : 'sumido')
+  };
+}

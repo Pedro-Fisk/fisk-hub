@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Planejador da Próxima Aula, FISK</title>
-<link rel="stylesheet" href="assets/fisk-shared.css">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <!-- pdf-lib: mesma lib usada pelo termo de atraso e pelo 2nd chance para gerar
@@ -92,6 +92,13 @@
        background:var(--blue-soft);color:var(--blue-ink);white-space:nowrap}
   .metr .chip.warn{background:var(--media-soft);color:var(--media)}
   .metr .chip.bad{background:var(--alta-soft);color:var(--alta)}
+  /* Estudo em casa. Paleta PRÓPRIA, separada do atraso de propósito: são
+     dois eixos diferentes, e pintar os dois com a mesma cor faria o
+     professor ler "vermelho" como uma coisa só. */
+  .metr .chip.emcasa-ok{background:#e6f4ef;color:#27866e}
+  .metr .chip.emcasa-frio{background:var(--gray-light);color:var(--gray)}
+  a.dossie-link{color:inherit;text-decoration:none;border-bottom:1px dotted var(--blue-bd,#9db6cb)}
+  a.dossie-link:hover{color:var(--blue,#2b4d70);border-bottom-style:solid}
   .aluno .sug{grid-column:2;font-size:.86rem;color:var(--blue-ink);line-height:1.4}
   .aluno .sug b{color:var(--blue-pill)}
   .aluno .aviso{grid-column:2;font-size:.8rem;color:#8a5a00;background:#fff4e0;border:1px solid #f0d28a;
@@ -299,7 +306,7 @@
   Ferramenta interna das escolas Fisk Taubaté · Caçapava.
 </footer>
 
-<script src="assets/fisk-shared.js"></script>
+<script src="assets/fisk-shared.js?v=2026-08-04"></script>
 <script>
 /* ============================================================
    Planejador de Aula Personalizada — lê fn=turma do card (mesma
@@ -354,6 +361,24 @@ function montarSelect(sel, ph, itens) {
     itens.map(function (i) { return '<option value="' + i.v + '">' + String(i.t).replace(/</g, '&lt;') + '</option>'; }).join('');
   sel.disabled = false;
 }
+/* Sessão expirada é o erro mais comum destas telas, e o único com conserto
+   óbvio — mas chegava como texto puro, e o professor tinha de descobrir
+   sozinho como voltar. Agora a mensagem vem com a porta. Os outros erros
+   continuam sugerindo a cascata, que é o contorno certo para eles. */
+function erroDeSessaoOuCascata(e) {
+  var msg = (e && e.message) || 'erro';
+  var el = document.getElementById('statusCard');
+  if (/sess[ãa]o/i.test(msg)) {
+    var base = (typeof fiskHubBase === 'function') ? fiskHubBase() : '';
+    el.className = 'status err';
+    el.innerHTML = '⚠️ ' + fiskEsc(msg) +
+      ' <a href="' + base + 'index.html" style="font-weight:800">Entrar de novo →</a>';
+    return;
+  }
+  statusCard('⚠️ ' + msg + ', use a cascata.', 'err');
+  initCascade();
+}
+
 function initCascade() {
   $('origem').hidden = false;
   statusCard('Escolha escola, professor(a) e turma, os dados vêm ao vivo do card.');
@@ -395,7 +420,7 @@ function initFragment() {
   var ref = decodeURIComponent(location.hash.slice(3)).split('|'); // escola|prof|linha
   statusCard('🔄 Lendo a turma do card…');
   api({ fn: 'turma', escola: ref[0], prof: ref[1], linha: ref[2] })
-    .then(onTurma).catch(function (e) { statusCard('⚠️ ' + e.message + ', use a cascata.', 'err'); initCascade(); });
+    .then(onTurma).catch(function (e) { erroDeSessaoOuCascata(e); });
 }
 
 /* ============ PRIORIZAÇÃO ============ */
@@ -551,6 +576,39 @@ function particiona() {
 // alunos atualmente exibidos, na ordem exibida (usado por drag e copiar)
 var visiveis = [];
 
+/* ── ESTUDO EM CASA E DOSSIÊ ───────────────────────────────────────────
+ * A fila era ordenada só pelo atraso de conteúdo — e "atrasado e sumido do
+ * portal" é um aluno diferente de "atrasado mas fazendo atividade toda
+ * semana": o primeiro precisa de conversa, o segundo de tempo. O chip NÃO
+ * reordena a fila (a régua do atraso continua sendo a régua), mas põe a
+ * informação ao lado do nome, que é onde a decisão acontece.
+ * O índice chega depois da tela; quando chega, a fila é repintada. */
+var IDX_ALUNOS = {};
+if (typeof fiskAlunosDoProf === 'function') {
+  fiskAlunosDoProf().then(function (idx) {
+    IDX_ALUNOS = idx || {};
+    if (turma) renderFila();
+  });
+}
+function nomeComDossie(nome) {
+  var url = (typeof fiskLinkDossie === 'function') ? fiskLinkDossie(IDX_ALUNOS, nome) : '';
+  if (!url) return esc(nome);
+  return '<a class="dossie-link" href="' + url + '" title="Ver o dossiê deste aluno">' + esc(nome) + '</a>';
+}
+function estudoChip(nome) {
+  if (typeof fiskEstudoEmCasa !== 'function') return '';
+  var e = fiskEstudoEmCasa(IDX_ALUNOS, nome);
+  if (!e) return '';
+  var mapa = {
+    ativo:  ['emcasa-ok',   '🏠 estudou · ' + e.naSemana + ' nos 7 dias'],
+    sumido: ['emcasa-frio', '🏠 nada há ' + e.dias + ' dias'],
+    nada:   ['emcasa-frio', '🏠 entra e não faz'],
+    nunca:  ['emcasa-frio', '🏠 nunca entrou']
+  };
+  var m = mapa[e.estado];
+  return m ? '<span class="chip ' + m[0] + '">' + m[1] + '</span>' : '';
+}
+
 function renderFila() {
   var fila = estado.fila, fora = estado.fora;
 
@@ -587,10 +645,10 @@ function renderFila() {
         (ini ? ' grp-ini' : '') + (fim ? ' grp-fim' : '') +
         '" data-i="' + i + '" draggable="false">' +
         '<div class="rank" title="Arraste para reordenar">' + (i + 1) + '</div>' +
-        '<div><div class="nome">' + esc(a.nome) + '</div>' +
+        '<div><div class="nome">' + nomeComDossie(a.nome) + '</div>' +
           '<div class="book">' + esc(a.book || 'sem book') + '</div></div>' +
         '<span class="tag ' + nv + '">' + ROT[nv] + '</span>' +
-        '<div class="metr">' + chips(a) + '</div>' +
+        '<div class="metr">' + chips(a) + estudoChip(a.nome) + '</div>' +
         '<div class="sug">' + sugestao(a) + '</div>' +
         (a.atrasoAproximado ? '<div class="aviso">⚠ Conta aproximada: a última aula do aluno (“' + esc(a.ultimaAula || '') + '”) está fora do gabarito; o atraso foi medido pela última lição reconhecida (' + esc(a.ultimaLicao || '?') + '). Confira no card.</div>' : '') +
         '<textarea class="nota-in" data-i="' + i + '" rows="1" placeholder="✏️ anotação do professor (ex.: explanation, checking, entregar written task…)">' + esc(nota) + '</textarea>' +

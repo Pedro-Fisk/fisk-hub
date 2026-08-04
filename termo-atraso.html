@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Termo de Atraso, FISK</title>
-<link rel="stylesheet" href="assets/fisk-shared.css">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-<script src="assets/fisk-shared.js"></script>
+<script src="assets/fisk-shared.js?v=2026-08-04"></script>
 <!-- aviso de aluno fora do card -->
 <script src="fisk-fora-do-card.js"></script>
 <style>
@@ -54,6 +54,8 @@
          border-radius:99px;white-space:nowrap}
   .badge.atraso{background:var(--red);color:var(--white)}
   .badge.ok{background:var(--gray-light);color:var(--gray)}
+  a.dossie-link{color:inherit;text-decoration:none;border-bottom:1px dotted var(--blue-bd)}
+  a.dossie-link:hover{color:var(--blue);border-bottom-style:solid}
   .linha-campos{display:flex;flex-wrap:wrap;gap:.7rem}
   .campo{flex:1 1 160px}
   .campo label{display:block;font-size:.78rem;font-weight:800;margin-bottom:.2rem}
@@ -377,7 +379,18 @@ if (!temHashPayload && location.hash.indexOf('#t=') !== 0) {
   }
 }
 function mostrarErroApi(err) {
-  document.getElementById('statusCard').textContent = '⚠️ ' + err.message;
+  var el = document.getElementById('statusCard');
+  /* Sessão expirada é o erro mais comum aqui, e o único com conserto óbvio.
+     A mensagem do servidor é boa, mas chegava como texto puro: o professor
+     lia "entre novamente pelo Fisk Hub" e tinha de descobrir sozinho como
+     voltar. Agora vem com a porta. */
+  el.innerHTML = '⚠️ ' + fiskEsc(err.message) + comLinkDeLogin(err.message);
+}
+/* Devolve o link para o Hub quando o erro é de sessão; senão, string vazia. */
+function comLinkDeLogin(msg) {
+  if (!/sess[ãa]o/i.test(String(msg || ''))) return '';
+  var base = (typeof fiskHubBase === 'function') ? fiskHubBase() : '';
+  return ' <a href="' + base + 'index.html" style="font-weight:800">Entrar de novo →</a>';
 }
 
 /* ---- modo livre: termo sem vínculo com turma (ex.: aluno ainda não
@@ -493,7 +506,7 @@ function montarLista() {
     .forEach(function (a) {
       var div = document.createElement('div');
       div.className = 'aluno-item';
-      div.innerHTML = '<span>' + a.nome + '</span>' +
+      div.innerHTML = '<span>' + nomeComDossie(a.nome) + '</span>' +
         (a.precisaTermo
           ? '<span class="badge atraso">' + a.aulasAtraso + ' aulas atrasado</span>'
           : '<span class="badge ok">' + (a.aulasAtraso == null ? 'sem placeholder' : 'em dia') + '</span>');
@@ -503,7 +516,34 @@ function montarLista() {
     });
 }
 
+/* ── Dossiê: o card não conhece RAF, a ponte vem do kit compartilhado ──
+   O professor está olhando a lista da turma para emitir um termo; a pergunta
+   que vem junto é "esse aluno está estudando em casa?". Antes daqui, a única
+   saída desta tela era voltar ao Hub. */
+var IDX_ALUNOS = {};
+if (typeof fiskAlunosDoProf === 'function') {
+  fiskAlunosDoProf().then(function (idx) { IDX_ALUNOS = idx || {}; renderListaSeHouver(); });
+}
+function nomeComDossie(nome) {
+  var url = (typeof fiskLinkDossie === 'function') ? fiskLinkDossie(IDX_ALUNOS, nome) : '';
+  if (!url) return String(nome).replace(/</g, '&lt;');
+  return '<a class="dossie-link" href="' + url + '" title="Ver o dossiê deste aluno" ' +
+         'onclick="event.stopPropagation()">' + String(nome).replace(/</g, '&lt;') + '</a>';
+}
+/* repinta a lista quando o índice chega depois dela */
+function renderListaSeHouver() {
+  if (payload && payload.alunos) montarLista();
+}
+
 function selecionarAluno(a) {
+  /* ZERAR ANTES DE TROCAR — não é conforto, é correção.
+     Trocar de aluno atualizava as métricas e deixava para trás os MOTIVOS
+     marcados, as SUGESTÕES escolhidas e, pior, o `ultimoPDF` do aluno
+     anterior com o botão do Drive já armado: um clique em "Salvar na pasta
+     do aluno" mandava o PDF do aluno A para a pasta do aluno B, sem aviso
+     nenhum. Como a lista da turma fica na tela e convida a clicar no
+     próximo, esse caminho é o normal, não o excepcional. */
+  limparEscolhasDoAlunoAnterior();
   alunoSel = a;
   modoLivre = false;
   document.getElementById('camposLivre').hidden = true;
@@ -527,6 +567,24 @@ function selecionarAluno(a) {
   document.getElementById('fFaltas').value = a.faltas;
   var chkFaltas = document.querySelector('#listaMotivos input[value="Faltas às aulas"]');
   chkFaltas.checked = a.faltas > 0 && a.pctFaltas >= 15;
+}
+
+/* Tudo o que é do aluno ANTERIOR e não pode vazar para o próximo. */
+function limparEscolhasDoAlunoAnterior() {
+  document.querySelectorAll('#listaMotivos input, #listaSugestoes input').forEach(function (i) {
+    i.checked = false;
+  });
+  // os dois campos livres também são do aluno anterior
+  ['moOutros', 'fSugestoes'].forEach(function (id) {
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+  ultimoPDF = null;
+  pares('btnDrive').forEach(function (b) { b.disabled = true; b.title = 'Gere o PDF primeiro'; });
+  pares('btnLancar').forEach(function (b) { b.hidden = true; });
+  pares('btnVerPasta').forEach(function (b) { b.hidden = true; b.removeAttribute('href'); });
+  statusDoc('');
+  var prev = document.getElementById('preview');
+  if (prev) { prev.hidden = true; prev.removeAttribute('src'); }
 }
 
 function tituloCaso(s){ s=String(s||'').toLowerCase(); return s.charAt(0).toUpperCase()+s.slice(1); }
