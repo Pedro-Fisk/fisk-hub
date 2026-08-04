@@ -189,35 +189,34 @@ saíram do `fisk-hub`. Hoje há um caminho só.
 
 ---
 
-## 7-A. ⚠️ ANTES DO PRIMEIRO `clasp push` — leia
+## 7-A. ⚠️ `clasp push` apaga arquivo que só existe no ar
 
-Em 04/08/2026 encontrei uma **divergência entre o repositório e o que está no
-ar**, e **não a resolvi**:
+✅ Reconciliação feita em 04/08/2026 com `clasp pull` para uma pasta temporária.
+Resultado: `Code.js`, `Gabarito.js` e `appsscript.json` são **idênticos** entre
+repositório e projeto no ar (431.892 caracteres, 9.307 linhas).
 
-| | linhas |
-|---|---|
-| `fisk-hub-backend/Code.js` (repositório) | **9.307** |
-| `Code.gs` no editor do Apps Script (no ar) | **5.742** |
+**Mas o projeto no ar tinha 10 arquivos que o repositório não tinha** — o
+`arrumar-pastas.js` e 9 `migracao-cacapava-*.js`, gerados por outra frente de
+trabalho no mesmo dia. **`clasp push` sincroniza o projeto inteiro**: um push
+teria apagado os 10, sem conflito e sem aviso. Eles foram versionados; o
+repositório agora é superconjunto do que está no ar.
 
-O repositório tem ~3.500 linhas **a mais**. Isso sugere trabalho commitado e
-**não publicado** — mas eu não confirmei em que direção está a diferença, nem o
-que exatamente diverge. O que sei com certeza: rotas de commits recentes
-(`foraDoCard`, `dirNps`) **respondem no ar**, então não é um caso simples de
-"repositório inteiro por publicar".
+**A regra que fica:** antes de um `clasp push`, confira se alguém criou arquivo
+direto no editor. É barato e não destrutivo:
 
-**Um `clasp push` sobrescreve o editor inteiro, sem merge e sem aviso.** Se o
-editor tiver algo que o repositório não tem, some.
+```bash
+mkdir /tmp/live && cd /tmp/live
+echo '{"scriptId":"1AlWF9j-indNvmh_A3Jk9k28mCC3uhF8eP_dj7C74BzX1wauT3b1VGFTm","rootDir":""}' > .clasp.json
+clasp pull
+diff -rq /tmp/live <pasta-do-repo> | grep "Only in /tmp/live"
+```
 
-**Como reconciliar antes do primeiro push** (não destrutivo):
+Se aparecer qualquer arquivo, **traga para o repositório antes de publicar**.
 
-1. Abrir o editor do Apps Script, clicar no `Code.gs`, `Cmd+A`, `Cmd+C`.
-2. `LANG=en_US.UTF-8 pbpaste > /tmp/live.gs` (sem o `LANG` o acento vem
-   corrompido).
-3. `diff /tmp/live.gs Code.js` e decidir o que fica.
-
-Só depois disso o `clasp push` é seguro. Uma divergência já conhecida está
-corrigida: o `DIRETORES` do repositório não tinha o Davi e o do ar tinha — um
-push teria tirado o acesso dele.
+> **Não confie no editor do Apps Script para medir o arquivo.** Ao ler o
+> conteúdo pelo editor eu obtive 5.742 linhas para um arquivo que tem 9.307 — o
+> modelo estava incompleto e a leitura levou a um diagnóstico errado. Para
+> comparar, use `clasp pull`.
 
 ---
 
@@ -264,15 +263,21 @@ mas contêm **duas instruções erradas**, ambas confirmadas em 04/08/2026:
 `const DIRETORES = ['PEDRO (DIREÇÃO)', 'DAVI (DIREÇÃO)']`. ✅ Isso **não
 funciona**: `ehDiretor_` faz comparação **exata** (`normNome(d) ===
 normNome(nome)`), e o nome cadastrado na `_profs` é simplesmente **`Davi`**. A
-lista correta, que é a que está no ar, é:
+forma correta é:
 
 ```js
 const DIRETORES = ['PEDRO (DIREÇÃO)', 'Davi'];
 ```
 
-Para conferir sem saber a senha de ninguém: `POST {action:'dirLogin',
-name:'<nome>'}` sem senha. *"Este usuário não é da direção."* = fora da lista.
-*"Senha incorreta."* / *"Nome ou senha incorretos."* = passou.
+✅ Em 04/08/2026 o que está **no ar** ainda é `['PEDRO (DIREÇÃO)']` — ou seja, o
+**Davi ainda não tem Painel da Direção**. A correção está commitada no
+repositório e entra no ar no próximo `clasp push` + Nova versão.
+
+> **Não dá para descobrir isso pelo login.** O `dirLogin` devolve **a mesma
+> mensagem** para "não é da direção", "não existe" e "senha errada" — é proteção
+> deliberada, porque a conta da direção é o alvo mais valioso. Eu interpretei
+> essa mensagem como confirmação de acesso e errei. A única forma confiável é
+> **ler a constante no `Code.js`**.
 
 **8.2 — O bug do livro que não existe.** O handoff afirma que a coluna do livro
 de Taubaté era lida errada e que **142 de 630 alunos** estavam sem estágio, e que
@@ -332,10 +337,12 @@ aceito.
 - `secretaria.html` no ar; `diretor.html` com o link.
 - `_alunos` com 758 alunos, **todos com estágio** (não há o bug da seção 8.2).
 - Planilha de dados fechada para Restrito, sem impacto no sistema.
-- Davi com cargo Direção na `_profs` **e** na constante `DIRETORES`.
+- Davi com cargo **Direção** na `_profs` (feito pelo painel).
 - Fonte única do backend consolidada; teste com trava de desatualização.
+- Repositório reconciliado com o projeto no ar (seção 7-A).
 
 **Pendências:**
-1. **Reconciliar repositório × editor antes do primeiro `clasp push`** (seção
-   7-A). É a única que pode causar perda de trabalho.
+1. **Publicar o `DIRETORES` com o Davi** — está commitado, não está no ar. Até
+   sair, ele tem o Portal da Secretaria (o cargo Direção basta) mas **não** o
+   Painel da Direção nem a Padronização dos cards.
 2. A área Financeira do Painel da Direção está vazia.
