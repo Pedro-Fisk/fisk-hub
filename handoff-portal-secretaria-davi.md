@@ -269,9 +269,8 @@ forma correta é:
 const DIRETORES = ['PEDRO (DIREÇÃO)', 'Davi'];
 ```
 
-✅ Em 04/08/2026 o que está **no ar** ainda é `['PEDRO (DIREÇÃO)']` — ou seja, o
-**Davi ainda não tem Painel da Direção**. A correção está commitada no
-repositório e entra no ar no próximo `clasp push` + Nova versão.
+✅ Publicado em 04/08/2026 na versão **@124** (mesma URL). O Davi tem Painel da
+Direção e Padronização dos cards.
 
 > **Não dá para descobrir isso pelo login.** O `dirLogin` devolve **a mesma
 > mensagem** para "não é da direção", "não existe" e "senha errada" — é proteção
@@ -337,12 +336,10 @@ aceito.
 - `secretaria.html` no ar; `diretor.html` com o link.
 - `_alunos` com 758 alunos, **todos com estágio** (não há o bug da seção 8.2).
 - Planilha de dados fechada para Restrito, sem impacto no sistema.
-- Davi com cargo **Direção** na `_profs` (feito pelo painel).
+- Davi com cargo **Direção** na `_profs` **e** na constante `DIRETORES` (@124).
 - Fonte única do backend consolidada; teste com trava de desatualização.
-- Repositório reconciliado com o projeto no ar (seção 7-A).
+- Repositório reconciliado com o projeto no ar e `main` publicada (seção 7-A).
+- Backend na **@124**, mesma URL. Conferido depois de publicar: os 13 arquivos
+  continuam lá, o backend responde e as quatro telas devolvem 200.
 
-**Pendências:**
-1. **Publicar o `DIRETORES` com o Davi** — está commitado, não está no ar. Até
-   sair, ele tem o Portal da Secretaria (o cargo Direção basta) mas **não** o
-   Painel da Direção nem a Padronização dos cards.
-2. A área Financeira do Painel da Direção está vazia.
+**Pendência:** a área Financeira do Painel da Direção está vazia.
