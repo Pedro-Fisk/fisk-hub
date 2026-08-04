@@ -26,13 +26,25 @@ minúsculo) tem de **começar** com um destes — `secretaria`, `coordenacao`,
 
 ## 2. Onde cada peça mora
 
-**Não existe um repositório só do Portal da Secretaria.** Ele está espalhado por
-três: ✅
+**Não existe um repositório só do Portal da Secretaria**, e isso é de propósito:
+os repositórios são separados por **onde cada coisa é publicada**, não por
+funcionalidade. ✅
 
-- `portal-aluno-fisk` (privado) — a tela, `secretaria.html`
-- **`fisk-hub-backend`** — o `Code.js`, que é onde as rotas `sec*` de fato rodam;
-  publicado por `clasp` (tem `.clasp.json`)
-- `fisk-hub` — os blocos `.gs` em `apps-script/` e o teste em Node
+- `portal-aluno-fisk` (privado) → **Vercel** — a tela, `secretaria.html`
+- **`fisk-hub-backend`** (privado) → **Apps Script via `clasp`** — o `Code.js`,
+  onde as rotas `sec*` de fato rodam
+- `fisk-hub` (público) → **GitHub Pages** — as ferramentas do professor
+
+Um repositório dedicado à secretaria não funcionaria: a tela precisa ser servida
+do projeto da Vercel para manter o domínio, e o backend **não pode ser dividido**
+(um projeto Apps Script aceita um único `doPost`, então as rotas `sec*` moram no
+mesmo arquivo que o Portal do Aluno e o Painel). Seria uma terceira cópia de
+coisas publicadas de outro lugar.
+
+> **Consolidação feita em 04/08/2026.** Antes disso o backend tinha **duas**
+> fontes: o `Code.js` e cópias em `fisk-hub/apps-script/` (incluindo um
+> `COLAR-NO-CODE-GS.gs` feito para colar à mão no editor). As cópias foram
+> removidas. **A fonte única do backend é `fisk-hub-backend/Code.js`.**
 
 | peça | onde | observação |
 |---|---|---|
@@ -171,14 +183,75 @@ Combinado mínimo:
 - Se a pasta local estiver na branch de outra sessão, **não troque de branch** —
   crie uma worktree (`git worktree add <tmp> origin/main -b minha-branch`).
 
-⚠️ **Pendência que vale resolver antes de trabalharem juntos:** hoje existem
-**dois caminhos para publicar o backend**, e agora com nome e endereço —
-`fisk-hub-backend/Code.js` publicado por `clasp`, **e** os blocos em
-`fisk-hub/apps-script/` colados à mão no editor. São duas fontes para o mesmo
-backend. Enquanto as duas existirem, dá para se atropelar mesmo trabalhando
-sozinho, porque o editor pode estar à frente do repositório e vice-versa.
-**Escolham uma e abandonem a outra.** Essa é a mudança mais valiosa disponível,
-e vale mais do que qualquer regra de processo.
+✅ **Resolvido em 04/08/2026:** existiam dois caminhos para publicar o backend
+(`clasp` a partir do `Code.js`, **e** blocos colados à mão no editor). As cópias
+saíram do `fisk-hub`. Hoje há um caminho só.
+
+---
+
+## 7-A. ⚠️ ANTES DO PRIMEIRO `clasp push` — leia
+
+Em 04/08/2026 encontrei uma **divergência entre o repositório e o que está no
+ar**, e **não a resolvi**:
+
+| | linhas |
+|---|---|
+| `fisk-hub-backend/Code.js` (repositório) | **9.307** |
+| `Code.gs` no editor do Apps Script (no ar) | **5.742** |
+
+O repositório tem ~3.500 linhas **a mais**. Isso sugere trabalho commitado e
+**não publicado** — mas eu não confirmei em que direção está a diferença, nem o
+que exatamente diverge. O que sei com certeza: rotas de commits recentes
+(`foraDoCard`, `dirNps`) **respondem no ar**, então não é um caso simples de
+"repositório inteiro por publicar".
+
+**Um `clasp push` sobrescreve o editor inteiro, sem merge e sem aviso.** Se o
+editor tiver algo que o repositório não tem, some.
+
+**Como reconciliar antes do primeiro push** (não destrutivo):
+
+1. Abrir o editor do Apps Script, clicar no `Code.gs`, `Cmd+A`, `Cmd+C`.
+2. `LANG=en_US.UTF-8 pbpaste > /tmp/live.gs` (sem o `LANG` o acento vem
+   corrompido).
+3. `diff /tmp/live.gs Code.js` e decidir o que fica.
+
+Só depois disso o `clasp push` é seguro. Uma divergência já conhecida está
+corrigida: o `DIRETORES` do repositório não tinha o Davi e o do ar tinha — um
+push teria tirado o acesso dele.
+
+---
+
+## 7-B. Como o seu Claude publica
+
+Você pode trabalhar pelo Claude e publicar sozinho. O fluxo é este:
+
+**Front-end e qualquer coisa em Git** — nunca commitar direto na `main`:
+
+```bash
+git fetch && git status -sb          # SEMPRE antes de editar, não só antes de publicar
+git checkout -b davi/nome-da-mudanca
+# ... edições ...
+git push -u origin davi/nome-da-mudanca
+```
+
+Depois abre um Pull Request. O Pedro vê o que mudou antes de entrar na `main`. A
+Vercel publica sozinha quando a `main` recebe (leva ~1 min).
+
+**Backend** — dois passos, e o segundo é manual de propósito:
+
+```bash
+cd fisk-hub-backend
+node scripts/testes/secretaria/painel-secretaria.test.js   # antes de qualquer coisa
+clasp push
+```
+
+Depois, no editor: *Implantar → Gerenciar implantações → lápis → Versão: Nova
+versão → Implantar*. **Nunca "Nova implantação".**
+
+**A regra que evita o acidente:** o backend tem **dono por vez**. Avise antes de
+abrir o editor ou rodar `clasp push`, e avise ao terminar. O Git protege vocês
+em tudo menos aqui — o Apps Script não tem merge, e quem salva por último apaga
+o trabalho do outro sem deixar rastro.
 
 ---
 
@@ -216,22 +289,53 @@ Portal do Aluno.
 Existe um teste que roda em Node, com uma planilha sintética no formato real:
 
 ```bash
-node fisk-hub/apps-script/teste-painel-secretaria.js
+cd fisk-hub-backend
+node scripts/testes/secretaria/painel-secretaria.test.js
 ```
 
 ✅ Em 04/08/2026: **99 asserções, todas passando**. É a forma mais rápida de
-entender como o card é lido, e não toca em nada que está no ar. Rode isso antes
-de colar qualquer coisa no editor.
+entender como o card é lido, e não toca em nada que está no ar. Rode antes de
+qualquer `clasp push`.
+
+Ele começa conferindo se as suas fixtures `.gs` ainda batem com o `Code.js`. Se
+alguém mexer num e esquecer do outro, o teste **para e avisa**, em vez de ficar
+verde testando código que não está mais no ar.
 
 ---
 
-## 10. Estado em 04/08/2026 ✅
+## 10. Os 10 repositórios
+
+A conta `Pedro-Fisk` é **pessoal**, não uma organização — então permissão é uma
+a uma, e o convite vence em **7 dias**. ✅ Levantado direto do GitHub em
+04/08/2026 (o `onboarding-davi.md` lista 8 e esqueceu 2, ambos privados):
+
+| repositório | | o que é |
+|---|---|---|
+| `fisk-hub` | público | ferramentas do professor |
+| `portal-aluno-fisk` | privado | Portal do Aluno, Painel da Direção e **a tela da Secretaria** |
+| `fisk-hub-backend` | privado | **o backend inteiro** — é aqui que a secretaria roda |
+| `fisk-dashboard` | privado | Dashboard Executivo (TypeScript) |
+| `met-siele-simulador` | público | simulador MET e SIELE |
+| `fisk-simulador` | público | Quick Practice |
+| `boletim-fisk` | público | gerador de boletim |
+| `planner-fisk` | público | planner |
+| `conversation-maker` | público | Conversation Maker |
+| `conversation-maker-logs` | privado | logs do Conversation Maker |
+
+Os **públicos** dá para ler e clonar sem convite — mas **não dá para publicar**
+sem ser colaborador. Os **privados** não aparecem nem na busca sem o convite
+aceito.
+
+## 11. Estado em 04/08/2026 ✅
 
 - Backend implantado e funcionando; rotas `sec*` respondendo.
 - `secretaria.html` no ar; `diretor.html` com o link.
-- `_alunos` com 758 alunos, todos com estágio.
+- `_alunos` com 758 alunos, **todos com estágio** (não há o bug da seção 8.2).
 - Planilha de dados fechada para Restrito, sem impacto no sistema.
 - Davi com cargo Direção na `_profs` **e** na constante `DIRETORES`.
+- Fonte única do backend consolidada; teste com trava de desatualização.
 
-**Pendente:** a área Financeira do Painel da Direção está vazia; e a decisão do
-caminho único de publicação do backend (seção 7).
+**Pendências:**
+1. **Reconciliar repositório × editor antes do primeiro `clasp push`** (seção
+   7-A). É a única que pode causar perda de trabalho.
+2. A área Financeira do Painel da Direção está vazia.
