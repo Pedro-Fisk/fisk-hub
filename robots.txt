@@ -1,0 +1,5 @@
+# Ferramentas internas do professor: nenhum buscador deve indexar.
+# O conteúdo exige login, mas as URLs são públicas — indexar expõe a
+# superfície do sistema sem necessidade.
+User-agent: *
+Disallow: /
