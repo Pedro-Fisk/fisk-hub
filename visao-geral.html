@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Visão Geral das Turmas, FISK</title>
-<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04b">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04c">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <style>
@@ -248,10 +248,14 @@
     </div>
   </div>
 
-  <div class="painel" id="painelAnaliseCta">
-    <button type="button" class="btn-ghost" id="btnAnalises" style="width:100%">
-      📊 Ver análise das turmas</button>
-    <p class="sub" style="margin:.5rem 0 0">Panorama, faltas × ritmo, tabela por turma e alunos que pedem atenção.</p>
+  <!-- Bloco recolhível igual a todos os outros da página: mesmo h2, mesma
+       seta ▾, mesmo mecanismo (colapsaveis()). A primeira versão era um botão
+       solto com o estilo do kit compartilhado, que não é o desta tela — ele
+       chamava atenção por destoar, não por importar. -->
+  <div class="painel is-colapsavel is-fechado" id="painelAnalises">
+    <h2>📊 Análise das turmas</h2>
+    <p class="sub" style="margin:.2rem 0 0">Panorama, faltas × ritmo, tabela por turma e
+      alunos que pedem atenção.</p>
   </div>
 
   <div id="analises" hidden>
@@ -319,7 +323,7 @@
   Ferramenta interna das escolas Fisk Taubaté · Caçapava.
 </footer>
 
-<script src="assets/fisk-shared.js?v=2026-08-04b"></script>
+<script src="assets/fisk-shared.js?v=2026-08-04c"></script>
 <script>
 /* ============================================================
    Visão Geral das Turmas — agrega TODAS as turmas de um professor
@@ -1013,14 +1017,17 @@ initCascade();
    própria visibilidade (vários só aparecem quando há dado), então esconder
    por fora preserva a lógica que já existia. */
 (function analisesToggle(){
-  var bt = document.getElementById('btnAnalises'), cx = document.getElementById('analises');
-  if (!bt || !cx) return;
-  bt.addEventListener('click', function(){
-    var abrindo = cx.hidden;
-    cx.hidden = !abrindo;
-    bt.textContent = abrindo ? '📊 Ocultar análise das turmas' : '📊 Ver análise das turmas';
-    if (abrindo) cx.scrollIntoView({ behavior:'smooth', block:'start' });
-  });
+  var pan = document.getElementById('painelAnalises'), cx = document.getElementById('analises');
+  if (!pan || !cx) return;
+  /* Quem manda no abre/fecha é o `colapsaveis()`, o mesmo de todos os blocos
+     — inclusive no teclado e no estado guardado. Aqui só espelhamos a classe
+     dele no contêiner das análises, que é irmão do painel e não filho (os
+     quatro blocos de dentro já são `.painel`, e aninhá-los daria borda dupla).
+     Observando a classe em vez de escutar o clique, o espelho vale para
+     qualquer caminho que a mude, sem depender da ordem dos handlers. */
+  var sync = function(){ cx.hidden = pan.classList.contains('is-fechado'); };
+  new MutationObserver(sync).observe(pan, { attributes:true, attributeFilter:['class'] });
+  sync();
 })();
 
 /* O nome do aluno abre o Acompanhamento numa GAVETA à direita, em vez de

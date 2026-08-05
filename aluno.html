@@ -5,10 +5,10 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Acompanhamento do Aluno, FISK</title>
-<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04b">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04c">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
-<script src="assets/fisk-shared.js?v=2026-08-04b"></script>
+<script src="assets/fisk-shared.js?v=2026-08-04c"></script>
 <!-- activityId → nome legível ("mp:essentials-1:frozen-1" → "Frozen · Part I").
      Gerado por scripts/build-atividades-index.js no portal-aluno-fisk. -->
 <script src="assets/atividades-index.js"></script>
@@ -143,9 +143,16 @@
      cabeçalho e as margens de página, para caber numa coluna estreita ao
      lado da lista de alunos, sem duplicar código de renderização. */
   body.embed .hero{ display:none; }
-  body.embed main{ max-width:none; margin:0; padding:.2rem .1rem 1rem; }
-  body.embed .painel{ box-shadow:none; border-radius:12px; margin-bottom:.6rem; padding:.8rem .9rem; }
+  /* Respiro: sem cabeçalho, a página começa colada no topo da gaveta e os
+     blocos ficam ombro a ombro com a borda. O padding aqui é o que dá ao
+     painel o mesmo conforto de leitura da página inteira. */
+  body.embed main{ max-width:none; margin:0; padding:.9rem 1rem 1.6rem; }
+  body.embed .painel{ box-shadow:none; border-radius:14px; margin-bottom:.9rem; padding:1.05rem 1.15rem; }
   body.embed .aluno-head{ flex-wrap:wrap; }
+  body.embed .resumo{ gap:.6rem; margin:.6rem 0 .2rem; }
+  body.embed .kpi{ padding:.7rem .8rem; }
+  body.embed .agora{ margin-top:1rem; padding:.85rem 1rem; }
+  body.embed .ativ{ margin-top:.65rem; }
 
   /* seletor de curso do aluno de dupla matrícula */
   .cursos{ display:flex; gap:.35rem; flex-wrap:wrap; margin:.5rem 0 .2rem; }

@@ -409,8 +409,14 @@ body, .hero, .btn, .btn-generate, .btn-ghost, .modal-card, .theme-toggle, .mic-b
 #fiskAcompGaveta{ position:fixed; inset:0; z-index:9000; pointer-events:none; }
 #fiskAcompGaveta .fk-acomp-fundo{ position:absolute; inset:0; background:rgba(12,12,14,.35);
   opacity:0; transition:opacity .2s ease; }
+/* Largura: a primeira versão tinha 560px fixos e o conteúdo ficava espremido
+   numa coluna estreita — KPIs quebrando de dois em dois e tabela de notas
+   apertada. Agora acompanha a tela (46vw), com piso para o notebook pequeno e
+   teto para não virar a página inteira no monitor grande: a lista atrás
+   precisa continuar visível, senão a gaveta perdeu a razão de existir. */
 #fiskAcompGaveta .fk-acomp-painel{ position:absolute; top:0; right:0; height:100%;
-  width:min(560px, 92vw); background:var(--white,#fff); box-shadow:-14px 0 40px rgba(0,0,0,.18);
+  width:clamp(460px, 46vw, 880px); max-width:96vw;
+  background:var(--white,#fff); box-shadow:-14px 0 40px rgba(0,0,0,.18);
   display:flex; flex-direction:column; transform:translateX(100%); transition:transform .22s ease; }
 #fiskAcompGaveta.on{ pointer-events:auto; }
 #fiskAcompGaveta.on .fk-acomp-fundo{ opacity:1; }
