@@ -1,5 +1,5 @@
 /* GERADO por scripts/build-atividades-index.js — não edite à mão.
-   activityId → nome legível, para o dossiê do aluno mostrar "Frozen"
+   activityId → nome legível, para o Acompanhamento do Aluno mostrar "Frozen"
    em vez de "mp:essentials-1:frozen-1". Rode o gerador ao mexer nos
    catálogos de filme e música. */
 window.ATIVIDADES_INDEX = {

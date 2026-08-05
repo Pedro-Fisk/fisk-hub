@@ -10,8 +10,8 @@
      regra nova de estilo simplesmente não aparece na tela dele — foi o que
      aconteceu no teste da busca de aluno, com o campo saindo sem formatação.
      MEXEU no style.css ou no kit? Suba a data aqui. -->
-<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04">
-<link rel="stylesheet" href="style.css?v=2026-08-04">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04b">
+<link rel="stylesheet" href="style.css?v=2026-08-04b">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 </head>
@@ -127,8 +127,12 @@
     <!-- Busca de aluno. Fica AQUI, e não numa ferramenta a mais na grade,
          porque a pergunta que ela responde é de meio de aula ("o aluno fez
          mesmo a atividade?") — tem de estar a um campo de distância, não a
-         dois cliques. Leva ao dossiê (aluno.html). -->
+         dois cliques. Leva ao Acompanhamento do Aluno (aluno.html). -->
     <div class="md-busca">
+      <!-- O título é o que faz a busca ser ENCONTRADA. Sem ele, o campo era
+           só uma caixa cinza no meio do painel: quem não sabia que existia
+           não descobria, e é justamente a ferramenta mais usada do Hub. -->
+      <label class="md-busca-t" for="mdQ" data-i18n="md-busca-t">🎓 Acompanhamento do Aluno</label>
       <input id="mdQ" type="search" autocomplete="off" spellcheck="false"
              data-i18n-ph="md-busca-ph" placeholder="🔎 Buscar aluno por nome ou RAF…">
       <div class="md-achados" id="mdAchados" hidden></div>
@@ -403,7 +407,7 @@
     <p data-i18n="footer">Ferramenta desenvolvida exclusivamente para uso interno das escolas Fisk. A utilização deste sistema e de seu conteúdo por pessoas ou instituições não autorizadas, incluindo professores particulares, é proibida. Desenvolvido por @fiskcacapava e @taubatefisk</p>
   </footer>
 
-  <script src="assets/fisk-shared.js?v=2026-08-04"></script>
+  <script src="assets/fisk-shared.js?v=2026-08-04b"></script>
   <script>
     fiskInitThemeToggle('themeToggle');
 
@@ -429,7 +433,7 @@
         'md-emdia':'Em dia','md-atras':'Atrasados','md-crit':'Críticos',
         'md-faltas':'Faltas médias','md-nota':'Média de notas','md-turmas':'turmas',
         'md-load':'analisando suas turmas…','md-pick':'Escolha um professor no seletor do topo para ver o painel dele.',
-        'md-busca-ph':'🔎 Buscar aluno por nome ou RAF…','md-busca-nada':'Nenhum aluno com esse nome ou RAF.',
+        'md-busca-t':'🎓 Acompanhamento do Aluno','md-busca-ph':'🔎 Buscar aluno por nome ou RAF…','md-busca-nada':'Nenhum aluno com esse nome ou RAF.',
         'card-planner-h2': 'Abridor de Planners',
         'card-planner-p':  'Crie o PPT / Planner do aluno com as datas corretas',
         'card-conv-h2':    'Conversation Maker',
@@ -503,7 +507,7 @@
         'md-emdia':'On track','md-atras':'Behind','md-crit':'Critical',
         'md-faltas':'Avg. absences','md-nota':'Avg. grade','md-turmas':'classes',
         'md-load':'analyzing your classes…','md-pick':'Pick a teacher in the selector above to see their panel.',
-        'md-busca-ph':'🔎 Search student by name or RAF…','md-busca-nada':'No student with that name or RAF.',
+        'md-busca-t':'🎓 Student Follow-up','md-busca-ph':'🔎 Search student by name or RAF…','md-busca-nada':'No student with that name or RAF.',
         'card-planner-h2': 'Planner Opener',
         'card-planner-p':  'Create student planners with the correct dates',
         'card-conv-h2':    'Conversation Maker',
@@ -577,7 +581,7 @@
         'md-emdia':'Al día','md-atras':'Atrasados','md-crit':'Críticos',
         'md-faltas':'Faltas medias','md-nota':'Nota media','md-turmas':'grupos',
         'md-load':'analizando tus grupos…','md-pick':'Elige un profesor en el selector de arriba para ver su panel.',
-        'md-busca-ph':'🔎 Buscar alumno por nombre o RAF…','md-busca-nada':'Ningún alumno con ese nombre o RAF.',
+        'md-busca-t':'🎓 Seguimiento del Alumno','md-busca-ph':'🔎 Buscar alumno por nombre o RAF…','md-busca-nada':'Ningún alumno con ese nombre o RAF.',
         'card-planner-h2': 'Abridor de Planners',
         'card-planner-p':  'Crea planners del alumno con las fechas correctas',
         'card-conv-h2':    'Conversation Maker',
@@ -1425,33 +1429,69 @@
       /* ── Busca de aluno ──────────────────────────────────────────────────
          Responde à pergunta de meio de aula: "o aluno fez mesmo a atividade
          que disse que fez?". Só monta a lista; quem conta a história é o
-         dossiê (aluno.html). Usa o token da sessão — nenhuma chave aqui, que
+         Acompanhamento do Aluno (aluno.html). Usa o token da sessão — nenhuma chave aqui, que
          este repositório é público. */
       (function buscaAluno(){
         var inp = document.getElementById('mdQ'), cx = document.getElementById('mdAchados'), tmr = null;
         if (!inp) return;
         function fecha(){ cx.hidden = true; cx.innerHTML = ''; }
+        var e = function(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); };
+        /* Duas fontes, e a ordem importa: primeiro os alunos DO PROFESSOR,
+           que já estão na memória e aparecem sem ida à rede; depois o resto
+           da escola, que vem do servidor e é anexado. Na prática o aluno
+           procurado quase sempre já está na primeira lista, e o campo passa a
+           responder enquanto se digita em vez de depois de digitar. */
+        var vistos = {};
+        function pinta(lista, meus, limpar){
+          if (limpar){ cx.innerHTML = ''; vistos = {}; }
+          var html = '';
+          lista.forEach(function(a){
+            if (!a || !a.raf || vistos[a.raf]) return;
+            vistos[a.raf] = true;
+            html += '<button type="button" class="md-achado" data-raf="'+e(a.raf)+'">' +
+                    '<b>'+e(a.name)+'</b>' + (meus ? '<i class="md-meu">sua turma</i>' : '') +
+                    '<span>'+e(a.turma||'')+'<br>'+e(a.raf)+'</span></button>';
+          });
+          if (html){ cx.hidden = false; cx.insertAdjacentHTML('beforeend', html); }
+          return Object.keys(vistos).length;
+        }
         function busca(){
           var q = inp.value.trim();
           if (q.length < 2){ fecha(); return; }
+          var meusOk = false;
+          if (typeof fiskBuscaMeusAlunos === 'function'){
+            fiskBuscaMeusAlunos(q).then(function(l){
+              if (inp.value.trim() !== q) return;      // já digitou outra coisa
+              meusOk = true;
+              pinta(l, true, true);
+            });
+          }
           fetch(API, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
                        body: JSON.stringify({ action:'alunoBusca', token: tokenSessao(), q: q }) })
             .then(function(r){ return r.json(); })
             .then(function(res){
-              cx.hidden = false;
+              if (inp.value.trim() !== q) return;
               var l = (res && res.alunos) || [];
-              if (!l.length){ cx.innerHTML = '<div class="md-achado vazio">'+tr('md-busca-nada')+'</div>'; return; }
-              cx.innerHTML = l.map(function(a){
-                var e = function(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); };
-                return '<button type="button" class="md-achado" data-raf="'+e(a.raf)+'">' +
-                       '<b>'+e(a.name)+'</b><span>'+e(a.turma||'')+'<br>'+e(a.raf)+'</span></button>';
-              }).join('');
-            }).catch(function(){ fecha(); });
+              var n = pinta(l, false, !meusOk);
+              cx.hidden = false;
+              if (!n) cx.innerHTML = '<div class="md-achado vazio">'+tr('md-busca-nada')+'</div>';
+            }).catch(function(){ if (!Object.keys(vistos).length) fecha(); });
         }
-        inp.addEventListener('input', function(){ clearTimeout(tmr); tmr = setTimeout(busca, 320); });
+        /* 160ms, e não 320: metade do resultado agora vem da memória, então a
+           espera existe só para não disparar a busca do servidor a cada tecla. */
+        inp.addEventListener('input', function(){ clearTimeout(tmr); tmr = setTimeout(busca, 160); });
         cx.addEventListener('click', function(ev){
           var b = ev.target.closest('.md-achado'); if (!b || !b.dataset.raf) return;
-          location.href = 'aluno.html?raf=' + encodeURIComponent(b.dataset.raf);
+          /* Gaveta à direita, não navegação: a home é de onde o professor sai
+             para tudo, e trocá-la de página por causa de uma conferência de
+             dez segundos é caro. Se o kit estiver velho em cache, o caminho
+             antigo continua valendo. */
+          if (typeof fiskAcompanhamento === 'function'){
+            fecha();
+            fiskAcompanhamento(b.dataset.raf, { nome: (b.querySelector('b')||{}).textContent || '' });
+          } else {
+            location.href = 'aluno.html?raf=' + encodeURIComponent(b.dataset.raf);
+          }
         });
         document.addEventListener('click', function(ev){
           if (!ev.target.closest('.md-busca')) fecha();

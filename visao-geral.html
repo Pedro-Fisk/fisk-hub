@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Visão Geral das Turmas, FISK</title>
-<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04b">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <style>
@@ -131,7 +131,7 @@
   .hintbox{background:var(--blue-soft);border-radius:10px;padding:.55rem .8rem;font-size:.8rem;
            color:var(--blue-ink);margin-top:.8rem;line-height:1.45}
   .foranote{font-size:.8rem;color:var(--gray);margin-top:.8rem;padding-top:.7rem;border-top:1px dashed var(--gray-light)}
-  /* o nome do aluno leva ao dossiê: sublinhado só no hover, para a tabela não
+  /* o nome do aluno leva ao acompanhamento: sublinhado só no hover, para a tabela não
      virar um mar de links azuis */
   /* ── Blocos colapsáveis ──────────────────────────────────────────────
      Os DOIS primeiros ("Suas turmas" e "Panorama geral") ficam sempre
@@ -208,6 +208,53 @@
     <div class="status" id="statusCard"></div>
   </div>
 
+
+  <!-- "Meus alunos" subiu para cá em 04/08/2026. A tela abria com quatro
+       blocos de análise antes da lista de alunos, e o professor tinha de
+       rolar por gráficos para chegar ao que ele mais usa: achar um aluno.
+       As análises não foram jogadas fora — continuam inteiras, atrás do
+       botão abaixo, para quem está fazendo leitura de turma e não
+       atendimento individual. -->
+  <!-- 5 · acessos ao Portal do Aluno (era uma ferramenta separada no Hub) -->
+  <div class="painel is-colapsavel" id="painelAcessos">
+    <h2>👥 Meus alunos</h2>
+    <p class="sub">Todas as suas turmas, para bater o olho. Abra uma turma e clique no aluno
+      para ver o <b>acompanhamento</b> dele. A busca alcança a escola inteira, inclusive alunos de
+      outros professores.</p>
+    <div class="status" id="acStatus">🔄 Carregando…</div>
+    <div id="acCorpo" hidden>
+      <div class="resumo" style="margin-top:.7rem">
+        <div class="kpi"><b id="ac-total">0</b><span>Alunos</span></div>
+        <div class="kpi emdia"><b id="ac-ent">0</b><span>Já entraram</span></div>
+        <div class="kpi alta"><b id="ac-nunca">0</b><span>Nunca fizeram nada</span></div>
+        <div class="kpi"><b id="ac-7d">0</b><span>Ativos nos 7 dias</span></div>
+      </div>
+      <div class="row" style="margin:.7rem 0 .5rem">
+        <div style="flex:1 1 200px"><select id="acTurma"><option value="">Todas as turmas</option></select></div>
+        <div style="flex:1 1 170px"><select id="acFiltro">
+          <option value="">Todos</option>
+          <option value="sim">Só quem já entrou</option>
+          <option value="nao">Só quem nunca entrou</option>
+          <option value="parado">Entrou, mas não fez nada</option>
+          <option value="sumido">Sem atividade há 7 dias</option>
+        </select></div>
+        <div style="flex:1 1 170px"><input type="search" id="acBusca" placeholder="Buscar aluno…"
+          style="width:100%;padding:.5rem .6rem;border:1px solid var(--gray-light);border-radius:9px;
+                 font-family:var(--font-body);font-size:.92rem;background:var(--white);color:var(--black)"></div>
+      </div>
+      <div id="acLinhas"></div>
+      <p class="sub" style="margin:.8rem 0 0">O aluno entra em <b>portalfisk.com.br</b> usando o RAF.
+        <b>Entrar não é fazer</b>: a coluna de atividade conta exercício concluído, não visita.</p>
+    </div>
+  </div>
+
+  <div class="painel" id="painelAnaliseCta">
+    <button type="button" class="btn-ghost" id="btnAnalises" style="width:100%">
+      📊 Ver análise das turmas</button>
+    <p class="sub" style="margin:.5rem 0 0">Panorama, faltas × ritmo, tabela por turma e alunos que pedem atenção.</p>
+  </div>
+
+  <div id="analises" hidden>
   <!-- 2 · panorama -->
   <div class="painel" id="painelGeral" hidden>
     <h2 id="tituloGeral">📊 Panorama geral</h2>
@@ -265,38 +312,6 @@
       Tudo é <b>só leitura</b>: nada é gravado no card.
     </div>
   </div>
-
-  <!-- 5 · acessos ao Portal do Aluno (era uma ferramenta separada no Hub) -->
-  <div class="painel is-colapsavel" id="painelAcessos">
-    <h2>👥 Meus alunos</h2>
-    <p class="sub">Todas as suas turmas, para bater o olho. Abra uma turma e clique no aluno
-      para ver o <b>dossiê</b> dele. A busca alcança a escola inteira, inclusive alunos de
-      outros professores.</p>
-    <div class="status" id="acStatus">🔄 Carregando…</div>
-    <div id="acCorpo" hidden>
-      <div class="resumo" style="margin-top:.7rem">
-        <div class="kpi"><b id="ac-total">0</b><span>Alunos</span></div>
-        <div class="kpi emdia"><b id="ac-ent">0</b><span>Já entraram</span></div>
-        <div class="kpi alta"><b id="ac-nunca">0</b><span>Nunca fizeram nada</span></div>
-        <div class="kpi"><b id="ac-7d">0</b><span>Ativos nos 7 dias</span></div>
-      </div>
-      <div class="row" style="margin:.7rem 0 .5rem">
-        <div style="flex:1 1 200px"><select id="acTurma"><option value="">Todas as turmas</option></select></div>
-        <div style="flex:1 1 170px"><select id="acFiltro">
-          <option value="">Todos</option>
-          <option value="sim">Só quem já entrou</option>
-          <option value="nao">Só quem nunca entrou</option>
-          <option value="parado">Entrou, mas não fez nada</option>
-          <option value="sumido">Sem atividade há 7 dias</option>
-        </select></div>
-        <div style="flex:1 1 170px"><input type="search" id="acBusca" placeholder="Buscar aluno…"
-          style="width:100%;padding:.5rem .6rem;border:1px solid var(--gray-light);border-radius:9px;
-                 font-family:var(--font-body);font-size:.92rem;background:var(--white);color:var(--black)"></div>
-      </div>
-      <div id="acLinhas"></div>
-      <p class="sub" style="margin:.8rem 0 0">O aluno entra em <b>portalfisk.com.br</b> usando o RAF.
-        <b>Entrar não é fazer</b>: a coluna de atividade conta exercício concluído, não visita.</p>
-    </div>
   </div>
 </main>
 
@@ -304,7 +319,7 @@
   Ferramenta interna das escolas Fisk Taubaté · Caçapava.
 </footer>
 
-<script src="assets/fisk-shared.js?v=2026-08-04"></script>
+<script src="assets/fisk-shared.js?v=2026-08-04b"></script>
 <script>
 /* ============================================================
    Visão Geral das Turmas — agrega TODAS as turmas de um professor
@@ -730,7 +745,7 @@ function render(escola, prof, dados) {
     /* A linha da turma abre. O número "5 críticos" respondia QUANTOS mas
        nunca QUEM, e era exatamente essa a pergunta seguinte do professor —
        que só tinha como responder abrindo o card. Agora a turma expande e
-       lista os alunos, e cada aluno leva ao dossiê. */
+       lista os alunos, e cada aluno leva ao acompanhamento. */
     return '<tr class="tr-turma" data-turma="' + i + '">' +
       '<td><span class="tnome">' + esc(t.titulo) + '</span>' +
         '<span class="tt-seta">▾</span>' +
@@ -791,7 +806,7 @@ function render(escola, prof, dados) {
    O card não conhece RAF: ele guarda nome, atraso e faltas. Quem tem a
    correspondência é a matrícula do backend, que a Chamada do Portal já
    carrega nesta mesma página. Guardando esse índice aqui, qualquer nome de
-   aluno na tela vira link para o dossiê — sem uma chamada a mais ao
+   aluno na tela vira link para o acompanhamento — sem uma chamada a mais ao
    servidor. Enquanto a Chamada não terminou de carregar, `rafDe` devolve
    vazio e o nome fica em texto puro; quando ela chega, os blocos que
    dependem disso são repintados. */
@@ -801,7 +816,7 @@ function chaveAluno(nome) {
     .replace(/\s+/g, ' ').trim();
 }
 function rafDe(nome) { return _rafPorNome[chaveAluno(nome)] || ''; }
-/* nome do aluno como link para o dossiê — texto puro se ainda não sabemos o RAF */
+/* nome do aluno como link para o acompanhamento — texto puro se ainda não sabemos o RAF */
 function linkAluno(nome, classe) {
   var raf = rafDe(nome);
   var txt = esc(nome);
@@ -989,6 +1004,31 @@ function linkAluno(nome, classe) {
 })();
 
 initCascade();
+
+/* ── Análises atrás de um botão (04/08/2026) ──────────────────────────────
+   Quatro blocos de gráfico e tabela abriam antes da lista de alunos, e o
+   professor tinha de rolar por todos para chegar ao que mais usa. Eles
+   continuam inteiros — só deixaram de ser a primeira coisa da tela.
+   O toggle mexe SÓ no contêiner: cada painel de dentro continua mandando na
+   própria visibilidade (vários só aparecem quando há dado), então esconder
+   por fora preserva a lógica que já existia. */
+(function analisesToggle(){
+  var bt = document.getElementById('btnAnalises'), cx = document.getElementById('analises');
+  if (!bt || !cx) return;
+  bt.addEventListener('click', function(){
+    var abrindo = cx.hidden;
+    cx.hidden = !abrindo;
+    bt.textContent = abrindo ? '📊 Ocultar análise das turmas' : '📊 Ver análise das turmas';
+    if (abrindo) cx.scrollIntoView({ behavior:'smooth', block:'start' });
+  });
+})();
+
+/* O nome do aluno abre o Acompanhamento numa GAVETA à direita, em vez de
+   trocar de página: aqui o professor está comparando alunos, e navegar
+   custaria recarregar esta tela a cada nome. O link continua sendo um <a>
+   de verdade — ctrl+clique, botão do meio e "abrir em nova aba" seguem
+   funcionando, e sem sessão a página cheia responde igual. */
+if (typeof fiskLigarAcompanhamento === 'function') fiskLigarAcompanhamento(document, 'a.ac-link');
 </script>
 </body>
 </html>

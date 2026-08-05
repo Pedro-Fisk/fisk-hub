@@ -4,17 +4,17 @@
 <meta charset="UTF-8">
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dossiê do Aluno, FISK</title>
-<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04">
+<title>Acompanhamento do Aluno, FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04b">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
-<script src="assets/fisk-shared.js?v=2026-08-04"></script>
+<script src="assets/fisk-shared.js?v=2026-08-04b"></script>
 <!-- activityId → nome legível ("mp:essentials-1:frozen-1" → "Frozen · Part I").
      Gerado por scripts/build-atividades-index.js no portal-aluno-fisk. -->
 <script src="assets/atividades-index.js"></script>
 <style>
   /* Estética copiada da Visão Geral (pedido do Pedro): o bloco do professor
-     ficou melhor que o do dossiê, então o molde passa a ser o mesmo — mesma
+     ficou melhor que o desta página, então o molde passa a ser o mesmo — mesma
      borda de 2px, mesmo título em Poppins, mesmos KPIs e mesmas pílulas.
      Com fallback literal de propósito: se o navegador ainda tiver o kit
      compartilhado antigo em cache, --ui não existe e a cor sumiria. */
@@ -63,6 +63,9 @@
   .achado:hover{ border-color:var(--blue); }
   .achado b{ font-weight:800; }
   .achado span{ font-size:.78rem; color:var(--gray); margin-left:auto; text-align:right; }
+  .achado .meu{ font-style:normal; font-size:.62rem; font-weight:800; text-transform:uppercase;
+                letter-spacing:.03em; background:var(--emdia-soft); color:var(--emdia);
+                border-radius:99px; padding:.1rem .4rem; margin-left:.4rem; }
 
   /* ── turmas do professor (mesmo molde da Visão Geral) ── */
   .tg{border:1.5px solid var(--gray-light);border-radius:12px;margin-bottom:.5rem;overflow:hidden}
@@ -134,6 +137,24 @@
   .btn-ver[disabled]{ opacity:.6; cursor:default; }
 
   .vazio{ color:var(--gray); font-size:.85rem; padding:.6rem 0; }
+
+  /* ── modo embutido (painel lateral) ──────────────────────────────────
+     A mesma página serve de tela cheia e de painel. Aqui ela perde o
+     cabeçalho e as margens de página, para caber numa coluna estreita ao
+     lado da lista de alunos, sem duplicar código de renderização. */
+  body.embed .hero{ display:none; }
+  body.embed main{ max-width:none; margin:0; padding:.2rem .1rem 1rem; }
+  body.embed .painel{ box-shadow:none; border-radius:12px; margin-bottom:.6rem; padding:.8rem .9rem; }
+  body.embed .aluno-head{ flex-wrap:wrap; }
+
+  /* seletor de curso do aluno de dupla matrícula */
+  .cursos{ display:flex; gap:.35rem; flex-wrap:wrap; margin:.5rem 0 .2rem; }
+  .curso-b{ border:1.5px solid var(--blue-bd); background:transparent; color:var(--blue);
+            border-radius:999px; padding:.25rem .8rem; cursor:pointer;
+            font-family:var(--font-heading); font-weight:700; font-size:.8rem; }
+  .curso-b.on{ background:var(--blue); color:var(--white); }
+  body.theme-dark .curso-b{ color:#8ab4dd; }
+  body.theme-dark .curso-b.on{ color:var(--white); }
   body.theme-dark .painel{ background:#1e1c1c; }
   body.theme-dark .ativ-top{ background:#1e1c1c; }
   body.theme-dark .aluno-head .nome{ color:#dce7f2; }
@@ -146,7 +167,7 @@
   <a class="back-link" href="index.html">&larr; Voltar ao Hub</a>
   <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
   <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
-  <h1>Dossiê do Aluno</h1>
+  <h1>Acompanhamento do Aluno</h1>
   <p>O que o aluno fez no portal, quando, e com que aproveitamento</p>
 </header>
 
@@ -171,7 +192,7 @@
     <div class="status" id="stTurmas"></div>
   </div>
 
-  <!-- 2 · dossiê -->
+  <!-- 2 · acompanhamento -->
   <div class="painel" id="pnAluno" hidden>
     <div class="aluno-head">
       <div>
@@ -182,6 +203,10 @@
       <button type="button" class="btn-ver" id="btnPasta" hidden>📂 Pasta no Drive</button>
     </div>
     <div class="status" id="stPasta"></div>
+    <!-- Aluno de dois cursos (inglês e espanhol): a turma, o estágio, o
+         atraso e as faltas são de UMA matrícula. Sem este seletor, o
+         professor de espanhol leria os números da turma de inglês. -->
+    <div class="cursos" id="alCursos" hidden></div>
     <div class="agora" id="alAgora" hidden></div>
     <div class="resumo" id="alKpis"></div>
   </div>
@@ -195,13 +220,15 @@
     <div id="alAtiv"></div>
   </div>
 
-  <!-- 5 · notas (atrás de um clique, de propósito) -->
+  <!-- 5 · notas: o semestre em curso à vista, o histórico atrás de um clique -->
   <div class="painel" id="pnNotas" hidden>
-    <h2>🔒 Notas e boletins</h2>
-    <p class="sub">Fica fechado de propósito: nota não é para ficar à mostra na tela.
-      Abre com um clique, e só para quem está com sessão da equipe.</p>
-    <button type="button" class="btn-ver" id="btnNotas">Ver notas anteriores</button>
+    <h2>📊 Notas e boletins</h2>
+    <p class="sub">As avaliações do <b>semestre em curso</b> aparecem assim que carregam.
+      Os semestres <b>anteriores</b> ficam atrás de um clique — histórico de nota não precisa
+      estar aberto na tela o tempo todo. Só para quem tem sessão da equipe.</p>
     <div id="alNotas"></div>
+    <button type="button" class="btn-ver" id="btnNotas" hidden>Ver semestres anteriores</button>
+    <div id="alNotasAnt"></div>
     <div class="status" id="stNotas"></div>
   </div>
 </main>
@@ -230,6 +257,7 @@
 var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
 var IDX = window.ATIVIDADES_INDEX || {};
 
+var EMBED = /[?&]embed=1/.test(location.search);
 function $(id){ return document.getElementById(id); }
 function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 fiskInitThemeToggle('themeToggle');
@@ -238,7 +266,7 @@ function sess(){ try{ return JSON.parse(localStorage.getItem('fisk_prof')||'null
 
 /* Token da URL (`#dirtok=`), o mesmo padrão com que o Painel da Direção já
    abre o Fisk Hub e o Portal do Aluno. Serve para a direção cair direto no
-   dossiê de um aluno sem refazer login numa origem diferente — o painel vive
+   acompanhamento de um aluno sem refazer login numa origem diferente — o painel vive
    em portalfisk.com.br e esta página no github.io, então o localStorage de lá
    não vale aqui. O backend aceita token de diretor como sessão de equipe
    (profResolveLinha_), então nada mais é preciso; token inválido cai no
@@ -303,42 +331,72 @@ function rotulo(id){
 
 /* ── busca ── */
 var timer = null;
+/* Duas fontes, nesta ordem: os alunos DO PROFESSOR saem da memória e
+   aparecem sem ida à rede; o resto da escola vem do servidor logo atrás.
+   Quase toda consulta termina na primeira lista, e aí o campo responde
+   enquanto se digita. */
+var _vistosBusca = {};
+function pintaAchados(l, meus, limpar){
+  if (limpar){ $('achados').innerHTML = ''; _vistosBusca = {}; }
+  var html = '';
+  l.forEach(function(a){
+    if (!a || !a.raf || _vistosBusca[a.raf]) return;
+    _vistosBusca[a.raf] = true;
+    html += '<button type="button" class="achado" data-raf="'+esc(a.raf)+'">'+
+            '<b>'+esc(a.name)+'</b>'+(meus ? '<i class="meu">sua turma</i>' : '')+
+            '<span>'+esc(a.turma||'')+(a.book?' · '+esc(a.book):'')+'<br>'+esc(a.raf)+'</span></button>';
+  });
+  if (html) $('achados').insertAdjacentHTML('beforeend', html);
+  return Object.keys(_vistosBusca).length;
+}
 function buscar(){
   var q = $('q').value.trim();
-  $('achados').innerHTML = '';
-  if (q.length < 2){ $('stBusca').textContent = ''; return; }
+  if (q.length < 2){ $('achados').innerHTML = ''; _vistosBusca = {}; $('stBusca').textContent = ''; return; }
   $('stBusca').className = 'status'; $('stBusca').textContent = 'Procurando…';
+  var meusOk = false;
+  if (typeof fiskBuscaMeusAlunos === 'function'){
+    fiskBuscaMeusAlunos(q).then(function(l){
+      if ($('q').value.trim() !== q || !l.length) return;
+      meusOk = true; pintaAchados(l, true, true);
+      $('stBusca').textContent = l.length + (l.length === 1 ? ' aluno seu' : ' alunos seus') + ' · procurando na escola…';
+    });
+  }
   post({ action:'alunoBusca', token: token(), q: q }).then(function(res){
+    if ($('q').value.trim() !== q) return;
     if (!res.ok){ $('stBusca').className = 'status err'; $('stBusca').textContent = '⚠️ ' + (res.error || 'Não consegui buscar.'); return; }
-    var l = res.alunos || [];
-    $('stBusca').textContent = l.length ? (l.length + (l.length === 1 ? ' aluno' : ' alunos')) : 'Nenhum aluno com esse nome ou RAF.';
-    $('achados').innerHTML = l.map(function(a){
-      return '<button type="button" class="achado" data-raf="'+esc(a.raf)+'">'+
-             '<b>'+esc(a.name)+'</b><span>'+esc(a.turma||'')+' · '+esc(a.book||'')+'<br>'+esc(a.raf)+'</span></button>';
-    }).join('');
-  }).catch(function(){ $('stBusca').className = 'status err'; $('stBusca').textContent = '⚠️ Erro de conexão.'; });
+    var n = pintaAchados(res.alunos || [], false, !meusOk);
+    $('stBusca').textContent = n ? (n + (n === 1 ? ' aluno' : ' alunos')) : 'Nenhum aluno com esse nome ou RAF.';
+  }).catch(function(){
+    if (!Object.keys(_vistosBusca).length){
+      $('stBusca').className = 'status err'; $('stBusca').textContent = '⚠️ Erro de conexão.';
+    }
+  });
 }
-$('q').addEventListener('input', function(){ clearTimeout(timer); timer = setTimeout(buscar, 320); });
+$('q').addEventListener('input', function(){ clearTimeout(timer); timer = setTimeout(buscar, 160); });
 $('achados').addEventListener('click', function(e){
   var b = e.target.closest('.achado'); if (!b) return;
   abrir(b.dataset.raf);
 });
 
-/* ── dossiê ── */
-var atual = null;
-function abrir(raf){
-  atual = raf;
+/* ── acompanhamento ── */
+var atual = null, atualTurma = '';
+function abrir(raf, turma){
+  atual = raf; atualTurma = turma || '';
   $('pnAluno').hidden = false;
   $('alNome').textContent = 'Carregando…';
   $('alMeta').textContent = ''; $('alKpis').innerHTML = '';
   $('alFd').hidden = true; $('alAgora').hidden = true;
+  $('alCursos').hidden = true; $('alCursos').innerHTML = '';
   $('btnPasta').hidden = true; $('btnPasta').disabled = false; $('stPasta').textContent = '';
   $('pnAtiv').hidden = true; $('pnNotas').hidden = true;
-  $('alNotas').innerHTML = ''; $('stNotas').textContent = '';
-  $('btnNotas').disabled = false; $('btnNotas').textContent = 'Ver notas anteriores';
-  $('pnAluno').scrollIntoView({ behavior:'smooth', block:'start' });
+  /* zerar TUDO do aluno anterior, e não só o que se vê: a lista de semestres
+     anteriores ficava na memória e o botão a mostraria para o próximo aluno. */
+  $('alNotas').innerHTML = ''; $('alNotasAnt').innerHTML = ''; $('stNotas').textContent = '';
+  _notasAnteriores = [];
+  $('btnNotas').hidden = true; $('btnNotas').disabled = false;
+  if (!EMBED) $('pnAluno').scrollIntoView({ behavior:'smooth', block:'start' });
 
-  post({ action:'alunoDiagnostico', token: token(), raf: raf }).then(function(res){
+  post({ action:'alunoDiagnostico', token: token(), raf: raf, turma: atualTurma }).then(function(res){
     if (!res.ok){ $('alNome').textContent = '⚠️ ' + (res.error || 'Não consegui abrir o aluno.'); return; }
     render(res);
   }).catch(function(){ $('alNome').textContent = '⚠️ Erro de conexão.'; });
@@ -349,6 +407,19 @@ function render(d){
   $('alNome').textContent = st.name || '—';
   $('alMeta').innerHTML = esc(st.turma || 'sem turma') + ' &middot; ' + esc(st.book || 'sem estágio') +
                           ' &middot; <b>' + esc(st.raf) + '</b>';
+
+  /* Dupla matrícula: um botão por curso. Trocar refaz a consulta com a turma
+     escolhida — é o servidor que decide a matrícula ativa, então situação,
+     atraso e faltas vêm coerentes com o curso na tela. */
+  var mats = st.matriculas || [];
+  if (mats.length > 1){
+    $('alCursos').hidden = false;
+    $('alCursos').innerHTML = mats.map(function(m){
+      var lbl = m.book || m.turma || 'Curso';
+      return '<button type="button" class="curso-b'+(m.turma === st.turma ? ' on' : '')+'" ' +
+             'data-turma="'+esc(m.turma)+'">'+esc(lbl)+'</button>';
+    }).join('');
+  }
 
   if (d.fd){
     $('alFd').hidden = false;
@@ -380,7 +451,18 @@ function render(d){
      faltas (contagem), pctEstagio, ultimaLicao e licaoPrevista — não há
      "aulas em atraso" pronta, o atraso se lê comparando as duas lições. */
   var sit = d.situacao || {};
+  /* Atraso de conteúdo: a régua é a mesma do Planejador, do Termo e da Visão
+     Geral (4+ aulas = crítico) — o professor não pode ter de aprender um
+     código de cor por tela. Vem pronto do servidor (`situacao.atraso`), que
+     calcula pela sequência do gabarito e por isso também vale para Chapter
+     Review e prova, não só para "L<n>". */
+  var atr = (sit.atraso != null && !isNaN(sit.atraso)) ? Number(sit.atraso) : null;
   $('alKpis').innerHTML =
+    (atr != null
+      ? kpi(atr === 0 ? 'Em dia' : atr + (atr === 1 ? ' aula' : ' aulas'),
+            atr === 0 ? 'Conteúdo' : 'Atraso de conteúdo',
+            atr >= 4 ? 'alta' : atr >= 1 ? 'media' : 'emdia')
+      : '') +
     kpi(ativ.length, 'Atividades feitas') +
     kpi(media == null ? '—' : media + '%', 'Aproveitamento médio', classePct(media)) +
     kpi((d.acesso && d.acesso.count) || 0, 'Acessos ao portal') +
@@ -392,7 +474,12 @@ function render(d){
   renderAtividades(fundir(ativ, d.provas || []));
   $('pnNotas').hidden = (d.escopo !== 'equipe');
   $('btnPasta').hidden = (d.escopo !== 'equipe');   // a pasta é do professor, não do aluno
+  if (d.escopo === 'equipe') carregarNotas(st.raf);
 }
+$('alCursos').addEventListener('click', function(ev){
+  var b = ev.target.closest('.curso-b'); if (!b) return;
+  abrir(atual, b.dataset.turma);
+});
 function kpi(v, l, cls){
   var texto = !/^[\d.,]+%?$/.test(String(v));   // "há 8 min" e "nunca" pedem corpo menor
   return '<div class="kpi'+(cls?' '+cls:'')+'"><b'+(texto?' class="txt"':'')+'>'+esc(v)+'</b>' +
@@ -498,40 +585,67 @@ function topicos(tops){
   }).join('');
 }
 
-/* ── notas: só quando pedidas (Pedro não quer nota fácil de ver, e é a parte
-      cara do backend — abre os cards das duas escolas) ── */
-$('btnNotas').addEventListener('click', function(){
-  if (!atual) return;
-  $('btnNotas').disabled = true;
-  $('stNotas').className = 'status'; $('stNotas').textContent = 'Buscando nos cards…';
-  post({ action:'alunoDiagnostico', token: token(), raf: atual, notas: '1' }).then(function(res){
+/* ── notas ────────────────────────────────────────────────────────────────
+ * Duas mudanças em 04/08/2026, a pedido do Pedro: o Acompanhamento passou a
+ * ser o lugar ÚNICO do histórico do aluno, então a nota do semestre em curso
+ * não pode mais estar escondida — ela carrega sozinha. O que continua atrás
+ * de um clique é o histórico dos semestres anteriores.
+ *
+ * A busca é uma só: o backend devolve tudo (os cards de hoje mais o do 1º
+ * semestre) com a marca `atual`, e a separação é feita aqui. Clicar em "ver
+ * anteriores" não vai ao servidor de novo — o dado já está na mão.
+ *
+ * Por que carrega DEPOIS e não junto: ler nota abre os cards das duas
+ * escolas, e é a parte cara. Segurar a tela por causa dela quebraria o caso
+ * de uso que originou a página — o professor conferindo, no meio da aula, se
+ * o aluno fez mesmo a atividade. Então a página pinta primeiro e a nota entra
+ * quando chega. O backend guarda 3h em cache, então a segunda visita é rápida. */
+function tabelaNotas(linhas){
+  var nota = function(v){
+    if (v == null || v === '') return '<span style="color:var(--gray)">—</span>';
+    return '<b style="color:'+(Number(v) >= 6 ? 'var(--emdia)' : 'var(--alta)')+'">'+
+           esc(String(v).replace('.', ','))+'</b>';
+  };
+  return '<table class="dossie"><thead><tr><th>Estágio</th><th>Turma</th>' +
+    '<th class="num">1ª av.</th><th class="num">2ª av.</th><th class="num">Final</th></tr></thead><tbody>' +
+    linhas.map(function(b){
+      return '<tr><td>'+esc(b.book || '—')+'</td>' +
+             '<td>'+esc(b.turma || '')+'<div class="ativ-sub">'+esc(b.escola || '')+'</div></td>' +
+             '<td class="num">'+nota(b.av1)+'</td><td class="num">'+nota(b.av2)+'</td>' +
+             '<td class="num">'+nota(b.final)+'</td></tr>';
+    }).join('') + '</tbody></table>';
+}
+
+var _notasAnteriores = [];
+function carregarNotas(raf){
+  _notasAnteriores = [];
+  $('alNotas').innerHTML = ''; $('alNotasAnt').innerHTML = '';
+  $('btnNotas').hidden = true; $('btnNotas').disabled = false;
+  $('btnNotas').textContent = 'Ver semestres anteriores';
+  $('stNotas').className = 'status'; $('stNotas').textContent = 'Buscando as notas nos cards…';
+  post({ action:'alunoDiagnostico', token: token(), raf: raf, notas: '1' }).then(function(res){
+    if (raf !== atual) return;            // o professor já trocou de aluno: resposta velha
     $('stNotas').textContent = '';
-    var n = res && res.notas;
-    var linhas = (n && n.boletins) || [];
-    if (!linhas.length){
-      $('alNotas').innerHTML = '<div class="vazio">Nenhuma nota lançada para este aluno ainda.</div>';
-      $('btnNotas').textContent = 'Nenhuma nota'; return;
+    var linhas = (res && res.notas && res.notas.boletins) || [];
+    /* `atual` só existe a partir de 04/08/2026; resposta em cache antiga vem
+       sem ele, e aí é melhor mostrar a linha do que escondê-la. */
+    var agora = linhas.filter(function(b){ return b.atual !== false; });
+    _notasAnteriores = linhas.filter(function(b){ return b.atual === false; });
+    $('alNotas').innerHTML = agora.length ? tabelaNotas(agora)
+      : '<div class="vazio">Nenhuma nota lançada neste semestre ainda.</div>';
+    if (_notasAnteriores.length){
+      $('btnNotas').hidden = false;
+      $('btnNotas').textContent = 'Ver semestres anteriores (' + _notasAnteriores.length + ')';
     }
-    /* Inclui o card do 1º semestre de propósito (o backend também) — é
-       histórico real do aluno, e some se filtrarmos pelo semestre corrente. */
-    $('alNotas').innerHTML = '<table class="dossie"><thead><tr><th>Estágio</th><th>Turma</th>' +
-      '<th class="num">1ª av.</th><th class="num">2ª av.</th><th class="num">Final</th></tr></thead><tbody>' +
-      linhas.map(function(b){
-        var nota = function(v){
-          if (v == null || v === '') return '<span style="color:var(--gray)">—</span>';
-          return '<b style="color:'+(Number(v) >= 6 ? 'var(--emdia)' : 'var(--alta)')+'">'+
-                 esc(String(v).replace('.', ','))+'</b>';
-        };
-        return '<tr><td>'+esc(b.book || '—')+'</td>' +
-               '<td>'+esc(b.turma || '')+'<div class="ativ-sub">'+esc(b.escola || '')+'</div></td>' +
-               '<td class="num">'+nota(b.av1)+'</td><td class="num">'+nota(b.av2)+'</td>' +
-               '<td class="num">'+nota(b.final)+'</td></tr>';
-      }).join('') + '</tbody></table>';
-    $('btnNotas').hidden = true;
   }).catch(function(){
+    if (raf !== atual) return;
     $('stNotas').className = 'status err'; $('stNotas').textContent = '⚠️ Não consegui ler as notas.';
-    $('btnNotas').disabled = false;
   });
+}
+$('btnNotas').addEventListener('click', function(){
+  $('alNotasAnt').innerHTML = '<h3 style="margin:.9rem 0 .2rem;font-size:.9rem">Semestres anteriores</h3>' +
+                              tabelaNotas(_notasAnteriores);
+  $('btnNotas').hidden = true;
 });
 
 /* ── Minhas turmas: navegar sem digitar ──────────────────────────────────
@@ -592,7 +706,7 @@ $('alTurmas').addEventListener('click', function(ev){
 
 /* ── pasta do aluno no Drive ──────────────────────────────────────────────
    Só busca quando o professor pede: achar a pasta é caro (varre o Drive) e
-   quase nunca é o motivo de abrir o dossiê. */
+   quase nunca é o motivo de abrir o acompanhamento. */
 $('btnPasta').addEventListener('click', function(){
   if (!atual) return;
   $('btnPasta').disabled = true;
@@ -617,10 +731,21 @@ $('btnPasta').addEventListener('click', function(){
    aluno vendo o dele); com sessão da equipe, a busca; sem nenhum dos dois,
    manda para o login em vez de mostrar uma tela quebrada. */
 (function inicio(){
-  var raf = new URLSearchParams(location.search).get('raf');
+  var qs = new URLSearchParams(location.search);
+  var raf = qs.get('raf');
   var equipe = !!token();
+  /* Modo embutido: a página inteira vira o conteúdo do painel lateral que o
+     kit abre por cima da Visão Geral, da home e das ilhas. Some o que só faz
+     sentido na página cheia — cabeçalho, busca e "Minhas turmas" —, porque
+     quem abriu o painel JÁ escolheu o aluno numa lista. */
+  if (EMBED){
+    document.body.classList.add('embed');
+    $('pnBusca').hidden = true; $('pnTurmas').hidden = true;
+    if (raf) abrir(raf, qs.get('turma') || '');
+    return;
+  }
   $('pnBusca').hidden = !equipe;
-  if (raf){ abrir(raf); return; }
+  if (raf){ abrir(raf, qs.get('turma') || ''); return; }
   if (!equipe){
     $('pnAluno').hidden = false;
     $('alNome').textContent = 'Entre para continuar';

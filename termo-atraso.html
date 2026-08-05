@@ -5,11 +5,11 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Termo de Atraso, FISK</title>
-<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04b">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-<script src="assets/fisk-shared.js?v=2026-08-04"></script>
+<script src="assets/fisk-shared.js?v=2026-08-04b"></script>
 <!-- aviso de aluno fora do card -->
 <script src="fisk-fora-do-card.js"></script>
 <style>
@@ -517,7 +517,7 @@ function montarLista() {
     });
 }
 
-/* ── Dossiê: o card não conhece RAF, a ponte vem do kit compartilhado ──
+/* ── Acompanhamento: o card não conhece RAF, a ponte vem do kit compartilhado ──
    O professor está olhando a lista da turma para emitir um termo; a pergunta
    que vem junto é "esse aluno está estudando em casa?". Antes daqui, a única
    saída desta tela era voltar ao Hub. */
@@ -528,7 +528,7 @@ if (typeof fiskAlunosDoProf === 'function') {
 function nomeComDossie(nome) {
   var url = (typeof fiskLinkDossie === 'function') ? fiskLinkDossie(IDX_ALUNOS, nome) : '';
   if (!url) return String(nome).replace(/</g, '&lt;');
-  return '<a class="dossie-link" href="' + url + '" title="Ver o dossiê deste aluno" ' +
+  return '<a class="dossie-link" href="' + url + '" title="Ver o acompanhamento deste aluno" ' +
          'onclick="event.stopPropagation()">' + String(nome).replace(/</g, '&lt;') + '</a>';
 }
 /* repinta a lista quando o índice chega depois dela */
@@ -910,6 +910,13 @@ if (POLISH_URL) {
 
 fiskInitUserMenu();
 fiskRegistrarUso("Termo de Atraso");
+
+/* O nome do aluno abre o Acompanhamento numa GAVETA à direita, em vez de
+   trocar de página: aqui o professor está comparando alunos, e navegar
+   custaria recarregar esta tela a cada nome. O link continua sendo um <a>
+   de verdade — ctrl+clique, botão do meio e "abrir em nova aba" seguem
+   funcionando, e sem sessão a página cheia responde igual. */
+if (typeof fiskLigarAcompanhamento === 'function') fiskLigarAcompanhamento(document, 'a.dossie-link');
 </script>
 </body>
 </html>

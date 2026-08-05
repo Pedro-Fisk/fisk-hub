@@ -575,7 +575,7 @@ function fiskCampanha() {
    ═══════════════════════════════════════════════════════════════════════════
  * O card NÃO conhece RAF: ele guarda nome, atraso, faltas e notas. Quem tem
  * a correspondência é a matrícula do backend. Sem essa ponte, nenhuma
- * ferramenta que lista alunos consegue mandar o professor para o dossiê —
+ * ferramenta que lista alunos consegue mandar o professor para o Acompanhamento do Aluno —
  * que era exatamente o caso do Planejador, do Termo e do 2nd Chance: três
  * telas cheias de nomes e nenhuma saída.
  *
@@ -622,7 +622,7 @@ function fiskAlunosDoProf() {
   return _fiskAlunos;
 }
 
-/** URL do dossiê de um aluno, ou '' se ainda não sabemos o RAF dele. */
+/** URL do Acompanhamento de um aluno, ou '' se ainda não sabemos o RAF dele. */
 function fiskLinkDossie(idx, nome) {
   var a = idx && idx[fiskChaveAluno(nome)];
   return a ? (fiskHubBase() + 'aluno.html?raf=' + encodeURIComponent(a.raf)) : '';
@@ -646,4 +646,109 @@ function fiskEstudoEmCasa(idx, nome) {
     estado: !a.totalAtividades ? (a.last ? 'nada' : 'nunca')
           : (dias != null && dias <= 7 ? 'ativo' : 'sumido')
   };
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PAINEL LATERAL DO ACOMPANHAMENTO DO ALUNO
+   ═══════════════════════════════════════════════════════════════════════════
+ * POR QUE (04/08/2026, pedido do Pedro): o professor está olhando a turma
+ * inteira, clica num aluno e PERDE a lista — a página do acompanhamento
+ * substitui a que ele estava lendo, e voltar significa recarregar tudo. Como
+ * o uso real é comparar vários alunos em sequência, isso cobra o preço da
+ * navegação a cada nome. Agora o acompanhamento abre numa gaveta à direita e
+ * a lista continua ali, atrás.
+ *
+ * POR QUE UM IFRAME, e não a tela redesenhada dentro de cada página: o
+ * conteúdo do acompanhamento tem ~400 linhas de renderização (atividades,
+ * tentativas, tópicos, notas, KPIs). Reescrevê-lo como componente para cinco
+ * páginas criaria a quinta cópia de uma tela que muda toda semana. Com o
+ * iframe existe UMA implementação — a própria `aluno.html`, no modo
+ * `embed=1` —, e ela continua servindo de página cheia para quem chega por
+ * link. Mesma origem, então a sessão do localStorage vale lá dentro sem
+ * precisar passar token pela URL.
+ *
+ * O QUE ISTO CUSTA: uma carga de página por aluno aberto. É aceitável porque
+ * o backend do acompanhamento já não tem cache de propósito (o caso de uso é
+ * "ele acabou de fazer?"), então a consulta aconteceria de qualquer jeito.
+ */
+function fiskAcompanhamento(raf, opts) {
+  if (!raf) return;
+  opts = opts || {};
+  var g = document.getElementById('fiskAcompGaveta');
+  if (!g) {
+    g = document.createElement('div');
+    g.id = 'fiskAcompGaveta';
+    g.innerHTML =
+      '<div class="fk-acomp-fundo"></div>' +
+      '<aside class="fk-acomp-painel" role="dialog" aria-label="Acompanhamento do aluno">' +
+        '<div class="fk-acomp-topo">' +
+          '<b id="fiskAcompNome">Acompanhamento do Aluno</b>' +
+          '<span style="flex:1"></span>' +
+          '<a class="fk-acomp-abrir" id="fiskAcompFull" target="_blank" rel="noopener" ' +
+             'title="Abrir em página inteira">⤢</a>' +
+          '<button type="button" class="fk-acomp-x" aria-label="Fechar">✕</button>' +
+        '</div>' +
+        '<iframe id="fiskAcompFrame" title="Acompanhamento do aluno"></iframe>' +
+      '</aside>';
+    document.body.appendChild(g);
+    var fecha = function () {
+      g.classList.remove('on');
+      document.body.classList.remove('fk-acomp-aberto');
+      /* zera o src ao fechar: sem isso o próximo aluno aparece por um instante
+         com os dados do anterior, que é o erro que mais confunde numa tela de
+         conferência. */
+      setTimeout(function () { if (!g.classList.contains('on')) document.getElementById('fiskAcompFrame').src = 'about:blank'; }, 250);
+    };
+    g.querySelector('.fk-acomp-fundo').addEventListener('click', fecha);
+    g.querySelector('.fk-acomp-x').addEventListener('click', fecha);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && g.classList.contains('on')) fecha();
+    });
+  }
+  var url = fiskHubBase() + 'aluno.html?raf=' + encodeURIComponent(raf) + '&embed=1' +
+            (opts.turma ? '&turma=' + encodeURIComponent(opts.turma) : '');
+  document.getElementById('fiskAcompFrame').src = url;
+  document.getElementById('fiskAcompFull').href = url.replace('&embed=1', '');
+  document.getElementById('fiskAcompNome').textContent = opts.nome || 'Acompanhamento do Aluno';
+  g.classList.add('on');
+  document.body.classList.add('fk-acomp-aberto');
+}
+
+/** Liga a gaveta a uma lista: todo clique em `seletor` dentro de `raiz` abre o
+ *  painel em vez de navegar. Usa data-raf / data-nome / data-turma do próprio
+ *  elemento. Devolve false quando não há RAF, para o link seguir seu caminho. */
+function fiskLigarAcompanhamento(raiz, seletor) {
+  (raiz || document).addEventListener('click', function (ev) {
+    var el = ev.target.closest(seletor);
+    if (!el) return;
+    var raf = el.dataset.raf || (el.getAttribute('href') || '').split('raf=')[1];
+    if (!raf) return;
+    raf = decodeURIComponent(String(raf).split('&')[0]);
+    /* ctrl/cmd/meio = o professor QUER outra aba; não sequestrar isso. */
+    if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button === 1) return;
+    ev.preventDefault();
+    fiskAcompanhamento(raf, { nome: el.dataset.nome || el.textContent.trim(), turma: el.dataset.turma || '' });
+  });
+}
+
+/* Busca INSTANTÂNEA entre os alunos do professor logado.
+ * A busca do servidor varre a escola inteira (regra do Pedro: substituição é
+ * frequente), e isso é uma ida à rede a cada tecla. Mas em 9 de 10 consultas
+ * o aluno é de uma turma DELE — e essa lista já está na memória, porque o
+ * `acessosProf` foi carregado para a ponte nome→RAF. Então respondemos daqui
+ * na hora e deixamos o servidor completar depois com o resto da escola.
+ * Casa por trecho, sem acento e sem caixa, no nome ou no RAF. */
+function fiskBuscaMeusAlunos(q) {
+  var t = fiskChaveAluno(q);
+  if (t.length < 2) return Promise.resolve([]);
+  return fiskAlunosDoProf().then(function (idx) {
+    var out = [];
+    Object.keys(idx).forEach(function (k) {
+      var a = idx[k];
+      if (!a || !a.raf) return;
+      if (k.indexOf(t) > -1 || String(a.raf).toUpperCase().indexOf(t) > -1) out.push(a);
+    });
+    out.sort(function (x, y) { return String(x.name||'').localeCompare(String(y.name||''), 'pt'); });
+    return out.slice(0, 12);
+  }).catch(function () { return []; });
 }

@@ -687,3 +687,14 @@ body.theme-dark .card{
    card): sem KPIs, a seção vira só o campo de busca — sem a moldura vazia. */
 .mini-dash.md-so-busca{margin-top:1rem}
 .mini-dash.md-so-busca .md-busca{flex:1 1 100%}
+
+/* Título da busca de aluno no mini-dash. Ela é a porta principal do
+   Acompanhamento do Aluno e estava sem nome nenhum — um campo anônimo no meio
+   do painel, que só encontrava quem já sabia que ele existia. */
+.md-busca-t{display:block;font-family:var(--font-heading);font-weight:800;font-size:.82rem;
+  color:var(--ui-ink,#1d3349);text-transform:uppercase;letter-spacing:.03em;margin:0 0 .35rem}
+body.theme-dark .md-busca-t{color:#cfe0ff}
+/* Selo "sua turma" nos resultados que vieram da memória (alunos do professor) */
+.md-achado .md-meu{font-style:normal;font-size:.62rem;font-weight:800;text-transform:uppercase;
+  letter-spacing:.03em;background:#e6f4ef;color:#27866e;border-radius:99px;padding:.1rem .4rem;margin-left:.4rem}
+body.theme-dark .md-achado .md-meu{background:#1d3a31;color:#7fd3b6}
