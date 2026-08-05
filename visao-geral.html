@@ -918,7 +918,17 @@ function linkAluno(nome, classe) {
      turma(s)" — não era rótulo errado, era a consulta inteira feita para a
      pessoa errada. Agora vai o professor escolhido, e recarrega quando a
      escolha muda. */
+  /* UMA fonte de verdade para "qual professor" (corrigido em 04/08/2026).
+     Havia duas, e elas divergiam: a ANÁLISE seguia o seletor da cascata
+     (que o prefill preenche a partir da URL `?escola=&prof=`, do fisk_actas
+     ou do login, nessa ordem), e este bloco seguia SÓ o fisk_actas. Bastava
+     chegar por link com ?prof= — ou trocar o professor no seletor — para a
+     página mostrar a análise de um e a lista de alunos de outro, cada metade
+     parecendo certa sozinha. Agora vale o que está selecionado na tela;
+     o fisk_actas fica só como plano B, para antes de a cascata carregar. */
   function profEscolhido() {
+    var sel = document.getElementById('selProf');
+    if (sel && sel.value) return sel.value;
     try {
       var a = JSON.parse(localStorage.getItem('fisk_actas') || 'null');
       return (a && a.name) || '';
@@ -958,8 +968,22 @@ function linkAluno(nome, classe) {
       Object.keys(turmas).sort().forEach(function (t) {
         var o = document.createElement('option'); o.value = t; o.textContent = t; $('acTurma').appendChild(o);
       });
-      $('acStatus').className = 'status ok';
-      $('acStatus').textContent = '👩‍🏫 ' + res.prof + ' · ' + res.turmas + ' turma(s) · ' + lista.length + ' aluno(s)';
+      /* O servidor diz para QUEM ele respondeu, e nem sempre é quem está
+         selecionado: pedir por outro professor exige ser da direção, então
+         para o professor comum o `prof` enviado é ignorado e a resposta volta
+         com o dono do login. Antes isso passava calado, e a tela ficava com a
+         análise de um e a lista de outro — duas metades plausíveis. Agora,
+         quando as duas discordam, a tela avisa em vez de fingir coerência. */
+      var pedido = profEscolhido();
+      var chaveProf = function (s) {
+        return String(s || '').toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim();
+      };
+      var divergiu = pedido && res.prof && chaveProf(pedido) !== chaveProf(res.prof);
+      $('acStatus').className = divergiu ? 'status err' : 'status ok';
+      $('acStatus').textContent = divergiu
+        ? '⚠️ A análise acima é de ' + pedido + ', mas esta lista é de ' + res.prof +
+          ' — só a direção pode ver os alunos de outro professor.'
+        : '👩‍🏫 ' + res.prof + ' · ' + res.turmas + ' turma(s) · ' + lista.length + ' aluno(s)';
       if (!ligado) {
         ['acTurma', 'acFiltro', 'acBusca'].forEach(function (id) { $(id).addEventListener('input', pinta); });
         $('acLinhas').addEventListener('click', function (ev) {
@@ -979,6 +1003,21 @@ function linkAluno(nome, classe) {
   carregar();
   // a direção troca de professor no seletor do topo: a chamada acompanha
   window._acRecarregar = carregar;
+
+  /* A cascata resolve DEPOIS desta primeira carga (ela vai ao card buscar
+     escolas e professores), e é ela quem define o professor da tela. Então
+     este bloco recarrega quando o seletor muda — inclusive na preseleção
+     automática, que dispara o mesmo evento 'change'. O guard evita a chamada
+     repetida quando o professor não mudou de fato. */
+  var _ultimoProf = null;
+  var selProf = document.getElementById('selProf');
+  if (selProf) {
+    selProf.addEventListener('change', function () {
+      if (!selProf.value || selProf.value === _ultimoProf) return;
+      _ultimoProf = selProf.value;
+      carregar();
+    });
+  }
 })();
 
 /* Recolher e reabrir bloco. A escolha fica no navegador, por bloco: o
