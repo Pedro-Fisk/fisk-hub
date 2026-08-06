@@ -88,7 +88,7 @@
   </div>
 </main>
 
-<script src="assets/fisk-shared.js?v=2026-08-04c"></script>
+<script src="assets/fisk-shared.js?v=2026-08-06a"></script>
 <script>
 fiskInitThemeToggle('themeToggle');
 fiskInitUserMenu();
@@ -160,7 +160,7 @@ function boot(){
   }
   fetch(EP, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
               body: JSON.stringify({ action:'acessosProf', token: s.token }) })
-    .then(function(r){ return r.json(); })
+    .then(fiskJson)
     .then(function(res){
       if(!res.ok){
         $('status').className = 'status err';

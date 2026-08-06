@@ -407,7 +407,7 @@
     <p data-i18n="footer">Ferramenta desenvolvida exclusivamente para uso interno das escolas Fisk. A utilização deste sistema e de seu conteúdo por pessoas ou instituições não autorizadas, incluindo professores particulares, é proibida. Desenvolvido por @fiskcacapava e @taubatefisk</p>
   </footer>
 
-  <script src="assets/fisk-shared.js?v=2026-08-04c"></script>
+  <script src="assets/fisk-shared.js?v=2026-08-06a"></script>
   <script>
     fiskInitThemeToggle('themeToggle');
 
@@ -762,7 +762,7 @@
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'calList', publico: 'pedag', ano: String(ano) })
       });
-      const json = await res.json();
+      const json = await fiskJson(res);
       if (!json || !json.ok) throw new Error((json && json.error) || 'calList falhou');
       return json.itens || [];
     }
@@ -1106,7 +1106,7 @@
       function setupActAs(){
         var sb = $('profActAs'); if (!sb) return;
         sb.hidden = false;
-        fetch(EP+'?action=profList').then(function(r){return r.json();}).then(function(res){
+        fetch(EP+'?action=profList').then(fiskJson).then(function(res){
           var ps = ((res&&res.profs)||[]).filter(function(p){ return !p.director; })
             .sort(function(a,b){ return String(a.name).localeCompare(String(b.name),'pt-BR'); });
           var cur = (actingSaved()||{}).name || '';
@@ -1171,7 +1171,7 @@
       }
       function loadProfs(){
         sel.innerHTML = '<option value="" disabled selected>' + tr('pg-loading') + '</option>';
-        fetch(EP + '?action=profList').then(function(r){ return r.json(); }).then(function(res){
+        fetch(EP + '?action=profList').then(fiskJson).then(function(res){
           var ps = ((res && res.profs) || []).filter(ehProfessor);
           ps.sort(function(a, b){ return String(a.name).localeCompare(String(b.name), 'pt-BR'); });
           sel.innerHTML = '<option value="" disabled selected>' + tr('pg-name-ph') + '</option>' +
@@ -1193,7 +1193,7 @@
 
       function post(body){
         return fetch(EP, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
-          body: JSON.stringify(body) }).then(function(r){ return r.json(); });
+          body: JSON.stringify(body) }).then(fiskJson);
       }
 
       function submit(){
@@ -1332,7 +1332,7 @@
       function api(p){
         var P = comSessao(p);
         var qs = Object.keys(P).map(function(k){ return k+'='+encodeURIComponent(P[k]); }).join('&');
-        return fetch(API+'?'+qs).then(function(r){ return r.json(); })
+        return fetch(API+'?'+qs).then(fiskJson)
           .then(function(j){ if (j && j.erro) throw new Error(j.erro); return j; });
       }
       function notaDe(c){
@@ -1468,7 +1468,7 @@
           }
           fetch(API, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
                        body: JSON.stringify({ action:'alunoBusca', token: tokenSessao(), q: q }) })
-            .then(function(r){ return r.json(); })
+            .then(fiskJson)
             .then(function(res){
               if (inp.value.trim() !== q) return;
               var l = (res && res.alunos) || [];

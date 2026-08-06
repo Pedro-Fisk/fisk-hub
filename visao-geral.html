@@ -323,7 +323,7 @@
   Ferramenta interna das escolas Fisk Taubaté · Caçapava.
 </footer>
 
-<script src="assets/fisk-shared.js?v=2026-08-04c"></script>
+<script src="assets/fisk-shared.js?v=2026-08-06a"></script>
 <script>
 /* ============================================================
    Visão Geral das Turmas — agrega TODAS as turmas de um professor
@@ -362,7 +362,7 @@ function api(params) {
   params = comSessao(params);   // action=card + token da sessão
   var qs = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
   return fetch(API_URL + '?' + qs)
-    .then(function (r) { return r.json(); })
+    .then(fiskJson)
     .then(function (j) { if (j && j.erro) throw new Error(j.erro); return j; });
 }
 
@@ -433,7 +433,7 @@ function selecionarNaCascata(escola, prof, auto) {
 function setupVgActAs() {
   var wrap = $('vgActAsWrap'), sb = $('vgActAs');
   wrap.hidden = false;
-  fetch(EP_HUB + '?action=profList').then(function (r) { return r.json(); }).then(function (res) {
+  fetch(EP_HUB + '?action=profList').then(fiskJson).then(function (res) {
     var ps = ((res && res.profs) || []).filter(function (p) { return !p.director; })
       .sort(function (a, b) { return String(a.name).localeCompare(String(b.name), 'pt-BR'); });
     var cur = ''; try { cur = (JSON.parse(localStorage.getItem('fisk_actas') || 'null') || {}).name || ''; } catch (e) {}
@@ -946,7 +946,7 @@ function linkAluno(nome, classe) {
   $('acStatus').textContent = '⏳ Carregando…';
   fetch(EP_HUB2, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                    body: JSON.stringify({ action: 'acessosProf', token: s.token, prof: profEscolhido() }) })
-    .then(function (r) { return r.json(); })
+    .then(fiskJson)
     .then(function (res) {
       if (!res.ok) { $('acStatus').className = 'status err'; $('acStatus').textContent = '⚠️ ' + (res.error || 'Não consegui carregar.'); return; }
       lista = res.acessos || [];

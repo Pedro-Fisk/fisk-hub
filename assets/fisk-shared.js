@@ -5,6 +5,53 @@
    ferramentas do Hub. Sem dependências externas.
    ============================================================ */
 
+/* ── Resposta do servidor que NÃO é JSON ──────────────────────────────────
+ * O Apps Script responde uma PÁGINA HTML (<!DOCTYPE …>) toda vez que a
+ * execução não chega ao fim por conta dele: tempo estourado, cota do dia,
+ * deployment fora do ar, sessão do Google pedindo login. Quem chamava
+ * `resp.json()` direto recebia a exceção crua do parser —
+ *
+ *     Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+ *
+ * — e ela ia parar na tela do professor, que não tem como saber que aquilo
+ * quer dizer "tente de novo em alguns instantes". Aconteceu em 06/08/2026 no
+ * Abridor de Planners, ao abrir a turma no card.
+ *
+ * A ponte no servidor (cardProxy_) já traduz o HTML que vem DO CARD, mas ela
+ * não pode traduzir o HTML que o Google gera quando é a execução do próprio
+ * Hub que morre — aí não sobra código nosso rodando. Por isso a última
+ * defesa mora aqui, no navegador.
+ *
+ * Uso: fetch(url).then(fiskJson).then(...)
+ */
+function fiskJson(resp) {
+  return resp.text().then(function (txt) {
+    var limpo = String(txt || '').replace(/^\uFEFF/, '').trim();
+    var inicio = limpo.charAt(0);
+    if (inicio === '{' || inicio === '[') {
+      try { return JSON.parse(limpo); }
+      catch (e) { throw new Error(fiskMsgRespostaEstranha(resp, limpo)); }
+    }
+    throw new Error(fiskMsgRespostaEstranha(resp, limpo));
+  });
+}
+
+/* Frase única para o professor, com a pista técnica escondida no fim para
+   quem for depurar. Separada do fiskJson porque o fisk-drive.js das outras
+   ferramentas usa a mesma frase por outro caminho (POST). */
+function fiskMsgRespostaEstranha(resp, corpo) {
+  var http = resp && resp.status ? resp.status : 0;
+  var ehLogin = /accounts\.google\.com|Fa(ç|c)a login|Sign in/i.test(String(corpo || ''));
+  if (ehLogin) {
+    return 'O Google pediu login para responder. Abra o Fisk Hub numa aba, entre com a ' +
+           'conta da escola e tente de novo.';
+  }
+  return 'O servidor não respondeu com dados (o Google devolveu uma página de erro' +
+         (http ? ', HTTP ' + http : '') + '). Quase sempre é a leitura estourando o ' +
+         'tempo do Google: espere alguns instantes e tente de novo. Se insistir, ' +
+         'avise o Pedro — pode ser o backend precisando ser publicado de novo.';
+}
+
 /** Liga um botão de alternar modo escuro/claro, com persistência em localStorage. */
 function fiskInitThemeToggle(buttonId, opts) {
   opts = opts || {};
@@ -112,7 +159,7 @@ async function fiskSalvarNoDrive(opts) {
   var resp = await fetch(endpoint, { method: 'POST', body: JSON.stringify(payload) });
   var j;
   try { j = await resp.json(); }
-  catch (e) { throw new Error('resposta inválida do servidor (o doPost já foi publicado no Apps Script?)'); }
+  catch (e) { throw new Error(fiskMsgRespostaEstranha(resp, '')); }
   if (!j || j.ok !== true) {
     var err = new Error((j && j.erro) || 'falha ao salvar no Drive');
     err.code = (j && j.code) || '';
@@ -424,7 +471,7 @@ function fiskCampanha() {
   fetch(FISK_HUB_EP, {
     method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify({ action: 'campAtivas', publico: 'equipe' })
-  }).then(function (r) { return r.json(); }).then(function (j) {
+  }).then(fiskJson).then(function (j) {
     var lista = (j && j.ok && j.campanhas) ? j.campanhas : [];
     try { localStorage.setItem('fisk_camps_equipe', JSON.stringify({ t: Date.now(), v: lista })); } catch (e) {}
     montar(lista);
@@ -551,7 +598,7 @@ function fiskCampanha() {
           method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ action: 'campVotar', token: s.token, campanha: c.id,
                                  opcoes: sel, outro: (txt && txt.value.trim()) || '' })
-        }).then(function (r) { return r.json(); }).then(function (j) {
+        }).then(fiskJson).then(function (j) {
           if (!j || !j.ok) { ok.disabled = false; conta.textContent = (j && j.error) || 'não deu para enviar'; return; }
           try { localStorage.setItem('fisk_camp_' + c.id, '1'); } catch (e) {}
           fab.textContent = '📣 Resposta enviada';
@@ -610,7 +657,7 @@ function fiskAlunosDoProf() {
   _fiskAlunos = fetch(FISK_HUB_EP, {
     method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify({ action: 'acessosProf', token: s.token, prof: prof })
-  }).then(function (r) { return r.json(); }).then(function (res) {
+  }).then(fiskJson).then(function (res) {
     var idx = {};
     if (res && res.ok) {
       (res.acessos || []).forEach(function (a) {

@@ -151,6 +151,7 @@
     <p>Ferramenta desenvolvida exclusivamente para uso interno das escolas Fisk. A utilização deste sistema e de seu conteúdo por pessoas ou instituições não autorizadas, incluindo professores particulares, é proibida. Desenvolvido por @fiskcacapava e @taubatefisk</p>
   </footer>
 
+<script src="assets/fisk-shared.js?v=2026-08-06a"></script>
 <script src="treinamentos-data.js"></script>
 <script>
 /* ── Porta de entrada ───────────────────────────────────────────────────────
@@ -175,7 +176,7 @@ var TN_EP='https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOm
 
   function post(body){
     return fetch(TN_EP,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body:JSON.stringify(body)}).then(r=>r.json());
+      body:JSON.stringify(body)}).then(fiskJson);
   }
   function unlock(){ gate.classList.add('hidden'); }
   function recusa(msg){
@@ -196,7 +197,7 @@ var TN_EP='https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOm
 
   /* 2. senão, a mesma lista de nomes da porta do Hub */
   function listar(){
-    fetch(TN_EP+'?action=profList').then(r=>r.json()).then(function(res){
+    fetch(TN_EP+'?action=profList').then(fiskJson).then(function(res){
       var ps=((res&&res.profs)||[]).filter(function(p){ return !p.director; });
       ps.sort(function(a,b){ return String(a.name).localeCompare(String(b.name),'pt-BR'); });
       sel.innerHTML='<option value="" disabled selected>Seu nome de acesso</option>'+
@@ -383,7 +384,7 @@ var TN_EP='https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOm
   aviso.hidden=false;
   fetch(EP,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
             body:JSON.stringify({action:'tnList'})})
-    .then(r=>r.json())
+    .then(fiskJson)
     .then(res=>{
       aviso.hidden=true;
       if(!res||!res.ok||!res.itens||!res.itens.length) return;
@@ -396,7 +397,6 @@ var TN_EP='https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOm
 </script>
 <!-- registro de uso (painel da direção): esta página não carregava o kit
      compartilhado, então era a única ferramenta do Hub invisível no log -->
-<script src="assets/fisk-shared.js?v=2026-08-04c"></script>
 <script>fiskRegistrarUso("Treinamentos");</script>
 </body>
 </html>
