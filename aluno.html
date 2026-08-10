@@ -123,6 +123,25 @@
   .topico .barra i{ display:block; height:100%; }
   .topico .n{ font-size:.78rem; color:var(--gray); min-width:44px; text-align:right; }
   /* tópicos ficam recuados sob a tentativa a que pertencem */
+  /* ── Diagnóstico acumulado ── */
+  .dg-toggle{display:flex;align-items:center;gap:.5rem;font-size:.82rem;font-weight:700;color:var(--muted);cursor:pointer;user-select:none;margin:.5rem 0 .8rem}
+  .dg-toggle input{width:1rem;height:1rem;cursor:pointer}
+  .dg-comentario{font-size:.9rem;line-height:1.55;background:var(--surface);border-left:3px solid var(--blue-bd);border-radius:8px;padding:.7rem .85rem;margin-bottom:.9rem}
+  .dg-grupo{margin-bottom:.85rem}
+  .dg-grupo h4{font-size:.74rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:0 0 .4rem}
+  .dg-grupo.focar{background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.3);border-radius:10px;padding:.75rem .85rem}
+  .dg-grupo.focar h4{color:#B91C1C;font-size:.8rem}
+  .dg-item{display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;padding:.38rem 0;border-bottom:1px solid var(--surface-border-color)}
+  .dg-grupo .dg-item:last-child{border-bottom:none}
+  .dg-nome{flex:1;min-width:9rem;font-weight:700;font-size:.86rem}
+  .dg-onde{font-size:.7rem;font-weight:700;color:var(--muted);background:var(--surface);border-radius:999px;padding:.12rem .5rem;white-space:nowrap}
+  .dg-barra{width:5rem;height:7px;border-radius:999px;background:var(--surface);overflow:hidden;flex-shrink:0}
+  .dg-barra i{display:block;height:100%;border-radius:999px}
+  .dg-pct{width:4.4rem;text-align:right;font-size:.79rem;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .dg-btn{font-size:.72rem;font-weight:800;text-decoration:none;background:var(--blue);color:#fff;border-radius:999px;padding:.25rem .65rem;white-space:nowrap}
+  .dg-btn:hover{filter:brightness(1.12)}
+  .dg-ajuda{font-size:.76rem;color:var(--muted);margin-top:.3rem}
+  @media(max-width:520px){.dg-barra{display:none}}
   .topicos-da-tent{ padding:.25rem 0 .5rem 1.1rem; border-left:2px solid var(--blue-bd); margin:.1rem 0 .35rem .4rem; }
 
   table.dossie{ width:100%; border-collapse:collapse; margin-top:.5rem; font-size:.85rem; }
@@ -219,6 +238,16 @@
   </div>
 
   <!-- 3 · tudo o que o aluno fez, numa lista só -->
+  <!-- 4 · diagnóstico: onde o aluno está, somando tudo o que já respondeu -->
+  <div class="painel" id="pnDiag" hidden>
+    <h2>🎯 Onde o aluno está</h2>
+    <p class="sub">Desempenho acumulado por ponto gramatical, somando Quick Practice e
+      Treino MET. A régua é a mesma que o aluno vê no portal dele: <b>70% de acerto</b>
+      para considerar dominado, e nada é afirmado antes de <b>6 questões</b> no ponto.</p>
+    <label class="dg-toggle"><input type="checkbox" id="dgAnt"><span>Incluir estágios anteriores</span></label>
+    <div id="alDiag"></div>
+  </div>
+
   <div class="painel" id="pnAtiv" hidden>
     <h2>🎬 O que o aluno fez</h2>
     <p class="sub">Movie Program, Song Program, Mundo Fisk e Quick Practice, em ordem de
@@ -395,7 +424,7 @@ function abrir(raf, turma){
   $('alFd').hidden = true; $('alAgora').hidden = true;
   $('alCursos').hidden = true; $('alCursos').innerHTML = '';
   $('btnPasta').hidden = true; $('btnPasta').disabled = false; $('stPasta').textContent = '';
-  $('pnAtiv').hidden = true; $('pnNotas').hidden = true;
+  $('pnAtiv').hidden = true; $('pnNotas').hidden = true; $('pnDiag').hidden = true;
   /* zerar TUDO do aluno anterior, e não só o que se vê: a lista de semestres
      anteriores ficava na memória e o botão a mostraria para o próximo aluno. */
   $('alNotas').innerHTML = ''; $('alNotasAnt').innerHTML = ''; $('stNotas').textContent = '';
@@ -478,6 +507,10 @@ function render(d){
     (sit.pctEstagio != null ? kpi(sit.pctEstagio + '%', 'Progresso do estágio') : '') +
     (sit.ultimaLicao ? kpi(sit.ultimaLicao, 'Última lição dada') : '');
 
+  dgProvas = (d.provas || []).filter(function(p){ return p && p.topicos && p.topicos.length; });
+  dgEstagio = st.book || '';
+  renderDiagnostico();
+
   renderAtividades(fundir(ativ, d.provas || []));
   $('pnNotas').hidden = (d.escopo !== 'equipe');
   $('btnPasta').hidden = (d.escopo !== 'equipe');   // a pasta é do professor, não do aluno
@@ -539,6 +572,115 @@ function fundir(ativ, provas) {
     a.vezes = a.tentativas.length || a.vezes;
     return a;
   }).sort(function (a, b) { return (b.ultima || 0) - (a.ultima || 0); });
+}
+
+/* ══ Diagnóstico acumulado ═══════════════════════════════════════════════════
+   "O que o aluno fez" é o histórico; isto é o retrato. A régua (70% para
+   dominar, piso de 6 questões antes de afirmar) vem do `diagnostico.js` do
+   fisk-simulador, o MESMO módulo que o Portal do Aluno carrega — se cada tela
+   tivesse a sua cópia, um dia o professor e o aluno discordariam sobre o mesmo
+   aluno. Falhou o carregamento, o painel some e o resto do dossiê fica de pé. */
+/* Ver a nota sobre a versão no portal: sem ela o navegador do professor
+   continua com a régua antiga. Os dois devem subir juntos. */
+var DG_BASE = 'https://pedro-fisk.github.io/fisk-simulador/';
+var DG_V = '2026-08-10a';
+var dgProvas = [], dgEstagio = '', dgPronto = null;
+
+function dgCarregar(){
+  if (dgPronto) return dgPronto;
+  dgPronto = new Promise(function(ok){
+    if (window.FiskDiagnostico) return ok(true);
+    var el = document.createElement('script');
+    el.src = DG_BASE + 'assets/diagnostico.js?v=' + DG_V;
+    el.onload = function(){ ok(true); };
+    el.onerror = function(){ ok(false); };
+    document.head.appendChild(el);
+  }).then(function(tem){
+    return tem ? window.FiskDiagnostico.carregarMapa(DG_BASE + 'topicos.json?v=' + DG_V) : null;
+  }).catch(function(){ return null; });
+  return dgPronto;
+}
+
+function dgCor(faixa){
+  return faixa === 'domina' ? '#16A34A' : faixa === 'progresso' ? '#D97706' : '#DC2626';
+}
+
+function dgLinhas(pontos){
+  return pontos.map(function(p){
+    var cor = dgCor(p.faixa);
+    return '<div class="dg-item">' +
+      '<span class="dg-nome">' + esc(p.topico) + '</span>' +
+      (p.onde ? '<span class="dg-onde">' + esc(p.onde.rotulo) + '</span>' : '') +
+      '<span class="dg-barra"><i style="width:' + p.pct + '%;background:' + cor + '"></i></span>' +
+      '<span class="dg-pct" style="color:' + cor + '">' + p.c + ' de ' + p.q + '</span>' +
+      (p.praticar ? '<a class="dg-btn" href="' + p.praticar.url + '" target="_blank" rel="noopener">' +
+                    esc(p.praticar.rotulo === 'Praticar' ? 'Abrir exercícios' : p.praticar.rotulo) + '</a>' : '') +
+    '</div>';
+  }).join('');
+}
+
+function dgGrupo(titulo, pontos, classe, ajuda){
+  if (!pontos.length) return '';
+  return '<div class="dg-grupo ' + (classe || '') + '"><h4>' + titulo + '</h4>' +
+    dgLinhas(pontos) + (ajuda ? '<div class="dg-ajuda">' + ajuda + '</div>' : '') + '</div>';
+}
+
+function dgNomes(ps, n){
+  n = n || 3;
+  var nomes = ps.slice(0, n).map(function(p){ return p.topico; }).join(', ');
+  return nomes + (ps.length > n ? ' e mais ' + (ps.length - n) : '');
+}
+function dgTextoProfessor(d){
+  var partes = [];
+  if (d.domina.length)   partes.push('Já demonstra domínio em ' + dgNomes(d.domina) + '.');
+  if (d.desafios.length) partes.push('Precisa de trabalho em ' + dgNomes(d.desafios) + '.');
+  else if (d.progresso.length) partes.push('Está perto de firmar ' + dgNomes(d.progresso) + '.');
+  if (!partes.length) return 'Ainda são poucos exercícios para dizer onde ele está firme.';
+  if (d.semDado.length) {
+    partes.push(d.semDado.length === 1
+      ? 'Outro ponto ainda tem poucas questões respondidas.'
+      : 'Outros ' + d.semDado.length + ' pontos ainda têm poucas questões respondidas.');
+  }
+  return partes.join(' ');
+}
+
+function renderDiagnostico(){
+  var box = $('alDiag');
+  if (!box) return;
+  if (!dgProvas.length) { $('pnDiag').hidden = true; return; }
+  $('pnDiag').hidden = false;
+  box.innerHTML = '<p class="sub">Carregando…</p>';
+
+  dgCarregar().then(function(mapa){
+    if (!window.FiskDiagnostico) { $('pnDiag').hidden = true; return; }
+    var incluir = $('dgAnt') && $('dgAnt').checked;
+    var d = window.FiskDiagnostico.montar({
+      provas: dgProvas, mapa: mapa, estagio: dgEstagio, incluirAnteriores: incluir
+      /* De propósito SEM `aluno`: o link do professor não leva o RAF. Se
+         levasse, um clique dele abriria a ferramenta logado como o aluno e a
+         tentativa entraria no histórico do aluno como se fosse dele. */
+    });
+    if (!d.pontos.length) {
+      box.innerHTML = '<p class="sub">Sem exercícios com tópico neste recorte.' +
+        (incluir ? '' : ' Marque "incluir estágios anteriores" para ver o que ele fez antes.') + '</p>';
+      return;
+    }
+    var html = '';
+    if (!incluir && d.estagio) {
+      html += '<div class="dg-ajuda" style="margin:-.4rem 0 .7rem">Só o estágio atual · ' +
+              esc(d.estagio) + ' · ' + d.tentativas + ' tentativa' + (d.tentativas > 1 ? 's' : '') + '</div>';
+    }
+    /* O `comentario` do módulo fala COM o aluno ("você já domina"). Aqui quem
+       lê é o professor, então o texto é montado em terceira pessoa a partir das
+       mesmas faixas. A régua continua sendo a de lá; muda só a voz. */
+    html += '<div class="dg-comentario">' + esc(dgTextoProfessor(d)) + '</div>';
+    html += dgGrupo('⚠️ Trabalhar com ele agora', d.desafios, 'focar');
+    html += dgGrupo('🔸 Quase lá', d.progresso, '');
+    html += dgGrupo('✅ Já domina', d.domina, '');
+    html += dgGrupo('⏳ Sem dado suficiente', d.semDado, '',
+                    'Menos de ' + d.regra.piso + ' questões respondidas: não dá para afirmar nada ainda.');
+    box.innerHTML = html;
+  });
 }
 
 function renderAtividades(ativ){
