@@ -54,6 +54,10 @@ Duas URLs de Apps Script, de propósito diferentes:
   corrigido e não volta.
 - **Apps Script: sempre "editar a implantação existente → Nova versão".** Criar
   implantação nova troca a URL do Web App e derruba Hub, Portal e Painel de uma vez.
+  **Quem publica sou eu, não o Pedro** (instrução dele, 10/08/2026): reautorizo o
+  `clasp` pelo Chrome dele quando a credencial expira e rodo push, versão e
+  deploy daqui. O procedimento inteiro, com o ID da implantação de produção e a
+  conferência pós-deploy, está em `fisk-hub-backend/CLAUDE.md`.
 - **O backend tem UMA fonte: `Pedro-Fisk/fisk-hub-backend/Code.js`**, publicado
   por `clasp push`. Não existe mais cópia do backend neste repositório, e
   **nunca** volte a colar bloco à mão no editor do Apps Script: eram duas fontes
