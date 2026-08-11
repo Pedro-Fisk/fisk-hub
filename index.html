@@ -336,9 +336,19 @@
   </main>
 
   <!-- ═══════════════════════════════════════
-       Calendário Institucional
+       Calendário Institucional — FORA DO AR desde 03/08/2026
+
+       Retirado a pedido da direção: a base de eventos ainda está incompleta
+       (a marcação da planilha começou por agosto e não foi concluída), e um
+       calendário pela metade na página do professor é pior que calendário
+       nenhum — ele passa a impressão de que o mês está vazio.
+
+       Para trazer de volta quando a base estiver pronta: tire o `hidden`
+       daqui e o `return` do initCal, lá embaixo. Nada mais foi mexido — a
+       leitura do backend, a montagem da grade e as traduções continuam
+       inteiras no arquivo.
   ════════════════════════════════════════ -->
-  <section class="cal-section">
+  <section class="cal-section" hidden>
     <button class="cal-header-btn" id="calToggle" aria-expanded="true" onclick="toggleCal()">
       <span class="cal-title-text">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -1016,6 +1026,10 @@
     }
 
     (function initCal() {
+      /* Fora do ar (ver o comentário na seção, lá em cima). O return evita
+         a chamada ao backend e o desenho de uma grade que ninguém vê. */
+      return;
+      /* eslint-disable no-unreachable */
       let open = true;
       try { if (localStorage.getItem('cal-open') === '0') open = false; } catch(e) {}
       setCalOpen(open, false);
