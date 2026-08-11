@@ -809,6 +809,11 @@
     let _calMonth  = new Date().getMonth();
 
     function buildCalendar() {
+      /* Fora do ar: além do initCal, o applyLang também chama esta função (a
+         cada troca de idioma), então sem esta guarda a grade continuava sendo
+         montada em memória para ninguém ver. Sai junto com o `hidden` da
+         seção quando o calendário voltar. */
+      if (document.querySelector('.cal-section[hidden]')) return;
       const events = _calEvents;
       const year   = _calYear;
       const month  = _calMonth;
