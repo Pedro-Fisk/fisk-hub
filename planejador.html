@@ -489,7 +489,16 @@ function sugestao(a) {
   var lp = a.licaoPrevista ? String(a.licaoPrevista) : null;
   var s;
   if (!isNum(a.aulasAtraso)) {
-    if (!ul) s = 'Ainda sem aula registrada nesta linha, conferir o card antes de planejar.';
+    /* "Sem aula registrada" só quando a linha está MESMO vazia. Enquanto o
+       card lia o livro pela coluna errada em Taubaté, esta frase aparecia para
+       turma com aula lançada há semanas e mandava o professor conferir o card
+       que já estava certo. Quando há aula anotada mas nenhum código bate com o
+       gabarito, o problema é o casamento, e é isso que a tela deve dizer. */
+    var ua = a.ultimaAula ? String(a.ultimaAula) : null;
+    if (!ul && !ua) s = 'Ainda sem aula registrada nesta linha, conferir o card antes de planejar.';
+    else if (!ul) s = 'Última aula anotada: <b>' + esc(ua) + '</b>, mas esse código não está no gabarito de <b>' +
+                      esc(a.book || 'book não informado') + '</b>, então não dá para medir o atraso. Retomar dali' +
+                      (lp ? ' rumo a <b>' + esc(lp) + '</b>' : '') + '.';
     else if (!lp) s = 'Sem placeholder à frente (pode ter concluído o previsto). Definir o próximo passo no card.';
     else s = 'Não deu para medir o atraso (gabarito do book não localizado). Retomar de <b>' + ul + '</b>.';
   } else if (a.aulasAtraso >= LIMITE_ATRASO) {
