@@ -93,6 +93,7 @@
 
 <header class="hero">
   <a class="back-link" href="index.html">&larr; Voltar aos recursos</a>
+  <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
   <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
   <h1>Termo de Atraso</h1>
   <p>Comunicado de atraso no plano de curso, gerado com os dados vivos do card</p>
@@ -908,6 +909,7 @@ if (POLISH_URL) {
   });
 }
 
+fiskInitThemeToggle('themeToggle');
 fiskInitUserMenu();
 fiskRegistrarUso("Termo de Atraso");
 

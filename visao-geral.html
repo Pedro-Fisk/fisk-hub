@@ -341,6 +341,23 @@ fiskInitUserMenu();
 fiskRegistrarUso("Visão Geral");
 
 function statusCard(msg, kind) { var s = $('statusCard'); s.textContent = msg || ''; s.className = 'status' + (kind ? ' ' + kind : ''); }
+
+/* ── ESPERA COM SINAL DE VIDA ───────────────────────────────────────────────
+   A leitura do card leva de 5 a 40 segundos, e desde que ela virou UMA
+   requisição não há mais o "3/11" para mostrar. Uma tela parada por 30s parece
+   travada, então aqui o texto conta o tempo e explica o que está acontecendo.
+   Devolve a função que encerra — chame-a no sucesso E no erro. */
+function esperando(frases) {
+  var t0 = Date.now(), timer = null;
+  function pinta() {
+    var seg = Math.round((Date.now() - t0) / 1000);
+    var i = seg < 8 ? 0 : (seg < 20 ? 1 : 2);
+    statusCard('🔄 ' + frases[Math.min(i, frases.length - 1)] + (seg >= 3 ? ' (' + seg + 's)' : ''));
+  }
+  pinta();
+  timer = setInterval(pinta, 1000);
+  return function () { clearInterval(timer); };
+}
 function ind(id, st) { $(id).className = 'ind' + (st ? ' ' + st : ''); }
 function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
@@ -487,7 +504,11 @@ function prefill() {
 function analisar(escola, prof) {
   var btn = $('btnAnalisar'); btn.disabled = true;
   $('painelGeral').hidden = $('painelTurmas').hidden = $('painelAtencao').hidden = true;
-  statusCard('🔄 Lendo as turmas de ' + prof + '…');
+  var pararEspera = esperando([
+    'Lendo as turmas de ' + prof + ' no card…',
+    'Ainda lendo o card de ' + prof + ' — são todas as turmas de uma vez…',
+    'O card está demorando mais que o normal. Se passar de um minuto, tente de novo.'
+  ]);
   /* UMA LEITURA. Antes eram 1 chamada para listar as turmas mais 1 por turma:
      cada uma custava 6-7s pela ponte do card, e o lote em paralelo estourava o
      tempo do Google e derrubava quem estivesse em outra ferramenta no mesmo
@@ -495,7 +516,7 @@ function analisar(escola, prof) {
      servidor e devolve tudo junto. */
   panorama(escola, prof).then(function (j) {
     var turmas = j.turmas || [];
-    if (!turmas.length) { statusCard('Nenhuma turma encontrada para ' + prof + '.', 'err'); btn.disabled = false; return; }
+    if (!turmas.length) { pararEspera(); statusCard('Nenhuma turma encontrada para ' + prof + '.', 'err'); btn.disabled = false; return; }
     /* O render espera uma lista por turma, no formato do antigo `fn=turma`.
        DESISTENTE FICA DE FORA: o card guarda a linha de quem saiu, e o
        `fn=turma` já a descartava — mantê-la aqui inflaria todos os números. */
@@ -510,9 +531,10 @@ function analisar(escola, prof) {
       if (b) b.alunos.push(a);
     });
     var dados = turmas.map(function (t) { return blocos[t.turma]; });
+    pararEspera();
     btn.disabled = false;
     render(escola, prof, dados);
-  }).catch(function (e) { statusCard('⚠️ ' + e.message, 'err'); btn.disabled = false; });
+  }).catch(function (e) { pararEspera(); statusCard('⚠️ ' + e.message, 'err'); btn.disabled = false; });
 }
 
 /* ============ GRÁFICOS (SVG na mão — a página não carrega biblioteca) ============ */
