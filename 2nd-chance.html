@@ -416,6 +416,9 @@ function initCascade() {
   api({ fn: 'escolas' }).then(function (j) {
     montarSelect(selEscola, 'Escola…', (j.escolas || []).map(function (e) { return { v: e, t: e }; }));
     ind('indEscola', 'ok');
+    /* Repõe a última turma usada (ver fiskReporTurma): cada degrau reposto
+       dispara o `change`, que carrega o seguinte. */
+    if (fiskReporTurma(selEscola, 'escola')) statusCard('🔄 Voltando para a última turma que você abriu…');
   }).catch(function (e) { ind('indEscola', ''); statusCard('⚠️ ' + e.message, 'err'); });
 
   selEscola.onchange = function () {
@@ -425,6 +428,7 @@ function initCascade() {
     api({ fn: 'profs', escola: selEscola.value }).then(function (j) {
       montarSelect(selProf, 'Professor(a)…', (j.profs || []).map(function (p) { return { v: p, t: p }; }));
       ind('indProf', 'ok');
+      fiskReporTurma(selProf, 'prof');
     }).catch(function (e) { ind('indProf', ''); statusCard('⚠️ ' + e.message, 'err'); });
   };
   selProf.onchange = function () {
@@ -433,11 +437,14 @@ function initCascade() {
     api({ fn: 'turmas', escola: selEscola.value, prof: selProf.value }).then(function (j) {
       montarSelect(selTurma, 'Turma…', (j.turmas || []).map(function (t) { return { v: t.linhaTitulo, t: t.titulo }; }));
       ind('indTurma', 'ok');
+      fiskReporTurma(selTurma, 'linha');
     }).catch(function (e) { ind('indTurma', ''); statusCard('⚠️ ' + e.message, 'err'); });
   };
   /* ao escolher a turma (último dropdown), carrega automaticamente */
   selTurma.onchange = function () {
     if (!selTurma.value) return;
+    fiskLembrarTurma(selEscola.value, selProf.value, selTurma.value,
+                     selTurma.options[selTurma.selectedIndex] ? selTurma.options[selTurma.selectedIndex].text : '');
     carregarTurma(selEscola.value, selProf.value, selTurma.value);
   };
 }

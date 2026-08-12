@@ -248,6 +248,59 @@ function fiskSessao() {
   try { return JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) { return null; }
 }
 
+/* ── A ÚLTIMA TURMA ─────────────────────────────────────────────────────────
+ * Toda ferramenta que lê o card começa pela mesma cascata: escola →
+ * professor(a) → turma. Quem dá dez aulas repetia as três escolhas a cada
+ * troca de ferramenta, e ainda esperava uma leitura do card em cada passo.
+ * A escolha fica guardada aqui, COMPARTILHADA entre as ferramentas: sair do
+ * planejador e abrir o termo cai na mesma turma, que é o caminho real de uso.
+ *
+ * Guarda também DE QUEM é a memória: a direção atua como vários professores, e
+ * repor a turma de outro seria pior do que não repor nada. E tem prazo — 45
+ * dias cobrem o semestre em andamento; passado isso, o card já é outro. */
+var FISK_TURMA_CHAVE = 'fisk_ultima_turma';
+var FISK_TURMA_VALIDADE_MS = 45 * 24 * 60 * 60 * 1000;
+
+function fiskLembrarTurma(escola, prof, linha, titulo) {
+  if (!escola || !prof || linha == null || linha === '') return;
+  var s = fiskSessao();
+  try {
+    localStorage.setItem(FISK_TURMA_CHAVE, JSON.stringify({
+      escola: String(escola), prof: String(prof), linha: String(linha),
+      titulo: String(titulo || ''), quem: (s && s.name) || '', quando: Date.now()
+    }));
+  } catch (e) {}
+}
+
+/** A última turma, ou null se não houver, se venceu, ou se é de outra pessoa. */
+function fiskUltimaTurma() {
+  var m = null;
+  try { m = JSON.parse(localStorage.getItem(FISK_TURMA_CHAVE) || 'null'); } catch (e) {}
+  if (!m || !m.escola || !m.prof) return null;
+  if (!m.quando || Date.now() - m.quando > FISK_TURMA_VALIDADE_MS) return null;
+  var s = fiskSessao();
+  if (m.quem && s && s.name && m.quem !== s.name) return null;
+  return m;
+}
+
+/**
+ * Repõe um degrau da cascata. Chame depois de MONTAR cada select, com o campo
+ * correspondente ('escola', 'prof' ou 'linha'): se o valor guardado estiver
+ * entre as opções, ele é escolhido e o `change` dispara — é o próprio change
+ * que carrega o degrau seguinte, então a cascata se remonta sozinha.
+ * Devolve true quando repôs, para a ferramenta poder ajustar o texto da tela.
+ */
+function fiskReporTurma(sel, campo) {
+  var m = fiskUltimaTurma();
+  if (!sel || !m || !m[campo]) return false;
+  var alvo = String(m[campo]);
+  var existe = Array.prototype.some.call(sel.options, function (o) { return String(o.value) === alvo; });
+  if (!existe) return false;   // turma que saiu do card, professor que mudou de escola
+  sel.value = alvo;
+  sel.dispatchEvent(new Event('change'));
+  return true;
+}
+
 /**
  * Raiz do Fisk Hub a partir de QUALQUER ferramenta. As páginas do próprio
  * repo carregam o kit por caminho relativo ('assets/…'); as de fora (boletim,

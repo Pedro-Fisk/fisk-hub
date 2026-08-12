@@ -388,6 +388,10 @@ function initCascade() {
   api({ fn: 'escolas' }).then(function (j) {
     montarSelect(selEscola, 'Escolha a escola…', (j.escolas || []).map(function (e) { return { v: e, t: e }; }));
     ind('indEscola', 'ok');
+    /* Repõe a última turma usada (ver fiskReporTurma): cada degrau reposto
+       dispara o `change`, que carrega o seguinte — a cascata se remonta
+       sozinha e o professor cai direto na turma de onde parou. */
+    if (fiskReporTurma(selEscola, 'escola')) statusCard('🔄 Voltando para a última turma que você abriu…');
   }).catch(function (e) { ind('indEscola', ''); statusCard('⚠️ ' + e.message, 'err'); });
 
   selEscola.addEventListener('change', function () {
@@ -398,6 +402,7 @@ function initCascade() {
     api({ fn: 'profs', escola: selEscola.value }).then(function (j) {
       montarSelect(selProf, 'Escolha o professor(a)…', (j.profs || []).map(function (p) { return { v: p, t: p }; }));
       ind('indProf', 'ok');
+      fiskReporTurma(selProf, 'prof');
     }).catch(function (e) { ind('indProf', ''); statusCard('⚠️ ' + e.message, 'err'); });
   });
   selProf.addEventListener('change', function () {
@@ -407,13 +412,19 @@ function initCascade() {
     api({ fn: 'turmas', escola: selEscola.value, prof: selProf.value }).then(function (j) {
       montarSelect(selTurma, 'Escolha a turma…', (j.turmas || []).map(function (t) { return { v: t.linhaTitulo, t: t.titulo }; }));
       ind('indTurma', 'ok');
+      fiskReporTurma(selTurma, 'linha');
     }).catch(function (e) { ind('indTurma', ''); statusCard('⚠️ ' + e.message, 'err'); });
   });
   selTurma.addEventListener('change', function () {
     if (!selTurma.value) return;
     ind('indTurma', 'spin'); statusCard('🔄 Lendo a turma ao vivo…');
     api({ fn: 'turma', escola: selEscola.value, prof: selProf.value, linha: selTurma.value })
-      .then(function (d) { ind('indTurma', 'ok'); onTurma(d); })
+      .then(function (d) {
+        ind('indTurma', 'ok');
+        fiskLembrarTurma(selEscola.value, selProf.value, selTurma.value,
+                         selTurma.options[selTurma.selectedIndex] ? selTurma.options[selTurma.selectedIndex].text : '');
+        onTurma(d);
+      })
       .catch(function (e) { ind('indTurma', ''); statusCard('⚠️ ' + e.message, 'err'); });
   });
 }

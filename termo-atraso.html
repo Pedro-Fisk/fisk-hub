@@ -312,6 +312,10 @@ if (!temHashPayload && location.hash.indexOf('#t=') !== 0) {
     api({ fn: 'escolas' }).then(function (j) {
       montarSelect(selEscola, 'Escolha a escola…', j.escolas.map(function (e) { return { v: e, t: e }; }));
       ind('indEscola', 'ok');
+      /* Repõe a última turma usada (ver fiskReporTurma): cada degrau reposto
+         dispara o `change`, que carrega o seguinte. A pré-seleção por URL, logo
+         abaixo, vence esta — quem veio do painel do card sabe a turma. */
+      if (!location.search) fiskReporTurma(selEscola, 'escola');
     }).catch(function (e) { ind('indEscola', ''); mostrarErroApi(e); });
 
     selEscola.addEventListener('change', function () {
@@ -324,6 +328,7 @@ if (!temHashPayload && location.hash.indexOf('#t=') !== 0) {
       api({ fn: 'profs', escola: selEscola.value }).then(function (j) {
         montarSelect(selProf, 'Escolha o professor(a)…', j.profs.map(function (p) { return { v: p, t: p }; }));
         ind('indProf', 'ok');
+        if (!location.search) fiskReporTurma(selProf, 'prof');
       }).catch(function (e) { ind('indProf', ''); mostrarErroApi(e); });
     });
 
@@ -337,6 +342,7 @@ if (!temHashPayload && location.hash.indexOf('#t=') !== 0) {
           return { v: t.linhaTitulo, t: t.titulo };
         }));
         ind('indTurma', 'ok');
+        if (!location.search) fiskReporTurma(selTurma, 'linha');
       }).catch(function (e) { ind('indTurma', ''); mostrarErroApi(e); });
     });
 
@@ -347,7 +353,12 @@ if (!temHashPayload && location.hash.indexOf('#t=') !== 0) {
       ind('indTurma', 'spin');
       document.getElementById('statusCard').textContent = '🔄 Lendo a turma ao vivo…';
       api({ fn: 'turma', escola: selEscola.value, prof: selProf.value, linha: selTurma.value })
-        .then(function (dados) { ind('indTurma', 'ok'); payload = dados; montarLista(); })
+        .then(function (dados) {
+          ind('indTurma', 'ok');
+          fiskLembrarTurma(selEscola.value, selProf.value, selTurma.value,
+                           selTurma.options[selTurma.selectedIndex] ? selTurma.options[selTurma.selectedIndex].text : '');
+          payload = dados; montarLista();
+        })
         .catch(function (e) { ind('indTurma', ''); mostrarErroApi(e); });
     });
 
