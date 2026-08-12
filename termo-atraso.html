@@ -351,15 +351,17 @@ if (!temHashPayload && location.hash.indexOf('#t=') !== 0) {
     selTurma.addEventListener('change', function () {
       if (!selTurma.value) return;
       ind('indTurma', 'spin');
-      document.getElementById('statusCard').textContent = '🔄 Lendo a turma ao vivo…';
+      var pararEspera = fiskEsperando(function (txt) { document.getElementById('statusCard').textContent = txt; },
+                                      ['Lendo a turma no card…', 'Ainda lendo — o card está devagar agora…']);
       api({ fn: 'turma', escola: selEscola.value, prof: selProf.value, linha: selTurma.value })
         .then(function (dados) {
+          pararEspera();
           ind('indTurma', 'ok');
           fiskLembrarTurma(selEscola.value, selProf.value, selTurma.value,
                            selTurma.options[selTurma.selectedIndex] ? selTurma.options[selTurma.selectedIndex].text : '');
           payload = dados; montarLista();
         })
-        .catch(function (e) { ind('indTurma', ''); mostrarErroApi(e); });
+        .catch(function (e) { pararEspera(); ind('indTurma', ''); mostrarErroApi(e); });
     });
 
     /* Pré-seleção vinda do painel lateral (?escola=&prof=): escolhe escola→professor

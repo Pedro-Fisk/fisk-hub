@@ -319,10 +319,11 @@ function resetSel(sel, ph) {
 }
 /* escolher a turma (último dropdown) já carrega a turma — sem botão */
 function carregarTurma(escola, prof, linha) {
-  ind('indTurma', 'spin'); statusCard('🔄 Lendo a turma ao vivo…');
+  ind('indTurma', 'spin');
+  var pararEspera = fiskEsperando(statusCard, ['Lendo a turma no card…', 'Ainda lendo — o card está devagar agora…']);
   return api({ fn: 'turma', escola: escola, prof: prof, linha: linha })
-    .then(function (d) { ind('indTurma', 'ok'); onTurma(d); })
-    .catch(function (e) { ind('indTurma', ''); statusCard('⚠️ ' + e.message, 'err'); });
+    .then(function (d) { pararEspera(); ind('indTurma', 'ok'); onTurma(d); })
+    .catch(function (e) { pararEspera(); ind('indTurma', ''); statusCard('⚠️ ' + e.message, 'err'); });
 }
 
 /* ---- sessão do professor vinda do Hub (mesmo origin, mesmo localStorage) ---- */

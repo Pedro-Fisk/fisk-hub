@@ -342,67 +342,7 @@ fiskRegistrarUso("Visão Geral");
 
 function statusCard(msg, kind) { var s = $('statusCard'); s.textContent = msg || ''; s.className = 'status' + (kind ? ' ' + kind : ''); }
 
-/* ── ESPERA COM SINAL DE VIDA ───────────────────────────────────────────────
-   A leitura do card leva de 5 a 40 segundos, e desde que ela virou UMA
-   requisição não há mais o "3/11" para mostrar. Uma tela parada por 30s parece
-   travada, então aqui o texto conta o tempo e explica o que está acontecendo.
-   Devolve a função que encerra — chame-a no sucesso E no erro. */
-function esperando(frases) {
-  var t0 = Date.now(), timer = null;
-  function pinta() {
-    var seg = Math.round((Date.now() - t0) / 1000);
-    var i = seg < 8 ? 0 : (seg < 20 ? 1 : 2);
-    statusCard('🔄 ' + frases[Math.min(i, frases.length - 1)] + (seg >= 3 ? ' (' + seg + 's)' : ''));
-  }
-  pinta();
-  timer = setInterval(pinta, 1000);
-  return function () { clearInterval(timer); };
-}
-function ind(id, st) { $(id).className = 'ind' + (st ? ' ' + st : ''); }
-function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
-
-/* A CHAVE DO CARD NÃO VIVE MAIS AQUI. Este repositório é público: enquanto
-   ela estava neste arquivo, qualquer pessoa na internet lia nome, notas e
-   faltas de todas as turmas — e escrevia nota. Quem fala com o card agora é
-   o backend (action=card), que valida a sessão e só então carimba a chave.
-   Ver cardProxy_ no fisk-hub-backend. NUNCA reintroduzir a chave aqui. */
-function tokenSessao() {
-  try { var s = JSON.parse(localStorage.getItem('fisk_prof') || 'null'); return (s && s.token) || ''; }
-  catch (e) { return ''; }
-}
-function comSessao(p) {
-  var o = { action: 'card', token: tokenSessao() };
-  Object.keys(p).forEach(function (k) { o[k] = p[k]; });
-  return o;
-}
-function api(params) {
-  params = comSessao(params);   // action=card + token da sessão
-  var qs = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
-  return fetch(API_URL + '?' + qs)
-    .then(fiskJson)
-    .then(function (j) { if (j && j.erro) throw new Error(j.erro); return j; });
-}
-
-/* Todas as turmas do professor numa leitura só. Não passa pela ponte
-   `action=card`: quem lê o card aqui é o próprio backend, por openById. */
-function panorama(escola, prof) {
-  var qs = 'action=panoramaProf&token=' + encodeURIComponent(tokenSessao()) +
-           '&escola=' + encodeURIComponent(escola) + '&prof=' + encodeURIComponent(prof);
-  return fetch(API_URL + '?' + qs).then(fiskJson)
-    .then(function (j) { if (!j || !j.ok) throw new Error((j && j.erro) || 'panorama falhou'); return j; });
-}
-
-/* nota da célula do card: "[EST] 15/03 · média 7,5\nA8 B7…" ou número puro */
-function notaDe(cell) {
-  if (cell == null || cell === '') return null;
-  var s = String(cell);
-  var m = s.match(/m[eé]dia\s*([0-9]+(?:[.,][0-9]+)?)/i);
-  if (m) return parseFloat(m[1].replace(',', '.'));
-  var m2 = s.trim().match(/^([0-9]+(?:[.,][0-9]+)?)$/);
-  return m2 ? parseFloat(m2[1].replace(',', '.')) : null;
-}
-function fmtNota(n){ return n == null ? '-' : (Math.round(n*10)/10).toFixed(1).replace('.', ','); }
-function fmtPct(n){ return n == null ? '-' : Math.round(n) + '%'; }
+/* A espera com contador vive no kit compartilhado: `fiskEsperando`. */
 
 /* ============ CASCATA (escola → professor, turma NÃO — pega todas) ============ */
 function montarSelect(sel, ph, itens) {
@@ -504,7 +444,7 @@ function prefill() {
 function analisar(escola, prof) {
   var btn = $('btnAnalisar'); btn.disabled = true;
   $('painelGeral').hidden = $('painelTurmas').hidden = $('painelAtencao').hidden = true;
-  var pararEspera = esperando([
+  var pararEspera = fiskEsperando(statusCard, [
     'Lendo as turmas de ' + prof + ' no card…',
     'Ainda lendo o card de ' + prof + ' — são todas as turmas de uma vez…',
     'O card está demorando mais que o normal. Se passar de um minuto, tente de novo.'

@@ -248,6 +248,25 @@ function fiskSessao() {
   try { return JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) { return null; }
 }
 
+/* ── ESPERA COM SINAL DE VIDA ───────────────────────────────────────────────
+ * Ler o card leva de 5 a 40 segundos, e a tela parada nesse tempo parece
+ * travada — foi a queixa depois que a Visão Geral passou a fazer uma leitura
+ * única, sem o "3/11" para mostrar. O texto conta os segundos e muda conforme
+ * a espera passa; `escrever` é quem sabe pintar o status daquela página.
+ * Devolve a função que encerra: chame-a no sucesso E no erro.
+ */
+function fiskEsperando(escrever, frases) {
+  var t0 = Date.now();
+  function pinta() {
+    var seg = Math.round((Date.now() - t0) / 1000);
+    var i = seg < 8 ? 0 : (seg < 20 ? 1 : 2);
+    escrever('🔄 ' + frases[Math.min(i, frases.length - 1)] + (seg >= 3 ? ' (' + seg + 's)' : ''));
+  }
+  pinta();
+  var timer = setInterval(pinta, 1000);
+  return function () { clearInterval(timer); };
+}
+
 /* ── A ÚLTIMA TURMA ─────────────────────────────────────────────────────────
  * Toda ferramenta que lê o card começa pela mesma cascata: escola →
  * professor(a) → turma. Quem dá dez aulas repetia as três escolhas a cada
