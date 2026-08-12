@@ -341,6 +341,15 @@ fiskInitUserMenu();
 fiskRegistrarUso("Visão Geral");
 
 function statusCard(msg, kind) { var s = $('statusCard'); s.textContent = msg || ''; s.className = 'status' + (kind ? ' ' + kind : ''); }
+/* O spinner/✓ de cada degrau da cascata. ESTAVA FALTANDO desde o commit que
+   criou esta página: a cascata foi copiada do planejador e esta linha ficou
+   para trás, então `initCascade` estourava ReferenceError na PRIMEIRA
+   instrução. Efeito: os seletores de escola e professor nunca enchiam, o
+   prefill nunca rodava, o botão Analisar nunca ganhava o clique — metade da
+   tela estava morta e nada aparecia dizendo isso, porque o erro acontecia
+   antes de existir alguém para mostrá-lo. O `if (e)` é para um span faltando
+   no HTML nunca mais derrubar a cascata inteira. */
+function ind(id, estado) { var e = $(id); if (e) e.className = 'ind' + (estado ? ' ' + estado : ''); }
 
 /* A espera com contador vive no kit compartilhado: `fiskEsperando`. */
 
@@ -408,7 +417,13 @@ function setupVgActAs() {
         var nm = esc(p.name);
         return '<option value="' + nm.replace(/"/g, '&quot;') + '" data-esc="' + String(p.escolas || '').replace(/"/g, '&quot;') + '"' + (p.name === cur ? ' selected' : '') + '>' + nm + ' · ' + p.escolas + '</option>';
       }).join('');
-  }).catch(function () {});
+  }).catch(function (e) {
+    /* seletor vazio e calado é o mesmo problema do "sem conexão": a direção
+       não sabe se é bug, permissão ou lista vazia. Fica no próprio seletor
+       para não atropelar o statusCard, que serve à análise. */
+    sb.innerHTML = '<option value="">👥 Não consegui carregar a lista, ' +
+                   esc((e && e.message) || 'falha desconhecida') + '</option>';
+  });
   sb.onchange = function () {
     var opt = sb.options[sb.selectedIndex];
     if (!sb.value) { try { localStorage.removeItem('fisk_actas'); } catch (e) {} statusCard('Escolha um professor.'); return; }
@@ -974,7 +989,21 @@ function linkAluno(nome, classe) {
       pinta();
       $('acCorpo').hidden = false;
     })
-    .catch(function () { $('acStatus').className = 'status err'; $('acStatus').textContent = '⚠️ Sem conexão com o servidor.'; });
+    /* MOSTRE O ERRO DE VERDADE. Isto aqui dizia "Sem conexão com o servidor"
+       para QUALQUER falha, e a frase é uma acusação errada na maioria dos
+       casos: o `fiskJson` já distingue "o Google pediu login", "o servidor
+       devolveu página de erro" e o HTTP que veio, e tudo isso era jogado fora.
+       Quem estava na tela via "sem conexão" com a internet funcionando e não
+       tinha o que fazer. Só quando o fetch falha de fato (rede caiu, offline)
+       é que a mensagem de conexão é a verdadeira. */
+    .catch(function (e) {
+      var msg = (e && e.message) || 'falha desconhecida';
+      var semRede = (e instanceof TypeError) || /Failed to fetch|NetworkError|Load failed/i.test(msg);
+      $('acStatus').className = 'status err';
+      $('acStatus').textContent = semRede
+        ? '⚠️ Sem conexão com o servidor. Confira a internet e recarregue a página.'
+        : '⚠️ ' + msg;
+    });
   }
   carregar();
   // a direção troca de professor no seletor do topo: a chamada acompanha
