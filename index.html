@@ -442,7 +442,7 @@
         'md-title':'Visão Geral','md-more':'ver análise completa →','md-alunos':'Alunos',
         'md-emdia':'Em dia','md-atras':'Atrasados','md-crit':'Críticos',
         'md-faltas':'Faltas médias','md-nota':'Média de notas','md-turmas':'turmas',
-        'md-load':'analisando suas turmas…','md-falhou':'{n} de {t} turmas não responderam e ficaram de fora destes números. Recarregue para tentar de novo.','md-pick':'Escolha um professor no seletor do topo para ver o painel dele.',
+        'md-load':'analisando suas turmas…','md-falhou':'Não consegui ler {n} de {t} escolas suas: estes números estão incompletos. Recarregue para tentar de novo.','md-pick':'Escolha um professor no seletor do topo para ver o painel dele.',
         'md-busca-t':'🎓 Acompanhamento do Aluno','md-busca-ph':'🔎 Buscar aluno por nome ou RAF…','md-busca-nada':'Nenhum aluno com esse nome ou RAF.',
         'card-planner-h2': 'Abridor de Planners',
         'card-planner-p':  'Crie o PPT / Planner do aluno com as datas corretas',
@@ -516,7 +516,7 @@
         'md-title':'Overview','md-more':'see full analysis →','md-alunos':'Students',
         'md-emdia':'On track','md-atras':'Behind','md-crit':'Critical',
         'md-faltas':'Avg. absences','md-nota':'Avg. grade','md-turmas':'classes',
-        'md-load':'analyzing your classes…','md-falhou':'{n} of {t} classes did not answer and are missing from these numbers. Reload to try again.','md-pick':'Pick a teacher in the selector above to see their panel.',
+        'md-load':'analyzing your classes…','md-falhou':'Could not read {n} of your {t} schools: these numbers are incomplete. Reload to try again.','md-pick':'Pick a teacher in the selector above to see their panel.',
         'md-busca-t':'🎓 Student Follow-up','md-busca-ph':'🔎 Search student by name or RAF…','md-busca-nada':'No student with that name or RAF.',
         'card-planner-h2': 'Planner Opener',
         'card-planner-p':  'Create student planners with the correct dates',
@@ -590,7 +590,7 @@
         'md-title':'Visión General','md-more':'ver análisis completo →','md-alunos':'Alumnos',
         'md-emdia':'Al día','md-atras':'Atrasados','md-crit':'Críticos',
         'md-faltas':'Faltas medias','md-nota':'Nota media','md-turmas':'grupos',
-        'md-load':'analizando tus grupos…','md-falhou':'{n} de {t} grupos no respondieron y quedaron fuera de estos números. Recarga para intentarlo de nuevo.','md-pick':'Elige un profesor en el selector de arriba para ver su panel.',
+        'md-load':'analizando tus grupos…','md-falhou':'No pude leer {n} de {t} escuelas tuyas: estos números están incompletos. Recarga para intentarlo de nuevo.','md-pick':'Elige un profesor en el selector de arriba para ver su panel.',
         'md-busca-t':'🎓 Seguimiento del Alumno','md-busca-ph':'🔎 Buscar alumno por nombre o RAF…','md-busca-nada':'Ningún alumno con ese nombre o RAF.',
         'card-planner-h2': 'Abridor de Planners',
         'card-planner-p':  'Crea planners del alumno con las fechas correctas',
@@ -1354,6 +1354,14 @@
         return fetch(API+'?'+qs).then(fiskJson)
           .then(function(j){ if (j && j.erro) throw new Error(j.erro); return j; });
       }
+      /* Todas as turmas do professor numa leitura só. Não passa pela ponte
+         `action=card`: quem lê o card aqui é o próprio backend, por openById. */
+      function panorama(escola, prof){
+        var qs = 'action=panoramaProf&token=' + encodeURIComponent(tokenSessao()) +
+                 '&escola=' + encodeURIComponent(escola) + '&prof=' + encodeURIComponent(prof);
+        return fetch(API+'?'+qs).then(fiskJson)
+          .then(function(j){ if (!j || !j.ok) throw new Error((j && j.erro) || 'panorama falhou'); return j; });
+      }
       function notaDe(c){
         if (c == null || c === '') return null;
         var s = String(c), m = s.match(/m[eé]dia\s*([0-9]+(?:[.,][0-9]+)?)/i);
@@ -1406,7 +1414,7 @@
         if (d.falharam){
           box.insertAdjacentHTML('beforeend',
             '<div class="md-status md-aviso">⚠️ ' +
-            tr('md-falhou').replace('{n}', d.falharam).replace('{t}', d.turmas) + '</div>');
+            tr('md-falhou').replace('{n}', d.falharam).replace('{t}', d.escolas || 1) + '</div>');
         }
       }
 
@@ -1427,35 +1435,33 @@
         box.innerHTML = '<div class="md-status">⏳ '+tr('md-load')+'</div>';
         var escolas = String(s.escolas || s.escola || '').split(',').map(function(x){ return x.trim(); }).filter(Boolean);
         if (!escolas.length){ semKpis(); return; }
-        Promise.all(escolas.map(function(esc){
-          return api({ fn:'turmas', escola:esc, prof:s.name })
-            .then(function(j){ return (j.turmas||[]).map(function(t){ return { esc:esc, linha:t.linhaTitulo }; }); })
-            .catch(function(){ return []; });
-        })).then(function(lists){
-          var all = [].concat.apply([], lists);
-          if (!all.length){ semKpis(); return; } // sem turmas (ex.: conta da direção)
-          var alunos = [], falharam = 0;
-          /* UMA TURMA POR VEZ, de propósito. Ler quatro em paralelo não
-             acelerava nada — o card serializa de qualquer jeito (medido em
-             11/08/2026: uma turma 6-7s, quatro juntas 37s) — e era isso que
-             estourava o tempo do Google e derrubava quem estivesse usando
-             outra ferramenta no mesmo minuto. */
-          (function proxima(i){
-            if (i >= all.length){
-              var d = agg(alunos, all.length);
-              d.falharam = falharam;
-              dataCache = d;
-              try{ localStorage.setItem('fisk_minidash', JSON.stringify({ prof:s.name, t:Date.now(), d:d })); }catch(e){}
-              render(d); return;
-            }
-            api({ fn:'turma', escola:all[i].esc, prof:s.name, linha:all[i].linha })
-              .catch(function(){ falharam++; return null; })
-              .then(function(d){
-                if (d) (d.alunos||[]).forEach(function(a){ if (a && a.nome) alunos.push(a); });
-                proxima(i+1);
-              });
-          })(0);
-        }).catch(function(){ semKpis(); });
+        /* UMA LEITURA POR ESCOLA. Antes eram 1 chamada para listar as turmas
+           mais 1 por turma (11, no caso do Leonardo): cada uma custava 6-7s
+           pela ponte do card, e o lote em paralelo estourava o tempo do Google
+           e derrubava quem estivesse em outra ferramenta no mesmo minuto. O
+           `panoramaProf` devolve todas as turmas do professor de uma vez,
+           lendo a aba inteira no servidor. */
+        var alunos = [], nTurmas = 0, falharam = 0;
+        (function proximaEscola(i){
+          if (i >= escolas.length){
+            if (!nTurmas && !alunos.length){ semKpis(); return; }  // conta da direção, sem turmas
+            var d = agg(alunos, nTurmas);
+            d.falharam = falharam;
+            d.escolas = escolas.length;
+            dataCache = d;
+            try{ localStorage.setItem('fisk_minidash', JSON.stringify({ prof:s.name, t:Date.now(), d:d })); }catch(e){}
+            render(d); return;
+          }
+          panorama(escolas[i], s.name)
+            .then(function(j){
+              nTurmas += (j.turmas || []).length;
+              /* Quem saiu não entra nos números: o professor conta a turma que
+                 ele tem hoje, e o card guarda o desistente na linha. */
+              (j.alunos || []).forEach(function(a){ if (a && a.nome && !a.saiu) alunos.push(a); });
+            })
+            .catch(function(){ falharam++; })
+            .then(function(){ proximaEscola(i+1); });
+        })(0);
       }
 
       /* ── Busca de aluno ──────────────────────────────────────────────────

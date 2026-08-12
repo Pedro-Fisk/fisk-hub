@@ -366,6 +366,15 @@ function api(params) {
     .then(function (j) { if (j && j.erro) throw new Error(j.erro); return j; });
 }
 
+/* Todas as turmas do professor numa leitura só. Não passa pela ponte
+   `action=card`: quem lê o card aqui é o próprio backend, por openById. */
+function panorama(escola, prof) {
+  var qs = 'action=panoramaProf&token=' + encodeURIComponent(tokenSessao()) +
+           '&escola=' + encodeURIComponent(escola) + '&prof=' + encodeURIComponent(prof);
+  return fetch(API_URL + '?' + qs).then(fiskJson)
+    .then(function (j) { if (!j || !j.ok) throw new Error((j && j.erro) || 'panorama falhou'); return j; });
+}
+
 /* nota da célula do card: "[EST] 15/03 · média 7,5\nA8 B7…" ou número puro */
 function notaDe(cell) {
   if (cell == null || cell === '') return null;
@@ -478,41 +487,31 @@ function prefill() {
 function analisar(escola, prof) {
   var btn = $('btnAnalisar'); btn.disabled = true;
   $('painelGeral').hidden = $('painelTurmas').hidden = $('painelAtencao').hidden = true;
-  statusCard('🔄 Buscando as turmas de ' + prof + '…');
-  api({ fn: 'turmas', escola: escola, prof: prof }).then(function (j) {
+  statusCard('🔄 Lendo as turmas de ' + prof + '…');
+  /* UMA LEITURA. Antes eram 1 chamada para listar as turmas mais 1 por turma:
+     cada uma custava 6-7s pela ponte do card, e o lote em paralelo estourava o
+     tempo do Google e derrubava quem estivesse em outra ferramenta no mesmo
+     minuto (medido em 11/08/2026). O `panoramaProf` lê a aba inteira no
+     servidor e devolve tudo junto. */
+  panorama(escola, prof).then(function (j) {
     var turmas = j.turmas || [];
     if (!turmas.length) { statusCard('Nenhuma turma encontrada para ' + prof + '.', 'err'); btn.disabled = false; return; }
-    var dados = [], feitas = 0, falharam = [];
-    /* UMA TURMA POR VEZ. O lote de 4 em paralelo não acelerava — o card
-       serializa de qualquer jeito (medido em 11/08/2026: uma turma 6-7s,
-       quatro juntas 37s) — e era ele que estourava o tempo do Google e
-       derrubava quem estivesse usando outra ferramenta no mesmo minuto. */
-    function proxima(i) {
-      if (i >= turmas.length) {
-        btn.disabled = false;
-        render(escola, prof, dados);
-        /* No caso feliz quem fala é o render (ele conta turmas e alunos). Aqui
-           só tomo a frente para avisar do que ficou faltando: turma que não
-           respondeu sumia do relatório em silêncio, e o professor lia os
-           números como se fossem de todas as turmas dele. */
-        if (falharam.length) {
-          statusCard('⚠️ ' + falharam.length + ' de ' + turmas.length + ' turmas não responderam e ficaram de fora: ' +
-                     falharam.join(', ') + '. Analise de novo para tentar outra vez.', 'err');
-        }
-        return;
-      }
-      var t = turmas[i];
-      api({ fn: 'turma', escola: escola, prof: prof, linha: t.linhaTitulo })
-        .then(function (d) { d._titulo = t.titulo; return d; })
-        .catch(function () { falharam.push(String(t.titulo).split('\n')[0]); return null; })
-        .then(function (d) {
-          if (d) dados.push(d);
-          feitas++;
-          statusCard('🔄 Lendo turmas… ' + feitas + '/' + turmas.length);
-          proxima(i + 1);
-        });
-    }
-    proxima(0);
+    /* O render espera uma lista por turma, no formato do antigo `fn=turma`.
+       DESISTENTE FICA DE FORA: o card guarda a linha de quem saiu, e o
+       `fn=turma` já a descartava — mantê-la aqui inflaria todos os números. */
+    var blocos = {};
+    turmas.forEach(function (t) {
+      blocos[t.turma] = { turma: t.turma, _titulo: t.turma, linhaTitulo: t.linhaTitulo,
+                          professor: prof, aba: prof, alunos: [] };
+    });
+    (j.alunos || []).forEach(function (a) {
+      if (!a || !a.nome || a.saiu) return;
+      var b = blocos[a.turma];
+      if (b) b.alunos.push(a);
+    });
+    var dados = turmas.map(function (t) { return blocos[t.turma]; });
+    btn.disabled = false;
+    render(escola, prof, dados);
   }).catch(function (e) { statusCard('⚠️ ' + e.message, 'err'); btn.disabled = false; });
 }
 
