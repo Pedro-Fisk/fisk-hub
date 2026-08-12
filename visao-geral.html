@@ -341,17 +341,64 @@ fiskInitUserMenu();
 fiskRegistrarUso("Visão Geral");
 
 function statusCard(msg, kind) { var s = $('statusCard'); s.textContent = msg || ''; s.className = 'status' + (kind ? ' ' + kind : ''); }
-/* O spinner/✓ de cada degrau da cascata. ESTAVA FALTANDO desde o commit que
-   criou esta página: a cascata foi copiada do planejador e esta linha ficou
-   para trás, então `initCascade` estourava ReferenceError na PRIMEIRA
-   instrução. Efeito: os seletores de escola e professor nunca enchiam, o
-   prefill nunca rodava, o botão Analisar nunca ganhava o clique — metade da
-   tela estava morta e nada aparecia dizendo isso, porque o erro acontecia
-   antes de existir alguém para mostrá-lo. O `if (e)` é para um span faltando
-   no HTML nunca mais derrubar a cascata inteira. */
-function ind(id, estado) { var e = $(id); if (e) e.className = 'ind' + (estado ? ' ' + estado : ''); }
 
 /* A espera com contador vive no kit compartilhado: `fiskEsperando`. */
+
+/* ⚠️ ESTE BLOCO JÁ FOI APAGADO POR ACIDENTE, em 12/08/2026 (commit 572ab55).
+   Aquele commit queria remover só a função `esperando()` local, que tinha
+   virado `fiskEsperando` no kit — mas a remoção levou junto tudo o que vinha
+   depois dela até o `fmtPct`. Resultado: a página inteira parou. O
+   `initCascade` estourava "ReferenceError: ind is not defined" na primeira
+   instrução, então os seletores de escola e professor nunca enchiam, o
+   prefill não rodava e o botão Analisar nunca ganhava o clique; e o bloco
+   "Meus alunos" morria em "esc is not defined" e culpava a conexão. Ficou
+   assim das 10h03 às 18h50 do mesmo dia. Ao mover helper daqui para o kit,
+   confira o QUE MAIS saiu no diff. */
+function ind(id, st) { var e = $(id); if (e) e.className = 'ind' + (st ? ' ' + st : ''); }
+function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+/* A CHAVE DO CARD NÃO VIVE MAIS AQUI. Este repositório é público: enquanto
+   ela estava neste arquivo, qualquer pessoa na internet lia nome, notas e
+   faltas de todas as turmas — e escrevia nota. Quem fala com o card agora é
+   o backend (action=card), que valida a sessão e só então carimba a chave.
+   Ver cardProxy_ no fisk-hub-backend. NUNCA reintroduzir a chave aqui. */
+function tokenSessao() {
+  try { var s = JSON.parse(localStorage.getItem('fisk_prof') || 'null'); return (s && s.token) || ''; }
+  catch (e) { return ''; }
+}
+function comSessao(p) {
+  var o = { action: 'card', token: tokenSessao() };
+  Object.keys(p).forEach(function (k) { o[k] = p[k]; });
+  return o;
+}
+function api(params) {
+  params = comSessao(params);   // action=card + token da sessão
+  var qs = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
+  return fetch(API_URL + '?' + qs)
+    .then(fiskJson)
+    .then(function (j) { if (j && j.erro) throw new Error(j.erro); return j; });
+}
+
+/* Todas as turmas do professor numa leitura só. Não passa pela ponte
+   `action=card`: quem lê o card aqui é o próprio backend, por openById. */
+function panorama(escola, prof) {
+  var qs = 'action=panoramaProf&token=' + encodeURIComponent(tokenSessao()) +
+           '&escola=' + encodeURIComponent(escola) + '&prof=' + encodeURIComponent(prof);
+  return fetch(API_URL + '?' + qs).then(fiskJson)
+    .then(function (j) { if (!j || !j.ok) throw new Error((j && j.erro) || 'panorama falhou'); return j; });
+}
+
+/* nota da célula do card: "[EST] 15/03 · média 7,5\nA8 B7…" ou número puro */
+function notaDe(cell) {
+  if (cell == null || cell === '') return null;
+  var s = String(cell);
+  var m = s.match(/m[eé]dia\s*([0-9]+(?:[.,][0-9]+)?)/i);
+  if (m) return parseFloat(m[1].replace(',', '.'));
+  var m2 = s.trim().match(/^([0-9]+(?:[.,][0-9]+)?)$/);
+  return m2 ? parseFloat(m2[1].replace(',', '.')) : null;
+}
+function fmtNota(n){ return n == null ? '-' : (Math.round(n*10)/10).toFixed(1).replace('.', ','); }
+function fmtPct(n){ return n == null ? '-' : Math.round(n) + '%'; }
 
 /* ============ CASCATA (escola → professor, turma NÃO — pega todas) ============ */
 function montarSelect(sel, ph, itens) {
