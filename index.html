@@ -442,7 +442,7 @@
         'md-title':'Visão Geral','md-more':'ver análise completa →','md-alunos':'Alunos',
         'md-emdia':'Em dia','md-atras':'Atrasados','md-crit':'Críticos',
         'md-faltas':'Faltas médias','md-nota':'Média de notas','md-turmas':'turmas',
-        'md-load':'analisando suas turmas…','md-pick':'Escolha um professor no seletor do topo para ver o painel dele.',
+        'md-load':'analisando suas turmas…','md-falhou':'{n} de {t} turmas não responderam e ficaram de fora destes números. Recarregue para tentar de novo.','md-pick':'Escolha um professor no seletor do topo para ver o painel dele.',
         'md-busca-t':'🎓 Acompanhamento do Aluno','md-busca-ph':'🔎 Buscar aluno por nome ou RAF…','md-busca-nada':'Nenhum aluno com esse nome ou RAF.',
         'card-planner-h2': 'Abridor de Planners',
         'card-planner-p':  'Crie o PPT / Planner do aluno com as datas corretas',
@@ -516,7 +516,7 @@
         'md-title':'Overview','md-more':'see full analysis →','md-alunos':'Students',
         'md-emdia':'On track','md-atras':'Behind','md-crit':'Critical',
         'md-faltas':'Avg. absences','md-nota':'Avg. grade','md-turmas':'classes',
-        'md-load':'analyzing your classes…','md-pick':'Pick a teacher in the selector above to see their panel.',
+        'md-load':'analyzing your classes…','md-falhou':'{n} of {t} classes did not answer and are missing from these numbers. Reload to try again.','md-pick':'Pick a teacher in the selector above to see their panel.',
         'md-busca-t':'🎓 Student Follow-up','md-busca-ph':'🔎 Search student by name or RAF…','md-busca-nada':'No student with that name or RAF.',
         'card-planner-h2': 'Planner Opener',
         'card-planner-p':  'Create student planners with the correct dates',
@@ -590,7 +590,7 @@
         'md-title':'Visión General','md-more':'ver análisis completo →','md-alunos':'Alumnos',
         'md-emdia':'Al día','md-atras':'Atrasados','md-crit':'Críticos',
         'md-faltas':'Faltas medias','md-nota':'Nota media','md-turmas':'grupos',
-        'md-load':'analizando tus grupos…','md-pick':'Elige un profesor en el selector de arriba para ver su panel.',
+        'md-load':'analizando tus grupos…','md-falhou':'{n} de {t} grupos no respondieron y quedaron fuera de estos números. Recarga para intentarlo de nuevo.','md-pick':'Elige un profesor en el selector de arriba para ver su panel.',
         'md-busca-t':'🎓 Seguimiento del Alumno','md-busca-ph':'🔎 Buscar alumno por nombre o RAF…','md-busca-nada':'Ningún alumno con ese nombre o RAF.',
         'card-planner-h2': 'Abridor de Planners',
         'card-planner-p':  'Crea planners del alumno con las fechas correctas',
@@ -1401,6 +1401,13 @@
           tile(d.an ? d.crit : '-', tr('md-crit'), 'alta') +
           tile(d.mf == null ? '-' : Math.round(d.mf)+'%', tr('md-faltas')) +
           tile(d.mn == null ? '-' : (Math.round(d.mn*10)/10).toFixed(1).replace('.',','), tr('md-nota'), 'roxa');
+        /* Turma que não respondeu sumia daqui em silêncio, e o professor lia um
+           número menor sem saber que faltava gente. Agora ela aparece. */
+        if (d.falharam){
+          box.insertAdjacentHTML('beforeend',
+            '<div class="md-status md-aviso">⚠️ ' +
+            tr('md-falhou').replace('{n}', d.falharam).replace('{t}', d.turmas) + '</div>');
+        }
       }
 
       function load(){
@@ -1427,20 +1434,26 @@
         })).then(function(lists){
           var all = [].concat.apply([], lists);
           if (!all.length){ semKpis(); return; } // sem turmas (ex.: conta da direção)
-          var alunos = [];
-          (function lote(i){
+          var alunos = [], falharam = 0;
+          /* UMA TURMA POR VEZ, de propósito. Ler quatro em paralelo não
+             acelerava nada — o card serializa de qualquer jeito (medido em
+             11/08/2026: uma turma 6-7s, quatro juntas 37s) — e era isso que
+             estourava o tempo do Google e derrubava quem estivesse usando
+             outra ferramenta no mesmo minuto. */
+          (function proxima(i){
             if (i >= all.length){
               var d = agg(alunos, all.length);
+              d.falharam = falharam;
               dataCache = d;
               try{ localStorage.setItem('fisk_minidash', JSON.stringify({ prof:s.name, t:Date.now(), d:d })); }catch(e){}
               render(d); return;
             }
-            Promise.all(all.slice(i, i+4).map(function(t){
-              return api({ fn:'turma', escola:t.esc, prof:s.name, linha:t.linha }).catch(function(){ return null; });
-            })).then(function(rs){
-              rs.forEach(function(d){ if (d) (d.alunos||[]).forEach(function(a){ if (a && a.nome) alunos.push(a); }); });
-              lote(i+4);
-            });
+            api({ fn:'turma', escola:all[i].esc, prof:s.name, linha:all[i].linha })
+              .catch(function(){ falharam++; return null; })
+              .then(function(d){
+                if (d) (d.alunos||[]).forEach(function(a){ if (a && a.nome) alunos.push(a); });
+                proxima(i+1);
+              });
           })(0);
         }).catch(function(){ semKpis(); });
       }

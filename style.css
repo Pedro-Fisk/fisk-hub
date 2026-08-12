@@ -101,6 +101,8 @@
 .md-kpi.alta b{color:#c0392b}
 .md-kpi.roxa b{color:#7C3AED}
 .md-status{grid-column:1/-1;font-size:.78rem;font-weight:700;color:var(--gray);align-self:center;padding:.6rem 0}
+/* turma que não respondeu: o número na tela está incompleto e precisa dizer isso */
+.md-aviso{color:#c0392b;line-height:1.45}
 
 /* ── Busca de aluno no mini-dash ──────────────────────────────────────────
    Ocupa a linha inteira abaixo dos KPIs (flex-basis 100% no container que já

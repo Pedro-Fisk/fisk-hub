@@ -482,22 +482,37 @@ function analisar(escola, prof) {
   api({ fn: 'turmas', escola: escola, prof: prof }).then(function (j) {
     var turmas = j.turmas || [];
     if (!turmas.length) { statusCard('Nenhuma turma encontrada para ' + prof + '.', 'err'); btn.disabled = false; return; }
-    var dados = [], feitas = 0;
-    // lotes de 4 leituras em paralelo (não sobrecarrega o Apps Script)
-    function lote(i) {
-      if (i >= turmas.length) { btn.disabled = false; render(escola, prof, dados); return; }
-      var grupo = turmas.slice(i, i + 4);
-      Promise.all(grupo.map(function (t) {
-        return api({ fn: 'turma', escola: escola, prof: prof, linha: t.linhaTitulo })
-          .then(function (d) { d._titulo = t.titulo; return d; })
-          .catch(function () { return null; }); // turma com erro não derruba o resto
-      })).then(function (rs) {
-        rs.forEach(function (d) { if (d) dados.push(d); feitas++; });
-        statusCard('🔄 Lendo turmas… ' + Math.min(feitas + 0, turmas.length) + '/' + turmas.length);
-        lote(i + 4);
-      });
+    var dados = [], feitas = 0, falharam = [];
+    /* UMA TURMA POR VEZ. O lote de 4 em paralelo não acelerava — o card
+       serializa de qualquer jeito (medido em 11/08/2026: uma turma 6-7s,
+       quatro juntas 37s) — e era ele que estourava o tempo do Google e
+       derrubava quem estivesse usando outra ferramenta no mesmo minuto. */
+    function proxima(i) {
+      if (i >= turmas.length) {
+        btn.disabled = false;
+        render(escola, prof, dados);
+        /* No caso feliz quem fala é o render (ele conta turmas e alunos). Aqui
+           só tomo a frente para avisar do que ficou faltando: turma que não
+           respondeu sumia do relatório em silêncio, e o professor lia os
+           números como se fossem de todas as turmas dele. */
+        if (falharam.length) {
+          statusCard('⚠️ ' + falharam.length + ' de ' + turmas.length + ' turmas não responderam e ficaram de fora: ' +
+                     falharam.join(', ') + '. Analise de novo para tentar outra vez.', 'err');
+        }
+        return;
+      }
+      var t = turmas[i];
+      api({ fn: 'turma', escola: escola, prof: prof, linha: t.linhaTitulo })
+        .then(function (d) { d._titulo = t.titulo; return d; })
+        .catch(function () { falharam.push(String(t.titulo).split('\n')[0]); return null; })
+        .then(function (d) {
+          if (d) dados.push(d);
+          feitas++;
+          statusCard('🔄 Lendo turmas… ' + feitas + '/' + turmas.length);
+          proxima(i + 1);
+        });
     }
-    lote(0);
+    proxima(0);
   }).catch(function (e) { statusCard('⚠️ ' + e.message, 'err'); btn.disabled = false; });
 }
 
