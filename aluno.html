@@ -157,6 +157,25 @@
 
   .vazio{ color:var(--gray); font-size:.85rem; padding:.6rem 0; }
 
+  /* ── conteúdo passivo (áudio e vídeo por lição) ── */
+  .pv-livro{ border:1px solid var(--gray-light); border-radius:12px; margin-bottom:.7rem; overflow:hidden; }
+  .pv-top{ display:flex; align-items:center; gap:.5rem; width:100%; padding:.6rem .8rem;
+           background:var(--gray-light); border:0; font:inherit; cursor:pointer; text-align:left; }
+  .pv-top b{ font-family:var(--font-heading); }
+  .pv-top .pv-resumo{ margin-left:auto; color:var(--gray); font-size:.82rem; }
+  .pv-lic{ display:grid; grid-template-columns:minmax(7rem,1fr) 5.5rem 1fr 4.6rem;
+           gap:.5rem; align-items:center; padding:.35rem .8rem; border-top:1px solid var(--gray-light); }
+  .pv-lic.zero{ opacity:.55; }
+  .pv-nome{ font-weight:600; }
+  .pv-num{ font-variant-numeric:tabular-nums; font-size:.85rem; color:var(--gray); }
+  .pv-barra{ height:7px; border-radius:4px; background:var(--gray-light); overflow:hidden; }
+  .pv-barra i{ display:block; height:100%; background:var(--emdia); }
+  .pv-barra i.parcial{ background:var(--media); }
+  .pv-vid{ font-size:.8rem; color:var(--gray); text-align:right; }
+  .pv-trofeu{ font-size:.95rem; }
+  @media(max-width:640px){ .pv-lic{ grid-template-columns:1fr 4.5rem; }
+    .pv-barra,.pv-vid{ grid-column:1/-1; text-align:left; } }
+
   /* ── modo embutido (painel lateral) ──────────────────────────────────
      A mesma página serve de tela cheia e de painel. Aqui ela perde o
      cabeçalho e as margens de página, para caber numa coluna estreita ao
@@ -256,7 +275,20 @@
     <div id="alAtiv"></div>
   </div>
 
-  <!-- 5 · notas: o semestre em curso à vista, o histórico atrás de um clique -->
+  <!-- 5 · conteúdo passivo: o que ele CONSUMIU, ao lado do que ele FEZ.
+       Pedido de um professor em 12/08/2026, para o checking: sem isto não dá
+       para separar "errou porque não ouviu" de "ouviu e não entendeu". -->
+  <div class="painel" id="pnPassivo" hidden>
+    <h2>🎧 O que o aluno ouviu e assistiu</h2>
+    <p class="sub">Áudios da lição, vídeos de explicação e Video Book, por lição.
+      O áudio só conta com <b>80% da faixa ouvida</b>. O vídeo é um player do Drive, de
+      fora do portal: ele conta por <b>90 segundos na tela</b>, o que mostra
+      <b>presença, não atenção</b>. Lição em branco quer dizer que ele não ouviu
+      <b>pelo portal</b>, e não que não estudou.</p>
+    <div id="alPassivo"></div>
+  </div>
+
+  <!-- 6 · notas: o semestre em curso à vista, o histórico atrás de um clique -->
   <div class="painel" id="pnNotas" hidden>
     <h2>📊 Notas e boletins</h2>
     <p class="sub">As avaliações do <b>semestre em curso</b> aparecem assim que carregam.
@@ -512,6 +544,7 @@ function render(d){
   renderDiagnostico();
 
   renderAtividades(fundir(ativ, d.provas || []));
+  renderPassivo(d.passivo);
   $('pnNotas').hidden = (d.escopo !== 'equipe');
   $('btnPasta').hidden = (d.escopo !== 'equipe');   // a pasta é do professor, não do aluno
   if (d.escopo === 'equipe') carregarNotas(st.raf);
@@ -704,6 +737,60 @@ function renderAtividades(ativ){
     '</div>';
   }).join('');
 }
+/* Conteúdo passivo, por lição. A leitura que o professor precisa fazer em
+ * cinco segundos é "a Lesson 1 está cheia ou vazia?", então a lição é a linha
+ * e a barra é o que salta. O troféu marca a lição com TODOS os áudios ouvidos,
+ * que é o pedido do professor, e só aparece no áudio: no vídeo o sistema não
+ * sabe se ele assistiu, só que ficou na tela. */
+function renderPassivo(p){
+  $('pnPassivo').hidden = false;
+  var box = $('alPassivo');
+  if (!p || !p.livros || !p.livros.length){
+    box.innerHTML = '<div class="vazio">Nenhum áudio ou vídeo do livro registrado ' +
+      'para este aluno. O registro existe desde <b>04/08/2026</b>, então nada aparece aqui ' +
+      'de antes dessa data.</div>';
+    return;
+  }
+  box.innerHTML = p.livros.map(function(L, i){
+    var somaA = 0, totA = 0, cheias = 0;
+    L.licoes.forEach(function(l){ somaA += l.audios; totA += l.audiosTotal;
+                                  if (l.audiosTotal && l.audios >= l.audiosTotal) cheias++; });
+    var linhas = L.licoes.map(function(l){
+      var pct = l.audiosTotal ? Math.min(100, Math.round(l.audios / l.audiosTotal * 100)) : 0;
+      var cheia = l.audiosTotal > 0 && l.audios >= l.audiosTotal;
+      return '<div class="pv-lic'+(l.audios || l.videos ? '' : ' zero')+'">' +
+        '<span class="pv-nome">'+esc(l.t)+ (cheia ? ' <span class="pv-trofeu" title="ouviu todos os áudios desta lição">🏆</span>' : '') +'</span>' +
+        '<span class="pv-num">'+l.audios+' de '+l.audiosTotal+'</span>' +
+        '<span class="pv-barra"><i class="'+(cheia?'':'parcial')+'" style="width:'+pct+'%"></i></span>' +
+        '<span class="pv-vid">'+(l.videosTotal ? l.videos+'/'+l.videosTotal+' vídeo'+(l.videosTotal===1?'':'s') : '—')+'</span>' +
+      '</div>';
+    }).join('');
+    var vbk = L.vbk && L.vbk.total
+      ? '<div class="pv-lic"><span class="pv-nome">Video Book</span>' +
+        '<span class="pv-num">'+L.vbk.feitos+' de '+L.vbk.total+'</span>' +
+        '<span class="pv-vid" style="grid-column:3/-1">'+
+          (L.vbk.itens && L.vbk.itens.length ? esc(L.vbk.itens.join(' · ')) : 'abriu, sem detalhe') +
+        '</span></div>'
+      : '';
+    return '<div class="pv-livro">' +
+      '<button type="button" class="pv-top" data-pv="'+i+'">' +
+        '<span>▾</span><b>'+esc(L.nome)+'</b>' +
+        '<span class="pv-resumo">'+somaA+' de '+totA+' áudios · '+cheias+' lição'+(cheias===1?'':'ões')+' completa'+(cheias===1?'':'s')+
+        (L.ultimo ? ' · último '+haQuanto(L.ultimo) : '')+'</span>' +
+      '</button>' +
+      '<div id="pv'+i+'">'+linhas+vbk+'</div>' +
+    '</div>';
+  }).join('') +
+  (p.foraDoCatalogo ? '<div class="vazio">'+p.foraDoCatalogo+' registro(s) não batem com o catálogo atual ' +
+    '(áudio renomeado ou removido depois de o aluno ouvir). Ficam de fora das contas acima.</div>' : '');
+}
+$('alPassivo').addEventListener('click', function(ev){
+  var b = ev.target.closest('.pv-top'); if (!b) return;
+  var corpo = $('pv' + b.dataset.pv);
+  corpo.hidden = !corpo.hidden;
+  b.firstChild.textContent = corpo.hidden ? '▸' : '▾';
+});
+
 function tentativas(a){
   if (!a.tentativas || !a.tentativas.length) return '<div class="vazio">Sem detalhe de tentativas.</div>';
   return a.tentativas.map(function(t, n){
