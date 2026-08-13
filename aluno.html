@@ -157,6 +157,19 @@
 
   .vazio{ color:var(--gray); font-size:.85rem; padding:.6rem 0; }
 
+  /* ── escuta por habilidade ── */
+  .es-l{display:grid;grid-template-columns:1.4rem minmax(9rem,1fr) 3.6rem 1fr 3rem;gap:.55rem;
+        align-items:center;padding:.4rem .1rem;border-top:1px solid var(--gray-light)}
+  .es-l:first-child{border-top:0}
+  .es-ic{font-size:1.05rem}
+  .es-nome{font-weight:600}
+  .es-n{font-variant-numeric:tabular-nums;font-size:.85rem;color:var(--gray)}
+  .es-bar{height:8px;border-radius:5px;background:var(--gray-light);overflow:hidden}
+  .es-bar i{display:block;height:100%}
+  .es-pct{font-family:var(--font-heading);font-weight:800;font-size:.9rem;text-align:right}
+  @media(max-width:640px){ .es-l{grid-template-columns:1.4rem 1fr 3rem}
+    .es-n{grid-column:2/-1;font-size:.78rem} .es-bar{grid-column:1/-1} }
+
   /* ── conteúdo passivo (áudio e vídeo por lição) ── */
   .pv-livro{ border:1px solid var(--gray-light); border-radius:12px; margin-bottom:.7rem; overflow:hidden; }
   .pv-top{ display:flex; align-items:center; gap:.5rem; width:100%; padding:.6rem .8rem;
@@ -289,7 +302,19 @@
     <div id="alPassivo"></div>
   </div>
 
-  <!-- 6 · notas: o semestre em curso à vista, o histórico atrás de um clique -->
+  <!-- 6 · escuta por habilidade: o padrão que se repete, não o resultado de um
+       exercício. O aluno vê o dele no fim de cada atividade do Listening Lab;
+       aqui é a soma do estágio, com o mais fraco em cima. -->
+  <div class="painel" id="pnEscuta" hidden>
+    <h2>🎧 Onde a escuta falha</h2>
+    <p class="sub">Desempenho por <b>habilidade de escuta</b>, somando todas as tentativas do
+      Listening Lab. Conta <b>todas</b>, e não a melhor: quem refez três vezes e continuou
+      errando inferência precisa aparecer errando inferência. O registro por habilidade
+      começou em <b>12/08/2026</b>, então o que veio antes não entra aqui.</p>
+    <div id="alEscuta"></div>
+  </div>
+
+  <!-- 7 · notas: o semestre em curso à vista, o histórico atrás de um clique -->
   <div class="painel" id="pnNotas" hidden>
     <h2>📊 Notas e boletins</h2>
     <p class="sub">As avaliações do <b>semestre em curso</b> aparecem assim que carregam.
@@ -546,6 +571,7 @@ function render(d){
 
   renderAtividades(fundir(ativ, d.provas || []));
   renderPassivo(d.passivo);
+  renderEscuta(d.escuta);
   $('pnNotas').hidden = (d.escopo !== 'equipe');
   $('btnPasta').hidden = (d.escopo !== 'equipe');   // a pasta é do professor, não do aluno
   if (d.escopo === 'equipe') carregarNotas(st.raf);
@@ -738,6 +764,50 @@ function renderAtividades(ativ){
     '</div>';
   }).join('');
 }
+/* Escuta por habilidade. A leitura que o professor faz aqui é diferente da do
+ * aluno: ele não quer saber como foi UM exercício, quer saber o que se repete.
+ * Por isso o mais fraco vem em cima (o servidor já ordena) e a barra é o que
+ * salta. A régua de cor é a mesma das outras telas: 70% dominado, abaixo de 50%
+ * é o que pede aula. */
+/* O catálogo das oito é JSON, não script, então vem por fetch. É CÓPIA do
+   portal-aluno-fisk/listening/data/habilidades.json — mexeu lá, recopie para
+   cá, como já vale para o assets/atividades-index.js.
+   Se chegar depois do dossiê, repinta; se não chegar, a tela mostra o id cru
+   em vez de sumir com o bloco. */
+var HABS = null, _ultimaEscuta = null;
+fetch('assets/habilidades.json').then(function(r){ return r.json(); })
+  .then(function(j){ HABS = j; if (_ultimaEscuta) renderEscuta(_ultimaEscuta); })
+  .catch(function(){});
+function habNome(id){
+  var h = HABS && (HABS.habilidades||[]).filter(function(x){ return x.id === id; })[0];
+  return h ? { nome: h.pt.nome, ic: h.ic, desc: h.pt.desc } : { nome: id, ic: '🎧', desc: '' };
+}
+function renderEscuta(e){
+  _ultimaEscuta = e;
+  $('pnEscuta').hidden = false;
+  var box = $('alEscuta');
+  if (!e || !e.habilidades || !e.habilidades.length){
+    box.innerHTML = '<div class="vazio">Nenhuma atividade do Listening Lab registrada por habilidade ' +
+      'para este aluno. O recorte começou em <b>12/08/2026</b>: antes disso o exercício era gravado, ' +
+      'mas sem dizer que habilidade ele treinava.</div>';
+    return;
+  }
+  box.innerHTML = e.habilidades.map(function(h){
+    var m = habNome(h.hab);
+    var cor = corPct(h.pct);
+    return '<div class="es-l" title="'+esc(m.desc)+'">' +
+      '<span class="es-ic">'+m.ic+'</span>' +
+      '<span class="es-nome">'+esc(m.nome)+'</span>' +
+      '<span class="es-n">'+h.c+' de '+h.q+'</span>' +
+      '<span class="es-bar"><i style="width:'+(h.pct==null?0:h.pct)+'%;background:'+cor+'"></i></span>' +
+      '<span class="es-pct" style="color:'+cor+'">'+(h.pct==null?'—':h.pct+'%')+'</span>' +
+    '</div>';
+  }).join('') +
+  '<div class="vazio">' + e.tentativas + ' atividade' + (e.tentativas===1?'':'s') + ' de escuta' +
+  (e.ultimo ? ' · última ' + haQuanto(e.ultimo) : '') + '. Uma habilidade com poucas questões respondidas ' +
+  'diz pouco: olhe o número ao lado da barra antes de concluir.</div>';
+}
+
 /* Conteúdo passivo, por lição. A leitura que o professor precisa fazer em
  * cinco segundos é "a Lesson 1 está cheia ou vazia?", então a lição é a linha
  * e a barra é o que salta. O troféu marca a lição com TODOS os áudios ouvidos,

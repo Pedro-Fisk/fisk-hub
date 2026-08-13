@@ -1,0 +1,260 @@
+{
+  "_leia_me": [
+    "AS OITO HABILIDADES DE ESCUTA. Cada questão do Listening Lab e dos simulados",
+    "leva uma delas no campo `hab`, e é por elas que o aluno e o professor passam a",
+    "ver ONDE a escuta falha, não só quantos acertos saíram.",
+    "",
+    "DE ONDE ELAS SAÍRAM (12/08/2026). Não são uma lista de manual: vieram de três",
+    "leituras cruzadas.",
+    "1. As 60 questões de listening do MET Sample Test Form A oficial (Cambridge",
+    "   Michigan), contadas uma a uma pelo que cada enunciado exige. Foi essa",
+    "   contagem que revelou duas habilidades que ninguém chuta de cabeça: 'ação",
+    "   seguinte' (6 das 60, e campeã da Parte 1) e o item de replay, em que o áudio",
+    "   repete uma fala e pergunta o que ela SIGNIFICA (7 das 60).",
+    "2. Os scripts das provas de estágio da Fisk. O `Script - Ess 1 - 1-5` mostrou o",
+    "   que o exame inicial cobra e que nenhuma taxonomia internacional nomeia,",
+    "   porque todas a pressupõem: ouvir a pergunta e saber que resposta ela pede.",
+    "3. TOEFL, IELTS, Cambridge, SIELE e DELE, que convergem em gist, detalhe,",
+    "   inferência, atitude e função.",
+    "",
+    "O QUE FICOU DE FORA, e por quê: 'números e datas' e 'vocabulário em contexto'",
+    "estavam na primeira proposta e caíram na medição. No MET Form A não há uma",
+    "única questão de listening sobre números, e vocabulário em contexto aparece só",
+    "na seção de LEITURA. Eram intuição, não evidência.",
+    "",
+    "NÃO HÁ ESCADA POR ESTÁGIO (decisão do Pedro): as oito valem desde o Essentials",
+    "1. O que muda com o estágio é o inglês do áudio, não a habilidade cobrada.",
+    "",
+    "CINCO QUESTÕES POR ATIVIDADE, variando quais habilidades entram em cada uma. O",
+    "aluno encontra as oito ao longo do estágio, não em cada exercício: oito por",
+    "atividade transformaria um exercício de 4 minutos numa sessão longa."
+  ],
+  "habilidades": [
+    {
+      "id": "reconhecer_pergunta",
+      "ic": "❓",
+      "pt": {
+        "nome": "Reconhecer a pergunta",
+        "desc": "Ouvir a pergunta e saber que tipo de resposta ela pede.",
+        "texto": "Toda pergunta pede um tipo de resposta. <b>Where</b> pede um lugar, <b>when</b> pede um tempo, <b>how much</b> pede um preço. Quem reconhece a pergunta já sabe o que procurar no áudio antes de a resposta chegar.",
+        "dica": "Treine ouvindo só a primeira palavra da pergunta e adivinhando que tipo de resposta vem. Você acerta muita coisa sem entender a frase inteira."
+      },
+      "en": {
+        "nome": "Understanding the question",
+        "desc": "Hear a question and know what kind of answer it calls for.",
+        "texto": "Every question asks for a type of answer. <b>Where</b> asks for a place, <b>when</b> for a time, <b>how much</b> for a price.",
+        "dica": "Listen to the first word of the question and predict what kind of answer must come."
+      },
+      "es": {
+        "nome": "Reconocer la pregunta",
+        "desc": "Escuchar la pregunta y saber qué tipo de respuesta pide.",
+        "texto": "Cada pregunta pide un tipo de respuesta. <b>Dónde</b> pide un lugar, <b>cuándo</b> un tiempo, <b>cuánto</b> un precio.",
+        "dica": "Escucha solo la primera palabra de la pregunta y adivina qué tipo de respuesta viene."
+      },
+      "exemplo": "Where are you from? → escolher a resposta coerente"
+    },
+    {
+      "id": "detalhe",
+      "ic": "🔎",
+      "pt": {
+        "nome": "Detalhe explícito",
+        "desc": "A resposta está dita com todas as letras no áudio.",
+        "texto": "A resposta está dita com todas as letras. Não é preciso concluir nada: é preciso <b>ouvir e segurar</b> a informação, que muitas vezes passa uma vez só.",
+        "dica": "Antes de dar play, leia a pergunta. Saber o que procurar transforma escuta em busca, e busca é bem mais fácil."
+      },
+      "en": {
+        "nome": "Listening for detail",
+        "desc": "The answer is stated word for word in the audio.",
+        "texto": "The answer is said word for word. You do not need to work anything out: you need to catch and hold the information.",
+        "dica": "Read the question before you press play. Knowing what to look for turns listening into searching."
+      },
+      "es": {
+        "nome": "Detalle explícito",
+        "desc": "La respuesta se dice literalmente en el audio.",
+        "texto": "La respuesta se dice literalmente. No hay que deducir nada: hay que oír y retener el dato.",
+        "dica": "Lee la pregunta antes de dar play. Saber qué buscar convierte la escucha en búsqueda."
+      },
+      "exemplo": "What is the right size for Anna?"
+    },
+    {
+      "id": "ideia_principal",
+      "ic": "🎯",
+      "pt": {
+        "nome": "Ideia principal",
+        "desc": "Do que trata a conversa ou a fala, no conjunto.",
+        "texto": "Do que trata a conversa <b>no conjunto</b>. É a habilidade de quem perde metade das palavras e mesmo assim sabe o que está acontecendo, e é ela que sustenta uma conversa de verdade.",
+        "dica": "Ouça a primeira vez sem tentar entender tudo. Pergunte-se apenas: quem fala, onde estão, o que querem?"
+      },
+      "en": {
+        "nome": "Main idea",
+        "desc": "What the conversation or talk is about as a whole.",
+        "texto": "What the whole conversation is about. It is what lets you follow a talk even when you miss half the words.",
+        "dica": "Listen the first time without trying to catch everything. Just ask: who is talking, where are they, what do they want?"
+      },
+      "es": {
+        "nome": "Idea principal",
+        "desc": "De qué trata la conversación o la charla en conjunto.",
+        "texto": "De qué trata la conversación en conjunto, aunque se pierdan palabras.",
+        "dica": "Escucha la primera vez sin intentar entenderlo todo. Pregúntate: ¿quién habla, dónde están, qué quieren?"
+      },
+      "exemplo": "What are the speakers mainly discussing?"
+    },
+    {
+      "id": "acao_seguinte",
+      "ic": "➡️",
+      "pt": {
+        "nome": "Ação seguinte",
+        "desc": "O que a pessoa provavelmente vai fazer depois.",
+        "texto": "O que a pessoa provavelmente vai fazer depois. A resposta não está dita: ela vem do que foi combinado, pedido ou decidido durante a conversa.",
+        "dica": "Preste atenção no fim das falas. É quase sempre lá que se combina o próximo passo."
+      },
+      "en": {
+        "nome": "What happens next",
+        "desc": "What the speaker will probably do next.",
+        "texto": "What the speaker will probably do next. It is not stated: it follows from what was agreed or decided.",
+        "dica": "Pay attention to the end of the conversation. That is usually where the next step is agreed."
+      },
+      "es": {
+        "nome": "Acción siguiente",
+        "desc": "Qué hará probablemente la persona después.",
+        "texto": "Qué hará probablemente la persona después. No está dicho: se deduce de lo que se acordó.",
+        "dica": "Presta atención al final de la conversación: ahí suele acordarse el próximo paso."
+      },
+      "exemplo": "What will the woman probably do?"
+    },
+    {
+      "id": "sugestao_pedido",
+      "ic": "🤝",
+      "pt": {
+        "nome": "Sugestão e pedido",
+        "desc": "Reconhecer que aquilo foi um conselho, uma oferta ou um pedido.",
+        "texto": "Reconhecer que aquilo foi um <b>conselho, uma oferta ou um pedido</b>, e não uma informação. Em inglês isso vem em fórmulas prontas: <i>How about…?</i>, <i>Why don't you…?</i>, <i>Would you like…?</i>, <i>Remember to…</i>",
+        "dica": "Decore as fórmulas, não as frases. Quem reconhece <i>How about…?</i> entende qualquer sugestão que venha depois."
+      },
+      "en": {
+        "nome": "Suggestions and requests",
+        "desc": "Recognising advice, an offer or a request.",
+        "texto": "Recognising that something was advice, an offer or a request. English marks these with set phrases.",
+        "dica": "Learn the formulas, not the sentences. If you know <i>How about…?</i> you will catch any suggestion."
+      },
+      "es": {
+        "nome": "Sugerencia y petición",
+        "desc": "Reconocer que aquello fue un consejo, una oferta o una petición.",
+        "texto": "Reconocer que aquello fue un consejo, un ofrecimiento o una petición, no una información.",
+        "dica": "Aprende las fórmulas, no las frases sueltas."
+      },
+      "exemplo": "What does the man suggest the woman do?"
+    },
+    {
+      "id": "atitude",
+      "ic": "😀",
+      "pt": {
+        "nome": "Atitude e sentimento",
+        "desc": "Como o falante se sente sobre aquilo que diz.",
+        "texto": "Como o falante <b>se sente</b> sobre o que diz. A mesma frase muda de sentido conforme o tom: quem só ouve as palavras perde metade da conversa.",
+        "dica": "Repare no tom de voz e nas palavrinhas de reação: <i>oh</i>, <i>well</i>, <i>hmm</i>, <i>really?</i>. Elas carregam o sentimento."
+      },
+      "en": {
+        "nome": "Attitude and feeling",
+        "desc": "How the speaker feels about what is being said.",
+        "texto": "How the speaker feels about what is being said. Tone changes the meaning of the same sentence.",
+        "dica": "Notice the tone and the small reaction words: <i>oh</i>, <i>well</i>, <i>hmm</i>, <i>really?</i>"
+      },
+      "es": {
+        "nome": "Actitud y sentimiento",
+        "desc": "Cómo se siente el hablante sobre lo que dice.",
+        "texto": "Cómo se siente quien habla sobre lo que dice. El tono cambia el sentido de la misma frase.",
+        "dica": "Fíjate en el tono y en las palabras de reacción: <i>ah</i>, <i>bueno</i>, <i>¿en serio?</i>"
+      },
+      "exemplo": "How does the man feel?"
+    },
+    {
+      "id": "proposito",
+      "ic": "🧭",
+      "pt": {
+        "nome": "Propósito",
+        "desc": "Por que a pessoa disse ou fez aquilo; para que serve a fala.",
+        "texto": "<b>Por que</b> a pessoa disse ou fez aquilo. Não é o que aconteceu, é para quê. Vale para uma fala solta e para uma palestra inteira.",
+        "dica": "Depois de entender o que foi dito, pergunte-se: por que essa pessoa está dizendo isso agora?"
+      },
+      "en": {
+        "nome": "Purpose",
+        "desc": "Why the speaker said or did that; what the talk is for.",
+        "texto": "<b>Why</b> the speaker said or did that. Not what happened, but what for.",
+        "dica": "After you understand what was said, ask yourself: why is this person saying it now?"
+      },
+      "es": {
+        "nome": "Propósito",
+        "desc": "Por qué la persona dijo o hizo aquello; para qué sirve.",
+        "texto": "<b>Por qué</b> la persona dijo o hizo aquello. No es qué pasó, sino para qué.",
+        "dica": "Después de entender lo dicho, pregúntate: ¿por qué lo dice ahora?"
+      },
+      "exemplo": "Why is the woman meeting the dean?"
+    },
+    {
+      "id": "sentido_implicito",
+      "ic": "💭",
+      "pt": {
+        "nome": "Sentido implícito",
+        "desc": "O que não foi dito com todas as letras: inferência, ironia, expressão.",
+        "texto": "O que <b>não</b> foi dito com todas as letras: ironia, expressão pronta, resposta indireta. Um <i>I'm good</i> pode ser um não educado. É a habilidade mais difícil, e a que mais aparece nos exames.",
+        "dica": "Quando a resposta parecer estranha para a pergunta, desconfie: quase sempre há um sentido por trás dela."
+      },
+      "en": {
+        "nome": "Implied meaning",
+        "desc": "What was not said outright: inference, irony, idiom.",
+        "texto": "What was <b>not</b> said outright: irony, idiom, an indirect answer. <i>I'm good</i> can be a polite no.",
+        "dica": "When an answer sounds odd for the question, look for the meaning behind it."
+      },
+      "es": {
+        "nome": "Sentido implícito",
+        "desc": "Lo que no se dijo literalmente: inferencia, ironía, expresión.",
+        "texto": "Lo que <b>no</b> se dijo literalmente: ironía, expresión hecha, respuesta indirecta.",
+        "dica": "Cuando la respuesta suene rara para la pregunta, busca el sentido que hay detrás."
+      },
+      "exemplo": "What does the woman mean when she says…?"
+    }
+  ],
+  "_dificuldade": [
+    "A HABILIDADE NÃO MUDA COM O ESTÁGIO; A CARGA MUDA (Pedro, 12/08/2026).",
+    "O aluno do Essentials trabalha as mesmas oito habilidades do aluno de In Focus.",
+    "O que cai no Essentials é o peso de LEITURA e de MEMÓRIA da questão, nunca a",
+    "habilidade cobrada. Uma pergunta de sentido implícito continua sendo de sentido",
+    "implícito; ela só para de exigir que o aluno guarde a frase de cabeça.",
+    "",
+    "ESSENTIALS (níveis Iniciante e Básico):",
+    "  · enunciado no presente, curto, sem oração relativa;",
+    "  · alternativas curtas, com a mesma estrutura entre si;",
+    "  · só UMA alternativa plausível — nada de distrator que exija distinção fina;",
+    "  · vocabulário das alternativas restrito ao que aparece no áudio ou na lição;",
+    "  · sentido implícito SEMPRE cita a fala dentro da pergunta;",
+    "  · a resposta nunca depende de algo dito uma vez, de passagem.",
+    "",
+    "TRANSITIONS e FLUENCY (Intermediário):",
+    "  · enunciado e alternativas em linguagem natural, sem citar a fala;",
+    "  · distratores plausíveis, que exigem ter entendido a cena.",
+    "",
+    "IN FOCUS e simulados (Avançado):",
+    "  · formato do MET, inclusive o item de replay sem citação no enunciado."
+  ],
+  "_lingua_da_questao": [
+    "A LÍNGUA DO ENUNCIADO TAMBÉM É DO ESTÁGIO (12/08/2026). A pergunta não pode",
+    "usar estrutura que o aluno ainda não viu, senão ela vira prova de gramática",
+    "disfarçada de prova de escuta.",
+    "",
+    "A fonte é a TABELA DE CONTEÚDOS de cada estágio, em PDF, na pasta de projetos",
+    "('TABELA DE CONTEÚDOS (for reference)'). Ela traz, lição a lição, a gramática,",
+    "o vocabulário e a coluna Communication.",
+    "",
+    "ERRO REAL QUE ELA PEGOU: eu havia escrito 'What will Anna probably do next?'",
+    "em atividades de Essentials. O Essentials 1 tem `going to` na lição 8 e `did`",
+    "nas 9 e 10; **`will` não aparece em nenhuma lição do livro**. Corrigido para",
+    "'What is Anna going to do next?' nas três atividades atingidas.",
+    "",
+    "ACHADO QUE VALE GUARDAR: a coluna Communication da tabela já nomeia várias das",
+    "oito habilidades com outras palavras — 'Making suggestions' e 'Asking for a",
+    "favor' são a nossa `sugestao_pedido`; 'Expressing surprise', 'Giving opinion' e",
+    "'Sympathizing' são `atitude`. Ou seja, a taxonomia não é estrangeira ao método:",
+    "ela dá nome de habilidade de escuta ao que o livro já ensina como função."
+  ]
+}
