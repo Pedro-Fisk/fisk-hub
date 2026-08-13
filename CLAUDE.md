@@ -72,7 +72,15 @@ Duas URLs de Apps Script, de propósito diferentes:
 - **Não transferir os repositórios para uma organização** antes de resolver os
   links: o endereço `pedro-fisk.github.io/…` está escrito na mão em
   `assets/fisk-shared.js`, `met.html`, `siele.html`, `quick-practice.html`,
-  `boletins.html` e `index.html`.
+  `boletins.html` e `index.html`. O `aluno.html` também busca
+  `portalfisk.com.br/listening/data/habilidades.json`, pelo mesmo motivo.
+- **Dado que já existe noutro repositório se LÊ, não se copia.** O dossiê lê o
+  catálogo das habilidades de escuta direto do portal, e o módulo de
+  diagnóstico direto do `fisk-simulador`. Cópia local vira duas verdades, e um
+  dia aluno e professor discordam sobre o mesmo aluno. Quando a leitura de fora
+  for indispensável para a tela funcionar, embuta uma **reserva mínima** no
+  próprio arquivo (o `HAB_RESERVA` do `aluno.html` é o exemplo: oito nomes, para
+  o portal fora do ar virar nome desatualizado e não tela quebrada).
 
 ## Convenções de código
 

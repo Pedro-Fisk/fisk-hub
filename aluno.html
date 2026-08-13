@@ -769,14 +769,38 @@ function renderAtividades(ativ){
  * Por isso o mais fraco vem em cima (o servidor já ordena) e a barra é o que
  * salta. A régua de cor é a mesma das outras telas: 70% dominado, abaixo de 50%
  * é o que pede aula. */
-/* O catálogo das oito é JSON, não script, então vem por fetch. É CÓPIA do
-   portal-aluno-fisk/listening/data/habilidades.json — mexeu lá, recopie para
-   cá, como já vale para o assets/atividades-index.js.
-   Se chegar depois do dossiê, repinta; se não chegar, a tela mostra o id cru
-   em vez de sumir com o bloco. */
-var HABS = null, _ultimaEscuta = null;
-fetch('assets/habilidades.json').then(function(r){ return r.json(); })
-  .then(function(j){ HABS = j; if (_ultimaEscuta) renderEscuta(_ultimaEscuta); })
+/* O CATÁLOGO DAS OITO NÃO É COPIADO PARA CÁ (12/08/2026). Ele mora num lugar
+   só, no portal (listening/data/habilidades.json), e esta tela lê de lá pela
+   rede. Chegou a existir uma cópia em assets/, com a regra "mexeu lá, recopie";
+   ela durou algumas horas e morreu pelo argumento que já vale para o
+   `diagnostico.js`, carregado do fisk-simulador pelas duas telas: cópia é como
+   aluno e professor acabam discordando sobre o mesmo aluno.
+   Os dois servidores mandam `access-control-allow-origin: *`, conferido em
+   12/08/2026, então a leitura de fora funciona.
+   A RESERVA ABAIXO é o que impede a tela de depender do portal estar no ar:
+   nome e ícone das oito, embutidos. O que só existe lá é a explicação longa e
+   a dica, que são para o ALUNO — o dossiê nunca precisou delas. Portal fora do
+   ar vira, no pior caso, um nome desatualizado; nunca uma tela quebrada. */
+var HAB_RESERVA = [
+  ['reconhecer_pergunta','❓','Reconhecer a pergunta'],
+  ['detalhe','🔎','Detalhe explícito'],
+  ['ideia_principal','🎯','Ideia principal'],
+  ['acao_seguinte','➡️','Ação seguinte'],
+  ['sugestao_pedido','🤝','Sugestão e pedido'],
+  ['atitude','😀','Atitude e sentimento'],
+  ['proposito','🧭','Propósito'],
+  ['sentido_implicito','💭','Sentido implícito']
+];
+var HABS = { habilidades: HAB_RESERVA.map(function(r){
+               return { id: r[0], ic: r[1], pt: { nome: r[2], desc: '' } }; }) };
+var _ultimaEscuta = null;
+fetch('https://portalfisk.com.br/listening/data/habilidades.json')
+  .then(function(r){ return r.json(); })
+  .then(function(j){
+    if (!j || !j.habilidades || !j.habilidades.length) return;   // resposta estranha: fica a reserva
+    HABS = j;
+    if (_ultimaEscuta) renderEscuta(_ultimaEscuta);
+  })
   .catch(function(){});
 function habNome(id){
   var h = HABS && (HABS.habilidades||[]).filter(function(x){ return x.id === id; })[0];
