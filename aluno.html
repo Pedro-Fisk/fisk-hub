@@ -281,8 +281,9 @@
   <div class="painel" id="pnPassivo" hidden>
     <h2>🎧 O que o aluno ouviu e assistiu</h2>
     <p class="sub">Áudios da lição, vídeos de explicação e Video Book, por lição.
-      O áudio só conta com <b>80% da faixa ouvida</b>. O vídeo é um player do Drive, de
-      fora do portal: ele conta por <b>90 segundos na tela</b>, o que mostra
+      O áudio só conta com <b>60% da faixa ouvida</b>, e o material marcado
+      <b>Extra</b> fica de fora da conta: o total é o que a aula pede. O vídeo é um player
+      do Drive, de fora do portal: ele conta por <b>90 segundos na tela</b>, o que mostra
       <b>presença, não atenção</b>. Lição em branco quer dizer que ele não ouviu
       <b>pelo portal</b>, e não que não estudou.</p>
     <div id="alPassivo"></div>
@@ -754,12 +755,17 @@ function renderPassivo(p){
   box.innerHTML = p.livros.map(function(L, i){
     var somaA = 0, totA = 0, cheias = 0;
     L.licoes.forEach(function(l){ somaA += l.audios; totA += l.audiosTotal;
-                                  if (l.audiosTotal && l.audios >= l.audiosTotal) cheias++; });
+                                  if (l.fechada || (l.audiosTotal && l.audios >= Math.ceil(l.audiosTotal * 0.6))) cheias++; });
     var linhas = L.licoes.map(function(l){
       var pct = l.audiosTotal ? Math.min(100, Math.round(l.audios / l.audiosTotal * 100)) : 0;
-      var cheia = l.audiosTotal > 0 && l.audios >= l.audiosTotal;
+      /* LIÇÃO FECHADA = 60% das faixas que contam (Pedro, 12/08/2026), não
+         100%: é a mesma régua do portal, senão o troféu aparece para o aluno e
+         não para a professora. O `fechada` vem do evento `sec:`; a conta local
+         cobre quem passou dos 60% antes de a régua mudar, e por isso nunca
+         emitiu o evento. */
+      var cheia = l.fechada || (l.audiosTotal > 0 && l.audios >= Math.ceil(l.audiosTotal * 0.6));
       return '<div class="pv-lic'+(l.audios || l.videos ? '' : ' zero')+'">' +
-        '<span class="pv-nome">'+esc(l.t)+ (cheia ? ' <span class="pv-trofeu" title="ouviu todos os áudios desta lição">🏆</span>' : '') +'</span>' +
+        '<span class="pv-nome">'+esc(l.t)+ (cheia ? ' <span class="pv-trofeu" title="lição fechada: 60% ou mais dos áudios que contam">🏆</span>' : '') +'</span>' +
         '<span class="pv-num">'+l.audios+' de '+l.audiosTotal+'</span>' +
         '<span class="pv-barra"><i class="'+(cheia?'':'parcial')+'" style="width:'+pct+'%"></i></span>' +
         '<span class="pv-vid">'+(l.videosTotal ? l.videos+'/'+l.videosTotal+' vídeo'+(l.videosTotal===1?'':'s') : '—')+'</span>' +
