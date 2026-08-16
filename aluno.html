@@ -167,6 +167,23 @@
   .es-bar{height:8px;border-radius:5px;background:var(--gray-light);overflow:hidden}
   .es-bar i{display:block;height:100%}
   .es-pct{font-family:var(--font-heading);font-weight:800;font-size:.9rem;text-align:right}
+
+  /* ── fala (Speaking Lab) ── */
+  .fa-p{border-top:1px solid var(--gray-light);padding:.65rem 0}
+  .fa-p:first-child{border-top:0}
+  .fa-h{display:flex;align-items:baseline;gap:.5rem;flex-wrap:wrap}
+  .fa-h b{font-family:var(--font-heading);font-size:.95rem}
+  .fa-h .q{color:var(--gray);font-size:.78rem}
+  .fa-h .m{margin-left:auto;font-family:var(--font-heading);font-weight:800}
+  .fa-i{display:grid;grid-template-columns:1fr 3.2rem 2.2rem;gap:.5rem;align-items:center;
+        padding:.3rem 0 .3rem .9rem;font-size:.86rem}
+  .fa-i .txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .fa-i .txt i{color:var(--gray)}
+  .fa-i .n{font-family:var(--font-heading);font-weight:800;text-align:right;font-size:.85rem}
+  .fa-ouvir{border:1px solid var(--gray-light);background:transparent;border-radius:999px;
+            cursor:pointer;font-size:.9rem;line-height:1;padding:.25rem .45rem}
+  .fa-ouvir:hover{border-color:var(--red)}
+  .fa-ouvir[disabled]{opacity:.4;cursor:default}
   @media(max-width:640px){ .es-l{grid-template-columns:1.4rem 1fr 3rem}
     .es-n{grid-column:2/-1;font-size:.78rem} .es-bar{grid-column:1/-1} }
 
@@ -312,6 +329,18 @@
       errando inferência precisa aparecer errando inferência. O registro por habilidade
       começou em <b>12/08/2026</b>, então o que veio antes não entra aqui.</p>
     <div id="alEscuta"></div>
+  </div>
+
+  <!-- 6b · fala: o Speaking Lab. O professor NÃO corrige aqui, e isso é
+       decisão de produto: quem corrige é o motor. O que esta seção oferece é
+       poder OUVIR, quando ele quiser, sem nenhuma ação obrigatória. -->
+  <div class="painel" id="pnFala" hidden>
+    <h2>🎤 Como ele fala</h2>
+    <p class="sub">As <b>Práticas de fluência</b> do Speaking Lab, que preparam o <i>checking</i> de
+      cada lição. A nota é do motor de avaliação, e mede <b>pronúncia, ritmo e fluência</b> —
+      não substitui o seu <i>checking</i>, adianta o que você já veria. Fica aqui a melhor
+      tentativa de cada item, e a gravação pode ser ouvida por <b>90 dias</b>.</p>
+    <div id="alFala"></div>
   </div>
 
   <!-- 7 · notas: o semestre em curso à vista, o histórico atrás de um clique -->
@@ -572,6 +601,7 @@ function render(d){
   renderAtividades(fundir(ativ, d.provas || []));
   renderPassivo(d.passivo);
   renderEscuta(d.escuta);
+  renderFala(d.fala);
   $('pnNotas').hidden = (d.escopo !== 'equipe');
   $('btnPasta').hidden = (d.escopo !== 'equipe');   // a pasta é do professor, não do aluno
   if (d.escopo === 'equipe') carregarNotas(st.raf);
@@ -831,6 +861,75 @@ function renderEscuta(e){
   (e.ultimo ? ' · última ' + haQuanto(e.ultimo) : '') + '. Uma habilidade com poucas questões respondidas ' +
   'diz pouco: olhe o número ao lado da barra antes de concluir.</div>';
 }
+
+/* Fala, do Speaking Lab. Uma linha por PRÁTICA e, dentro dela, o melhor de
+ * cada item — o professor quer saber como foi a preparação do checking, não
+ * ver dezoito tentativas. O botão de ouvir busca o áudio pela rota
+ * autenticada: a gravação não fica pública no Drive, porque é voz de aluno.
+ */
+function renderFala(f){
+  var pn = $('pnFala');
+  if (!f || !f.praticas || !f.praticas.length){
+    /* Sem prática nenhuma o painel some, em vez de mostrar caixa vazia: o
+       Speaking Lab é novo e a maioria dos alunos ainda não tem nada aqui. */
+    pn.hidden = true;
+    return;
+  }
+  pn.hidden = false;
+  $('alFala').innerHTML = f.praticas.map(function(p){
+    var itens = p.itens.map(function(it){
+      var cor = corPct(it.pron);
+      var texto = it.livre
+        ? '<i>resposta livre:</i> ' + esc(it.texto.replace(/^↪\s*/, '')) 
+        : esc(it.texto);
+      return '<div class="fa-i">' +
+        '<span class="txt" title="'+esc(it.texto)+'">'+texto+'</span>' +
+        '<span class="n" style="color:'+cor+'">'+(it.pron||'—')+'</span>' +
+        (it.arquivo
+          ? '<button type="button" class="fa-ouvir" data-arq="'+esc(it.arquivo)+'" title="Ouvir a gravação">▶</button>'
+          : '<span></span>') +
+      '</div>';
+    }).join('');
+    return '<div class="fa-p">' +
+      '<div class="fa-h"><b>'+esc(nomePratica(p.id))+'</b>' +
+      '<span class="q">'+haQuanto(p.quando)+' · '+p.tentativas+' gravaç'+(p.tentativas===1?'ão':'ões')+'</span>' +
+      '<span class="m" style="color:'+corPct(p.media)+'">'+(p.media==null?'—':p.media)+'</span></div>' +
+      itens +
+    '</div>';
+  }).join('') +
+  '<div class="vazio">' + f.tentativas + ' gravaç' + (f.tentativas===1?'ão':'ões') +
+  (f.ultimo ? ' · última ' + haQuanto(f.ultimo) : '') + '. A nota vai de 0 a 100 e compara com fala ' +
+  'nativa: um aluno de Essentials na faixa dos 50 e 60 está <b>dentro do esperado</b> para o estágio.</div>';
+}
+
+/* `e1-l3` → "Essentials 1 · Lesson 3". Id de formato desconhecido volta como
+   está, em vez de sumir. */
+function nomePratica(id){
+  var m = String(id||'').match(/^e(\d+)-l(\d+)$/);
+  return m ? ('Essentials ' + m[1] + ' · Lesson ' + m[2]) : id;
+}
+
+/* Ouvir a gravação. O áudio vem em base64 pela rota autenticada e vira um
+ * Blob local; nada fica público no Drive. Um clipe dá uns 400 KB, então o
+ * botão avisa que está carregando e não deixa clicar duas vezes. */
+var _falaAudio = null;
+document.addEventListener('click', function(ev){
+  var b = ev.target.closest && ev.target.closest('.fa-ouvir');
+  if (!b) return;
+  if (_falaAudio){ _falaAudio.pause(); _falaAudio = null; }
+  b.disabled = true; b.textContent = '⏳';
+  post({ action:'falaAudio', token: token(), raf: (atual && atual.raf) || '', fileId: b.dataset.arq })
+    .then(function(r){
+      b.disabled = false; b.textContent = '▶';
+      if (!r || !r.ok){ b.title = (r && r.error) || 'não deu para carregar'; b.textContent = '⚠'; return; }
+      _falaAudio = new Audio('data:' + (r.mime||'audio/wav') + ';base64,' + r.b64);
+      _falaAudio.play();
+      b.textContent = '⏸';
+      _falaAudio.onended = function(){ b.textContent = '▶'; };
+      b.onclick = null;
+    })
+    .catch(function(){ b.disabled = false; b.textContent = '⚠'; });
+});
 
 /* Conteúdo passivo, por lição. A leitura que o professor precisa fazer em
  * cinco segundos é "a Lesson 1 está cheia ou vazia?", então a lição é a linha
