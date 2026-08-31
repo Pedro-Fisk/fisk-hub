@@ -1173,8 +1173,144 @@
          apareceria em lugar nenhum. */
       function registrarHome(){
         if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Fisk Hub (início)');
+        avisoNovidade();
         // campanha da direção, se houver alguma no ar para a equipe
         if (typeof fiskCampanha === 'function') fiskCampanha();
+      }
+
+      /* ══ CORTINA DE AVISO AO PROFESSOR ═══════════════════════════════════
+         A tela cheia que conta ao professor o que mudou na ferramenta dele.
+         Aparece UMA VEZ por professor (ciência em `fisk_aviso_<id>_<nome>`,
+         no aparelho) e some sozinha depois de `ate`.
+
+         FALHA FECHADA, ao contrário da cortina do aluno: qualquer defeito
+         (data torta, sessão sem nome, sem localStorage) simplesmente NÃO
+         mostra o aviso e o Hub abre inteiro. Cortina que trava o professor no
+         meio da aula é pior do que aviso não lido.
+
+         NOS TRÊS IDIOMAS do Hub, e não só em português: o padrão da casa é
+         INGLÊS (`localStorage 'fisk-lang' || 'en'`), então um aviso só em
+         português apareceria em outra língua que não a da tela para a maior
+         parte dos professores. Segue o `_lang` do momento em que abre.
+
+         ⚠️ A SENHA APARECE AQUI, e por isso ela não está escrita em texto no
+         fonte: o Hub é servido pelo GitHub Pages e a página é pública, então
+         `Ctrl+F ksif` acharia. Os códigos abaixo são OFUSCAÇÃO, não segredo —
+         quem ler o JavaScript com atenção monta a palavra em dez segundos. É
+         o mesmo nível de proteção da própria trava (ver o comentário do
+         `prova` no config.js do Portal do Aluno): atrito, não cofre. */
+      var AVISO = {
+        id: 'provas-audio-2026-09',
+        ate: '2026-10-15',                       // AAAA-MM-DD, some sozinha depois
+        senha: String.fromCharCode(107,115,105,102),
+        pt: { selo:'Novidade para o professor',
+              t:'Os áudios das provas agora estão no Portal do Aluno 🎧',
+              p1:'Os áudios das provas auditivas saíram do computador da escola e estão no Portal do Aluno, em <b>Áudios do livro</b>, numa seção separada chamada <b>TESTS</b> (no espanhol, <b>TEST DE ESCUCHA</b>).',
+              p2:'<b>Ela nasce trancada.</b> Para abrir, na hora da prova:',
+              li1:'Abra a seção <b>TESTS</b>, no fim da lista de áudios.',
+              li2:'Digite a senha abaixo no aparelho e toque em <b>Liberar</b>.',
+              li3:'Os áudios ficam abertos por <b>1 hora</b> naquele aparelho.',
+              rot:'A senha é',
+              cuidado:'O campo esconde o que você digita, em bolinhas. A ideia é que você digite de frente para o teclado, sem ditar em voz alta — assim o aluno não ouve a prova antes.',
+              p3:'Se a prova for no fone de cada aluno, digite a senha no aparelho de cada um. Ouvir esses áudios <b>não dá Fisk Dólares</b> e não fecha lição nenhuma.',
+              btn:'Entendi 👍' },
+        en: { selo:'New for teachers',
+              t:'The test audio is now in the Student Portal 🎧',
+              p1:'The listening test audio has moved off the school computer and into the Student Portal, under <b>Book audio</b>, in a separate section called <b>TESTS</b> (in Spanish, <b>TEST DE ESCUCHA</b>).',
+              p2:'<b>It starts locked.</b> To open it at test time:',
+              li1:'Open the <b>TESTS</b> section, at the end of the audio list.',
+              li2:'Type the code below on the device and tap <b>Unlock</b>.',
+              li3:'The audio stays open for <b>1 hour</b> on that device.',
+              rot:'The code is',
+              cuidado:'The field hides what you type, as dots. The idea is that you type facing the keyboard, without saying it out loud — so students do not hear the test beforehand.',
+              p3:'If students take the test on their own headphones, type the code on each device. Listening to this audio <b>earns no Fisk Dollars</b> and does not complete any lesson.',
+              btn:'Got it 👍' },
+        es: { selo:'Novedad para el profesor',
+              t:'Los audios de las pruebas ya están en el Portal del Alumno 🎧',
+              p1:'Los audios de las pruebas auditivas salieron de la computadora de la escuela y están en el Portal del Alumno, en <b>Audios del libro</b>, en una sección aparte llamada <b>TEST DE ESCUCHA</b> (en inglés, <b>TESTS</b>).',
+              p2:'<b>Nace bloqueada.</b> Para abrirla, a la hora de la prueba:',
+              li1:'Abre la sección <b>TEST DE ESCUCHA</b>, al final de la lista de audios.',
+              li2:'Escribe la contraseña de abajo en el aparato y toca <b>Liberar</b>.',
+              li3:'Los audios quedan abiertos por <b>1 hora</b> en ese aparato.',
+              rot:'La contraseña es',
+              cuidado:'El campo esconde lo que escribes, en puntos. La idea es que escribas de frente al teclado, sin decirla en voz alta — así el alumno no oye la prueba antes.',
+              p3:'Si la prueba es con los auriculares de cada alumno, escribe la contraseña en cada aparato. Escuchar estos audios <b>no da Fisk Dólares</b> y no cierra ninguna lección.',
+              btn:'Entendido 👍' }
+      };
+      function avisoVisto(nome){
+        try { return localStorage.getItem('fisk_aviso_' + AVISO.id + '_' + nome) === '1'; }
+        catch(e) { return true; }                // sem localStorage: não insista
+      }
+      function avisoNovidade(){
+        try{
+          var s = saved(); if (!s || !s.name) return;
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(AVISO.ate)) return;
+          var d = new Date();
+          var hoje = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+          if (hoje > AVISO.ate) return;          // passou da validade
+          if (avisoVisto(s.name)) return;
+          if (document.getElementById('av-mask')) return;   // já está na tela
+
+          var st = document.createElement('style');
+          st.textContent =
+            '#av-mask{position:fixed;inset:0;z-index:9995;background:rgba(15,12,12,.62);display:flex;' +
+            'align-items:center;justify-content:center;padding:1rem}' +
+            '#av-card{background:var(--white,#fff);color:var(--black,#161414);border-radius:18px;' +
+            'border-top:6px solid var(--ui,#2b4d70);max-width:34rem;width:100%;max-height:88vh;overflow:auto;' +
+            'padding:1.5rem 1.6rem 1.3rem;box-shadow:0 20px 50px rgba(0,0,0,.35)}' +
+            '#av-card .av-selo{display:inline-block;background:var(--ui-soft,#e9eff5);color:var(--ui-ink,#1d3349);' +
+            'font-weight:800;font-size:.74rem;letter-spacing:.04em;text-transform:uppercase;' +
+            'padding:.3rem .7rem;border-radius:999px}' +
+            '#av-card h2{font-family:var(--font-heading);font-size:1.25rem;line-height:1.3;margin:.6rem 0 .5rem}' +
+            '#av-card p{font-size:.95rem;line-height:1.55;margin:0 0 .7rem;color:var(--black,#161414)}' +
+            '#av-card ol{margin:.2rem 0 .9rem 1.1rem;padding:0;font-size:.95rem;line-height:1.6}' +
+            '#av-card li{margin-bottom:.3rem}' +
+            '.av-senha{background:var(--ui-soft,#e9eff5);border:1.5px dashed var(--ui-bd,#9db6cb);border-radius:14px;' +
+            'padding:.9rem 1rem;text-align:center;margin:.2rem 0 1rem}' +
+            '.av-senha .rot{font-size:.76rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;' +
+            'color:var(--ui-ink,#1d3349);display:block;margin-bottom:.25rem}' +
+            '.av-senha .val{font-family:var(--font-heading);font-size:2rem;font-weight:800;letter-spacing:.35em;' +
+            'color:var(--ui,#2b4d70);display:block;padding-left:.35em}' +
+            '.av-cuidado{background:#fdf3e3;border-left:4px solid var(--gold,#c9922e);border-radius:10px;' +
+            'padding:.7rem .9rem;font-size:.9rem;line-height:1.5;margin:0 0 1rem}' +
+            '#av-ok{background:var(--ui,#2b4d70);color:#fff;border:none;border-radius:12px;width:100%;' +
+            'padding:.8rem 1rem;font:inherit;font-weight:800;font-size:1rem;cursor:pointer}' +
+            'body.theme-dark #av-card{background:#211e1e;color:#f2efef}' +
+            'body.theme-dark #av-card p,body.theme-dark #av-card li{color:#f2efef}' +
+            'body.theme-dark .av-cuidado{background:#3a2f14;color:#f5d78e}';
+          document.head.appendChild(st);
+
+          var tx = AVISO[(typeof _lang !== 'undefined' && AVISO[_lang]) ? _lang : 'pt'];
+          var mask = document.createElement('div');
+          mask.id = 'av-mask';
+          mask.innerHTML =
+            '<div id="av-card" role="dialog" aria-modal="true" aria-labelledby="av-t">' +
+              '<span class="av-selo">' + tx.selo + '</span>' +
+              '<h2 id="av-t">' + tx.t + '</h2>' +
+              '<p>' + tx.p1 + '</p>' +
+              '<p>' + tx.p2 + '</p>' +
+              '<ol><li>' + tx.li1 + '</li><li>' + tx.li2 + '</li><li>' + tx.li3 + '</li></ol>' +
+              '<div class="av-senha"><span class="rot">' + tx.rot + '</span>' +
+                '<span class="val">' + AVISO.senha + '</span></div>' +
+              '<div class="av-cuidado">' + tx.cuidado + '</div>' +
+              '<p>' + tx.p3 + '</p>' +
+              '<button id="av-ok" type="button">' + tx.btn + '</button>' +
+            '</div>';
+          document.body.appendChild(mask);
+          document.body.style.overflow = 'hidden';
+
+          function fechar(){
+            try { localStorage.setItem('fisk_aviso_' + AVISO.id + '_' + s.name, '1'); } catch(e) {}
+            mask.remove();
+            document.body.style.overflow = '';
+          }
+          document.getElementById('av-ok').addEventListener('click', fechar);
+          /* fecha no Esc e no clique fora, e AMBOS marcam ciência: o professor
+             que fechou já viu a senha, e insistir na terceira aula seguinte é
+             barulho. Para reapresentar a todos, troque o `id`. */
+          mask.addEventListener('click', function(e){ if (e.target === mask) fechar(); });
+          document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && document.getElementById('av-mask')) fechar(); });
+        }catch(e){ /* aviso nunca pode segurar o Hub */ }
       }
 
       /* Este é o portal do PROFESSOR: a lista mostra só quem dá aula.
