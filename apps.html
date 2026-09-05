@@ -35,7 +35,11 @@
   .ap-lista{ display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 1rem; }
   /* o ícone da loja fica à ESQUERDA do nome: o professor reconhece o app pelo
      desenho antes de ler, que é como ele o procura no celular do aluno */
-  .ap-topo{ display: flex; align-items: center; gap: .7rem; }
+  /* ⚠️ ALINHA PELO TOPO, não pelo centro. Com `center`, o card cujo nome ocupa
+     três linhas (o Playground XP) descia o ícone para o meio do texto e ele
+     ficava fora da linha dos vizinhos — o olho compara os cards lado a lado, e
+     o desalinhamento aparece antes do conteúdo. */
+  .ap-topo{ display: flex; align-items: flex-start; gap: .7rem; }
   .ap-ic{
     width: 44px; height: 44px; flex: none; border-radius: 10px;
     border: 1px solid var(--ui-bd); background: var(--white); object-fit: cover;
