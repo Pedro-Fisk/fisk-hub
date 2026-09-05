@@ -44,12 +44,36 @@
 */
 window.FISK_APPS = {
   atualizado: '05/09/2026',
+  /* Os blocos e, dentro de cada um, OS ESTÁGIOS QUE A ESCOLA DÁ. A pergunta
+     que o professor faz não é "quais apps existem para Kids", é "o que o meu
+     aluno do Teens Connect 2 precisa baixar" — então o estágio é o filtro que
+     importa, e o bloco só agrupa (decisão do Pedro, 05/09/2026).
+
+     Os nomes são os do CARD, porque é contra eles que as expressões `rx` de
+     cada app são testadas — a mesma comparação que o Portal do Aluno faz com o
+     `book` do aluno. Escrever aqui um nome que o card não usa quebra o filtro
+     em silêncio.
+
+     Estágio SEM app alguém tem: aparece assim mesmo, com a tela dizendo que não
+     há. Esconder o estágio faria o professor procurar de novo achando que
+     errou o clique. */
   blocos: [
-    { id: 'kids',     nome: 'Kids',              hint: 'Magic Way, Playground e Fun' },
-    { id: 'teens',    nome: 'Teens',             hint: 'Teens Connect e Elementary' },
-    { id: 'adultos',  nome: 'Jovens e adultos',  hint: 'Essentials a In Focus' },
-    { id: 'espanhol', nome: 'Espanhol',          hint: 'Inmediato 1, 2 e 3' },
-    { id: 'escola',   nome: 'Uso do professor em sala', hint: 'Não são para o aluno' }
+    { id: 'kids', nome: 'Kids', hint: 'Magic Way, Playground e Fun', estagios: [
+      'Magic Way - Yellow Book', 'Magic Way - Blue Book', 'Magic Way - Red Book',
+      'Magic Way - Green Book', 'Playground Hello A', 'Playground Hello B',
+      'Playground Slide', 'Playground See-Saw', 'Playground Merry-go-round',
+      'Playground Maze', 'Fun At Home', 'Fun At School', 'Fun Around Town' ] },
+    { id: 'teens', nome: 'Teens', hint: 'Teens Connect, Elementary e Teenstation', estagios: [
+      'Teens Connect 1', 'Teens Connect 2', 'Teens Connect 3', 'Teens Connect 4',
+      'Teens Elementary 1', 'Teens Elementary 2', 'Teenstation 1', 'Teenstation 2' ] },
+    { id: 'adultos', nome: 'Jovens e adultos', hint: 'Essentials a In Focus', estagios: [
+      'Essentials 1', 'Essentials 2', 'Transitions 1', 'Transitions 2',
+      'Fluency 1', 'Fluency 2', 'In Focus', 'Pathways 3' ] },
+    { id: 'espanhol', nome: 'Espanhol', hint: 'do Chiquiteens ao Inmediato 3', estagios: [
+      'Chiquiteens 1', 'Chiquiteens 2', 'Conéctate 1', 'Conéctate 2',
+      'Español con Ñ 2', 'Español con Ñ 5',
+      'Inmediato 1', 'Inmediato 2', 'Inmediato 3' ] },
+    { id: 'escola', nome: 'Uso do professor em sala', hint: 'Não são para o aluno', estagios: [] }
   ],
   apps: [
     /* ── Cyber Fisk: o oficial, um por bloco ─────────────────────────────── */
