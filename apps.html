@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aplicativos da Fisk</title>
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04c">
+<link rel="stylesheet" href="style.css?v=2026-08-04b">
+<meta name="theme-color" content="#161414">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+<style>
+  /* Esta página é uma LISTA, não uma grade de ferramentas: os cards são baixos
+     e largos, para caber o nome, onde se usa e os dois botões de loja. Por isso
+     ela não reaproveita `.grid`/`.card` do Hub, que são cards altos de 220px. */
+  .ap-wrap{ max-width: 1100px; margin: 0 auto; padding: 2.2rem 1.5rem 4rem; }
+  .ap-filtros{ display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.4rem; }
+  .ap-chip{
+    font: 700 .85rem/1 var(--font-body, inherit); padding: .55rem .95rem;
+    border-radius: 999px; border: 1.5px solid var(--ui-bd); background: var(--white);
+    color: var(--ui-dark); cursor: pointer; transition: background .12s, border-color .12s;
+  }
+  .ap-chip:hover{ border-color: var(--ui); }
+  .ap-chip.is-on{ background: var(--ui); border-color: var(--ui); color: #fff; }
+  .ap-busca{
+    width: 100%; max-width: 420px; margin-bottom: 1.6rem; padding: .7rem 1rem;
+    border: 1.5px solid var(--ui-bd); border-radius: 12px; background: var(--white);
+    color: var(--black); font-size: .95rem;
+  }
+  .ap-sec-t{
+    font-family: var(--font-title, inherit); font-size: 1.05rem; font-weight: 800;
+    color: var(--ui-dark); margin: 2rem 0 .3rem;
+  }
+  .ap-sec-d{ color: var(--gray); font-size: .88rem; margin: 0 0 1rem; }
+  .ap-lista{ display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 1rem; }
+  .ap-card{
+    display: flex; flex-direction: column; gap: .55rem;
+    background: var(--white); border: 1.5px solid var(--surface-border-color);
+    border-left: 5px solid var(--accent, var(--ui)); border-radius: var(--surface-radius);
+    padding: 1.1rem 1.2rem; box-shadow: var(--surface-shadow);
+  }
+  .ap-nome{ font-family: var(--font-title, inherit); font-size: 1rem; font-weight: 800; color: var(--black); }
+  .ap-onde{ font-size: .82rem; font-weight: 700; color: var(--ui-dark); }
+  .ap-desc{ font-size: .85rem; color: var(--gray); line-height: 1.45; margin: 0; }
+  .ap-lojas{ display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .35rem; }
+  .ap-loja{
+    display: inline-flex; align-items: center; gap: .4rem; text-decoration: none;
+    font-size: .82rem; font-weight: 700; padding: .48rem .8rem; border-radius: 10px;
+    border: 1.5px solid var(--ui-bd); color: var(--ui-dark); background: var(--ui-soft);
+  }
+  .ap-loja:hover{ border-color: var(--ui); }
+  .ap-sem{
+    display: inline-flex; align-items: center; gap: .4rem; font-size: .78rem; font-weight: 700;
+    padding: .48rem .8rem; border-radius: 10px; border: 1.5px dashed var(--ui-bd); color: var(--gray);
+  }
+  .ap-vazio{ color: var(--gray); padding: 2rem 0; }
+  .ap-aviso{
+    border: 1.5px solid var(--ui-bd); border-left: 5px solid #B45309;
+    background: var(--ui-soft); border-radius: var(--surface-radius);
+    padding: 1rem 1.2rem; margin-bottom: 1.6rem; font-size: .88rem; line-height: 1.5;
+  }
+  .ap-aviso b{ color: var(--ui-dark); }
+  body.theme-dark .ap-card, body.theme-dark .ap-busca{ background: var(--surface, #1e2733); }
+  body.theme-dark .ap-chip{ background: transparent; color: var(--white); }
+  body.theme-dark .ap-loja{ background: transparent; color: var(--white); }
+</style>
+</head>
+<body>
+<script>try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
+
+  <header class="hero">
+    <a class="back-link" href="index.html">&larr; Voltar aos recursos</a>
+    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
+    <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+    <h1>Aplicativos da Fisk</h1>
+    <p>O que existe nas lojas, para qual estágio serve e o link para baixar</p>
+  </header>
+
+  <div class="ap-wrap">
+    <div class="ap-aviso">
+      <b>Antes de indicar um app para a turma, confira a plataforma.</b> Nem tudo
+      está nas duas lojas: <b>Fun Transition 1</b>, <b>Fun Fluency 1</b> e
+      <b>Fun Fluency 2</b> só existem para iPhone, e o <b>Fisk Helper</b> e o
+      <b>New Fisk Player</b> só para Android. O card avisa quando falta.
+      <br><br>
+      A régua de <b>qual app serve a qual série</b> é a <b>Circular 29/25</b> da
+      Fundação Fisk; os links e a conferência de plataforma são de 05/09/2026.
+    </div>
+
+    <div class="ap-filtros" id="apFiltros"></div>
+    <input class="ap-busca" id="apBusca" type="search" placeholder="Buscar por nome ou estágio…" aria-label="Buscar aplicativo">
+    <div id="apSaida"></div>
+  </div>
+
+  <footer>
+    <p>Ferramenta desenvolvida exclusivamente para uso interno das escolas Fisk. A utilização deste sistema e de seu conteúdo por pessoas ou instituições não autorizadas, incluindo professores particulares, é proibida. Desenvolvido por @fiskcacapava e @taubatefisk</p>
+  </footer>
+
+<script src="assets/apps-data.js?v=2026-09-05"></script>
+<script src="assets/fisk-shared.js?v=2026-08-06a"></script>
+<script>
+(function () {
+  var D = window.FISK_APPS || { blocos: [], apps: [] };
+  var filtro = 'todos', busca = '';
+
+  /* As três famílias, na ordem em que o professor decide: primeiro o oficial,
+     depois o jogo do livro, depois o que vale para todo mundo. O "só da escola"
+     vem por último e com o aviso, porque é o que NÃO se manda para o aluno. */
+  var SECOES = [
+    { tipo: 'cyber',  cor: '#0B5394', t: 'Cyber Fisk — o oficial',
+      d: 'Um por bloco de curso. É a plataforma que a franqueadora mantém, e a primeira que o aluno deve ter.' },
+    { tipo: 'fun',    cor: '#15803D', t: 'Cyber Fun — o jogo do livro',
+      d: 'Um por estágio, opcional. Jogos e atividades em 3D ligados ao que a turma está estudando.' },
+    { tipo: 'ra',     cor: '#7C3AED', t: 'Realidade aumentada',
+      d: 'Presos a um livro só: a câmera aponta para a página e a atividade ganha vida.' },
+    { tipo: 'geral',  cor: '#B45309', t: 'Genéricos — servem a qualquer estágio',
+      d: 'Não dependem do livro. Valem para a turma inteira, o ano inteiro.' },
+    { tipo: 'escola', cor: '#DC2626', t: 'Só da escola — não indique ao aluno',
+      d: 'Uso interno. A própria loja diz que não são destinados a alunos.' }
+  ];
+
+  function esc(s){ var d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; }
+
+  function botoes(a) {
+    var h = '<div class="ap-lojas">';
+    h += a.android
+      ? '<a class="ap-loja" target="_blank" rel="noopener" href="https://play.google.com/store/apps/details?id=' +
+        encodeURIComponent(a.android) + '">🤖 Android</a>'
+      : '<span class="ap-sem" title="A franqueadora não publicou este app no Google Play">🤖 sem Android</span>';
+    h += a.ios
+      ? '<a class="ap-loja" target="_blank" rel="noopener" href="https://apps.apple.com/br/app/id' +
+        encodeURIComponent(a.ios) + '">🍎 iPhone</a>'
+      : '<span class="ap-sem" title="A franqueadora não publicou este app na App Store">🍎 sem iPhone</span>';
+    return h + '</div>';
+  }
+
+  function passa(a) {
+    if (filtro !== 'todos' && a.blocos.indexOf(filtro) < 0) return false;
+    if (!busca) return true;
+    var alvo = (a.nome + ' ' + a.onde + ' ' + a.desc).toLowerCase();
+    return alvo.indexOf(busca) >= 0;
+  }
+
+  function desenha() {
+    var saida = document.getElementById('apSaida'), html = '', total = 0;
+    SECOES.forEach(function (s) {
+      var apps = D.apps.filter(function (a) { return a.tipo === s.tipo && passa(a); });
+      if (!apps.length) return;
+      total += apps.length;
+      html += '<div class="ap-sec-t">' + esc(s.t) + '</div><p class="ap-sec-d">' + esc(s.d) + '</p><div class="ap-lista">';
+      apps.forEach(function (a) {
+        html += '<div class="ap-card" style="--accent:' + s.cor + '">' +
+          '<div class="ap-nome">' + esc(a.nome) + '</div>' +
+          '<div class="ap-onde">' + esc(a.onde) + '</div>' +
+          '<p class="ap-desc">' + esc(a.desc) + '</p>' + botoes(a) + '</div>';
+      });
+      html += '</div>';
+    });
+    /* O que a circular promete e a loja não entrega. Entra no fim e só sem
+       filtro/busca: é informação de gestão, não de "qual app eu mando baixar". */
+    if (filtro === 'todos' && !busca && (D.pendentes || []).length) {
+      html += '<div class="ap-sec-t">Previstos pela franqueadora, ausentes das lojas</div>' +
+        '<p class="ap-sec-d">A Circular 29/25 lista estes apps, mas em 05/09/2026 nenhuma das duas lojas os tinha. ' +
+        'A própria circular avisa: "apps sendo renovados, alguns podem estar indisponíveis temporariamente".</p>' +
+        '<div class="ap-lista">';
+      D.pendentes.forEach(function (x) {
+        html += '<div class="ap-card" style="--accent:#94a3b8">' +
+          '<div class="ap-nome">' + esc(x.nome) + '</div>' +
+          '<div class="ap-onde">' + esc(x.onde) + '</div>' +
+          '<p class="ap-desc">' + esc(x.nota) + '</p></div>';
+      });
+      html += '</div>';
+    }
+    saida.innerHTML = total ? html :
+      '<p class="ap-vazio">Nenhum aplicativo com esse filtro. Tente outro bloco ou limpe a busca.</p>';
+  }
+
+  var box = document.getElementById('apFiltros');
+  var lista = [{ id: 'todos', nome: 'Todos', hint: '' }].concat(D.blocos);
+  lista.forEach(function (b) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'ap-chip' + (b.id === 'todos' ? ' is-on' : '');
+    btn.textContent = b.nome;
+    if (b.hint) btn.title = b.hint;
+    btn.addEventListener('click', function () {
+      filtro = b.id;
+      box.querySelectorAll('.ap-chip').forEach(function (c) { c.classList.toggle('is-on', c === btn); });
+      desenha();
+    });
+    box.appendChild(btn);
+  });
+
+  document.getElementById('apBusca').addEventListener('input', function () {
+    busca = this.value.trim().toLowerCase();
+    desenha();
+  });
+
+  desenha();
+})();
+</script>
+</body>
+</html>
