@@ -56,7 +56,7 @@
      o desalinhamento aparece antes do conteúdo. */
   .ap-topo{ display: flex; align-items: flex-start; gap: .7rem; }
   .ap-ic{
-    width: 44px; height: 44px; flex: none; border-radius: 10px;
+    width: 60px; height: 60px; flex: none; border-radius: 13px;
     border: 1px solid var(--ui-bd); background: var(--white); object-fit: cover;
   }
   .ap-card{
@@ -65,9 +65,9 @@
     border-left: 5px solid var(--accent, var(--ui)); border-radius: var(--surface-radius);
     padding: 1.1rem 1.2rem; box-shadow: var(--surface-shadow);
   }
-  .ap-nome{ font-family: var(--font-title, inherit); font-size: 1rem; font-weight: 800; color: var(--black); }
-  .ap-onde{ font-size: .82rem; font-weight: 700; color: var(--ui-dark); }
-  .ap-desc{ font-size: .85rem; color: var(--gray); line-height: 1.45; margin: 0; }
+  .ap-nome{ font-family: var(--font-title, inherit); font-size: 1.08rem; font-weight: 800; color: var(--black); }
+  .ap-onde{ font-size: .88rem; font-weight: 700; color: var(--ui-dark); }
+  .ap-desc{ font-size: .9rem; color: var(--gray); line-height: 1.5; margin: 0; }
   .ap-lojas{ display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .35rem; }
   .ap-loja{
     display: inline-flex; align-items: center; gap: .4rem; text-decoration: none;
@@ -123,7 +123,7 @@
     <p>Ferramenta desenvolvida exclusivamente para uso interno das escolas Fisk. A utilização deste sistema e de seu conteúdo por pessoas ou instituições não autorizadas, incluindo professores particulares, é proibida. Desenvolvido por @fiskcacapava e @taubatefisk</p>
   </footer>
 
-<script src="assets/apps-data.js?v=2026-09-05d"></script>
+<script src="assets/apps-data.js?v=2026-09-05e"></script>
 <script src="assets/fisk-shared.js?v=2026-08-06a"></script>
 <script>
 (function () {
@@ -157,6 +157,9 @@
 
   function botoes(a) {
     var h = '<div class="ap-lojas">';
+    /* a versão web vem PRIMEIRO quando existe: é a que abre sem instalar nada,
+       e é a saída para o aluno com o celular cheio ou emprestado */
+    if (a.web) h += '<a class="ap-loja" target="_blank" rel="noopener" href="' + a.web + '">🌐 Versão web</a>';
     h += a.android
       ? '<a class="ap-loja" target="_blank" rel="noopener" href="https://play.google.com/store/apps/details?id=' +
         encodeURIComponent(a.android) + '">🤖 Android</a>'
@@ -218,7 +221,7 @@
       apps.forEach(function (a) {
         html += '<div class="ap-card" style="--accent:' + s.cor + '">' +
           '<div class="ap-topo">' +
-            (a.icone ? '<img class="ap-ic" src="' + esc(iconeLocal(a.icone)) + '" alt="" width="44" height="44" loading="lazy">' : '') +
+            (a.icone ? '<img class="ap-ic" src="' + esc(iconeLocal(a.icone)) + '" alt="" width="60" height="60" loading="lazy">' : '') +
             '<div><div class="ap-nome">' + esc(a.nome) + '</div>' +
             '<div class="ap-onde">' + esc(a.onde) + '</div></div>' +
           '</div>' +

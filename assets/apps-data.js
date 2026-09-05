@@ -29,6 +29,9 @@
      onde     texto curto que responde "em que estágio eu uso isto?"
      android  pacote no Google Play (null = não existe para Android)
      ios      id numérico na App Store (null = não existe para iPhone)
+     web      quando o app TAMBÉM roda no navegador, o endereço. Só o Cyber
+              Fisk 3.0 tem: é a mesma plataforma, e o aluno que não pode
+              instalar (aparelho cheio, celular emprestado) entra por ali.
      icone    o ícone do app, baixado das lojas e servido POR ESTE REPOSITÓRIO
               (assets/apps/). A URL é absoluta de propósito: o Portal do Aluno
               lê este arquivo de outro domínio, e caminho relativo quebraria lá.
@@ -96,7 +99,7 @@ window.FISK_APPS = {
     { nome: 'Cyber Fisk 3.0', tipo: 'cyber', blocos: ['adultos', 'espanhol'],
       onde: 'Essentials 1 a In Focus, e o espanhol — um app para todos',
       desc: 'A plataforma oficial do aluno de jovens e adultos. É um só para todos os estágios.',
-      android: 'com.mbr.cyber30', ios: '1491785193', rx: ['essentials', 'transitions?', 'fluency', 'in\\s*focus', 'speed\\s*[123]', 'inmediato'], icone: 'https://pedro-fisk.github.io/fisk-hub/assets/apps/cyber-fisk-3-0.png' },
+      android: 'com.mbr.cyber30', ios: '1491785193', web: 'https://cyber.fisk.com.br:175/cyberfisknew/', rx: ['essentials', 'transitions?', 'fluency', 'in\\s*focus', 'speed\\s*[123]', 'inmediato'], icone: 'https://pedro-fisk.github.io/fisk-hub/assets/apps/cyber-fisk-3-0.png' },
 
     /* ── Cyber Fun: o joguinho, um por livro ─────────────────────────────── */
     { nome: 'Cyber Fun Magic Way', tipo: 'fun', blocos: ['kids'],
