@@ -33,6 +33,13 @@
   }
   .ap-sec-d{ color: var(--gray); font-size: .88rem; margin: 0 0 1rem; }
   .ap-lista{ display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 1rem; }
+  /* o ícone da loja fica à ESQUERDA do nome: o professor reconhece o app pelo
+     desenho antes de ler, que é como ele o procura no celular do aluno */
+  .ap-topo{ display: flex; align-items: center; gap: .7rem; }
+  .ap-ic{
+    width: 44px; height: 44px; flex: none; border-radius: 10px;
+    border: 1px solid var(--ui-bd); background: var(--white); object-fit: cover;
+  }
   .ap-card{
     display: flex; flex-direction: column; gap: .55rem;
     background: var(--white); border: 1.5px solid var(--surface-border-color);
@@ -96,7 +103,7 @@
     <p>Ferramenta desenvolvida exclusivamente para uso interno das escolas Fisk. A utilização deste sistema e de seu conteúdo por pessoas ou instituições não autorizadas, incluindo professores particulares, é proibida. Desenvolvido por @fiskcacapava e @taubatefisk</p>
   </footer>
 
-<script src="assets/apps-data.js?v=2026-09-05b"></script>
+<script src="assets/apps-data.js?v=2026-09-05c"></script>
 <script src="assets/fisk-shared.js?v=2026-08-06a"></script>
 <script>
 (function () {
@@ -115,11 +122,18 @@
       d: 'Presos a um livro só: a câmera aponta para a página e a atividade ganha vida.' },
     { tipo: 'geral',  cor: '#B45309', t: 'Genéricos — servem a qualquer estágio',
       d: 'Não dependem do livro. Valem para a turma inteira, o ano inteiro.' },
-    { tipo: 'escola', cor: '#DC2626', t: 'Só da escola — não indique ao aluno',
-      d: 'Uso interno. A própria loja diz que não são destinados a alunos.' }
+    { tipo: 'escola', cor: '#DC2626', t: 'Uso do professor em sala',
+      d: 'Não indique ao aluno: são de uso interno, e a própria loja diz que não são destinados a alunos.' }
   ];
 
   function esc(s){ var d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; }
+
+  /* O `icone` do apps-data.js e ABSOLUTO porque o Portal do Aluno le o arquivo
+     de outro dominio. Aqui dentro do Hub, o mesmo arquivo esta ao lado: usa a
+     copia local, que responde offline e nao paga uma volta na rede. */
+  function iconeLocal(u){
+    return String(u || '').replace('https://pedro-fisk.github.io/fisk-hub/assets/', 'assets/');
+  }
 
   function botoes(a) {
     var h = '<div class="ap-lojas">';
@@ -150,8 +164,11 @@
       html += '<div class="ap-sec-t">' + esc(s.t) + '</div><p class="ap-sec-d">' + esc(s.d) + '</p><div class="ap-lista">';
       apps.forEach(function (a) {
         html += '<div class="ap-card" style="--accent:' + s.cor + '">' +
-          '<div class="ap-nome">' + esc(a.nome) + '</div>' +
-          '<div class="ap-onde">' + esc(a.onde) + '</div>' +
+          '<div class="ap-topo">' +
+            (a.icone ? '<img class="ap-ic" src="' + esc(iconeLocal(a.icone)) + '" alt="" width="44" height="44" loading="lazy">' : '') +
+            '<div><div class="ap-nome">' + esc(a.nome) + '</div>' +
+            '<div class="ap-onde">' + esc(a.onde) + '</div></div>' +
+          '</div>' +
           '<p class="ap-desc">' + esc(a.desc) + '</p>' + botoes(a) + '</div>';
       });
       html += '</div>';

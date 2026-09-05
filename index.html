@@ -1224,9 +1224,58 @@
          quem ler o JavaScript com atenção monta a palavra em dez segundos. É
          o mesmo nível de proteção da própria trava (ver o comentário do
          `prova` no config.js do Portal do Aluno): atrito, não cofre. */
-      var AVISO = {
+      /* ⚠️ É UMA LISTA, e não um aviso só (05/09/2026). Com um objeto único,
+         publicar a novidade seguinte apagava a anterior para quem ainda não
+         tinha entrado — foi exatamente o que aconteceu na cortina do aluno, e o
+         conserto lá foi este. Mostra o PRIMEIRO da lista que esteja na janela
+         de datas e que este professor ainda não tenha confirmado; o outro
+         espera a próxima entrada, porque duas cortinas seguidas são parede.
+         Ordem da lista = ordem de prioridade.
+
+         Os campos `lista`, `senha`, `cuidado`, `p3` e `link` são OPCIONAIS: o
+         desenho só escreve o que o aviso trouxer. */
+      var AVISOS = [
+      {
+        id: 'apps-da-fisk-2026-09',
+        ate: '2026-11-30',
+        link: { href: 'apps.html' },
+        pt: { selo:'Novidade para o professor',
+              t:'Já dá para saber, na hora, qual app a sua turma precisa baixar 📱',
+              p1:'O Hub tem uma área nova, <b>Aplicativos da Fisk</b>: os 34 aplicativos que a franqueadora publica nas lojas, com <b>qual deles serve a qual estágio</b> e o link para baixar no Android e no iPhone. A régua é a Circular 29/25 da Fundação — não é o que dá para deduzir pelo nome.',
+              p2:'Ela existe para você orientar o aluno, e o mesmo card está em mais dois lugares:',
+              li1:'no acesso <b>KIDS</b> do Portal do Aluno (que é seu, para o plantão das crianças): dentro de cada estágio, ao lado dos áudios e dos vídeos;',
+              li2:'no <b>Portal do Aluno</b> de Teens Connect em diante, o espanhol incluído — ali o aluno vê só os apps do estágio dele.',
+              cuidado:'Confira a plataforma antes de indicar: três Cyber Fun só existem para iPhone, e o Fisk Helper e o New Fisk Player só para Android. O card avisa quando falta.',
+              p3:'O <b>Fisk Helper</b> e o <b>New Fisk Player</b> aparecem só para você: são de uso interno da escola e nunca chegam à tela do aluno.',
+              btnLink:'Ver os aplicativos 📱', btn:'Entendi 👍' },
+        en: { selo:'New for teachers',
+              t:'Now you can tell, on the spot, which app your class needs 📱',
+              p1:'The Hub has a new area, <b>Fisk apps</b>: the 34 apps the franchisor publishes in the stores, with <b>which one belongs to which level</b> and the link to download on Android and iPhone. The rule is the Foundation\u2019s Circular 29/25 — not what the name suggests.',
+              p2:'It is there so you can guide your students, and the same card lives in two more places:',
+              li1:'in the <b>KIDS</b> login of the Student Portal (which is yours, for the children\u2019s drop-in): inside each level, next to the audio and the videos;',
+              li2:'in the <b>Student Portal</b> from Teens Connect on, Spanish included — there the student sees only the apps for their own level.',
+              cuidado:'Check the platform before recommending: three Cyber Fun apps exist only for iPhone, and Fisk Helper and New Fisk Player only for Android. The card says so when one is missing.',
+              p3:'<b>Fisk Helper</b> and <b>New Fisk Player</b> show up for you only: they are for school use and never reach a student\u2019s screen.',
+              btnLink:'See the apps 📱', btn:'Got it 👍' },
+        es: { selo:'Novedad para el profesor',
+              t:'Ya puedes saber, al instante, qué app necesita tu grupo 📱',
+              p1:'El Hub tiene un área nueva, <b>Aplicaciones de Fisk</b>: las 34 aplicaciones que la franquicia publica en las tiendas, con <b>cuál sirve a cada nivel</b> y el enlace para descargar en Android y iPhone. La regla es la Circular 29/25 de la Fundación — no lo que sugiere el nombre.',
+              p2:'Existe para que orientes al alumno, y la misma tarjeta está en dos lugares más:',
+              li1:'en el acceso <b>KIDS</b> del Portal del Alumno (que es tuyo, para la tutoría de los niños): dentro de cada nivel, junto a los audios y los videos;',
+              li2:'en el <b>Portal del Alumno</b> de Teens Connect en adelante, el español incluido — ahí el alumno ve solo las apps de su nivel.',
+              cuidado:'Confirma la plataforma antes de indicar: tres Cyber Fun solo existen para iPhone, y Fisk Helper y New Fisk Player solo para Android. La tarjeta lo avisa.',
+              p3:'El <b>Fisk Helper</b> y el <b>New Fisk Player</b> aparecen solo para ti: son de uso interno de la escuela y nunca llegan a la pantalla del alumno.',
+              btnLink:'Ver las aplicaciones 📱', btn:'Entendido 👍' }
+      },
+      {
         id: 'provas-audio-2026-09',
         ate: '2026-10-15',                       // AAAA-MM-DD, some sozinha depois
+        /* ⚠️ A SENHA APARECE AQUI, e por isso ela não está escrita em texto no
+           fonte: o Hub é servido pelo GitHub Pages e a página é pública, então
+           `Ctrl+F ksif` acharia. O código abaixo é OFUSCAÇÃO, não segredo —
+           quem ler o JavaScript com atenção monta a palavra em dez segundos. É
+           o mesmo nível de proteção da própria trava (ver o comentário do
+           `prova` no config.js do Portal do Aluno): atrito, não cofre. */
         senha: String.fromCharCode(107,115,105,102),
         pt: { selo:'Novidade para o professor',
               t:'Os áudios das provas agora estão no Portal do Aluno 🎧',
@@ -1261,20 +1310,29 @@
               cuidado:'El campo esconde lo que escribes, en puntos. La idea es que escribas de frente al teclado, sin decirla en voz alta — así el alumno no oye la prueba antes.',
               p3:'Si la prueba es con los auriculares de cada alumno, escribe la contraseña en cada aparato. Escuchar estos audios <b>no da Fisk Dólares</b> y no cierra ninguna lección.',
               btn:'Entendido 👍' }
-      };
-      function avisoVisto(nome){
-        try { return localStorage.getItem('fisk_aviso_' + AVISO.id + '_' + nome) === '1'; }
+      }
+      ];
+
+      function avisoVisto(id, nome){
+        try { return localStorage.getItem('fisk_aviso_' + id + '_' + nome) === '1'; }
         catch(e) { return true; }                // sem localStorage: não insista
       }
       function avisoNovidade(){
         try{
           var s = saved(); if (!s || !s.name) return;
-          if (!/^\d{4}-\d{2}-\d{2}$/.test(AVISO.ate)) return;
+          if (document.getElementById('av-mask')) return;   // já está na tela
           var d = new Date();
           var hoje = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-          if (hoje > AVISO.ate) return;          // passou da validade
-          if (avisoVisto(s.name)) return;
-          if (document.getElementById('av-mask')) return;   // já está na tela
+          var AVISO = null;
+          for (var i = 0; i < AVISOS.length; i++) {
+            var a = AVISOS[i];
+            if (!a || !a.id) continue;
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(a.ate)) continue;   // data torta: não mostra
+            if (hoje > a.ate) continue;                          // passou da validade
+            if (avisoVisto(a.id, s.name)) continue;
+            AVISO = a; break;
+          }
+          if (!AVISO) return;
 
           var st = document.createElement('style');
           st.textContent =
@@ -1298,28 +1356,37 @@
             'color:var(--ui,#2b4d70);display:block;padding-left:.35em}' +
             '.av-cuidado{background:#fdf3e3;border-left:4px solid var(--gold,#c9922e);border-radius:10px;' +
             'padding:.7rem .9rem;font-size:.9rem;line-height:1.5;margin:0 0 1rem}' +
-            '#av-ok{background:var(--ui,#2b4d70);color:#fff;border:none;border-radius:12px;width:100%;' +
-            'padding:.8rem 1rem;font:inherit;font-weight:800;font-size:1rem;cursor:pointer}' +
+            '#av-ok,.av-ir{background:var(--ui,#2b4d70);color:#fff;border:none;border-radius:12px;width:100%;' +
+            'padding:.8rem 1rem;font:inherit;font-weight:800;font-size:1rem;cursor:pointer;' +
+            'display:block;text-align:center;text-decoration:none;box-sizing:border-box}' +
+            '#av-ok.secund{background:transparent;color:var(--ui,#2b4d70);border:1.5px solid var(--ui-bd,#9db6cb);margin-top:.5rem}' +
             'body.theme-dark #av-card{background:#211e1e;color:#f2efef}' +
             'body.theme-dark #av-card p,body.theme-dark #av-card li{color:#f2efef}' +
+            'body.theme-dark #av-ok.secund{color:#f2efef}' +
             'body.theme-dark .av-cuidado{background:#3a2f14;color:#f5d78e}';
           document.head.appendChild(st);
 
           var tx = AVISO[(typeof _lang !== 'undefined' && AVISO[_lang]) ? _lang : 'pt'];
           var mask = document.createElement('div');
           mask.id = 'av-mask';
+          /* só escreve o que o aviso trouxer: senha, lista e cuidado são
+             opcionais, e um aviso sem eles não pode desenhar caixa vazia */
+          var lista = (tx.li1 || tx.li2 || tx.li3)
+            ? '<ol>' + [tx.li1, tx.li2, tx.li3].filter(Boolean).map(function(x){ return '<li>' + x + '</li>'; }).join('') + '</ol>'
+            : '';
           mask.innerHTML =
             '<div id="av-card" role="dialog" aria-modal="true" aria-labelledby="av-t">' +
               '<span class="av-selo">' + tx.selo + '</span>' +
               '<h2 id="av-t">' + tx.t + '</h2>' +
               '<p>' + tx.p1 + '</p>' +
-              '<p>' + tx.p2 + '</p>' +
-              '<ol><li>' + tx.li1 + '</li><li>' + tx.li2 + '</li><li>' + tx.li3 + '</li></ol>' +
-              '<div class="av-senha"><span class="rot">' + tx.rot + '</span>' +
-                '<span class="val">' + AVISO.senha + '</span></div>' +
-              '<div class="av-cuidado">' + tx.cuidado + '</div>' +
-              '<p>' + tx.p3 + '</p>' +
-              '<button id="av-ok" type="button">' + tx.btn + '</button>' +
+              (tx.p2 ? '<p>' + tx.p2 + '</p>' : '') +
+              lista +
+              (AVISO.senha ? '<div class="av-senha"><span class="rot">' + tx.rot + '</span>' +
+                '<span class="val">' + AVISO.senha + '</span></div>' : '') +
+              (tx.cuidado ? '<div class="av-cuidado">' + tx.cuidado + '</div>' : '') +
+              (tx.p3 ? '<p>' + tx.p3 + '</p>' : '') +
+              (AVISO.link ? '<a class="av-ir" id="av-ir" href="' + AVISO.link.href + '">' + (tx.btnLink || tx.btn) + '</a>' : '') +
+              '<button id="av-ok" type="button" class="' + (AVISO.link ? 'secund' : '') + '">' + tx.btn + '</button>' +
             '</div>';
           document.body.appendChild(mask);
           document.body.style.overflow = 'hidden';
@@ -1330,8 +1397,14 @@
             document.body.style.overflow = '';
           }
           document.getElementById('av-ok').addEventListener('click', fechar);
+          /* quem clica em "ver" também deu ciência: ele vai PARA a novidade, e
+             receber a mesma cortina ao voltar seria castigo por ter obedecido */
+          var ir = document.getElementById('av-ir');
+          if (ir) ir.addEventListener('click', function(){
+            try { localStorage.setItem('fisk_aviso_' + AVISO.id + '_' + s.name, '1'); } catch(e) {}
+          });
           /* fecha no Esc e no clique fora, e AMBOS marcam ciência: o professor
-             que fechou já viu a senha, e insistir na terceira aula seguinte é
+             que fechou já viu o aviso, e insistir na terceira aula seguinte é
              barulho. Para reapresentar a todos, troque o `id`. */
           mask.addEventListener('click', function(e){ if (e.target === mask) fechar(); });
           document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && document.getElementById('av-mask')) fechar(); });
