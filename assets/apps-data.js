@@ -52,8 +52,8 @@ window.FISK_APPS = {
      aluno do Teens Connect 2 precisa baixar" — então o estágio é o filtro que
      importa, e o bloco só agrupa (decisão do Pedro, 05/09/2026).
 
-     Os nomes são os do CARD, porque é contra eles que as expressões `rx` de
-     cada app são testadas — a mesma comparação que o Portal do Aluno faz com o
+     Cada estágio é `{ n, ic }`: o NOME é o do CARD, porque é contra ele que as
+     expressões `rx` de cada app são testadas — a mesma comparação que o Portal do Aluno faz com o
      `book` do aluno. Escrever aqui um nome que o card não usa quebra o filtro
      em silêncio.
 
@@ -62,22 +62,32 @@ window.FISK_APPS = {
      errou o clique. */
   blocos: [
     { id: 'kids', nome: 'Kids', hint: 'Magic Way, Playground e Fun', estagios: [
-      'Magic Way - Yellow Book', 'Magic Way - Blue Book', 'Magic Way - Red Book',
-      'Magic Way - Green Book', 'Playground Hello A', 'Playground Hello B',
-      'Playground Slide', 'Playground See-Saw', 'Playground Merry-go-round',
-      'Playground Maze', 'Fun At Home', 'Fun At School', 'Fun Around Town' ] },
-    { id: 'teens', nome: 'Teens', hint: 'Teens Connect, Elementary e Teenstation', estagios: [
-      'Teens Connect 1', 'Teens Connect 2', 'Teens Connect 3', 'Teens Connect 4',
-      'Teens Elementary 1', 'Teens Elementary 2', 'Teenstation 1', 'Teenstation 2' ] },
+      { n: 'Magic Way - Yellow Book', ic: '🟡' }, { n: 'Magic Way - Blue Book',  ic: '🔵' },
+      { n: 'Magic Way - Red Book',    ic: '🔴' }, { n: 'Magic Way - Green Book', ic: '🟢' },
+      { n: 'Playground Hello A', ic: '👋' }, { n: 'Playground Hello B', ic: '🎈' },
+      { n: 'Playground Slide',   ic: '🛝' }, { n: 'Playground See-Saw', ic: '⚖️' },
+      { n: 'Playground Merry-go-round', ic: '🎠' }, { n: 'Playground Maze', ic: '🌀' },
+      { n: 'Fun At Home', ic: '🏠' }, { n: 'Fun At School', ic: '🏫' },
+      { n: 'Fun Around Town', ic: '🏙️' } ] },
+    /* Teenstation e Teens Elementary 1 saíram em 05/09/2026: a escola não abre
+       mais turma neles. O Elementary 2 fica porque é o Teens Connect 3. */
+    { id: 'teens', nome: 'Teens', hint: 'Teens Connect e Elementary 2', estagios: [
+      { n: 'Teens Connect 1', ic: '🔗' }, { n: 'Teens Connect 2', ic: '🔗' },
+      { n: 'Teens Connect 3', ic: '🔗' }, { n: 'Teens Connect 4', ic: '🔗' },
+      { n: 'Teens Elementary 2', ic: '🎒' } ] },
     { id: 'adultos', nome: 'Jovens e adultos', hint: 'Essentials a In Focus', estagios: [
-      'Essentials 1', 'Essentials 2', 'Transitions 1', 'Transitions 2',
-      'Fluency 1', 'Fluency 2', 'In Focus', 'Pathways 3' ] },
-    { id: 'espanhol', nome: 'Espanhol', hint: 'do Chiquiteens ao Inmediato 3', estagios: [
-      'Chiquiteens 1', 'Chiquiteens 2', 'Conéctate 1', 'Conéctate 2',
-      'Español con Ñ 2', 'Español con Ñ 5',
-      'Inmediato 1', 'Inmediato 2', 'Inmediato 3' ] },
+      { n: 'Essentials 1', ic: '🌱' }, { n: 'Essentials 2', ic: '🌿' },
+      { n: 'Transitions 1', ic: '🌤️' }, { n: 'Transitions 2', ic: '⛅' },
+      { n: 'Fluency 1', ic: '🚀' }, { n: 'Fluency 2', ic: '🛰️' },
+      { n: 'In Focus', ic: '🎯' }, { n: 'Pathways 3', ic: '🌐' } ] },
+    /* Só os Inmediato (05/09/2026, decisão do Pedro): Chiquiteens, Español con
+       Ñ e Conéctate saíram da lista de estágios. Os apps deles, quando houver,
+       continuam aparecendo no bloco e na busca. */
+    { id: 'espanhol', nome: 'Espanhol', hint: 'Inmediato 1, 2 e 3', estagios: [
+      { n: 'Inmediato 1', ic: '🇪🇸' }, { n: 'Inmediato 2', ic: '🇪🇸' }, { n: 'Inmediato 3', ic: '🇪🇸' } ] },
     { id: 'escola', nome: 'Uso do professor em sala', hint: 'Não são para o aluno', estagios: [] }
   ],
+
   apps: [
     /* ── Cyber Fisk: o oficial, um por bloco ─────────────────────────────── */
     { nome: 'Cyber Fisk Kids Magic Way', tipo: 'cyber', blocos: ['kids'],

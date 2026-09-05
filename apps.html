@@ -80,12 +80,6 @@
     padding: .48rem .8rem; border-radius: 10px; border: 1.5px dashed var(--ui-bd); color: var(--gray);
   }
   .ap-vazio{ color: var(--gray); padding: 2rem 0; }
-  .ap-aviso{
-    border: 1.5px solid var(--ui-bd); border-left: 5px solid #B45309;
-    background: var(--ui-soft); border-radius: var(--surface-radius);
-    padding: 1rem 1.2rem; margin-bottom: 1.6rem; font-size: .88rem; line-height: 1.5;
-  }
-  .ap-aviso b{ color: var(--ui-dark); }
   body.theme-dark .ap-card, body.theme-dark .ap-busca{ background: var(--surface, #1e2733); }
   body.theme-dark .ap-chip{ background: transparent; color: var(--white); }
   body.theme-dark .ap-loja{ background: transparent; color: var(--white); }
@@ -103,15 +97,6 @@
   </header>
 
   <div class="ap-wrap">
-    <div class="ap-aviso">
-      <b>Antes de indicar um app para a turma, confira a plataforma.</b> Nem tudo
-      está nas duas lojas: <b>Fun Transition 1</b>, <b>Fun Fluency 1</b> e
-      <b>Fun Fluency 2</b> só existem para iPhone, e o <b>Fisk Helper</b> e o
-      <b>New Fisk Player</b> só para Android. O card avisa quando falta.
-      <br><br>
-      A régua de <b>qual app serve a qual série</b> é a <b>Circular 29/25</b> da
-      Fundação Fisk; os links e a conferência de plataforma são de 05/09/2026.
-    </div>
 
     <div class="ap-filtros" id="apFiltros"></div>
     <div class="ap-estagios" id="apEstagios" hidden></div>
@@ -123,7 +108,7 @@
     <p>Ferramenta desenvolvida exclusivamente para uso interno das escolas Fisk. A utilização deste sistema e de seu conteúdo por pessoas ou instituições não autorizadas, incluindo professores particulares, é proibida. Desenvolvido por @fiskcacapava e @taubatefisk</p>
   </footer>
 
-<script src="assets/apps-data.js?v=2026-09-05e"></script>
+<script src="assets/apps-data.js?v=2026-09-05f"></script>
 <script src="assets/fisk-shared.js?v=2026-08-06a"></script>
 <script>
 (function () {
@@ -195,13 +180,15 @@
     box.innerHTML = '';
     box.hidden = !lista.length;
     if (!lista.length) return;
-    [''].concat(lista).forEach(function (nome) {
+    /* o ícone é o MESMO do card do estágio no Modo Kids do Portal do Aluno:
+       o professor que abre os dois vê o mesmo desenho para o mesmo livro */
+    [{ n: '', ic: '' }].concat(lista).forEach(function (e) {
       var b = document.createElement('button');
       b.type = 'button';
-      b.className = 'ap-est' + (nome === estagio ? ' is-on' : '');
-      b.textContent = nome || 'Todos os estágios';
+      b.className = 'ap-est' + (e.n === estagio ? ' is-on' : '');
+      b.textContent = e.n ? (e.ic ? e.ic + ' ' + e.n : e.n) : 'Todos os estágios';
       b.addEventListener('click', function () {
-        estagio = nome;
+        estagio = e.n;
         box.querySelectorAll('.ap-est').forEach(function (c) { c.classList.toggle('is-on', c === b); });
         desenha();
       });
