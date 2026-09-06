@@ -72,6 +72,44 @@
 .card-ak-provas    { --accent: #0F766E; }
 .card-ak-livro     { --accent: #B45309; }
 
+/* ── A Cerimônia de Seleção (campanha de 09/2026) ─────────────────────────
+   Card de céu noturno com borda dourada respirando. Ele destoa dos outros de
+   propósito: é campanha com data para acabar, e no meio de quinze cards
+   brancos iguais ninguém veria a novidade a tempo. A animação NÃO depende de
+   `hover`, porque metade dos professores abre o Hub no celular.
+   Some sozinho depois de 10/10/2026 (ver o script no fim do index.html). */
+.card-hogwarts{
+  --accent:#d4af37;
+  background:linear-gradient(158deg,#101a3f 0%,#0a1030 55%,#131d46 100%);
+  border-color:rgba(212,175,55,.5);
+  color:#f4ecd8;
+  overflow:hidden; isolation:isolate;
+  animation:hubHwGlow 3.6s ease-in-out infinite;
+}
+@keyframes hubHwGlow{
+  0%,100%{box-shadow:0 8px 26px rgba(8,11,28,.30), 0 0 0 1px rgba(212,175,55,.22), 0 0 16px rgba(212,175,55,.12)}
+  50%    {box-shadow:0 12px 36px rgba(8,11,28,.42), 0 0 0 1px rgba(212,175,55,.52), 0 0 30px rgba(212,175,55,.32)}
+}
+.card-hogwarts::after{
+  content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.85;
+  background:
+    radial-gradient(120px 80px at 84% 14%, rgba(93,120,220,.28), transparent 70%),
+    radial-gradient(1.5px 1.5px at 14% 24%, #fff, transparent),
+    radial-gradient(1.3px 1.3px at 36% 70%, #ffeeba, transparent),
+    radial-gradient(1.6px 1.6px at 60% 20%, #fff, transparent),
+    radial-gradient(1.2px 1.2px at 78% 74%, #cfe3ff, transparent),
+    radial-gradient(1.4px 1.4px at 92% 44%, #fff, transparent);
+  animation:hubHwSky 6s ease-in-out infinite;
+}
+@keyframes hubHwSky{0%,100%{opacity:.55}50%{opacity:1}}
+.card-hogwarts h2{color:#fff8e2}
+.card-hogwarts p{color:rgba(244,236,216,.82)}
+.card-hogwarts .icon{background:rgba(212,175,55,.14);color:#f2dd94}
+.card-hogwarts .badge{background:rgba(212,175,55,.9);color:#241c05}
+@media (prefers-reduced-motion:reduce){
+  .card-hogwarts,.card-hogwarts::after{animation:none}
+}
+
 /* Cards que só navegam (estágio → teste → forma) não abrem PDF: o cursor de
    link já basta, mas o ícone segue o mesmo padrão dos cards de documento. */
 .ak-nav .ak-arquivo{ color: var(--gray); }

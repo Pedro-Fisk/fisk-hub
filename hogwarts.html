@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Sorting Ceremony · Fisk</title>
+<link rel="icon" href="assets/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Nunito:wght@400;600;700;800&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+
+<!-- ══ A CERIMÔNIA DE SELEÇÃO, PARA O PROFESSOR ═══════════════════════════
+     O mesmo quiz do Portal do Aluno, com a mesma casa guardada na mesma aba do
+     backend. Pedido do Pedro em 06/09/2026: a campanha é da escola, e professor
+     que não tem casa não conversa com a turma sobre a dele.
+
+     ⚠️ OS TRÊS ARQUIVOS DO QUIZ SÃO CARREGADOS DO PORTAL, e não copiados para
+     cá. É de propósito, e a razão é o banco de perguntas: são 160 perguntas em
+     quatro níveis, o tipo de conteúdo que alguém melhora no mês que vem. Uma
+     cópia aqui significaria dois bancos que um dia discordariam, e a regra da
+     casa é que arquivo sem merge não tem duas fontes. O preço é uma
+     dependência de tempo de execução: se o portalfisk.com.br estiver fora do
+     ar, esta página não abre — e nesse cenário o Portal do Aluno também está
+     fora, então o professor tem problema maior do que a casa dele.
+
+     ⚠️ A IDENTIDADE AQUI NÃO É UM RAF. Professor não tem matrícula, então a
+     chave é `PROF:<nome>`, o mesmo nome com que ele entra no Hub. O backend
+     guarda isso como qualquer outra chave (`normRaf` só apara e maiusculiza),
+     e nenhum RAF de aluno pode colidir com ela. Dois professores de mesmo nome
+     dividiriam a casa — o Hub inteiro já os trata como a mesma pessoa. -->
+
+<link rel="stylesheet" href="https://portalfisk.com.br/assets/hogwarts.css">
+<style>
+  /* O bastante para esta página existir sem o portal.css: o quiz desenha tudo
+     o que importa dentro do #screen-hogwarts. */
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--font-h:'Poppins',system-ui,sans-serif;--font-b:'Nunito',system-ui,sans-serif}
+  body{font-family:var(--font-b);background:#080b1c;min-height:100vh;display:flex;flex-direction:column}
+  .screen{display:flex;flex-direction:column;flex:1;min-height:100vh}
+</style>
+</head>
+<body>
+
+<div class="screen" id="screen-hogwarts">
+  <div class="hw-sky" id="hw-sky" aria-hidden="true"></div>
+  <div class="hw-top">
+    <button class="hw-btn-ghost" id="hw-back">← Fisk Hub</button>
+    <div class="hero-actions"></div>
+    <button class="hw-btn-ghost hw-music" id="hw-music" type="button" aria-pressed="true"></button>
+  </div>
+  <div class="hw-stage" id="hw-stage"></div>
+</div>
+
+<script src="assets/fisk-shared.js"></script>
+<script>
+  /* A APP_KEY é pública por desenho: ela está em toda página de aluno e em
+     todas as ferramentas. Só autoriza gravar; não lê dado de ninguém. */
+  window.PORTAL_CONFIG = {
+    endpoint: 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec',
+    appKey: 'fisk_0719bacbecc857f61d1e'
+  };
+</script>
+<script src="https://portalfisk.com.br/assets/hogwarts-perguntas.js"></script>
+<script src="https://portalfisk.com.br/assets/hogwarts.js"></script>
+<script>
+(function(){
+  'use strict';
+  var sessao = (typeof fiskSessao === 'function') ? fiskSessao() : null;
+  var nome = sessao && (sessao.name || sessao.nome) ? String(sessao.name || sessao.nome) : '';
+
+  /* Sem sessão não há onde guardar a casa, e um quiz que não guarda nada é
+     tempo do professor jogado fora. Volta para o login do Hub. */
+  if (!nome) { location.replace('index.html'); return; }
+
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ var d=document.createElement('div'); d.textContent = s==null?'':s; return d.innerHTML; }
+
+  /* Aqui só existe uma tela. O quiz pede `show('screen-home')` quando o
+     professor termina; no Portal isso é voltar para a home, e aqui é voltar
+     para o Hub. */
+  function show(id){ if (id !== 'screen-hogwarts') location.href = 'index.html'; }
+
+  if (!window.FiskHogwarts) {
+    $('hw-stage').innerHTML = '<p style="color:#f4ecd8;text-align:center;padding:3rem 1rem">' +
+      'The Sorting Ceremony is not answering right now. Please try again in a moment.</p>';
+    return;
+  }
+
+  var hw = window.FiskHogwarts({
+    $: $, esc: esc, show: show,
+    t: function(k){ return k; },          // esta página não é trilíngue
+    ehFamilia: function(){ return false; },
+    /* O professor não tem estágio, então a régua pelo livro não diria nada.
+       `focus` é a versão da prova escrita para adulto (In Focus e Pathways). */
+    bloco: 'focus',
+    get student(){
+      return { raf: 'PROF:' + nome, name: nome, book: '', master: false };
+    }
+  });
+
+  hw.openHogwarts();
+})();
+</script>
+</body>
+</html>

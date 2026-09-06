@@ -323,6 +323,28 @@
       <p data-i18n="card-apps-p">Qual app serve a qual estágio, e o link para baixar no Android e no iPhone</p>
     </a>
 
+    <!-- ══ A CERIMÔNIA DE SELEÇÃO (campanha, 06/09 a 10/10/2026) ═══════════
+         O mesmo quiz do Portal do Aluno, e a mesma casa guardada na mesma aba
+         do backend. Pedido do Pedro: a campanha é da escola, e professor sem
+         casa não conversa com a turma sobre a dele.
+         O card SOME sozinho depois da campanha (o script no fim do arquivo),
+         e é por isso que ele tem id. A página continua de pé para quem quiser
+         rever a casa. -->
+    <a class="card card-hogwarts" id="card-hogwarts" href="hogwarts.html">
+      <span class="badge" data-i18n="hw-badge">Por tempo limitado</span>
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 19.5c2.2-1.1 4.4-1.6 8-1.6s5.8.5 8 1.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M12 18V8.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M12 8.4C10.4 6.6 8.7 5.6 6.6 5.2c-.5-.1-.9.3-.8.8.4 2 1.3 3.7 3 5.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 8.4c1.6-1.8 3.3-2.8 5.4-3.2.5-.1.9.3.8.8-.4 2-1.3 3.7-3 5.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16.8 3.2l.5 1.2 1.2.5-1.2.5-.5 1.2-.5-1.2-1.2-.5 1.2-.5.5-1.2z" fill="currentColor"/>
+        </svg>
+      </div>
+      <h2 data-i18n="card-hw-h2">A Cerimônia de Seleção</h2>
+      <p data-i18n="card-hw-p">Responda 16 perguntas sobre você e descubra a sua casa de Hogwarts, a mesma brincadeira que está na tela dos alunos</p>
+    </a>
+
     <a class="card is-soon" href="#" aria-disabled="true" tabindex="-1">
       <span class="badge" data-i18n="soon">Em breve</span>
       <div class="icon">
@@ -483,6 +505,9 @@
         'card-met-p':      'Pratique para o exame MET com simulados interativos',
         'card-siele-h2':   'Treino SIELE',
         'card-siele-p':    'Pratique para o exame SIELE de espanhol, na modalidade S1',
+        'card-hw-h2':      'A Cerimônia de Seleção',
+        'card-hw-p':       'Responda 16 perguntas sobre você e descubra a sua casa de Hogwarts, a mesma brincadeira que está na tela dos alunos',
+        'hw-badge':        'Por tempo limitado',
         'card-apps-h2':     'Aplicativos da Fisk',
         'card-apps-p':      'Qual app serve a qual estágio, e o link para baixar no Android e no iPhone',
         'card-overview-h2': 'Visão Geral das Turmas',
@@ -559,6 +584,9 @@
         'card-met-p':      'Practice for the MET exam with interactive simulations',
         'card-siele-h2':   'SIELE Drills',
         'card-siele-p':    'Practice for the SIELE Spanish exam, S1 modality',
+        'card-hw-h2':      'The Sorting Ceremony',
+        'card-hw-p':       'Answer 16 questions about yourself and find your Hogwarts house, the same game your students have on their screens',
+        'hw-badge':        'Limited time',
         'card-apps-h2':     'Fisk apps',
         'card-apps-p':      'Which app belongs to which level, and where to download it on Android and iPhone',
         'card-overview-h2': 'Class Overview',
@@ -635,6 +663,9 @@
         'card-met-p':      'Practica para el examen MET con simulacros interactivos',
         'card-siele-h2':   'Entrenamiento SIELE',
         'card-siele-p':    'Practica para el examen SIELE de español, modalidad S1',
+        'card-hw-h2':      'La Ceremonia de Selección',
+        'card-hw-p':       'Responde 16 preguntas sobre ti y descubre tu casa de Hogwarts, el mismo juego que tus alumnos tienen en pantalla',
+        'hw-badge':        'Por tiempo limitado',
         'card-apps-h2':     'Aplicaciones de Fisk',
         'card-apps-p':      'Qué app sirve a cada nivel, y el enlace para descargar en Android y iPhone',
         'card-overview-h2': 'Visión General de los Grupos',
@@ -1784,6 +1815,22 @@
       });
       if (document.body.classList.contains('prof-in')) load();
     })();
+  </script>
+  <script>
+  /* A CERIMÔNIA DE SELEÇÃO SAI SOZINHA DA HOME quando a campanha vence.
+     A data é a mesma do `CAMPANHA_ATE` no assets/hogwarts.js do Portal, e as
+     duas precisam contar a mesma história: card aqui depois de a campanha
+     acabar seria convite para uma festa que já terminou.
+     A PÁGINA continua de pé, e é de propósito: quem já tem casa volta a ela
+     pelo endereço direto, e a casa de ninguém é apagada. */
+  (function(){
+    var ATE = '2026-10-10';
+    var hoje = new Date().toISOString().slice(0,10);
+    if (hoje > ATE) {
+      var c = document.getElementById('card-hogwarts');
+      if (c && c.parentNode) c.parentNode.removeChild(c);
+    }
+  })();
   </script>
 </body>
 </html>
