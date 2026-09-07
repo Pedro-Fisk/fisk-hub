@@ -116,3 +116,27 @@ O `conversation_maker/` é a exceção: Python, com `requirements.txt` próprio.
 - **Autorização do Drive tem duas etapas**: `setupDrive()` libera só leitura;
   a escrita exige `setupDriveEscrita()`. O sintoma é falhar ao criar o arquivo com
   a pasta já localizada.
+
+## A casa do professor veste o Hub (campanha de 09/2026)
+
+Quem fez a Cerimônia de Seleção (`hogwarts.html`) vê a faixa preta do topo com
+as cores, o padrão e o brasão da casa dele, nas dezessete páginas.
+
+- **`assets/casa-tema.css` é CÓPIA.** O original vive em
+  `portal-aluno-fisk/assets/casa-tema.css`, e há uma terceira cópia no
+  `fisk-simulador` (o Quick Practice). Mexeu numa, mexa nas outras: a casa que
+  muda de cara entre o Hub e o Portal lê como erro. As imagens dos brasões vêm
+  do `portalfisk.com.br` por URL absoluta, como o próprio quiz já vem.
+- **Quem pinta é o bloco no fim do `assets/fisk-shared.js`**, e não cada
+  página: a casa é do professor, não de uma tela. A identidade é `PROF:<nome>`
+  (professor não tem RAF) e a chave do cache passa pela mesma régua do Portal e
+  do backend — letra e número, maiúsculas. O cache pinta na hora; quem
+  respondeu no celular descobre por uma chamada `hwGet`, que fica guardada.
+  ⚠️ Sem rede a faixa fica preta, e está certo: nada aparece nem some por
+  falha de rede.
+- **O interruptor está no menu do professor** (`fiskInitUserMenu`), ao lado do
+  idioma, e guarda a MESMA chave `hw_tema` do Portal: é preferência da pessoa,
+  não da página. A barra fixa do canto não serve — ela fica escondida para
+  professor comum.
+- ⚠️ **Mexeu no `fisk-shared.js`? Suba o `?v=` nas dezessete páginas**, senão
+  o navegador do professor segue com a versão antiga por tempo indeterminado.
