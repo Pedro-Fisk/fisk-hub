@@ -353,3 +353,10 @@ body:not([data-casa]) .hwt-virada{background:rgba(0,0,0,.06)}
   font-size:1.15rem}
 .hwt-fecho p{margin:0;font-size:.85rem;font-weight:400}
 .hwt-fobs{margin-top:.3rem !important;opacity:.72;font-size:.78rem !important}
+
+/* às cegas nas duas primeiras semanas: o nome e o brasão saem, a barra perde
+   a cor da casa (a cor é a assinatura dela) e sobra a pontuação */
+.hwt-l.is-oculta .hwt-n{letter-spacing:.14em;opacity:.75}
+.hwt-bx{display:grid;place-items:center;width:22px;height:24px;border-radius:6px;
+  border:1.5px dashed rgba(255,255,255,.35);font-size:.8rem;font-weight:800;opacity:.8}
+.hwt-cego{margin:.55rem 0 0;font-size:.8rem;line-height:1.45;opacity:.75;font-weight:400}
