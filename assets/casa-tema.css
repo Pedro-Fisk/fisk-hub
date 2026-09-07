@@ -289,14 +289,49 @@ body:not([data-casa]) .hwt-bar{background:rgba(0,0,0,.12)}
   font-size:.76rem;letter-spacing:.05em;text-transform:uppercase;opacity:.92}
 .hwt-gt span:nth-child(2){flex:1;min-width:0}
 .hwt-gfrasco{flex:none;font-size:1.7rem;line-height:0;color:#7cc4ff}
-.hwt-gbar{display:block;height:18px;margin:.45rem 0 .4rem;border-radius:999px;
+/* o tubo tem halo DOURADO por fora e o líquido azul por dentro: o ouro não é
+   a cor da barra, é a luz em volta dela */
+.hwt-gbar{position:relative;display:block;height:18px;margin:.45rem 0 .4rem;border-radius:999px;
   background:rgba(255,255,255,.14);overflow:hidden;
-  box-shadow:inset 0 1px 3px rgba(0,0,0,.28)}
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.28),
+             0 0 0 1px rgba(212,175,55,.45),
+             0 0 10px rgba(212,175,55,.35),
+             0 0 22px rgba(212,175,55,.18)}
 body:not([data-casa]) .hwt-gbar{background:rgba(0,0,0,.10)}
-.hwt-gbar i{display:block;height:100%;border-radius:999px;
+.hwt-gbar i{position:relative;display:block;height:100%;border-radius:999px;overflow:hidden;
   background:linear-gradient(180deg,#7cc4ff 0%,#2f6fe4 55%,#1d4ed8 100%);
   box-shadow:0 0 12px rgba(47,111,228,.55), inset 0 1px 0 rgba(255,255,255,.4);
   animation:hwt-cresce 1.1s cubic-bezier(.2,.8,.2,1) both;transform-origin:left}
+
+/* ⚠️ AS FAÍSCAS ANDAM COM `transform`, e não com `background-position`: a
+   primeira roda na GPU, a segunda repinta a barra a cada quadro — e isto fica
+   na home, à vista o tempo todo. A camada tem 200% de largura e o padrão se
+   repete a cada 50%, então deslocar -50% fecha o laço sem salto. */
+.hwt-gbar i::after{
+  content:'';position:absolute;inset:0;width:200%;pointer-events:none;
+  background-image:
+    radial-gradient(2.2px 2.2px at 4%  32%, rgba(255,255,255,.98), transparent 64%),
+    radial-gradient(1.6px 1.6px at 11% 70%, rgba(191,227,255,.95), transparent 64%),
+    radial-gradient(2.6px 2.6px at 19% 26%, rgba(255,248,220,.95), transparent 64%),
+    radial-gradient(1.5px 1.5px at 25% 62%, rgba(255,255,255,.9),  transparent 64%),
+    radial-gradient(2px 2px     at 31% 40%, rgba(191,227,255,.95), transparent 64%),
+    radial-gradient(1.4px 1.4px at 37% 76%, rgba(255,255,255,.95), transparent 64%),
+    radial-gradient(2.4px 2.4px at 43% 30%, rgba(255,248,220,.9),  transparent 64%),
+    radial-gradient(1.7px 1.7px at 47% 58%, rgba(255,255,255,.95), transparent 64%);
+  background-size:50% 100%;
+  animation:hwt-faisca 5.5s linear infinite;
+}
+.hwt-gbar i::before{
+  content:'';position:absolute;inset:0;width:200%;pointer-events:none;
+  background:linear-gradient(105deg, transparent 0 38%, rgba(255,255,255,.30) 46%,
+             rgba(255,236,186,.35) 50%, transparent 60% 100%);
+  background-size:50% 100%;
+  animation:hwt-faisca 3.4s linear infinite;
+}
+@keyframes hwt-faisca{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){
+  .hwt-gbar i::after,.hwt-gbar i::before{animation:none}
+}
 .hwt-geral p{margin:0;font-size:.8rem;line-height:1.45;opacity:.8;font-weight:400}
 
 /* a virada de posição: subir é verde, cair é neutro (nunca vermelho — o
