@@ -289,3 +289,23 @@ body:not([data-casa]) .hwt-gbar{background:rgba(0,0,0,.12)}
   background:linear-gradient(90deg,#b8912a,#f0d68a 55%,#d4af37);
   animation:hwt-cresce 1.1s cubic-bezier(.2,.8,.2,1) both;transform-origin:left}
 .hwt-geral p{margin:0;font-size:.8rem;line-height:1.45;opacity:.8;font-weight:400}
+
+/* a virada de posição: subir é verde, cair é neutro (nunca vermelho — o
+   professor não controla o que a casa dele faz) */
+.hwt-virada{margin:0 0 .6rem;padding:.4rem .6rem;border-radius:9px;
+  font-size:.82rem;font-weight:700;background:rgba(255,255,255,.10)}
+.hwt-virada.is-sobe{background:rgba(34,197,94,.18);color:#a7f3c6}
+body:not([data-casa]) .hwt-virada{background:rgba(0,0,0,.06)}
+
+/* a cerimônia de fechamento: o placar vira resultado */
+.hwt-fecho{display:flex;gap:.9rem;align-items:center;margin-bottom:.8rem;padding:.8rem .9rem;
+  border-radius:12px;border:1px solid rgba(212,175,55,.35);background:rgba(0,0,0,.18)}
+.hwt-fecho.is-minha{border-color:color-mix(in srgb, var(--c) 60%, transparent);
+  background:color-mix(in srgb, var(--c) 16%, transparent)}
+.hwt-fecho img{flex:none;object-fit:contain}
+.hwt-fselo{display:inline-block;font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;
+  border:1px solid rgba(212,175,55,.5);border-radius:999px;padding:.2rem .5rem;opacity:.9}
+.hwt-fecho b{display:block;margin:.35rem 0 .2rem;font-family:'Cinzel',var(--font-heading),Georgia,serif;
+  font-size:1.15rem}
+.hwt-fecho p{margin:0;font-size:.85rem;font-weight:400}
+.hwt-fobs{margin-top:.3rem !important;opacity:.72;font-size:.78rem !important}

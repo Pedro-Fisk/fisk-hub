@@ -12,7 +12,7 @@
      MEXEU no style.css ou no kit? Suba a data aqui. -->
 <link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04c">
   <!-- a casa do professor veste a faixa do topo (campanha de 09/2026) -->
-  <link rel="stylesheet" href="assets/casa-tema.css?v=5">
+  <link rel="stylesheet" href="assets/casa-tema.css?v=6">
 <link rel="stylesheet" href="style.css?v=2026-08-04b">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
@@ -1870,6 +1870,12 @@
             semNada:  'Suas turmas ainda não pontuaram nesta temporada. Cada exercício que um aluno seu faz no portal vira mana para a sua casa.',
             todos:    'Contam todos os seus alunos, não só os que caíram na sua casa.',
             geralT:   'A escola inteira',
+            subiu:    function(p){ return 'A sua casa subiu para o ' + p + ' lugar desde a sua última visita.'; },
+            caiu:     function(p){ return 'A sua casa está em ' + p + ' agora.'; },
+            fimSelo:  'Campeã da Taça',
+            fimSua:   'A sua casa venceu a Taça das Casas. 🏆',
+            fimDela:  function(c){ return '' + c + ' venceu a Taça das Casas.'; },
+            fimObrig: 'A campanha terminou. A sua casa fica com você: o brasão continua no menu e as cores continuam no Hub.',
             geral:    function(m,n){ return 'Juntos, todos os alunos já somaram ' + m + ' de mana. Próxima meta: ' + n + '.'; },
             geralMax: function(m){ return 'Juntos, todos os alunos já somaram ' + m + ' de mana. Passaram de todas as metas.'; },
             ir:       'ver a minha casa →' },
@@ -1881,6 +1887,12 @@
             semNada:  'Your classes have not scored yet this season. Every exercise a student of yours does turns into mana for your house.',
             todos:    'Every student of yours counts, not only the ones sorted into your house.',
             geralT:   'The whole school',
+            subiu:    function(p){ return 'Your house has moved up to ' + p + ' place since your last visit.'; },
+            caiu:     function(p){ return 'Your house is ' + p + ' now.'; },
+            fimSelo:  'House Cup winner',
+            fimSua:   'Your house has won the House Cup. 🏆',
+            fimDela:  function(c){ return '' + c + ' has won the House Cup.'; },
+            fimObrig: 'The campaign is over. Your house stays with you: the crest is still in your menu and the colours are still in the Hub.',
             geral:    function(m,n){ return 'Together, every student has gathered ' + m + ' mana so far. Next goal: ' + n + '.'; },
             geralMax: function(m){ return 'Together, every student has gathered ' + m + ' mana so far. They passed every goal.'; },
             ir:       'see my house →' },
@@ -1892,6 +1904,12 @@
             semNada:  'Tus grupos aún no puntuaron en esta temporada. Cada ejercicio que hace un alumno tuyo se vuelve maná para tu casa.',
             todos:    'Cuentan todos tus alumnos, no solo los que quedaron en tu casa.',
             geralT:   'Toda la escuela',
+            subiu:    function(p){ return 'Tu casa subió al ' + p + ' lugar desde tu última visita.'; },
+            caiu:     function(p){ return 'Tu casa está en ' + p + ' ahora.'; },
+            fimSelo:  'Campeona de la Copa',
+            fimSua:   'Tu casa ganó la Copa de las Casas. 🏆',
+            fimDela:  function(c){ return '' + c + ' ganó la Copa de las Casas.'; },
+            fimObrig: 'La campaña terminó. Tu casa se queda contigo: el escudo sigue en tu menú y los colores siguen en el Hub.',
             geral:    function(m,n){ return 'Juntos, todos los alumnos ya reunieron ' + m + ' de maná. Próxima meta: ' + n + '.'; },
             geralMax: function(m){ return 'Juntos, todos los alumnos ya reunieron ' + m + ' de maná. Superaron todas las metas.'; },
             ir:       'ver mi casa →' }
@@ -1962,7 +1980,44 @@
         '</div>';
       }
 
-      document.getElementById('hwpTaca').innerHTML = geral + lista.map(function(x,i){
+      /* A CERIMÔNIA DE FECHAMENTO e a VIRADA DE POSIÇÃO, as mesmas do portal
+         do aluno. Depois de 10/10 o placar deixa de ser disputa e vira
+         resultado; até lá, quando a casa do professor muda de lugar, ele
+         descobre na visita seguinte.
+         ⚠️ A virada só avisa depois de já ter visto uma vez: na primeira
+         abertura não há "antes", e anunciar a posição atual como novidade
+         seria inventar um movimento que não houve. */
+      var hoje = new Date().toISOString().slice(0,10);
+      var fim = hoje > (taca.ate || '2026-10-10');
+      var minhaPos = 0;
+      lista.forEach(function(x,i){ if (x.k === dados.casa) minhaPos = i + 1; });
+
+      var aviso = '';
+      if (!fim && !zerado && minhaPos) {
+        var kp = 'hw_pos_PROF', antes = null;
+        try { antes = JSON.parse(localStorage.getItem(kp) || 'null'); } catch (e) {}
+        try { localStorage.setItem(kp, JSON.stringify({ casa: dados.casa, pos: minhaPos })); } catch (e) {}
+        if (antes && antes.casa === dados.casa && antes.pos && antes.pos !== minhaPos) {
+          var sobe = minhaPos < antes.pos;
+          aviso = '<p class="hwt-virada' + (sobe ? ' is-sobe' : '') + '">' +
+                  (sobe ? '▲ ' : '▼ ') +
+                  (sobe ? t.subiu(minhaPos + 'º') : t.caiu(minhaPos + 'º')) + '</p>';
+        }
+      }
+
+      var podio = '';
+      if (fim) {
+        var c1 = lista[0].k, eu1 = c1 === dados.casa;
+        podio = '<div class="hwt-fecho' + (eu1 ? ' is-minha' : '') + '" style="--c:' + BARRA[c1] + '">' +
+          '<img src="' + IMG + SLUG[c1] + '.webp" alt="" width="64" height="70" loading="lazy">' +
+          '<div><span class="hwt-fselo">' + t.fimSelo + '</span>' +
+          '<b>' + NOMES[c1] + '</b>' +
+          '<p>' + (eu1 ? t.fimSua : t.fimDela(NOMES[c1])) + '</p>' +
+          '<p class="hwt-fobs">' + t.fimObrig + '</p></div>' +
+        '</div>';
+      }
+
+      document.getElementById('hwpTaca').innerHTML = podio + (fim ? '' : geral + aviso) + lista.map(function(x,i){
         var m = Math.round(x.media * f);
         return '<div class="hwt-l' + (x.k === dados.casa ? ' is-minha' : '') +
                  '" style="--c:' + BARRA[x.k] + '">' +
