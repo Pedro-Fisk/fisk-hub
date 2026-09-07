@@ -871,3 +871,109 @@ function fiskBuscaMeusAlunos(q) {
     return out.slice(0, 12);
   }).catch(function () { return []; });
 }
+
+/* ══ A CASA DO PROFESSOR VESTE O HUB ═══════════════════════════════════════
+ * A Cerimônia de Seleção (campanha de 09/2026) dá uma casa de Hogwarts ao
+ * professor, e a faixa preta do topo passa a usar as cores dela, igual ao que
+ * acontece no Portal do Aluno. O desenho mora em `assets/casa-tema.css`.
+ *
+ * ⚠️ ISTO VIVE NO FISK-SHARED PORQUE SÃO DEZESSETE PÁGINAS. A casa é do
+ * professor, não de uma tela: pendurar o bloco em cada HTML seria dezessete
+ * lugares para esquecer um.
+ *
+ * ⚠️ A IDENTIDADE É `PROF:<nome>`, e não um RAF: professor não tem matrícula.
+ * A chave do cache passa pela MESMA régua do Portal e do backend (letra e
+ * número, maiúsculas), senão o Hub procuraria a casa numa chave que o quiz
+ * nunca escreveu.
+ *
+ * ⚠️ O CACHE VEM PRIMEIRO E O SERVIDOR CONFIRMA. Quem respondeu neste
+ * computador pinta a tela sem esperar rede; quem respondeu no celular e abriu
+ * o Hub na escola descobre a casa numa chamada só, que fica guardada. Falha de
+ * rede não faz nada aparecer nem desaparecer: sem casa, a faixa é a preta de
+ * sempre.
+ *
+ * O interruptor é o botão na barra do professor, e ele guarda `hw_tema`, a
+ * MESMA chave do Portal — quem desligou a pintura lá não a encontra ligada
+ * aqui, e isso é o certo: é uma preferência da pessoa, não da página. */
+(function () {
+  var LS = 'hw_casa_', TEMA = 'hw_tema';
+  var EP  = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
+  var KEY = 'fisk_0719bacbecc857f61d1e';   // pública por desenho: só autoriza gravar
+  var CASAS = { g:'Gryffindor', r:'Ravenclaw', h:'Hufflepuff', s:'Slytherin' };
+
+  function nomeDoProf() {
+    try {
+      var s = (typeof fiskSessao === 'function') ? fiskSessao() : null;
+      return s && (s.name || s.nome) ? String(s.name || s.nome) : '';
+    } catch (e) { return ''; }
+  }
+  function chave(nome) {
+    return LS + ('PROF:' + nome).replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+  }
+  function ligado() {
+    try { return localStorage.getItem(TEMA) !== 'off'; } catch (e) { return true; }
+  }
+  function pinta(casa) {
+    if (!CASAS[casa]) return;
+    document.body.setAttribute('data-casa', casa);
+    document.body.classList.toggle('hw-sem-casa', !ligado());
+    interruptor(casa);
+  }
+
+  /* O interruptor mora no MENU DO PROFESSOR (o `fiskInitUserMenu`), ao lado
+     do idioma e do "Sair desta conta", que é exatamente onde ele fica no
+     Portal do Aluno. A barra fixa do canto não serve: ela é escondida para
+     professor comum e só reaparece na visita da direção.
+     ⚠️ O MENU NASCE DEPOIS DAQUI em várias páginas (cada uma chama o
+     `fiskInitUserMenu` no seu próprio tempo), então isto espera por ele em vez
+     de desistir na primeira tentativa. Dez tentativas, e para. */
+  function interruptor(casa) {
+    var tentativas = 0;
+    var t = setInterval(function () {
+      var menu = document.querySelector('.fisk-user-menu');
+      if (!menu) { if (++tentativas > 10) clearInterval(t); return; }
+      clearInterval(t);
+      if (document.getElementById('hwTema')) return;
+      var b = document.createElement('button');
+      b.type = 'button'; b.id = 'hwTema'; b.className = 'fu-item hw-tema-item';
+      function rotulo() {
+        b.textContent = '🎨 ' + (ligado() ? 'Cores da minha casa' : 'Cores da casa desligadas');
+        b.setAttribute('aria-pressed', ligado() ? 'true' : 'false');
+      }
+      rotulo();
+      b.title = CASAS[casa];
+      b.addEventListener('click', function (ev) {
+        ev.stopPropagation();          // o menu não fecha: quem clica quer VER a mudança
+        try { localStorage.setItem(TEMA, ligado() ? 'off' : 'on'); } catch (e) {}
+        document.body.classList.toggle('hw-sem-casa', !ligado());
+        rotulo();
+      });
+      var sep = menu.querySelector('.fu-sep');
+      if (sep) menu.insertBefore(b, sep); else menu.appendChild(b);
+    }, 300);
+  }
+
+  function comeca() {
+    var nome = nomeDoProf();
+    if (!nome) return;                       // ninguém logado: nada a vestir
+    var k = chave(nome), reg = null;
+    try { reg = JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) {}
+    if (reg && CASAS[reg.casa]) { pinta(reg.casa); return; }
+
+    /* POST, e não GET: as rotas das casas moram no `doPost` do Code.js. Pelo
+       GET o servidor responde "chave inválida", que é a mensagem mais
+       enganosa possível, porque a chave está certa. */
+    fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'hwGet', key: KEY, raf: 'PROF:' + nome }) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (!j || !j.ok || !CASAS[j.casa]) return;
+        try { localStorage.setItem(k, JSON.stringify({ casa: j.casa, em: j.em || null })); } catch (e) {}
+        pinta(j.casa);
+      })
+      .catch(function () {});                // sem rede a faixa fica preta, e tudo bem
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', comeca);
+  else comeca();
+})();

@@ -1,0 +1,218 @@
+/* ══ A ESTÉTICA DA CASA · a faixa do topo veste a casa do professor ═════════
+   ⚠️ ESTE ARQUIVO É CÓPIA. O original vive em
+   `portal-aluno-fisk/assets/casa-tema.css`, junto do quiz que atribui a casa,
+   e há uma terceira cópia no `fisk-simulador` (o Quick Practice). Ele está
+   duplicado porque o Hub é outro domínio (github.io) e outro repositório.
+   Mexeu numa cópia, mexa nas outras: são as cores das casas, e a casa que
+   muda de cara entre o Hub e o Portal lê como erro.
+
+   Quem PINTA é o `data-casa` no <body>, posto pelo `assets/fisk-shared.js`
+   (o bloco da Cerimônia, no fim do arquivo), que descobre a casa pela chave
+   `PROF:<nome>` — professor não tem RAF.
+
+   ⚠️ AS IMAGENS DOS BRASÕES VÊM DO PORTAL, por URL absoluta. É o mesmo
+   desenho do quiz, que também é carregado de lá: o brasão não pode ter duas
+   fontes, e copiar quatro webp para cá seria a quinta cópia da campanha.
+
+   ⚠️ A COR DE FUNDO É SEMPRE A ESCURA DO PAR, e a clara vira o padrão por
+   cima. Hufflepuff é amarelo: faixa amarela com o texto branco que já mora
+   ali seria ilegível.
+
+   Some com `body.hw-sem-casa` (o interruptor na barra do professor). */
+
+/* ══ A ESTÉTICA DA CASA NO PORTAL INTEIRO ═══════════════════════════════
+   A faixa preta do topo (`.hero`) passa a vestir as cores da casa do aluno.
+   Ela aparece em TODAS as telas do portal, então uma regra aqui veste o
+   portal todo sem tocar em tela nenhuma.
+
+   ⚠️ A COR DE FUNDO É SEMPRE A ESCURA DO PAR, e a clara vira o padrão por
+   cima. Hufflepuff é amarelo: faixa amarela com o texto branco que já mora
+   ali seria ilegível, e trocar a cor do texto por casa espalharia a decisão
+   por meia folha de estilo.
+
+   O padrão é feito com gradiente (listra diagonal e losango), não com imagem:
+   é a leitura da textura das casas, desenhada aqui, e custa zero requisição.
+
+   Some com `body.hw-sem-casa` (o botão no menu do aluno). */
+body[data-casa]:not(.hw-sem-casa) .hero{
+  background:
+    /* véu escuro no alto: o logo da Fisk é VERMELHO e vive ali. Sobre o
+       carmim da Grifinória ele quase sumia, e trocar o logo por casa seria
+       espalhar a decisão por meia folha de estilo. */
+    radial-gradient(130% 90% at 50% -25%, rgba(0,0,0,.55), transparent 62%),
+    repeating-linear-gradient(48deg,
+      transparent 0 26px, var(--casa-listra) 26px 52px),
+    linear-gradient(160deg, var(--casa-base) 0%, var(--casa-fundo) 100%);
+  border-bottom-color:var(--casa-luz);
+}
+/* o brilho de cima segue a casa, para a faixa não ficar chapada */
+body[data-casa]:not(.hw-sem-casa) .hero::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(80% 60% at 50% 0%, rgba(255,255,255,.10), transparent 70%);
+}
+/* ══ O BRASÃO NA FAIXA ══════════════════════════════════════════════════
+   O escudo da casa no alto, à esquerda da home, nas quatro páginas. Ele é o
+   oposto do selo do menu: o selo é um botão (leva à tela da Cerimônia) e diz
+   "esta é a sua casa"; este é bandeira, não controle.
+
+   ⚠️ NO HUB O LOGO FICA NO FLUXO, centralizado, também no celular (o Portal
+   é que o joga para o canto). Por isso aqui o brasão não muda de lugar em
+   tela estreita: ele só encolhe.
+
+   ⚠️ O ARQUIVO JÁ ESTÁ NO CACHE: é o mesmo webp do selo do menu e da tela da
+   revelação. Nenhuma requisição a mais. */
+body[data-casa]:not(.hw-sem-casa) .hero::before{
+  content:'';position:absolute;top:50%;left:1.9rem;transform:translateY(-50%);
+  width:132px;height:132px;
+  background:var(--casa-brasao) center/contain no-repeat;
+  filter:drop-shadow(0 2px 7px rgba(0,0,0,.55));
+  pointer-events:none;
+}
+/* ⚠️ NAS PÁGINAS INTERNAS ELE NÃO APARECE: quem mora neste canto é o
+   `.back-link` ("← Fisk Hub"), e dois elementos no mesmo lugar é um em cima
+   do outro. A casa continua nas cores; o brasão é da home do Hub. */
+body[data-casa]:not(.hw-sem-casa) .hero:has(.back-link)::before{display:none}
+@media (max-width:640px){
+  body[data-casa]:not(.hw-sem-casa) .hero::before{left:.9rem;width:74px;height:74px}
+}
+body[data-casa="g"]{--casa-base:#7a0c0c;--casa-fundo:#40060a;--casa-luz:#d3a625;--casa-listra:rgba(211,166,37,.16);
+  --casa-brasao:url(https://portalfisk.com.br/assets/img/hogwarts/gryffindor.webp)}
+
+/* ══ GRIFINÓRIA ═════════════════════════════════════════════════════════
+   A regra genérica acima serve as quatro casas, e é o piso. Esta desce ao
+   detalhe da Grifinória, e é o desenho que as outras três vão ganhar uma a
+   uma. Três camadas, e cada uma responde a uma pergunta:
+
+   1. O LOSANGO, que é o padrão do brasão (o fundo atrás do leão). Duas
+      famílias de listras finas cruzadas a 45° desenham a grade em losango
+      sem imagem nenhuma; a listra diagonal solta que estava aqui não dizia
+      Grifinória, dizia "faixa listrada".
+   2. A BRASA subindo da base, que é a lareira do salão comunal. É o que tira
+      a faixa do chapado: a luz vem de baixo e quente, e não de um brilho
+      branco no alto que serve a qualquer casa.
+   3. A VINHETA nos cantos, que devolve contraste ao texto branco centralizado
+      — o carmim claro do meio disputava com ele.
+
+   ⚠️ O VÉU ESCURO NO ALTO CONTINUA, e não é enfeite: o logo da Fisk é
+   VERMELHO e vive ali. Sobre o carmim ele some.
+
+   ⚠️ NADA DISSO ANIMA. A faixa está em TODAS as telas do portal, o dia
+   inteiro; animação aqui é bateria e distração, não encanto. O movimento
+   mora no card da Cerimônia, que é uma tela só. */
+body[data-casa="g"]:not(.hw-sem-casa) .hero{
+  background:
+    radial-gradient(125% 115% at 50% 45%, transparent 34%, rgba(0,0,0,.46) 100%),
+    /* ⚠️ FAIXA, e não um círculo no meio: no celular o logo desce para o
+       CANTO esquerdo (portal.css, .hero-logo abaixo de 640px), e um véu
+       centrado deixava justamente ele sem sombra por baixo */
+    linear-gradient(to bottom, rgba(0,0,0,.46) 0, rgba(0,0,0,.16) 78px, transparent 128px),
+    radial-gradient(58% 62% at 50% 4%, rgba(0,0,0,.40), transparent 72%),
+    radial-gradient(130% 90% at 50% -25%, rgba(0,0,0,.42), transparent 62%),
+    radial-gradient(72% 130% at 50% 125%, rgba(255,148,46,.30), transparent 62%),
+    repeating-linear-gradient(45deg,  transparent 0 20px, rgba(211,166,37,.11) 20px 22px),
+    repeating-linear-gradient(-45deg, transparent 0 20px, rgba(211,166,37,.11) 20px 22px),
+    linear-gradient(165deg, #8d1212 0%, #5c0a0d 46%, #2c0407 100%);
+  /* o galão: a borda de baixo deixa de ser um traço chapado e vira um fio de
+     ouro com brilho no meio, que é como o dourado aparece em tecido */
+  border-image:linear-gradient(90deg, #6f5310 0%, #d3a625 22%, #f6e3a3 50%, #d3a625 78%, #6f5310 100%) 1;
+}
+body[data-casa="g"]:not(.hw-sem-casa) .hero::after{
+  background:
+    /* o fio claro em cima do galão, que dá relevo à borda */
+    linear-gradient(to top, rgba(246,227,163,.42) 0 1.5px, transparent 1.5px),
+    radial-gradient(62% 48% at 50% 0%, rgba(255,232,186,.13), transparent 72%);
+}
+/* as pílulas do estágio e dos Fisk Dólares na faixa: contorno de ouro velho,
+   para não flutuarem em azul e dourado sobre o carmim */
+body[data-casa="g"]:not(.hw-sem-casa) .hero .pill-book{
+  background:rgba(0,0,0,.28);border-color:rgba(246,227,163,.62);color:#ffeec2}
+body[data-casa="g"]:not(.hw-sem-casa) .hero .fd-pill{
+  background:rgba(0,0,0,.28);border-color:rgba(246,227,163,.62);color:#ffdf94}
+body[data-casa="r"]{--casa-base:#17265a;--casa-fundo:#0a1130;--casa-luz:#c9a45a;--casa-listra:rgba(201,164,90,.15);--casa-brasao:url(https://portalfisk.com.br/assets/img/hogwarts/ravenclaw.webp)}
+body[data-casa="h"]{--casa-base:#4a3c14;--casa-fundo:#241d09;--casa-luz:#ecb939;--casa-listra:rgba(236,185,57,.18);--casa-brasao:url(https://portalfisk.com.br/assets/img/hogwarts/hufflepuff.webp)}
+body[data-casa="s"]{--casa-base:#15452a;--casa-fundo:#08210f;--casa-luz:#b9c2c0;--casa-listra:rgba(185,194,192,.14);--casa-brasao:url(https://portalfisk.com.br/assets/img/hogwarts/slytherin.webp)}
+
+
+/* ══ CORVINAL ═══════════════════════════════════════════════════════════
+   Azul de meia-noite com PENAS em bronze e um punhado de estrelas: a casa é
+   a torre alta, a águia e o estudo até tarde. Ao contrário da Grifinória, a
+   luz aqui vem de CIMA e é fria — as duas casas não podem ter o mesmo céu. */
+body[data-casa="r"]:not(.hw-sem-casa) .hero{
+  background:
+    radial-gradient(125% 115% at 50% 45%, transparent 34%, rgba(0,0,0,.48) 100%),
+    linear-gradient(to bottom, rgba(0,0,0,.44) 0, rgba(0,0,0,.14) 78px, transparent 128px),
+    radial-gradient(58% 62% at 50% 4%, rgba(0,0,0,.38), transparent 72%),
+    /* as estrelas: dois tamanhos e passos que não são múltiplos um do outro,
+       senão o olho lê a grade em vez do céu */
+    radial-gradient(circle, rgba(255,255,255,.55) 0 1px, transparent 1.6px) 13px 21px/97px 83px,
+    radial-gradient(circle, rgba(214,231,255,.38) 0 1px, transparent 1.4px) 44px 9px/61px 67px,
+    /* as penas: arcos deitados, em duas fileiras deslocadas */
+    radial-gradient(circle at 50% 100%, rgba(201,164,90,.09) 0 47%, transparent 48%) 0 0/30px 13px,
+    radial-gradient(circle at 50% 100%, rgba(201,164,90,.06) 0 47%, transparent 48%) 15px 6.5px/30px 13px,
+    linear-gradient(165deg, #1d3070 0%, #101b4a 46%, #060a24 100%);
+  border-image:linear-gradient(90deg, #6a5427 0%, #c9a45a 22%, #f0dcae 50%, #c9a45a 78%, #6a5427 100%) 1;
+}
+body[data-casa="r"]:not(.hw-sem-casa) .hero::after{
+  background:
+    linear-gradient(to top, rgba(240,220,174,.38) 0 1.5px, transparent 1.5px),
+    radial-gradient(70% 55% at 50% 0%, rgba(198,222,255,.15), transparent 72%);
+}
+body[data-casa="r"]:not(.hw-sem-casa) .hero .pill-book,
+body[data-casa="r"]:not(.hw-sem-casa) .hero .fd-pill{
+  background:rgba(0,0,0,.28);border-color:rgba(240,220,174,.60);color:#f2e6c6}
+
+/* ══ LUFA-LUFA ══════════════════════════════════════════════════════════
+   ⚠️ O FUNDO É O MARROM DA TERRA, e não o amarelo da casa: a faixa tem texto
+   branco em cima. O amarelo entra como LUZ e como o favo, que é o padrão que
+   diz Lufa-Lufa sem precisar de imagem. A luz vem de baixo, quente e larga,
+   como sol em campo — a lareira da Grifinória é um ponto, esta é uma faixa. */
+body[data-casa="h"]:not(.hw-sem-casa) .hero{
+  background:
+    radial-gradient(125% 115% at 50% 45%, transparent 36%, rgba(0,0,0,.46) 100%),
+    linear-gradient(to bottom, rgba(0,0,0,.44) 0, rgba(0,0,0,.14) 78px, transparent 128px),
+    radial-gradient(58% 62% at 50% 4%, rgba(0,0,0,.36), transparent 72%),
+    linear-gradient(to top, rgba(255,196,63,.26) 0, transparent 62%),
+    /* o favo: três famílias de fios a 60°, que é o desenho da colmeia */
+    repeating-linear-gradient(60deg,  transparent 0 21px, rgba(236,185,57,.11) 21px 22px),
+    repeating-linear-gradient(-60deg, transparent 0 21px, rgba(236,185,57,.11) 21px 22px),
+    repeating-linear-gradient(0deg,   transparent 0 18px, rgba(236,185,57,.08) 18px 19px),
+    linear-gradient(165deg, #5c4a17 0%, #3a2e0d 46%, #1c1607 100%);
+  border-image:linear-gradient(90deg, #7a5f14 0%, #ecb939 22%, #ffeaa8 50%, #ecb939 78%, #7a5f14 100%) 1;
+}
+body[data-casa="h"]:not(.hw-sem-casa) .hero::after{
+  background:
+    linear-gradient(to top, rgba(255,234,168,.42) 0 1.5px, transparent 1.5px),
+    radial-gradient(62% 48% at 50% 0%, rgba(255,236,186,.12), transparent 72%);
+}
+body[data-casa="h"]:not(.hw-sem-casa) .hero .pill-book,
+body[data-casa="h"]:not(.hw-sem-casa) .hero .fd-pill{
+  background:rgba(0,0,0,.30);border-color:rgba(255,234,168,.62);color:#ffeec2}
+
+/* ══ SONSERINA ══════════════════════════════════════════════════════════
+   Verde profundo com ESCAMAS de prata e a névoa subindo do canto: a casa é a
+   masmorra ao lado do lago, e a luz dela é fria e baixa. As escamas são duas
+   fileiras de meias-luas deslocadas, o mesmo truque das penas da Corvinal com
+   outro passo — de perto são bicho, de longe são tecido. */
+body[data-casa="s"]:not(.hw-sem-casa) .hero{
+  background:
+    radial-gradient(125% 115% at 50% 45%, transparent 34%, rgba(0,0,0,.50) 100%),
+    linear-gradient(to bottom, rgba(0,0,0,.44) 0, rgba(0,0,0,.14) 78px, transparent 128px),
+    radial-gradient(58% 62% at 50% 4%, rgba(0,0,0,.38), transparent 72%),
+    radial-gradient(85% 120% at 18% 120%, rgba(120,255,190,.16), transparent 58%),
+    radial-gradient(circle at 50% 100%, rgba(185,194,192,.10) 0 47%, transparent 48%) 0 0/26px 13px,
+    radial-gradient(circle at 50% 100%, rgba(185,194,192,.07) 0 47%, transparent 48%) 13px 6.5px/26px 13px,
+    linear-gradient(165deg, #175733 0%, #0b3319 46%, #04170a 100%);
+  border-image:linear-gradient(90deg, #57645f 0%, #adb7b4 22%, #dfe7e3 50%, #adb7b4 78%, #57645f 100%) 1;
+}
+body[data-casa="s"]:not(.hw-sem-casa) .hero::after{
+  background:
+    linear-gradient(to top, rgba(238,243,241,.40) 0 1.5px, transparent 1.5px),
+    radial-gradient(62% 48% at 50% 0%, rgba(226,255,240,.11), transparent 72%);
+}
+body[data-casa="s"]:not(.hw-sem-casa) .hero .pill-book,
+body[data-casa="s"]:not(.hw-sem-casa) .hero .fd-pill{
+  background:rgba(0,0,0,.30);border-color:rgba(238,243,241,.58);color:#e8f5ee}
+
+/* O interruptor da pintura, dentro do menu do professor. Ele guarda a MESMA
+   chave `hw_tema` do Portal: é preferência da pessoa, não da página. */
+.hw-tema-item[aria-pressed="false"]{opacity:.62}
