@@ -12,7 +12,7 @@
      MEXEU no style.css ou no kit? Suba a data aqui. -->
 <link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04c">
   <!-- a casa do professor veste a faixa do topo (campanha de 09/2026) -->
-  <link rel="stylesheet" href="assets/casa-tema.css?v=4">
+  <link rel="stylesheet" href="assets/casa-tema.css?v=5">
 <link rel="stylesheet" href="style.css?v=2026-08-04b">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
@@ -1869,6 +1869,9 @@
             semTurma: 'Ainda não encontrei turmas suas no card. Quando encontrar, o que os seus alunos ganharem passa a pontuar aqui.',
             semNada:  'Suas turmas ainda não pontuaram nesta temporada. Cada exercício que um aluno seu faz no portal vira mana para a sua casa.',
             todos:    'Contam todos os seus alunos, não só os que caíram na sua casa.',
+            geralT:   'A escola inteira',
+            geral:    function(m,n){ return 'Juntos, todos os alunos já somaram ' + m + ' de mana. Próxima meta: ' + n + '.'; },
+            geralMax: function(m){ return 'Juntos, todos os alunos já somaram ' + m + ' de mana. Passaram de todas as metas.'; },
             ir:       'ver a minha casa →' },
       en: { colegas:  function(n){ return n === 0
                         ? 'You are the first of the team in this house.'
@@ -1877,6 +1880,9 @@
             semTurma: 'I could not find your classes in the card yet. Once I do, what your students earn will count here.',
             semNada:  'Your classes have not scored yet this season. Every exercise a student of yours does turns into mana for your house.',
             todos:    'Every student of yours counts, not only the ones sorted into your house.',
+            geralT:   'The whole school',
+            geral:    function(m,n){ return 'Together, every student has gathered ' + m + ' mana so far. Next goal: ' + n + '.'; },
+            geralMax: function(m){ return 'Together, every student has gathered ' + m + ' mana so far. They passed every goal.'; },
             ir:       'see my house →' },
       es: { colegas:  function(n){ return n === 0
                         ? 'Eres el primero del equipo en esta casa.'
@@ -1885,6 +1891,9 @@
             semTurma: 'Todavía no encontré tus grupos en el card. Cuando los encuentre, lo que ganen tus alumnos contará aquí.',
             semNada:  'Tus grupos aún no puntuaron en esta temporada. Cada ejercicio que hace un alumno tuyo se vuelve maná para tu casa.',
             todos:    'Cuentan todos tus alumnos, no solo los que quedaron en tu casa.',
+            geralT:   'Toda la escuela',
+            geral:    function(m,n){ return 'Juntos, todos los alumnos ya reunieron ' + m + ' de maná. Próxima meta: ' + n + '.'; },
+            geralMax: function(m){ return 'Juntos, todos los alumnos ya reunieron ' + m + ' de maná. Superaron todas las metas.'; },
             ir:       'ver mi casa →' }
     };
     var dados = null, taca = null;
@@ -1932,7 +1941,28 @@
       var teto = Math.max(1, lista[0].media);
       var zerado = lista[0].media === 0;
       var f = fator();
-      document.getElementById('hwpTaca').innerHTML = lista.map(function(x,i){
+      var t = TXT[(typeof _lang !== 'undefined' && TXT[_lang]) ? _lang : 'pt'];
+
+      /* A BARRA DA COMUNIDADE, a mesma do portal do aluno: a Taça divide a
+         escola em quatro, e ela volta a juntá-la. O total inclui quem ainda
+         não fez a Cerimônia (é o `geral` do servidor, não a soma das casas).
+         ⚠️ A meta é um MARCO MÓVEL: meta chutada alta deixa a barra parada em
+         3% e meta baixa é batida na terça e nunca mais muda. */
+      var MARCOS = [5000,10000,25000,50000,100000,200000,350000,500000,750000,1000000];
+      var geral = '';
+      if (taca.geral) {
+        var tot = Math.round(Number(taca.geral.fd || 0) * f);
+        var meta = null;
+        for (var mi = 0; mi < MARCOS.length; mi++) { if (tot < MARCOS[mi]) { meta = MARCOS[mi]; break; } }
+        var pct = meta ? Math.min(100, Math.round(tot / meta * 100)) : 100;
+        geral = '<div class="hwt-geral">' +
+          '<div class="hwt-gt"><span>' + t.geralT + '</span><b>' + pct + '%</b></div>' +
+          '<span class="hwt-gbar"><i style="width:' + pct + '%"></i></span>' +
+          '<p>' + (meta ? t.geral(num(tot), num(meta)) : t.geralMax(num(tot))) + '</p>' +
+        '</div>';
+      }
+
+      document.getElementById('hwpTaca').innerHTML = geral + lista.map(function(x,i){
         var m = Math.round(x.media * f);
         return '<div class="hwt-l' + (x.k === dados.casa ? ' is-minha' : '') +
                  '" style="--c:' + BARRA[x.k] + '">' +
