@@ -216,3 +216,39 @@ body[data-casa="s"]:not(.hw-sem-casa) .hero .fd-pill{
 /* O interruptor da pintura, dentro do menu do professor. Ele guarda a MESMA
    chave `hw_tema` do Portal: é preferência da pessoa, não da página. */
 .hw-tema-item[aria-pressed="false"]{opacity:.62}
+
+/* ══ O PAINEL "A SUA CASA" (home do Hub) ═══════════════════════════════════
+   Ele existe fora da faixa porque fala de números, não de identidade: quantos
+   colegas estão na casa e quanto as turmas renderam. Nasce escondido e o
+   script da home o acende só para quem já foi selecionado.
+   As cores vêm das MESMAS variáveis da faixa (`--casa-luz`, `--casa-fundo`),
+   então ele se veste sozinho de cada casa. Sem `data-casa` (pintura desligada
+   no menu) ele fica neutro, e continua legível. */
+.hwp{
+  max-width:1100px;margin:1.4rem auto 0;padding:1rem 1.15rem;
+  display:flex;align-items:center;gap:1rem;
+  border:1px solid var(--casa-luz,#d3a625);border-radius:16px;
+  background:linear-gradient(135deg, rgba(0,0,0,.04), rgba(0,0,0,0));
+}
+body[data-casa] .hwp{
+  background:linear-gradient(135deg, var(--casa-base,#222) 0%, var(--casa-fundo,#111) 100%);
+  color:#f6efdd;
+}
+.hwp-b{flex:none;width:64px;height:64px;background:center/contain no-repeat;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,.45))}
+.hwp-c{flex:1;min-width:0}
+.hwp-casa{font-family:'Cinzel',var(--font-heading),Georgia,serif;font-size:1.12rem;
+  letter-spacing:.02em;color:var(--casa-luz,#8a6a15)}
+body[data-casa] .hwp-casa{color:#ffeec2}
+.hwp-l1,.hwp-l2{margin:.18rem 0 0;font-size:.9rem;line-height:1.45}
+.hwp-l2{opacity:.82}
+.hwp-ir{flex:none;align-self:center;font-weight:700;font-size:.86rem;text-decoration:none;
+  padding:.5rem .9rem;border-radius:999px;border:1px solid var(--casa-luz,#d3a625);
+  color:var(--casa-luz,#8a6a15);white-space:nowrap}
+body[data-casa] .hwp-ir{color:#ffeec2}
+.hwp-ir:hover{background:rgba(211,166,37,.14)}
+@media (max-width:640px){
+  .hwp{flex-wrap:wrap;margin:1.1rem .9rem 0;gap:.8rem}
+  .hwp-b{width:52px;height:52px}
+  .hwp-ir{width:100%;text-align:center}
+}

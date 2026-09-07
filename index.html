@@ -12,7 +12,7 @@
      MEXEU no style.css ou no kit? Suba a data aqui. -->
 <link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04c">
   <!-- a casa do professor veste a faixa do topo (campanha de 09/2026) -->
-  <link rel="stylesheet" href="assets/casa-tema.css?v=1">
+  <link rel="stylesheet" href="assets/casa-tema.css?v=2">
 <link rel="stylesheet" href="style.css?v=2026-08-04b">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
@@ -139,6 +139,21 @@
              data-i18n-ph="md-busca-ph" placeholder="🔎 Buscar aluno por nome ou RAF…">
       <div class="md-achados" id="mdAchados" hidden></div>
     </div>
+  </section>
+
+  <!-- ══ A SUA CASA (campanha de 09/2026) ══════════════════════════════════
+       Aparece só para quem já fez a Cerimônia, e some sozinho quando a
+       campanha acabar (o script no fim do arquivo, junto do card).
+       ⚠️ Os colegas saem SEM NOME, e é decisão do Pedro: quantos estão na
+       mesma casa, nunca quem. -->
+  <section class="hwp" id="hwProf" hidden>
+    <div class="hwp-b" id="hwpB" aria-hidden="true"></div>
+    <div class="hwp-c">
+      <b class="hwp-casa" id="hwpCasa"></b>
+      <p class="hwp-l1" id="hwpL1"></p>
+      <p class="hwp-l2" id="hwpL2"></p>
+    </div>
+    <a class="hwp-ir" id="hwpIr" href="hogwarts.html"></a>
   </section>
 
   <main class="grid">
@@ -460,6 +475,10 @@
     <p data-i18n="footer">Ferramenta desenvolvida exclusivamente para uso interno das escolas Fisk. A utilização deste sistema e de seu conteúdo por pessoas ou instituições não autorizadas, incluindo professores particulares, é proibida. Desenvolvido por @fiskcacapava e @taubatefisk</p>
   </footer>
 
+  <!-- O fator da mana (F$ × 2,25) mora num arquivo só, no Portal: o Hub o lê
+       de lá em vez de repetir o número. Se não carregar, o painel da casa
+       mostra os Fisk Dólares e nada quebra. -->
+  <script src="https://portalfisk.com.br/assets/mana.js"></script>
   <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
   <script>
     fiskInitThemeToggle('themeToggle');
@@ -726,6 +745,7 @@
         var val = tr(el.dataset.i18nPh);
         if (val && typeof val === 'string') el.placeholder = val;
       });
+      if (typeof window.hwpRender === 'function') window.hwpRender();
       document.querySelectorAll('.lang-btn').forEach(function(btn) {
         btn.classList.toggle('is-active', btn.dataset.lang === lang);
       });
@@ -1819,6 +1839,85 @@
     })();
   </script>
   <script>
+  /* ══ O PAINEL "A SUA CASA" ═══════════════════════════════════════════════
+     O que o professor vê da campanha na home: a casa dele, quantos colegas
+     estão nela (sem nome nenhum) e o que as turmas dele renderam.
+
+     ⚠️ A PONTUAÇÃO DELE É POR ALUNO, e o texto diz isso em voz alta: o que
+     conta para a casa é a MÉDIA por aluno elegível, não o total. Sem essa
+     frase, o professor de turma grande acha que está perdendo e o de turma
+     pequena acha que não adianta tentar — que é exatamente o contrário do
+     desenho (ver `casasProfPontos_` no Casas.js).
+
+     ⚠️ O FATOR DA MANA VEM DO `FiskMana`, carregado do Portal. Se ele não
+     estiver lá, o painel mostra os Fisk Dólares em vez de inventar um 2,25
+     local — uma segunda fonte do valor de um Fisk Dólar é como as duas
+     acabam discordando. */
+  (function(){
+    var EP  = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
+    var NOMES = { g:'Gryffindor', r:'Ravenclaw', h:'Hufflepuff', s:'Slytherin' };
+    var IMG = 'https://portalfisk.com.br/assets/img/hogwarts/';
+    var SLUG = { g:'gryffindor', r:'ravenclaw', h:'hufflepuff', s:'slytherin' };
+    var TXT = {
+      pt: { colegas:  function(n){ return n === 0
+                        ? 'Você é o primeiro da equipe nesta casa.'
+                        : 'Você e mais ' + n + (n === 1 ? ' colega estão' : ' colegas estão') + ' nesta casa.'; },
+            rendeu:   function(m,med){ return 'Suas turmas renderam ' + m + ' de mana na temporada, o que vale ' + med + ' por aluno para a sua casa.'; },
+            semTurma: 'Ainda não encontrei turmas suas no card. Quando encontrar, o que os seus alunos ganharem passa a pontuar aqui.',
+            semNada:  'Suas turmas ainda não pontuaram nesta temporada. Cada exercício que um aluno seu faz no portal vira mana para a sua casa.',
+            ir:       'ver a minha casa →' },
+      en: { colegas:  function(n){ return n === 0
+                        ? 'You are the first of the team in this house.'
+                        : 'You and ' + n + ' other ' + (n === 1 ? 'colleague are' : 'colleagues are') + ' in this house.'; },
+            rendeu:   function(m,med){ return 'Your classes earned ' + m + ' mana this season, which is worth ' + med + ' per student for your house.'; },
+            semTurma: 'I could not find your classes in the card yet. Once I do, what your students earn will count here.',
+            semNada:  'Your classes have not scored yet this season. Every exercise a student of yours does turns into mana for your house.',
+            ir:       'see my house →' },
+      es: { colegas:  function(n){ return n === 0
+                        ? 'Eres el primero del equipo en esta casa.'
+                        : 'Tú y ' + n + (n === 1 ? ' colega están' : ' colegas están') + ' en esta casa.'; },
+            rendeu:   function(m,med){ return 'Tus grupos generaron ' + m + ' de maná en la temporada, que valen ' + med + ' por alumno para tu casa.'; },
+            semTurma: 'Todavía no encontré tus grupos en el card. Cuando los encuentre, lo que ganen tus alumnos contará aquí.',
+            semNada:  'Tus grupos aún no puntuaron en esta temporada. Cada ejercicio que hace un alumno tuyo se vuelve maná para tu casa.',
+            ir:       'ver mi casa →' }
+    };
+    var dados = null;
+
+    function fator(){ return (window.FiskMana && window.FiskMana.FATOR) || 1; }
+    /* o separador de milhar segue o IDIOMA da tela: 2.970 em português é
+       2,970 em inglês, e o número errado lê como outro número */
+    function num(n){
+      var loc = { pt:'pt-BR', en:'en-US', es:'es-ES' }[(typeof _lang !== 'undefined' && _lang) || 'pt'] || 'pt-BR';
+      return Number(n || 0).toLocaleString(loc);
+    }
+
+    function pinta(){
+      if (!dados || !dados.casa) return;
+      var t = TXT[(typeof _lang !== 'undefined' && TXT[_lang]) ? _lang : 'pt'];
+      var f = fator();
+      document.getElementById('hwpB').style.backgroundImage = 'url(' + IMG + SLUG[dados.casa] + '.webp)';
+      document.getElementById('hwpCasa').textContent = NOMES[dados.casa];
+      document.getElementById('hwpL1').textContent = t.colegas(dados.colegas || 0);
+      document.getElementById('hwpL2').textContent = !dados.elegiveis ? t.semTurma
+        : (!dados.fd ? t.semNada
+        : t.rendeu(num(Math.round(dados.fd * f)), num(Math.round(dados.media * f))));
+      document.getElementById('hwpIr').textContent = t.ir;
+      document.getElementById('hwProf').hidden = false;
+    }
+    window.hwpRender = pinta;   // o applyLang chama isto ao trocar de idioma
+
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) {}
+    if (!s || !s.token) return;
+    fetch(EP, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action:'hwProf', token: s.token }) })
+      .then(function(r){ return r.json(); })
+      .then(function(j){ if (j && j.ok && j.casa) { dados = j; pinta(); } })
+      .catch(function(){});    // sem rede o painel não aparece, e está certo
+  })();
+  </script>
+
+  <script>
   /* A CERIMÔNIA DE SELEÇÃO SAI SOZINHA DA HOME quando a campanha vence.
      A data é a mesma do `CAMPANHA_ATE` no assets/hogwarts.js do Portal, e as
      duas precisam contar a mesma história: card aqui depois de a campanha
@@ -1831,6 +1930,8 @@
     if (hoje > ATE) {
       var c = document.getElementById('card-hogwarts');
       if (c && c.parentNode) c.parentNode.removeChild(c);
+      var pn = document.getElementById('hwProf');
+      if (pn && pn.parentNode) pn.parentNode.removeChild(pn);
     }
   })();
   </script>
