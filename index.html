@@ -12,7 +12,7 @@
      MEXEU no style.css ou no kit? Suba a data aqui. -->
 <link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04c">
   <!-- a casa do professor veste a faixa do topo (campanha de 09/2026) -->
-  <link rel="stylesheet" href="assets/casa-tema.css?v=2">
+  <link rel="stylesheet" href="assets/casa-tema.css?v=4">
 <link rel="stylesheet" href="style.css?v=2026-08-04b">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
@@ -152,8 +152,11 @@
       <b class="hwp-casa" id="hwpCasa"></b>
       <p class="hwp-l1" id="hwpL1"></p>
       <p class="hwp-l2" id="hwpL2"></p>
+      <p class="hwp-l3" id="hwpL3"></p>
     </div>
     <a class="hwp-ir" id="hwpIr" href="hogwarts.html"></a>
+    <!-- o placar das quatro casas, o MESMO que o aluno vê na home dele -->
+    <div class="hwp-taca" id="hwpTaca" hidden></div>
   </section>
 
   <main class="grid">
@@ -1865,6 +1868,7 @@
             rendeu:   function(m,med){ return 'Suas turmas renderam ' + m + ' de mana na temporada, o que vale ' + med + ' por aluno para a sua casa.'; },
             semTurma: 'Ainda não encontrei turmas suas no card. Quando encontrar, o que os seus alunos ganharem passa a pontuar aqui.',
             semNada:  'Suas turmas ainda não pontuaram nesta temporada. Cada exercício que um aluno seu faz no portal vira mana para a sua casa.',
+            todos:    'Contam todos os seus alunos, não só os que caíram na sua casa.',
             ir:       'ver a minha casa →' },
       en: { colegas:  function(n){ return n === 0
                         ? 'You are the first of the team in this house.'
@@ -1872,6 +1876,7 @@
             rendeu:   function(m,med){ return 'Your classes earned ' + m + ' mana this season, which is worth ' + med + ' per student for your house.'; },
             semTurma: 'I could not find your classes in the card yet. Once I do, what your students earn will count here.',
             semNada:  'Your classes have not scored yet this season. Every exercise a student of yours does turns into mana for your house.',
+            todos:    'Every student of yours counts, not only the ones sorted into your house.',
             ir:       'see my house →' },
       es: { colegas:  function(n){ return n === 0
                         ? 'Eres el primero del equipo en esta casa.'
@@ -1879,9 +1884,17 @@
             rendeu:   function(m,med){ return 'Tus grupos generaron ' + m + ' de maná en la temporada, que valen ' + med + ' por alumno para tu casa.'; },
             semTurma: 'Todavía no encontré tus grupos en el card. Cuando los encuentre, lo que ganen tus alumnos contará aquí.',
             semNada:  'Tus grupos aún no puntuaron en esta temporada. Cada ejercicio que hace un alumno tuyo se vuelve maná para tu casa.',
+            todos:    'Cuentan todos tus alumnos, no solo los que quedaron en tu casa.',
             ir:       'ver mi casa →' }
     };
-    var dados = null;
+    var dados = null, taca = null;
+
+    /* ⚠️ AS CORES DA BARRA NÃO SÃO AS `cor1` DAS CASAS (o vinho, o azul-noite,
+       o verde-masmorra): aquelas são cores de FUNDO, feitas para ter texto
+       branco em cima, e como barra fina sobre o painel escuro da casa elas
+       somem. Estas são as mesmas famílias, clareadas até se enxergarem. O
+       brasão ao lado é quem identifica a casa; a barra só precisa ser lida. */
+    var BARRA = { g:'#e0533f', r:'#4d86ee', h:'#ecb939', s:'#33b877' };
 
     function fator(){ return (window.FiskMana && window.FiskMana.FATOR) || 1; }
     /* o separador de milhar segue o IDIOMA da tela: 2.970 em português é
@@ -1901,9 +1914,38 @@
       document.getElementById('hwpL2').textContent = !dados.elegiveis ? t.semTurma
         : (!dados.fd ? t.semNada
         : t.rendeu(num(Math.round(dados.fd * f)), num(Math.round(dados.media * f))));
+      /* a pergunta que todo professor faz ao ler o número: "só os da minha
+         casa?". A resposta fica na tela, e não numa conversa. */
+      document.getElementById('hwpL3').textContent = dados.elegiveis ? t.todos : '';
       document.getElementById('hwpIr').textContent = t.ir;
       document.getElementById('hwProf').hidden = false;
+      pintaTaca();
     }
+    /* O PLACAR DAS QUATRO CASAS, o mesmo que o aluno vê na home dele: a
+       pontuação é a MÉDIA por membro (ver `hwTaca_` no Casas.js), e é por isso
+       que a casa maior não começa ganhando. A do professor fica marcada. */
+    function pintaTaca(){
+      if (!taca || !taca.casas || !dados || !dados.casa) return;
+      var lista = ['g','r','h','s'].map(function(k){
+        return { k:k, media: (taca.casas[k] && taca.casas[k].media) || 0 };
+      }).sort(function(a,b){ return b.media - a.media; });
+      var teto = Math.max(1, lista[0].media);
+      var zerado = lista[0].media === 0;
+      var f = fator();
+      document.getElementById('hwpTaca').innerHTML = lista.map(function(x,i){
+        var m = Math.round(x.media * f);
+        return '<div class="hwt-l' + (x.k === dados.casa ? ' is-minha' : '') +
+                 '" style="--c:' + BARRA[x.k] + '">' +
+          '<span class="hwt-pos">' + (zerado ? '·' : (i+1) + 'º') + '</span>' +
+          '<img class="hwt-b" src="' + IMG + SLUG[x.k] + '.webp" alt="" width="22" height="24" loading="lazy">' +
+          '<span class="hwt-n">' + NOMES[x.k] + '</span>' +
+          '<span class="hwt-bar"><i style="width:' + Math.round(x.media / teto * 100) + '%"></i></span>' +
+          '<span class="hwt-p">' + num(m) + '</span>' +
+        '</div>';
+      }).join('');
+      document.getElementById('hwpTaca').hidden = false;
+    }
+
     window.hwpRender = pinta;   // o applyLang chama isto ao trocar de idioma
 
     var s = null;
@@ -1914,6 +1956,14 @@
       .then(function(r){ return r.json(); })
       .then(function(j){ if (j && j.ok && j.casa) { dados = j; pinta(); } })
       .catch(function(){});    // sem rede o painel não aparece, e está certo
+
+    /* O placar é público (APP_KEY, a mesma do portal do aluno): ele não fala
+       de ninguém em particular, é o resultado das quatro casas. */
+    fetch(EP, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action:'hwTaca', key:'fisk_0719bacbecc857f61d1e' }) })
+      .then(function(r){ return r.json(); })
+      .then(function(j){ if (j && j.ok) { taca = j; pintaTaca(); } })
+      .catch(function(){});
   })();
   </script>
 

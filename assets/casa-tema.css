@@ -226,7 +226,7 @@ body[data-casa="s"]:not(.hw-sem-casa) .hero .fd-pill{
    no menu) ele fica neutro, e continua legível. */
 .hwp{
   max-width:1100px;margin:1.4rem auto 0;padding:1rem 1.15rem;
-  display:flex;align-items:center;gap:1rem;
+  display:flex;flex-wrap:wrap;align-items:center;gap:1rem;
   border:1px solid var(--casa-luz,#d3a625);border-radius:16px;
   background:linear-gradient(135deg, rgba(0,0,0,.04), rgba(0,0,0,0));
 }
@@ -236,12 +236,14 @@ body[data-casa] .hwp{
 }
 .hwp-b{flex:none;width:64px;height:64px;background:center/contain no-repeat;
   filter:drop-shadow(0 2px 6px rgba(0,0,0,.45))}
-.hwp-c{flex:1;min-width:0}
+.hwp-c{flex:1 1 20rem;min-width:0}   /* 20rem de base: sem isso o placar de
+  largura inteira espremia o texto numa coluna de uma palavra por linha */
 .hwp-casa{font-family:'Cinzel',var(--font-heading),Georgia,serif;font-size:1.12rem;
   letter-spacing:.02em;color:var(--casa-luz,#8a6a15)}
 body[data-casa] .hwp-casa{color:#ffeec2}
-.hwp-l1,.hwp-l2{margin:.18rem 0 0;font-size:.9rem;line-height:1.45}
+.hwp-l1,.hwp-l2,.hwp-l3{margin:.18rem 0 0;font-size:.9rem;line-height:1.45}
 .hwp-l2{opacity:.82}
+.hwp-l3{opacity:.62;font-size:.82rem}
 .hwp-ir{flex:none;align-self:center;font-weight:700;font-size:.86rem;text-decoration:none;
   padding:.5rem .9rem;border-radius:999px;border:1px solid var(--casa-luz,#d3a625);
   color:var(--casa-luz,#8a6a15);white-space:nowrap}
@@ -251,4 +253,26 @@ body[data-casa] .hwp-ir{color:#ffeec2}
   .hwp{flex-wrap:wrap;margin:1.1rem .9rem 0;gap:.8rem}
   .hwp-b{width:52px;height:52px}
   .hwp-ir{width:100%;text-align:center}
+}
+
+/* ── o placar das quatro casas dentro do painel ── */
+.hwp-taca{flex-basis:100%;display:grid;gap:.3rem;margin-top:.9rem;
+  border-top:1px solid rgba(212,175,55,.28);padding-top:.8rem}
+.hwt-l{display:grid;grid-template-columns:1.5rem 22px 9.5rem 1fr auto;align-items:center;
+  gap:.5rem;padding:.3rem .45rem;border-radius:9px;font-size:.82rem;font-weight:700}
+.hwt-l.is-minha{background:color-mix(in srgb, var(--c) 16%, transparent);
+  box-shadow:inset 0 0 0 1.5px color-mix(in srgb, var(--c) 45%, transparent)}
+.hwt-pos{font-size:.75rem;opacity:.7;text-align:center}
+.hwt-b{object-fit:contain;display:block}
+.hwt-n{font-family:'Cinzel',var(--font-heading),Georgia,serif;letter-spacing:.02em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hwt-bar{height:6px;border-radius:999px;background:rgba(255,255,255,.16);overflow:hidden}
+body:not([data-casa]) .hwt-bar{background:rgba(0,0,0,.12)}
+.hwt-bar i{display:block;height:100%;border-radius:999px;background:var(--c);
+  animation:hwt-cresce .9s cubic-bezier(.2,.8,.2,1) both;transform-origin:left}
+@keyframes hwt-cresce{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.hwt-p{text-align:right;font-variant-numeric:tabular-nums;min-width:3rem}
+@media (max-width:640px){
+  .hwt-l{grid-template-columns:1.3rem 20px 1fr auto;gap:.35rem}
+  .hwt-bar{grid-area:2/1/3/-1;margin-top:.15rem}
 }
