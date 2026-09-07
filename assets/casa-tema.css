@@ -277,16 +277,25 @@ body:not([data-casa]) .hwt-bar{background:rgba(0,0,0,.12)}
   .hwt-bar{grid-area:2/1/3/-1;margin-top:.15rem}
 }
 
-/* a barra da comunidade, acima das quatro casas: ela é a única em ouro,
-   porque o ouro não é a cor de casa nenhuma */
-.hwt-geral{margin-bottom:.7rem}
-.hwt-gt{display:flex;justify-content:space-between;align-items:baseline;
-  font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
-.hwt-gbar{display:block;height:9px;margin:.35rem 0 .35rem;border-radius:999px;
-  background:rgba(255,255,255,.16);overflow:hidden}
-body:not([data-casa]) .hwt-gbar{background:rgba(0,0,0,.12)}
+/* A BARRA DA COMUNIDADE, acima das quatro casas.
+   ⚠️ A COR É A DA MANA, e não o ouro das casas (foi ouro no primeiro dia, e
+   estava errado): esta barra mede MANA, a mesma que o professor vê ao lado de
+   cada crédito, e o frasco ao lado é o mesmo desenho do `mana.js`. Ouro dizia
+   "prêmio"; azul diz "o que estamos enchendo".
+   Ela é o DOBRO da altura das barrinhas de casa, de propósito: quem olha
+   rápido lê primeiro a escola inteira e só depois a disputa. */
+.hwt-geral{margin-bottom:.8rem}
+.hwt-gt{display:flex;align-items:center;gap:.45rem;
+  font-size:.76rem;letter-spacing:.05em;text-transform:uppercase;opacity:.92}
+.hwt-gt span:nth-child(2){flex:1;min-width:0}
+.hwt-gfrasco{flex:none;font-size:1.7rem;line-height:0;color:#7cc4ff}
+.hwt-gbar{display:block;height:18px;margin:.45rem 0 .4rem;border-radius:999px;
+  background:rgba(255,255,255,.14);overflow:hidden;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.28)}
+body:not([data-casa]) .hwt-gbar{background:rgba(0,0,0,.10)}
 .hwt-gbar i{display:block;height:100%;border-radius:999px;
-  background:linear-gradient(90deg,#b8912a,#f0d68a 55%,#d4af37);
+  background:linear-gradient(180deg,#7cc4ff 0%,#2f6fe4 55%,#1d4ed8 100%);
+  box-shadow:0 0 12px rgba(47,111,228,.55), inset 0 1px 0 rgba(255,255,255,.4);
   animation:hwt-cresce 1.1s cubic-bezier(.2,.8,.2,1) both;transform-origin:left}
 .hwt-geral p{margin:0;font-size:.8rem;line-height:1.45;opacity:.8;font-weight:400}
 

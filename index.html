@@ -12,7 +12,7 @@
      MEXEU no style.css ou no kit? Suba a data aqui. -->
 <link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04c">
   <!-- a casa do professor veste a faixa do topo (campanha de 09/2026) -->
-  <link rel="stylesheet" href="assets/casa-tema.css?v=6">
+  <link rel="stylesheet" href="assets/casa-tema.css?v=7">
 <link rel="stylesheet" href="style.css?v=2026-08-04b">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
@@ -1973,8 +1973,13 @@
         var meta = null;
         for (var mi = 0; mi < MARCOS.length; mi++) { if (tot < MARCOS[mi]) { meta = MARCOS[mi]; break; } }
         var pct = meta ? Math.min(100, Math.round(tot / meta * 100)) : 100;
+        /* o frasco e o MESMO SVG da mana (assets/mana.js do Portal), so que
+           grande: ele e desenhado em `1em`, entao quem manda no tamanho e o
+           `font-size` — nada de uma segunda copia do desenho por aqui */
+        var frasco = (window.FiskMana && window.FiskMana.SVG) || '';
         geral = '<div class="hwt-geral">' +
-          '<div class="hwt-gt"><span>' + t.geralT + '</span><b>' + pct + '%</b></div>' +
+          '<div class="hwt-gt"><span class="hwt-gfrasco">' + frasco + '</span>' +
+            '<span>' + t.geralT + '</span><b>' + pct + '%</b></div>' +
           '<span class="hwt-gbar"><i style="width:' + pct + '%"></i></span>' +
           '<p>' + (meta ? t.geral(num(tot), num(meta)) : t.geralMax(num(tot))) + '</p>' +
         '</div>';
