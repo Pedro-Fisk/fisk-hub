@@ -250,7 +250,7 @@
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260913h"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914a"></script>
 <!-- o guia do Checking, lição a lição (Essentials 1) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913c"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
@@ -503,7 +503,7 @@ function cartaoAluno(a) {
     (atras > 0 ? '<span class="pill atras">' + atras + ' aula' + (atras === 1 ? '' : 's') + ' atrás do plano</span>' : '') +
     (ckAtual && ckAtual.feito ? '<span class="pill chk">✓ Checking ' + esc(pos.id) + (ckAtual.nota != null ? ' · nota ' + esc(ckAtual.nota) : '') + '</span>' : '<span class="pill chk falta">Checking ' + esc(pos.id) + ' pendente</span>') +
     (plano ? '' : '<span class="acoes"><button type="button" class="btn btn-ck" data-ck>' + (ckAtual && ckAtual.feito ? 'Editar Checking' : 'Registrar Checking') + '</button></span>') +
-    (plano ? '<a class="pill aguia" href="plano-curso.html?raf=' + encodeURIComponent(a.raf) + '&book=' + encodeURIComponent(a.book || '') + '&nome=' + encodeURIComponent(a.nome || '') + '" target="_blank" rel="noopener" title="O plano de curso inteiro, do começo ao fim">🦅 Ver planner completo</a>' : '');
+    (plano ? '<a class="pill aguia" href="plano-curso.html?raf=' + encodeURIComponent(a.raf) + '&book=' + encodeURIComponent(a.book || '') + '&nome=' + encodeURIComponent(a.nome || '') + '&prof=' + encodeURIComponent(estado.prof || '') + '&turma=' + encodeURIComponent(estado.turma || '') + '&escola=' + encodeURIComponent(estado.escola || '') + '" target="_blank" rel="noopener" title="O plano de curso inteiro, do começo ao fim">🦅 Ver planner completo</a>' : '');
   card.appendChild(cab);
   var corpo = document.createElement('div'); corpo.className = 'al-corpo';
   var esq = document.createElement('div'); esq.className = 'esq';

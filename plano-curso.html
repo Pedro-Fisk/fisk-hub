@@ -26,12 +26,12 @@
 <div class="topo"><h1>🦅 Plano de curso</h1><span class="sub" id="quem"></span><button type="button" onclick="window.print()">🖨 Imprimir / PDF</button><a href="turma-de-hoje.html">← Turma de hoje</a></div>
 <div class="status" id="status">Lendo o planner…</div>
 <div id="corpo"></div>
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260913j"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914a"></script>
 <script>
 var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
 var $ = function (id) { return document.getElementById(id); };
 var q = new URLSearchParams(location.search);
-var raf = q.get('raf') || '', book = q.get('book') || '', nome = q.get('nome') || '';
+var raf = q.get('raf') || '', book = q.get('book') || '', nome = q.get('nome') || '', prof = q.get('prof') || '', turma = q.get('turma') || '', escola = q.get('escola') || '';
 function token() { try { return (JSON.parse(localStorage.getItem('fisk_prof') || 'null') || {}).token || ''; } catch (e) { return ''; } }
 function livroId(b) { return String(b || '').trim().toLowerCase().replace(/\s+/g, '-'); }
 function planoGlobal(b) { return 'PLANO_' + livroId(b).toUpperCase().replace(/-/g, '_'); }
@@ -56,7 +56,31 @@ else Promise.all([
     planner: { feitos: d.feitos || [], atividades: d.atividades || {}, evidencia: d.evidencia || [], plano: d.planner || { itens: {}, checking: {} } },
     cels: (d.situacao && d.situacao.cels) || [], situacao: d.situacao || null };
   status('');
-  PlannerV2.planoCompleto($('corpo'), plano, ctx, { nome: nome });
+  /* tudo clicável, como na Turma de hoje: o professor tica a metade dele
+     (ou desfaz) em qualquer aula, inclusive antiga; a marca aparece na hora
+     e o servidor confirma atrás (Pedro, 14/09/2026) */
+  var salvando = Promise.resolve();
+  function desenha() { PlannerV2.planoCompleto($('corpo'), plano, ctx, { nome: nome, raf: raf, prof: prof, turma: turma, escola: escola, hist: d.hist || [], aoClicar: clicar }); }
+  function clicar(it, st) {
+    var itens = ctx.planner.plano.itens = ctx.planner.plano.itens || {};
+    var marca = { p: st.prof ? 0 : 1 };
+    var antes = JSON.stringify(itens[it.id] || null);
+    var reg = Object.assign({}, itens[it.id] || {});
+    if (marca.p) { reg.p = 1; reg.pq = prof || 'você'; reg.pt = Date.now(); } else { delete reg.p; delete reg.pq; delete reg.pt; }
+    if (reg.p || reg.a) itens[it.id] = reg; else delete itens[it.id];
+    desenha();
+    var patch = { itens: {} }; patch.itens[it.id] = marca;
+    salvando = salvando.then(function () {
+      return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plannerProf', token: token(), raf: raf, book: book, patch: patch }) }).then(function (r) { return r.json(); });
+    }).then(function (r) {
+      if (!r || r.ok === false) throw new Error((r && (r.erro || r.error)) || 'não salvou');
+      if (r.card && r.card.escreveu) status('📇 Card: ' + r.card.escreveu + ' na aula de hoje.');
+    }).catch(function (e) {
+      var v = JSON.parse(antes); if (v) itens[it.id] = v; else delete itens[it.id];
+      desenha(); status('⚠️ Não salvou (' + (e && e.message || e) + '). A marca voltou.', true);
+    });
+  }
+  desenha();
 }).catch(function (e) { status('Erro: ' + (e && e.message || e), true); });
 </script>
 </body>
