@@ -71,13 +71,21 @@
   .it{ display: flex; align-items: center; gap: .6rem; padding: .32rem .4rem; border-radius: 12px; font-size: .92rem; font-weight: 700; color: var(--ui-ink); border: 0; background: transparent; width: 100%; text-align: left; font-family: inherit; cursor: default; }
   .it.pode{ cursor: pointer; }
   .it.pode:hover{ background: var(--ui-soft); }
-  .it.feito{ color: var(--gray); text-decoration: line-through; }
+  .it.feito{ color: var(--gray); }
+  .it.feito span:first-of-type + span{ text-decoration: line-through; }
   .it .pg{ margin-left: auto; font-weight: 600; font-size: .74rem; color: var(--gray); white-space: nowrap; }
-  .mk{ flex: 0 0 30px; width: 30px; height: 30px; border-radius: 50%; border: 3px solid #1d3685; background: #fff; }
-  .mk.a{ background: linear-gradient(90deg,#1d3685 50%,#fff 50%); }
-  .mk.p{ background: linear-gradient(90deg,#fff 50%,#d4e909 50%); }
-  .mk.ap{ background: linear-gradient(90deg,#1d3685 50%,#d4e909 50%); }
-  .mk.prof{ border-color: #a8b907; }
+  /* as três mãos: esquerda azul = o aluno; direita verde-amarela = a plataforma;
+     direita LISTRADA em dois azuis = o professor (pedido do Pedro, 13/09) */
+  .mk{ flex: 0 0 30px; width: 30px; height: 30px; border-radius: 50%; border: 3px solid #1d3685; background: #fff; --listra: repeating-linear-gradient(45deg,#1d3685 0 4px,#9fb4e8 4px 8px); }
+  .mk.l-a{ background: linear-gradient(90deg,#1d3685 50%,#fff 50%); }
+  .mk.l-plat{ background: linear-gradient(90deg,#d4e909 50%,#fff 50%); }
+  .mk.r-plat{ background: linear-gradient(90deg,#fff 50%,#d4e909 50%); }
+  .mk.l-a.r-plat{ background: linear-gradient(90deg,#1d3685 50%,#d4e909 50%); }
+  .mk.r-prof{ background: linear-gradient(90deg,#fff 50%,transparent 50%), var(--listra); }
+  .mk.l-a.r-prof{ background: linear-gradient(90deg,#1d3685 50%,transparent 50%), var(--listra); }
+  .mk.l-plat.r-prof{ background: linear-gradient(90deg,#d4e909 50%,transparent 50%), var(--listra); }
+  .mk.cheia-prof{ background: var(--listra); }
+  .mk.dep-prof{ border-color: #a8b907; }
   .mk.plat{ background: #d4e909; border-color: #a8b907; }
   .mk.tri{ border-radius: 0; width: 30px; height: 27px; border: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,4.5 25.5,23 4.5,23' fill='%23fff' stroke='%23d91e9e' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
   .mk.tri.on{ background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,3.5 26.5,24 3.5,24' fill='%23d91e9e' stroke='%23d91e9e' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
@@ -194,11 +202,12 @@
     </div>
     <div class="status" id="status">Escolha a turma. Os alunos e a posição de cada um vêm do card.</div>
     <div class="legenda" id="legenda" hidden>
-      <span><i class="mk a" style="width:16px;height:16px;border-width:2px"></i> o aluno marcou</span>
-      <span><i class="mk p" style="width:16px;height:16px;border-width:2px"></i> a plataforma provou ou você confirmou</span>
-      <span><i class="mk prof" style="width:16px;height:16px;border-width:2px"></i> depende de você (Exploration)</span>
-      <span><i class="mk tri" style="width:16px;height:14px"></i> tarefa: só o aluno marca</span>
-      <span>Toque num item para confirmar (ou desfazer) a metade do professor.</span>
+      <span><i class="mk l-a" style="width:18px;height:18px;border-width:2px"></i> o aluno marcou</span>
+      <span><i class="mk r-plat" style="width:18px;height:18px;border-width:2px"></i> a plataforma provou</span>
+      <span><i class="mk r-prof" style="width:18px;height:18px;border-width:2px"></i> você confirmou</span>
+      <span><i class="mk cheia-prof dep-prof" style="width:18px;height:18px;border-width:2px"></i> Exploration feita com você</span>
+      <span><i class="mk tri" style="width:18px;height:16px"></i> tarefa: só o aluno marca</span>
+      <span>Toque na bolinha para confirmar a sua metade; toque de novo para desfazer.</span>
     </div>
   </div>
   <div id="resumo" class="resumo" style="max-width:1080px;margin:0 auto .6rem" hidden></div>
@@ -208,7 +217,7 @@
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
 <script src="https://portalfisk.com.br/assets/plano-essentials-1.v2.js?v=20260913d"></script>
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260913d"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260913e"></script>
 <!-- o guia do Checking, lição a lição (Essentials 1) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913b"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
@@ -495,14 +504,18 @@ function linhaItem(a, it) {
   var pode = !tri && it.marca !== 'plataforma';
   var b = document.createElement('button'); b.type = 'button';
   b.className = 'it' + (pode ? ' pode' : '') + (it.feito ? ' feito' : '');
-  var mk = '<span class="mk' + (tri ? ' tri' + (it.a ? ' on' : '') : (it.marca === 'plataforma' ? (it.p ? ' plat' : '') : ((it.a && it.p) ? ' ap' : it.a ? ' a' : it.p ? ' p' : ''))) + (it.quem === 'prof' ? ' prof' : '') + '"></span>';
+  var cls = '';
+  if (tri) cls = ' tri' + (it.a ? ' on' : '');
+  else if (it.marca === 'plataforma') cls = it.p ? ' plat' : '';
+  else if (it.marca === 'expl') cls = (it.prof && !it.plat) ? ' cheia-prof' : ((it.plat ? ' l-plat' : '') + (it.prof ? ' r-prof' : ''));
+  else cls = (it.a ? ' l-a' : '') + (it.prof ? ' r-prof' : (it.plat ? ' r-plat' : ''));
+  var mk = '<span class="mk' + cls + (it.quem === 'prof' ? ' dep-prof' : '') + '"></span>';
   b.innerHTML = mk + '<span>' + esc(it.nm) + (it.pq ? ' <span class="quem">✓ ' + esc(it.pq) + '</span>' : '') + '</span>';
-  /* o ciclo do professor (pedido do Pedro, 13/09): vazia → a sua metade
-     (direita, verde-amarela) → a bolinha inteira (marca a do aluno também) →
-     vazia de novo */
-  var prox = (!it.p) ? { p: 1 } : (!it.a ? { p: 1, a: 1 } : { p: 0, a: 0 });
+  /* o professor marca só a SUA metade (a direita, listrada): um toque põe,
+     outro tira. A metade do aluno é do aluno; só o triângulo ele enche. */
+  var prox = { p: it.prof ? 0 : 1 };
   b.title = tri ? 'A tarefa é só do aluno' : (it.marca === 'plataforma' ? 'A plataforma preenche'
-          : (!it.p ? 'Toque para confirmar a sua metade' : (!it.a ? 'Toque de novo para marcar a bolinha inteira' : 'Toque para esvaziar')));
+          : (it.prof ? 'Toque para desfazer a sua confirmação' : 'Toque para confirmar a sua metade'));
   if (pode) b.addEventListener('click', function () { b.classList.add('salvando'); confirmar(a, it.id, prox); });
   return b;
 }
