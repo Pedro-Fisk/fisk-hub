@@ -33,7 +33,7 @@
      ═══════════════════════════════════════════════════════════════════════ -->
 <style>
   body{ padding-bottom: 4rem; }
-  .painel{ background: var(--white); border: 1px solid var(--surface-border-color); border-radius: var(--surface-radius); box-shadow: var(--surface-shadow); padding: 1rem 1.2rem; margin: 0 auto 1rem; max-width: 1080px; }
+  .painel{ background: var(--white); border: 1px solid var(--surface-border-color); border-radius: var(--surface-radius); box-shadow: var(--surface-shadow); padding: 1rem 1.2rem; margin: 0 auto 1rem; max-width: 1500px; }
   .cascata{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: .6rem; }
   .cascata label{ display: block; font-size: .74rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--gray); margin-bottom: .25rem; }
   .cascata select{ width: 100%; padding: .55rem .7rem; border: 1.5px solid var(--ui-bd); border-radius: 10px; font-family: var(--font-body); font-size: .92rem; background: var(--white); color: var(--black); }
@@ -43,7 +43,7 @@
   .resumo b{ color: var(--black); }
 
   /* o aluno */
-  .al{ background: var(--white); border: 1px solid var(--surface-border-color); border-radius: var(--surface-radius); box-shadow: var(--surface-shadow); margin: 0 auto .8rem; max-width: 1080px; overflow: hidden; }
+  .al{ background: var(--white); border: 1px solid var(--surface-border-color); border-radius: var(--surface-radius); box-shadow: var(--surface-shadow); margin: 0 auto .8rem; max-width: 1500px; overflow: hidden; }
   .al-cab{ display: flex; align-items: center; gap: .7rem; padding: .75rem 1rem; flex-wrap: wrap; }
   .al-cab .nome{ font-family: var(--font-heading); font-weight: 700; font-size: 1.02rem; }
   .al-cab .livro{ font-size: .8rem; color: var(--gray); }
@@ -153,7 +153,7 @@
   body.theme-dark .guia{ background: #172232; border-color: #2e4560; }
   body.theme-dark .guia .en{ color: #dbe6f3; }
   /* a fila do Planejador e o atendimento */
-  .fila-info{ max-width: 1080px; margin: 0 auto .8rem; display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; font-size: .84rem; color: var(--gray); background: #e4f3f1; border: 1px solid #cfe6e1; border-radius: 12px; padding: .55rem .9rem; }
+  .fila-info{ max-width: 1500px; margin: 0 auto .8rem; display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; font-size: .84rem; color: var(--gray); background: #e4f3f1; border: 1px solid #cfe6e1; border-radius: 12px; padding: .55rem .9rem; }
   .fila-info b{ color: #155a48; }
   .fila-info a{ margin-left: auto; font-weight: 800; color: #155a48; }
   .fila-info.sem{ background: var(--ui-soft); border-color: var(--ui-line); }
@@ -234,9 +234,9 @@
       <span>Toque na bolinha para confirmar a sua metade; toque de novo para desfazer.</span>
     </div>
   </div>
-  <div id="resumo" class="resumo" style="max-width:1080px;margin:0 auto .6rem" hidden></div>
+  <div id="resumo" class="resumo" style="max-width:1500px;margin:0 auto .6rem" hidden></div>
   <div id="fila" class="fila-info" hidden></div>
-  <div style="max-width:1080px;margin:0 auto .6rem;display:flex" id="obsBarra" hidden>
+  <div style="max-width:1500px;margin:0 auto .6rem;display:flex" id="obsBarra" hidden>
     <button type="button" class="obs-toggle" id="obsToggle">🙈 Esconder as anotações (tela na TV)</button>
   </div>
   <div id="alunos"></div>
@@ -643,6 +643,21 @@ function linhaItem(a, it) {
 
 /* ── a metade do professor: um toque, um POST; a resposta é o planner fundido ── */
 var salvando = {};
+/* as marcas ainda a caminho, por aluno: a resposta de UMA gravação traz o
+   planner inteiro do servidor, e sem isto ela apagava da tela a bolinha
+   clicada logo depois, que ainda não tinha chegado lá (Pedro, 14/09/2026) */
+var pendentes = {};
+function aplicaPendentes(raf, planner) {
+  var p = pendentes[raf] || {};
+  planner.itens = planner.itens || {};
+  Object.keys(p).forEach(function (id) {
+    var marca = p[id], it = Object.assign({}, planner.itens[id] || {});
+    if ('p' in marca) { if (marca.p) { it.p = 1; it.pq = it.pq || (sessao() || {}).name || 'você'; it.pt = it.pt || Date.now(); } else { delete it.p; delete it.pq; delete it.pt; } }
+    if ('a' in marca) { if (marca.a) it.a = 1; else { delete it.a; delete it.at; } }
+    if (it.p || it.a) planner.itens[id] = it; else delete planner.itens[id];
+  });
+  return planner;
+}
 /* Um toque, um POST. A trava é por ITEM (não por aluno): o Apps Script pode
    levar até 30 s numa fila de gravações, e a trava por aluno fazia os toques
    seguintes morrerem em silêncio ("toca e nada acontece", Claudinei,
@@ -661,6 +676,7 @@ function confirmar(a, id, marca) {
   if (!it.p && !it.a) delete d.planner.itens[id];
   redesenhar(a);   /* já com a marca nova */
   var patch = { itens: {} }; patch.itens[id] = marca;
+  pendentes[a.raf] = pendentes[a.raf] || {}; pendentes[a.raf][id] = marca;
   var k = a.raf + '|' + id;
   var anterior = salvando[k] || Promise.resolve();
   salvando[k] = anterior.then(function () {
@@ -669,8 +685,11 @@ function confirmar(a, id, marca) {
     return Promise.race([pedido, limite]);
   }).then(function (r) {
     console.log('plannerProf', id, marca, r);
-    if (r.planner) { estado.dados[a.raf].planner = r.planner; }
+    if (pendentes[a.raf] && pendentes[a.raf][id] === marca) delete pendentes[a.raf][id];
+    if (r.planner) { estado.dados[a.raf].planner = aplicaPendentes(a.raf, r.planner); redesenhar(a); }
+    if (r.card && r.card.escreveu) toast('📇 Card: ' + r.card.escreveu + ' na aula de hoje.');
   }).catch(function (e) {
+    if (pendentes[a.raf] && pendentes[a.raf][id] === marca) delete pendentes[a.raf][id];
     console.error('plannerProf falhou', id, e);
     var v = JSON.parse(antes); if (v) estado.dados[a.raf].planner.itens[id] = v; else delete estado.dados[a.raf].planner.itens[id];
     redesenhar(a);
