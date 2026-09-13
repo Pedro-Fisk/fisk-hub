@@ -509,14 +509,25 @@ function linhaItem(a, it) {
 
 /* ── a metade do professor: um toque, um POST; a resposta é o planner fundido ── */
 var salvando = {};
+/* Um toque, um POST. A trava é por ITEM (não por aluno): o Apps Script pode
+   levar até 30 s numa fila de gravações, e a trava por aluno fazia os toques
+   seguintes morrerem em silêncio ("toca e nada acontece", Claudinei,
+   13/09/2026). Passou de 1,5 s, avisa que está gravando; passou de 25 s,
+   desiste e avisa. Tudo vai para o console também. */
 function confirmar(a, id, marca) {
-  if (salvando[a.raf]) return;
-  salvando[a.raf] = true;
+  var k = a.raf + '|' + id;
+  if (salvando[k]) { toast('⏳ Ainda gravando este item…'); return; }
+  salvando[k] = true;
   var patch = { itens: {} }; patch.itens[id] = marca;
-  post({ action: 'plannerProf', raf: a.raf, book: a.book, patch: patch }).then(function (r) {
+  var lento = setTimeout(function () { toast('⏳ Gravando no servidor…'); }, 1500);
+  var pedido = post({ action: 'plannerProf', raf: a.raf, book: a.book, patch: patch });
+  var limite = new Promise(function (_, rej) { setTimeout(function () { rej(new Error('o servidor demorou demais; tente de novo')); }, 25000); });
+  Promise.race([pedido, limite]).then(function (r) {
+    console.log('plannerProf', id, marca, r);
     if (r.planner) estado.dados[a.raf] = Object.assign(estado.dados[a.raf] || {}, { planner: r.planner });
     redesenhar(a);
-  }).catch(function (e) { toast('⚠️ Não salvou: ' + e.message); redesenhar(a); }).then(function () { salvando[a.raf] = false; });
+  }).catch(function (e) { console.error('plannerProf falhou', id, e); toast('⚠️ Não salvou: ' + e.message); redesenhar(a); })
+    .then(function () { clearTimeout(lento); salvando[k] = false; });
 }
 function redesenhar(a) {
   var velho = document.querySelector('.al[data-raf="' + a.raf + '"]');
