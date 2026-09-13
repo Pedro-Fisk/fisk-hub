@@ -168,6 +168,22 @@
   .al.atendido .btn-atend{ background: var(--gray-light); color: var(--gray); box-shadow: none; }
   .al .atend .quando{ font-size: .8rem; color: #155a48; font-weight: 700; }
   .it.salvando{ opacity: .5; }
+  /* a anotação livre do professor, à direita de cada aluno; some com um toque
+     quando a tela vai para a TV (dado sensível) */
+  .al-corpo{ display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 0; }
+  .al-corpo > .esq{ min-width: 0; }
+  .obs{ border-left: 1px solid var(--ui-line); background: #fffbea; padding: .8rem .9rem; display: flex; flex-direction: column; gap: .5rem; }
+  .obs label{ font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #7a5b00; }
+  .obs textarea{ width: 100%; min-height: 110px; resize: vertical; font-family: var(--font-body); font-size: .88rem; padding: .55rem .65rem; border: 1.5px solid #e8d48a; border-radius: 10px; background: #fff; color: var(--black); }
+  .obs .st{ font-size: .74rem; color: var(--gray); min-height: 1em; }
+  .obs .ec{ font-size: .78rem; border: 1.5px dashed var(--ui-bd); background: transparent; color: var(--gray); border-radius: 999px; padding: .4rem .8rem; font-family: var(--font-body); font-weight: 800; cursor: not-allowed; }
+  body.sem-obs .obs{ display: none; }
+  body.sem-obs .al-corpo{ grid-template-columns: 1fr; }
+  .obs-toggle{ margin-left: auto; border: 1.5px solid var(--ui-bd); background: var(--white); color: var(--ui-ink); border-radius: 999px; padding: .35rem .8rem; font-family: var(--font-body); font-weight: 800; font-size: .8rem; cursor: pointer; }
+  .extras span.ok b{ color: #155a48; }
+  body.theme-dark .obs{ background: #26301a; border-color: #2e4560; }
+  body.theme-dark .obs textarea{ background: #101a28; color: #dbe6f3; border-color: #4a5a3a; }
+  @media (max-width: 760px){ .al-corpo{ grid-template-columns: 1fr; } .obs{ border-left: 0; border-top: 1px solid var(--ui-line); } }
   .toast{ position: fixed; left: 50%; bottom: 1.4rem; transform: translateX(-50%); background: #1d3685; color: #fff; padding: .7rem 1.1rem; border-radius: 999px; font-weight: 800; font-size: .9rem; box-shadow: 0 8px 24px rgba(0,0,0,.25); z-index: 50; }
 
   body.theme-dark .painel, body.theme-dark .al{ background: #172232; border-color: #2e4560; }
@@ -212,12 +228,15 @@
   </div>
   <div id="resumo" class="resumo" style="max-width:1080px;margin:0 auto .6rem" hidden></div>
   <div id="fila" class="fila-info" hidden></div>
+  <div style="max-width:1080px;margin:0 auto .6rem;display:flex" id="obsBarra" hidden>
+    <button type="button" class="obs-toggle" id="obsToggle">🙈 Esconder as anotações (tela na TV)</button>
+  </div>
   <div id="alunos"></div>
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
 <script src="https://portalfisk.com.br/assets/plano-essentials-1.v2.js?v=20260913d"></script>
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260913e"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260913f"></script>
 <!-- o guia do Checking, lição a lição (Essentials 1) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913b"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
@@ -397,6 +416,7 @@ function carregarTurma(escola, prof, linha, titulo) {
         aplicarFila();
         status((semRaf.length ? semRaf.length + ' aluno(s) sem RAF no card ficaram de fora. ' : '') + 'Pronto. Toque num item para confirmar; o Checking fica na aula 3 de cada aluno.');
         $('legenda').hidden = false;
+        $('obsBarra').hidden = false;
         pintaFila();
         desenharTurma();
       });
@@ -450,6 +470,12 @@ function cartaoAluno(a) {
     (ckAtual && ckAtual.feito ? '<span class="pill chk">✓ Checking ' + esc(pos.id) + (ckAtual.nota != null ? ' · nota ' + esc(ckAtual.nota) : '') + '</span>' : '<span class="pill chk falta">Checking ' + esc(pos.id) + ' pendente</span>') +
     (plano ? '' : '<span class="acoes"><button type="button" class="btn btn-ck" data-ck>' + (ckAtual && ckAtual.feito ? 'Editar Checking' : 'Registrar Checking') + '</button></span>');
   card.appendChild(cab);
+  var corpo = document.createElement('div'); corpo.className = 'al-corpo';
+  var esq = document.createElement('div'); esq.className = 'esq';
+  corpo.appendChild(esq); corpo.appendChild(caixaObs(a));
+  card.appendChild(corpo);
+  /* daqui para baixo, tudo o que é da lição entra na coluna da esquerda */
+  var cardReal = card; card = { appendChild: function (n) { esq.appendChild(n); }, querySelectorAll: function (q) { return cardReal.querySelectorAll(q); }, classList: cardReal.classList, dataset: cardReal.dataset, querySelector: function (q) { return cardReal.querySelector(q); } };
   if (plan && (plan.atividade || plan.nota)) {
     var pa = document.createElement('div'); pa.className = 'plano-ativ';
     pa.innerHTML = (plan.atividade ? '🎯 ' + esc(plan.atividade) : '') + (plan.nota ? ' <i>· ' + esc(plan.nota) + '</i>' : '');
@@ -477,7 +503,7 @@ function cartaoAluno(a) {
       card.appendChild(grade);
       if (est.extras.length) {
         var ex = document.createElement('div'); ex.className = 'extras';
-        ex.innerHTML = 'Keep studying: ' + est.extras.map(function (x) { return '<span class="' + (x.feito ? 'ok' : '') + '">' + (x.feito ? '✓ ' : '') + esc(x.nm) + '</span>'; }).join('');
+        ex.innerHTML = 'Keep studying: ' + est.extras.map(function (x) { return '<span class="' + (x.feito ? 'ok' : '') + '">' + (x.feito ? '✓ ' : '') + esc(x.nm) + (x.feito && typeof x.pct === 'number' ? ' <b>' + Math.round(x.pct) + '%</b>' : '') + '</span>'; }).join('');
         card.appendChild(ex);
       }
     }
@@ -494,9 +520,38 @@ function cartaoAluno(a) {
   at.appendChild(ba);
   if (estado.atendidos[a.raf]) { var q = document.createElement('span'); q.className = 'quando'; var dt = new Date(estado.atendidos[a.raf]); q.textContent = 'Atendido às ' + ('0' + dt.getHours()).slice(-2) + ':' + ('0' + dt.getMinutes()).slice(-2); at.appendChild(q); }
   card.appendChild(at);
-  card.querySelectorAll('[data-ck]').forEach(function (b) { b.addEventListener('click', function () { abrirChecking(card, a, plano, pos); }); });
-  if (estado.aberto === a.raf) abrirChecking(card, a, plano, pos);
-  return card;
+  cardReal.querySelectorAll('[data-ck]').forEach(function (b) { b.addEventListener('click', function () { abrirChecking(cardReal, a, plano, pos); }); });
+  if (estado.aberto === a.raf) abrirChecking(cardReal, a, plano, pos);
+  return cardReal;
+}
+
+/* ── a anotação livre do professor (pedido do Pedro, 13/09) ──
+   Fica na linha do planner do aluno (`obs`), só o professor lê. Salva ao
+   parar de escrever (1,2 s) e ao sair do campo. O botão do e-counseling é
+   promessa: fica visível e desligado até a integração existir. */
+var obsTimer = {};
+function caixaObs(a) {
+  var box = document.createElement('div'); box.className = 'obs';
+  var d = estado.dados[a.raf] || {}; var atual = (d.planner && d.planner.obs) || '';
+  box.innerHTML = '<label>📝 Anotações sobre ' + esc(a.nome.split(' ')[0]) + ' (só você vê)</label>' +
+    '<textarea maxlength="600" placeholder="Ex.: aniversário na próxima aula; conversar com a família; pediu mais exercícios de listening…"></textarea>' +
+    '<div class="st"></div>' +
+    '<button type="button" class="ec" disabled title="Em breve: a anotação vai para o e-counseling do aluno">➕ Adicionar ao e-counseling (em breve)</button>';
+  var ta = box.querySelector('textarea'), st = box.querySelector('.st');
+  ta.value = atual;
+  function salvar() {
+    var v = ta.value.trim();
+    if (v === ((estado.dados[a.raf] || {}).planner || {}).obs && v !== '') return;
+    if (!v && !atual) return;
+    st.textContent = 'Salvando…';
+    post({ action: 'plannerProf', raf: a.raf, book: a.book, patch: { obs: v } }).then(function (r) {
+      if (r.planner) estado.dados[a.raf] = Object.assign(estado.dados[a.raf] || {}, { planner: r.planner });
+      atual = v; st.textContent = v ? '✓ Salvo' : '✓ Apagado';
+    }).catch(function (e) { st.textContent = '⚠️ Não salvou: ' + e.message; });
+  }
+  ta.addEventListener('input', function () { st.textContent = ''; clearTimeout(obsTimer[a.raf]); obsTimer[a.raf] = setTimeout(salvar, 1200); });
+  ta.addEventListener('blur', function () { clearTimeout(obsTimer[a.raf]); salvar(); });
+  return box;
 }
 
 function linhaItem(a, it) {
@@ -676,6 +731,14 @@ function abrirChecking(card, a, plano, pos) {
   ck.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 
+/* esconder as anotações quando a tela vai para a TV; a escolha fica no aparelho */
+(function () {
+  var b = $('obsToggle'); if (!b) return;
+  function pinta() { var off = document.body.classList.contains('sem-obs'); b.textContent = off ? '👁️ Mostrar as anotações' : '🙈 Esconder as anotações (tela na TV)'; }
+  try { if (localStorage.getItem('th:obs') === 'off') document.body.classList.add('sem-obs'); } catch (e) {}
+  pinta();
+  b.addEventListener('click', function () { document.body.classList.toggle('sem-obs'); try { localStorage.setItem('th:obs', document.body.classList.contains('sem-obs') ? 'off' : 'on'); } catch (e) {} pinta(); });
+})();
 /* a tela grande salvou o feedback: atualiza o aluno aqui sem recarregar */
 window.addEventListener('message', function (ev) {
   var d = ev.data || {};
