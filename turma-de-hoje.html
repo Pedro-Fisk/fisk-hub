@@ -33,7 +33,7 @@
      ═══════════════════════════════════════════════════════════════════════ -->
 <style>
   body{ padding-bottom: 4rem; }
-  .painel{ background: var(--white); border: 1px solid var(--surface-border-color); border-radius: var(--surface-radius); box-shadow: var(--surface-shadow); padding: 1rem 1.2rem; margin: 0 auto 1rem; max-width: 1500px; }
+  .painel{ background: var(--white); border: 1px solid var(--surface-border-color); border-radius: var(--surface-radius); box-shadow: var(--surface-shadow); padding: 1rem 1.2rem; margin: 1.4rem auto 1rem; max-width: 1500px; }
   .cascata{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: .6rem; }
   .cascata label{ display: block; font-size: .74rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--gray); margin-bottom: .25rem; }
   .cascata select{ width: 100%; padding: .55rem .7rem; border: 1.5px solid var(--ui-bd); border-radius: 10px; font-family: var(--font-body); font-size: .92rem; background: var(--white); color: var(--black); }
@@ -94,8 +94,11 @@
   .extras{ padding: 0 1rem .8rem; font-size: .8rem; color: var(--gray); display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; }
   .extras span{ border: 1px solid var(--ui-line); border-radius: 99px; padding: .1rem .5rem; }
   .extras span.ok{ background: #e4f3f1; color: #155a48; border-color: #cfe6e1; }
-  .legenda{ font-size: .76rem; color: var(--gray); display: flex; flex-wrap: wrap; gap: .8rem; padding: .3rem 0 0; }
+  .legenda{ font-size: .95rem; color: var(--gray); display: flex; flex-wrap: wrap; gap: 1.1rem; padding: .5rem 0 0; }
   .legenda i{ display: inline-block; vertical-align: middle; margin-right: .25rem; }
+  .aula .t .dt{ margin-left: auto; text-transform: none; letter-spacing: 0; font-size: .72rem; font-weight: 800; background: #eef2fa; color: var(--gray); border-radius: 999px; padding: .1rem .5rem; }
+  .aula .t .dt.dada{ background: #e4f3f1; color: #155a48; } .aula .t .dt.falta, .aula .t .dt.tarde{ background: #fde8e8; color: #b91c1c; } .aula .t .dt.semdata{ opacity: .6; }
+  .it .capa{ width: 44px; height: 28px; object-fit: cover; border-radius: 5px; flex: 0 0 44px; border: 1px solid var(--ui-line); }
   .sem-plano{ padding: 0 1rem .9rem; font-size: .84rem; color: var(--gray); }
 
   /* o registro do Checking */
@@ -165,7 +168,8 @@
   .al .plano-ativ{ padding: 0 1rem .6rem; font-size: .84rem; color: var(--ui-ink); }
   .al .plano-ativ i{ color: var(--gray); }
   .al .atend{ padding: .6rem 1rem .9rem; display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; border-top: 1px solid var(--ui-line); }
-  .btn-atend{ background: var(--green); color: #fff; padding: .55rem 1rem; font-size: .86rem; box-shadow: 0 3px 0 var(--green-dark); }
+  .btn-atend{ background: var(--green); color: #fff; padding: .7rem 1rem; font-size: .92rem; box-shadow: 0 3px 0 var(--green-dark); width: 100%; }
+  .al .atend .quando{ width: 100%; text-align: center; }
   .al.atendido{ opacity: .72; }
   .al.atendido .btn-atend{ background: var(--gray-light); color: var(--gray); box-shadow: none; }
   .al .atend .quando{ font-size: .8rem; color: #155a48; font-weight: 700; }
@@ -179,8 +183,11 @@
   .obs textarea{ width: 100%; min-height: 110px; resize: vertical; font-family: var(--font-body); font-size: .88rem; padding: .55rem .65rem; border: 1.5px solid #e8d48a; border-radius: 10px; background: #fff; color: var(--black); }
   .obs .st{ font-size: .74rem; color: var(--gray); min-height: 1em; }
   .obs .ec{ font-size: .78rem; border: 1.5px dashed var(--ui-bd); background: transparent; color: var(--gray); border-radius: 999px; padding: .4rem .8rem; font-family: var(--font-body); font-weight: 800; cursor: not-allowed; }
-  body.sem-obs .obs{ display: none; }
-  body.sem-obs .al-corpo{ grid-template-columns: 1fr; }
+  /* esconder as anotações BORRA a caixa e não mexe na largura das aulas:
+     a tela mudando de proporção na TV era um susto (Pedro, 14/09/2026) */
+  body.sem-obs .obs > *{ filter: blur(7px); pointer-events: none; user-select: none; }
+  body.sem-obs .obs{ position: relative; }
+  body.sem-obs .obs::after{ content: '🙈 anotações escondidas'; position: absolute; inset: 0; display: grid; place-items: center; font-size: .82rem; font-weight: 800; color: var(--gray); }
   .obs-toggle{ margin-left: auto; border: 1.5px solid var(--ui-bd); background: var(--white); color: var(--ui-ink); border-radius: 999px; padding: .35rem .8rem; font-family: var(--font-body); font-weight: 800; font-size: .8rem; cursor: pointer; }
   .extras span.ok b{ color: #155a48; }
   /* o que o aluno fez no portal nesta lição: tudo, previsto ou não */
@@ -496,7 +503,7 @@ function cartaoAluno(a) {
     (atras > 0 ? '<span class="pill atras">' + atras + ' aula' + (atras === 1 ? '' : 's') + ' atrás do plano</span>' : '') +
     (ckAtual && ckAtual.feito ? '<span class="pill chk">✓ Checking ' + esc(pos.id) + (ckAtual.nota != null ? ' · nota ' + esc(ckAtual.nota) : '') + '</span>' : '<span class="pill chk falta">Checking ' + esc(pos.id) + ' pendente</span>') +
     (plano ? '' : '<span class="acoes"><button type="button" class="btn btn-ck" data-ck>' + (ckAtual && ckAtual.feito ? 'Editar Checking' : 'Registrar Checking') + '</button></span>') +
-    (plano ? '<a class="pill aguia" href="plano-curso.html?raf=' + encodeURIComponent(a.raf) + '&book=' + encodeURIComponent(a.book || '') + '&nome=' + encodeURIComponent(a.nome || '') + '" target="_blank" rel="noopener" title="O plano de curso inteiro, do começo ao fim">🦅 Plano completo</a>' : '');
+    (plano ? '<a class="pill aguia" href="plano-curso.html?raf=' + encodeURIComponent(a.raf) + '&book=' + encodeURIComponent(a.book || '') + '&nome=' + encodeURIComponent(a.nome || '') + '" target="_blank" rel="noopener" title="O plano de curso inteiro, do começo ao fim">🦅 Ver planner completo</a>' : '');
   card.appendChild(cab);
   var corpo = document.createElement('div'); corpo.className = 'al-corpo';
   var esq = document.createElement('div'); esq.className = 'esq';
@@ -514,9 +521,10 @@ function cartaoAluno(a) {
     var est = PlannerV2.estadoEtapa(plano, pos.id, ctx);
     if (est) {
       var grade = document.createElement('div'); grade.className = 'aulas';
-      est.aulas.forEach(function (au) {
+      var datas = datasDasAulas(plano, pos.id, ctx);
+      est.aulas.forEach(function (au, ai) {
         var col = document.createElement('div'); col.className = 'aula' + (au.atual ? ' atual' : '');
-        col.innerHTML = '<div class="t">Class ' + au.n + ' <b>' + esc(au.papel) + '</b>' + (au.atual ? '<span class="agora">agora</span>' : '') + '</div>';
+        col.innerHTML = '<div class="t">Class ' + au.n + ' <b>' + esc(au.papel) + '</b>' + pilulaData(datas[ai], au.atual) + '</div>';
         au.itens.forEach(function (it) { col.appendChild(linhaItem(a, it)); });
         /* o Checking mora na aula em que acontece (pedido do Pedro, 13/09) */
         if (au.checking) {
@@ -532,7 +540,7 @@ function cartaoAluno(a) {
       var pr = resumoPortal(a, ctx, pos); if (pr) card.appendChild(pr);
       if (est.extras.length) {
         var ex = document.createElement('div'); ex.className = 'extras';
-        ex.innerHTML = 'Keep studying: ' + est.extras.map(function (x) { return '<span class="' + (x.feito ? 'ok' : '') + '">' + (x.feito ? '✓ ' : '') + esc(x.nm) + (x.feito && typeof x.pct === 'number' ? ' <b>' + Math.round(x.pct) + '%</b>' : '') + '</span>'; }).join('');
+        ex.innerHTML = '<span title="Os extras que o gabarito sugere para esta lição; ✓ é o que ele já fez">Keep Studying sugerido:</span> ' + est.extras.map(function (x) { return '<span class="' + (x.feito ? 'ok' : '') + '">' + (x.feito ? '✓ ' : '') + esc(x.nm) + (x.feito && typeof x.pct === 'number' ? ' <b>' + Math.round(x.pct) + '%</b>' : '') + '</span>'; }).join('');
         card.appendChild(ex);
       }
     }
@@ -566,6 +574,21 @@ var FERRAMENTAS = [
   [/^ck[:-]|checking/, '✅ Checking do portal', true], [/^aud:/, '🔊 Áudios do livro', false], [/^vid:/, '▶ Vídeos', false],
   [/^vbk:/, '📺 Video Program', false], [/^met|^siele/, '🎓 Treino MET/SIELE', true], [/^hw|hogwarts/, '🎩 Cerimônia', false]
 ];
+/* a data de cada aula, do card: a mesma régua do planner do aluno (datasDaEtapa) */
+function datasDasAulas(plano, etapaId, ctx) {
+  var etapa = plano.etapas.find(function (e) { return e.id === etapaId; }); if (!etapa) return [];
+  var cels = (ctx.cels || []).filter(function (c) { return c && c.c && etapa.celulas.indexOf(c.c) > -1 && (c.s === 'dada' || c.s === 'plano' || c.s === 'falta'); });
+  return etapa.aulas.map(function (a, i) { return cels[i] || null; });
+}
+function pilulaData(d, atual) {
+  var hoje = new Date(); var iso = hoje.getFullYear() + '-' + ('0' + (hoje.getMonth() + 1)).slice(-2) + '-' + ('0' + hoje.getDate()).slice(-2);
+  if (!d || !d.d) return atual ? '<span class="agora">agora</span>' : '<span class="dt semdata">sem data</span>';
+  var p = d.d.split('-'), rot = p[2] + '.' + p[1];
+  if (d.d === iso) return '<span class="agora">hoje · ' + rot + '</span>';
+  if (d.s === 'dada') return '<span class="dt dada">' + rot + ' · dada</span>';
+  if (d.s === 'falta') return '<span class="dt falta">' + rot + ' · falta</span>';
+  return '<span class="dt' + (d.d < iso ? ' tarde' : '') + '">' + rot + (d.d < iso ? ' · prevista' : '') + '</span>';
+}
 function resumoPortal(a, ctx, pos) {
   var d = estado.dados[a.raf] || {}; var hist = d.hist || [];
   if (!hist.length) return null;
@@ -584,7 +607,7 @@ function resumoPortal(a, ctx, pos) {
   var box = document.createElement('div'); box.className = 'portal-res';
   var ini = inicio.split('-').reverse().slice(0, 2).join('.');
   var chaves = Object.keys(por);
-  box.innerHTML = '<span class="rot">🖥️ Portal desde ' + esc(ini) + ':</span>' + (chaves.length ? chaves.map(function (k) {
+  box.innerHTML = '<span class="rot" title="Tudo o que o aluno fez no portal desde ' + esc(ini) + ', inclusive o que o gabarito não pede">🖥️ Atividades feitas durante esta lição:</span>' + (chaves.length ? chaves.map(function (k) {
     var v = por[k]; return '<span class="f">' + esc(k) + ' ×' + v.n + (v.nota && v.best !== null ? ' <b>' + Math.round(v.best) + '%</b>' : '') + '</span>';
   }).join('') : '<span class="nada">nada ainda nesta lição</span>');
   return box;
@@ -631,7 +654,9 @@ function linhaItem(a, it) {
   else cls = (it.a ? ' l-a' : '') + (it.prof ? ' r-prof' : (it.plat ? ' r-plat' : ''));
   var mk = '<span class="mk' + cls + (it.quem === 'prof' ? ' dep-prof' : '') + '"></span>';
   var qd = it.pt ? (function (d) { return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2); })(new Date(it.pt)) : '';
-  b.innerHTML = mk + '<span>' + esc(it.nm) + (it.pq ? ' <span class="quem">✓ ' + esc(it.pq) + (qd ? ' · ' + qd : '') + '</span>' : '') + '</span>';
+  var capa = '';
+  if (it.code === 'va') { var ep = (String(it.nm).match(/(\d+)/) || [])[1] || '1'; capa = '<img class="capa" alt="" src="https://portalfisk.com.br/assets/img/videobook/' + livroId(a.book) + '/' + ep + '-cover.jpg" onerror="this.remove()">'; }
+  b.innerHTML = mk + capa + '<span>' + esc(it.nm) + (it.pq ? ' <span class="quem">✓ ' + esc(it.pq) + (qd ? ' · ' + qd : '') + '</span>' : '') + '</span>';
   /* o professor marca só a SUA metade (a direita, listrada): um toque põe,
      outro tira. A metade do aluno é do aluno; só o triângulo ele enche. */
   var prox = { p: it.prof ? 0 : 1 };
