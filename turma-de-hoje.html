@@ -233,7 +233,9 @@ function carregarTurma(escola, prof, linha, titulo) {
   estado.escola = escola; estado.prof = prof; estado.turma = titulo;
   $('alunos').innerHTML = ''; $('resumo').hidden = true; $('legenda').hidden = true;
   status('🔄 Lendo a turma no card…');
-  post({ action: 'panoramaProf', escola: escola, prof: prof }).then(function (j) {
+  /* o panorama é rota de GET no backend (doGet); por POST ele cai na guarda
+     genérica de chave e volta "chave inválida" */
+  get({ action: 'panoramaProf', escola: escola, prof: prof }).then(function (j) {
     var turmaPan = (j.turmas || []).find(function (t) { return String(t.linhaTitulo) === String(linha); });
     var nomeTurma = turmaPan ? turmaPan.turma : titulo;
     var alunos = (j.alunos || []).filter(function (a) { return !a.saiu && (a.turma === nomeTurma || a.turma === titulo); });
