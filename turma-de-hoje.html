@@ -68,18 +68,18 @@
   .aula .t{ display: flex; align-items: baseline; gap: .5rem; font-size: .74rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--gray); margin-bottom: .35rem; }
   .aula .t b{ color: var(--ui-ink); font-size: .84rem; letter-spacing: 0; text-transform: none; font-family: var(--font-heading); }
   .aula .t .agora{ margin-left: auto; background: var(--ui); color: #fff; border-radius: 99px; padding: .05rem .5rem; font-size: .68rem; }
-  .it{ display: flex; align-items: center; gap: .5rem; padding: .28rem .4rem; border-radius: 10px; font-size: .86rem; font-weight: 700; color: var(--ui-ink); border: 0; background: transparent; width: 100%; text-align: left; font-family: inherit; cursor: default; }
+  .it{ display: flex; align-items: center; gap: .6rem; padding: .32rem .4rem; border-radius: 12px; font-size: .92rem; font-weight: 700; color: var(--ui-ink); border: 0; background: transparent; width: 100%; text-align: left; font-family: inherit; cursor: default; }
   .it.pode{ cursor: pointer; }
   .it.pode:hover{ background: var(--ui-soft); }
   .it.feito{ color: var(--gray); text-decoration: line-through; }
   .it .pg{ margin-left: auto; font-weight: 600; font-size: .74rem; color: var(--gray); white-space: nowrap; }
-  .mk{ flex: 0 0 22px; width: 22px; height: 22px; border-radius: 50%; border: 2.5px solid #1d3685; background: #fff; }
+  .mk{ flex: 0 0 30px; width: 30px; height: 30px; border-radius: 50%; border: 3px solid #1d3685; background: #fff; }
   .mk.a{ background: linear-gradient(90deg,#1d3685 50%,#fff 50%); }
   .mk.p{ background: linear-gradient(90deg,#fff 50%,#d4e909 50%); }
   .mk.ap{ background: linear-gradient(90deg,#1d3685 50%,#d4e909 50%); }
   .mk.prof{ border-color: #a8b907; }
   .mk.plat{ background: #d4e909; border-color: #a8b907; }
-  .mk.tri{ border-radius: 0; width: 22px; height: 20px; border: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,4.5 25.5,23 4.5,23' fill='%23fff' stroke='%23d91e9e' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
+  .mk.tri{ border-radius: 0; width: 30px; height: 27px; border: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,4.5 25.5,23 4.5,23' fill='%23fff' stroke='%23d91e9e' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
   .mk.tri.on{ background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,3.5 26.5,24 3.5,24' fill='%23d91e9e' stroke='%23d91e9e' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
   .it .quem{ font-size: .68rem; color: var(--gray); font-weight: 600; }
   .extras{ padding: 0 1rem .8rem; font-size: .8rem; color: var(--gray); display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; }
@@ -95,7 +95,14 @@
   .ck .lin{ display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-bottom: .55rem; }
   .ck label.rot{ font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--gray); width: 100%; }
   .chip{ font-family: var(--font-body); font-weight: 800; font-size: .8rem; padding: .45rem .9rem; border-radius: 99px; border: 1.5px solid var(--ui-bd); background: var(--white); color: var(--ui-ink); cursor: pointer; }
-  .ck .lin.crit{ gap: .6rem; }
+  .ck .lin.crit{ gap: .6rem; padding: .6rem .7rem; border-radius: 14px; }
+  /* verde para o que foi bem, vermelho-claro para o que precisa melhorar: o
+     professor bate o olho e sabe de que lado está (pedido do Pedro, 13/09) */
+  .ck .lin.crit.bom{ background: #e4f3f1; border: 1px solid #cfe6e1; }
+  .ck .lin.crit.bom label.rot{ color: #155a48; }
+  .ck .lin.crit.ruim{ background: #fde2e2; border: 1px solid #f5b8b8; }
+  .ck .lin.crit.ruim label.rot{ color: #8a1c1c; }
+  .ck .lin.crit.ruim .chip.on{ background: #d81f26; border-color: #d81f26; }
   .ck .lin.crit .chip{ padding: .5rem 1rem; }
   .ck .notas{ display: flex; flex-wrap: wrap; gap: .35rem; }
   .ck .notas .chip{ min-width: 2.6rem; text-align: center; padding: .45rem .5rem; }
@@ -119,17 +126,20 @@
   .guia summary{ cursor: pointer; padding: .7rem .9rem; font-family: var(--font-heading); font-weight: 700; font-size: .95rem; list-style: none; display: flex; align-items: center; gap: .6rem; }
   .guia summary::-webkit-details-marker{ display: none; }
   .guia summary .tempo{ margin-left: auto; font-size: .76rem; color: var(--gray); font-weight: 600; }
-  .guia .bl{ border-top: 1px solid #cfe6e1; padding: .6rem .9rem .7rem; }
+  .guia .bl{ border-top: 1px solid #cfe6e1; padding: .7rem .9rem .8rem; }
   .guia .bl h5{ margin: 0 0 .2rem; font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: #155a48; display: flex; align-items: center; gap: .5rem; }
   .guia .bl h5 .min{ font-weight: 600; color: var(--gray); text-transform: none; letter-spacing: 0; }
-  .guia .bl h5 input{ width: auto; margin: 0 0 0 auto; }
-  .guia .bl .o{ font-size: .78rem; color: var(--gray); margin: 0 0 .4rem; }
-  .guia .bl ul{ margin: 0; padding-left: 1.1rem; font-size: .86rem; line-height: 1.4; }
-  .guia .bl li{ margin-bottom: .3rem; }
-  .guia .en{ font-weight: 800; color: var(--ui-ink); }
-  .guia .esp{ color: #155a48; }
-  .guia .dica{ display: block; font-size: .78rem; color: var(--gray); }
+  .guia .bl .o{ font-size: .78rem; color: var(--gray); margin: 0 0 .5rem; }
+  .guia table{ width: 100%; border-collapse: collapse; }
+  .guia td{ vertical-align: top; padding: .35rem .4rem .35rem 0; border-top: 1px dashed #cfe6e1; }
+  .guia tr:first-child td{ border-top: 0; }
+  .guia td.diz{ width: 55%; font-family: var(--font-heading); font-weight: 700; font-size: 1.05rem; color: var(--ui-ink); line-height: 1.3; }
+  .guia td.nota{ font-size: .8rem; color: var(--gray); line-height: 1.35; }
+  .guia .feito-btn{ display: block; width: 100%; margin-top: .6rem; border: 0; border-radius: 14px; padding: .8rem 1rem; font-family: var(--font-body); font-weight: 900; font-size: 1.05rem; background: #d4e909; color: #3f4703; box-shadow: 0 4px 0 #a8b907; cursor: pointer; }
   .guia .bl.feito{ opacity: .55; }
+  .guia .bl.feito .feito-btn{ background: #e4f3f1; color: #155a48; box-shadow: none; }
+  .guia .tela-grande{ display: block; margin: .6rem .9rem .8rem; text-align: center; border-radius: 14px; padding: .8rem 1rem; font-weight: 900; font-size: 1rem; background: #1d3685; color: #fff; text-decoration: none; box-shadow: 0 4px 0 #0f2260; }
+  body.theme-dark .guia td.diz{ color: #dbe6f3; }
   body.theme-dark .guia{ background: #172232; border-color: #2e4560; }
   body.theme-dark .guia .en{ color: #dbe6f3; }
   /* a fila do Planejador e o atendimento */
@@ -200,7 +210,7 @@
 <script src="https://portalfisk.com.br/assets/plano-essentials-1.v2.js?v=20260913d"></script>
 <script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260913d"></script>
 <!-- o guia do Checking, lição a lição (Essentials 1) -->
-<script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913a"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913b"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
 <script>
 fiskInitThemeToggle('themeToggle');
@@ -526,17 +536,16 @@ function guiaHTML(book, licaoId, nome) {
   var primeiro = String(nome || '').split(' ')[0];
   function bloco(k) {
     var r = g.ROTEIRO.find(function (x) { return x.k === k; }) || {};
-    var corpo = '';
-    if (k === 'abertura') corpo = '<ul>' + l.abertura.perguntas.map(function (q) { return '<li class="en">' + esc(q) + '</li>'; }).join('') + '<li class="en">' + esc(l.abertura.objetivo) + '</li></ul>';
-    if (k === 'funcoes') corpo = '<ul>' + l.funcoes.map(function (f) { return '<li><b>' + esc(f.nome) + ':</b> <span class="en">' + esc(f.gatilho) + '</span><span class="dica">Espera: ' + esc(f.esperado) + '</span></li>'; }).join('') + '</ul>';
-    if (k === 'estrutura') corpo = '<ul>' + l.estrutura.map(function (e, i) { return '<li><b>' + (i + 1) + '. ' + esc(e.ponto) + ':</b> <span class="en">' + esc(e.pergunta) + '</span><span class="dica">Espera: ' + esc(e.esperado) + ' · ' + esc(e.dica) + '</span></li>'; }).join('') + '</ul>';
-    if (k === 'vocabulario') corpo = '<ul>' + l.vocabulario.map(function (v) { return '<li><span class="en">' + esc(v.eliciar) + '</span> <span class="esp">→ ' + esc(v.palavra) + '</span></li>'; }).join('') + '</ul>';
-    if (k === 'pronuncia') corpo = '<ul>' + l.pronuncia.map(function (p) { return '<li class="en">' + esc(p) + '</li>'; }).join('') + '</ul>';
-    if (k === 'fluencia') corpo = '<ul><li class="en">' + esc(l.fluencia.pergunta) + '<span class="dica">Apoio: ' + esc(l.fluencia.apoio) + '</span></li><li class="en">' + esc(l.fluencia.extra) + '</li></ul>';
-    if (k === 'fechamento') corpo = '<ul><li><b>Evidência:</b> ' + esc(l.fechamento.evidencia) + '</li><li><b>Feedback concreto:</b> ' + esc(l.fechamento.acao) + '</li></ul>';
-    return '<div class="bl"><h5>' + esc(r.t || k) + ' <span class="min">' + (r.min || '') + ' min</span><input type="checkbox" aria-label="feito"></h5><p class="o">' + esc(r.o || '') + '</p>' + corpo + '</div>';
+    var linhas = g.linhasDe ? g.linhasDe(l, k) : [];
+    var corpo = '<table>' + linhas.map(function (ln) {
+      return '<tr><td class="diz">' + esc(ln.diz) + '</td><td class="nota">' + esc(ln.nota) + '</td></tr>';
+    }).join('') + '</table>';
+    return '<div class="bl"><h5>' + esc(r.t || k) + ' <span class="min">' + (r.min || '') + ' min</span></h5><p class="o">' + esc(r.o || '') + '</p>' + corpo +
+      '<button type="button" class="feito-btn">✓ Feito</button></div>';
   }
+  var grande = 'checking-guia.html?book=' + encodeURIComponent(book) + '&licao=' + encodeURIComponent(licaoId) + '&aluno=' + encodeURIComponent(nome || '');
   return '<details class="guia" open><summary>📋 Guia do Checking · ' + esc(l.rot) + ' · ' + esc(l.tema) + '<span class="tempo">' + g.ROTEIRO.reduce(function (t, r) { return t + (r.min || 0); }, 0) + ' min com ' + esc(primeiro) + '</span></summary>' +
+    '<a class="tela-grande" href="' + grande + '" target="_blank" rel="noopener">🖥️ Abrir em tela grande, para fazer junto com ' + esc(primeiro) + '</a>' +
     g.ROTEIRO.map(function (r) { return bloco(r.k); }).join('') + '</details>';
 }
 
@@ -555,8 +564,8 @@ function abrirChecking(card, a, plano, pos) {
     '<div data-guia></div>' +
     '<div class="registrado" data-reg hidden></div>' +
     '<div class="lin"><label class="rot">Lição</label><select data-licao>' + licoes.map(function (l) { return '<option value="' + esc(l.v) + '"' + (l.v === licao ? ' selected' : '') + '>' + esc(l.t) + '</option>'; }).join('') + '</select></div>' +
-    '<div class="lin crit"><label class="rot">Em que foi melhor (um só; o aluno vê)</label><span data-melhor>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</span></div>' +
-    '<div class="lin crit"><label class="rot">O que precisa melhorar (o aluno vê como pedidos)</label><span data-melhorar>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</span></div>' +
+    '<div class="lin crit bom"><label class="rot">👍 Em que foi melhor (um só; o aluno vê)</label><span data-melhor>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</span></div>' +
+    '<div class="lin crit ruim"><label class="rot">👎 O que precisa melhorar (o aluno vê como pedidos)</label><span data-melhorar>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</span></div>' +
     '<div class="lin"><label class="rot">Nota (0 a 10, só você vê; com nota a próxima lição abre)</label><span class="notas" data-nota>' + [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(function (n) { return '<button type="button" class="chip" data-v="' + n + '">' + n + '</button>'; }).join('') + '</span></div>' +
     '<div class="lin"><label class="rot">Pedidos para o aluno (até 8): toque nos prontos, que chegam com o botão do material, ou escreva</label><span class="prontos" data-prontos></span><span class="pedidos" data-pedidos></span><input type="text" data-novo placeholder="Ou escreva um pedido e aperte Enter" maxlength="80"></div>' +
     '<div class="lin"><label class="rot">Bilhete (até 400 letras; o aluno lê no planner)</label><textarea data-bilhete maxlength="400" placeholder="Good job on pronunciation. Study Do / Does before Lesson 4."></textarea></div>' +
@@ -590,7 +599,7 @@ function abrirChecking(card, a, plano, pos) {
   function carregaLicao() {
     var r = reg[f.licao.value] || {};
     ck.querySelector('[data-guia]').innerHTML = guiaHTML(a.book, f.licao.value, a.nome);
-    ck.querySelectorAll('[data-guia] .bl input').forEach(function (cb) { cb.addEventListener('change', function () { cb.closest('.bl').classList.toggle('feito', cb.checked); }); });
+    ck.querySelectorAll('[data-guia] .feito-btn').forEach(function (bt) { bt.addEventListener('click', function () { var bl = bt.closest('.bl'); bl.classList.toggle('feito'); bt.textContent = bl.classList.contains('feito') ? '✓ Feito · desfazer' : '✓ Feito'; }); });
     pintaProntos();
     f.melhor.querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('on', c.dataset.v === r.melhor); c.classList.toggle('melhor', c.dataset.v === r.melhor); });
     f.melhorar.querySelectorAll('.chip').forEach(function (c) { var on = (r.melhorar || []).indexOf(c.dataset.v) > -1; c.classList.toggle('on', on); c.classList.toggle('pior', on); });

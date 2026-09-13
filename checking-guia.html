@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checking em tela grande, FISK</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Nunito:wght@400;700;800;900&display=swap">
+<!-- ═══════════════════════════════════════════════════════════════════════
+     CHECKING EM TELA GRANDE (13/09/2026): o guia do Checking numa janela
+     própria, com texto enorme, para o professor virar o computador para o
+     aluno e os dois percorrerem o Checking juntos (o mesmo gesto do Teacher
+     Mode do Treino MET). Um bloco por tela: à esquerda o que se diz ou
+     pergunta, em inglês; à direita a nota para o professor, pequena e apagada,
+     que ele pode esconder. O botão de "feito" é gigante e leva ao próximo
+     bloco. Abre pelo registro do Checking na Turma de hoje:
+       checking-guia.html?book=Essentials%201&licao=L3&aluno=Giovana
+     O conteúdo vem do guia do portal (guia-e1.js), uma fonte só.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<style>
+  :root{ --mar:#1d3685; --marf:#0f2260; --lima:#d4e909; --limae:#a8b907; --limai:#3f4703; --verde:#31a889; --verdes:#28866e; --txt:#0f1f4e; --med:#54648d; --pap:#fff; --chao:#f4f6fb; --lin:#ccd6e9; }
+  *{ box-sizing:border-box }
+  html,body{ margin:0; height:100%; }
+  body{ background:var(--chao); color:var(--txt); font-family:'Nunito','Segoe UI',system-ui,sans-serif; display:flex; flex-direction:column; min-height:100vh; }
+  header{ background:var(--mar); color:#fff; padding:14px 22px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  header .rot{ font-family:'Poppins',sans-serif; font-weight:700; font-size:20px; }
+  header .aluno{ font-size:15px; opacity:.9; }
+  header .passos{ margin-left:auto; display:flex; gap:6px; }
+  header .passos button{ width:36px; height:36px; border-radius:50%; border:2px solid rgba(255,255,255,.5); background:transparent; color:#fff; font-weight:900; cursor:pointer; font-family:inherit; font-size:13px; }
+  header .passos button.on{ background:var(--lima); color:var(--limai); border-color:var(--lima); }
+  header .passos button.ok{ background:rgba(255,255,255,.85); color:var(--mar); border-color:transparent; }
+  header .fechar{ color:#fff; text-decoration:none; font-weight:800; opacity:.85; margin-left:8px; }
+  main{ flex:1; padding:22px; display:flex; flex-direction:column; gap:18px; max-width:1500px; width:100%; margin:0 auto; }
+  .bloco-cab{ display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+  .bloco-cab h1{ margin:0; font-family:'Poppins',sans-serif; font-weight:800; font-size:clamp(28px,4vw,44px); color:var(--mar); }
+  .bloco-cab .min{ font-size:16px; color:var(--med); font-weight:700; }
+  .bloco-cab .o{ width:100%; font-size:clamp(15px,1.6vw,19px); color:var(--med); margin:0; }
+  .linhas{ display:flex; flex-direction:column; gap:14px; }
+  .linha{ display:grid; grid-template-columns:minmax(0,3fr) minmax(0,2fr); gap:20px; background:var(--pap); border:1px solid var(--lin); border-radius:22px; padding:22px 26px; align-items:center; }
+  .linha.so-nota{ grid-template-columns:1fr; }
+  .linha .diz{ font-family:'Poppins',sans-serif; font-weight:700; font-size:clamp(24px,3.2vw,40px); line-height:1.25; color:var(--txt); }
+  .linha .n{ display:inline-block; width:34px; height:34px; border-radius:50%; background:var(--lima); color:var(--limai); font-weight:900; font-size:16px; text-align:center; line-height:34px; margin-right:12px; vertical-align:middle; font-family:'Nunito',sans-serif; }
+  .linha .nota{ font-size:clamp(14px,1.5vw,18px); color:var(--med); line-height:1.4; border-left:3px solid var(--lin); padding-left:16px; }
+  body.sem-notas .linha .nota{ display:none; }
+  body.sem-notas .linha{ grid-template-columns:1fr; }
+  .linha.feita{ opacity:.45; }
+  .linha .tick{ justify-self:end; grid-column:1 / -1; }
+  .acoes{ position:sticky; bottom:0; padding:14px 0 6px; background:linear-gradient(to top,var(--chao) 70%,transparent); display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+  .btn{ border:0; border-radius:999px; font-family:inherit; font-weight:900; cursor:pointer; }
+  .btn-feito{ flex:1 1 320px; background:var(--lima); color:var(--limai); font-size:clamp(20px,2.4vw,30px); padding:22px 30px; box-shadow:0 6px 0 var(--limae); }
+  .btn-feito:active{ transform:translateY(3px); box-shadow:0 3px 0 var(--limae); }
+  .btn-sec{ background:var(--pap); border:2px solid var(--lin); color:var(--med); font-size:16px; padding:14px 20px; }
+  .btn-notas{ background:transparent; border:0; color:var(--med); font-size:14px; text-decoration:underline; cursor:pointer; font-family:inherit; }
+  .fim{ text-align:center; padding:40px 20px; }
+  .fim h1{ font-family:'Poppins',sans-serif; color:var(--mar); font-size:clamp(28px,4vw,44px); margin:0 0 10px; }
+  .fim p{ font-size:clamp(16px,1.8vw,22px); color:var(--med); max-width:60ch; margin:0 auto 24px; }
+  .fim .btn-feito{ display:inline-block; }
+  .erro{ padding:40px; font-size:18px; color:var(--med); }
+  @media (max-width:760px){ .linha{ grid-template-columns:1fr; gap:10px; padding:16px 18px; } .linha .nota{ border-left:0; padding-left:0; } }
+</style>
+</head>
+<body>
+<header>
+  <span class="rot" id="rot">Checking</span>
+  <span class="aluno" id="aluno"></span>
+  <nav class="passos" id="passos" aria-label="Blocos"></nav>
+  <a class="fechar" href="#" onclick="window.close(); return false;">✕ Fechar</a>
+</header>
+<main id="main"><div class="erro">Carregando o guia…</div></main>
+
+<script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913b"></script>
+<script>
+var $ = function (id) { return document.getElementById(id); };
+var q = new URLSearchParams(location.search);
+var book = q.get('book') || 'Essentials 1', licaoId = (q.get('licao') || 'L1').toUpperCase(), aluno = q.get('aluno') || '';
+var G = (String(book).toLowerCase().replace(/\s+/g, ' ') === 'essentials 1') ? window.GUIA_CHECKING_E1 : null;
+var L = G && G.licoes.find(function (x) { return x.id === licaoId; });
+var estado = { i: 0, feitas: {} };
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+if (!G || !L) {
+  $('main').innerHTML = '<div class="erro">Não há guia para ' + esc(book) + ' · ' + esc(licaoId) + ' ainda. Só o Essentials 1 tem guia por enquanto.</div>';
+} else {
+  $('rot').textContent = 'Checking · ' + L.rot + ' · ' + L.tema;
+  $('aluno').textContent = aluno ? 'com ' + aluno : '';
+  document.title = 'Checking ' + L.rot + (aluno ? ' · ' + aluno : '') + ', FISK';
+  try { if (localStorage.getItem('ckg:notas') === 'off') document.body.classList.add('sem-notas'); } catch (e) {}
+  pintaPassos(); pinta();
+}
+function pintaPassos() {
+  var nav = $('passos'); nav.innerHTML = '';
+  G.ROTEIRO.forEach(function (r, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = i + 1; b.title = r.t;
+    b.className = (i === estado.i ? 'on' : '') + (estado.feitas[r.k] ? ' ok' : '');
+    b.addEventListener('click', function () { estado.i = i; pinta(); });
+    nav.appendChild(b);
+  });
+}
+function pinta() {
+  var main = $('main'); main.innerHTML = '';
+  pintaPassos();
+  if (estado.i >= G.ROTEIRO.length) {
+    main.innerHTML = '<div class="fim"><h1>Checking de ' + esc(L.rot) + ' feito' + (aluno ? ' com ' + esc(aluno) : '') + '.</h1>' +
+      '<p>Agora diga em que ' + (aluno ? esc(aluno.split(' ')[0]) : 'o aluno') + ' foi melhor e UMA ação concreta, e registre na Turma de hoje: melhor, a melhorar, nota, pedidos e bilhete.</p>' +
+      '<button type="button" class="btn btn-feito" onclick="window.close()">✓ Voltar para o registro</button></div>';
+    return;
+  }
+  var r = G.ROTEIRO[estado.i];
+  var cab = document.createElement('div'); cab.className = 'bloco-cab';
+  cab.innerHTML = '<h1>' + (estado.i + 1) + '. ' + esc(r.t) + '</h1><span class="min">' + r.min + ' min</span><p class="o">' + esc(r.o) + '</p>';
+  main.appendChild(cab);
+  var box = document.createElement('div'); box.className = 'linhas';
+  (G.linhasDe(L, r.k) || []).forEach(function (ln, i) {
+    var el = document.createElement('div'); el.className = 'linha' + (ln.diz ? '' : ' so-nota');
+    el.innerHTML = (ln.diz ? '<div class="diz"><span class="n">' + (i + 1) + '</span>' + esc(ln.diz) + '</div>' : '') +
+      (ln.nota ? '<div class="nota">' + esc(ln.nota) + '</div>' : '');
+    el.addEventListener('click', function () { el.classList.toggle('feita'); });
+    box.appendChild(el);
+  });
+  main.appendChild(box);
+  var acoes = document.createElement('div'); acoes.className = 'acoes';
+  var volta = document.createElement('button'); volta.type = 'button'; volta.className = 'btn btn-sec'; volta.textContent = '‹ Anterior'; volta.disabled = estado.i === 0;
+  volta.addEventListener('click', function () { estado.i = Math.max(0, estado.i - 1); pinta(); window.scrollTo(0, 0); });
+  var feito = document.createElement('button'); feito.type = 'button'; feito.className = 'btn btn-feito';
+  feito.textContent = '✓ Feito · ' + (estado.i + 1 < G.ROTEIRO.length ? 'próximo: ' + G.ROTEIRO[estado.i + 1].t : 'terminar');
+  feito.addEventListener('click', function () { estado.feitas[r.k] = 1; estado.i++; pinta(); window.scrollTo(0, 0); });
+  var notas = document.createElement('button'); notas.type = 'button'; notas.className = 'btn-notas';
+  notas.textContent = document.body.classList.contains('sem-notas') ? 'mostrar as notas do professor' : 'esconder as notas do professor (para virar a tela)';
+  notas.addEventListener('click', function () { document.body.classList.toggle('sem-notas'); try { localStorage.setItem('ckg:notas', document.body.classList.contains('sem-notas') ? 'off' : 'on'); } catch (e) {} pinta(); });
+  acoes.appendChild(volta); acoes.appendChild(feito); acoes.appendChild(notas);
+  main.appendChild(acoes);
+}
+document.addEventListener('keydown', function (ev) {
+  if (!L) return;
+  if (ev.key === 'ArrowRight' || ev.key === 'Enter') { estado.feitas[(G.ROTEIRO[estado.i] || {}).k] = 1; estado.i = Math.min(G.ROTEIRO.length, estado.i + 1); pinta(); }
+  if (ev.key === 'ArrowLeft') { estado.i = Math.max(0, estado.i - 1); pinta(); }
+});
+</script>
+</body>
+</html>
