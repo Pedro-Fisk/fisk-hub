@@ -99,6 +99,8 @@
   .ck textarea{ width: 100%; min-height: 64px; resize: vertical; }
   .ck input[type=text]{ flex: 1 1 200px; }
   .ck .pedidos{ display: flex; flex-wrap: wrap; gap: .35rem; }
+  .ck .prontos{ display: flex; flex-wrap: wrap; gap: .3rem; width: 100%; }
+  .ck .prontos .chip{ font-size: .76rem; padding: .28rem .6rem; }
   .ck .ped{ background: var(--ui-soft); border-radius: 99px; padding: .25rem .6rem; font-size: .8rem; font-weight: 700; display: inline-flex; gap: .35rem; align-items: center; }
   .ck .ped button{ border: 0; background: none; cursor: pointer; font-weight: 900; color: var(--gray); padding: 0; }
   .ck .fim{ display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; margin-top: .4rem; }
@@ -151,8 +153,8 @@
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/plano-essentials-1.v2.js?v=20260913b"></script>
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260913b"></script>
+<script src="https://portalfisk.com.br/assets/plano-essentials-1.v2.js?v=20260913c"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260913c"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
 <script>
 fiskInitThemeToggle('themeToggle');
@@ -371,22 +373,38 @@ function abrirChecking(card, a, plano, pos) {
     '<div class="lin"><label class="rot">Em que foi melhor (um só; o aluno vê)</label><span data-melhor>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</span></div>' +
     '<div class="lin"><label class="rot">O que precisa melhorar (o aluno vê como pedidos)</label><span data-melhorar>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</span></div>' +
     '<div class="lin"><label class="rot">Nota (0 a 10, só você vê; com nota a próxima lição abre)</label><select data-nota><option value="">sem nota</option>' + [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map(function (n) { return '<option value="' + n + '">' + n + '</option>'; }).join('') + '</select></div>' +
-    '<div class="lin"><label class="rot">Pedidos para o aluno (até 8)</label><span class="pedidos" data-pedidos></span><input type="text" data-novo placeholder="Escreva um pedido e aperte Enter (ex.: rever os vídeos da lição)" maxlength="80"></div>' +
+    '<div class="lin"><label class="rot">Pedidos para o aluno (até 8): toque nos prontos, que chegam com o botão do material, ou escreva</label><span class="prontos" data-prontos></span><span class="pedidos" data-pedidos></span><input type="text" data-novo placeholder="Ou escreva um pedido e aperte Enter" maxlength="80"></div>' +
     '<div class="lin"><label class="rot">Bilhete (até 400 letras; o aluno lê no planner)</label><textarea data-bilhete maxlength="400" placeholder="Good job on pronunciation. Study Do / Does before Lesson 4."></textarea></div>' +
     '<div class="fim"><button type="button" class="btn btn-ck" data-salvar>Registrar Checking</button><button type="button" class="btn btn-ghost" data-fechar>Fechar</button><span class="aviso" data-aviso>O registro paga F$ 150 ao aluno, uma vez por lição.</span></div>';
   card.appendChild(ck);
   var f = {
     licao: ck.querySelector('[data-licao]'), melhor: ck.querySelector('[data-melhor]'), melhorar: ck.querySelector('[data-melhorar]'),
     nota: ck.querySelector('[data-nota]'), pedidos: ck.querySelector('[data-pedidos]'), novo: ck.querySelector('[data-novo]'),
-    bilhete: ck.querySelector('[data-bilhete]'), reg: ck.querySelector('[data-reg]'), aviso: ck.querySelector('[data-aviso]'), salvar: ck.querySelector('[data-salvar]')
+    bilhete: ck.querySelector('[data-bilhete]'), reg: ck.querySelector('[data-reg]'), aviso: ck.querySelector('[data-aviso]'), salvar: ck.querySelector('[data-salvar]'),
+    prontos: ck.querySelector('[data-prontos]')
   };
   var pedidos = [];
+  /* os pedidos prontos da lição: o id viaja, o aluno recebe a frase com o
+     botão do material (PlannerV2.pedidosDa, a mesma lista que o portal usa) */
+  function prontos() { return (plano && window.PlannerV2 && PlannerV2.pedidosDa) ? PlannerV2.pedidosDa(plano, f.licao.value) : []; }
+  function rotuloDe(p) { var c = prontos().find(function (x) { return x.id === p; }); return c ? c.pt : p; }
   function pintaPedidos() {
-    f.pedidos.innerHTML = pedidos.map(function (p, i) { return '<span class="ped">' + esc(p) + '<button type="button" data-i="' + i + '" aria-label="tirar">×</button></span>'; }).join('');
+    f.pedidos.innerHTML = pedidos.map(function (p, i) { return '<span class="ped">' + esc(rotuloDe(p)) + '<button type="button" data-i="' + i + '" aria-label="tirar">×</button></span>'; }).join('');
     f.pedidos.querySelectorAll('button').forEach(function (b) { b.addEventListener('click', function () { pedidos.splice(+b.dataset.i, 1); pintaPedidos(); }); });
+    f.prontos.querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('on', pedidos.indexOf(c.dataset.id) > -1); });
+  }
+  function pintaProntos() {
+    var lista = prontos();
+    f.prontos.innerHTML = lista.map(function (c) { return '<button type="button" class="chip" data-id="' + esc(c.id) + '">' + (c.tipo === 'extra' ? '★ ' : '') + esc(c.pt) + '</button>'; }).join('');
+    f.prontos.querySelectorAll('.chip').forEach(function (c) { c.addEventListener('click', function () {
+      var i = pedidos.indexOf(c.dataset.id);
+      if (i > -1) pedidos.splice(i, 1); else if (pedidos.length < 8) pedidos.push(c.dataset.id);
+      pintaPedidos();
+    }); });
   }
   function carregaLicao() {
     var r = reg[f.licao.value] || {};
+    pintaProntos();
     f.melhor.querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('on', c.dataset.v === r.melhor); c.classList.toggle('melhor', c.dataset.v === r.melhor); });
     f.melhorar.querySelectorAll('.chip').forEach(function (c) { var on = (r.melhorar || []).indexOf(c.dataset.v) > -1; c.classList.toggle('on', on); c.classList.toggle('pior', on); });
     f.nota.value = (typeof r.nota === 'number') ? String(r.nota) : '';
@@ -422,7 +440,8 @@ function abrirChecking(card, a, plano, pos) {
       if (r.planner) estado.dados[a.raf] = Object.assign(estado.dados[a.raf] || {}, { planner: r.planner });
       var fd = r.fd;
       toast(fd && fd.credito > 0 ? '✓ Checking ' + checking.licao + ' registrado · F$ ' + fd.credito + ' para ' + a.nome.split(' ')[0]
-           : (fd && fd.jaPago ? '✓ Checking ' + checking.licao + ' atualizado (já tinha sido pago)' : '✓ Checking ' + checking.licao + ' registrado'));
+           : (fd && fd.jaPago ? '✓ Checking ' + checking.licao + ' atualizado (já tinha sido pago)'
+           : (fd && fd.espelho ? '✓ Checking ' + checking.licao + ' registrado (aluno em piloto: sem F$)' : '✓ Checking ' + checking.licao + ' registrado')));
       estado.aberto = '';
       redesenhar(a);
     }).catch(function (e) { f.salvar.disabled = false; f.aviso.textContent = '⚠️ ' + e.message; f.aviso.className = 'aviso err'; });
