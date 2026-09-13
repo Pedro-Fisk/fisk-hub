@@ -114,6 +114,24 @@
   .ck .aviso{ font-size: .8rem; color: var(--gray); }
   .ck .ok{ color: #155a48; font-weight: 800; }
   .ck .registrado{ font-size: .84rem; color: #155a48; font-weight: 700; margin-bottom: .5rem; }
+  /* o guia do Checking: o roteiro da mesa, bloco a bloco */
+  .guia{ margin: 0 0 .9rem; border: 1px solid #cfe6e1; background: #f2faf8; border-radius: 14px; overflow: hidden; }
+  .guia summary{ cursor: pointer; padding: .7rem .9rem; font-family: var(--font-heading); font-weight: 700; font-size: .95rem; list-style: none; display: flex; align-items: center; gap: .6rem; }
+  .guia summary::-webkit-details-marker{ display: none; }
+  .guia summary .tempo{ margin-left: auto; font-size: .76rem; color: var(--gray); font-weight: 600; }
+  .guia .bl{ border-top: 1px solid #cfe6e1; padding: .6rem .9rem .7rem; }
+  .guia .bl h5{ margin: 0 0 .2rem; font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: #155a48; display: flex; align-items: center; gap: .5rem; }
+  .guia .bl h5 .min{ font-weight: 600; color: var(--gray); text-transform: none; letter-spacing: 0; }
+  .guia .bl h5 input{ width: auto; margin: 0 0 0 auto; }
+  .guia .bl .o{ font-size: .78rem; color: var(--gray); margin: 0 0 .4rem; }
+  .guia .bl ul{ margin: 0; padding-left: 1.1rem; font-size: .86rem; line-height: 1.4; }
+  .guia .bl li{ margin-bottom: .3rem; }
+  .guia .en{ font-weight: 800; color: var(--ui-ink); }
+  .guia .esp{ color: #155a48; }
+  .guia .dica{ display: block; font-size: .78rem; color: var(--gray); }
+  .guia .bl.feito{ opacity: .55; }
+  body.theme-dark .guia{ background: #172232; border-color: #2e4560; }
+  body.theme-dark .guia .en{ color: #dbe6f3; }
   .toast{ position: fixed; left: 50%; bottom: 1.4rem; transform: translateX(-50%); background: #1d3685; color: #fff; padding: .7rem 1.1rem; border-radius: 999px; font-weight: 800; font-size: .9rem; box-shadow: 0 8px 24px rgba(0,0,0,.25); z-index: 50; }
 
   body.theme-dark .painel, body.theme-dark .al{ background: #172232; border-color: #2e4560; }
@@ -162,6 +180,8 @@
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
 <script src="https://portalfisk.com.br/assets/plano-essentials-1.v2.js?v=20260913d"></script>
 <script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260913d"></script>
+<!-- o guia do Checking, lição a lição (Essentials 1) -->
+<script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913a"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
 <script>
 fiskInitThemeToggle('themeToggle');
@@ -410,6 +430,32 @@ function redesenhar(a) {
   if (velho) velho.replaceWith(novo); else $('alunos').appendChild(novo);
 }
 
+/* ── o guia do Checking: o roteiro da mesa, bloco a bloco (GUIA_CHECKING_E1) ── */
+function guiaDe(book) {
+  var b = String(book || '').toLowerCase().replace(/\s+/g, ' ');
+  if (b === 'essentials 1' && window.GUIA_CHECKING_E1) return window.GUIA_CHECKING_E1;
+  return null;
+}
+function guiaHTML(book, licaoId, nome) {
+  var g = guiaDe(book); if (!g) return '';
+  var l = g.licoes.find(function (x) { return x.id === licaoId; }); if (!l) return '';
+  var primeiro = String(nome || '').split(' ')[0];
+  function bloco(k) {
+    var r = g.ROTEIRO.find(function (x) { return x.k === k; }) || {};
+    var corpo = '';
+    if (k === 'abertura') corpo = '<ul>' + l.abertura.perguntas.map(function (q) { return '<li class="en">' + esc(q) + '</li>'; }).join('') + '<li class="en">' + esc(l.abertura.objetivo) + '</li></ul>';
+    if (k === 'funcoes') corpo = '<ul>' + l.funcoes.map(function (f) { return '<li><b>' + esc(f.nome) + ':</b> <span class="en">' + esc(f.gatilho) + '</span><span class="dica">Espera: ' + esc(f.esperado) + '</span></li>'; }).join('') + '</ul>';
+    if (k === 'estrutura') corpo = '<ul>' + l.estrutura.map(function (e, i) { return '<li><b>' + (i + 1) + '. ' + esc(e.ponto) + ':</b> <span class="en">' + esc(e.pergunta) + '</span><span class="dica">Espera: ' + esc(e.esperado) + ' · ' + esc(e.dica) + '</span></li>'; }).join('') + '</ul>';
+    if (k === 'vocabulario') corpo = '<ul>' + l.vocabulario.map(function (v) { return '<li><span class="en">' + esc(v.eliciar) + '</span> <span class="esp">→ ' + esc(v.palavra) + '</span></li>'; }).join('') + '</ul>';
+    if (k === 'pronuncia') corpo = '<ul>' + l.pronuncia.map(function (p) { return '<li class="en">' + esc(p) + '</li>'; }).join('') + '</ul>';
+    if (k === 'fluencia') corpo = '<ul><li class="en">' + esc(l.fluencia.pergunta) + '<span class="dica">Apoio: ' + esc(l.fluencia.apoio) + '</span></li><li class="en">' + esc(l.fluencia.extra) + '</li></ul>';
+    if (k === 'fechamento') corpo = '<ul><li><b>Evidência:</b> ' + esc(l.fechamento.evidencia) + '</li><li><b>Feedback concreto:</b> ' + esc(l.fechamento.acao) + '</li></ul>';
+    return '<div class="bl"><h5>' + esc(r.t || k) + ' <span class="min">' + (r.min || '') + ' min</span><input type="checkbox" aria-label="feito"></h5><p class="o">' + esc(r.o || '') + '</p>' + corpo + '</div>';
+  }
+  return '<details class="guia" open><summary>📋 Guia do Checking · ' + esc(l.rot) + ' · ' + esc(l.tema) + '<span class="tempo">' + g.ROTEIRO.reduce(function (t, r) { return t + (r.min || 0); }, 0) + ' min com ' + esc(primeiro) + '</span></summary>' +
+    g.ROTEIRO.map(function (r) { return bloco(r.k); }).join('') + '</details>';
+}
+
 /* ── o Checking ── */
 function abrirChecking(card, a, plano, pos) {
   var jaAberto = card.querySelector('.ck');
@@ -422,6 +468,7 @@ function abrirChecking(card, a, plano, pos) {
   var ck = document.createElement('div'); ck.className = 'ck';
   ck.innerHTML =
     '<h4>Checking de ' + esc(a.nome) + '</h4>' +
+    '<div data-guia></div>' +
     '<div class="registrado" data-reg hidden></div>' +
     '<div class="lin"><label class="rot">Lição</label><select data-licao>' + licoes.map(function (l) { return '<option value="' + esc(l.v) + '"' + (l.v === licao ? ' selected' : '') + '>' + esc(l.t) + '</option>'; }).join('') + '</select></div>' +
     '<div class="lin crit"><label class="rot">Em que foi melhor (um só; o aluno vê)</label><span data-melhor>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</span></div>' +
@@ -458,6 +505,8 @@ function abrirChecking(card, a, plano, pos) {
   }
   function carregaLicao() {
     var r = reg[f.licao.value] || {};
+    ck.querySelector('[data-guia]').innerHTML = guiaHTML(a.book, f.licao.value, a.nome);
+    ck.querySelectorAll('[data-guia] .bl input').forEach(function (cb) { cb.addEventListener('change', function () { cb.closest('.bl').classList.toggle('feito', cb.checked); }); });
     pintaProntos();
     f.melhor.querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('on', c.dataset.v === r.melhor); c.classList.toggle('melhor', c.dataset.v === r.melhor); });
     f.melhorar.querySelectorAll('.chip').forEach(function (c) { var on = (r.melhorar || []).indexOf(c.dataset.v) > -1; c.classList.toggle('on', on); c.classList.toggle('pior', on); });
