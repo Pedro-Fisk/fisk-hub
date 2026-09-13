@@ -30,13 +30,13 @@
   header .passos button.on{ background:var(--lima); color:var(--limai); border-color:var(--lima); }
   header .passos button.ok{ background:rgba(255,255,255,.85); color:var(--mar); border-color:transparent; }
   header .fechar{ color:#fff; text-decoration:none; font-weight:800; opacity:.85; margin-left:8px; }
-  main{ flex:1; padding:22px; display:flex; flex-direction:column; gap:18px; max-width:1500px; width:100%; margin:0 auto; }
+  main{ flex:1; padding:26px 22px 140px; display:flex; flex-direction:column; gap:26px; max-width:1500px; width:100%; margin:0 auto; }
   .bloco-cab{ display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
   .bloco-cab h1{ margin:0; font-family:'Poppins',sans-serif; font-weight:800; font-size:clamp(28px,4vw,44px); color:var(--mar); }
   .bloco-cab .min{ font-size:16px; color:var(--med); font-weight:700; }
   .bloco-cab .o{ width:100%; font-size:clamp(15px,1.6vw,19px); color:var(--med); margin:0; }
-  .linhas{ display:flex; flex-direction:column; gap:14px; }
-  .linha{ display:grid; grid-template-columns:minmax(0,3fr) minmax(0,2fr); gap:20px; background:var(--pap); border:1px solid var(--lin); border-radius:22px; padding:22px 26px; align-items:center; }
+  .linhas{ display:flex; flex-direction:column; gap:18px; }
+  .linha{ display:grid; grid-template-columns:minmax(0,3fr) minmax(0,2fr); gap:24px; background:var(--pap); border:1px solid var(--lin); border-radius:22px; padding:26px 30px; align-items:center; }
   .linha.so-nota{ grid-template-columns:1fr; }
   .linha .diz{ font-family:'Poppins',sans-serif; font-weight:700; font-size:clamp(24px,3.2vw,40px); line-height:1.25; color:var(--txt); }
   .linha .n{ display:inline-block; width:34px; height:34px; border-radius:50%; background:var(--lima); color:var(--limai); font-weight:900; font-size:16px; text-align:center; line-height:34px; margin-right:12px; vertical-align:middle; font-family:'Nunito',sans-serif; }
@@ -45,7 +45,23 @@
   body.sem-notas .linha{ grid-template-columns:1fr; }
   .linha.feita{ opacity:.45; }
   .linha .tick{ justify-self:end; grid-column:1 / -1; }
-  .acoes{ position:sticky; bottom:0; padding:14px 0 6px; background:linear-gradient(to top,var(--chao) 70%,transparent); display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+  .acoes{ position:fixed; left:0; right:0; bottom:0; padding:18px 22px 22px; background:linear-gradient(to top,var(--chao) 75%,transparent); display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:center; }
+  .acoes > *{ max-width:1500px; }
+  /* o feedback, no fim */
+  .fb{ display:flex; flex-direction:column; gap:22px; }
+  .fb .grupo{ background:var(--pap); border:1px solid var(--lin); border-radius:22px; padding:22px 26px; }
+  .fb .grupo.bom{ background:#e4f3f1; border-color:#cfe6e1; }
+  .fb .grupo.ruim{ background:#fde2e2; border-color:#f5b8b8; }
+  .fb h2{ margin:0 0 14px; font-family:'Poppins',sans-serif; font-size:clamp(20px,2.4vw,28px); }
+  .fb .grupo.bom h2{ color:#155a48; } .fb .grupo.ruim h2{ color:#8a1c1c; }
+  .fb .chips{ display:flex; flex-wrap:wrap; gap:12px; }
+  .chip{ border:2px solid var(--lin); background:var(--pap); color:var(--txt); border-radius:999px; padding:14px 22px; font-family:inherit; font-weight:800; font-size:clamp(16px,1.8vw,20px); cursor:pointer; }
+  .chip.on{ background:var(--mar); color:#fff; border-color:var(--mar); }
+  .grupo.bom .chip.on{ background:var(--verde); border-color:var(--verde); }
+  .grupo.ruim .chip.on{ background:#d81f26; border-color:#d81f26; }
+  .fb textarea{ width:100%; min-height:90px; font-family:inherit; font-size:18px; padding:14px; border:2px solid var(--lin); border-radius:14px; resize:vertical; }
+  .fb .sub{ font-size:15px; color:var(--med); margin:0 0 10px; }
+  .fb .ok{ color:#155a48; font-weight:800; font-size:18px; }
   .btn{ border:0; border-radius:999px; font-family:inherit; font-weight:900; cursor:pointer; }
   .btn-feito{ flex:1 1 320px; background:var(--lima); color:var(--limai); font-size:clamp(20px,2.4vw,30px); padding:22px 30px; box-shadow:0 6px 0 var(--limae); }
   .btn-feito:active{ transform:translateY(3px); box-shadow:0 3px 0 var(--limae); }
@@ -56,7 +72,19 @@
   .fim p{ font-size:clamp(16px,1.8vw,22px); color:var(--med); max-width:60ch; margin:0 auto 24px; }
   .fim .btn-feito{ display:inline-block; }
   .erro{ padding:40px; font-size:18px; color:var(--med); }
-  @media (max-width:760px){ .linha{ grid-template-columns:1fr; gap:10px; padding:16px 18px; } .linha .nota{ border-left:0; padding-left:0; } }
+  @media (max-width:760px){
+    main{ padding:18px 14px 170px; gap:18px; }
+    .linha{ grid-template-columns:1fr; gap:12px; padding:18px 18px; }
+    .linha .nota{ border-left:0; padding-left:0; }
+    .linha .diz{ font-size:24px; }
+    header{ padding:12px 14px; gap:8px; }
+    header .passos{ margin-left:0; width:100%; justify-content:center; }
+    header .passos button{ width:32px; height:32px; }
+    .acoes{ padding:12px 14px 16px; }
+    .btn-feito{ flex:1 1 100%; font-size:22px; padding:18px 20px; }
+    .btn-sec{ flex:1 1 auto; }
+    .fb .grupo{ padding:16px 16px; }
+  }
 </style>
 </head>
 <body>
@@ -68,11 +96,17 @@
 </header>
 <main id="main"><div class="erro">Carregando o guia…</div></main>
 
+<script src="https://portalfisk.com.br/assets/plano-essentials-1.v2.js?v=20260913e"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260913e"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913b"></script>
 <script>
 var $ = function (id) { return document.getElementById(id); };
 var q = new URLSearchParams(location.search);
-var book = q.get('book') || 'Essentials 1', licaoId = (q.get('licao') || 'L1').toUpperCase(), aluno = q.get('aluno') || '';
+var book = q.get('book') || 'Essentials 1', licaoId = (q.get('licao') || 'L1').toUpperCase(), aluno = q.get('aluno') || '', raf = q.get('raf') || '';
+var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
+var CRITERIOS = [['vocabulary', '🔤 Vocabulary'], ['fluency', '💬 Fluency'], ['structure', '🧱 Structure'], ['pronunciation', '🗣️ Pronunciation'], ['listening', '👂 Listening']];
+var fb = { melhor: '', melhorar: [], pedidos: [], bilhete: '' };
+function token() { try { return (JSON.parse(localStorage.getItem('fisk_prof') || 'null') || {}).token || ''; } catch (e) { return ''; } }
 var G = (String(book).toLowerCase().replace(/\s+/g, ' ') === 'essentials 1') ? window.GUIA_CHECKING_E1 : null;
 var L = G && G.licoes.find(function (x) { return x.id === licaoId; });
 var estado = { i: 0, feitas: {} };
@@ -99,12 +133,7 @@ function pintaPassos() {
 function pinta() {
   var main = $('main'); main.innerHTML = '';
   pintaPassos();
-  if (estado.i >= G.ROTEIRO.length) {
-    main.innerHTML = '<div class="fim"><h1>Checking de ' + esc(L.rot) + ' feito' + (aluno ? ' com ' + esc(aluno) : '') + '.</h1>' +
-      '<p>Agora diga em que ' + (aluno ? esc(aluno.split(' ')[0]) : 'o aluno') + ' foi melhor e UMA ação concreta, e registre na Turma de hoje: melhor, a melhorar, nota, pedidos e bilhete.</p>' +
-      '<button type="button" class="btn btn-feito" onclick="window.close()">✓ Voltar para o registro</button></div>';
-    return;
-  }
+  if (estado.i >= G.ROTEIRO.length) { pintaFeedback(main); return; }
   var r = G.ROTEIRO[estado.i];
   var cab = document.createElement('div'); cab.className = 'bloco-cab';
   cab.innerHTML = '<h1>' + (estado.i + 1) + '. ' + esc(r.t) + '</h1><span class="min">' + r.min + ' min</span><p class="o">' + esc(r.o) + '</p>';
@@ -122,7 +151,7 @@ function pinta() {
   var volta = document.createElement('button'); volta.type = 'button'; volta.className = 'btn btn-sec'; volta.textContent = '‹ Anterior'; volta.disabled = estado.i === 0;
   volta.addEventListener('click', function () { estado.i = Math.max(0, estado.i - 1); pinta(); window.scrollTo(0, 0); });
   var feito = document.createElement('button'); feito.type = 'button'; feito.className = 'btn btn-feito';
-  feito.textContent = '✓ Feito · ' + (estado.i + 1 < G.ROTEIRO.length ? 'próximo: ' + G.ROTEIRO[estado.i + 1].t : 'terminar');
+  feito.textContent = '✓ Feito · ' + (estado.i + 1 < G.ROTEIRO.length ? 'próximo: ' + G.ROTEIRO[estado.i + 1].t : 'próximo: Feedback');
   feito.addEventListener('click', function () { estado.feitas[r.k] = 1; estado.i++; pinta(); window.scrollTo(0, 0); });
   var notas = document.createElement('button'); notas.type = 'button'; notas.className = 'btn-notas';
   notas.textContent = document.body.classList.contains('sem-notas') ? 'mostrar as notas do professor' : 'esconder as notas do professor (para virar a tela)';
@@ -130,8 +159,56 @@ function pinta() {
   acoes.appendChild(volta); acoes.appendChild(feito); acoes.appendChild(notas);
   main.appendChild(acoes);
 }
+/* ── O FEEDBACK, junto com o aluno (pedido do Pedro, 13/09): em que foi
+   melhor (verde), o que precisa melhorar (vermelho), os pedidos com destino
+   e o bilhete. Salva pela mesma rota do registro; a NOTA fica só na Turma de
+   hoje, porque é do professor. A Turma de hoje recebe o resultado por
+   postMessage e atualiza o aluno sem recarregar. */
+function pintaFeedback(main) {
+  var primeiro = aluno ? aluno.split(' ')[0] : 'the student';
+  var box = document.createElement('div'); box.className = 'fb';
+  box.innerHTML = '<div class="bloco-cab"><h1>8. Feedback</h1><span class="min">1 min</span><p class="o">Diga em que ' + esc(primeiro) + ' foi melhor, o que precisa melhorar, e combine o que fazer até a próxima lição. Mostre a tela: é para os dois.</p></div>' +
+    '<div class="grupo bom"><h2>👍 ' + esc(primeiro) + ', you were best at…</h2><div class="chips" data-melhor>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</div></div>' +
+    '<div class="grupo ruim"><h2>👎 Let\'s work on…</h2><div class="chips" data-melhorar>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</div></div>' +
+    '<div class="grupo"><h2>🎯 Before the next lesson…</h2><p class="sub">Toque no que combinar: chega no planner de ' + esc(primeiro) + ' com o botão do material.</p><div class="chips" data-pedidos></div></div>' +
+    '<div class="grupo"><h2>✉️ A note for ' + esc(primeiro) + '</h2><textarea data-bilhete placeholder="Good job on pronunciation. Study Do / Does before Lesson 4."></textarea></div>' +
+    '<p class="ok" data-ok hidden></p>';
+  main.appendChild(box);
+  var prontos = (window.PlannerV2 && PlannerV2.pedidosDa && window.PLANO_ESSENTIALS_1) ? PlannerV2.pedidosDa(PLANO_ESSENTIALS_1, licaoId) : [];
+  var cp = box.querySelector('[data-pedidos]');
+  cp.innerHTML = prontos.map(function (c) { return '<button type="button" class="chip" data-id="' + esc(c.id) + '">' + (c.tipo === 'extra' ? '★ ' : (c.code === 'ex' ? '▶ ' : '🎧 ')) + esc(c.en) + '</button>'; }).join('') || '<span class="sub">Sem pedidos prontos para esta lição.</span>';
+  box.querySelectorAll('[data-melhor] .chip').forEach(function (c) { c.classList.toggle('on', c.dataset.v === fb.melhor); c.addEventListener('click', function () {
+    fb.melhor = fb.melhor === c.dataset.v ? '' : c.dataset.v; fb.melhorar = fb.melhorar.filter(function (v) { return v !== fb.melhor; }); pinta(); }); });
+  box.querySelectorAll('[data-melhorar] .chip').forEach(function (c) { c.classList.toggle('on', fb.melhorar.indexOf(c.dataset.v) > -1); c.addEventListener('click', function () {
+    var i = fb.melhorar.indexOf(c.dataset.v); if (i > -1) fb.melhorar.splice(i, 1); else { fb.melhorar.push(c.dataset.v); if (fb.melhor === c.dataset.v) fb.melhor = ''; } pinta(); }); });
+  cp.querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('on', fb.pedidos.indexOf(c.dataset.id) > -1); c.addEventListener('click', function () {
+    var i = fb.pedidos.indexOf(c.dataset.id); if (i > -1) fb.pedidos.splice(i, 1); else if (fb.pedidos.length < 8) fb.pedidos.push(c.dataset.id); c.classList.toggle('on', i === -1); }); });
+  var ta = box.querySelector('[data-bilhete]'); ta.value = fb.bilhete; ta.addEventListener('input', function () { fb.bilhete = ta.value; });
+
+  var acoes = document.createElement('div'); acoes.className = 'acoes';
+  var volta = document.createElement('button'); volta.type = 'button'; volta.className = 'btn btn-sec'; volta.textContent = '‹ Anterior';
+  volta.addEventListener('click', function () { estado.i = G.ROTEIRO.length - 1; pinta(); window.scrollTo(0, 0); });
+  var salvar = document.createElement('button'); salvar.type = 'button'; salvar.className = 'btn btn-feito';
+  salvar.textContent = raf ? '✓ Salvar o feedback (a nota fica na Turma de hoje)' : '✓ Terminar';
+  salvar.addEventListener('click', function () {
+    if (!raf) { window.close(); return; }
+    salvar.disabled = true; salvar.textContent = 'Salvando…';
+    var checking = { licao: licaoId, feito: 1, melhor: fb.melhor || null, melhorar: fb.melhorar.slice(), pedidos: fb.pedidos.slice(), bilhete: fb.bilhete.trim() };
+    fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plannerProf', token: token(), raf: raf, book: book, patch: { checking: checking } }) })
+      .then(function (r) { return r.json(); })
+      .then(function (r) {
+        if (!r || !r.ok) throw new Error((r && (r.error || r.erro)) || 'não salvou');
+        var okEl = box.querySelector('[data-ok]'); okEl.hidden = false; okEl.textContent = '✓ Feedback salvo. Na Turma de hoje falta só a nota.';
+        try { if (window.opener) window.opener.postMessage({ tipo: 'checking', raf: raf, planner: r.planner }, '*'); } catch (e) {}
+        salvar.textContent = '✓ Salvo · fechar'; salvar.disabled = false; salvar.onclick = function () { window.close(); };
+      }).catch(function (e) { salvar.disabled = false; salvar.textContent = '⚠️ ' + e.message + ' · tentar de novo'; });
+  });
+  acoes.appendChild(volta); acoes.appendChild(salvar);
+  main.appendChild(acoes);
+}
 document.addEventListener('keydown', function (ev) {
   if (!L) return;
+  if (ev.target && /TEXTAREA|INPUT/.test(ev.target.tagName)) return;
   if (ev.key === 'ArrowRight' || ev.key === 'Enter') { estado.feitas[(G.ROTEIRO[estado.i] || {}).k] = 1; estado.i = Math.min(G.ROTEIRO.length, estado.i + 1); pinta(); }
   if (ev.key === 'ArrowLeft') { estado.i = Math.max(0, estado.i - 1); pinta(); }
 });

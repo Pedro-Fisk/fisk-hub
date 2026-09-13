@@ -554,7 +554,7 @@ function guiaDe(book) {
   if (b === 'essentials 1' && window.GUIA_CHECKING_E1) return window.GUIA_CHECKING_E1;
   return null;
 }
-function guiaHTML(book, licaoId, nome) {
+function guiaHTML(book, licaoId, nome, raf) {
   var g = guiaDe(book); if (!g) return '';
   var l = g.licoes.find(function (x) { return x.id === licaoId; }); if (!l) return '';
   var primeiro = String(nome || '').split(' ')[0];
@@ -567,7 +567,7 @@ function guiaHTML(book, licaoId, nome) {
     return '<div class="bl"><h5>' + esc(r.t || k) + ' <span class="min">' + (r.min || '') + ' min</span></h5><p class="o">' + esc(r.o || '') + '</p>' + corpo +
       '<button type="button" class="feito-btn">✓ Feito</button></div>';
   }
-  var grande = 'checking-guia.html?book=' + encodeURIComponent(book) + '&licao=' + encodeURIComponent(licaoId) + '&aluno=' + encodeURIComponent(nome || '');
+  var grande = 'checking-guia.html?book=' + encodeURIComponent(book) + '&licao=' + encodeURIComponent(licaoId) + '&aluno=' + encodeURIComponent(nome || '') + '&raf=' + encodeURIComponent(raf || '');
   return '<details class="guia" open><summary>📋 Guia do Checking · ' + esc(l.rot) + ' · ' + esc(l.tema) + '<span class="tempo">' + g.ROTEIRO.reduce(function (t, r) { return t + (r.min || 0); }, 0) + ' min com ' + esc(primeiro) + '</span></summary>' +
     '<a class="tela-grande" href="' + grande + '" target="_blank" rel="noopener">🖥️ Abrir em tela grande, para fazer junto com ' + esc(primeiro) + '</a>' +
     g.ROTEIRO.map(function (r) { return bloco(r.k); }).join('') + '</details>';
@@ -622,7 +622,7 @@ function abrirChecking(card, a, plano, pos) {
   }
   function carregaLicao() {
     var r = reg[f.licao.value] || {};
-    ck.querySelector('[data-guia]').innerHTML = guiaHTML(a.book, f.licao.value, a.nome);
+    ck.querySelector('[data-guia]').innerHTML = guiaHTML(a.book, f.licao.value, a.nome, a.raf);
     ck.querySelectorAll('[data-guia] .feito-btn').forEach(function (bt) { bt.addEventListener('click', function () { var bl = bt.closest('.bl'); bl.classList.toggle('feito'); bt.textContent = bl.classList.contains('feito') ? '✓ Feito · desfazer' : '✓ Feito'; }); });
     pintaProntos();
     f.melhor.querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('on', c.dataset.v === r.melhor); c.classList.toggle('melhor', c.dataset.v === r.melhor); });
@@ -675,6 +675,18 @@ function abrirChecking(card, a, plano, pos) {
   carregaLicao();
   ck.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
+
+/* a tela grande salvou o feedback: atualiza o aluno aqui sem recarregar */
+window.addEventListener('message', function (ev) {
+  var d = ev.data || {};
+  if (d.tipo !== 'checking' || !d.raf || !d.planner) return;
+  var a = estado.alunos.find(function (x) { return x.raf === d.raf; });
+  if (!a) return;
+  estado.dados[a.raf] = Object.assign(estado.dados[a.raf] || {}, { planner: d.planner });
+  estado.aberto = '';
+  redesenhar(a);
+  toast('✓ Feedback de ' + a.nome.split(' ')[0] + ' registrado pela tela grande. Falta só a nota.');
+});
 
 (function () {
   var s = sessao();
