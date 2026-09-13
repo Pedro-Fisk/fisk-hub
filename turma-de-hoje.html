@@ -181,6 +181,12 @@
   body.sem-obs .al-corpo{ grid-template-columns: 1fr; }
   .obs-toggle{ margin-left: auto; border: 1.5px solid var(--ui-bd); background: var(--white); color: var(--ui-ink); border-radius: 999px; padding: .35rem .8rem; font-family: var(--font-body); font-weight: 800; font-size: .8rem; cursor: pointer; }
   .extras span.ok b{ color: #155a48; }
+  /* o que o aluno fez no portal nesta lição: tudo, previsto ou não */
+  .portal-res{ padding: 0 1rem .8rem; font-size: .82rem; color: var(--ui-ink); display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; }
+  .portal-res .rot{ color: var(--gray); margin-right: .2rem; }
+  .portal-res span.f{ background: var(--ui-soft); border-radius: 99px; padding: .15rem .55rem; }
+  .portal-res span.f b{ color: #155a48; }
+  .portal-res .nada{ color: var(--gray); font-style: italic; }
   body.theme-dark .obs{ background: #26301a; border-color: #2e4560; }
   body.theme-dark .obs textarea{ background: #101a28; color: #dbe6f3; border-color: #4a5a3a; }
   @media (max-width: 760px){ .al-corpo{ grid-template-columns: 1fr; } .obs{ border-left: 0; border-top: 1px solid var(--ui-line); } }
@@ -236,7 +242,7 @@
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
 <script src="https://portalfisk.com.br/assets/plano-essentials-1.v2.js?v=20260913d"></script>
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260913f"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260913g"></script>
 <!-- o guia do Checking, lição a lição (Essentials 1) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913b"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
@@ -501,6 +507,7 @@ function cartaoAluno(a) {
         grade.appendChild(col);
       });
       card.appendChild(grade);
+      var pr = resumoPortal(a, ctx, pos); if (pr) card.appendChild(pr);
       if (est.extras.length) {
         var ex = document.createElement('div'); ex.className = 'extras';
         ex.innerHTML = 'Keep studying: ' + est.extras.map(function (x) { return '<span class="' + (x.feito ? 'ok' : '') + '">' + (x.feito ? '✓ ' : '') + esc(x.nm) + (x.feito && typeof x.pct === 'number' ? ' <b>' + Math.round(x.pct) + '%</b>' : '') + '</span>'; }).join('');
@@ -523,6 +530,42 @@ function cartaoAluno(a) {
   cardReal.querySelectorAll('[data-ck]').forEach(function (b) { b.addEventListener('click', function () { abrirChecking(cardReal, a, plano, pos); }); });
   if (estado.aberto === a.raf) abrirChecking(cardReal, a, plano, pos);
   return cardReal;
+}
+
+/* ── o que o aluno fez no portal nesta lição (pedido do Pedro, 13/09) ──
+   Varre o histórico datado (`hist` da plannerTurma) desde o dia da primeira
+   aula da lição no card (ou os últimos 21 dias, sem data) e agrupa por
+   ferramenta pelo prefixo do id: previsto ou não, tudo conta. É a prévia do
+   dossiê, para o professor sentar com o aluno e ver o que aconteceu. */
+var FERRAMENTAS = [
+  [/^mp:/, '🎬 Movie', true], [/^sp:/, '🎵 Song', true], [/^qp:/, '📝 Quick Practice', true],
+  [/^listen-/, '🎧 Listening Lab', true], [/^read-/, '📖 Reading Lab', true], [/^writing:/, '✍️ Writing Lab', false],
+  [/^fala:/, '🎙️ Speaking Lab', false], [/^mundo/, '🌍 World English', true], [/^sq[:-]|sidequest/, '🧭 Minicourses', true],
+  [/^ck[:-]|checking/, '✅ Checking do portal', true], [/^aud:/, '🔊 Áudios do livro', false], [/^vid:/, '▶ Vídeos', false],
+  [/^vbk:/, '📺 Video Program', false], [/^met|^siele/, '🎓 Treino MET/SIELE', true], [/^hw|hogwarts/, '🎩 Cerimônia', false]
+];
+function resumoPortal(a, ctx, pos) {
+  var d = estado.dados[a.raf] || {}; var hist = d.hist || [];
+  if (!hist.length) return null;
+  var inicio = '';
+  var cels = (ctx.cels || []).filter(function (c) { return c.c === pos.id && c.s === 'dada' && c.d; }).map(function (c) { return c.d; }).sort();
+  if (cels.length) inicio = cels[0];
+  else { var dt = new Date(Date.now() - 21 * 86400000); inicio = dt.getFullYear() + '-' + ('0' + (dt.getMonth() + 1)).slice(-2) + '-' + ('0' + dt.getDate()).slice(-2); }
+  var por = {};
+  hist.forEach(function (h) {
+    if (!h.q || h.q < inicio) return;
+    var f = FERRAMENTAS.find(function (x) { return x[0].test(h.id); }) || [null, '⭐ Outros', true];
+    var k = f[1]; por[k] = por[k] || { n: 0, best: null, nota: f[2] };
+    por[k].n++;
+    if (typeof h.pct === 'number' && (por[k].best === null || h.pct > por[k].best)) por[k].best = h.pct;
+  });
+  var box = document.createElement('div'); box.className = 'portal-res';
+  var ini = inicio.split('-').reverse().slice(0, 2).join('.');
+  var chaves = Object.keys(por);
+  box.innerHTML = '<span class="rot">🖥️ Portal desde ' + esc(ini) + ':</span>' + (chaves.length ? chaves.map(function (k) {
+    var v = por[k]; return '<span class="f">' + esc(k) + ' ×' + v.n + (v.nota && v.best !== null ? ' <b>' + Math.round(v.best) + '%</b>' : '') + '</span>';
+  }).join('') : '<span class="nada">nada ainda nesta lição</span>');
+  return box;
 }
 
 /* ── a anotação livre do professor (pedido do Pedro, 13/09) ──
@@ -565,7 +608,8 @@ function linhaItem(a, it) {
   else if (it.marca === 'expl') cls = (it.prof && !it.plat) ? ' cheia-prof' : ((it.plat ? ' l-plat' : '') + (it.prof ? ' r-prof' : ''));
   else cls = (it.a ? ' l-a' : '') + (it.prof ? ' r-prof' : (it.plat ? ' r-plat' : ''));
   var mk = '<span class="mk' + cls + (it.quem === 'prof' ? ' dep-prof' : '') + '"></span>';
-  b.innerHTML = mk + '<span>' + esc(it.nm) + (it.pq ? ' <span class="quem">✓ ' + esc(it.pq) + '</span>' : '') + '</span>';
+  var qd = it.pt ? (function (d) { return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2); })(new Date(it.pt)) : '';
+  b.innerHTML = mk + '<span>' + esc(it.nm) + (it.pq ? ' <span class="quem">✓ ' + esc(it.pq) + (qd ? ' · ' + qd : '') + '</span>' : '') + '</span>';
   /* o professor marca só a SUA metade (a direita, listrada): um toque põe,
      outro tira. A metade do aluno é do aluno; só o triângulo ele enche. */
   var prox = { p: it.prof ? 0 : 1 };
@@ -590,7 +634,7 @@ function confirmar(a, id, marca) {
   d.planner = d.planner || { itens: {}, checking: {} }; d.planner.itens = d.planner.itens || {};
   var antes = JSON.stringify(d.planner.itens[id] || null);
   var it = d.planner.itens[id] = Object.assign({}, d.planner.itens[id] || {});
-  if ('p' in marca) { if (marca.p) { it.p = 1; it.pq = (sessao() || {}).name || 'você'; } else { delete it.p; delete it.pq; delete it.pt; } }
+  if ('p' in marca) { if (marca.p) { it.p = 1; it.pq = (sessao() || {}).name || 'você'; it.pt = Date.now(); } else { delete it.p; delete it.pq; delete it.pt; } }
   if ('a' in marca) { if (marca.a) it.a = 1; else { delete it.a; delete it.at; } }
   if (!it.p && !it.a) delete d.planner.itens[id];
   redesenhar(a);   /* já com a marca nova */
