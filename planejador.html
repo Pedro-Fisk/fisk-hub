@@ -58,6 +58,8 @@
   .chk{display:inline-flex;gap:.4rem;align-items:center;font-size:.85rem;font-weight:700;color:var(--gray);cursor:pointer}
   .btn{border:0;border-radius:11px;font-weight:800;cursor:pointer;font-family:var(--font-heading)}
   .btn-ghost{background:var(--blue-soft);color:var(--blue-pill);padding:.55rem 1rem;font-size:.88rem}
+  .btn-fila{background:#31a889;color:#fff;padding:.55rem 1rem;font-size:.88rem;box-shadow:0 3px 0 #28866e}
+  .btn-fila.ok{background:#e4f3f1;color:#155a48;box-shadow:none}
   .btn-ghost:hover{background:#dbe6f0}
   .btn-pdf{background:var(--blue);color:#fff;padding:.55rem 1.1rem;font-size:.9rem}
   .btn-pdf:hover{background:var(--blue-mid)}
@@ -236,6 +238,7 @@
       <label class="topdata">📅 Data desta aula planejada
         <input type="date" id="dataAula"></label>
       <div class="doc-actions">
+        <button type="button" class="btn btn-fila js-fila" title="A ordem desta fila passa a ser a ordem dos alunos na Turma de hoje">💾 Salvar fila para a Turma de hoje</button>
         <button type="button" class="btn btn-ghost js-copiar">📋 Copiar roteiro</button>
         <button type="button" class="btn btn-pdf js-pdf">📄 Gerar PDF</button>
         <button type="button" class="btn btn-drive js-drive">📁 Enviar para pasta da turma</button>
@@ -276,6 +279,7 @@
          está aqui embaixo e não deve ter de subir para entregar o plano -->
     <div class="finalizar" id="finalizar">
       <div class="doc-actions">
+        <button type="button" class="btn btn-fila js-fila">💾 Salvar fila para a Turma de hoje</button>
         <button type="button" class="btn btn-ghost js-copiar">📋 Copiar roteiro</button>
         <button type="button" class="btn btn-pdf js-pdf">📄 Gerar PDF do plano de aula</button>
         <button type="button" class="btn btn-drive js-drive">📁 Enviar para pasta da turma</button>
@@ -959,8 +963,38 @@ function copiarExec(txt) {
   var ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
   document.body.removeChild(ta); return ok;
 }
+/* ── A FILA VAI PARA A TURMA DE HOJE (13/09/2026) ─────────────────────────
+   O que o professor decide aqui (a ordem, com o nível e a atividade de cada
+   aluno) é gravado no servidor por turma e data (`planejamentoSalva`), e a
+   Turma de hoje lê essa ordem e põe os alunos nela. O Planejador continua
+   sendo a tela que ordena; a Turma de hoje só obedece. Também salva sozinho
+   ao copiar o roteiro ou gerar o PDF, que é quando o plano fica pronto. */
+function salvarFila(silencioso) {
+  if (!turma || !estado.fila.length) return;
+  var ordem = estado.fila.map(function (a) {
+    return { nome: a.nome, nivel: nivel(a), atividade: atividadeTexto(a), nota: (a._nota || '').trim() };
+  });
+  var data = ($('dataAula') && $('dataAula').value) || '';
+  var bts = acoes('.js-fila');
+  bts.forEach(function (b) { b.disabled = true; if (!silencioso) b.textContent = 'Salvando…'; });
+  fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action: 'planejamentoSalva', token: tokenSessao(), escola: turma.escola || '', prof: turma.professor || turma.aba || '',
+                           turma: turma.turma || '', data: data, ordem: ordem }) })
+    .then(fiskJson).then(function (r) {
+      if (!r || !r.ok) throw new Error((r && (r.error || r.erro)) || 'não salvou');
+      bts.forEach(function (b) { b.disabled = false; b.classList.add('ok'); b.textContent = '✓ Fila salva para ' + (r.data || 'hoje') + ' · a Turma de hoje já usa esta ordem'; });
+      setTimeout(function () { bts.forEach(function (b) { b.classList.remove('ok'); b.textContent = '💾 Salvar fila para a Turma de hoje'; }); }, 4000);
+    }).catch(function (e) {
+      bts.forEach(function (b) { b.disabled = false; b.textContent = '⚠️ ' + e.message; });
+      setTimeout(function () { bts.forEach(function (b) { b.textContent = '💾 Salvar fila para a Turma de hoje'; }); }, 4000);
+    });
+}
+ligarAcao('.js-fila', function () { salvarFila(false); });
+ligarAcao('.js-pdf', function () { salvarFila(true); });
+
 ligarAcao('.js-copiar', function () {
   if (!turma) return;
+  salvarFila(true);
   var txt = roteiroTexto();
   var viaApi = (navigator.clipboard && navigator.clipboard.writeText)
     ? navigator.clipboard.writeText(txt) : Promise.reject();
