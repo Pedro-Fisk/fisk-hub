@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Turma de hoje, FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04c">
+<link rel="stylesheet" href="assets/casa-tema.css?v=9">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+<!-- ═══════════════════════════════════════════════════════════════════════
+     TURMA DE HOJE (13/09/2026): o lado do professor no Planner Digital.
+
+     A decisão 14 do Pedro: uma página com a aula do planner em que cada um
+     dos alunos da turma está, no celular também, ticando. Esta é a versão
+     mínima: a turma vinda do card (cascata escola → professor → turma, a
+     mesma do Planejador), cada aluno na lição e aula em que o card o coloca,
+     as três metades do planner (o que o aluno marcou, o que a plataforma
+     provou, o que o professor confirmou) e o registro do Checking em poucos
+     toques: o critério em que foi melhor, os que precisam melhorar, a nota
+     (só o professor vê), os pedidos e um bilhete.
+
+     O GABARITO NÃO MORA AQUI. O plano do Essentials 1 e a régua das marcas
+     (`estadoEtapa`, a mesma que desenha a lição para o aluno) vêm do Portal
+     do Aluno, carregados de portalfisk.com.br: o professor enxerga exatamente
+     o que o aluno enxerga, e uma régua só não discorda dela mesma. Livro sem
+     gabarito v2 ainda (todos menos o Essentials 1) mostra só a posição e o
+     registro do Checking.
+
+     O que ESCREVE: a rota `plannerProf` (token da sessão do Hub; o `quem` do
+     registro sai da sessão no servidor, nunca daqui). O que LÊ: `plannerTurma`
+     (a turma inteira numa leitura por aba) e `panoramaProf` (os alunos da
+     turma com RAF, vindos do card).
+     ═══════════════════════════════════════════════════════════════════════ -->
+<style>
+  body{ padding-bottom: 4rem; }
+  .painel{ background: var(--white); border: 1px solid var(--surface-border-color); border-radius: var(--surface-radius); box-shadow: var(--surface-shadow); padding: 1rem 1.2rem; margin: 0 auto 1rem; max-width: 1080px; }
+  .cascata{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: .6rem; }
+  .cascata label{ display: block; font-size: .74rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--gray); margin-bottom: .25rem; }
+  .cascata select{ width: 100%; padding: .55rem .7rem; border: 1.5px solid var(--ui-bd); border-radius: 10px; font-family: var(--font-body); font-size: .92rem; background: var(--white); color: var(--black); }
+  .status{ font-size: .88rem; color: var(--gray); padding: .5rem 0 0; }
+  .status.err{ color: var(--red-dark); font-weight: 700; }
+  .resumo{ display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin: .2rem 0 .6rem; font-size: .84rem; color: var(--gray); }
+  .resumo b{ color: var(--black); }
+
+  /* o aluno */
+  .al{ background: var(--white); border: 1px solid var(--surface-border-color); border-radius: var(--surface-radius); box-shadow: var(--surface-shadow); margin: 0 auto .8rem; max-width: 1080px; overflow: hidden; }
+  .al-cab{ display: flex; align-items: center; gap: .7rem; padding: .75rem 1rem; flex-wrap: wrap; }
+  .al-cab .nome{ font-family: var(--font-heading); font-weight: 700; font-size: 1.02rem; }
+  .al-cab .livro{ font-size: .8rem; color: var(--gray); }
+  .pill{ display: inline-flex; align-items: center; gap: .3rem; font-size: .74rem; font-weight: 800; padding: .2rem .6rem; border-radius: 99px; white-space: nowrap; background: var(--ui-soft); color: var(--ui-ink); }
+  .pill.pos{ background: #e4f3f1; color: #155a48; }
+  .pill.atras{ background: #fdf6e6; color: #6b4d0f; }
+  .pill.chk{ background: #d4e909; color: #3f4703; }
+  .pill.chk.falta{ background: var(--gray-light); color: var(--gray); }
+  .al-cab .acoes{ margin-left: auto; display: flex; gap: .4rem; }
+  .btn{ font-family: var(--font-body); font-weight: 800; border-radius: 999px; border: 0; cursor: pointer; }
+  .btn-ck{ background: var(--green); color: #fff; padding: .5rem .95rem; font-size: .84rem; box-shadow: 0 3px 0 var(--green-dark); }
+  .btn-ck:disabled{ opacity: .5; cursor: default; box-shadow: none; }
+  .btn-ghost{ background: var(--white); border: 1.5px solid var(--ui-bd); color: var(--ui-ink); padding: .45rem .9rem; font-size: .82rem; }
+
+  /* as três aulas */
+  .aulas{ display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: .6rem; padding: 0 1rem .9rem; }
+  .aula{ border: 1px solid var(--ui-line); border-radius: 12px; padding: .55rem .65rem; background: #f8fafc; }
+  .aula.atual{ border: 2px solid var(--ui); background: var(--white); }
+  .aula .t{ display: flex; align-items: baseline; gap: .5rem; font-size: .74rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--gray); margin-bottom: .35rem; }
+  .aula .t b{ color: var(--ui-ink); font-size: .84rem; letter-spacing: 0; text-transform: none; font-family: var(--font-heading); }
+  .aula .t .agora{ margin-left: auto; background: var(--ui); color: #fff; border-radius: 99px; padding: .05rem .5rem; font-size: .68rem; }
+  .it{ display: flex; align-items: center; gap: .5rem; padding: .28rem .4rem; border-radius: 10px; font-size: .86rem; font-weight: 700; color: var(--ui-ink); border: 0; background: transparent; width: 100%; text-align: left; font-family: inherit; cursor: default; }
+  .it.pode{ cursor: pointer; }
+  .it.pode:hover{ background: var(--ui-soft); }
+  .it.feito{ color: var(--gray); text-decoration: line-through; }
+  .it .pg{ margin-left: auto; font-weight: 600; font-size: .74rem; color: var(--gray); white-space: nowrap; }
+  .mk{ flex: 0 0 22px; width: 22px; height: 22px; border-radius: 50%; border: 2.5px solid #1d3685; background: #fff; }
+  .mk.a{ background: linear-gradient(90deg,#1d3685 50%,#fff 50%); }
+  .mk.p{ background: linear-gradient(90deg,#fff 50%,#d4e909 50%); }
+  .mk.ap{ background: linear-gradient(90deg,#1d3685 50%,#d4e909 50%); }
+  .mk.prof{ border-color: #a8b907; }
+  .mk.plat{ background: #d4e909; border-color: #a8b907; }
+  .mk.tri{ border-radius: 0; width: 22px; height: 20px; border: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,3.5 26.5,24 3.5,24' fill='%23d91e9e' stroke='%23d91e9e' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
+  .mk.tri.off{ opacity: .3; }
+  .it .quem{ font-size: .68rem; color: var(--gray); font-weight: 600; }
+  .extras{ padding: 0 1rem .8rem; font-size: .8rem; color: var(--gray); display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; }
+  .extras span{ border: 1px solid var(--ui-line); border-radius: 99px; padding: .1rem .5rem; }
+  .extras span.ok{ background: #e4f3f1; color: #155a48; border-color: #cfe6e1; }
+  .legenda{ font-size: .76rem; color: var(--gray); display: flex; flex-wrap: wrap; gap: .8rem; padding: .3rem 0 0; }
+  .legenda i{ display: inline-block; vertical-align: middle; margin-right: .25rem; }
+  .sem-plano{ padding: 0 1rem .9rem; font-size: .84rem; color: var(--gray); }
+
+  /* o registro do Checking */
+  .ck{ border-top: 1px solid var(--ui-line); background: #fbfce6; padding: .9rem 1rem 1rem; }
+  .ck h4{ margin: 0 0 .5rem; font-family: var(--font-heading); font-size: .98rem; }
+  .ck .lin{ display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-bottom: .55rem; }
+  .ck label.rot{ font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--gray); width: 100%; }
+  .chip{ font-family: var(--font-body); font-weight: 800; font-size: .8rem; padding: .35rem .75rem; border-radius: 99px; border: 1.5px solid var(--ui-bd); background: var(--white); color: var(--ui-ink); cursor: pointer; }
+  .chip.on{ background: #1d3685; color: #fff; border-color: #1d3685; }
+  .chip.on.melhor{ background: var(--green); border-color: var(--green); }
+  .chip.on.pior{ background: #d91e9e; border-color: #d91e9e; }
+  .ck select, .ck input[type=text], .ck textarea{ font-family: var(--font-body); font-size: .88rem; padding: .45rem .6rem; border: 1.5px solid var(--ui-bd); border-radius: 10px; background: var(--white); color: var(--black); }
+  .ck textarea{ width: 100%; min-height: 64px; resize: vertical; }
+  .ck input[type=text]{ flex: 1 1 200px; }
+  .ck .pedidos{ display: flex; flex-wrap: wrap; gap: .35rem; }
+  .ck .ped{ background: var(--ui-soft); border-radius: 99px; padding: .25rem .6rem; font-size: .8rem; font-weight: 700; display: inline-flex; gap: .35rem; align-items: center; }
+  .ck .ped button{ border: 0; background: none; cursor: pointer; font-weight: 900; color: var(--gray); padding: 0; }
+  .ck .fim{ display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; margin-top: .4rem; }
+  .ck .aviso{ font-size: .8rem; color: var(--gray); }
+  .ck .ok{ color: #155a48; font-weight: 800; }
+  .ck .registrado{ font-size: .84rem; color: #155a48; font-weight: 700; margin-bottom: .5rem; }
+  .toast{ position: fixed; left: 50%; bottom: 1.4rem; transform: translateX(-50%); background: #1d3685; color: #fff; padding: .7rem 1.1rem; border-radius: 999px; font-weight: 800; font-size: .9rem; box-shadow: 0 8px 24px rgba(0,0,0,.25); z-index: 50; }
+
+  body.theme-dark .painel, body.theme-dark .al{ background: #172232; border-color: #2e4560; }
+  body.theme-dark .aula{ background: #101a28; border-color: #2e4560; }
+  body.theme-dark .aula.atual{ background: #172232; }
+  body.theme-dark .it{ color: #dbe6f3; }
+  body.theme-dark .ck{ background: #1b2436; }
+  body.theme-dark .chip, body.theme-dark .cascata select, body.theme-dark .ck select, body.theme-dark .ck input, body.theme-dark .ck textarea{ background: #101a28; color: #dbe6f3; border-color: #3a5170; }
+  body.theme-dark .chip.on{ color: #fff; }
+  body.theme-dark .ck .ped{ background: #26364d; color: #dbe6f3; }
+  body.theme-dark .resumo b, body.theme-dark .aula .t b{ color: #dbe6f3; }
+  @media (max-width: 640px){ .al-cab .acoes{ margin-left: 0; width: 100%; } }
+</style>
+</head>
+<body>
+<script>try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
+
+<header class="hero">
+  <a class="back-link" href="index.html">&larr; Voltar ao Hub</a>
+  <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
+  <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+  <h1>Turma de hoje</h1>
+  <p>Cada aluno na lição em que está &middot; confirme o que viu e registre o <i>Checking</i></p>
+</header>
+
+<main>
+  <div class="painel">
+    <div class="cascata">
+      <div><label for="selEscola">Escola</label><select id="selEscola" disabled><option value="" disabled selected>Carregando…</option></select></div>
+      <div><label for="selProf">Professor(a)</label><select id="selProf" disabled><option value="" disabled selected>Professor(a)…</option></select></div>
+      <div><label for="selTurma">Turma</label><select id="selTurma" disabled><option value="" disabled selected>Turma…</option></select></div>
+    </div>
+    <div class="status" id="status">Escolha a turma. Os alunos e a posição de cada um vêm do card.</div>
+    <div class="legenda" id="legenda" hidden>
+      <span><i class="mk a" style="width:16px;height:16px;border-width:2px"></i> o aluno marcou</span>
+      <span><i class="mk p" style="width:16px;height:16px;border-width:2px"></i> a plataforma provou ou você confirmou</span>
+      <span><i class="mk prof" style="width:16px;height:16px;border-width:2px"></i> depende de você (Exploration)</span>
+      <span><i class="mk tri" style="width:16px;height:14px"></i> tarefa: só o aluno marca</span>
+      <span>Toque num item para confirmar (ou desfazer) a metade do professor.</span>
+    </div>
+  </div>
+  <div id="resumo" class="resumo" style="max-width:1080px;margin:0 auto .6rem" hidden></div>
+  <div id="alunos"></div>
+</main>
+
+<!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
+<script src="https://portalfisk.com.br/assets/plano-essentials-1.v2.js?v=20260913b"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260913b"></script>
+<script src="assets/fisk-shared.js?v=2026-09-07a"></script>
+<script>
+fiskInitThemeToggle('themeToggle');
+fiskInitUserMenu();
+fiskRegistrarUso("Turma de hoje");
+
+var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
+var $ = function (id) { return document.getElementById(id); };
+var CRITERIOS = [['vocabulary', 'Vocabulário'], ['fluency', 'Fluência'], ['structure', 'Estrutura'], ['pronunciation', 'Pronúncia'], ['listening', 'Compreensão auditiva']];
+var PLANOS = { 'essentials 1': window.PLANO_ESSENTIALS_1 || null };
+var estado = { escola: '', prof: '', turma: '', alunos: [], dados: {}, aberto: '' };
+
+function sessao() { try { return JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) { return null; } }
+function token() { var s = sessao(); return (s && s.token) || ''; }
+function status(msg, err) { var el = $('status'); el.textContent = msg || ''; el.className = 'status' + (err ? ' err' : ''); }
+function get(params) {
+  params.token = token();
+  var qs = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
+  return fetch(EP + '?' + qs).then(fiskJson).then(function (j) { if (j && (j.erro || j.error)) throw new Error(j.erro || j.error); return j; });
+}
+function post(body) {
+  body.token = token();
+  return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
+    .then(fiskJson).then(function (j) { if (!j || j.ok === false) throw new Error((j && (j.erro || j.error)) || 'Não consegui.'); return j; });
+}
+function toast(msg) { var t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 3200); }
+function esc(s) { return fiskEsc(String(s == null ? '' : s)); }
+function planoDe(book) { return PLANOS[String(book || '').trim().toLowerCase().replace(/\s+/g, ' ')] || null; }
+
+/* ── a cascata, a mesma do Planejador ── */
+function montarSelect(sel, ph, itens) {
+  sel.innerHTML = '<option value="" disabled selected>' + ph + '</option>' +
+    itens.map(function (i) { return '<option value="' + esc(i.v) + '">' + esc(i.t) + '</option>'; }).join('');
+  sel.disabled = false;
+}
+function initCascata() {
+  var selEscola = $('selEscola'), selProf = $('selProf'), selTurma = $('selTurma');
+  get({ action: 'card', fn: 'escolas' }).then(function (j) {
+    montarSelect(selEscola, 'Escolha a escola…', (j.escolas || []).map(function (e) { return { v: e, t: e }; }));
+    if (fiskReporTurma(selEscola, 'escola')) status('🔄 Voltando para a última turma que você abriu…');
+  }).catch(erro);
+  selEscola.addEventListener('change', function () {
+    if (!selEscola.value) return;
+    selProf.innerHTML = '<option value="" disabled selected>Carregando…</option>'; selProf.disabled = true;
+    selTurma.innerHTML = '<option value="" disabled selected>Turma…</option>'; selTurma.disabled = true;
+    get({ action: 'card', fn: 'profs', escola: selEscola.value }).then(function (j) {
+      montarSelect(selProf, 'Escolha o professor(a)…', (j.profs || []).map(function (p) { return { v: p, t: p }; }));
+      fiskReporTurma(selProf, 'prof');
+    }).catch(erro);
+  });
+  selProf.addEventListener('change', function () {
+    if (!selProf.value) return;
+    selTurma.innerHTML = '<option value="" disabled selected>Carregando…</option>'; selTurma.disabled = true;
+    get({ action: 'card', fn: 'turmas', escola: selEscola.value, prof: selProf.value }).then(function (j) {
+      montarSelect(selTurma, 'Escolha a turma…', (j.turmas || []).map(function (t) { return { v: t.linhaTitulo, t: t.titulo }; }));
+      fiskReporTurma(selTurma, 'linha');
+    }).catch(erro);
+  });
+  selTurma.addEventListener('change', function () {
+    if (!selTurma.value) return;
+    var titulo = selTurma.options[selTurma.selectedIndex].text;
+    fiskLembrarTurma(selEscola.value, selProf.value, selTurma.value, titulo);
+    carregarTurma(selEscola.value, selProf.value, selTurma.value, titulo);
+  });
+}
+function erro(e) {
+  var msg = (e && e.message) || 'erro';
+  if (/sess[ãa]o/i.test(msg)) {
+    $('status').className = 'status err';
+    $('status').innerHTML = '⚠️ ' + esc(msg) + ' <a href="index.html" style="font-weight:800">Entrar de novo →</a>';
+    return;
+  }
+  status('⚠️ ' + msg, true);
+}
+
+/* ── a turma: os alunos do card (com RAF) e o planner de cada um ── */
+function carregarTurma(escola, prof, linha, titulo) {
+  estado.escola = escola; estado.prof = prof; estado.turma = titulo;
+  $('alunos').innerHTML = ''; $('resumo').hidden = true; $('legenda').hidden = true;
+  status('🔄 Lendo a turma no card…');
+  post({ action: 'panoramaProf', escola: escola, prof: prof }).then(function (j) {
+    var turmaPan = (j.turmas || []).find(function (t) { return String(t.linhaTitulo) === String(linha); });
+    var nomeTurma = turmaPan ? turmaPan.turma : titulo;
+    var alunos = (j.alunos || []).filter(function (a) { return !a.saiu && (a.turma === nomeTurma || a.turma === titulo); });
+    if (!alunos.length) { status('Nenhum aluno ativo nesta turma no card.'); return; }
+    var semRaf = alunos.filter(function (a) { return !a.raf; });
+    estado.alunos = alunos.filter(function (a) { return a.raf; });
+    status('🔄 ' + estado.alunos.length + ' alunos. Lendo o planner de cada um…');
+    return post({ action: 'plannerTurma', alunos: estado.alunos.map(function (a) { return { raf: a.raf, book: a.book, turma: nomeTurma }; }) })
+      .then(function (r) {
+        estado.dados = r.alunos || {};
+        status((semRaf.length ? semRaf.length + ' aluno(s) sem RAF no card ficaram de fora. ' : '') + 'Pronto. Toque num item para confirmar; o Checking fica no botão de cada aluno.');
+        $('legenda').hidden = false;
+        desenharTurma();
+      });
+  }).catch(erro);
+}
+
+function ctxDe(a) {
+  var d = estado.dados[a.raf] || { planner: { itens: {}, checking: {} }, feitos: [], atividades: {}, evidencia: [], situacao: null };
+  return {
+    raf: a.raf, book: a.book,
+    salvar: function () {},   /* com `salvar` a régua lê as marcas do servidor, não do aparelho */
+    planner: { feitos: d.feitos || [], atividades: d.atividades || {}, evidencia: d.evidencia || [], plano: d.planner || { itens: {}, checking: {} } },
+    cels: (d.situacao && d.situacao.cels) || [],
+    situacao: d.situacao || { ultimaLicao: a.ultimaLicao || '', licaoPrevista: a.licaoPrevista || '' }
+  };
+}
+function posicaoDe(a, plano, ctx) {
+  if (plano) { var p = PlannerV2.posicao(plano, ctx); return { id: p.etapa.id, rot: p.etapa.rot, tema: p.etapa.tema }; }
+  var cod = String((ctx.situacao && ctx.situacao.ultimaLicao) || a.ultimaLicao || '').toUpperCase();
+  return { id: cod, rot: cod ? (/^L\d+$/.test(cod) ? 'Lesson ' + cod.slice(1) : cod) : 'sem posição', tema: '' };
+}
+function licoesDoLivro(plano) {
+  if (plano) return plano.etapas.filter(function (e) { return e.aulas.some(function (au) { return au.checking; }); }).map(function (e) { return { v: e.id, t: e.rot + (e.tema ? ' · ' + e.tema : '') }; });
+  var out = []; for (var i = 1; i <= 12; i++) out.push({ v: 'L' + i, t: 'Lesson ' + i }); return out;
+}
+
+function desenharTurma() {
+  var caixa = $('alunos'); caixa.innerHTML = '';
+  var nCk = 0;
+  estado.alunos.forEach(function (a) { caixa.appendChild(cartaoAluno(a)); var ck = (estado.dados[a.raf] || {}).planner; if (ck && ck.checking && Object.keys(ck.checking).some(function (k) { return ck.checking[k].feito; })) nCk++; });
+  $('resumo').hidden = false;
+  $('resumo').innerHTML = '<b>' + estado.alunos.length + '</b> alunos em <b>' + esc(estado.turma) + '</b> · <b>' + nCk + '</b> com algum Checking registrado';
+}
+
+function cartaoAluno(a) {
+  var plano = planoDe(a.book);
+  var ctx = ctxDe(a);
+  var pos = posicaoDe(a, plano, ctx);
+  var reg = ctx.planner.plano.checking || {};
+  var ckAtual = reg[pos.id];
+  var card = document.createElement('section'); card.className = 'al'; card.dataset.raf = a.raf;
+  var cab = document.createElement('div'); cab.className = 'al-cab';
+  var atras = Number(a.aulasAtraso) || 0;
+  cab.innerHTML = '<span class="nome">' + esc(a.nome) + '</span><span class="livro">' + esc(a.book || '') + '</span>' +
+    '<span class="pill pos">📍 ' + esc(pos.rot) + (pos.tema ? ' · ' + esc(pos.tema) : '') + '</span>' +
+    (atras > 0 ? '<span class="pill atras">' + atras + ' aula' + (atras === 1 ? '' : 's') + ' atrás do plano</span>' : '') +
+    (ckAtual && ckAtual.feito ? '<span class="pill chk">✓ Checking ' + esc(pos.id) + (ckAtual.nota != null ? ' · nota ' + esc(ckAtual.nota) : '') + '</span>' : '<span class="pill chk falta">Checking ' + esc(pos.id) + ' pendente</span>') +
+    '<span class="acoes"><a class="btn btn-ghost" href="' + fiskLinkDossie(a.raf) + '" target="_blank" rel="noopener">Dossiê ↗</a>' +
+    '<button type="button" class="btn btn-ck" data-ck>' + (ckAtual && ckAtual.feito ? 'Editar Checking' : 'Registrar Checking') + '</button></span>';
+  card.appendChild(cab);
+
+  if (plano) {
+    var est = PlannerV2.estadoEtapa(plano, pos.id, ctx);
+    if (est) {
+      var grade = document.createElement('div'); grade.className = 'aulas';
+      est.aulas.forEach(function (au) {
+        var col = document.createElement('div'); col.className = 'aula' + (au.atual ? ' atual' : '');
+        col.innerHTML = '<div class="t">Class ' + au.n + ' <b>' + esc(au.papel) + '</b>' + (au.atual ? '<span class="agora">agora</span>' : '') + '</div>';
+        au.itens.forEach(function (it) { col.appendChild(linhaItem(a, it)); });
+        grade.appendChild(col);
+      });
+      card.appendChild(grade);
+      if (est.extras.length) {
+        var ex = document.createElement('div'); ex.className = 'extras';
+        ex.innerHTML = 'Keep studying: ' + est.extras.map(function (x) { return '<span class="' + (x.feito ? 'ok' : '') + '">' + (x.feito ? '✓ ' : '') + esc(x.nm) + '</span>'; }).join('');
+        card.appendChild(ex);
+      }
+    }
+  } else {
+    var sp = document.createElement('div'); sp.className = 'sem-plano';
+    sp.textContent = 'O gabarito do ' + (a.book || 'livro') + ' ainda não foi transcrito: por enquanto só o Checking é registrado aqui.';
+    card.appendChild(sp);
+  }
+  cab.querySelector('[data-ck]').addEventListener('click', function () { abrirChecking(card, a, plano, pos); });
+  if (estado.aberto === a.raf) abrirChecking(card, a, plano, pos);
+  return card;
+}
+
+function linhaItem(a, it) {
+  var doAluno = it.quem === 'aluno', tri = it.marca === 'tri';
+  var pode = !tri && it.marca !== 'plataforma';
+  var b = document.createElement('button'); b.type = 'button';
+  b.className = 'it' + (pode ? ' pode' : '') + (it.feito ? ' feito' : '');
+  var mk = '<span class="mk' + (tri ? ' tri' + (it.a ? '' : ' off') : (it.marca === 'plataforma' ? (it.p ? ' plat' : '') : ((it.a && it.p) ? ' ap' : it.a ? ' a' : it.p ? ' p' : ''))) + (it.quem === 'prof' ? ' prof' : '') + '"></span>';
+  b.innerHTML = mk + '<span>' + esc(it.nm) + (it.pq ? ' <span class="quem">✓ ' + esc(it.pq) + '</span>' : '') + '</span>' + (it.pg ? '<span class="pg">' + esc(it.pg) + '</span>' : '');
+  b.title = tri ? 'A tarefa é só do aluno' : (it.marca === 'plataforma' ? 'A plataforma preenche' : (it.p ? 'Toque para desfazer a confirmação' : 'Toque para confirmar'));
+  if (pode) b.addEventListener('click', function () { confirmar(a, it.id, !it.p); });
+  return b;
+}
+
+/* ── a metade do professor: um toque, um POST; a resposta é o planner fundido ── */
+var salvando = {};
+function confirmar(a, id, liga) {
+  if (salvando[a.raf]) return;
+  salvando[a.raf] = true;
+  var patch = { itens: {} }; patch.itens[id] = { p: liga ? 1 : 0 };
+  post({ action: 'plannerProf', raf: a.raf, book: a.book, patch: patch }).then(function (r) {
+    if (r.planner) estado.dados[a.raf] = Object.assign(estado.dados[a.raf] || {}, { planner: r.planner });
+    redesenhar(a);
+  }).catch(function (e) { toast('⚠️ ' + e.message); }).then(function () { salvando[a.raf] = false; });
+}
+function redesenhar(a) {
+  var velho = document.querySelector('.al[data-raf="' + a.raf + '"]');
+  var novo = cartaoAluno(a);
+  if (velho) velho.replaceWith(novo); else $('alunos').appendChild(novo);
+}
+
+/* ── o Checking ── */
+function abrirChecking(card, a, plano, pos) {
+  var jaAberto = card.querySelector('.ck');
+  if (jaAberto) { jaAberto.remove(); estado.aberto = ''; return; }
+  document.querySelectorAll('.ck').forEach(function (x) { x.remove(); });
+  estado.aberto = a.raf;
+  var reg = ((estado.dados[a.raf] || {}).planner || {}).checking || {};
+  var licoes = licoesDoLivro(plano);
+  var licao = (licoes.some(function (l) { return l.v === pos.id; }) ? pos.id : (licoes[0] || {}).v) || 'L1';
+  var ck = document.createElement('div'); ck.className = 'ck';
+  ck.innerHTML =
+    '<h4>Checking de ' + esc(a.nome) + '</h4>' +
+    '<div class="registrado" data-reg hidden></div>' +
+    '<div class="lin"><label class="rot">Lição</label><select data-licao>' + licoes.map(function (l) { return '<option value="' + esc(l.v) + '"' + (l.v === licao ? ' selected' : '') + '>' + esc(l.t) + '</option>'; }).join('') + '</select></div>' +
+    '<div class="lin"><label class="rot">Em que foi melhor (um só; o aluno vê)</label><span data-melhor>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</span></div>' +
+    '<div class="lin"><label class="rot">O que precisa melhorar (o aluno vê como pedidos)</label><span data-melhorar>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</span></div>' +
+    '<div class="lin"><label class="rot">Nota (0 a 10, só você vê; com nota a próxima lição abre)</label><select data-nota><option value="">sem nota</option>' + [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map(function (n) { return '<option value="' + n + '">' + n + '</option>'; }).join('') + '</select></div>' +
+    '<div class="lin"><label class="rot">Pedidos para o aluno (até 8)</label><span class="pedidos" data-pedidos></span><input type="text" data-novo placeholder="Escreva um pedido e aperte Enter (ex.: rever os vídeos da lição)" maxlength="80"></div>' +
+    '<div class="lin"><label class="rot">Bilhete (até 400 letras; o aluno lê no planner)</label><textarea data-bilhete maxlength="400" placeholder="Good job on pronunciation. Study Do / Does before Lesson 4."></textarea></div>' +
+    '<div class="fim"><button type="button" class="btn btn-ck" data-salvar>Registrar Checking</button><button type="button" class="btn btn-ghost" data-fechar>Fechar</button><span class="aviso" data-aviso>O registro paga F$ 150 ao aluno, uma vez por lição.</span></div>';
+  card.appendChild(ck);
+  var f = {
+    licao: ck.querySelector('[data-licao]'), melhor: ck.querySelector('[data-melhor]'), melhorar: ck.querySelector('[data-melhorar]'),
+    nota: ck.querySelector('[data-nota]'), pedidos: ck.querySelector('[data-pedidos]'), novo: ck.querySelector('[data-novo]'),
+    bilhete: ck.querySelector('[data-bilhete]'), reg: ck.querySelector('[data-reg]'), aviso: ck.querySelector('[data-aviso]'), salvar: ck.querySelector('[data-salvar]')
+  };
+  var pedidos = [];
+  function pintaPedidos() {
+    f.pedidos.innerHTML = pedidos.map(function (p, i) { return '<span class="ped">' + esc(p) + '<button type="button" data-i="' + i + '" aria-label="tirar">×</button></span>'; }).join('');
+    f.pedidos.querySelectorAll('button').forEach(function (b) { b.addEventListener('click', function () { pedidos.splice(+b.dataset.i, 1); pintaPedidos(); }); });
+  }
+  function carregaLicao() {
+    var r = reg[f.licao.value] || {};
+    f.melhor.querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('on', c.dataset.v === r.melhor); c.classList.toggle('melhor', c.dataset.v === r.melhor); });
+    f.melhorar.querySelectorAll('.chip').forEach(function (c) { var on = (r.melhorar || []).indexOf(c.dataset.v) > -1; c.classList.toggle('on', on); c.classList.toggle('pior', on); });
+    f.nota.value = (typeof r.nota === 'number') ? String(r.nota) : '';
+    pedidos = (r.pedidos || []).slice(); pintaPedidos();
+    f.bilhete.value = r.bilhete || '';
+    f.reg.hidden = !r.feito;
+    if (r.feito) f.reg.textContent = '✓ Registrado' + (r.quem ? ' por ' + r.quem : '') + (r.quando ? ' em ' + new Date(r.quando).toLocaleDateString('pt-BR') : '') + '. Editar aqui atualiza o registro.';
+    f.salvar.textContent = r.feito ? 'Salvar alterações' : 'Registrar Checking';
+  }
+  f.licao.addEventListener('change', carregaLicao);
+  f.melhor.querySelectorAll('.chip').forEach(function (c) { c.addEventListener('click', function () {
+    var on = !c.classList.contains('on');
+    f.melhor.querySelectorAll('.chip').forEach(function (x) { x.classList.remove('on', 'melhor'); });
+    if (on) { c.classList.add('on', 'melhor'); var m = f.melhorar.querySelector('.chip[data-v="' + c.dataset.v + '"]'); if (m) m.classList.remove('on', 'pior'); }
+  }); });
+  f.melhorar.querySelectorAll('.chip').forEach(function (c) { c.addEventListener('click', function () {
+    var on = !c.classList.contains('on'); c.classList.toggle('on', on); c.classList.toggle('pior', on);
+    if (on) { var m = f.melhor.querySelector('.chip[data-v="' + c.dataset.v + '"]'); if (m) m.classList.remove('on', 'melhor'); }
+  }); });
+  f.novo.addEventListener('keydown', function (ev) {
+    if (ev.key !== 'Enter') return; ev.preventDefault();
+    var v = f.novo.value.trim(); if (!v || pedidos.length >= 8) return;
+    pedidos.push(v.slice(0, 80)); f.novo.value = ''; pintaPedidos();
+  });
+  ck.querySelector('[data-fechar]').addEventListener('click', function () { ck.remove(); estado.aberto = ''; });
+  f.salvar.addEventListener('click', function () {
+    var melhor = f.melhor.querySelector('.chip.on'); var melhorar = Array.prototype.map.call(f.melhorar.querySelectorAll('.chip.on'), function (c) { return c.dataset.v; });
+    if (f.novo.value.trim() && pedidos.length < 8) { pedidos.push(f.novo.value.trim().slice(0, 80)); f.novo.value = ''; }
+    var checking = { licao: f.licao.value, feito: 1, melhor: melhor ? melhor.dataset.v : null, melhorar: melhorar, pedidos: pedidos.slice(), bilhete: f.bilhete.value.trim() };
+    checking.nota = f.nota.value === '' ? null : Number(f.nota.value);
+    f.salvar.disabled = true; f.aviso.textContent = 'Registrando…'; f.aviso.className = 'aviso';
+    post({ action: 'plannerProf', raf: a.raf, book: a.book, patch: { checking: checking } }).then(function (r) {
+      if (r.planner) estado.dados[a.raf] = Object.assign(estado.dados[a.raf] || {}, { planner: r.planner });
+      var fd = r.fd;
+      toast(fd && fd.credito > 0 ? '✓ Checking ' + checking.licao + ' registrado · F$ ' + fd.credito + ' para ' + a.nome.split(' ')[0]
+           : (fd && fd.jaPago ? '✓ Checking ' + checking.licao + ' atualizado (já tinha sido pago)' : '✓ Checking ' + checking.licao + ' registrado'));
+      estado.aberto = '';
+      redesenhar(a);
+    }).catch(function (e) { f.salvar.disabled = false; f.aviso.textContent = '⚠️ ' + e.message; f.aviso.className = 'aviso err'; });
+  });
+  carregaLicao();
+  ck.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
+(function () {
+  var s = sessao();
+  if (!s || !s.token) { $('status').className = 'status err'; $('status').innerHTML = '⚠️ Entre no Fisk Hub para abrir a turma. <a href="index.html" style="font-weight:800">Ir para o login →</a>'; return; }
+  if (!window.PlannerV2) { status('⚠️ Não consegui carregar a régua do Planner (portalfisk.com.br). Recarregue a página.', true); return; }
+  initCascata();
+})();
+</script>
+</body>
+</html>

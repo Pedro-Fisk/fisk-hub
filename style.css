@@ -60,6 +60,7 @@
 .card-conversation { --accent: #2563EB; }
 .card-planner      { --accent: #15803D; }
 .card-lessonplan   { --accent: #4338CA; } /* indigo do planejador de aula */
+.card-turmahoje    { --accent: #1d3685; } /* o azul-marinho do planner do aluno */
 .card-kids         { --accent: #CC0E50; }
 .card-adults       { --accent: #1096B5; }
 .card-spanish      { --accent: #CC7C08; }
