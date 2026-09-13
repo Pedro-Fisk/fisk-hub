@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plano de curso · Fisk</title>
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04c">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+<style>
+  /* A VISÃO DE ÁGUIA (Pedro, 13/09/2026): o plano de curso inteiro de UM
+     aluno, do começo ao fim, com as datas do card, as marcas das três mãos,
+     o Checking de cada lição e os extras. É o que o PDF do planner sempre
+     deu à coordenação: bater o olho e ver o curso todo. Só leitura: quem
+     marca é a Turma de hoje. O desenho mora no planner-v2.js do portal
+     (PlannerV2.planoCompleto), o mesmo do aluno; o botão Imprimir vira PDF. */
+  body { margin: 0; background: #eef1f7; font-family: "Nunito", "Segoe UI", system-ui, sans-serif; color: #0f1f4e; }
+  .topo { background: #1d3685; color: #fff; padding: 10px 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; position: sticky; top: 0; z-index: 3; }
+  .topo h1 { font-size: 16px; margin: 0; font-weight: 800; } .topo .sub { opacity: .8; font-size: 13px; }
+  .topo a, .topo button { margin-left: auto; background: rgba(255,255,255,.15); color: #fff; border: 0; border-radius: 999px; padding: 6px 12px; font-weight: 800; font-size: 12.5px; text-decoration: none; cursor: pointer; font-family: inherit; }
+  .topo button + a { margin-left: 0; }
+  .status { padding: 12px 16px; color: #54648d; font-weight: 700; } .status.err { color: #b91c1c; }
+  @media print { .topo { display: none; } body { background: #fff; } }
+</style>
+</head>
+<body>
+<div class="topo"><h1>🦅 Plano de curso</h1><span class="sub" id="quem"></span><button type="button" onclick="window.print()">🖨 Imprimir / PDF</button><a href="turma-de-hoje.html">← Turma de hoje</a></div>
+<div class="status" id="status">Lendo o planner…</div>
+<div id="corpo"></div>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260913j"></script>
+<script>
+var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
+var $ = function (id) { return document.getElementById(id); };
+var q = new URLSearchParams(location.search);
+var raf = q.get('raf') || '', book = q.get('book') || '', nome = q.get('nome') || '';
+function token() { try { return (JSON.parse(localStorage.getItem('fisk_prof') || 'null') || {}).token || ''; } catch (e) { return ''; } }
+function livroId(b) { return String(b || '').trim().toLowerCase().replace(/\s+/g, '-'); }
+function planoGlobal(b) { return 'PLANO_' + livroId(b).toUpperCase().replace(/-/g, '_'); }
+function carregaPlano(b) {
+  if (!livroId(b)) return Promise.resolve(null);
+  if (window[planoGlobal(b)]) return Promise.resolve(window[planoGlobal(b)]);
+  return new Promise(function (res) { var sc = document.createElement('script'); sc.src = 'https://portalfisk.com.br/assets/plano-' + livroId(b) + '.v2.js?v=20260913j'; sc.onload = function () { res(window[planoGlobal(b)] || null); }; sc.onerror = function () { res(null); }; document.head.appendChild(sc); });
+}
+function status(msg, err) { var e = $('status'); e.textContent = msg || ''; e.className = 'status' + (err ? ' err' : ''); e.hidden = !msg; }
+$('quem').textContent = (nome ? nome + ' · ' : '') + (book || '') + (raf ? ' · ' + raf : '');
+document.title = 'Plano de curso' + (nome ? ' · ' + nome : '') + ' · Fisk';
+if (!raf || !book) { status('Faltou o aluno: abra esta página pelo botão da Turma de hoje.', true); }
+else Promise.all([
+  carregaPlano(book),
+  fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plannerTurma', token: token(), alunos: [{ raf: raf, book: book }] }) }).then(function (r) { return r.json(); })
+]).then(function (rs) {
+  var plano = rs[0], j = rs[1];
+  if (!plano) { status('O gabarito do ' + book + ' não carregou.', true); return; }
+  if (!j || j.ok === false) { status((j && (j.erro || j.error)) || 'Não consegui ler o planner.', true); return; }
+  var d = (j.alunos || {})[raf] || { planner: { itens: {}, checking: {} }, feitos: [], atividades: {}, evidencia: [], situacao: null };
+  var ctx = { raf: raf, book: book, salvar: function () {},
+    planner: { feitos: d.feitos || [], atividades: d.atividades || {}, evidencia: d.evidencia || [], plano: d.planner || { itens: {}, checking: {} } },
+    cels: (d.situacao && d.situacao.cels) || [], situacao: d.situacao || null };
+  status('');
+  PlannerV2.planoCompleto($('corpo'), plano, ctx, { nome: nome });
+}).catch(function (e) { status('Erro: ' + (e && e.message || e), true); });
+</script>
+</body>
+</html>

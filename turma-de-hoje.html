@@ -86,6 +86,7 @@
   .mk.l-plat.r-prof{ background: linear-gradient(90deg,#d4e909 50%,transparent 50%), var(--listra); }
   .mk.cheia-prof{ background: var(--listra); }
   .mk.dep-prof{ border-color: #a8b907; }
+  .pill.aguia{ background:#fff; border:1.5px solid #1d3685; color:#1d3685; text-decoration:none; cursor:pointer; }
   .mk.plat{ background: #d4e909; border-color: #a8b907; }
   .mk.tri{ border-radius: 0; width: 38px; height: 34px; border: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,4.5 25.5,23 4.5,23' fill='%23fff' stroke='%23d91e9e' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
   .mk.tri.on{ background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,3.5 26.5,24 3.5,24' fill='%23d91e9e' stroke='%23d91e9e' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
@@ -257,7 +258,7 @@ var CRITERIOS = [['vocabulary', '🔤 Vocabulário'], ['fluency', '💬 Fluênci
 /* Os dez gabaritos v2 moram no portal e descem sob demanda, pelo livro: nenhum
    professor precisa dos outros nove. 'Essentials 1' → plano-essentials-1.v2.js
    → window.PLANO_ESSENTIALS_1 (13/09/2026). */
-var PLANO_V = '20260913i';
+var PLANO_V = '20260913j';
 function livroId(book) { return String(book || '').trim().toLowerCase().replace(/\s+/g, '-'); }
 function planoGlobal(book) { return 'PLANO_' + livroId(book).toUpperCase().replace(/-/g, '_'); }
 var planoCarregando = {};
@@ -494,7 +495,8 @@ function cartaoAluno(a) {
     '<span class="pill pos">📍 ' + esc(pos.rot) + (pos.tema ? ' · ' + esc(pos.tema) : '') + '</span>' +
     (atras > 0 ? '<span class="pill atras">' + atras + ' aula' + (atras === 1 ? '' : 's') + ' atrás do plano</span>' : '') +
     (ckAtual && ckAtual.feito ? '<span class="pill chk">✓ Checking ' + esc(pos.id) + (ckAtual.nota != null ? ' · nota ' + esc(ckAtual.nota) : '') + '</span>' : '<span class="pill chk falta">Checking ' + esc(pos.id) + ' pendente</span>') +
-    (plano ? '' : '<span class="acoes"><button type="button" class="btn btn-ck" data-ck>' + (ckAtual && ckAtual.feito ? 'Editar Checking' : 'Registrar Checking') + '</button></span>');
+    (plano ? '' : '<span class="acoes"><button type="button" class="btn btn-ck" data-ck>' + (ckAtual && ckAtual.feito ? 'Editar Checking' : 'Registrar Checking') + '</button></span>') +
+    (plano ? '<a class="pill aguia" href="plano-curso.html?raf=' + encodeURIComponent(a.raf) + '&book=' + encodeURIComponent(a.book || '') + '&nome=' + encodeURIComponent(a.nome || '') + '" target="_blank" rel="noopener" title="O plano de curso inteiro, do começo ao fim">🦅 Plano completo</a>' : '');
   card.appendChild(cab);
   var corpo = document.createElement('div'); corpo.className = 'al-corpo';
   var esq = document.createElement('div'); esq.className = 'esq';
