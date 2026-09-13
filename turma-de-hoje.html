@@ -68,7 +68,7 @@
   .aula .t{ display: flex; align-items: baseline; gap: .5rem; font-size: .74rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--gray); margin-bottom: .35rem; }
   .aula .t b{ color: var(--ui-ink); font-size: .84rem; letter-spacing: 0; text-transform: none; font-family: var(--font-heading); }
   .aula .t .agora{ margin-left: auto; background: var(--ui); color: #fff; border-radius: 99px; padding: .05rem .5rem; font-size: .68rem; }
-  .it{ display: flex; align-items: center; gap: .6rem; padding: .32rem .4rem; border-radius: 12px; font-size: .92rem; font-weight: 700; color: var(--ui-ink); border: 0; background: transparent; width: 100%; text-align: left; font-family: inherit; cursor: default; }
+  .it{ display: flex; align-items: center; gap: .7rem; padding: .35rem .45rem; border-radius: 14px; font-size: .95rem; font-weight: 700; color: var(--ui-ink); border: 0; background: transparent; width: 100%; text-align: left; font-family: inherit; cursor: default; }
   .it.pode{ cursor: pointer; }
   .it.pode:hover{ background: var(--ui-soft); }
   .it.feito{ color: var(--gray); }
@@ -76,7 +76,7 @@
   .it .pg{ margin-left: auto; font-weight: 600; font-size: .74rem; color: var(--gray); white-space: nowrap; }
   /* as três mãos: esquerda azul = o aluno; direita verde-amarela = a plataforma;
      direita LISTRADA em dois azuis = o professor (pedido do Pedro, 13/09) */
-  .mk{ flex: 0 0 30px; width: 30px; height: 30px; border-radius: 50%; border: 3px solid #1d3685; background: #fff; --listra: repeating-linear-gradient(45deg,#1d3685 0 4px,#9fb4e8 4px 8px); }
+  .mk{ flex: 0 0 38px; width: 38px; height: 38px; border-radius: 50%; border: 3px solid #1d3685; background: #fff; --listra: repeating-linear-gradient(45deg,#1d3685 0 2px,#9fb4e8 2px 4px); }
   .mk.l-a{ background: linear-gradient(90deg,#1d3685 50%,#fff 50%); }
   .mk.l-plat{ background: linear-gradient(90deg,#d4e909 50%,#fff 50%); }
   .mk.r-plat{ background: linear-gradient(90deg,#fff 50%,#d4e909 50%); }
@@ -87,7 +87,7 @@
   .mk.cheia-prof{ background: var(--listra); }
   .mk.dep-prof{ border-color: #a8b907; }
   .mk.plat{ background: #d4e909; border-color: #a8b907; }
-  .mk.tri{ border-radius: 0; width: 30px; height: 27px; border: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,4.5 25.5,23 4.5,23' fill='%23fff' stroke='%23d91e9e' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
+  .mk.tri{ border-radius: 0; width: 38px; height: 34px; border: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,4.5 25.5,23 4.5,23' fill='%23fff' stroke='%23d91e9e' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
   .mk.tri.on{ background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,3.5 26.5,24 3.5,24' fill='%23d91e9e' stroke='%23d91e9e' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
   .it .quem{ font-size: .68rem; color: var(--gray); font-weight: 600; }
   .extras{ padding: 0 1rem .8rem; font-size: .8rem; color: var(--gray); display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; }
@@ -571,7 +571,7 @@ function linhaItem(a, it) {
   var prox = { p: it.prof ? 0 : 1 };
   b.title = tri ? 'A tarefa é só do aluno' : (it.marca === 'plataforma' ? 'A plataforma preenche'
           : (it.prof ? 'Toque para desfazer a sua confirmação' : 'Toque para confirmar a sua metade'));
-  if (pode) b.addEventListener('click', function () { b.classList.add('salvando'); confirmar(a, it.id, prox); });
+  if (pode) b.addEventListener('click', function () { confirmar(a, it.id, prox); });
   return b;
 }
 
@@ -582,20 +582,34 @@ var salvando = {};
    seguintes morrerem em silêncio ("toca e nada acontece", Claudinei,
    13/09/2026). Passou de 1,5 s, avisa que está gravando; passou de 25 s,
    desiste e avisa. Tudo vai para o console também. */
+/* OTIMISTA (pedido do Pedro, 13/09): a bolinha muda na hora, e o servidor
+   confirma por trás. Se o servidor recusar ou demorar mais de 25 s, a marca
+   volta e o professor é avisado. Toques seguidos no mesmo item vão em fila. */
 function confirmar(a, id, marca) {
-  var k = a.raf + '|' + id;
-  if (salvando[k]) { toast('⏳ Ainda gravando este item…'); return; }
-  salvando[k] = true;
+  var d = estado.dados[a.raf] = estado.dados[a.raf] || { planner: { itens: {}, checking: {} } };
+  d.planner = d.planner || { itens: {}, checking: {} }; d.planner.itens = d.planner.itens || {};
+  var antes = JSON.stringify(d.planner.itens[id] || null);
+  var it = d.planner.itens[id] = Object.assign({}, d.planner.itens[id] || {});
+  if ('p' in marca) { if (marca.p) { it.p = 1; it.pq = (sessao() || {}).name || 'você'; } else { delete it.p; delete it.pq; delete it.pt; } }
+  if ('a' in marca) { if (marca.a) it.a = 1; else { delete it.a; delete it.at; } }
+  if (!it.p && !it.a) delete d.planner.itens[id];
+  redesenhar(a);   /* já com a marca nova */
   var patch = { itens: {} }; patch.itens[id] = marca;
-  var lento = setTimeout(function () { toast('⏳ Gravando no servidor…'); }, 1500);
-  var pedido = post({ action: 'plannerProf', raf: a.raf, book: a.book, patch: patch });
-  var limite = new Promise(function (_, rej) { setTimeout(function () { rej(new Error('o servidor demorou demais; tente de novo')); }, 25000); });
-  Promise.race([pedido, limite]).then(function (r) {
+  var k = a.raf + '|' + id;
+  var anterior = salvando[k] || Promise.resolve();
+  salvando[k] = anterior.then(function () {
+    var pedido = post({ action: 'plannerProf', raf: a.raf, book: a.book, patch: patch });
+    var limite = new Promise(function (_, rej) { setTimeout(function () { rej(new Error('o servidor demorou demais')); }, 25000); });
+    return Promise.race([pedido, limite]);
+  }).then(function (r) {
     console.log('plannerProf', id, marca, r);
-    if (r.planner) estado.dados[a.raf] = Object.assign(estado.dados[a.raf] || {}, { planner: r.planner });
+    if (r.planner) { estado.dados[a.raf].planner = r.planner; }
+  }).catch(function (e) {
+    console.error('plannerProf falhou', id, e);
+    var v = JSON.parse(antes); if (v) estado.dados[a.raf].planner.itens[id] = v; else delete estado.dados[a.raf].planner.itens[id];
     redesenhar(a);
-  }).catch(function (e) { console.error('plannerProf falhou', id, e); toast('⚠️ Não salvou: ' + e.message); redesenhar(a); })
-    .then(function () { clearTimeout(lento); salvando[k] = false; });
+    toast('⚠️ Não salvou (' + e.message + '). A marca voltou; tente de novo.');
+  });
 }
 function redesenhar(a) {
   var velho = document.querySelector('.al[data-raf="' + a.raf + '"]');
