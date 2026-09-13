@@ -143,6 +143,7 @@
   .guia tr:first-child td{ border-top: 0; }
   .guia td.diz{ width: 55%; font-family: var(--font-heading); font-weight: 700; font-size: 1.05rem; color: var(--ui-ink); line-height: 1.3; }
   .guia td.nota{ font-size: .8rem; color: var(--gray); line-height: 1.35; }
+  .guia tr.aluno td.diz{ color: #155a48; padding-left: 1.2rem; }
   .guia .feito-btn{ display: block; width: 100%; margin-top: .6rem; border: 0; border-radius: 14px; padding: .8rem 1rem; font-family: var(--font-body); font-weight: 900; font-size: 1.05rem; background: #d4e909; color: #3f4703; box-shadow: 0 4px 0 #a8b907; cursor: pointer; }
   .guia .bl.feito{ opacity: .55; }
   .guia .bl.feito .feito-btn{ background: #e4f3f1; color: #155a48; box-shadow: none; }
@@ -244,7 +245,7 @@
 <script src="https://portalfisk.com.br/assets/plano-essentials-1.v2.js?v=20260913d"></script>
 <script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260913g"></script>
 <!-- o guia do Checking, lição a lição (Essentials 1) -->
-<script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913b"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913c"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
 <script>
 fiskInitThemeToggle('themeToggle');
@@ -675,9 +676,9 @@ function guiaHTML(book, licaoId, nome, raf) {
     var r = g.ROTEIRO.find(function (x) { return x.k === k; }) || {};
     var linhas = g.linhasDe ? g.linhasDe(l, k) : [];
     var corpo = '<table>' + linhas.map(function (ln) {
-      return '<tr><td class="diz">' + esc(ln.diz) + '</td><td class="nota">' + esc(ln.nota) + '</td></tr>';
+      return '<tr class="' + (ln.quem === 'A' ? 'aluno' : (ln.quem === 'P' ? 'prof' : '')) + '"><td class="diz">' + (ln.quem === 'A' ? '🧑‍🎓 ' : (ln.quem === 'P' ? '🧑‍🏫 ' : '')) + esc(ln.diz) + '</td><td class="nota">' + esc(ln.nota) + '</td></tr>';
     }).join('') + '</table>';
-    return '<div class="bl"><h5>' + esc(r.t || k) + ' <span class="min">' + (r.min || '') + ' min</span></h5><p class="o">' + esc(r.o || '') + '</p>' + corpo +
+    return '<div class="bl"><h5>' + (r.ic ? r.ic + ' ' : '') + esc(r.t || k) + ' <span class="min">' + (r.min || '') + ' min</span></h5><p class="o">' + esc(r.o || '') + '</p>' + corpo +
       '<button type="button" class="feito-btn">✓ Feito</button></div>';
   }
   var grande = 'checking-guia.html?book=' + encodeURIComponent(book) + '&licao=' + encodeURIComponent(licaoId) + '&aluno=' + encodeURIComponent(nome || '') + '&raf=' + encodeURIComponent(raf || '');

@@ -44,6 +44,11 @@
   body.sem-notas .linha .nota{ display:none; }
   body.sem-notas .linha{ grid-template-columns:1fr; }
   .linha.feita{ opacity:.45; }
+  /* a cena: as falas do professor à esquerda, as do aluno deslocadas e em verde */
+  .linha.fala-aluno{ margin-left:8%; background:#e4f3f1; border-color:#cfe6e1; }
+  .linha.fala-aluno .diz{ color:#155a48; }
+  .linha.fala-prof{ margin-right:8%; }
+  .linha .n{ font-size:20px; }
   .linha .tick{ justify-self:end; grid-column:1 / -1; }
   .acoes{ position:fixed; left:0; right:0; bottom:0; padding:18px 22px 22px; background:linear-gradient(to top,var(--chao) 75%,transparent); display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:center; }
   .acoes > *{ max-width:1500px; }
@@ -98,7 +103,7 @@
 
 <script src="https://portalfisk.com.br/assets/plano-essentials-1.v2.js?v=20260913e"></script>
 <script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260913e"></script>
-<script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913b"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913c"></script>
 <script>
 var $ = function (id) { return document.getElementById(id); };
 var q = new URLSearchParams(location.search);
@@ -136,12 +141,12 @@ function pinta() {
   if (estado.i >= G.ROTEIRO.length) { pintaFeedback(main); return; }
   var r = G.ROTEIRO[estado.i];
   var cab = document.createElement('div'); cab.className = 'bloco-cab';
-  cab.innerHTML = '<h1>' + (estado.i + 1) + '. ' + esc(r.t) + '</h1><span class="min">' + r.min + ' min</span><p class="o">' + esc(r.o) + '</p>';
+  cab.innerHTML = '<h1>' + (r.ic ? r.ic + ' ' : '') + (estado.i + 1) + '. ' + esc(r.t) + '</h1><span class="min">' + r.min + ' min</span><p class="o">' + esc(r.o) + '</p>';
   main.appendChild(cab);
   var box = document.createElement('div'); box.className = 'linhas';
   (G.linhasDe(L, r.k) || []).forEach(function (ln, i) {
-    var el = document.createElement('div'); el.className = 'linha' + (ln.diz ? '' : ' so-nota');
-    el.innerHTML = (ln.diz ? '<div class="diz"><span class="n">' + (i + 1) + '</span>' + esc(ln.diz) + '</div>' : '') +
+    var el = document.createElement('div'); el.className = 'linha' + (ln.diz ? '' : ' so-nota') + (ln.quem === 'A' ? ' fala-aluno' : (ln.quem === 'P' ? ' fala-prof' : ''));
+    el.innerHTML = (ln.diz ? '<div class="diz"><span class="n">' + (ln.quem === 'A' ? '🧑‍🎓' : (ln.quem === 'P' ? '🧑‍🏫' : (i + 1))) + '</span>' + esc(ln.diz) + '</div>' : '') +
       (ln.nota ? '<div class="nota">' + esc(ln.nota) + '</div>' : '');
     el.addEventListener('click', function () { el.classList.toggle('feita'); });
     box.appendChild(el);
