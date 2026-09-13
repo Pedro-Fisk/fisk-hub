@@ -101,8 +101,6 @@
 </header>
 <main id="main"><div class="erro">Carregando o guia…</div></main>
 
-<script src="https://portalfisk.com.br/assets/plano-essentials-1.v2.js?v=20260913e"></script>
-<script src="https://portalfisk.com.br/assets/plano-essentials-2.v2.js?v=20260913a"></script>
 <script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260913h"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913c"></script>
 <script>
@@ -112,6 +110,11 @@ var book = q.get('book') || 'Essentials 1', licaoId = (q.get('licao') || 'L1').t
 var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
 var CRITERIOS = [['vocabulary', '🔤 Vocabulary'], ['fluency', '💬 Fluency'], ['structure', '🧱 Structure'], ['pronunciation', '🗣️ Pronunciation'], ['listening', '👂 Listening']];
 var fb = { melhor: '', melhorar: [], pedidos: [], bilhete: '' };
+/* o gabarito v2 do livro desce do portal sob demanda (o mesmo desenho da Turma de hoje) */
+var PLANO_V = '20260913i';
+function livroId(b) { return String(b || '').trim().toLowerCase().replace(/\s+/g, '-'); }
+function planoGlobal(b) { return 'PLANO_' + livroId(b).toUpperCase().replace(/-/g, '_'); }
+(function () { if (!livroId(book) || window[planoGlobal(book)]) return; var sc = document.createElement('script'); sc.src = 'https://portalfisk.com.br/assets/plano-' + livroId(book) + '.v2.js?v=' + PLANO_V; document.head.appendChild(sc); })();
 function token() { try { return (JSON.parse(localStorage.getItem('fisk_prof') || 'null') || {}).token || ''; } catch (e) { return ''; } }
 var G = (String(book).toLowerCase().replace(/\s+/g, ' ') === 'essentials 1') ? window.GUIA_CHECKING_E1 : null;
 var L = G && G.licoes.find(function (x) { return x.id === licaoId; });
@@ -180,8 +183,7 @@ function pintaFeedback(main) {
     '<div class="grupo"><h2>✉️ A note for ' + esc(primeiro) + '</h2><textarea data-bilhete placeholder="Good job on pronunciation. Study Do / Does before Lesson 4."></textarea></div>' +
     '<p class="ok" data-ok hidden></p>';
   main.appendChild(box);
-  var PLANOS = { 'essentials 1': window.PLANO_ESSENTIALS_1, 'essentials 2': window.PLANO_ESSENTIALS_2 };
-  var planoV2 = PLANOS[String(book).toLowerCase().replace(/\s+/g, ' ')];
+  var planoV2 = window[planoGlobal(book)] || null;
   var prontos = (window.PlannerV2 && PlannerV2.pedidosDa && planoV2) ? PlannerV2.pedidosDa(planoV2, licaoId) : [];
   var cp = box.querySelector('[data-pedidos]');
   cp.innerHTML = prontos.map(function (c) { return '<button type="button" class="chip" data-id="' + esc(c.id) + '">' + (c.tipo === 'extra' ? '★ ' : (c.code === 'ex' ? '▶ ' : '🎧 ')) + esc(c.en) + '</button>'; }).join('') || '<span class="sub">Sem pedidos prontos para esta lição.</span>';

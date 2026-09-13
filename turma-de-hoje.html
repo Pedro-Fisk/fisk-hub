@@ -242,8 +242,6 @@
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/plano-essentials-1.v2.js?v=20260913d"></script>
-<script src="https://portalfisk.com.br/assets/plano-essentials-2.v2.js?v=20260913a"></script>
 <script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260913h"></script>
 <!-- o guia do Checking, lição a lição (Essentials 1) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913c"></script>
@@ -256,7 +254,25 @@ fiskRegistrarUso("Turma de hoje");
 var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
 var $ = function (id) { return document.getElementById(id); };
 var CRITERIOS = [['vocabulary', '🔤 Vocabulário'], ['fluency', '💬 Fluência'], ['structure', '🧱 Estrutura'], ['pronunciation', '🗣️ Pronúncia'], ['listening', '👂 Compreensão auditiva']];
-var PLANOS = { 'essentials 1': window.PLANO_ESSENTIALS_1 || null, 'essentials 2': window.PLANO_ESSENTIALS_2 || null };
+/* Os dez gabaritos v2 moram no portal e descem sob demanda, pelo livro: nenhum
+   professor precisa dos outros nove. 'Essentials 1' → plano-essentials-1.v2.js
+   → window.PLANO_ESSENTIALS_1 (13/09/2026). */
+var PLANO_V = '20260913i';
+function livroId(book) { return String(book || '').trim().toLowerCase().replace(/\s+/g, '-'); }
+function planoGlobal(book) { return 'PLANO_' + livroId(book).toUpperCase().replace(/-/g, '_'); }
+var planoCarregando = {};
+function carregaPlano(book) {
+  var id = livroId(book);
+  if (!id || window[planoGlobal(book)]) return Promise.resolve(window[planoGlobal(book)] || null);
+  if (!planoCarregando[id]) planoCarregando[id] = new Promise(function (res) {
+    var sc = document.createElement('script');
+    sc.src = 'https://portalfisk.com.br/assets/plano-' + id + '.v2.js?v=' + PLANO_V;
+    sc.onload = function () { res(window[planoGlobal(book)] || null); };
+    sc.onerror = function () { res(null); };
+    document.head.appendChild(sc);
+  });
+  return planoCarregando[id];
+}
 var estado = { escola: '', prof: '', turma: '', alunos: [], dados: {}, aberto: '', plano: null, atendidos: {} };
 /* ── a fila do Planejador e o "aluno atendido" ──
    A ordem vem do que o professor salvou no Planejador (planejamentoLe); quem
@@ -316,7 +332,7 @@ function post(body) {
 }
 function toast(msg) { var t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 3200); }
 function esc(s) { return fiskEsc(String(s == null ? '' : s)); }
-function planoDe(book) { return PLANOS[String(book || '').trim().toLowerCase().replace(/\s+/g, ' ')] || null; }
+function planoDe(book) { return window[planoGlobal(book)] || null; }
 
 /* ── a cascata, a mesma do Planejador ── */
 function montarSelect(sel, ph, itens) {
@@ -415,9 +431,11 @@ function carregarTurma(escola, prof, linha, titulo) {
     estado.alunos = alunos.filter(function (a) { return a.raf; });
     status('🔄 ' + estado.alunos.length + ' alunos. Lendo o planner de cada um…');
     estado.turma = nomeTurma; estado.atendidos = lerAtendidos();
+    var livros = {}; estado.alunos.forEach(function (a) { if (a.book) livros[livroId(a.book)] = a.book; });
     return Promise.all([
       post({ action: 'plannerTurma', alunos: estado.alunos.map(function (a) { return { raf: a.raf, book: a.book, turma: nomeTurma }; }) }),
-      post({ action: 'planejamentoLe', escola: escola, prof: prof, turma: nomeTurma }).catch(function () { return { plano: null }; })
+      post({ action: 'planejamentoLe', escola: escola, prof: prof, turma: nomeTurma }).catch(function () { return { plano: null }; }),
+      Promise.all(Object.keys(livros).map(function (k) { return carregaPlano(livros[k]); }))
     ]).then(function (rs) {
         estado.dados = rs[0].alunos || {};
         estado.plano = rs[1] && rs[1].plano || null;
