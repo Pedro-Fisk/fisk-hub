@@ -72,7 +72,15 @@
   .it.pode{ cursor: pointer; }
   .it.pode:hover{ background: var(--ui-soft); }
   .it.feito{ color: var(--gray); }
-  .it.feito span:first-of-type + span{ text-decoration: line-through; }
+  .it.feito .tx{ text-decoration: line-through; }
+  /* quem confirmou e quando: miúdo, numa linha só, PENDURADO embaixo do nome
+     e fora do fluxo. Dentro do texto ele quebrava a linha e a caixa da aula
+     crescia a cada toque do professor (Pedro, 14/09/2026). O risco não
+     herda o risco do nome, porque texto posicionado não recebe decoração. */
+  .it .tx{ position: relative; flex: 1 1 auto; min-width: 0; }
+  .it .quem{ position: absolute; left: 0; right: 0; top: 100%; margin-top: 1px; font-size: .6rem; line-height: 1; color: var(--gray); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* com a assinatura, o nome sobe um pouco para o par ficar no meio da linha (a altura não muda) */
+  .it .tx.com-quem{ transform: translateY(-.3rem); }
   .it .pg{ margin-left: auto; font-weight: 600; font-size: .74rem; color: var(--gray); white-space: nowrap; }
   /* as três mãos: esquerda azul = o aluno; direita verde-amarela = a plataforma;
      direita LISTRADA em dois azuis = o professor (pedido do Pedro, 13/09) */
@@ -86,11 +94,13 @@
   .mk.l-plat.r-prof{ background: linear-gradient(90deg,#d4e909 50%,transparent 50%), var(--listra); }
   .mk.cheia-prof{ background: var(--listra); }
   .mk.dep-prof{ border-color: #a8b907; }
-  .pill.aguia{ background:#fff; border:1.5px solid #1d3685; color:#1d3685; text-decoration:none; cursor:pointer; }
+  .pill.aguia{ background:#fff; border:1.5px solid #1d3685; color:#1d3685; text-decoration:none; cursor:pointer; font-family: inherit; }
   .mk.plat{ background: #d4e909; border-color: #a8b907; }
-  .mk.tri{ border-radius: 0; width: 38px; height: 34px; border: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,4.5 25.5,23 4.5,23' fill='%23fff' stroke='%23d91e9e' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
-  .mk.tri.on{ background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,3.5 26.5,24 3.5,24' fill='%23d91e9e' stroke='%23d91e9e' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
-  .it .quem{ font-size: .68rem; color: var(--gray); font-weight: 600; }
+  /* o triângulo ocupa a caixa inteira, como a bolinha: com folga de 4,5 dentro
+     dos 30 do desenho ele saía com dois terços da largura dela e parecia
+     menor (Pedro, 14/09/2026). Os mesmos pontos do planner-v2.js do portal. */
+  .mk.tri{ border-radius: 0; width: 38px; height: 34px; border: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,2 28.5,25.5 1.5,25.5' fill='%23fff' stroke='%23d91e9e' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
+  .mk.tri.on{ background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,3 27.5,24.5 2.5,24.5' fill='%23d91e9e' stroke='%23d91e9e' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
   .extras{ padding: 0 1rem .8rem; font-size: .8rem; color: var(--gray); display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; }
   .extras span{ border: 1px solid var(--ui-line); border-radius: 99px; padding: .1rem .5rem; }
   .extras span.ok{ background: #e4f3f1; color: #155a48; border-color: #cfe6e1; }
@@ -168,7 +178,8 @@
   .al .plano-ativ{ padding: 0 1rem .6rem; font-size: .84rem; color: var(--ui-ink); }
   .al .plano-ativ i{ color: var(--gray); }
   .al .atend{ padding: .6rem 1rem .9rem; display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; border-top: 1px solid var(--ui-line); }
-  .btn-atend{ background: var(--green); color: #fff; padding: .7rem 1rem; font-size: .92rem; box-shadow: 0 3px 0 var(--green-dark); width: 100%; }
+  /* o .btn do kit é inline-flex sem justify: na largura toda o texto encostava à esquerda */
+  .btn-atend{ background: var(--green); color: #fff; padding: .7rem 1rem; font-size: .92rem; box-shadow: 0 3px 0 var(--green-dark); width: 100%; justify-content: center; }
   .al .atend .quando{ width: 100%; text-align: center; }
   .al.atendido{ opacity: .72; }
   .al.atendido .btn-atend{ background: var(--gray-light); color: var(--gray); box-shadow: none; }
@@ -199,7 +210,24 @@
   body.theme-dark .obs{ background: #26301a; border-color: #2e4560; }
   body.theme-dark .obs textarea{ background: #101a28; color: #dbe6f3; border-color: #4a5a3a; }
   @media (max-width: 760px){ .al-corpo{ grid-template-columns: 1fr; } .obs{ border-left: 0; border-top: 1px solid var(--ui-line); } }
-  .toast{ position: fixed; left: 50%; bottom: 1.4rem; transform: translateX(-50%); background: #1d3685; color: #fff; padding: .7rem 1.1rem; border-radius: 999px; font-weight: 800; font-size: .9rem; box-shadow: 0 8px 24px rgba(0,0,0,.25); z-index: 50; }
+  .toast{ position: fixed; left: 50%; bottom: 1.4rem; transform: translateX(-50%); background: #1d3685; color: #fff; padding: .7rem 1.1rem; border-radius: 999px; font-weight: 800; font-size: .9rem; box-shadow: 0 8px 24px rgba(0,0,0,.25); z-index: 150; }
+  /* o planner completo abre POR CIMA da turma, com os dados que ela já tem
+     (Pedro, 14/09/2026): acima do menu do professor (60), abaixo do aviso
+     (150), para o "📇 Card: L3" e o "não salvou" aparecerem sobre ele */
+  body.com-aguia{ overflow: hidden; }
+  .aguia-ov{ position: fixed; inset: 0; z-index: 100; background: #eef1f7; overflow: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+  .aguia-topo{ position: sticky; top: 0; z-index: 3; background: #1d3685; color: #fff; display: flex; align-items: center; gap: .75rem; padding: .6rem 1rem; flex-wrap: wrap; }
+  .aguia-topo .voltar{ background: #fff; color: #1d3685; border: 0; border-radius: 999px; padding: .5rem 1rem; font-family: var(--font-body); font-weight: 900; font-size: .9rem; cursor: pointer; box-shadow: 0 2px 0 #0f2260; }
+  .aguia-topo h2{ margin: 0; color: #fff; font-family: var(--font-heading); font-size: 1rem; font-weight: 700; }
+  .aguia-topo .sub{ opacity: .85; font-size: .84rem; }
+  .aguia-topo .imprimir{ margin-left: auto; background: rgba(255,255,255,.15); color: #fff; border: 0; border-radius: 999px; padding: .45rem .9rem; font-family: var(--font-body); font-weight: 800; font-size: .82rem; cursor: pointer; }
+  body.theme-dark .aguia-ov{ background: #0f1724; }
+  @media print{
+    body.com-aguia > *:not(.aguia-ov){ display: none !important; }
+    body.com-aguia{ overflow: visible; }
+    .aguia-ov{ position: static; overflow: visible; background: #fff; }
+    .aguia-topo{ display: none; }
+  }
 
   body.theme-dark .painel, body.theme-dark .al{ background: #172232; border-color: #2e4560; }
   body.theme-dark .aula{ background: #101a28; border-color: #2e4560; }
@@ -250,7 +278,7 @@
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914a"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914b"></script>
 <!-- o guia do Checking, lição a lição (Essentials 1) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913c"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
@@ -503,8 +531,10 @@ function cartaoAluno(a) {
     (atras > 0 ? '<span class="pill atras">' + atras + ' aula' + (atras === 1 ? '' : 's') + ' atrás do plano</span>' : '') +
     (ckAtual && ckAtual.feito ? '<span class="pill chk">✓ Checking ' + esc(pos.id) + (ckAtual.nota != null ? ' · nota ' + esc(ckAtual.nota) : '') + '</span>' : '<span class="pill chk falta">Checking ' + esc(pos.id) + ' pendente</span>') +
     (plano ? '' : '<span class="acoes"><button type="button" class="btn btn-ck" data-ck>' + (ckAtual && ckAtual.feito ? 'Editar Checking' : 'Registrar Checking') + '</button></span>') +
-    (plano ? '<a class="pill aguia" href="plano-curso.html?raf=' + encodeURIComponent(a.raf) + '&book=' + encodeURIComponent(a.book || '') + '&nome=' + encodeURIComponent(a.nome || '') + '&prof=' + encodeURIComponent(estado.prof || '') + '&turma=' + encodeURIComponent(estado.turma || '') + '&escola=' + encodeURIComponent(estado.escola || '') + '" target="_blank" rel="noopener" title="O plano de curso inteiro, do começo ao fim">🦅 Ver planner completo</a>' : '');
+    (plano ? '<button type="button" class="pill aguia" data-aguia title="O plano de curso inteiro, do começo ao fim">🦅 Ver planner completo</button>' : '');
   card.appendChild(cab);
+  var btAguia = cab.querySelector('[data-aguia]');
+  if (btAguia) btAguia.addEventListener('click', function () { abrirAguia(a); });
   var corpo = document.createElement('div'); corpo.className = 'al-corpo';
   var esq = document.createElement('div'); esq.className = 'esq';
   corpo.appendChild(esq); corpo.appendChild(caixaObs(a));
@@ -656,7 +686,9 @@ function linhaItem(a, it) {
   var qd = it.pt ? (function (d) { return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2); })(new Date(it.pt)) : '';
   var capa = '';
   if (it.code === 'va') { var ep = (String(it.nm).match(/(\d+)/) || [])[1] || '1'; capa = '<img class="capa" alt="" src="https://portalfisk.com.br/assets/img/videobook/' + livroId(a.book) + '/' + ep + '-cover.jpg" onerror="this.remove()">'; }
-  b.innerHTML = mk + capa + '<span>' + esc(it.nm) + (it.pq ? ' <span class="quem">✓ ' + esc(it.pq) + (qd ? ' · ' + qd : '') + '</span>' : '') + '</span>';
+  /* só o primeiro nome na linha miúda; o nome inteiro fica no title */
+  var quem = it.pq ? '<span class="quem" title="' + esc('Confirmado por ' + it.pq + (qd ? ' em ' + qd : '')) + '">✓ ' + esc(String(it.pq).trim().split(/\s+/)[0]) + (qd ? ' · ' + qd : '') + '</span>' : '';
+  b.innerHTML = mk + capa + '<span class="tx' + (quem ? ' com-quem' : '') + '">' + esc(it.nm) + quem + '</span>';
   /* o professor marca só a SUA metade (a direita, listrada): um toque põe,
      outro tira. A metade do aluno é do aluno; só o triângulo ele enche. */
   var prox = { p: it.prof ? 0 : 1 };
@@ -725,7 +757,61 @@ function redesenhar(a) {
   var velho = document.querySelector('.al[data-raf="' + a.raf + '"]');
   var novo = cartaoAluno(a);
   if (velho) velho.replaceWith(novo); else $('alunos').appendChild(novo);
+  if (aguia.raf === a.raf) desenhaAguia();
 }
+
+/* ── o planner completo POR CIMA da turma (pedido do Pedro, 14/09/2026) ──
+   Antes ele abria o plano-curso.html numa aba nova, e o "← Turma de hoje" de
+   lá recarregava a turma inteira: a cascata, o panorama do card e o planner
+   de cada aluno, dezenas de segundos. Aqui ele abre sobre a própria turma,
+   com os dados que ela já leu. Abrir e voltar são instantâneos, sem cache
+   para envelhecer: a marca feita lá passa pelo mesmo `confirmar` e já está no
+   cartão do aluno quando a camada fecha. O Voltar do navegador e o Esc
+   também fecham. */
+var aguia = { raf: '', ov: null };
+function abrirAguia(a) {
+  if (!planoDe(a.book) || !window.PlannerV2) return;
+  if (aguia.ov) fecharAguia();
+  var ov = document.createElement('div'); ov.className = 'aguia-ov';
+  ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-label', 'Planner completo de ' + a.nome);
+  ov.innerHTML = '<div class="aguia-topo"><button type="button" class="voltar" data-voltar>← Voltar à turma</button>' +
+    '<h2>🦅 Planner completo</h2><span class="sub">' + esc(a.nome) + ' · ' + esc(a.book || '') + ' · ' + esc(a.raf) + '</span>' +
+    '<button type="button" class="imprimir" data-imprimir>🖨 Imprimir / PDF</button></div><div class="aguia-corpo"></div>';
+  document.body.appendChild(ov); document.body.classList.add('com-aguia');
+  aguia.raf = a.raf; aguia.ov = ov;
+  ov.querySelector('[data-voltar]').addEventListener('click', voltarDaAguia);
+  ov.querySelector('[data-imprimir]').addEventListener('click', function () { window.print(); });
+  desenhaAguia();
+  try { history.pushState({ aguia: a.raf }, ''); } catch (e) {}
+  ov.querySelector('[data-voltar]').focus({ preventScroll: true });
+}
+function desenhaAguia() {
+  if (!aguia.ov) return;
+  var a = estado.alunos.find(function (x) { return x.raf === aguia.raf; });
+  if (!a) { fecharAguia(); return; }
+  var y = aguia.ov.scrollTop;
+  PlannerV2.planoCompleto(aguia.ov.querySelector('.aguia-corpo'), planoDe(a.book), ctxDe(a), {
+    nome: a.nome, raf: a.raf, prof: estado.prof, turma: estado.turma, escola: estado.escola,
+    hist: (estado.dados[a.raf] || {}).hist || [],
+    /* a metade do professor, inclusive em aula antiga: o mesmo toque da turma */
+    aoClicar: function (it, st) { confirmar(a, it.id, { p: st.prof ? 0 : 1 }); }
+  });
+  aguia.ov.scrollTop = y;
+}
+function fecharAguia() {
+  if (!aguia.ov) return;
+  var raf = aguia.raf;
+  aguia.ov.remove(); aguia.ov = null; aguia.raf = '';
+  document.body.classList.remove('com-aguia');
+  var bt = document.querySelector('.al[data-raf="' + raf + '"] [data-aguia]');
+  if (bt) bt.focus({ preventScroll: true });
+}
+function voltarDaAguia() {
+  if (history.state && history.state.aguia) history.back();   /* o popstate fecha */
+  else fecharAguia();
+}
+window.addEventListener('popstate', function () { if (aguia.ov) fecharAguia(); });
+document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && aguia.ov) voltarDaAguia(); });
 
 /* ── o guia do Checking: o roteiro da mesa, bloco a bloco (GUIA_CHECKING_E1) ── */
 function guiaDe(book) {
