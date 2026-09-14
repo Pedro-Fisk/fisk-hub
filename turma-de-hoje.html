@@ -155,6 +155,9 @@
   .fila-info{ max-width: 1500px; margin: 0 auto .8rem; display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; font-size: .84rem; color: var(--gray); background: #e4f3f1; border: 1px solid #cfe6e1; border-radius: 12px; padding: .55rem .9rem; }
   .fila-info b{ color: #155a48; }
   .fila-info a{ margin-left: auto; font-weight: 800; color: #155a48; }
+  .fila-info .btn-recarrega{ border: 1.5px solid #155a48; background: #fff; color: #155a48; border-radius: 999px; padding: .25rem .75rem; font-family: var(--font-body); font-weight: 800; font-size: .8rem; cursor: pointer; }
+  .fila-info .btn-recarrega:disabled{ opacity: .6; cursor: default; }
+  .fila-info.sem .btn-recarrega{ border-color: var(--ui-bd); color: var(--ui-ink); }
   .fila-info.sem{ background: var(--ui-soft); border-color: var(--ui-line); }
   .fila-info.sem b{ color: var(--ui-ink); }
   .pill.nv-alta{ background: #fde2e2; color: #8a1c1c; }
@@ -257,19 +260,27 @@
      coluna do planner completo, numa linha própria embaixo das aulas. Como
      quarta coluna ele espremia as aulas (a coluna delas não passa de 1198 px,
      por causa da anotação) e os nomes quebravam em duas linhas. ── */
-  .al .aula.ks, body.theme-dark .al .aula.ks{ margin: -.2rem 1rem .9rem; background: #e4f3f1; border-color: #cfe6e1; }
-  .aula.ks .t{ background: transparent; color: #155a48; padding-bottom: .1rem; }
-  .aula.ks .t .dt{ background: #fff; color: #155a48; }
-  .ks-sug{ display: flex; flex-wrap: wrap; column-gap: 1.4rem; row-gap: 1px; }
-  .ksi{ flex: 0 1 auto; display: flex; align-items: center; gap: .55rem; min-height: 42px; padding: .3rem .5rem; font-size: .97rem; font-weight: 700; color: #0f1f4e; min-width: 0; }
-  .ksi .ic{ flex: 0 0 26px; text-align: center; font-size: 1.15rem; }
-  .ksi .nm{ min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* compacto (Pedro, 14/09/2026): colunas iguais, uma linha por item (o nome
+     longo corta com reticências e aparece inteiro no title), a contagem ao
+     lado do título e o "também fez" numa linha só com o rótulo */
+  .al .aula.ks, body.theme-dark .al .aula.ks{ margin: -.25rem 1rem .9rem; background: #e4f3f1; border-color: #cfe6e1; }
+  .aula.ks .t{ background: transparent; color: #155a48; padding: .45rem .8rem 0; }
+  .aula.ks .t .dt{ margin-left: .5rem; background: #fff; color: #155a48; padding: .05rem .5rem; font-size: .7rem; }
+  .aula.ks .lista{ padding: .15rem .45rem .45rem; }
+  .ks-sug{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: .9rem; row-gap: 0; }
+  /* colunas pelo número de itens, para não sobrar um órfão na segunda linha: 5 e 6 em três, 7 e 8 em quatro */
+  .ks-sug.c1{ grid-template-columns: minmax(0, 1fr); } .ks-sug.c2{ grid-template-columns: repeat(2, minmax(0, 1fr)); } .ks-sug.c3{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (max-width: 1200px){ .ks-sug.c3, .ks-sug.c4{ grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 640px){ .ks-sug.c2, .ks-sug.c3, .ks-sug.c4{ grid-template-columns: minmax(0, 1fr); } }
+  .ksi{ display: flex; align-items: center; gap: .4rem; min-height: 30px; padding: .1rem .35rem; font-size: .86rem; font-weight: 700; color: #0f1f4e; min-width: 0; }
+  .ksi .ic{ flex: 0 0 20px; text-align: center; font-size: .95rem; }
+  .ksi .nm{ flex: 0 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .ksi.feito .nm{ text-decoration: line-through; opacity: .6; }
-  .ksi .pct{ background: #fff; color: #155a48; border-radius: 999px; padding: .05rem .55rem; font-size: .85rem; font-weight: 800; white-space: nowrap; }
-  .ks-mais{ margin-top: auto; border-top: 1px dashed #9fcfc4; padding: .5rem .3rem 0; font-size: .8rem; color: #155a48; display: flex; flex-wrap: wrap; gap: .3rem; }
+  .ksi .pct{ flex: 0 0 auto; background: #fff; color: #155a48; border-radius: 999px; padding: 0 .45rem; font-size: .76rem; font-weight: 800; white-space: nowrap; }
+  .ks-mais{ margin: .3rem .35rem 0; border-top: 1px dashed #9fcfc4; padding-top: .35rem; font-size: .76rem; color: #155a48; display: flex; flex-wrap: wrap; align-items: center; gap: .25rem .3rem; }
   .ks-sug:empty + .ks-mais{ margin-top: 0; border-top: 0; padding-top: 0; }
-  .ks-mais b{ width: 100%; font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; }
-  .ks-mais span{ background: #fff; border-radius: 999px; padding: .15rem .55rem; font-weight: 800; color: #0f1f4e; }
+  .ks-mais b{ font-size: .64rem; text-transform: uppercase; letter-spacing: .06em; margin-right: .3rem; }
+  .ks-mais span{ background: #fff; border-radius: 999px; padding: .05rem .5rem; font-weight: 800; color: #0f1f4e; }
   .ks-mais span i{ font-style: normal; color: #155a48; }
   .btn-ck-editar:hover{ background: #eef2fa; }
   /* a nota do Checking é só do professor: com as anotações escondidas (tela na TV), ela borra junto */
@@ -325,7 +336,7 @@
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914g"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914h"></script>
 <!-- o guia do Checking, lição a lição (Essentials 1) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913c"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
@@ -385,14 +396,52 @@ function pintaFila() {
     f.className = 'fila-info';
     f.innerHTML = '📋 <b>Fila do Planejador' + (plano.hoje ? ' de hoje' : ' de ' + esc(d)) + '</b>' + (plano.quem ? ' · ' + esc(plano.quem) : '') + ' · ' + na + ' de ' + estado.alunos.length + ' alunos na ordem' +
       (nAt ? ' · <b>' + nAt + ' atendido' + (nAt === 1 ? '' : 's') + '</b>' : '') +
-      '<a href="planejador.html" target="_blank" rel="noopener">Ajustar no Planejador ↗</a>';
+      '<a href="planejador.html" target="_blank" rel="noopener" data-planejador>Ajustar no Planejador ↗</a>';
   } else {
     f.className = 'fila-info sem';
     f.innerHTML = '📋 <b>Sem fila do Planejador para esta turma.</b> Os alunos estão na ordem do card.' + (nAt ? ' · <b>' + nAt + ' atendido' + (nAt === 1 ? '' : 's') + '</b>' : '') +
-      '<a href="planejador.html" target="_blank" rel="noopener">Montar a fila no Planejador ↗</a>';
+      '<a href="planejador.html" target="_blank" rel="noopener" data-planejador>Montar a fila no Planejador ↗</a>';
   }
+  f.insertAdjacentHTML('beforeend', '<button type="button" class="btn-recarrega" data-recarrega title="Lê de novo a fila e as anotações do Planejador, e as marcas dos alunos">↻ Recarregar</button>');
+  f.querySelector('[data-recarrega]').addEventListener('click', function () { recarregarFila(this); });
+  f.querySelector('[data-planejador]').addEventListener('click', function () { estado.foiAoPlanejador = true; });
   f.hidden = false;
 }
+/* ── recarregar a fila (Pedro, 14/09/2026) ──
+   O professor abre a Turma, percebe que não fez o plano, monta a fila no
+   Planejador (outra aba) e volta: a ordem, as anotações e as marcas são lidas
+   de novo sem recarregar a página (os atendidos ficam). Pelo botão, ou
+   sozinho ao voltar para esta aba depois de ter aberto o Planejador por aqui. */
+function recarregarFila(bt) {
+  if (!estado.alunos.length || estado.recarregando) return;
+  if (bt && estado.aberto && !window.confirm('Há um Checking aberto: recarregar descarta o que ainda não foi registrado. Continuar?')) return;
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur();   /* a anotação em digitação salva antes */
+  estado.recarregando = true;
+  if (bt) { bt.disabled = true; bt.textContent = '↻ Recarregando…'; }
+  var turma = estado.turma, escola = estado.escola, prof = estado.prof;
+  Promise.all([
+    post({ action: 'plannerTurma', alunos: estado.alunos.map(function (a) { return { raf: a.raf, book: a.book, turma: turma }; }) }),
+    post({ action: 'planejamentoLe', escola: escola, prof: prof, turma: turma }).catch(function () { return { plano: null }; })
+  ]).then(function (rs) {
+    if (estado.turma !== turma || estado.escola !== escola) return;
+    estado.dados = rs[0].alunos || estado.dados;
+    estado.recursos = rs[0].recursos || estado.recursos;
+    estado.plano = rs[1] && rs[1].plano || null;
+    estado.atendidos = lerAtendidos();
+    aplicarFila(); pintaFila(); desenharTurma();
+    if (aguia.ov) desenhaAguia();
+    toast(estado.plano ? '✓ Fila do Planejador e anotações atualizadas' : 'Ainda não há fila salva no Planejador para esta turma');
+  }).catch(function (e) {
+    if (bt) { bt.disabled = false; bt.textContent = '↻ Recarregar'; }
+    toast('⚠️ Não recarreguei: ' + e.message);
+  }).then(function () { estado.recarregando = false; });
+}
+document.addEventListener('visibilitychange', function () {
+  if (document.visibilityState !== 'visible' || !estado.foiAoPlanejador) return;
+  estado.foiAoPlanejador = false;
+  if (estado.aberto || aguia.ov) return;   /* não mexe na tela com um Checking ou o planner completo abertos */
+  recarregarFila(null);
+});
 /* O cartão DESCE à vista (Pedro, 14/09/2026): antes a lista era redesenhada e
    o cartão sumia do lugar de uma vez. Agora cada cartão guarda onde estava,
    a lista é redesenhada na ordem nova, e todos deslizam da posição antiga
@@ -628,9 +677,13 @@ function cartaoAluno(a) {
   card.appendChild(corpo);
   /* daqui para baixo, tudo o que é da lição entra na coluna da esquerda */
   var cardReal = card; card = { appendChild: function (n) { esq.appendChild(n); }, querySelectorAll: function (q) { return cardReal.querySelectorAll(q); }, classList: cardReal.classList, dataset: cardReal.dataset, querySelector: function (q) { return cardReal.querySelector(q); } };
-  if (plan && (plan.atividade || plan.nota)) {
+  /* a nota da foto da fila só aparece enquanto a anotação do servidor está
+     vazia: desde 14/09/2026 as duas são o mesmo campo, e o Planejador grava lá */
+  var obsSrv = ((estado.dados[a.raf] || {}).planner || {}).obs || '';
+  var notaFila = plan && plan.nota && !obsSrv ? plan.nota : '';
+  if (plan && (plan.atividade || notaFila)) {
     var pa = document.createElement('div'); pa.className = 'plano-ativ';
-    pa.innerHTML = (plan.atividade ? '🎯 ' + esc(plan.atividade) : '') + (plan.nota ? ' <i>· ' + esc(plan.nota) + '</i>' : '');
+    pa.innerHTML = (plan.atividade ? '🎯 ' + esc(plan.atividade) : '') + (notaFila ? ' <i>· ' + esc(notaFila) + '</i>' : '');
     card.appendChild(pa);
   }
 
@@ -707,9 +760,10 @@ function quadroKS(a, plano, pos, ctx) {
   cel.innerHTML = '<div class="t" title="O que o gabarito sugere para esta lição (✓ e a melhor nota) e o que mais o aluno fez no portal">Keep Studying' +
     (ks.sugeridos.length ? '<span class="dt">' + feitos + ' de ' + ks.sugeridos.length + '</span>' : '') + '</div>';
   var lista = document.createElement('div'); lista.className = 'lista';
-  var sug = document.createElement('div'); sug.className = 'ks-sug';
+  var nS = ks.sugeridos.length;
+  var sug = document.createElement('div'); sug.className = 'ks-sug c' + (nS <= 4 ? Math.max(1, nS) : (nS <= 6 ? 3 : 4));
   ks.sugeridos.forEach(function (x) {
-    var r = document.createElement('div'); r.className = 'ksi' + (x.feito ? ' feito' : '');
+    var r = document.createElement('div'); r.className = 'ksi' + (x.feito ? ' feito' : ''); r.title = x.nm;
     r.innerHTML = '<span class="ic">' + x.icone + '</span><span class="nm">' + esc(x.nm) + '</span>' +
       (x.feito ? '<span class="pct">' + (typeof x.pct === 'number' ? Math.round(x.pct) + '%' : '✓') + '</span>' : '');
     sug.appendChild(r);
@@ -720,7 +774,7 @@ function quadroKS(a, plano, pos, ctx) {
     var mais = document.createElement('div'); mais.className = 'ks-mais';
     mais.innerHTML = o.total
       ? '<b>' + (ks.sugeridos.length ? 'Também fez no portal' : 'Fez no portal') + ' · ' + desde + '</b>' + o.grupos.map(function (g) {
-          return '<span>' + g.icone + ' ' + esc(g.rot.pt) + ' ×' + g.n + (g.best !== null ? ' <i>' + Math.round(g.best) + '%</i>' : '') + '</span>';
+          return '<span' + (g.ids && g.ids.length ? ' title="' + esc(g.ids.join(', ')) + '"' : '') + '>' + g.icone + ' ' + esc(g.rot.pt) + ' ×' + g.n + (g.best !== null ? ' <i>' + Math.round(g.best) + '%</i>' : '') + '</span>';
         }).join('')
       : '<b>Nada no portal ' + desde + '</b>';
     lista.appendChild(mais);

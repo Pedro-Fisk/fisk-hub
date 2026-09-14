@@ -487,6 +487,60 @@ function salvarNota(a) {
     else localStorage.removeItem(chaveNota(a));
   } catch (e) {}
 }
+/* ── A ANOTAÇÃO É UMA SÓ COM A DA TURMA DE HOJE (Pedro, 14/09/2026) ──
+   O que o professor escreve aqui vai para a linha do planner do aluno no
+   servidor (`plannerProf`, patch.obs), o MESMO campo das "Anotações" da Turma
+   de hoje; e o que ele escreveu lá aparece aqui ao abrir a turma. O
+   localStorage continua como cache. Na primeira leitura de cada aluno a nota
+   que só existia neste navegador sobe (se o servidor também tiver outra, as
+   duas ficam juntas, nada se perde); dali em diante o servidor manda, senão
+   o cache velho ressuscitaria o que o professor apagou na Turma. Limite de
+   600 caracteres, o do servidor. */
+var notaTimer = {};
+function rafChave(r) { return String(r || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); }
+function notaSincronizada(a, liga) {
+  var k = chaveNota(a) + '::servidor';
+  try { if (liga) localStorage.setItem(k, '1'); return localStorage.getItem(k) === '1'; } catch (e) { return false; }
+}
+function enviarNota(a) {
+  if (!a.raf || !tokenSessao()) return;
+  fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action: 'plannerProf', token: tokenSessao(), raf: a.raf, book: a.book || '', patch: { obs: (a._nota || '').trim().slice(0, 600) } }) })
+    .then(fiskJson).then(function (r) { if (r && r.ok) notaSincronizada(a, true); })
+    .catch(function () { /* sem rede: fica no cache e sobe na próxima abertura */ });
+}
+function agendarNota(a) {
+  var k = rafChave(a.raf) || a.nome;
+  clearTimeout(notaTimer[k]);
+  notaTimer[k] = setTimeout(function () { enviarNota(a); }, 1200);
+}
+function sincronizarNotas() {
+  var alunos = (turma && turma.alunos || []).filter(function (a) { return a.raf; });
+  if (!alunos.length || !tokenSessao()) return;
+  var t0 = turma;
+  fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action: 'plannerTurma', token: tokenSessao(), soObs: true, alunos: alunos.slice(0, 40).map(function (a) { return { raf: a.raf, book: a.book || '' }; }) }) })
+    .then(fiskJson).then(function (r) {
+      if (turma !== t0 || !r || !r.ok || !r.obs) return;
+      var srvPor = {}; Object.keys(r.obs).forEach(function (k) { srvPor[rafChave(k)] = String(r.obs[k] || ''); });
+      var mudou = false;
+      alunos.forEach(function (a) {
+        var srv = (srvPor[rafChave(a.raf)] || '').trim(), loc = (a._nota || '').trim(), novo = loc;
+        if (notaSincronizada(a)) novo = srv;                           /* o servidor manda */
+        else if (srv && loc && srv !== loc && srv.indexOf(loc) < 0) { novo = (srv + '\n' + loc).slice(0, 600); a._nota = novo; enviarNota(a); }
+        else if (srv) { novo = srv; notaSincronizada(a, true); }
+        else if (loc) { enviarNota(a); }                               /* a nota só deste navegador sobe */
+        else notaSincronizada(a, true);
+        if (novo !== loc) { a._nota = novo; salvarNota(a); mudou = true; }
+      });
+      if (mudou) {
+        document.querySelectorAll('#lista .nota-in').forEach(function (ta) {
+          var a = visiveis[+ta.dataset.i]; if (!a || document.activeElement === ta) return;
+          ta.value = a._nota || ''; autoAltura(ta);
+        });
+      }
+    }).catch(function () {});
+}
 var ROT = { alta: 'Prioridade alta', media: 'Prioridade média', emdia: 'Em dia', semdados: 'Sem dados' };
 
 /** sugestão do que fazer com o aluno na próxima aula. */
@@ -537,6 +591,7 @@ function onTurma(dados) {
   $('tituloTurma').textContent = '📋 Fila de atendimento,' + (turma.turma || '');
   statusCard('✓ Turma lida ao vivo. Fila montada por prioridade.', 'ok');
   renderFila();
+  sincronizarNotas();   // a anotação é a mesma da Turma de hoje (servidor)
   $('painelTurma').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -680,7 +735,7 @@ function renderFila() {
         '<div class="metr">' + chips(a) + estudoChip(a.nome) + '</div>' +
         '<div class="sug">' + sugestao(a) + '</div>' +
         (a.atrasoAproximado ? '<div class="aviso">⚠ Conta aproximada: a última aula do aluno (“' + esc(a.ultimaAula || '') + '”) está fora do gabarito; o atraso foi medido pela última lição reconhecida (' + esc(a.ultimaLicao || '?') + '). Confira no card.</div>' : '') +
-        '<textarea class="nota-in" data-i="' + i + '" rows="1" placeholder="✏️ anotação do professor (ex.: explanation, checking, entregar written task…)">' + esc(nota) + '</textarea>' +
+        '<textarea class="nota-in" data-i="' + i + '" rows="1" maxlength="600" placeholder="✏️ anotação do professor (ex.: explanation, checking, entregar written task…). Aparece também na Turma de hoje" title="A mesma anotação da Turma de hoje">' + esc(nota) + '</textarea>' +
       '</div>';
     }).join('');
     ligarLinhas();
@@ -791,7 +846,7 @@ function ligarLinhas() {
     // anotação: guarda no próprio aluno (sobrevive a filtro/reordenação)
     var ta = row.querySelector('.nota-in');
     autoAltura(ta);
-    ta.addEventListener('input', function () { a._nota = ta.value; autoAltura(ta); salvarNota(a); });
+    ta.addEventListener('input', function () { a._nota = ta.value; autoAltura(ta); salvarNota(a); agendarNota(a); });
 
     // o card INTEIRO arrasta; a anotação não, senão não dá para escrever nela
     row.addEventListener('mousedown', function (e) {
