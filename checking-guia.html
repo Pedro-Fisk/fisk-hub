@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Checking em tela grande, FISK</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Nunito:wght@400;700;800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Nunito:wght@400;500;600;700;800;900&display=swap">
 <!-- ═══════════════════════════════════════════════════════════════════════
      CHECKING EM TELA GRANDE (13/09/2026): o guia do Checking numa janela
      própria, com texto enorme, para o professor virar o computador para o
@@ -35,21 +35,24 @@
   .bloco-cab h1{ margin:0; font-family:'Poppins',sans-serif; font-weight:800; font-size:clamp(28px,4vw,44px); color:var(--mar); }
   .bloco-cab .min{ font-size:16px; color:var(--med); font-weight:700; }
   .bloco-cab .o{ width:100%; font-size:clamp(15px,1.6vw,19px); color:var(--med); margin:0; }
-  .linhas{ display:flex; flex-direction:column; gap:18px; }
-  .linha{ display:grid; grid-template-columns:minmax(0,3fr) minmax(0,2fr); gap:24px; background:var(--pap); border:1px solid var(--lin); border-radius:22px; padding:26px 30px; align-items:center; }
-  .linha.so-nota{ grid-template-columns:1fr; }
-  .linha .diz{ font-family:'Poppins',sans-serif; font-weight:700; font-size:clamp(24px,3.2vw,40px); line-height:1.25; color:var(--txt); }
-  .linha .n{ display:inline-block; width:34px; height:34px; border-radius:50%; background:var(--lima); color:var(--limai); font-weight:900; font-size:16px; text-align:center; line-height:34px; margin-right:12px; vertical-align:middle; font-family:'Nunito',sans-serif; }
-  .linha .nota{ font-size:clamp(14px,1.5vw,18px); color:var(--med); line-height:1.4; border-left:3px solid var(--lin); padding-left:16px; }
-  body.sem-notas .linha .nota{ display:none; }
-  body.sem-notas .linha{ grid-template-columns:1fr; }
-  .linha.feita{ opacity:.45; }
-  /* a cena: as falas do professor à esquerda, as do aluno deslocadas e em verde */
-  .linha.fala-aluno{ margin-left:8%; background:#e4f3f1; border-color:#cfe6e1; }
-  .linha.fala-aluno .diz{ color:#155a48; }
-  .linha.fala-prof{ margin-right:8%; }
-  .linha .n{ font-size:20px; }
-  .linha .tick{ justify-self:end; grid-column:1 / -1; }
+  .linhas{ display:flex; flex-direction:column; gap:14px; }
+  /* AS DUAS VOZES (Pedro, 14/09/2026): a cor diz quem fala, a mesma do
+     planner. Verde-oliva = o professor diz ou pergunta; azul-marinho = o
+     aluno diz. Sem notas nesta tela: só o que se fala. */
+  .legenda{ display:flex; gap:18px; flex-wrap:wrap; font-size:15px; font-weight:700; color:var(--med); }
+  .legenda span{ display:inline-flex; align-items:center; gap:8px; }
+  .legenda i{ width:14px; height:14px; border-radius:4px; display:inline-block; }
+  .legenda .p i{ background:var(--limae); } .legenda .a i{ background:var(--mar); }
+  .linha{ display:flex; align-items:flex-start; gap:18px; border-radius:20px; padding:20px 26px; border:2px solid transparent; cursor:pointer; }
+  .linha .quem{ flex:0 0 auto; font-size:13px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; border-radius:999px; padding:6px 12px; margin-top:6px; white-space:nowrap; }
+  .linha .diz{ font-family:'Nunito','Segoe UI',system-ui,sans-serif; font-weight:500; font-size:clamp(22px,2.8vw,36px); line-height:1.3; letter-spacing:.005em; }
+  .linha.fala-prof{ background:#f7fae3; border-color:#dfe79a; margin-right:10%; }
+  .linha.fala-prof .quem{ background:var(--limae); color:#fff; }
+  .linha.fala-prof .diz{ color:#3f4703; }
+  .linha.fala-aluno{ background:#e8eefb; border-color:#bccbeb; margin-left:10%; }
+  .linha.fala-aluno .quem{ background:var(--mar); color:#fff; }
+  .linha.fala-aluno .diz{ color:var(--mar); }
+  .linha.feita{ opacity:.4; }
   .acoes{ position:fixed; left:0; right:0; bottom:0; padding:18px 22px 22px; background:linear-gradient(to top,var(--chao) 75%,transparent); display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:center; }
   .acoes > *{ max-width:1500px; }
   /* o feedback, no fim */
@@ -83,9 +86,10 @@
   .erro{ padding:40px; font-size:18px; color:var(--med); }
   @media (max-width:760px){
     main{ padding:18px 14px 170px; gap:18px; }
-    .linha{ grid-template-columns:1fr; gap:12px; padding:18px 18px; }
-    .linha .nota{ border-left:0; padding-left:0; }
-    .linha .diz{ font-size:24px; }
+    .linha{ flex-direction:column; gap:8px; padding:14px 16px; }
+    .linha.fala-prof{ margin-right:0; } .linha.fala-aluno{ margin-left:0; }
+    .linha .quem{ margin-top:0; }
+    .linha .diz{ font-size:22px; }
     header{ padding:12px 14px; gap:8px; }
     header .passos{ margin-left:0; width:100%; justify-content:center; }
     header .passos button{ width:32px; height:32px; }
@@ -101,12 +105,12 @@
   <span class="rot" id="rot">Checking</span>
   <span class="aluno" id="aluno"></span>
   <nav class="passos" id="passos" aria-label="Blocos"></nav>
-  <a class="fechar" href="#" onclick="window.close(); return false;">✕ Fechar</a>
+  <a class="fechar" href="#" onclick="window.close(); return false;">✕ Close</a>
 </header>
-<main id="main"><div class="erro">Carregando o guia…</div></main>
+<main id="main"><div class="erro">Loading the guide…</div></main>
 
 <script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914m"></script>
-<script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260914c"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260914d"></script>
 <script>
 var $ = function (id) { return document.getElementById(id); };
 var q = new URLSearchParams(location.search);
@@ -137,12 +141,11 @@ var estado = { i: 0, feitas: {} };
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
 if (!G || !L) {
-  $('main').innerHTML = '<div class="erro">Não há guia para ' + esc(book) + ' · ' + esc(licaoId) + ' ainda. Só o Essentials 1 tem guia por enquanto.</div>';
+  $('main').innerHTML = '<div class="erro">There is no guide for ' + esc(book) + ' · ' + esc(licaoId) + ' yet. Only Essentials 1 has a guide for now.</div>';
 } else {
   $('rot').textContent = 'Checking · ' + L.rot + ' · ' + L.tema;
-  $('aluno').textContent = aluno ? 'com ' + aluno : '';
+  $('aluno').textContent = aluno ? 'with ' + aluno : '';
   document.title = 'Checking ' + L.rot + (aluno ? ' · ' + aluno : '') + ', FISK';
-  try { if (localStorage.getItem('ckg:notas') === 'off') document.body.classList.add('sem-notas'); } catch (e) {}
   pintaPassos(); pinta();
 }
 function pintaPassos() {
@@ -165,27 +168,26 @@ function pinta() {
   if (estado.i >= G.ROTEIRO.length) { pintaFeedback(main); return; }
   var r = G.ROTEIRO[estado.i];
   var cab = document.createElement('div'); cab.className = 'bloco-cab';
-  cab.innerHTML = '<h1>' + (r.ic ? r.ic + ' ' : '') + (estado.i + 1) + '. ' + esc(r.t) + '</h1><span class="min">' + r.min + ' min</span><p class="o">' + esc(r.o) + '</p>';
+  cab.innerHTML = '<h1>' + (r.ic ? r.ic + ' ' : '') + (estado.i + 1) + '. ' + esc(r.t) + '</h1><span class="min">' + r.min + ' min</span>' +
+    '<div class="legenda"><span class="p"><i></i>Teacher says</span><span class="a"><i></i>Student says</span></div>';
   main.appendChild(cab);
   var box = document.createElement('div'); box.className = 'linhas';
-  (G.linhasDe(L, r.k) || []).forEach(function (ln, i) {
-    var el = document.createElement('div'); el.className = 'linha' + (ln.diz ? '' : ' so-nota') + (ln.quem === 'A' ? ' fala-aluno' : (ln.quem === 'P' ? ' fala-prof' : ''));
-    el.innerHTML = (ln.diz ? '<div class="diz"><span class="n">' + (ln.quem === 'A' ? '🧑‍🎓' : (ln.quem === 'P' ? '🧑‍🏫' : (i + 1))) + '</span>' + esc(ln.diz) + '</div>' : '') +
-      (ln.nota ? '<div class="nota">' + esc(ln.nota) + '</div>' : '');
+  /* só as falas: a linha sem "diz" é nota do professor, e nota não entra aqui */
+  (G.linhasDe(L, r.k) || []).filter(function (ln) { return ln.diz; }).forEach(function (ln) {
+    var aluno = ln.quem === 'A';
+    var el = document.createElement('div'); el.className = 'linha ' + (aluno ? 'fala-aluno' : 'fala-prof');
+    el.innerHTML = '<span class="quem">' + (aluno ? 'Student' : 'Teacher') + '</span><div class="diz">' + esc(ln.diz) + '</div>';
     el.addEventListener('click', function () { el.classList.toggle('feita'); });
     box.appendChild(el);
   });
   main.appendChild(box);
   var acoes = document.createElement('div'); acoes.className = 'acoes';
-  var volta = document.createElement('button'); volta.type = 'button'; volta.className = 'btn btn-sec'; volta.textContent = '‹ Anterior'; volta.disabled = estado.i === 0;
+  var volta = document.createElement('button'); volta.type = 'button'; volta.className = 'btn btn-sec'; volta.textContent = '‹ Back'; volta.disabled = estado.i === 0;
   volta.addEventListener('click', function () { estado.i = Math.max(0, estado.i - 1); pinta(); window.scrollTo(0, 0); });
   var feito = document.createElement('button'); feito.type = 'button'; feito.className = 'btn btn-feito';
-  feito.textContent = '✓ Feito · ' + (estado.i + 1 < G.ROTEIRO.length ? 'próximo: ' + G.ROTEIRO[estado.i + 1].t : 'próximo: Feedback');
+  feito.textContent = '✓ Done · next: ' + (estado.i + 1 < G.ROTEIRO.length ? G.ROTEIRO[estado.i + 1].t : 'Feedback');
   feito.addEventListener('click', function () { estado.feitas[r.k] = 1; estado.i++; pinta(); window.scrollTo(0, 0); });
-  var notas = document.createElement('button'); notas.type = 'button'; notas.className = 'btn-notas';
-  notas.textContent = document.body.classList.contains('sem-notas') ? 'mostrar as notas do professor' : 'esconder as notas do professor (para virar a tela)';
-  notas.addEventListener('click', function () { document.body.classList.toggle('sem-notas'); try { localStorage.setItem('ckg:notas', document.body.classList.contains('sem-notas') ? 'off' : 'on'); } catch (e) {} pinta(); });
-  acoes.appendChild(volta); acoes.appendChild(feito); acoes.appendChild(notas);
+  acoes.appendChild(volta); acoes.appendChild(feito);
   main.appendChild(acoes);
 }
 /* ── O FEEDBACK, junto com o aluno (pedido do Pedro, 13/09): em que foi
@@ -196,17 +198,17 @@ function pinta() {
 function pintaFeedback(main) {
   var primeiro = aluno ? aluno.split(' ')[0] : 'the student';
   var box = document.createElement('div'); box.className = 'fb';
-  box.innerHTML = '<div class="bloco-cab"><h1>' + (G.ROTEIRO.length + 1) + '. Feedback</h1><span class="min">1 min</span><p class="o">Diga em que ' + esc(primeiro) + ' foi melhor, o que precisa melhorar, e combine o que fazer até a próxima lição. Mostre a tela: é para os dois.' + (G.REGUA ? '<br><b>Régua:</b> ' + esc(G.REGUA) : '') + '</p></div>' +
+  box.innerHTML = '<div class="bloco-cab"><h1>' + (G.ROTEIRO.length + 1) + '. Feedback</h1><span class="min">1 min</span></div>' +
     '<div class="grupo bom"><h2>👍 ' + esc(primeiro) + ', you were best at…</h2><div class="chips" data-melhor>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</div></div>' +
     '<div class="grupo ruim"><h2>👎 Let\'s work on…</h2><div class="chips" data-melhorar>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</div></div>' +
-    '<div class="grupo"><h2>🎯 To improve more, you should…</h2><p class="sub">Toque no que combinar: chega no planner de ' + esc(primeiro) + ' com o botão do material. O que combina com Let\'s work on… ganha ●; o que não depende do ponto já entra sozinho. Na estrutura, escolha o vídeo e o Quick Practice do ponto que ficou fraco.</p><div class="chips" data-pedidos></div></div>' +
+    '<div class="grupo"><h2>🎯 To improve more, you should…</h2><div class="chips" data-pedidos></div></div>' +
     '<div class="grupo"><h2>✉️ A note for ' + esc(primeiro) + '</h2><textarea data-bilhete placeholder="Good job on pronunciation. Study Do / Does before Lesson 4."></textarea></div>' +
     '<p class="ok" data-ok hidden></p>';
   main.appendChild(box);
   var planoV2 = window[planoGlobal(book)] || null;
   var prontos = (window.PlannerV2 && PlannerV2.pedidosDa && planoV2) ? PlannerV2.pedidosDa(planoV2, licaoId) : [];
   var cp = box.querySelector('[data-pedidos]');
-  cp.innerHTML = prontos.map(function (c) { return '<button type="button" class="chip" data-id="' + esc(c.id) + '">' + (c.tipo === 'extra' ? '★ ' : (c.code === 'ex' ? '▶ ' : '🎧 ')) + esc(c.en) + '</button>'; }).join('') || '<span class="sub">Sem pedidos prontos para esta lição.</span>';
+  cp.innerHTML = prontos.map(function (c) { return '<button type="button" class="chip" data-id="' + esc(c.id) + '">' + (c.tipo === 'extra' ? '★ ' : (c.code === 'ex' ? '▶ ' : '🎧 ')) + esc(c.en) + '</button>'; }).join('') || '<span class="sub">No ready suggestions for this lesson.</span>';
   box.querySelectorAll('[data-melhor] .chip').forEach(function (c) { c.classList.toggle('on', c.dataset.v === fb.melhor); c.addEventListener('click', function () {
     fb.melhor = fb.melhor === c.dataset.v ? '' : c.dataset.v; fb.melhorar = fb.melhorar.filter(function (v) { return v !== fb.melhor; }); aplicaSugestoes(planoV2); pinta(); }); });
   box.querySelectorAll('[data-melhorar] .chip').forEach(function (c) { c.classList.toggle('on', fb.melhorar.indexOf(c.dataset.v) > -1); c.addEventListener('click', function () {
@@ -223,22 +225,22 @@ function pintaFeedback(main) {
   var ta = box.querySelector('[data-bilhete]'); ta.value = fb.bilhete; ta.addEventListener('input', function () { fb.bilhete = ta.value; });
 
   var acoes = document.createElement('div'); acoes.className = 'acoes';
-  var volta = document.createElement('button'); volta.type = 'button'; volta.className = 'btn btn-sec'; volta.textContent = '‹ Anterior';
+  var volta = document.createElement('button'); volta.type = 'button'; volta.className = 'btn btn-sec'; volta.textContent = '‹ Back';
   volta.addEventListener('click', function () { estado.i = G.ROTEIRO.length - 1; pinta(); window.scrollTo(0, 0); });
   var salvar = document.createElement('button'); salvar.type = 'button'; salvar.className = 'btn btn-feito';
-  salvar.textContent = raf ? '✓ Salvar o feedback (a nota fica na Turma de hoje)' : '✓ Terminar';
+  salvar.textContent = raf ? '✓ Save feedback' : '✓ Finish';
   salvar.addEventListener('click', function () {
     if (!raf) { window.close(); return; }
-    salvar.disabled = true; salvar.textContent = 'Salvando…';
+    salvar.disabled = true; salvar.textContent = 'Saving…';
     var checking = { licao: licaoId, feito: 1, melhor: fb.melhor || null, melhorar: fb.melhorar.slice(), pedidos: fb.pedidos.slice(), bilhete: fb.bilhete.trim() };
     fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plannerProf', token: token(), raf: raf, book: book, patch: { checking: checking } }) })
       .then(function (r) { return r.json(); })
       .then(function (r) {
-        if (!r || !r.ok) throw new Error((r && (r.error || r.erro)) || 'não salvou');
-        var okEl = box.querySelector('[data-ok]'); okEl.hidden = false; okEl.textContent = '✓ Feedback salvo. Na Turma de hoje falta só a nota.';
+        if (!r || !r.ok) throw new Error((r && (r.error || r.erro)) || 'not saved');
+        var okEl = box.querySelector('[data-ok]'); okEl.hidden = false; okEl.textContent = '✓ Feedback saved. Only the grade is left, in Turma de hoje.';
         try { if (window.opener) window.opener.postMessage({ tipo: 'checking', raf: raf, planner: r.planner }, '*'); } catch (e) {}
-        salvar.textContent = '✓ Salvo · fechar'; salvar.disabled = false; salvar.onclick = function () { window.close(); };
-      }).catch(function (e) { salvar.disabled = false; salvar.textContent = '⚠️ ' + e.message + ' · tentar de novo'; });
+        salvar.textContent = '✓ Saved · close'; salvar.disabled = false; salvar.onclick = function () { window.close(); };
+      }).catch(function (e) { salvar.disabled = false; salvar.textContent = '⚠️ ' + e.message + ' · try again'; });
   });
   acoes.appendChild(volta); acoes.appendChild(salvar);
   main.appendChild(acoes);

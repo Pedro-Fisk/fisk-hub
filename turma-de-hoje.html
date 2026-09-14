@@ -145,9 +145,13 @@
   .guia table{ width: 100%; border-collapse: collapse; }
   .guia td{ vertical-align: top; padding: .35rem .4rem .35rem 0; border-top: 1px dashed #cfe6e1; }
   .guia tr:first-child td{ border-top: 0; }
-  .guia td.diz{ width: 55%; font-family: var(--font-heading); font-weight: 700; font-size: 1.05rem; color: var(--ui-ink); line-height: 1.3; }
+  /* as duas vozes do guia, com as cores do planner: verde-oliva o professor, azul-marinho o aluno */
+  .guia td.diz{ width: 55%; font-family: var(--font-body); font-weight: 500; font-size: 1.02rem; line-height: 1.3; }
   .guia td.nota{ font-size: .8rem; color: var(--gray); line-height: 1.35; }
-  .guia tr.aluno td.diz{ color: #155a48; padding-left: 1.2rem; }
+  .guia tr.prof td.diz{ color: #4b5503; border-left: 4px solid #a8b907; padding-left: .55rem; }
+  .guia tr.aluno td.diz{ color: #1d3685; border-left: 4px solid #1d3685; padding-left: 1.4rem; }
+  .guia .vozes{ display: flex; gap: .9rem; font-size: .74rem; font-weight: 700; color: var(--gray); margin: 0 .9rem .5rem; }
+  .guia .vozes i{ display: inline-block; width: .7rem; height: .7rem; border-radius: 3px; margin-right: .3rem; vertical-align: -1px; }
   .guia .feito-btn{ display: block; width: 100%; margin-top: .6rem; border: 0; border-radius: 14px; padding: .8rem 1rem; font-family: var(--font-body); font-weight: 900; font-size: 1.05rem; background: #d4e909; color: #3f4703; box-shadow: 0 4px 0 #a8b907; cursor: pointer; }
   .guia .bl.feito{ opacity: .55; }
   .guia .bl.feito .feito-btn{ background: #e4f3f1; color: #155a48; box-shadow: none; }
@@ -347,7 +351,7 @@
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
 <script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914m"></script>
 <!-- o guia do Checking, lição a lição (Essentials 1) -->
-<script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260914c"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260914d"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
 <script>
 fiskInitThemeToggle('themeToggle');
@@ -1096,13 +1100,14 @@ function guiaHTML(book, licaoId, nome, raf) {
     var r = g.ROTEIRO.find(function (x) { return x.k === k; }) || {};
     var linhas = g.linhasDe ? g.linhasDe(l, k) : [];
     var corpo = '<table>' + linhas.map(function (ln) {
-      return '<tr class="' + (ln.quem === 'A' ? 'aluno' : (ln.quem === 'P' ? 'prof' : '')) + '"><td class="diz">' + (ln.quem === 'A' ? '🧑‍🎓 ' : (ln.quem === 'P' ? '🧑‍🏫 ' : '')) + esc(ln.diz) + '</td><td class="nota">' + esc(ln.nota) + '</td></tr>';
+      return '<tr class="' + (ln.quem === 'A' ? 'aluno' : 'prof') + '"><td class="diz">' + esc(ln.diz) + '</td><td class="nota">' + esc(ln.nota) + '</td></tr>';
     }).join('') + '</table>';
     return '<div class="bl"><h5>' + (r.ic ? r.ic + ' ' : '') + esc(r.t || k) + ' <span class="min">' + (r.min || '') + ' min</span></h5><p class="o">' + esc(r.o || '') + '</p>' + corpo +
-      '<button type="button" class="feito-btn">✓ Feito</button></div>';
+      '<button type="button" class="feito-btn">✓ Done</button></div>';
   }
   var grande = 'checking-guia.html?book=' + encodeURIComponent(book) + '&licao=' + encodeURIComponent(licaoId) + '&aluno=' + encodeURIComponent(nome || '') + '&raf=' + encodeURIComponent(raf || '');
   return '<details class="guia" open><summary>📋 Guia do Checking · ' + esc(l.rot) + ' · ' + esc(l.tema) + '<span class="tempo">' + g.ROTEIRO.reduce(function (t, r) { return t + (r.min || 0); }, 0) + ' min com ' + esc(primeiro) + '</span></summary>' +
+    '<div class="vozes"><span><i style="background:#a8b907"></i>Teacher says</span><span><i style="background:#1d3685"></i>Student says</span></div>' +
     '<a class="tela-grande" href="' + grande + '" target="_blank" rel="noopener">🖥️ Abrir em tela grande, para fazer junto com ' + esc(primeiro) + '</a>' +
     g.ROTEIRO.map(function (r) { return bloco(r.k); }).join('') + '</details>';
 }
@@ -1182,7 +1187,7 @@ function abrirChecking(card, a, plano, pos) {
   function carregaLicao() {
     var r = reg[f.licao.value] || {};
     ck.querySelector('[data-guia]').innerHTML = guiaHTML(a.book, f.licao.value, a.nome, a.raf);
-    ck.querySelectorAll('[data-guia] .feito-btn').forEach(function (bt) { bt.addEventListener('click', function () { var bl = bt.closest('.bl'); bl.classList.toggle('feito'); bt.textContent = bl.classList.contains('feito') ? '✓ Feito · desfazer' : '✓ Feito'; }); });
+    ck.querySelectorAll('[data-guia] .feito-btn').forEach(function (bt) { bt.addEventListener('click', function () { var bl = bt.closest('.bl'); bl.classList.toggle('feito'); bt.textContent = bl.classList.contains('feito') ? '✓ Done · undo' : '✓ Done'; }); });
     pintaProntos();
     f.melhor.querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('on', c.dataset.v === r.melhor); c.classList.toggle('melhor', c.dataset.v === r.melhor); });
     f.melhorar.querySelectorAll('.chip').forEach(function (c) { var on = (r.melhorar || []).indexOf(c.dataset.v) > -1; c.classList.toggle('on', on); c.classList.toggle('pior', on); });
