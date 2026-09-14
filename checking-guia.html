@@ -105,8 +105,8 @@
 </header>
 <main id="main"><div class="erro">Carregando o guia…</div></main>
 
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914l"></script>
-<script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260914b"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914m"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260914c"></script>
 <script>
 var $ = function (id) { return document.getElementById(id); };
 var q = new URLSearchParams(location.search);
@@ -153,6 +153,11 @@ function pintaPassos() {
     b.addEventListener('click', function () { estado.i = i; pinta(); });
     nav.appendChild(b);
   });
+  /* o feedback também tem número: é o passo seguinte ao último bloco */
+  var bFb = document.createElement('button'); bFb.type = 'button'; bFb.textContent = G.ROTEIRO.length + 1; bFb.title = 'Feedback';
+  bFb.className = estado.i >= G.ROTEIRO.length ? 'on' : '';
+  bFb.addEventListener('click', function () { estado.i = G.ROTEIRO.length; pinta(); });
+  nav.appendChild(bFb);
 }
 function pinta() {
   var main = $('main'); main.innerHTML = '';
@@ -191,10 +196,10 @@ function pinta() {
 function pintaFeedback(main) {
   var primeiro = aluno ? aluno.split(' ')[0] : 'the student';
   var box = document.createElement('div'); box.className = 'fb';
-  box.innerHTML = '<div class="bloco-cab"><h1>8. Feedback</h1><span class="min">1 min</span><p class="o">Diga em que ' + esc(primeiro) + ' foi melhor, o que precisa melhorar, e combine o que fazer até a próxima lição. Mostre a tela: é para os dois.</p></div>' +
+  box.innerHTML = '<div class="bloco-cab"><h1>' + (G.ROTEIRO.length + 1) + '. Feedback</h1><span class="min">1 min</span><p class="o">Diga em que ' + esc(primeiro) + ' foi melhor, o que precisa melhorar, e combine o que fazer até a próxima lição. Mostre a tela: é para os dois.' + (G.REGUA ? '<br><b>Régua:</b> ' + esc(G.REGUA) : '') + '</p></div>' +
     '<div class="grupo bom"><h2>👍 ' + esc(primeiro) + ', you were best at…</h2><div class="chips" data-melhor>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</div></div>' +
     '<div class="grupo ruim"><h2>👎 Let\'s work on…</h2><div class="chips" data-melhorar>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</div></div>' +
-    '<div class="grupo"><h2>🎯 Before the next lesson…</h2><p class="sub">Toque no que combinar: chega no planner de ' + esc(primeiro) + ' com o botão do material. O que você marcou em Let\'s work on… já entra aqui (●).</p><div class="chips" data-pedidos></div></div>' +
+    '<div class="grupo"><h2>🎯 To improve more, you should…</h2><p class="sub">Toque no que combinar: chega no planner de ' + esc(primeiro) + ' com o botão do material. O que combina com Let\'s work on… ganha ●; o que não depende do ponto já entra sozinho. Na estrutura, escolha o vídeo e o Quick Practice do ponto que ficou fraco.</p><div class="chips" data-pedidos></div></div>' +
     '<div class="grupo"><h2>✉️ A note for ' + esc(primeiro) + '</h2><textarea data-bilhete placeholder="Good job on pronunciation. Study Do / Does before Lesson 4."></textarea></div>' +
     '<p class="ok" data-ok hidden></p>';
   main.appendChild(box);
