@@ -104,7 +104,7 @@
   .extras{ padding: 0 1rem .8rem; font-size: .8rem; color: var(--gray); display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; }
   .extras span{ border: 1px solid var(--ui-line); border-radius: 99px; padding: .1rem .5rem; }
   .extras span.ok{ background: #e4f3f1; color: #155a48; border-color: #cfe6e1; }
-  .legenda{ font-size: .95rem; color: var(--gray); display: flex; flex-wrap: wrap; gap: 1.1rem; padding: .5rem 0 0; }
+  .legenda{ font-size: .95rem; color: var(--gray); display: flex; flex-wrap: wrap; gap: 1.1rem; padding: .5rem 0 0; align-items: center; }
   .legenda i{ display: inline-block; vertical-align: middle; margin-right: .25rem; }
   .aula .t .dt{ margin-left: auto; text-transform: none; letter-spacing: 0; font-size: .72rem; font-weight: 800; background: #eef2fa; color: var(--gray); border-radius: 999px; padding: .1rem .5rem; }
   .aula .t .dt.dada{ background: #e4f3f1; color: #155a48; } .aula .t .dt.falta, .aula .t .dt.tarde{ background: #fde8e8; color: #b91c1c; } .aula .t .dt.semdata{ opacity: .6; }
@@ -239,6 +239,36 @@
   body.theme-dark .ck .ped{ background: #26364d; color: #dbe6f3; }
   body.theme-dark .resumo b, body.theme-dark .aula .t b{ color: #dbe6f3; }
   @media (max-width: 640px){ .al-cab .acoes{ margin-left: 0; width: 100%; } }
+  /* ── A CÉLULA DA AULA NO DESENHO DO PLANNER COMPLETO (Pedro, 14/09/2026):
+     faixa azul-marinho com o nome da aula e a data numa pílula branca, corpo
+     azul-claro, bolinha de 30, página à direita e a Exploration em
+     verde-amarelo. As duas visões leem como uma coisa só; a aula de agora
+     ganha o anel verde-amarelo que a lição atual tem no planner completo. ── */
+  .aulas{ gap: .7rem; }
+  .aula, body.theme-dark .aula, body.theme-dark .aula.atual{ background: #dce6f2; border: 2px solid #1d3685; border-radius: 12px; padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+  .aula.atual, body.theme-dark .aula.atual{ background: #dce6f2; border-color: #1d3685; box-shadow: 0 0 0 3px #d4e909; }
+  .aula .t{ margin: 0; background: #1d3685; color: #c2cdea; padding: .5rem .75rem; align-items: center; font-size: .72rem; }
+  .aula .t b, body.theme-dark .aula .t b{ color: #fff; font-size: 1.05rem; }
+  .aula .t .dt, .aula .t .agora{ margin-left: auto; background: #fff; color: #1d3685; border-radius: 999px; padding: .15rem .6rem; font-size: .74rem; font-weight: 800; text-transform: none; letter-spacing: 0; white-space: nowrap; opacity: 1; }
+  .aula .t .dt.dada{ background: #fff; color: #1d3685; }
+  .aula .t .dt.falta, .aula .t .dt.tarde{ background: #ffd9d9; color: #b91c1c; }
+  .aula .t .agora{ background: #d4e909; color: #3a3400; }
+  .aula .lista{ padding: .45rem .55rem .65rem; display: flex; flex-direction: column; gap: 1px; flex: 1; }
+  .aula .it, body.theme-dark .aula .it{ color: #0f1f4e; font-size: .97rem; padding: .3rem .5rem; border-radius: 9px; min-height: 42px; }
+  .aula .it.pode:hover{ background: rgba(255,255,255,.65); }
+  .aula .it.xp{ background: #d4e909; color: #3a3400; }
+  .aula .it.feito{ color: #0f1f4e; }
+  .aula .it.feito .tx{ opacity: .6; }
+  .aula .it .pg{ font-weight: 700; opacity: .7; font-size: .78rem; color: inherit; }
+  .aula .it .quem{ color: #54648d; }
+  .mk{ flex: 0 0 30px; width: 30px; height: 30px; }
+  .mk.tri{ width: 30px; height: 27px; flex-basis: 30px; }
+  .mk.cheia-a{ background: #1d3685; }
+  .mk.quad{ border-radius: 8px; }
+  .mk.l-prof{ background: linear-gradient(90deg,transparent 50%,#fff 50%), var(--listra); }
+  .aula .btn-ck{ margin-top: auto; }
+  .aula .it + .btn-ck{ margin-top: .6rem; }
+  .aula .libera{ color: #54648d; }
 </style>
 </head>
 <body>
@@ -262,23 +292,20 @@
     <div class="status" id="status">Escolha a turma. Os alunos e a posição de cada um vêm do card.</div>
     <div class="legenda" id="legenda" hidden>
       <span><i class="mk l-a" style="width:18px;height:18px;border-width:2px"></i> o aluno marcou</span>
-      <span><i class="mk r-plat" style="width:18px;height:18px;border-width:2px"></i> a plataforma provou</span>
+      <span><i class="mk quad plat" style="width:18px;height:18px;border-width:2px;border-radius:5px"></i> a plataforma provou (no portal)</span>
       <span><i class="mk r-prof" style="width:18px;height:18px;border-width:2px"></i> você confirmou</span>
-      <span><i class="mk cheia-prof dep-prof" style="width:18px;height:18px;border-width:2px"></i> Exploration feita com você</span>
+      <span><i class="mk cheia-prof" style="width:18px;height:18px;border-width:2px"></i> o professor marcou</span>
       <span><i class="mk tri" style="width:18px;height:16px"></i> tarefa: só o aluno marca</span>
-      <span>Toque na bolinha para confirmar a sua metade; toque de novo para desfazer.</span>
+      <button type="button" class="obs-toggle" id="obsToggle">🙈 Esconder as anotações (tela na TV)</button>
     </div>
   </div>
   <div id="resumo" class="resumo" style="max-width:1500px;margin:0 auto .6rem" hidden></div>
   <div id="fila" class="fila-info" hidden></div>
-  <div style="max-width:1500px;margin:0 auto .6rem;display:flex" id="obsBarra" hidden>
-    <button type="button" class="obs-toggle" id="obsToggle">🙈 Esconder as anotações (tela na TV)</button>
-  </div>
   <div id="alunos"></div>
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914b"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914c"></script>
 <!-- o guia do Checking, lição a lição (Essentials 1) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913c"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
@@ -293,7 +320,7 @@ var CRITERIOS = [['vocabulary', '🔤 Vocabulário'], ['fluency', '💬 Fluênci
 /* Os dez gabaritos v2 moram no portal e descem sob demanda, pelo livro: nenhum
    professor precisa dos outros nove. 'Essentials 1' → plano-essentials-1.v2.js
    → window.PLANO_ESSENTIALS_1 (13/09/2026). */
-var PLANO_V = '20260913j';
+var PLANO_V = '20260914c';
 function livroId(book) { return String(book || '').trim().toLowerCase().replace(/\s+/g, '-'); }
 function planoGlobal(book) { return 'PLANO_' + livroId(book).toUpperCase().replace(/-/g, '_'); }
 var planoCarregando = {};
@@ -346,16 +373,47 @@ function pintaFila() {
   }
   f.hidden = false;
 }
+/* O cartão DESCE à vista (Pedro, 14/09/2026): antes a lista era redesenhada e
+   o cartão sumia do lugar de uma vez. Agora cada cartão guarda onde estava,
+   a lista é redesenhada na ordem nova, e todos deslizam da posição antiga
+   para a nova (FLIP): o atendido desce por cima, com sombra, e os outros
+   sobem. Quem pediu menos movimento no sistema vê a troca direta. */
 function atender(a) {
+  var antes = {};
+  document.querySelectorAll('#alunos .al').forEach(function (el) { antes[el.dataset.raf] = el.getBoundingClientRect().top; });
   if (estado.atendidos[a.raf]) delete estado.atendidos[a.raf]; else estado.atendidos[a.raf] = Date.now();
-  guardaAtendidos(); aplicarFila(); desenharTurma();
-  var el = document.querySelector('.al[data-raf="' + a.raf + '"]');
-  if (el && estado.atendidos[a.raf]) { var topo = document.querySelector('#alunos .al'); if (topo) topo.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
+  guardaAtendidos(); aplicarFila(); desenharTurma(); pintaFila();
+  var quieto = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var cartoes = Array.prototype.slice.call(document.querySelectorAll('#alunos .al'));
+  var maior = 0;
+  if (!quieto) {
+    cartoes.forEach(function (el) {
+      var t0 = antes[el.dataset.raf]; if (t0 == null) return;
+      var dy = t0 - el.getBoundingClientRect().top; if (Math.abs(dy) < 1) return;
+      maior = Math.max(maior, Math.abs(dy));
+      el.style.transition = 'none'; el.style.transform = 'translateY(' + dy + 'px)';
+      if (el.dataset.raf === a.raf) { el.style.position = 'relative'; el.style.zIndex = '3'; el.style.boxShadow = '0 22px 48px rgba(15,31,78,.28)'; }
+    });
+    void document.body.offsetHeight;   /* o navegador pinta a posição antiga antes de soltar */
+    var dur = Math.min(1500, 650 + maior / 8);
+    cartoes.forEach(function (el) {
+      if (!el.style.transform) return;
+      el.style.transition = 'transform ' + dur + 'ms cubic-bezier(.3,.7,.25,1), box-shadow ' + dur + 'ms ease';
+      el.style.transform = '';
+      if (el.dataset.raf === a.raf) el.style.boxShadow = '';
+    });
+    setTimeout(function () { cartoes.forEach(function (el) { el.style.transition = ''; el.style.position = ''; el.style.zIndex = ''; el.style.boxShadow = ''; }); }, dur + 60);
+  }
+  /* depois que ele desceu, o próximo da fila fica à vista */
+  if (estado.atendidos[a.raf]) setTimeout(function () {
+    var prox = document.querySelector('#alunos .al:not(.atendido)');
+    if (prox) { var r = prox.getBoundingClientRect(); if (r.top < 0 || r.top > window.innerHeight * .6) prox.scrollIntoView({ block: 'start', behavior: quieto ? 'auto' : 'smooth' }); }
+  }, quieto ? 0 : Math.min(1500, 650 + maior / 8) + 80);
 }
 
 function sessao() { try { return JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) { return null; } }
 function token() { var s = sessao(); return (s && s.token) || ''; }
-function status(msg, err) { var el = $('status'); el.textContent = msg || ''; el.className = 'status' + (err ? ' err' : ''); }
+function status(msg, err) { var el = $('status'); el.textContent = msg || ''; el.className = 'status' + (err ? ' err' : ''); el.hidden = !msg; }
 function get(params) {
   params.token = token();
   var qs = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
@@ -444,7 +502,7 @@ function turmaDoHorario(turmas) {
 function erro(e) {
   var msg = (e && e.message) || 'erro';
   if (/sess[ãa]o/i.test(msg)) {
-    $('status').className = 'status err';
+    $('status').className = 'status err'; $('status').hidden = false;
     $('status').innerHTML = '⚠️ ' + esc(msg) + ' <a href="index.html" style="font-weight:800">Entrar de novo →</a>';
     return;
   }
@@ -468,17 +526,26 @@ function carregarTurma(escola, prof, linha, titulo) {
     status('🔄 ' + estado.alunos.length + ' alunos. Lendo o planner de cada um…');
     estado.turma = nomeTurma; estado.atendidos = lerAtendidos();
     var livros = {}; estado.alunos.forEach(function (a) { if (a.book) livros[livroId(a.book)] = a.book; });
+    /* telefone, aniversário e as células de avaliação (o Gerador de Boletins
+       escreve lá) vêm da mesma leitura da turma que o Planejador usa; corre
+       por fora e só o planner completo espera por ela */
+    estado.pessoais = null;
+    get({ action: 'card', fn: 'turma', escola: escola, prof: prof, linha: linha }).then(function (j) {
+      if (estado.escola !== escola || estado.prof !== prof) return;
+      estado.pessoais = (j && j.alunos) || [];
+      if (aguia.ov) desenhaAguia();
+    }).catch(function (e) { console.warn('card fn=turma', e); estado.pessoais = []; });
     return Promise.all([
       post({ action: 'plannerTurma', alunos: estado.alunos.map(function (a) { return { raf: a.raf, book: a.book, turma: nomeTurma }; }) }),
       post({ action: 'planejamentoLe', escola: escola, prof: prof, turma: nomeTurma }).catch(function () { return { plano: null }; }),
       Promise.all(Object.keys(livros).map(function (k) { return carregaPlano(livros[k]); }))
     ]).then(function (rs) {
         estado.dados = rs[0].alunos || {};
+        estado.recursos = rs[0].recursos || [];
         estado.plano = rs[1] && rs[1].plano || null;
         aplicarFila();
-        status((semRaf.length ? semRaf.length + ' aluno(s) sem RAF no card ficaram de fora. ' : '') + 'Pronto. Toque num item para confirmar; o Checking fica na aula 3 de cada aluno.');
+        status(semRaf.length ? semRaf.length + ' aluno(s) sem RAF no card ficaram de fora.' : '');
         $('legenda').hidden = false;
-        $('obsBarra').hidden = false;
         pintaFila();
         desenharTurma();
       });
@@ -490,7 +557,7 @@ function ctxDe(a) {
   return {
     raf: a.raf, book: a.book,
     salvar: function () {},   /* com `salvar` a régua lê as marcas do servidor, não do aparelho */
-    planner: { feitos: d.feitos || [], atividades: d.atividades || {}, evidencia: d.evidencia || [], plano: d.planner || { itens: {}, checking: {} } },
+    planner: { feitos: d.feitos || [], atividades: d.atividades || {}, evidencia: d.evidencia || [], plano: d.planner || { itens: {}, checking: {} }, simulados: d.simulados || [] },
     cels: (d.situacao && d.situacao.cels) || [],
     situacao: d.situacao || { ultimaLicao: a.ultimaLicao || '', licaoPrevista: a.licaoPrevista || '' }
   };
@@ -555,14 +622,15 @@ function cartaoAluno(a) {
       est.aulas.forEach(function (au, ai) {
         var col = document.createElement('div'); col.className = 'aula' + (au.atual ? ' atual' : '');
         col.innerHTML = '<div class="t">Class ' + au.n + ' <b>' + esc(au.papel) + '</b>' + pilulaData(datas[ai], au.atual) + '</div>';
-        au.itens.forEach(function (it) { col.appendChild(linhaItem(a, it)); });
+        var lista = document.createElement('div'); lista.className = 'lista'; col.appendChild(lista);
+        au.itens.forEach(function (it) { lista.appendChild(linhaItem(a, it)); });
         /* o Checking mora na aula em que acontece (pedido do Pedro, 13/09) */
         if (au.checking) {
           var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'btn btn-ck'; bt.dataset.ck = '1';
           bt.textContent = ckAtual && ckAtual.feito ? 'Editar Checking' : 'Registrar Checking';
-          col.appendChild(bt);
+          lista.appendChild(bt);
           var prox = plano.etapas[plano.etapas.indexOf(plano.etapas.find(function (e) { return e.id === pos.id; })) + 1];
-          if (prox) { var lb = document.createElement('p'); lb.className = 'libera'; lb.textContent = (ckAtual && ckAtual.feito ? 'Checking registrado: ' + prox.rot + ' liberada para o aluno.' : 'Ao registrar, a ' + prox.rot + ' é liberada para o aluno.'); col.appendChild(lb); }
+          if (prox) { var lb = document.createElement('p'); lb.className = 'libera'; lb.textContent = (ckAtual && ckAtual.feito ? 'Checking registrado: ' + prox.rot + ' liberada para o aluno.' : 'Ao registrar, a ' + prox.rot + ' é liberada para o aluno.'); lista.appendChild(lb); }
         }
         grade.appendChild(col);
       });
@@ -673,28 +741,25 @@ function caixaObs(a) {
 }
 
 function linhaItem(a, it) {
-  var doAluno = it.quem === 'aluno', tri = it.marca === 'tri';
-  var pode = !tri && it.marca !== 'plataforma';
+  /* a marca e o toque vêm da régua do portal (PlannerV2.marcaClasses e
+     toqueProf, 14/09/2026): o professor vê a mesma bolinha que o aluno, e o
+     toque anda em três tempos: a metade dele → a bolinha inteira, com a do
+     aluno em nome dele → vazia. Video Activity, QR Code, tarefa e o que a
+     plataforma já provou não têm toque. */
+  var classes = it.classes || [], toque = it.toque || null;
+  var feito = it.quem === 'aluno' ? (it.a || it.plat) : it.feito;
   var b = document.createElement('button'); b.type = 'button';
-  b.className = 'it' + (pode ? ' pode' : '') + (it.feito ? ' feito' : '');
-  var cls = '';
-  if (tri) cls = ' tri' + (it.a ? ' on' : '');
-  else if (it.marca === 'plataforma') cls = it.p ? ' plat' : '';
-  else if (it.marca === 'expl') cls = (it.prof && !it.plat) ? ' cheia-prof' : ((it.plat ? ' l-plat' : '') + (it.prof ? ' r-prof' : ''));
-  else cls = (it.a ? ' l-a' : '') + (it.prof ? ' r-prof' : (it.plat ? ' r-plat' : ''));
-  var mk = '<span class="mk' + cls + (it.quem === 'prof' ? ' dep-prof' : '') + '"></span>';
+  b.className = 'it' + (toque ? ' pode' : '') + (feito ? ' feito' : '') + (it.marca === 'expl' ? ' xp' : '');
+  var mk = '<span class="mk ' + classes.join(' ') + '"></span>';
   var qd = it.pt ? (function (d) { return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2); })(new Date(it.pt)) : '';
   var capa = '';
   if (it.code === 'va') { var ep = (String(it.nm).match(/(\d+)/) || [])[1] || '1'; capa = '<img class="capa" alt="" src="https://portalfisk.com.br/assets/img/videobook/' + livroId(a.book) + '/' + ep + '-cover.jpg" onerror="this.remove()">'; }
   /* só o primeiro nome na linha miúda; o nome inteiro fica no title */
   var quem = it.pq ? '<span class="quem" title="' + esc('Confirmado por ' + it.pq + (qd ? ' em ' + qd : '')) + '">✓ ' + esc(String(it.pq).trim().split(/\s+/)[0]) + (qd ? ' · ' + qd : '') + '</span>' : '';
-  b.innerHTML = mk + capa + '<span class="tx' + (quem ? ' com-quem' : '') + '">' + esc(it.nm) + quem + '</span>';
-  /* o professor marca só a SUA metade (a direita, listrada): um toque põe,
-     outro tira. A metade do aluno é do aluno; só o triângulo ele enche. */
-  var prox = { p: it.prof ? 0 : 1 };
-  b.title = tri ? 'A tarefa é só do aluno' : (it.marca === 'plataforma' ? 'A plataforma preenche'
-          : (it.prof ? 'Toque para desfazer a sua confirmação' : 'Toque para confirmar a sua metade'));
-  if (pode) b.addEventListener('click', function () { confirmar(a, it.id, prox); });
+  b.innerHTML = mk + capa + '<span class="tx' + (quem ? ' com-quem' : '') + '">' + esc(it.nm) + quem + '</span>' + (it.pg ? '<span class="pg">' + esc(it.pg) + '</span>' : '');
+  b.title = toque ? 'Toque: a sua metade, depois a bolinha inteira, depois vazia'
+    : (it.marca === 'tri' ? 'A tarefa é só do aluno' : (it.marca === 'aluno' ? 'Só o aluno marca: o professor não tem como ver' : (it.plat || it.marca === 'plataforma' ? 'A plataforma preenche' : '')));
+  if (toque) b.addEventListener('click', function () { confirmar(a, it.id, toque); });
   return b;
 }
 
@@ -710,7 +775,7 @@ function aplicaPendentes(raf, planner) {
   Object.keys(p).forEach(function (id) {
     var marca = p[id], it = Object.assign({}, planner.itens[id] || {});
     if ('p' in marca) { if (marca.p) { it.p = 1; it.pq = it.pq || (sessao() || {}).name || 'você'; it.pt = it.pt || Date.now(); } else { delete it.p; delete it.pq; delete it.pt; } }
-    if ('a' in marca) { if (marca.a) it.a = 1; else { delete it.a; delete it.at; } }
+    if ('a' in marca) { if (marca.a) { it.a = 1; it.aq = it.aq || (sessao() || {}).name || 'você'; it.at = it.at || Date.now(); } else { delete it.a; delete it.at; delete it.aq; } }
     if (it.p || it.a) planner.itens[id] = it; else delete planner.itens[id];
   });
   return planner;
@@ -729,7 +794,7 @@ function confirmar(a, id, marca) {
   var antes = JSON.stringify(d.planner.itens[id] || null);
   var it = d.planner.itens[id] = Object.assign({}, d.planner.itens[id] || {});
   if ('p' in marca) { if (marca.p) { it.p = 1; it.pq = (sessao() || {}).name || 'você'; it.pt = Date.now(); } else { delete it.p; delete it.pq; delete it.pt; } }
-  if ('a' in marca) { if (marca.a) it.a = 1; else { delete it.a; delete it.at; } }
+  if ('a' in marca) { if (marca.a) { it.a = 1; it.aq = (sessao() || {}).name || 'você'; it.at = Date.now(); } else { delete it.a; delete it.at; delete it.aq; } }
   if (!it.p && !it.a) delete d.planner.itens[id];
   redesenhar(a);   /* já com a marca nova */
   var patch = { itens: {} }; patch.itens[id] = marca;
@@ -743,7 +808,7 @@ function confirmar(a, id, marca) {
   }).then(function (r) {
     console.log('plannerProf', id, marca, r);
     if (pendentes[a.raf] && pendentes[a.raf][id] === marca) delete pendentes[a.raf][id];
-    if (r.planner) { estado.dados[a.raf].planner = aplicaPendentes(a.raf, r.planner); redesenhar(a); }
+    if (r.planner) { estado.dados[a.raf].planner = aplicaNotasPendentes(a.raf, aplicaPendentes(a.raf, r.planner)); redesenhar(a); }
     if (r.card && r.card.escreveu) toast('📇 Card: ' + r.card.escreveu + ' na aula de hoje.');
   }).catch(function (e) {
     if (pendentes[a.raf] && pendentes[a.raf][id] === marca) delete pendentes[a.raf][id];
@@ -790,13 +855,101 @@ function desenhaAguia() {
   var a = estado.alunos.find(function (x) { return x.raf === aguia.raf; });
   if (!a) { fecharAguia(); return; }
   var y = aguia.ov.scrollTop;
+  var pes = pessoaisDe(a) || {};
   PlannerV2.planoCompleto(aguia.ov.querySelector('.aguia-corpo'), planoDe(a.book), ctxDe(a), {
     nome: a.nome, raf: a.raf, prof: estado.prof, turma: estado.turma, escola: estado.escola,
     hist: (estado.dados[a.raf] || {}).hist || [],
+    /* a coluna do nome no card carrega anotação da secretaria, "(Bolsista)", "(Tem asma)": nunca sai daqui */
+    aluno: { nome: String(pes.nome || a.nome || '').replace(/\s*\([^)]*\)/g, '').trim(), nascimento: pes.nascimentoTxt || pes.nascimento || '', telefone: pes.telAluno || '', respNome: pes.respNome || '', respTel: pes.respTel || '' },
+    notas: notasDe(a, pes),
+    /* as refações só viram campo quando o servidor guarda notas (recurso 'notas') */
+    aoNota: (estado.recursos || []).indexOf('notas') > -1 ? function (t, crit, k, v) { salvaNota(a, t, crit, k, v); } : null,
     /* a metade do professor, inclusive em aula antiga: o mesmo toque da turma */
     aoClicar: function (it, st) { confirmar(a, it.id, { p: st.prof ? 0 : 1 }); }
   });
   aguia.ov.scrollTop = y;
+}
+/* o aluno na leitura da turma do card: pelo RAF quando ela traz, senão pelo
+   nome sem as anotações entre parênteses da secretaria */
+function pessoaisDe(a) {
+  var lista = estado.pessoais || [];
+  var alvoRaf = String(a.raf || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  var porRaf = lista.find(function (x) { return x.raf && String(x.raf).toUpperCase().replace(/[^A-Z0-9]/g, '') === alvoRaf; });
+  if (porRaf) return porRaf;
+  var nome = function (n) { return normNome(String(n || '').replace(/\([^)]*\)/g, '')); };
+  var alvo = nome(a.nome);
+  return lista.find(function (x) { return nome(x.nome) === alvo; }) || null;
+}
+/* A célula de avaliação do card, nos dois formatos que o Gerador de Boletins
+   escreve (boletim-fisk/card-sync.js). O atual: "prova de escuta: 9 / prova de
+   escrita: 5,5 / média (com todos os critérios do boletim): 8,2". O antigo:
+   "[EST] … · média 8,2" e a última linha "A9 B5,5 C8 D8 E9 F10 G9 H10", onde
+   Oral = média de C, D, E e Participação = média de F, G, H, a mesma conta do
+   boletim. Célula preenchida = boletim criado, mesmo sem número legível. */
+function notasDaCelula(txt) {
+  var t = String(txt || '').trim(); if (!t) return null;
+  var num = function (x) { return x == null ? null : Number(String(x).replace(',', '.')); };
+  var o = { card: true, cardCrit: {}, l: null, w: null, o: null, p: null, media: null };
+  var mE = t.match(/prova de escuta:\s*([0-9]+(?:[.,][0-9]+)?)/i), mW = t.match(/prova de escrita:\s*([0-9]+(?:[.,][0-9]+)?)/i), mM = t.match(/m[ée]dia[^0-9\n]*([0-9]+(?:[.,][0-9]+)?)/i);
+  if (mE) { o.l = num(mE[1]); o.cardCrit.l = 1; }
+  if (mW) { o.w = num(mW[1]); o.cardCrit.w = 1; }
+  if (mM) { o.media = num(mM[1]); o.cardCrit.media = 1; }
+  if (!mE && !mW) {
+    var linhas = t.split('\n'), ult = linhas[linhas.length - 1], re = /(?:^|\s)([A-H])\s*([0-9]+(?:[.,][0-9]+)?)/g, m, L = {};
+    while ((m = re.exec(ult))) L[m[1]] = num(m[2]);
+    var med = function (xs) { return xs.every(function (x) { return x != null; }) ? xs.reduce(function (s, x) { return s + x; }, 0) / xs.length : null; };
+    if (L.A != null) { o.l = L.A; o.cardCrit.l = 1; }
+    if (L.B != null) { o.w = L.B; o.cardCrit.w = 1; }
+    var or = med([L.C, L.D, L.E]), pa = med([L.F, L.G, L.H]);
+    if (or != null) { o.o = or; o.cardCrit.o = 1; }
+    if (pa != null) { o.p = pa; o.cardCrit.p = 1; }
+  }
+  return o;
+}
+/* as notas do cabeçalho: a 1ª coluna de cada prova vem do card; as refações
+   (e o que o card não tem) vêm do planner, digitadas pelo professor */
+function notasDe(a, pes) {
+  var guardadas = (((estado.dados[a.raf] || {}).planner || {}).notas) || {};
+  var out = {};
+  [['T1', pes && pes.notasAv1], ['T2', pes && pes.notasAv2]].forEach(function (par) {
+    var t = par[0], c = notasDaCelula(par[1]), g = guardadas[t] || {};
+    var n = { card: !!c, cardCrit: c ? c.cardCrit : {}, media: [c ? c.media : null, null, null] };
+    ['l', 'w', 'o', 'p'].forEach(function (k) {
+      var arr = [null, null, null];
+      [0, 1, 2].forEach(function (i) { var v = g[k] && g[k][i]; if (typeof v === 'number') arr[i] = v; });
+      if (c && c.cardCrit[k]) arr[0] = c[k];
+      n[k] = arr;
+    });
+    out[t] = n;
+  });
+  return out;
+}
+var pendNotas = {};
+function aplicaNotasPendentes(raf, planner) {
+  var p = pendNotas[raf] || {};
+  Object.keys(p).forEach(function (chave) {
+    var q = chave.split('|'), t = q[0], crit = q[1], k = +q[2];
+    planner.notas = planner.notas || {}; planner.notas[t] = planner.notas[t] || {};
+    var arr = (planner.notas[t][crit] || [null, null, null]).slice(); arr[k] = p[chave]; planner.notas[t][crit] = arr;
+  });
+  return planner;
+}
+function salvaNota(a, t, crit, k, v) {
+  var d = estado.dados[a.raf] = estado.dados[a.raf] || { planner: { itens: {}, checking: {} } };
+  d.planner = d.planner || { itens: {}, checking: {} };
+  var chave = t + '|' + crit + '|' + k;
+  pendNotas[a.raf] = pendNotas[a.raf] || {}; pendNotas[a.raf][chave] = v;
+  aplicaNotasPendentes(a.raf, d.planner);
+  desenhaAguia();
+  var patch = { notas: {} }; patch.notas[t] = {}; patch.notas[t][crit] = {}; patch.notas[t][crit][k] = v;
+  post({ action: 'plannerProf', raf: a.raf, book: a.book, patch: patch }).then(function (r) {
+    if (pendNotas[a.raf] && pendNotas[a.raf][chave] === v) delete pendNotas[a.raf][chave];
+    if (r.planner) { estado.dados[a.raf].planner = aplicaPendentes(a.raf, aplicaNotasPendentes(a.raf, r.planner)); }
+  }).catch(function (e) {
+    if (pendNotas[a.raf]) delete pendNotas[a.raf][chave];
+    toast('⚠️ A nota não salvou (' + e.message + '). Digite de novo.');
+    desenhaAguia();
+  });
 }
 function fecharAguia() {
   if (!aguia.ov) return;
