@@ -341,7 +341,7 @@
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914j"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914k"></script>
 <!-- o guia do Checking, lição a lição (Essentials 1) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913c"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
@@ -778,7 +778,7 @@ function quadroKS(a, plano, pos, ctx) {
   var nS = ks.sugeridos.length;
   var sug = document.createElement('div'); sug.className = 'ks-sug c' + (nS <= 4 ? Math.max(1, nS) : (nS <= 6 ? 3 : 4));
   ks.sugeridos.forEach(function (x) {
-    var r = document.createElement('div'); r.className = 'ksi' + (x.feito ? ' feito' : ''); r.title = x.nm;
+    var r = document.createElement('div'); r.className = 'ksi' + (x.feito ? ' feito' : ''); r.title = x.nm; r.dataset.id = x.id; r.dataset.tool = x.tool;
     r.innerHTML = '<span class="ic">' + x.icone + '</span><span class="nm">' + esc(x.nm) + '</span>' +
       (x.feito ? '<span class="pct">' + (typeof x.pct === 'number' ? Math.round(x.pct) + '%' : '✓') + '</span>' : '');
     sug.appendChild(r);
@@ -849,7 +849,7 @@ function linhaItem(a, it) {
      plataforma já provou não têm toque. */
   var classes = it.classes || [], toque = it.toque || null;
   var feito = it.quem === 'aluno' ? (it.a || it.plat) : it.feito;
-  var b = document.createElement('button'); b.type = 'button';
+  var b = document.createElement('button'); b.type = 'button'; b.dataset.id = it.id;   /* o id do gabarito: a sincronia com o papel e as outras vistas é conferida por ele */
   b.className = 'it' + (toque ? ' pode' : '') + (feito ? ' feito' : '') + (it.marca === 'expl' || /^(bi|pi|qi)$/.test(it.code || '') ? ' xp' : '');
   var mk = '<span class="mk ' + classes.join(' ') + '"></span>';
   var qd = it.pt ? (function (d) { return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2); })(new Date(it.pt)) : '';
