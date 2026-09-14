@@ -82,20 +82,9 @@
   /* com a assinatura, o nome sobe um pouco para o par ficar no meio da linha (a altura não muda) */
   .it .tx.com-quem{ transform: translateY(-.3rem); }
   .it .pg{ margin-left: auto; font-weight: 600; font-size: .74rem; color: var(--gray); white-space: nowrap; }
-  /* as três mãos: esquerda azul = o aluno; direita verde-amarela = a plataforma;
-     direita LISTRADA em dois azuis = o professor (pedido do Pedro, 13/09) */
-  .mk{ flex: 0 0 38px; width: 38px; height: 38px; border-radius: 50%; border: 3px solid #1d3685; background: #fff; --listra: repeating-linear-gradient(45deg,#1d3685 0 2px,#9fb4e8 2px 4px); }
-  .mk.l-a{ background: linear-gradient(90deg,#1d3685 50%,#fff 50%); }
-  .mk.l-plat{ background: linear-gradient(90deg,#d4e909 50%,#fff 50%); }
-  .mk.r-plat{ background: linear-gradient(90deg,#fff 50%,#d4e909 50%); }
-  .mk.l-a.r-plat{ background: linear-gradient(90deg,#1d3685 50%,#d4e909 50%); }
-  .mk.r-prof{ background: linear-gradient(90deg,#fff 50%,transparent 50%), var(--listra); }
-  .mk.l-a.r-prof{ background: linear-gradient(90deg,#1d3685 50%,transparent 50%), var(--listra); }
-  .mk.l-plat.r-prof{ background: linear-gradient(90deg,#d4e909 50%,transparent 50%), var(--listra); }
-  .mk.cheia-prof{ background: var(--listra); }
-  .mk.dep-prof{ border-color: #a8b907; }
+  /* a bolinha: as cores das mãos estão no GABARITO DAS MARCAS, no fim deste estilo */
+  .mk{ flex: 0 0 38px; width: 38px; height: 38px; border-radius: 50%; border: 3px solid #1d3685; background: #fff; }
   .pill.aguia{ background:#fff; border:1.5px solid #1d3685; color:#1d3685; text-decoration:none; cursor:pointer; font-family: inherit; }
-  .mk.plat{ background: #d4e909; border-color: #a8b907; }
   /* o triângulo ocupa a caixa inteira, como a bolinha: com folga de 4,5 dentro
      dos 30 do desenho ele saía com dois terços da largura dela e parecia
      menor (Pedro, 14/09/2026). Os mesmos pontos do planner-v2.js do portal. */
@@ -265,7 +254,6 @@
   .mk.tri{ width: 30px; height: 27px; flex-basis: 30px; }
   .mk.cheia-a{ background: #1d3685; }
   .mk.quad{ border-radius: 8px; }
-  .mk.l-prof{ background: linear-gradient(90deg,transparent 50%,#fff 50%), var(--listra); }
   .aula .btn-ck{ margin-top: auto; }
   .aula .it + .btn-ck{ margin-top: .6rem; }
   .aula .libera{ color: #54648d; }
@@ -278,6 +266,21 @@
   .btn-ck-editar:hover{ background: #eef2fa; }
   /* a nota do Checking é só do professor: com as anotações escondidas (tela na TV), ela borra junto */
   body.sem-obs .nota-priv{ filter: blur(5px); user-select: none; }
+  /* ── O GABARITO DAS MARCAS (aprovado pelo Pedro, 14/09/2026), o mesmo do
+     planner-v2.js: azul-marinho = o aluno (com ✓ branco quando o portal
+     comprovou); verde escuro #a8b907, na borda e no recheio = o professor.
+     Sem listras. ── */
+  .mk{ --prof: #a8b907; }
+  .mk.l-a, .mk.l-plat{ background: linear-gradient(90deg,#1d3685 50%,#fff 50%); }
+  .mk.r-plat{ background: linear-gradient(90deg,#fff 50%,#1d3685 50%); }
+  .mk.l-a.r-plat{ background: #1d3685; }
+  .mk.r-prof{ background: linear-gradient(90deg,#fff 50%,var(--prof) 50%); }
+  .mk.l-a.r-prof, .mk.l-plat.r-prof{ background: linear-gradient(90deg,#1d3685 50%,var(--prof) 50%); }
+  .mk.l-prof{ background: linear-gradient(90deg,var(--prof) 50%,#fff 50%); }
+  .mk.cheia-prof{ background: var(--prof); border-color: var(--prof); }
+  .mk.dep-prof{ border-color: var(--prof); }
+  .mk.plat{ background: #1d3685 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/64% no-repeat; border-color: #1d3685; }
+  .aula .it.xp .mk.dep-prof, .aula .it.xp .mk.cheia-prof{ border-color: #3a3400; }
 </style>
 </head>
 <body>
@@ -301,9 +304,9 @@
     <div class="status" id="status">Escolha a turma. Os alunos e a posição de cada um vêm do card.</div>
     <div class="legenda" id="legenda" hidden>
       <span><i class="mk l-a" style="width:18px;height:18px;border-width:2px"></i> o aluno marcou</span>
-      <span><i class="mk quad plat" style="width:18px;height:18px;border-width:2px;border-radius:5px"></i> a plataforma provou (no portal)</span>
       <span><i class="mk r-prof" style="width:18px;height:18px;border-width:2px"></i> você confirmou</span>
       <span><i class="mk cheia-prof" style="width:18px;height:18px;border-width:2px"></i> o professor marcou</span>
+      <span><i class="mk quad plat" style="width:18px;height:18px;border-width:2px;border-radius:5px"></i> o portal comprovou</span>
       <span><i class="mk tri" style="width:18px;height:16px"></i> tarefa: só o aluno marca</span>
       <button type="button" class="obs-toggle" id="obsToggle">🙈 Esconder as anotações (tela na TV)</button>
     </div>
@@ -314,7 +317,7 @@
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914d"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914e"></script>
 <!-- o guia do Checking, lição a lição (Essentials 1) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913c"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
@@ -637,7 +640,7 @@ function cartaoAluno(a) {
         if (au.checking) {
           /* o Checking REALIZADO aparece na aula como estado, e não só como o
              botão "Editar" (Pedro, 14/09/2026): o verde-amarelo do CHECK do
-             planner completo, a bolinha listrada de quem marcou, e a nota, o
+             planner completo, a bolinha verde de quem marcou, e a nota, o
              critério melhor, o dia e o professor. Editar vira botão de contorno. */
           var ckFeito = !!(ckAtual && ckAtual.feito);
           if (ckFeito) {
