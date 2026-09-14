@@ -305,7 +305,7 @@
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914c"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914d"></script>
 <!-- o guia do Checking, lição a lição (Essentials 1) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913c"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
@@ -320,7 +320,7 @@ var CRITERIOS = [['vocabulary', '🔤 Vocabulário'], ['fluency', '💬 Fluênci
 /* Os dez gabaritos v2 moram no portal e descem sob demanda, pelo livro: nenhum
    professor precisa dos outros nove. 'Essentials 1' → plano-essentials-1.v2.js
    → window.PLANO_ESSENTIALS_1 (13/09/2026). */
-var PLANO_V = '20260914c';
+var PLANO_V = '20260914d';
 function livroId(book) { return String(book || '').trim().toLowerCase().replace(/\s+/g, '-'); }
 function planoGlobal(book) { return 'PLANO_' + livroId(book).toUpperCase().replace(/-/g, '_'); }
 var planoCarregando = {};
@@ -749,7 +749,7 @@ function linhaItem(a, it) {
   var classes = it.classes || [], toque = it.toque || null;
   var feito = it.quem === 'aluno' ? (it.a || it.plat) : it.feito;
   var b = document.createElement('button'); b.type = 'button';
-  b.className = 'it' + (toque ? ' pode' : '') + (feito ? ' feito' : '') + (it.marca === 'expl' ? ' xp' : '');
+  b.className = 'it' + (toque ? ' pode' : '') + (feito ? ' feito' : '') + (it.marca === 'expl' || /^(bi|pi|qi)$/.test(it.code || '') ? ' xp' : '');
   var mk = '<span class="mk ' + classes.join(' ') + '"></span>';
   var qd = it.pt ? (function (d) { return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2); })(new Date(it.pt)) : '';
   var capa = '';

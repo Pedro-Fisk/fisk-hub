@@ -101,7 +101,7 @@
 </header>
 <main id="main"><div class="erro">Carregando o guia…</div></main>
 
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914c"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914d"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913c"></script>
 <script>
 var $ = function (id) { return document.getElementById(id); };
@@ -111,7 +111,7 @@ var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmt
 var CRITERIOS = [['vocabulary', '🔤 Vocabulary'], ['fluency', '💬 Fluency'], ['structure', '🧱 Structure'], ['pronunciation', '🗣️ Pronunciation'], ['listening', '👂 Listening']];
 var fb = { melhor: '', melhorar: [], pedidos: [], bilhete: '' };
 /* o gabarito v2 do livro desce do portal sob demanda (o mesmo desenho da Turma de hoje) */
-var PLANO_V = '20260914c';
+var PLANO_V = '20260914d';
 function livroId(b) { return String(b || '').trim().toLowerCase().replace(/\s+/g, '-'); }
 function planoGlobal(b) { return 'PLANO_' + livroId(b).toUpperCase().replace(/-/g, '_'); }
 (function () { if (!livroId(book) || window[planoGlobal(book)]) return; var sc = document.createElement('script'); sc.src = 'https://portalfisk.com.br/assets/plano-' + livroId(book) + '.v2.js?v=' + PLANO_V; document.head.appendChild(sc); })();
