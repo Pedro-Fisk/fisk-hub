@@ -287,6 +287,9 @@
   .btn-ck-editar:hover{ background: #eef2fa; }
   /* a nota do Checking é só do professor: com as anotações escondidas (tela na TV), ela borra junto */
   body.sem-obs .nota-priv{ filter: blur(5px); user-select: none; }
+  /* e no planner completo por cima da turma: a nota do Checking (.pv2-priv) e a tabela das provas (Pedro, 14/09/2026: a TV mostrava) */
+  body.sem-obs .aguia-ov .pv2-priv, body.sem-obs .aguia-ov .notas table{ filter: blur(6px); user-select: none; pointer-events: none; }
+  .aguia-topo .obs-toggle{ margin-left: auto; background: rgba(255,255,255,.15); color: #fff; border: 0; }
   /* ── O GABARITO DAS MARCAS (aprovado pelo Pedro, 14/09/2026), o mesmo do
      planner-v2.js: azul-marinho = o aluno (com ✓ branco quando o portal
      comprovou); verde escuro #a8b907, na borda e no recheio = o professor.
@@ -338,7 +341,7 @@
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914i"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914j"></script>
 <!-- o guia do Checking, lição a lição (Essentials 1) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913c"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
@@ -939,10 +942,14 @@ function abrirAguia(a) {
   ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-label', 'Planner completo de ' + a.nome);
   ov.innerHTML = '<div class="aguia-topo"><button type="button" class="voltar" data-voltar>← Voltar à turma</button>' +
     '<h2>🦅 Planner completo</h2><span class="sub">' + esc(a.nome) + ' · ' + esc(a.book || '') + ' · ' + esc(a.raf) + '</span>' +
-    '</div><div class="aguia-corpo"></div>';   /* sem Imprimir (Pedro, 14/09/2026) */
+    '<button type="button" class="obs-toggle" data-obs-toggle></button></div><div class="aguia-corpo"></div>';   /* sem Imprimir (Pedro, 14/09/2026); o esconder da TV também aqui, porque a camada cobre o botão da página */
   document.body.appendChild(ov); document.body.classList.add('com-aguia');
   aguia.raf = a.raf; aguia.ov = ov;
   ov.querySelector('[data-voltar]').addEventListener('click', voltarDaAguia);
+  var tgl = ov.querySelector('[data-obs-toggle]');
+  function pintaTgl() { tgl.textContent = document.body.classList.contains('sem-obs') ? '👁️ Mostrar notas' : '🙈 Esconder notas (TV)'; }
+  pintaTgl();
+  tgl.addEventListener('click', function () { var b = $('obsToggle'); if (b) b.click(); else document.body.classList.toggle('sem-obs'); pintaTgl(); });
   desenhaAguia();
   try { history.pushState({ aguia: a.raf }, ''); } catch (e) {}
   ov.querySelector('[data-voltar]').focus({ preventScroll: true });
