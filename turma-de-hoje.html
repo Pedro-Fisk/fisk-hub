@@ -269,6 +269,15 @@
   .aula .btn-ck{ margin-top: auto; }
   .aula .it + .btn-ck{ margin-top: .6rem; }
   .aula .libera{ color: #54648d; }
+  .aula .ck-feito{ margin-top: auto; display: flex; align-items: center; gap: .65rem; background: #d4e909; color: #3a3400; border-radius: 10px; padding: .5rem .7rem; }
+  .aula .it + .ck-feito{ margin-top: .6rem; }
+  .aula .ck-feito .mk{ border-color: #3a3400; }
+  .aula .ck-feito b{ display: block; font-family: var(--font-heading); font-size: .95rem; line-height: 1.2; }
+  .aula .ck-feito small{ display: block; font-size: .76rem; font-weight: 700; opacity: .85; line-height: 1.3; }
+  .btn-ck-editar{ width: 100%; margin-top: .45rem; justify-content: center; background: #fff; color: #1d3685; border: 1.5px solid #1d3685; padding: .38rem .9rem; font-size: .8rem; }
+  .btn-ck-editar:hover{ background: #eef2fa; }
+  /* a nota do Checking é só do professor: com as anotações escondidas (tela na TV), ela borra junto */
+  body.sem-obs .nota-priv{ filter: blur(5px); user-select: none; }
 </style>
 </head>
 <body>
@@ -596,7 +605,7 @@ function cartaoAluno(a) {
     (plan ? '<span class="pill nv-' + esc(plan.nivel || 'emdia') + '">' + (a._pos + 1) + 'º · ' + esc(nivelRot[plan.nivel] || plan.nivel || '') + '</span>' : (estado.plano ? '<span class="pill fora">fora do roteiro</span>' : '')) +
     '<span class="pill pos">📍 ' + esc(pos.rot) + (pos.tema ? ' · ' + esc(pos.tema) : '') + '</span>' +
     (atras > 0 ? '<span class="pill atras">' + atras + ' aula' + (atras === 1 ? '' : 's') + ' atrás do plano</span>' : '') +
-    (ckAtual && ckAtual.feito ? '<span class="pill chk">✓ Checking ' + esc(pos.id) + (ckAtual.nota != null ? ' · nota ' + esc(ckAtual.nota) : '') + '</span>' : '<span class="pill chk falta">Checking ' + esc(pos.id) + ' pendente</span>') +
+    (ckAtual && ckAtual.feito ? '<span class="pill chk">✓ Checking ' + esc(pos.id) + (ckAtual.nota != null ? ' · <span class="nota-priv">nota ' + esc(ckAtual.nota) + '</span>' : '') + '</span>' : '<span class="pill chk falta">Checking ' + esc(pos.id) + ' pendente</span>') +
     (plano ? '' : '<span class="acoes"><button type="button" class="btn btn-ck" data-ck>' + (ckAtual && ckAtual.feito ? 'Editar Checking' : 'Registrar Checking') + '</button></span>') +
     (plano ? '<button type="button" class="pill aguia" data-aguia title="O plano de curso inteiro, do começo ao fim">🦅 Ver planner completo</button>' : '');
   card.appendChild(cab);
@@ -626,8 +635,21 @@ function cartaoAluno(a) {
         au.itens.forEach(function (it) { lista.appendChild(linhaItem(a, it)); });
         /* o Checking mora na aula em que acontece (pedido do Pedro, 13/09) */
         if (au.checking) {
-          var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'btn btn-ck'; bt.dataset.ck = '1';
-          bt.textContent = ckAtual && ckAtual.feito ? 'Editar Checking' : 'Registrar Checking';
+          /* o Checking REALIZADO aparece na aula como estado, e não só como o
+             botão "Editar" (Pedro, 14/09/2026): o verde-amarelo do CHECK do
+             planner completo, a bolinha listrada de quem marcou, e a nota, o
+             critério melhor, o dia e o professor. Editar vira botão de contorno. */
+          var ckFeito = !!(ckAtual && ckAtual.feito);
+          if (ckFeito) {
+            var quando = ckAtual.quando ? (function (d) { return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2); })(new Date(ckAtual.quando)) : '';
+            var melhor = (CRITERIOS.find(function (c) { return c[0] === ckAtual.melhor; }) || [null, ''])[1].replace(/^\S+\s/, '');
+            var partes = [(ckAtual.nota != null && ckAtual.nota !== '') ? '<span class="nota-priv">nota ' + esc(ckAtual.nota) + '</span>' : '', melhor ? 'melhor em ' + esc(melhor.toLowerCase()) : '', esc(quando), ckAtual.quem ? esc(String(ckAtual.quem).trim().split(/\s+/)[0]) : ''].filter(Boolean);
+            var feitoBox = document.createElement('div'); feitoBox.className = 'ck-feito';
+            feitoBox.innerHTML = '<span class="mk cheia-prof"></span><span class="ck-tx"><b>✓ Checking realizado</b>' + (partes.length ? '<small>' + partes.join(' · ') + '</small>' : '') + '</span>';
+            lista.appendChild(feitoBox);
+          }
+          var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'btn ' + (ckFeito ? 'btn-ck-editar' : 'btn-ck'); bt.dataset.ck = '1';
+          bt.textContent = ckFeito ? 'Editar Checking' : 'Registrar Checking';
           lista.appendChild(bt);
           var prox = plano.etapas[plano.etapas.indexOf(plano.etapas.find(function (e) { return e.id === pos.id; })) + 1];
           if (prox) { var lb = document.createElement('p'); lb.className = 'libera'; lb.textContent = (ckAtual && ckAtual.feito ? 'Checking registrado: ' + prox.rot + ' liberada para o aluno.' : 'Ao registrar, a ' + prox.rot + ' é liberada para o aluno.'); lista.appendChild(lb); }
