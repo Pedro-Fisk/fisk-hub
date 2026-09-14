@@ -12,7 +12,7 @@
      o Checking de cada lição e os extras. É o que o PDF do planner sempre
      deu à coordenação: bater o olho e ver o curso todo. Só leitura: quem
      marca é a Turma de hoje. O desenho mora no planner-v2.js do portal
-     (PlannerV2.planoCompleto), o mesmo do aluno; o botão Imprimir vira PDF. */
+     (PlannerV2.planoCompleto), o mesmo do aluno. Sem o botão Imprimir desde 14/09/2026 (pedido do Pedro). */
   body { margin: 0; background: #eef1f7; font-family: "Nunito", "Segoe UI", system-ui, sans-serif; color: #0f1f4e; }
   .topo { background: #1d3685; color: #fff; padding: 10px 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; position: sticky; top: 0; z-index: 3; }
   .topo h1 { font-size: 16px; margin: 0; font-weight: 800; } .topo .sub { opacity: .8; font-size: 13px; }
@@ -25,10 +25,10 @@
 </style>
 </head>
 <body>
-<div class="topo"><a class="voltar" href="turma-de-hoje.html" id="voltar">← Turma de hoje</a><h1>🦅 Plano de curso</h1><span class="sub" id="quem"></span><button type="button" onclick="window.print()">🖨 Imprimir / PDF</button></div>
+<div class="topo"><a class="voltar" href="turma-de-hoje.html" id="voltar">← Turma de hoje</a><h1>🦅 Plano de curso</h1><span class="sub" id="quem"></span></div>
 <div class="status" id="status">Lendo o planner…</div>
 <div id="corpo"></div>
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914h"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914i"></script>
 <script>
 var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
 var $ = function (id) { return document.getElementById(id); };

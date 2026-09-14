@@ -202,7 +202,6 @@
   .aguia-topo .voltar{ background: #fff; color: #1d3685; border: 0; border-radius: 999px; padding: .5rem 1rem; font-family: var(--font-body); font-weight: 900; font-size: .9rem; cursor: pointer; box-shadow: 0 2px 0 #0f2260; }
   .aguia-topo h2{ margin: 0; color: #fff; font-family: var(--font-heading); font-size: 1rem; font-weight: 700; }
   .aguia-topo .sub{ opacity: .85; font-size: .84rem; }
-  .aguia-topo .imprimir{ margin-left: auto; background: rgba(255,255,255,.15); color: #fff; border: 0; border-radius: 999px; padding: .45rem .9rem; font-family: var(--font-body); font-weight: 800; font-size: .82rem; cursor: pointer; }
   body.theme-dark .aguia-ov{ background: #0f1724; }
   @media print{
     body.com-aguia > *:not(.aguia-ov){ display: none !important; }
@@ -227,18 +226,19 @@
      verde-amarelo. As duas visões leem como uma coisa só; a aula de agora
      ganha o anel verde-amarelo que a lição atual tem no planner completo. ── */
   .aulas{ gap: .7rem; }
-  .aula, body.theme-dark .aula, body.theme-dark .aula.atual{ background: #dce6f2; border: 2px solid #1d3685; border-radius: 12px; padding: 0; overflow: hidden; display: flex; flex-direction: column; }
-  .aula.atual, body.theme-dark .aula.atual{ background: #dce6f2; border-color: #1d3685; box-shadow: 0 0 0 3px #d4e909; }
-  .aula .t{ margin: 0; background: #1d3685; color: #c2cdea; padding: .5rem .75rem; align-items: center; font-size: .72rem; }
+  /* as cores vêm do plano do livro (--pil, --mar, --ac, --acTxt, calculadas em corDoEstagio como no planner completo); o azul é a reserva */
+  .aula, body.theme-dark .aula, body.theme-dark .aula.atual{ background: var(--pil, #dce6f2); border: 2px solid var(--mar, #1d3685); border-radius: 12px; padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+  .aula.atual, body.theme-dark .aula.atual{ background: var(--pil, #dce6f2); border-color: var(--mar, #1d3685); box-shadow: 0 0 0 3px var(--ac, #d4e909); }
+  .aula .t{ margin: 0; background: var(--mar, #1d3685); color: rgba(255,255,255,.78); padding: .5rem .75rem; align-items: center; font-size: .72rem; }
   .aula .t b, body.theme-dark .aula .t b{ color: #fff; font-size: 1.05rem; }
-  .aula .t .dt, .aula .t .agora{ margin-left: auto; background: #fff; color: #1d3685; border-radius: 999px; padding: .15rem .6rem; font-size: .74rem; font-weight: 800; text-transform: none; letter-spacing: 0; white-space: nowrap; opacity: 1; }
-  .aula .t .dt.dada{ background: #fff; color: #1d3685; }
+  .aula .t .dt, .aula .t .agora{ margin-left: auto; background: #fff; color: var(--mar, #1d3685); border-radius: 999px; padding: .15rem .6rem; font-size: .74rem; font-weight: 800; text-transform: none; letter-spacing: 0; white-space: nowrap; opacity: 1; }
+  .aula .t .dt.dada{ background: #fff; color: var(--mar, #1d3685); }
   .aula .t .dt.falta, .aula .t .dt.tarde{ background: #ffd9d9; color: #b91c1c; }
-  .aula .t .agora{ background: #d4e909; color: #3a3400; }
+  .aula .t .agora{ background: var(--ac, #d4e909); color: var(--acTxt, #3a3400); }
   .aula .lista{ padding: .45rem .55rem .65rem; display: flex; flex-direction: column; gap: 1px; flex: 1; }
   .aula .it, body.theme-dark .aula .it{ color: #0f1f4e; font-size: .97rem; padding: .3rem .5rem; border-radius: 9px; min-height: 42px; }
   .aula .it.pode:hover{ background: rgba(255,255,255,.65); }
-  .aula .it.xp{ background: #d4e909; color: #3a3400; }
+  .aula .it.xp{ background: var(--ac, #d4e909); color: var(--acTxt, #3a3400); }
   .aula .it.feito{ color: #0f1f4e; }
   .aula .it.feito .tx{ opacity: .6; }
   .aula .it .pg{ font-weight: 700; opacity: .7; font-size: .78rem; color: inherit; }
@@ -250,9 +250,11 @@
   .aula .btn-ck{ margin-top: auto; }
   .aula .it + .btn-ck{ margin-top: .6rem; }
   .aula .libera{ color: #54648d; }
-  .aula .ck-feito{ margin-top: auto; display: flex; align-items: center; gap: .65rem; background: #d4e909; color: #3a3400; border-radius: 10px; padding: .5rem .7rem; }
+  .aula .ck-feito{ margin-top: auto; display: flex; align-items: center; gap: .65rem; background: var(--ac, #d4e909); color: var(--acTxt, #3a3400); border-radius: 10px; padding: .5rem .7rem; }
   .aula .it + .ck-feito{ margin-top: .6rem; }
-  .aula .ck-feito .mk{ border-color: #3a3400; }
+  .aula .ck-feito .mk{ border-color: var(--acTxt, #3a3400); }
+  .aula .btn-ck{ background: var(--ac, #d4e909); color: var(--acTxt, #3f4703); }
+  .al-cab .livro.cor{ background: var(--tab); color: #fff; border-radius: 999px; padding: .1rem .6rem; font-weight: 800; }
   .aula .ck-feito b{ display: block; font-family: var(--font-heading); font-size: .95rem; line-height: 1.2; }
   .aula .ck-feito small{ display: block; font-size: .76rem; font-weight: 700; opacity: .85; line-height: 1.3; }
   .btn-ck-editar{ width: 100%; margin-top: .45rem; justify-content: center; background: #fff; color: #1d3685; border: 1.5px solid #1d3685; padding: .38rem .9rem; font-size: .8rem; }
@@ -336,7 +338,7 @@
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914h"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914i"></script>
 <!-- o guia do Checking, lição a lição (Essentials 1) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913c"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
@@ -649,6 +651,15 @@ function desenharTurma() {
   $('resumo').innerHTML = '<b>' + estado.alunos.length + '</b> alunos em <b>' + esc(estado.turma) + '</b> · <b>' + nCk + '</b> com algum Checking registrado';
 }
 
+/* AS CORES DO ESTÁGIO (Pedro, 14/09/2026: "cada estágio terá uma cor diferente"):
+   a mesma conta do planoCompleto do planner-v2.js. A cor do livro vira o corpo
+   da célula quando é clara, ou a faixa do título quando é escura; o acento
+   pinta a Exploration, o Checking e a aula de agora; a aba pinta o livro. */
+function lumCor(hex) { var n = parseInt(String(hex || '#1d3685').slice(1), 16); return (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255; }
+function corDoEstagio(plano) {
+  var cor = plano.cor || '#1d3685', tab = plano.corTab || '#912d99', ac = plano.acento || '#d4e909';
+  return '--tab:' + tab + ';--ac:' + ac + ';--acTxt:' + (lumCor(ac) > 0.6 ? '#3a3400' : '#fff') + ';--pil:' + (lumCor(cor) < 0.55 ? '#dce6f2' : cor) + ';--mar:' + (lumCor(cor) < 0.55 ? cor : '#1d3685');
+}
 function cartaoAluno(a) {
   var plano = planoDe(a.book);
   var ctx = ctxDe(a);
@@ -656,12 +667,13 @@ function cartaoAluno(a) {
   var reg = ctx.planner.plano.checking || {};
   var ckAtual = reg[pos.id];
   var card = document.createElement('section'); card.className = 'al'; card.dataset.raf = a.raf;
+  if (plano) card.style.cssText = corDoEstagio(plano);   /* cada estágio com a sua cor, a mesma do planner completo */
   var cab = document.createElement('div'); cab.className = 'al-cab';
   var atras = Number(a.aulasAtraso) || 0;
   var plan = a._plan;
   var nivelRot = { alta: 'prioridade alta', media: 'prioridade média', emdia: 'em dia', semdados: 'sem dados' };
   if (estado.atendidos[a.raf]) card.classList.add('atendido');
-  cab.innerHTML = '<span class="nome">' + esc(a.nome) + '</span><span class="livro">' + esc(a.book || '') + '</span>' +
+  cab.innerHTML = '<span class="nome">' + esc(a.nome) + '</span><span class="livro' + (plano ? ' cor' : '') + '">' + esc(a.book || '') + '</span>' +
     (plan ? '<span class="pill nv-' + esc(plan.nivel || 'emdia') + '">' + (a._pos + 1) + 'º · ' + esc(nivelRot[plan.nivel] || plan.nivel || '') + '</span>' : (estado.plano ? '<span class="pill fora">fora do roteiro</span>' : '')) +
     '<span class="pill pos">📍 ' + esc(pos.rot) + (pos.tema ? ' · ' + esc(pos.tema) : '') + '</span>' +
     (atras > 0 ? '<span class="pill atras">' + atras + ' aula' + (atras === 1 ? '' : 's') + ' atrás do plano</span>' : '') +
@@ -927,11 +939,10 @@ function abrirAguia(a) {
   ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-label', 'Planner completo de ' + a.nome);
   ov.innerHTML = '<div class="aguia-topo"><button type="button" class="voltar" data-voltar>← Voltar à turma</button>' +
     '<h2>🦅 Planner completo</h2><span class="sub">' + esc(a.nome) + ' · ' + esc(a.book || '') + ' · ' + esc(a.raf) + '</span>' +
-    '<button type="button" class="imprimir" data-imprimir>🖨 Imprimir / PDF</button></div><div class="aguia-corpo"></div>';
+    '</div><div class="aguia-corpo"></div>';   /* sem Imprimir (Pedro, 14/09/2026) */
   document.body.appendChild(ov); document.body.classList.add('com-aguia');
   aguia.raf = a.raf; aguia.ov = ov;
   ov.querySelector('[data-voltar]').addEventListener('click', voltarDaAguia);
-  ov.querySelector('[data-imprimir]').addEventListener('click', function () { window.print(); });
   desenhaAguia();
   try { history.pushState({ aguia: a.raf }, ''); } catch (e) {}
   ov.querySelector('[data-voltar]').focus({ preventScroll: true });
@@ -951,7 +962,7 @@ function desenhaAguia() {
     /* as refações só viram campo quando o servidor guarda notas (recurso 'notas') */
     aoNota: (estado.recursos || []).indexOf('notas') > -1 ? function (t, crit, k, v) { salvaNota(a, t, crit, k, v); } : null,
     /* a metade do professor, inclusive em aula antiga: o mesmo toque da turma */
-    aoClicar: function (it, st) { confirmar(a, it.id, { p: st.prof ? 0 : 1 }); }
+    aoClicar: function (it, st) { var marca = PlannerV2.toqueProf(it, st); if (marca) confirmar(a, it.id, marca); }
   });
   aguia.ov.scrollTop = y;
 }
