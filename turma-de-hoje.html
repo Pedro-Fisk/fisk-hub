@@ -123,6 +123,10 @@
   .ck .pedidos{ display: flex; flex-wrap: wrap; gap: .35rem; }
   .ck .prontos{ display: flex; flex-wrap: wrap; gap: .3rem; width: 100%; }
   .ck .prontos .chip{ font-size: .76rem; padding: .28rem .6rem; }
+  /* o pronto que a dimensão marcada em "precisa melhorar" pede */
+  .ck .prontos .chip.sug:not(.on){ border-color: #d91e9e; box-shadow: inset 0 0 0 1px #d91e9e; }
+  .ck .prontos .chip.sug::after{ content: ' ●'; color: #d91e9e; }
+  .ck .prontos .chip.sug.on::after{ color: #fff; }
   .ck .ped{ background: var(--ui-soft); border-radius: 99px; padding: .25rem .6rem; font-size: .8rem; font-weight: 700; display: inline-flex; gap: .35rem; align-items: center; }
   .ck .ped button{ border: 0; background: none; cursor: pointer; font-weight: 900; color: var(--gray); padding: 0; }
   .ck .fim{ display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; margin-top: .4rem; }
@@ -341,9 +345,9 @@
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914k"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914l"></script>
 <!-- o guia do Checking, lição a lição (Essentials 1) -->
-<script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913c"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260914a"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
 <script>
 fiskInitThemeToggle('themeToggle');
@@ -1121,7 +1125,7 @@ function abrirChecking(card, a, plano, pos) {
     '<div class="lin crit bom"><label class="rot">👍 Em que foi melhor (um só; o aluno vê)</label><span data-melhor>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</span></div>' +
     '<div class="lin crit ruim"><label class="rot">👎 O que precisa melhorar (o aluno vê como pedidos)</label><span data-melhorar>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</span></div>' +
     '<div class="lin"><label class="rot">Nota (0 a 10, só você vê; com nota a próxima lição abre)</label><span class="notas" data-nota>' + [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(function (n) { return '<button type="button" class="chip" data-v="' + n + '">' + n + '</button>'; }).join('') + '</span></div>' +
-    '<div class="lin"><label class="rot">Pedidos para o aluno (até 8): toque nos prontos, que chegam com o botão do material, ou escreva</label><span class="prontos" data-prontos></span><span class="pedidos" data-pedidos></span><input type="text" data-novo placeholder="Ou escreva um pedido e aperte Enter" maxlength="80"></div>' +
+    '<div class="lin"><label class="rot">Pedidos para o aluno (até 8): toque nos prontos, que chegam com o botão do material, ou escreva. Marcar o que precisa melhorar já traz o pedido daquela dimensão (●)</label><span class="prontos" data-prontos></span><span class="pedidos" data-pedidos></span><input type="text" data-novo placeholder="Ou escreva um pedido e aperte Enter" maxlength="80"></div>' +
     '<div class="lin"><label class="rot">Bilhete (até 400 letras; o aluno lê no planner)</label><textarea data-bilhete maxlength="400" placeholder="Good job on pronunciation. Study Do / Does before Lesson 4."></textarea></div>' +
     '<div class="fim"><button type="button" class="btn btn-ck" data-salvar>Registrar Checking</button><button type="button" class="btn btn-ghost" data-fechar>Fechar</button><span class="aviso" data-aviso>O registro paga F$ 150 ao aluno, uma vez por lição.</span></div>';
   card.appendChild(ck);
@@ -1132,13 +1136,37 @@ function abrirChecking(card, a, plano, pos) {
     prontos: ck.querySelector('[data-prontos]')
   };
   var pedidos = [];
+  /* a ligação dimensão → pedido (PlannerV2.pedidosSugeridos): o que entrou
+     sozinho sai sozinho quando a dimensão é desmarcada; o que o professor
+     tirou à mão não volta */
+  var autoPed = [], recusados = [];
+  function dimensoesMarcadas() { return Array.prototype.map.call(f.melhorar.querySelectorAll('.chip.on'), function (c) { return c.dataset.v; }); }
+  function nomeCrit(v) { var c = CRITERIOS.find(function (x) { return x[0] === v; }); return c ? c[1] : v; }
+  function sugestoes(aplicar) {
+    if (!(plano && window.PlannerV2 && PlannerV2.pedidosSugeridos)) return;
+    var s = PlannerV2.pedidosSugeridos(plano, f.licao.value, dimensoesMarcadas(), recusados);
+    if (aplicar) {
+      autoPed = autoPed.filter(function (id) {
+        if (s.auto.indexOf(id) > -1) return true;
+        var i = pedidos.indexOf(id); if (i > -1) pedidos.splice(i, 1);
+        return false;
+      });
+      s.auto.forEach(function (id) { if (pedidos.indexOf(id) < 0 && recusados.indexOf(id) < 0 && pedidos.length < 8) { pedidos.push(id); autoPed.push(id); } });
+    }
+    f.prontos.querySelectorAll('.chip').forEach(function (c) {
+      var d = s.destaque[c.dataset.id];
+      c.classList.toggle('sug', !!d);
+      c.title = d ? 'Sugerido para ' + d.map(nomeCrit).join(', ') : '';
+    });
+    if (aplicar) pintaPedidos();
+  }
   /* os pedidos prontos da lição: o id viaja, o aluno recebe a frase com o
      botão do material (PlannerV2.pedidosDa, a mesma lista que o portal usa) */
   function prontos() { return (plano && window.PlannerV2 && PlannerV2.pedidosDa) ? PlannerV2.pedidosDa(plano, f.licao.value) : []; }
   function rotuloDe(p) { var c = prontos().find(function (x) { return x.id === p; }); return c ? c.pt : p; }
   function pintaPedidos() {
     f.pedidos.innerHTML = pedidos.map(function (p, i) { return '<span class="ped">' + esc(rotuloDe(p)) + '<button type="button" data-i="' + i + '" aria-label="tirar">×</button></span>'; }).join('');
-    f.pedidos.querySelectorAll('button').forEach(function (b) { b.addEventListener('click', function () { pedidos.splice(+b.dataset.i, 1); pintaPedidos(); }); });
+    f.pedidos.querySelectorAll('button').forEach(function (b) { b.addEventListener('click', function () { var id = pedidos.splice(+b.dataset.i, 1)[0]; var ia = autoPed.indexOf(id); if (ia > -1) { autoPed.splice(ia, 1); recusados.push(id); } pintaPedidos(); }); });
     f.prontos.querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('on', pedidos.indexOf(c.dataset.id) > -1); });
   }
   function pintaProntos() {
@@ -1146,7 +1174,8 @@ function abrirChecking(card, a, plano, pos) {
     f.prontos.innerHTML = lista.map(function (c) { return '<button type="button" class="chip" data-id="' + esc(c.id) + '">' + (c.tipo === 'extra' ? '★ ' : (c.code === 'ex' ? '▶ ' : '🎧 ')) + esc(c.pt) + '</button>'; }).join('');
     f.prontos.querySelectorAll('.chip').forEach(function (c) { c.addEventListener('click', function () {
       var i = pedidos.indexOf(c.dataset.id);
-      if (i > -1) pedidos.splice(i, 1); else if (pedidos.length < 8) pedidos.push(c.dataset.id);
+      if (i > -1) { pedidos.splice(i, 1); var ia = autoPed.indexOf(c.dataset.id); if (ia > -1) { autoPed.splice(ia, 1); recusados.push(c.dataset.id); } }
+      else if (pedidos.length < 8) { pedidos.push(c.dataset.id); recusados = recusados.filter(function (x) { return x !== c.dataset.id; }); }
       pintaPedidos();
     }); });
   }
@@ -1158,7 +1187,7 @@ function abrirChecking(card, a, plano, pos) {
     f.melhor.querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('on', c.dataset.v === r.melhor); c.classList.toggle('melhor', c.dataset.v === r.melhor); });
     f.melhorar.querySelectorAll('.chip').forEach(function (c) { var on = (r.melhorar || []).indexOf(c.dataset.v) > -1; c.classList.toggle('on', on); c.classList.toggle('pior', on); });
     f.nota.querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('on', typeof r.nota === 'number' && Number(c.dataset.v) === r.nota); });
-    pedidos = (r.pedidos || []).slice(); pintaPedidos();
+    pedidos = (r.pedidos || []).slice(); autoPed = []; recusados = []; pintaPedidos(); sugestoes(false);
     f.bilhete.value = r.bilhete || '';
     f.reg.hidden = !r.feito;
     if (r.feito) f.reg.textContent = '✓ Registrado' + (r.quem ? ' por ' + r.quem : '') + (r.quando ? ' em ' + new Date(r.quando).toLocaleDateString('pt-BR') : '') + '. Editar aqui atualiza o registro.';
@@ -1174,10 +1203,12 @@ function abrirChecking(card, a, plano, pos) {
     var on = !c.classList.contains('on');
     f.melhor.querySelectorAll('.chip').forEach(function (x) { x.classList.remove('on', 'melhor'); });
     if (on) { c.classList.add('on', 'melhor'); var m = f.melhorar.querySelector('.chip[data-v="' + c.dataset.v + '"]'); if (m) m.classList.remove('on', 'pior'); }
+    sugestoes(true);
   }); });
   f.melhorar.querySelectorAll('.chip').forEach(function (c) { c.addEventListener('click', function () {
     var on = !c.classList.contains('on'); c.classList.toggle('on', on); c.classList.toggle('pior', on);
     if (on) { var m = f.melhor.querySelector('.chip[data-v="' + c.dataset.v + '"]'); if (m) m.classList.remove('on', 'melhor'); }
+    sugestoes(true);
   }); });
   f.novo.addEventListener('keydown', function (ev) {
     if (ev.key !== 'Enter') return; ev.preventDefault();

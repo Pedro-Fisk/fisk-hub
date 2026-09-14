@@ -64,6 +64,10 @@
   .chip.on{ background:var(--mar); color:#fff; border-color:var(--mar); }
   .grupo.bom .chip.on{ background:var(--verde); border-color:var(--verde); }
   .grupo.ruim .chip.on{ background:#d81f26; border-color:#d81f26; }
+  /* o pedido que a dimensão marcada em Let's work on pede */
+  .chip.sug:not(.on){ border-color:#d91e9e; }
+  .chip.sug::after{ content:' ●'; color:#d91e9e; }
+  .chip.sug.on::after{ color:#fff; }
   .fb textarea{ width:100%; min-height:90px; font-family:inherit; font-size:18px; padding:14px; border:2px solid var(--lin); border-radius:14px; resize:vertical; }
   .fb .sub{ font-size:15px; color:var(--med); margin:0 0 10px; }
   .fb .ok{ color:#155a48; font-weight:800; font-size:18px; }
@@ -101,15 +105,26 @@
 </header>
 <main id="main"><div class="erro">Carregando o guia…</div></main>
 
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914k"></script>
-<script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913c"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914l"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260914a"></script>
 <script>
 var $ = function (id) { return document.getElementById(id); };
 var q = new URLSearchParams(location.search);
 var book = q.get('book') || 'Essentials 1', licaoId = (q.get('licao') || 'L1').toUpperCase(), aluno = q.get('aluno') || '', raf = q.get('raf') || '';
 var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
 var CRITERIOS = [['vocabulary', '🔤 Vocabulary'], ['fluency', '💬 Fluency'], ['structure', '🧱 Structure'], ['pronunciation', '🗣️ Pronunciation'], ['listening', '👂 Listening']];
-var fb = { melhor: '', melhorar: [], pedidos: [], bilhete: '' };
+var fb = { melhor: '', melhorar: [], pedidos: [], bilhete: '', auto: [], recusados: [] };
+/* a ligação dimensão → pedido (PlannerV2.pedidosSugeridos, a mesma da Turma de hoje):
+   o que entrou sozinho sai sozinho; o que o professor tirou à mão não volta */
+function sugestoesDe(planoV2) {
+  if (!(planoV2 && window.PlannerV2 && PlannerV2.pedidosSugeridos)) return { auto: [], destaque: {} };
+  return PlannerV2.pedidosSugeridos(planoV2, licaoId, fb.melhorar, fb.recusados);
+}
+function aplicaSugestoes(planoV2) {
+  var s = sugestoesDe(planoV2);
+  fb.auto = fb.auto.filter(function (id) { if (s.auto.indexOf(id) > -1) return true; var i = fb.pedidos.indexOf(id); if (i > -1) fb.pedidos.splice(i, 1); return false; });
+  s.auto.forEach(function (id) { if (fb.pedidos.indexOf(id) < 0 && fb.recusados.indexOf(id) < 0 && fb.pedidos.length < 8) { fb.pedidos.push(id); fb.auto.push(id); } });
+}
 /* o gabarito v2 do livro desce do portal sob demanda (o mesmo desenho da Turma de hoje) */
 var PLANO_V = '20260914d';
 function livroId(b) { return String(b || '').trim().toLowerCase().replace(/\s+/g, '-'); }
@@ -179,7 +194,7 @@ function pintaFeedback(main) {
   box.innerHTML = '<div class="bloco-cab"><h1>8. Feedback</h1><span class="min">1 min</span><p class="o">Diga em que ' + esc(primeiro) + ' foi melhor, o que precisa melhorar, e combine o que fazer até a próxima lição. Mostre a tela: é para os dois.</p></div>' +
     '<div class="grupo bom"><h2>👍 ' + esc(primeiro) + ', you were best at…</h2><div class="chips" data-melhor>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</div></div>' +
     '<div class="grupo ruim"><h2>👎 Let\'s work on…</h2><div class="chips" data-melhorar>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</div></div>' +
-    '<div class="grupo"><h2>🎯 Before the next lesson…</h2><p class="sub">Toque no que combinar: chega no planner de ' + esc(primeiro) + ' com o botão do material.</p><div class="chips" data-pedidos></div></div>' +
+    '<div class="grupo"><h2>🎯 Before the next lesson…</h2><p class="sub">Toque no que combinar: chega no planner de ' + esc(primeiro) + ' com o botão do material. O que você marcou em Let\'s work on… já entra aqui (●).</p><div class="chips" data-pedidos></div></div>' +
     '<div class="grupo"><h2>✉️ A note for ' + esc(primeiro) + '</h2><textarea data-bilhete placeholder="Good job on pronunciation. Study Do / Does before Lesson 4."></textarea></div>' +
     '<p class="ok" data-ok hidden></p>';
   main.appendChild(box);
@@ -188,11 +203,18 @@ function pintaFeedback(main) {
   var cp = box.querySelector('[data-pedidos]');
   cp.innerHTML = prontos.map(function (c) { return '<button type="button" class="chip" data-id="' + esc(c.id) + '">' + (c.tipo === 'extra' ? '★ ' : (c.code === 'ex' ? '▶ ' : '🎧 ')) + esc(c.en) + '</button>'; }).join('') || '<span class="sub">Sem pedidos prontos para esta lição.</span>';
   box.querySelectorAll('[data-melhor] .chip').forEach(function (c) { c.classList.toggle('on', c.dataset.v === fb.melhor); c.addEventListener('click', function () {
-    fb.melhor = fb.melhor === c.dataset.v ? '' : c.dataset.v; fb.melhorar = fb.melhorar.filter(function (v) { return v !== fb.melhor; }); pinta(); }); });
+    fb.melhor = fb.melhor === c.dataset.v ? '' : c.dataset.v; fb.melhorar = fb.melhorar.filter(function (v) { return v !== fb.melhor; }); aplicaSugestoes(planoV2); pinta(); }); });
   box.querySelectorAll('[data-melhorar] .chip').forEach(function (c) { c.classList.toggle('on', fb.melhorar.indexOf(c.dataset.v) > -1); c.addEventListener('click', function () {
-    var i = fb.melhorar.indexOf(c.dataset.v); if (i > -1) fb.melhorar.splice(i, 1); else { fb.melhorar.push(c.dataset.v); if (fb.melhor === c.dataset.v) fb.melhor = ''; } pinta(); }); });
-  cp.querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('on', fb.pedidos.indexOf(c.dataset.id) > -1); c.addEventListener('click', function () {
-    var i = fb.pedidos.indexOf(c.dataset.id); if (i > -1) fb.pedidos.splice(i, 1); else if (fb.pedidos.length < 8) fb.pedidos.push(c.dataset.id); c.classList.toggle('on', i === -1); }); });
+    var i = fb.melhorar.indexOf(c.dataset.v); if (i > -1) fb.melhorar.splice(i, 1); else { fb.melhorar.push(c.dataset.v); if (fb.melhor === c.dataset.v) fb.melhor = ''; } aplicaSugestoes(planoV2); pinta(); }); });
+  var sug = sugestoesDe(planoV2);
+  cp.querySelectorAll('.chip').forEach(function (c) {
+    var d = sug.destaque[c.dataset.id]; c.classList.toggle('sug', !!d);
+    if (d) c.title = 'Pedido de ' + d.map(function (v) { return (CRITERIOS.find(function (x) { return x[0] === v; }) || [v, v])[1]; }).join(', ');
+    c.classList.toggle('on', fb.pedidos.indexOf(c.dataset.id) > -1); c.addEventListener('click', function () {
+    var i = fb.pedidos.indexOf(c.dataset.id);
+    if (i > -1) { fb.pedidos.splice(i, 1); var ia = fb.auto.indexOf(c.dataset.id); if (ia > -1) { fb.auto.splice(ia, 1); fb.recusados.push(c.dataset.id); } }
+    else if (fb.pedidos.length < 8) { fb.pedidos.push(c.dataset.id); fb.recusados = fb.recusados.filter(function (x) { return x !== c.dataset.id; }); }
+    c.classList.toggle('on', i === -1); }); });
   var ta = box.querySelector('[data-bilhete]'); ta.value = fb.bilhete; ta.addEventListener('input', function () { fb.bilhete = ta.value; });
 
   var acoes = document.createElement('div'); acoes.className = 'acoes';
