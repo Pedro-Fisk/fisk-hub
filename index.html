@@ -219,7 +219,9 @@
       <p data-i18n="card-answerkeys-p">Gabaritos das provas dos estágios, do Essentials ao In Focus e Espanhol</p>
     </a>
 
-    <a class="card card-turmahoje" href="turma-de-hoje.html">
+    <!-- PILOTO (Pedro, 14/09/2026): a Turma de hoje aparece só para a direção e para o professor de teste
+         (TURMA_HOJE_PILOTO, no script); nasce escondida e updateToolLinks decide -->
+    <a class="card card-turmahoje" href="turma-de-hoje.html" style="display:none">
       <div class="icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/>
@@ -1211,7 +1213,13 @@
         return sv;
       };
       // aponta os atalhos das ferramentas p/ o professor efetivo (pré-seleção; nunca trava)
+      /* O PILOTO DA TURMA DE HOJE (Pedro, 14/09/2026): a direção e o professor de teste. Para abrir para todos,
+         esvazie a trava (e a da própria turma-de-hoje.html, que tem a mesma lista). */
+      var TURMA_HOJE_PILOTO = ['CARLOS ALBERTO'];
+      function normPiloto(v){ return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
       function updateToolLinks(){
+        var sv0 = saved(), th = document.querySelector('a.card-turmahoje');
+        if (th) th.style.display = (sv0 && (sv0.master || TURMA_HOJE_PILOTO.some(function(n){ return normPiloto(n) === normPiloto(sv0.name); }))) ? '' : 'none';
         var p = window._actingProf();
         document.querySelectorAll('main.grid a.card, .md-cta').forEach(function(a){
           if (!a.getAttribute('data-base')){ a.setAttribute('data-base', (a.getAttribute('href')||'').split('?')[0].split('#')[0]); }

@@ -508,7 +508,15 @@ function montarSelect(sel, ph, itens) {
     itens.map(function (i) { return '<option value="' + esc(i.v) + '">' + esc(i.t) + '</option>'; }).join('');
   sel.disabled = false;
 }
+/* O PILOTO (Pedro, 14/09/2026): a direção e o professor de teste. A mesma lista do card no index.html */
+var TURMA_HOJE_PILOTO = ['CARLOS ALBERTO'];
+function turmaHojeLiberada() {
+  var s = sessao() || {};
+  var n = function (v) { return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); };
+  return !!(s.master || TURMA_HOJE_PILOTO.some(function (p) { return n(p) === n(s.name); }));
+}
 function initCascata() {
+  if (!turmaHojeLiberada()) { status('🔒 A Turma de hoje está em piloto com um professor de teste. Em breve para todos.', true); return; }
   var selEscola = $('selEscola'), selProf = $('selProf'), selTurma = $('selTurma');
   /* quem entrou já diz a escola e o professor (pedido do Pedro, 13/09): a
      cascata se preenche sozinha e só a turma fica para escolher; e se o
