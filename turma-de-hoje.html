@@ -90,9 +90,6 @@
      menor (Pedro, 14/09/2026). Os mesmos pontos do planner-v2.js do portal. */
   .mk.tri{ border-radius: 0; width: 38px; height: 34px; border: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,2 28.5,25.5 1.5,25.5' fill='%23fff' stroke='%23d91e9e' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
   .mk.tri.on{ background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,3 27.5,24.5 2.5,24.5' fill='%23d91e9e' stroke='%23d91e9e' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
-  .extras{ padding: 0 1rem .8rem; font-size: .8rem; color: var(--gray); display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; }
-  .extras span{ border: 1px solid var(--ui-line); border-radius: 99px; padding: .1rem .5rem; }
-  .extras span.ok{ background: #e4f3f1; color: #155a48; border-color: #cfe6e1; }
   .legenda{ font-size: .95rem; color: var(--gray); display: flex; flex-wrap: wrap; gap: 1.1rem; padding: .5rem 0 0; align-items: center; }
   .legenda i{ display: inline-block; vertical-align: middle; margin-right: .25rem; }
   .aula .t .dt{ margin-left: auto; text-transform: none; letter-spacing: 0; font-size: .72rem; font-weight: 800; background: #eef2fa; color: var(--gray); border-radius: 999px; padding: .1rem .5rem; }
@@ -189,13 +186,6 @@
   body.sem-obs .obs{ position: relative; }
   body.sem-obs .obs::after{ content: '🙈 anotações escondidas'; position: absolute; inset: 0; display: grid; place-items: center; font-size: .82rem; font-weight: 800; color: var(--gray); }
   .obs-toggle{ margin-left: auto; border: 1.5px solid var(--ui-bd); background: var(--white); color: var(--ui-ink); border-radius: 999px; padding: .35rem .8rem; font-family: var(--font-body); font-weight: 800; font-size: .8rem; cursor: pointer; }
-  .extras span.ok b{ color: #155a48; }
-  /* o que o aluno fez no portal nesta lição: tudo, previsto ou não */
-  .portal-res{ padding: 0 1rem .8rem; font-size: .82rem; color: var(--ui-ink); display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; }
-  .portal-res .rot{ color: var(--gray); margin-right: .2rem; }
-  .portal-res span.f{ background: var(--ui-soft); border-radius: 99px; padding: .15rem .55rem; }
-  .portal-res span.f b{ color: #155a48; }
-  .portal-res .nada{ color: var(--gray); font-style: italic; }
   body.theme-dark .obs{ background: #26301a; border-color: #2e4560; }
   body.theme-dark .obs textarea{ background: #101a28; color: #dbe6f3; border-color: #4a5a3a; }
   @media (max-width: 760px){ .al-corpo{ grid-template-columns: 1fr; } .obs{ border-left: 0; border-top: 1px solid var(--ui-line); } }
@@ -263,6 +253,24 @@
   .aula .ck-feito b{ display: block; font-family: var(--font-heading); font-size: .95rem; line-height: 1.2; }
   .aula .ck-feito small{ display: block; font-size: .76rem; font-weight: 700; opacity: .85; line-height: 1.3; }
   .btn-ck-editar{ width: 100%; margin-top: .45rem; justify-content: center; background: #fff; color: #1d3685; border: 1.5px solid #1d3685; padding: .38rem .9rem; font-size: .8rem; }
+  /* ── O QUADRO DO KEEP STUDYING (Pedro, 14/09/2026): a célula verde da
+     coluna do planner completo, numa linha própria embaixo das aulas. Como
+     quarta coluna ele espremia as aulas (a coluna delas não passa de 1198 px,
+     por causa da anotação) e os nomes quebravam em duas linhas. ── */
+  .al .aula.ks, body.theme-dark .al .aula.ks{ margin: -.2rem 1rem .9rem; background: #e4f3f1; border-color: #cfe6e1; }
+  .aula.ks .t{ background: transparent; color: #155a48; padding-bottom: .1rem; }
+  .aula.ks .t .dt{ background: #fff; color: #155a48; }
+  .ks-sug{ display: flex; flex-wrap: wrap; column-gap: 1.4rem; row-gap: 1px; }
+  .ksi{ flex: 0 1 auto; display: flex; align-items: center; gap: .55rem; min-height: 42px; padding: .3rem .5rem; font-size: .97rem; font-weight: 700; color: #0f1f4e; min-width: 0; }
+  .ksi .ic{ flex: 0 0 26px; text-align: center; font-size: 1.15rem; }
+  .ksi .nm{ min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ksi.feito .nm{ text-decoration: line-through; opacity: .6; }
+  .ksi .pct{ background: #fff; color: #155a48; border-radius: 999px; padding: .05rem .55rem; font-size: .85rem; font-weight: 800; white-space: nowrap; }
+  .ks-mais{ margin-top: auto; border-top: 1px dashed #9fcfc4; padding: .5rem .3rem 0; font-size: .8rem; color: #155a48; display: flex; flex-wrap: wrap; gap: .3rem; }
+  .ks-sug:empty + .ks-mais{ margin-top: 0; border-top: 0; padding-top: 0; }
+  .ks-mais b{ width: 100%; font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; }
+  .ks-mais span{ background: #fff; border-radius: 999px; padding: .15rem .55rem; font-weight: 800; color: #0f1f4e; }
+  .ks-mais span i{ font-style: normal; color: #155a48; }
   .btn-ck-editar:hover{ background: #eef2fa; }
   /* a nota do Checking é só do professor: com as anotações escondidas (tela na TV), ela borra junto */
   body.sem-obs .nota-priv{ filter: blur(5px); user-select: none; }
@@ -317,7 +325,7 @@
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914e"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914f"></script>
 <!-- o guia do Checking, lição a lição (Essentials 1) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260913c"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
@@ -660,12 +668,7 @@ function cartaoAluno(a) {
         grade.appendChild(col);
       });
       card.appendChild(grade);
-      var pr = resumoPortal(a, ctx, pos); if (pr) card.appendChild(pr);
-      if (est.extras.length) {
-        var ex = document.createElement('div'); ex.className = 'extras';
-        ex.innerHTML = '<span title="Os extras que o gabarito sugere para esta lição; ✓ é o que ele já fez">Keep Studying sugerido:</span> ' + est.extras.map(function (x) { return '<span class="' + (x.feito ? 'ok' : '') + '">' + (x.feito ? '✓ ' : '') + esc(x.nm) + (x.feito && typeof x.pct === 'number' ? ' <b>' + Math.round(x.pct) + '%</b>' : '') + '</span>'; }).join('');
-        card.appendChild(ex);
-      }
+      var ks = quadroKS(a, plano, pos, ctx); if (ks) card.appendChild(ks);
     }
   } else {
     var sp = document.createElement('div'); sp.className = 'sem-plano';
@@ -685,18 +688,46 @@ function cartaoAluno(a) {
   return cardReal;
 }
 
-/* ── o que o aluno fez no portal nesta lição (pedido do Pedro, 13/09) ──
-   Varre o histórico datado (`hist` da plannerTurma) desde o dia da primeira
-   aula da lição no card (ou os últimos 21 dias, sem data) e agrupa por
-   ferramenta pelo prefixo do id: previsto ou não, tudo conta. É a prévia do
-   dossiê, para o professor sentar com o aluno e ver o que aconteceu. */
-var FERRAMENTAS = [
-  [/^mp:/, '🎬 Movie', true], [/^sp:/, '🎵 Song', true], [/^qp:/, '📝 Quick Practice', true],
-  [/^listen-/, '🎧 Listening Lab', true], [/^read-/, '📖 Reading Lab', true], [/^writing:/, '✍️ Writing Lab', false],
-  [/^fala:/, '🎙️ Speaking Lab', false], [/^mundo/, '🌍 World English', true], [/^sq[:-]|sidequest/, '🧭 Minicourses', true],
-  [/^ck[:-]|checking/, '✅ Checking do portal', true], [/^aud:/, '🔊 Áudios do livro', false], [/^vid:/, '▶ Vídeos', false],
-  [/^vbk:/, '📺 Video Program', false], [/^met|^siele/, '🎓 Treino MET/SIELE', true], [/^hw|hogwarts/, '🎩 Cerimônia', false]
-];
+/* ── o quadro do Keep Studying (Pedro, 14/09/2026: "junta atividades feitas e
+   keep studying num quadro só") ──
+   Eram duas linhas soltas embaixo das aulas, e o professor não via a diferença
+   entre elas. Agora é uma célula só, no verde da coluna do planner completo:
+   em cima o que o gabarito sugere para a lição, com ✓ e a melhor
+   nota; embaixo o que MAIS o aluno fez no portal desde a primeira aula dela
+   (sem aula dada no card, nos últimos 21 dias). O que já está ticado em cima
+   não se repete embaixo. A conta é do PlannerV2.keepStudying, a mesma do
+   planner completo, para as duas telas nunca discordarem. */
+function quadroKS(a, plano, pos, ctx) {
+  if (!PlannerV2.keepStudying) return null;   /* planner-v2.js de antes do quadro, preso num cache */
+  var ks = PlannerV2.keepStudying(plano, pos.id, ctx, { hist: (estado.dados[a.raf] || {}).hist, recuo: 21 });
+  var o = ks && ks.outros, mostraMais = !!(o && (o.grupos.length || !o.total));
+  if (!ks || (!ks.sugeridos.length && !mostraMais)) return null;
+  var feitos = ks.sugeridos.filter(function (x) { return x.feito; }).length;
+  var cel = document.createElement('div'); cel.className = 'aula ks';
+  cel.innerHTML = '<div class="t" title="O que o gabarito sugere para esta lição (✓ e a melhor nota) e o que mais o aluno fez no portal">Keep Studying' +
+    (ks.sugeridos.length ? '<span class="dt">' + feitos + ' de ' + ks.sugeridos.length + '</span>' : '') + '</div>';
+  var lista = document.createElement('div'); lista.className = 'lista';
+  var sug = document.createElement('div'); sug.className = 'ks-sug';
+  ks.sugeridos.forEach(function (x) {
+    var r = document.createElement('div'); r.className = 'ksi' + (x.feito ? ' feito' : '');
+    r.innerHTML = '<span class="ic">' + x.icone + '</span><span class="nm">' + esc(x.nm) + '</span>' +
+      (x.feito ? '<span class="pct">' + (typeof x.pct === 'number' ? Math.round(x.pct) + '%' : '✓') + '</span>' : '');
+    sug.appendChild(r);
+  });
+  lista.appendChild(sug);
+  if (mostraMais) {
+    var desde = o.recuo ? 'nos últimos ' + o.recuo + ' dias' : 'desde ' + o.ini.split('-').reverse().slice(0, 2).join('.');
+    var mais = document.createElement('div'); mais.className = 'ks-mais';
+    mais.innerHTML = o.total
+      ? '<b>' + (ks.sugeridos.length ? 'Também fez no portal' : 'Fez no portal') + ' · ' + desde + '</b>' + o.grupos.map(function (g) {
+          return '<span>' + g.icone + ' ' + esc(g.rot.pt) + ' ×' + g.n + (g.best !== null ? ' <i>' + Math.round(g.best) + '%</i>' : '') + '</span>';
+        }).join('')
+      : '<b>Nada no portal ' + desde + '</b>';
+    lista.appendChild(mais);
+  }
+  cel.appendChild(lista);
+  return cel;
+}
 /* a data de cada aula, do card: a mesma régua do planner do aluno (datasDaEtapa) */
 function datasDasAulas(plano, etapaId, ctx) {
   var etapa = plano.etapas.find(function (e) { return e.id === etapaId; }); if (!etapa) return [];
@@ -712,30 +743,6 @@ function pilulaData(d, atual) {
   if (d.s === 'falta') return '<span class="dt falta">' + rot + ' · falta</span>';
   return '<span class="dt' + (d.d < iso ? ' tarde' : '') + '">' + rot + (d.d < iso ? ' · prevista' : '') + '</span>';
 }
-function resumoPortal(a, ctx, pos) {
-  var d = estado.dados[a.raf] || {}; var hist = d.hist || [];
-  if (!hist.length) return null;
-  var inicio = '';
-  var cels = (ctx.cels || []).filter(function (c) { return c.c === pos.id && c.s === 'dada' && c.d; }).map(function (c) { return c.d; }).sort();
-  if (cels.length) inicio = cels[0];
-  else { var dt = new Date(Date.now() - 21 * 86400000); inicio = dt.getFullYear() + '-' + ('0' + (dt.getMonth() + 1)).slice(-2) + '-' + ('0' + dt.getDate()).slice(-2); }
-  var por = {};
-  hist.forEach(function (h) {
-    if (!h.q || h.q < inicio) return;
-    var f = FERRAMENTAS.find(function (x) { return x[0].test(h.id); }) || [null, '⭐ Outros', true];
-    var k = f[1]; por[k] = por[k] || { n: 0, best: null, nota: f[2] };
-    por[k].n++;
-    if (typeof h.pct === 'number' && (por[k].best === null || h.pct > por[k].best)) por[k].best = h.pct;
-  });
-  var box = document.createElement('div'); box.className = 'portal-res';
-  var ini = inicio.split('-').reverse().slice(0, 2).join('.');
-  var chaves = Object.keys(por);
-  box.innerHTML = '<span class="rot" title="Tudo o que o aluno fez no portal desde ' + esc(ini) + ', inclusive o que o gabarito não pede">🖥️ Atividades feitas durante esta lição:</span>' + (chaves.length ? chaves.map(function (k) {
-    var v = por[k]; return '<span class="f">' + esc(k) + ' ×' + v.n + (v.nota && v.best !== null ? ' <b>' + Math.round(v.best) + '%</b>' : '') + '</span>';
-  }).join('') : '<span class="nada">nada ainda nesta lição</span>');
-  return box;
-}
-
 /* ── a anotação livre do professor (pedido do Pedro, 13/09) ──
    Fica na linha do planner do aluno (`obs`), só o professor lê. Salva ao
    parar de escrever (1,2 s) e ao sair do campo. O botão do e-counseling é
