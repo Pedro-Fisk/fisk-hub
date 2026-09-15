@@ -351,8 +351,8 @@
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
 <script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914n"></script>
-<!-- o guia do Checking, lição a lição: a base comum e um arquivo por livro (Essentials, Transitions e Fluency 1 e 2, In Focus) -->
-<script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=8d505afa15"></script>
+<!-- o guia do Checking, lição a lição: a base comum e um arquivo por livro (Essentials, Transitions e Fluency 1 e 2, In Focus, Inmediato 1 a 3) -->
+<script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=376d37037e"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=9630e2ddde"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e2.js?v=d46def0a40"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-t1.js?v=e9a53aa8f8"></script>
@@ -360,6 +360,9 @@
 <script src="https://portalfisk.com.br/assets/checking/guia-f1.js?v=168dda2a8e"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-f2.js?v=793d94a10f"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-if.js?v=bf2cd2ef09"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-i1.js?v=551896a136"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-i2.js?v=56bd0516a9"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-i3.js?v=e326479afd"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
 <script>
 fiskInitThemeToggle('themeToggle');
@@ -1100,6 +1103,8 @@ function guiaDe(book) {
   /* o guia do livro: Essentials 1 → GUIA_CHECKING_E1, Essentials 2 → E2 (14/09/2026) */
   var m = String(book || '').toLowerCase().replace(/\s+/g, ' ').trim().match(/^(essentials|transitions|fluency) ([12])$/);
   if (/^in focus/.test(String(book || '').toLowerCase().trim())) return window.GUIA_CHECKING_IF || null;
+  var mEs = String(book || '').toLowerCase().trim().match(/inmediato\s*([123])/);
+  if (mEs) return window['GUIA_CHECKING_I' + mEs[1]] || null;
   return (m && window['GUIA_CHECKING_' + m[1].charAt(0).toUpperCase() + m[2]]) || null;
 }
 function guiaHTML(book, licaoId, nome, raf) {
@@ -1113,11 +1118,11 @@ function guiaHTML(book, licaoId, nome, raf) {
       return '<tr class="' + (ln.quem === 'A' ? 'aluno' : 'prof') + '"><td class="diz">' + esc(ln.diz) + '</td><td class="nota">' + esc(ln.nota) + '</td></tr>';
     }).join('') + '</table>';
     return '<div class="bl"><h5>' + (r.ic ? r.ic + ' ' : '') + esc(r.t || k) + ' <span class="min">' + (r.min || '') + ' min</span></h5><p class="o">' + esc(r.o || '') + '</p>' + corpo +
-      '<button type="button" class="feito-btn">✓ Done</button></div>';
+      '<button type="button" class="feito-btn">' + (g.idioma === 'es' ? '✓ Hecho' : '✓ Done') + '</button></div>';
   }
   var grande = 'checking-guia.html?book=' + encodeURIComponent(book) + '&licao=' + encodeURIComponent(licaoId) + '&aluno=' + encodeURIComponent(nome || '') + '&raf=' + encodeURIComponent(raf || '');
   return '<details class="guia" open><summary>📋 Guia do Checking · ' + esc(l.rot) + ' · ' + esc(l.tema) + '<span class="tempo">' + g.ROTEIRO.reduce(function (t, r) { return t + (r.min || 0); }, 0) + ' min com ' + esc(primeiro) + '</span></summary>' +
-    '<div class="vozes"><span><i style="background:#a8b907"></i>Teacher says</span><span><i style="background:#1d3685"></i>Student says</span></div>' +
+    '<div class="vozes"><span><i style="background:#a8b907"></i>' + (g.idioma === 'es' ? 'Dice el profesor' : 'Teacher says') + '</span><span><i style="background:#1d3685"></i>' + (g.idioma === 'es' ? 'Dice el alumno' : 'Student says') + '</span></div>' +
     '<a class="tela-grande" href="' + grande + '" target="_blank" rel="noopener">🖥️ Abrir em tela grande, para fazer junto com ' + esc(primeiro) + '</a>' +
     g.ROTEIRO.map(function (r) { return bloco(r.k); }).join('') + '</details>';
 }
@@ -1197,7 +1202,7 @@ function abrirChecking(card, a, plano, pos) {
   function carregaLicao() {
     var r = reg[f.licao.value] || {};
     ck.querySelector('[data-guia]').innerHTML = guiaHTML(a.book, f.licao.value, a.nome, a.raf);
-    ck.querySelectorAll('[data-guia] .feito-btn').forEach(function (bt) { bt.addEventListener('click', function () { var bl = bt.closest('.bl'); bl.classList.toggle('feito'); bt.textContent = bl.classList.contains('feito') ? '✓ Done · undo' : '✓ Done'; }); });
+    ck.querySelectorAll('[data-guia] .feito-btn').forEach(function (bt) { bt.addEventListener('click', function () { var bl = bt.closest('.bl'); bl.classList.toggle('feito'); var esG = (guiaDe(a.book) || {}).idioma === 'es'; bt.textContent = bl.classList.contains('feito') ? (esG ? '✓ Hecho · deshacer' : '✓ Done · undo') : (esG ? '✓ Hecho' : '✓ Done'); }); });
     pintaProntos();
     f.melhor.querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('on', c.dataset.v === r.melhor); c.classList.toggle('melhor', c.dataset.v === r.melhor); });
     f.melhorar.querySelectorAll('.chip').forEach(function (c) { var on = (r.melhorar || []).indexOf(c.dataset.v) > -1; c.classList.toggle('on', on); c.classList.toggle('pior', on); });

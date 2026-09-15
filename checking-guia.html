@@ -110,7 +110,7 @@
 <main id="main"><div class="erro">Loading the guide…</div></main>
 
 <script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914n"></script>
-<script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=8d505afa15"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=376d37037e"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=9630e2ddde"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e2.js?v=d46def0a40"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-t1.js?v=e9a53aa8f8"></script>
@@ -118,6 +118,9 @@
 <script src="https://portalfisk.com.br/assets/checking/guia-f1.js?v=168dda2a8e"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-f2.js?v=793d94a10f"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-if.js?v=bf2cd2ef09"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-i1.js?v=551896a136"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-i2.js?v=56bd0516a9"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-i3.js?v=e326479afd"></script>
 <script>
 var $ = function (id) { return document.getElementById(id); };
 var q = new URLSearchParams(location.search);
@@ -146,15 +149,22 @@ function token() { try { return (JSON.parse(localStorage.getItem('fisk_prof') ||
 var mLivro = String(book || '').toLowerCase().replace(/\s+/g, ' ').trim().match(/^(essentials|transitions|fluency) ([12])$/);
 var G = (mLivro && window['GUIA_CHECKING_' + mLivro[1].charAt(0).toUpperCase() + mLivro[2]]) || null;
 if (!G && /^in focus/i.test(String(book || '').trim())) G = window.GUIA_CHECKING_IF || null;
+/* os Inmediato (14/09/2026): 'Inmediato 1' → GUIA_CHECKING_I1 */
+var mEs = String(book || '').toLowerCase().trim().match(/inmediato\s*([123])/);
+if (!G && mEs) G = window['GUIA_CHECKING_I' + mEs[1]] || null;
+/* a moldura no idioma do guia: o espanhol tem a tela inteira em espanhol */
+var ES = !!(G && G.idioma === 'es');
+function T2(en, es) { return ES ? es : en; }
+if (ES) CRITERIOS = [['vocabulary', '🔤 Vocabulario'], ['fluency', '💬 Fluidez'], ['structure', '🧱 Estructura'], ['pronunciation', '🗣️ Pronunciación'], ['listening', '👂 Comprensión auditiva']];
 var L = G && G.licoes.find(function (x) { return x.id === licaoId; });
 var estado = { i: 0, feitas: {} };
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
 if (!G || !L) {
-  $('main').innerHTML = '<div class="erro">There is no guide for ' + esc(book) + ' · ' + esc(licaoId) + ' yet. Essentials, Transitions, Fluency and In Focus have a guide for now.</div>';
+  $('main').innerHTML = '<div class="erro">There is no guide for ' + esc(book) + ' · ' + esc(licaoId) + ' yet.</div>';
 } else {
   $('rot').textContent = 'Checking · ' + L.rot + ' · ' + L.tema;
-  $('aluno').textContent = aluno ? 'with ' + aluno : '';
+  $('aluno').textContent = aluno ? T2('with ', 'con ') + aluno : '';
   document.title = 'Checking ' + L.rot + (aluno ? ' · ' + aluno : '') + ', FISK';
   pintaPassos(); pinta();
 }
@@ -179,23 +189,23 @@ function pinta() {
   var r = G.ROTEIRO[estado.i];
   var cab = document.createElement('div'); cab.className = 'bloco-cab';
   cab.innerHTML = '<h1>' + (r.ic ? r.ic + ' ' : '') + (estado.i + 1) + '. ' + esc(r.t) + '</h1><span class="min">' + r.min + ' min</span>' +
-    '<div class="legenda"><span class="p"><i></i>Teacher says</span><span class="a"><i></i>Student says</span></div>';
+    '<div class="legenda"><span class="p"><i></i>' + T2('Teacher says', 'Dice el profesor') + '</span><span class="a"><i></i>' + T2('Student says', 'Dice el alumno') + '</span></div>';
   main.appendChild(cab);
   var box = document.createElement('div'); box.className = 'linhas';
   /* só as falas: a linha sem "diz" é nota do professor, e nota não entra aqui */
   (G.linhasDe(L, r.k) || []).filter(function (ln) { return ln.diz; }).forEach(function (ln) {
     var aluno = ln.quem === 'A';
     var el = document.createElement('div'); el.className = 'linha ' + (aluno ? 'fala-aluno' : 'fala-prof');
-    el.innerHTML = '<span class="quem">' + (aluno ? 'Student' : 'Teacher') + '</span><div class="diz">' + esc(ln.diz) + '</div>';
+    el.innerHTML = '<span class="quem">' + (aluno ? T2('Student', 'Alumno') : T2('Teacher', 'Profesor')) + '</span><div class="diz">' + esc(ln.diz) + '</div>';
     el.addEventListener('click', function () { el.classList.toggle('feita'); });
     box.appendChild(el);
   });
   main.appendChild(box);
   var acoes = document.createElement('div'); acoes.className = 'acoes';
-  var volta = document.createElement('button'); volta.type = 'button'; volta.className = 'btn btn-sec'; volta.textContent = '‹ Back'; volta.disabled = estado.i === 0;
+  var volta = document.createElement('button'); volta.type = 'button'; volta.className = 'btn btn-sec'; volta.textContent = T2('‹ Back', '‹ Atrás'); volta.disabled = estado.i === 0;
   volta.addEventListener('click', function () { estado.i = Math.max(0, estado.i - 1); pinta(); window.scrollTo(0, 0); });
   var feito = document.createElement('button'); feito.type = 'button'; feito.className = 'btn btn-feito';
-  feito.textContent = '✓ Done · next: ' + (estado.i + 1 < G.ROTEIRO.length ? G.ROTEIRO[estado.i + 1].t : 'Feedback');
+  feito.textContent = T2('✓ Done · next: ', '✓ Hecho · siguiente: ') + (estado.i + 1 < G.ROTEIRO.length ? G.ROTEIRO[estado.i + 1].t : 'Feedback');
   feito.addEventListener('click', function () { estado.feitas[r.k] = 1; estado.i++; pinta(); window.scrollTo(0, 0); });
   acoes.appendChild(volta); acoes.appendChild(feito);
   main.appendChild(acoes);
@@ -209,10 +219,10 @@ function pintaFeedback(main) {
   var primeiro = aluno ? aluno.split(' ')[0] : 'the student';
   var box = document.createElement('div'); box.className = 'fb';
   box.innerHTML = '<div class="bloco-cab"><h1>' + (G.ROTEIRO.length + 1) + '. Feedback</h1><span class="min">1 min</span></div>' +
-    '<div class="grupo bom"><h2>👍 ' + esc(primeiro) + ', you were best at…</h2><div class="chips" data-melhor>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</div></div>' +
-    '<div class="grupo ruim"><h2>👎 Let\'s work on…</h2><div class="chips" data-melhorar>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</div></div>' +
-    '<div class="grupo"><h2>🎯 To improve more, you should…</h2><div class="chips" data-pedidos></div></div>' +
-    '<div class="grupo"><h2>✉️ A note for ' + esc(primeiro) + '</h2><textarea data-bilhete placeholder="Good job on pronunciation. Study Do / Does before Lesson 4."></textarea></div>' +
+    '<div class="grupo bom"><h2>👍 ' + esc(primeiro) + T2(', you were best at…', ', lo que mejor hiciste fue…') + '</h2><div class="chips" data-melhor>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</div></div>' +
+    '<div class="grupo ruim"><h2>👎 ' + T2('Let\'s work on…', 'Vamos a trabajar…') + '</h2><div class="chips" data-melhorar>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</div></div>' +
+    '<div class="grupo"><h2>🎯 ' + T2('To improve more, you should…', 'Para mejorar más, deberías…') + '</h2><div class="chips" data-pedidos></div></div>' +
+    '<div class="grupo"><h2>✉️ ' + T2('A note for ', 'Una nota para ') + esc(primeiro) + '</h2><textarea data-bilhete placeholder="' + T2('Good job on pronunciation. Study Do / Does before Lesson 4.', 'Muy bien la pronunciación. Repasa el pretérito antes de la Lección 4.') + '"></textarea></div>' +
     '<p class="ok" data-ok hidden></p>';
   main.appendChild(box);
   var planoV2 = window[planoGlobal(book)] || null;
@@ -235,22 +245,22 @@ function pintaFeedback(main) {
   var ta = box.querySelector('[data-bilhete]'); ta.value = fb.bilhete; ta.addEventListener('input', function () { fb.bilhete = ta.value; });
 
   var acoes = document.createElement('div'); acoes.className = 'acoes';
-  var volta = document.createElement('button'); volta.type = 'button'; volta.className = 'btn btn-sec'; volta.textContent = '‹ Back';
+  var volta = document.createElement('button'); volta.type = 'button'; volta.className = 'btn btn-sec'; volta.textContent = T2('‹ Back', '‹ Atrás');
   volta.addEventListener('click', function () { estado.i = G.ROTEIRO.length - 1; pinta(); window.scrollTo(0, 0); });
   var salvar = document.createElement('button'); salvar.type = 'button'; salvar.className = 'btn btn-feito';
-  salvar.textContent = raf ? '✓ Save feedback' : '✓ Finish';
+  salvar.textContent = raf ? T2('✓ Save feedback', '✓ Guardar el feedback') : T2('✓ Finish', '✓ Terminar');
   salvar.addEventListener('click', function () {
     if (!raf) { window.close(); return; }
-    salvar.disabled = true; salvar.textContent = 'Saving…';
+    salvar.disabled = true; salvar.textContent = T2('Saving…', 'Guardando…');
     var checking = { licao: licaoId, feito: 1, melhor: fb.melhor || null, melhorar: fb.melhorar.slice(), pedidos: fb.pedidos.slice(), bilhete: fb.bilhete.trim() };
     fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plannerProf', token: token(), raf: raf, book: book, patch: { checking: checking } }) })
       .then(function (r) { return r.json(); })
       .then(function (r) {
         if (!r || !r.ok) throw new Error((r && (r.error || r.erro)) || 'not saved');
-        var okEl = box.querySelector('[data-ok]'); okEl.hidden = false; okEl.textContent = '✓ Feedback saved. Only the grade is left, in Turma de hoje.';
+        var okEl = box.querySelector('[data-ok]'); okEl.hidden = false; okEl.textContent = T2('✓ Feedback saved. Only the grade is left, in Turma de hoje.', '✓ Feedback guardado. Solo falta la nota, en Turma de hoje.');
         try { if (window.opener) window.opener.postMessage({ tipo: 'checking', raf: raf, planner: r.planner }, '*'); } catch (e) {}
-        salvar.textContent = '✓ Saved · close'; salvar.disabled = false; salvar.onclick = function () { window.close(); };
-      }).catch(function (e) { salvar.disabled = false; salvar.textContent = '⚠️ ' + e.message + ' · try again'; });
+        salvar.textContent = T2('✓ Saved · close', '✓ Guardado · cerrar'); salvar.disabled = false; salvar.onclick = function () { window.close(); };
+      }).catch(function (e) { salvar.disabled = false; salvar.textContent = '⚠️ ' + e.message + T2(' · try again', ' · intentar de nuevo'); });
   });
   acoes.appendChild(volta); acoes.appendChild(salvar);
   main.appendChild(acoes);
