@@ -311,6 +311,9 @@
   .mk.l-a.r-prof, .mk.l-plat.r-prof{ background: linear-gradient(90deg,#1d3685 50%,var(--prof) 50%); }
   .mk.l-prof{ background: linear-gradient(90deg,var(--prof) 50%,#fff 50%); }
   .mk.cheia-prof{ background: var(--prof); border-color: var(--prof); }
+  /* feita antes do Planner (o corte de 15/09/2026): cinza até alguém mexer */
+  .mk.ant{ background: #aeb5c2 !important; border-color: #aeb5c2 !important; }
+  .mk.tri.ant{ background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,3 27.5,24.5 2.5,24.5' fill='%23aeb5c2' stroke='%23aeb5c2' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat !important; }
   .mk.dep-prof{ border-color: var(--prof); }
   .mk.plat{ background: #1d3685 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/64% no-repeat; border-color: #1d3685; }
   .aula .it.xp .mk.dep-prof, .aula .it.xp .mk.cheia-prof{ border-color: #3a3400; }
@@ -350,7 +353,7 @@
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260915d"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260915e"></script>
 <!-- o guia do Checking, lição a lição: a base comum e um arquivo por livro (Essentials, Transitions e Fluency 1 e 2, In Focus, Inmediato 1 a 3) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=376d37037e"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=9630e2ddde"></script>
@@ -884,7 +887,7 @@ function linhaItem(a, it) {
   var capa = '';
   if (it.code === 'va') { var ep = (String(it.nm).match(/(\d+)/) || [])[1] || '1'; capa = '<img class="capa" alt="" src="https://portalfisk.com.br/assets/img/videobook/' + livroId(a.book) + '/' + ep + '-cover.jpg" onerror="this.remove()">'; }
   /* só o primeiro nome na linha miúda; o nome inteiro fica no title */
-  var quem = it.pq ? '<span class="quem" title="' + esc('Confirmado por ' + it.pq + (qd ? ' em ' + qd : '')) + '">✓ ' + esc(String(it.pq).trim().split(/\s+/)[0]) + (qd ? ' · ' + qd : '') + '</span>' : '';
+  var quem = it.ant === 1 ? '<span class="quem" title="Aula dada antes do lançamento do Planner (pelo card)">antes do Planner</span>' : it.pq ? '<span class="quem" title="' + esc('Confirmado por ' + it.pq + (qd ? ' em ' + qd : '')) + '">✓ ' + esc(String(it.pq).trim().split(/\s+/)[0]) + (qd ? ' · ' + qd : '') + '</span>' : '';
   b.innerHTML = mk + capa + '<span class="tx' + (quem ? ' com-quem' : '') + '">' + esc(it.nm) + (it.breve ? ' · soon' : '') + quem + '</span>' + (it.pg ? '<span class="pg">' + esc(it.pg) + '</span>' : '');
   b.title = toque ? 'Toque: a sua metade, depois a bolinha inteira, depois vazia'
     : (it.marca === 'tri' ? 'A tarefa é só do aluno' : (it.marca === 'aluno' ? 'Só o aluno marca: o professor não tem como ver' : (it.plat || it.marca === 'plataforma' ? 'A plataforma preenche' : '')));
@@ -903,7 +906,7 @@ function aplicaPendentes(raf, planner) {
   planner.itens = planner.itens || {};
   Object.keys(p).forEach(function (id) {
     var marca = p[id], it = Object.assign({}, planner.itens[id] || {});
-    if ('p' in marca) { if (marca.p) { it.p = 1; it.pq = it.pq || (sessao() || {}).name || 'você'; it.pt = it.pt || Date.now(); } else { delete it.p; delete it.pq; delete it.pt; } }
+    delete it.ant; if ('p' in marca) { if (marca.p) { it.p = 1; it.pq = it.pq || (sessao() || {}).name || 'você'; it.pt = it.pt || Date.now(); } else { delete it.p; delete it.pq; delete it.pt; } }
     if ('a' in marca) { if (marca.a) { it.a = 1; it.aq = it.aq || (sessao() || {}).name || 'você'; it.at = it.at || Date.now(); } else { delete it.a; delete it.at; delete it.aq; } }
     if (it.p || it.a) planner.itens[id] = it; else delete planner.itens[id];
   });
@@ -922,7 +925,7 @@ function confirmar(a, id, marca) {
   d.planner = d.planner || { itens: {}, checking: {} }; d.planner.itens = d.planner.itens || {};
   var antes = JSON.stringify(d.planner.itens[id] || null);
   var it = d.planner.itens[id] = Object.assign({}, d.planner.itens[id] || {});
-  if ('p' in marca) { if (marca.p) { it.p = 1; it.pq = (sessao() || {}).name || 'você'; it.pt = Date.now(); } else { delete it.p; delete it.pq; delete it.pt; } }
+  delete it.ant; if ('p' in marca) { if (marca.p) { it.p = 1; it.pq = (sessao() || {}).name || 'você'; it.pt = Date.now(); } else { delete it.p; delete it.pq; delete it.pt; } }
   if ('a' in marca) { if (marca.a) { it.a = 1; it.aq = (sessao() || {}).name || 'você'; it.at = Date.now(); } else { delete it.a; delete it.at; delete it.aq; } }
   if (!it.p && !it.a) delete d.planner.itens[id];
   redesenhar(a);   /* já com a marca nova */
