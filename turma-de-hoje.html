@@ -425,7 +425,7 @@ function guardaAtendidos() { try { localStorage.setItem(chaveAtend(), JSON.strin
 function aplicarFila() {
   var plano = estado.plano, pos = {};
   if (plano && Array.isArray(plano.ordem)) plano.ordem.forEach(function (o, i) { pos[normNome(o.nome)] = { i: i, o: o }; });
-  estado.alunos.forEach(function (a) { var p = pos[normNome(a.nome)]; a._plan = p ? p.o : null; a._pos = p ? p.i : 999; });
+  estado.alunos.forEach(function (a) { var p = pos[normNome(a.nome)]; a._plan = p ? p.o : null; if (a.visitante) return; a._pos = p ? p.i : 999; });   /* quem veio pela busca fica na ordem em que chegou, depois da turma */
   estado.alunos.sort(function (x, y) {
     var ax = estado.atendidos[x.raf] ? 1 : 0, ay = estado.atendidos[y.raf] ? 1 : 0;
     if (ax !== ay) return ax - ay;
@@ -606,10 +606,13 @@ function initCascata() {
     lista('turmas:' + escola + '|' + prof, { action: 'card', fn: 'turmas', escola: escola, prof: prof }, 'turmas', function (turmas, doCache) {
       if (selEscola.value !== escola || selProf.value !== prof) return;
       var antes = selTurma.value;
-      montarSelect(selTurma, 'Escolha a turma…', turmas.map(function (t) { return { v: t.linhaTitulo, t: t.titulo }; }));
-      if (antes && turmas.some(function (t) { return String(t.linhaTitulo) === antes; })) { selTurma.value = antes; return; }
+      montarSelect(selTurma, 'Escolha a turma…', [{ v: PLANTAO, t: '🙋 Plantão de dúvidas (alunos da escola, pela busca)' }].concat(turmas.map(function (t) { return { v: t.linhaTitulo, t: t.titulo }; })));
+      if (antes && (antes === PLANTAO || turmas.some(function (t) { return String(t.linhaTitulo) === antes; }))) { selTurma.value = antes; return; }
       var agora = turmaDoHorario(turmas);
+      /* o horário do plantão escrito no card ("LC FIXO - 5ª 15h às 17h30") abre o plantão, não a lista daquela linha */
+      if (agora && ehPlantao(agora.titulo)) { status('🕒 Horário do plantão de dúvidas.'); escolhe(selTurma, PLANTAO); return; }
       if (agora) { status('🕒 Turma do horário de agora: ' + agora.titulo.split('\n')[0] + '. Troque acima se for outra.'); escolhe(selTurma, agora.linhaTitulo); return; }
+      if (ehMonitor(prof)) { status('🙋 Plantão de dúvidas: busque cada aluno pelo nome ou RAF.'); escolhe(selTurma, PLANTAO); return; }
       if (!doCache) status('Fora do horário de aula de ' + prof + ': escolha a turma acima.');
       else status('Fora do horário de aula de ' + prof + ': escolha a turma acima.');
     });
@@ -617,6 +620,7 @@ function initCascata() {
   selTurma.addEventListener('change', function () {
     if (!selTurma.value) return;
     var titulo = selTurma.options[selTurma.selectedIndex].text;
+    if (selTurma.value === PLANTAO) { carregarPlantao(selEscola.value, selProf.value); return; }
     fiskLembrarTurma(selEscola.value, selProf.value, selTurma.value, titulo);
     carregarTurma(selEscola.value, selProf.value, selTurma.value, titulo);
   });  /* a primeira lista vem DEPOIS dos três listeners: do cache ela escolhe na hora, e o change precisa de quem ouvir */
@@ -678,7 +682,7 @@ function erro(e) {
 
 /* ── a turma: os alunos do card (com RAF) e o planner de cada um ── */
 function carregarTurma(escola, prof, linha, titulo) {
-  estado.escola = escola; estado.prof = prof; estado.turma = titulo;
+  estado.escola = escola; estado.prof = prof; estado.turma = titulo; estado.plantao = false;
   $('alunos').innerHTML = ''; $('resumo').hidden = true; $('legenda').hidden = true;
   status('🔄 Lendo a turma no card…');
   /* o panorama é rota de GET no backend (doGet); por POST ele cai na guarda
@@ -724,6 +728,26 @@ function carregarTurma(escola, prof, linha, titulo) {
    Turmas juntadas por falta: o professor busca por nome ou RAF (a mesma busca do Dossiê, `alunoBusca`, na lista de
    matrículas) e o aluno entra no FIM da lista, com borda roxa, sem tirar ninguém da turma. Fica enquanto a tela
    estiver aberta, inclusive se trocar de turma; "Tirar da tela" só esconde (nada é apagado). */
+/* O PLANTÃO DE DÚVIDAS (Pedro, 15/09/2026). O monitor atende alunos de todas as turmas da unidade: não há lista
+   do card, a tela abre vazia e cada aluno entra pela busca, NA ORDEM em que foi chamado; "Aluno atendido" desce
+   para o fim, como na turma. A opção existe para todo professor (quem cobre o plantão um dia também usa); para
+   os monitores da lista abaixo ela vem escolhida fora do horário de aula, e para qualquer um no horário de uma
+   linha "LC"/"Plantão" do card. */
+var PLANTAO = '__plantao';
+var MONITORES = [];   /* nomes das contas dos monitores, como no login do Hub (ex.: 'NICOLE'); vazio até o Pedro dizer quem são */
+function nPessoa(v) { return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
+function ehMonitor(prof) { var s = sessao() || {}; return MONITORES.some(function (m) { var x = nPessoa(m); return x && (x === nPessoa(prof) || x === nPessoa(s.name) || nPessoa(s.name).indexOf(x + ' ') === 0); }); }
+function ehPlantao(titulo) { return /\bLC\b|plant[aã]o|learning\s*center|centro de estudos/i.test(String(titulo || '')); }
+function carregarPlantao(escola, prof) {
+  estado.escola = escola; estado.prof = prof; estado.turma = 'Plantão de dúvidas'; estado.plantao = true;
+  estado.alunos = []; estado.dados = estado.dados || {}; estado.plano = null; estado.pessoais = [];
+  estado.atendidos = lerAtendidos();
+  juntaVisitantes(); aplicarFila();
+  $('fila').hidden = true; $('legenda').hidden = false;
+  status('🙋 Plantão de dúvidas em ' + escola + ': busque cada aluno pelo nome ou RAF em "Trazer outro aluno". Eles entram na ordem em que chegam.');
+  desenharTurma();
+  try { $('qAluno').focus(); } catch (e) {}
+}
 function juntaVisitantes() {
   estado.visitantes.forEach(function (v) {
     if (!estado.alunos.some(function (a) { return a.raf === v.raf; })) estado.alunos.push(v);
@@ -734,7 +758,7 @@ function trazerAluno(al) {
   var ja = estado.alunos.some(function (a) { return a.raf === al.raf; });
   if (ja) { var c = document.querySelector('.al[data-raf="' + al.raf + '"]'); if (c) { c.scrollIntoView({ behavior: 'smooth', block: 'start' }); } toast(al.name + ' já está na tela.'); return; }
   if (!al.book) { toast('⚠️ ' + al.name + ' está sem livro na lista de matrículas.'); return; }
-  var v = { nome: al.name, raf: al.raf, book: al.book, turma: al.turma, visitante: true, _pos: 1000 };
+  var v = { nome: al.name, raf: al.raf, book: al.book, turma: al.turma, visitante: true, _pos: 1000 + estado.visitantes.length };
   status('🔄 Lendo o planner de ' + al.name + '…');
   estado.dados = estado.dados || {};
   Promise.all([
@@ -813,7 +837,7 @@ function desenharTurma() {
   var nCk = 0;
   estado.alunos.forEach(function (a) { caixa.appendChild(cartaoAluno(a)); var ck = (estado.dados[a.raf] || {}).planner; if (ck && ck.checking && Object.keys(ck.checking).some(function (k) { return ck.checking[k].feito; })) nCk++; });
   $('resumo').hidden = false;
-  $('resumo').innerHTML = '<b>' + estado.alunos.length + '</b> alunos em <b>' + esc(estado.turma) + '</b> · <b>' + nCk + '</b> com algum Checking registrado';
+  $('resumo').innerHTML = '<b>' + estado.alunos.length + '</b> alunos ' + (estado.plantao ? 'no' : 'em') + ' <b>' + esc(estado.turma) + '</b> · <b>' + nCk + '</b> com algum Checking registrado';
 }
 
 /* AS CORES DO ESTÁGIO (Pedro, 14/09/2026: "cada estágio terá uma cor diferente"):
@@ -863,7 +887,7 @@ function cartaoAluno(a) {
   var nivelRot = { alta: 'prioridade alta', media: 'prioridade média', emdia: 'em dia', semdados: 'sem dados' };
   if (estado.atendidos[a.raf]) card.classList.add('atendido');
   if (a.visitante) card.classList.add('visitante');
-  cab.innerHTML = '<span class="nome">' + esc(a.nome) + '</span>' + (a.visitante ? '<span class="visita" title="Aluno trazido pela busca">de outra turma' + (a.turma ? ' · ' + esc(a.turma) : '') + '</span><button type="button" class="tirar" data-tirar="' + esc(a.raf) + '">Tirar da tela</button>' : '') + '<span class="livro' + (plano ? ' cor' : '') + '">' + esc(a.book || '') + '</span>' +
+  cab.innerHTML = '<span class="nome">' + esc(a.nome) + '</span>' + (a.visitante ? '<span class="visita" title="Aluno trazido pela busca">' + (estado.plantao ? 'plantão' : 'de outra turma') + (a.turma ? ' · ' + esc(String(a.turma).split('\n')[0]) : '') + '</span><button type="button" class="tirar" data-tirar="' + esc(a.raf) + '">Tirar da tela</button>' : '') + '<span class="livro' + (plano ? ' cor' : '') + '">' + esc(a.book || '') + '</span>' +
     (plan ? '<span class="pill nv-' + esc(plan.nivel || 'emdia') + '">' + (a._pos + 1) + 'º · ' + esc(nivelRot[plan.nivel] || plan.nivel || '') + '</span>' : (estado.plano ? '<span class="pill fora">fora do roteiro</span>' : '')) +
     outrosProfs(a) +
     '<span class="pill pos">📍 ' + esc(pos.rot) + (pos.tema ? ' · ' + esc(pos.tema) : '') + '</span>' +
