@@ -483,14 +483,53 @@ function alternaPrioridade() {
     ordenarPorPrioridade();
   }
   desenharTurma();
-  /* FLIP: cada cartão desliza da posição antiga para a nova */
-  document.querySelectorAll('#alunos .al').forEach(function (c) {
+  /* FLIP calmo (Pedro, 15/09/2026): cada cartão parte de onde estava e caminha 1,1 s até o lugar novo, com uma leve
+     inclinação e sombra de "papel levantado"; quem se move mais sai um pouquinho depois. Som só no fim. */
+  var lento = !window.matchMedia || !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var cards = [].slice.call(document.querySelectorAll('#alunos .al'));
+  var movidos = 0, maiorDy = 0;
+  cards.forEach(function (c) {
     var t0 = antes[c.dataset.raf]; if (t0 == null) return;
     var dy = t0 - c.getBoundingClientRect().top; if (!dy) return;
-    c.style.transition = 'none'; c.style.transform = 'translateY(' + dy + 'px)';
-    requestAnimationFrame(function () { c.style.transition = 'transform .45s ease'; c.style.transform = ''; });
+    movidos++; maiorDy = Math.max(maiorDy, Math.abs(dy));
+    if (!lento) return;
+    c.style.transition = 'none'; c.style.transform = 'translateY(' + dy + 'px)'; c.style.zIndex = '5';
+    c.style.boxShadow = '0 10px 26px rgba(20,22,28,.18)';
   });
-  var pri = document.querySelector('#alunos .al'); if (pri && estado.prioridade) { var y = pri.getBoundingClientRect().top + window.scrollY - 90; window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' }); }
+  if (lento && movidos) {
+    var passo = 0;
+    cards.forEach(function (c) {
+      if (!c.style.transform) return;
+      var atraso = Math.min(260, passo * 45); passo++;
+      setTimeout(function () {
+        c.style.transition = 'transform 1.1s cubic-bezier(.22,.9,.24,1), box-shadow .9s ease';
+        c.style.transform = ''; c.style.boxShadow = '';
+      }, 40 + atraso);
+    });
+    setTimeout(function () {
+      cards.forEach(function (c) { c.style.transition = ''; c.style.zIndex = ''; });
+      if (estado.prioridade) somDeConquista();
+    }, 1500);
+  } else if (estado.prioridade && movidos) somDeConquista();
+  var pri = document.querySelector('#alunos .al');
+  if (pri && estado.prioridade) setTimeout(function () { var y = pri.getBoundingClientRect().top + window.scrollY - 90; window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' }); }, lento ? 1300 : 0);
+}
+/* um arpejo curto de três notas quando a fila termina de se organizar (sem arquivo de áudio: o navegador sintetiza) */
+function somDeConquista() {
+  try {
+    var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    var ac = somDeConquista._ac || (somDeConquista._ac = new AC());
+    if (ac.state === 'suspended') ac.resume();
+    var t0 = ac.currentTime + 0.02;
+    [[659.25, 0], [830.61, 0.11], [987.77, 0.22]].forEach(function (par) {
+      var o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'triangle'; o.frequency.value = par[0];
+      g.gain.setValueAtTime(0.0001, t0 + par[1]);
+      g.gain.exponentialRampToValueAtTime(0.13, t0 + par[1] + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + par[1] + 0.42);
+      o.connect(g); g.connect(ac.destination); o.start(t0 + par[1]); o.stop(t0 + par[1] + 0.45);
+    });
+  } catch (e) {}
 }
 function aplicarFila() {
   var plano = estado.plano, pos = {};
