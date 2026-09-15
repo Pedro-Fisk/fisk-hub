@@ -1247,7 +1247,7 @@
       function normPiloto(v){ return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
       function updateToolLinks(){
         var sv0 = saved(), th = document.querySelector('a.card-turmahoje');
-        if (th) th.style.display = (sv0 && (sv0.master || TURMA_HOJE_PILOTO.some(function(n){ return normPiloto(n) === normPiloto(sv0.name); }))) ? '' : 'none';
+        if (th) th.style.display = (sv0 && (sv0.master || TURMA_HOJE_PILOTO.some(function(n){ var x = normPiloto(sv0.name), y = normPiloto(n); return x === y || x.indexOf(y + ' ') === 0; }))) ? '' : 'none';
         var avc = document.getElementById('card-avatar');
         if (avc){
           var avAberto = !!(sv0 && (AVATAR_PROFS_ABERTO || sv0.master));

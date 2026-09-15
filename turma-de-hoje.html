@@ -553,7 +553,7 @@ var TURMA_HOJE_PILOTO = ['CARLOS ALBERTO'];
 function turmaHojeLiberada() {
   var s = sessao() || {};
   var n = function (v) { return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); };
-  return !!(s.master || TURMA_HOJE_PILOTO.some(function (p) { return n(p) === n(s.name); }));
+  return !!(s.master || TURMA_HOJE_PILOTO.some(function (p) { return n(p) === n(s.name) || n(s.name).indexOf(n(p) + ' ') === 0; }));   /* "Carlos Alberto da Silva" também */
 }
 function initCascata() {
   if (!turmaHojeLiberada()) { status('🔒 A Turma de hoje está em piloto com um professor de teste. Em breve para todos.', true); return; }
@@ -564,62 +564,106 @@ function initCascata() {
   var s = sessao() || {};
   var eu = s.master ? (function () { try { return (JSON.parse(localStorage.getItem('fisk_actas') || 'null') || {}).name || ''; } catch (e) { return ''; } })() : (s.name || '');
   var minhas = Array.isArray(s.escolas) ? s.escolas : (s.escolas ? String(s.escolas).split(/[,;]/).map(function (x) { return x.trim(); }) : []);
-  get({ action: 'card', fn: 'escolas' }).then(function (j) {
-    var escolas = (j.escolas || []);
-    montarSelect(selEscola, 'Escolha a escola…', escolas.map(function (e) { return { v: e, t: e }; }));
-    if (fiskReporTurma(selEscola, 'escola')) { status('🔄 Voltando para a última turma que você abriu…'); return; }
-    var minha = escolas.find(function (e) { return minhas.some(function (m) { return m && e.toLowerCase().indexOf(m.toLowerCase()) > -1; }); }) || (escolas.length === 1 ? escolas[0] : '');
-    if (minha) { selEscola.value = minha; selEscola.dispatchEvent(new Event('change')); }
-  }).catch(erro);
+  /* RÁPIDO (Pedro, 15/09/2026): as listas de escolas, professores e turmas ficam guardadas no aparelho e a cascata se
+     monta na hora com elas; a leitura do card corre por trás e só troca as opções se algo mudou. A escola e o professor
+     vêm de quem entrou; a turma, SÓ pelo horário: fora da aula nenhuma turma abre sozinha (a última vista não volta mais). */
+  var LISTA_V = 'th:lista:';
+  function lista(chave, params, campo, pinta) {
+    var guardada = null;
+    try { guardada = JSON.parse(localStorage.getItem(LISTA_V + chave) || 'null'); } catch (e) {}
+    if (guardada && guardada.length) pinta(guardada, true);
+    get(params).then(function (j) {
+      var nova = j[campo] || [];
+      try { localStorage.setItem(LISTA_V + chave, JSON.stringify(nova)); } catch (e) {}
+      if (!guardada || JSON.stringify(guardada) !== JSON.stringify(nova)) pinta(nova, false);
+    }).catch(function (e) { if (!guardada) erro(e); });
+  }
+  function escolhe(sel, valor) {
+    if (!valor || !Array.prototype.some.call(sel.options, function (o) { return o.value === String(valor); })) return false;
+    if (sel.value === String(valor)) return true;
+    sel.value = String(valor); sel.dispatchEvent(new Event('change')); return true;
+  }
   selEscola.addEventListener('change', function () {
     if (!selEscola.value) return;
+    var escola = selEscola.value;
     selProf.innerHTML = '<option value="" disabled selected>Carregando…</option>'; selProf.disabled = true;
     selTurma.innerHTML = '<option value="" disabled selected>Turma…</option>'; selTurma.disabled = true;
-    get({ action: 'card', fn: 'profs', escola: selEscola.value }).then(function (j) {
-      var profs = (j.profs || []);
+    lista('profs:' + escola, { action: 'card', fn: 'profs', escola: escola }, 'profs', function (profs) {
+      if (selEscola.value !== escola) return;
+      var antes = selProf.value;
       montarSelect(selProf, 'Escolha o professor(a)…', profs.map(function (p) { return { v: p, t: p }; }));
-      if (fiskReporTurma(selProf, 'prof')) return;
+      if (antes && profs.indexOf(antes) > -1) { selProf.value = antes; return; }
       var meu = profs.find(function (p) { return eu && p.toLowerCase() === eu.toLowerCase(); }) || profs.find(function (p) { return eu && p.toLowerCase().indexOf(eu.toLowerCase().split(' ')[0]) === 0; });
-      if (meu) { selProf.value = meu; selProf.dispatchEvent(new Event('change')); }
-    }).catch(erro);
+      var ult = fiskUltimaTurma();
+      escolhe(selProf, meu || (ult && ult.escola === escola && ult.prof));
+    });
   });
   selProf.addEventListener('change', function () {
     if (!selProf.value) return;
+    var escola = selEscola.value, prof = selProf.value;
     selTurma.innerHTML = '<option value="" disabled selected>Carregando…</option>'; selTurma.disabled = true;
-    get({ action: 'card', fn: 'turmas', escola: selEscola.value, prof: selProf.value }).then(function (j) {
-      var turmas = (j.turmas || []);
+    lista('turmas:' + escola + '|' + prof, { action: 'card', fn: 'turmas', escola: escola, prof: prof }, 'turmas', function (turmas, doCache) {
+      if (selEscola.value !== escola || selProf.value !== prof) return;
+      var antes = selTurma.value;
       montarSelect(selTurma, 'Escolha a turma…', turmas.map(function (t) { return { v: t.linhaTitulo, t: t.titulo }; }));
+      if (antes && turmas.some(function (t) { return String(t.linhaTitulo) === antes; })) { selTurma.value = antes; return; }
       var agora = turmaDoHorario(turmas);
-      if (agora) { selTurma.value = String(agora.linhaTitulo); status('🕒 Turma do horário de agora: ' + agora.titulo + '. Troque acima se for outra.'); selTurma.dispatchEvent(new Event('change')); return; }
-      fiskReporTurma(selTurma, 'linha');
-    }).catch(erro);
+      if (agora) { status('🕒 Turma do horário de agora: ' + agora.titulo.split('\n')[0] + '. Troque acima se for outra.'); escolhe(selTurma, agora.linhaTitulo); return; }
+      if (!doCache) status('Fora do horário de aula de ' + prof + ': escolha a turma acima.');
+      else status('Fora do horário de aula de ' + prof + ': escolha a turma acima.');
+    });
   });
   selTurma.addEventListener('change', function () {
     if (!selTurma.value) return;
     var titulo = selTurma.options[selTurma.selectedIndex].text;
     fiskLembrarTurma(selEscola.value, selProf.value, selTurma.value, titulo);
     carregarTurma(selEscola.value, selProf.value, selTurma.value, titulo);
+  });  /* a primeira lista vem DEPOIS dos três listeners: do cache ela escolhe na hora, e o change precisa de quem ouvir */
+  lista('escolas', { action: 'card', fn: 'escolas' }, 'escolas', function (escolas) {
+    var antes = selEscola.value;
+    montarSelect(selEscola, 'Escolha a escola…', escolas.map(function (e) { return { v: e, t: e }; }));
+    var minha = escolas.find(function (e) { return minhas.some(function (m) { return m && e.toLowerCase().indexOf(m.toLowerCase()) > -1; }); }) || (escolas.length === 1 ? escolas[0] : '');
+    if (antes && escolas.indexOf(antes) > -1) { selEscola.value = antes; return; }
+    var ult = fiskUltimaTurma();
+    escolhe(selEscola, minha || (ult && ult.escola));
   });
+
 }
-/* A turma cujo horário bate com o relógio: o título do card traz o dia da
-   semana ("5ª", "SÁB") e a faixa ("8h30 às 11h"). Vale de 30 minutos antes
-   do início até o fim; o professor abre a ferramenta na aula ou logo antes. */
-var DIAS = { 'DOM': 0, '2ª': 1, '2A': 1, 'SEG': 1, '3ª': 2, '3A': 2, 'TER': 2, '4ª': 3, '4A': 3, 'QUA': 3, '5ª': 4, '5A': 4, 'QUI': 4, '6ª': 5, '6A': 5, 'SEX': 5, 'SÁB': 6, 'SAB': 6 };
-function horaMin(txt) { var m = String(txt).match(/(\d{1,2})\s*[h:]\s*(\d{2})?/i); return m ? (+m[1]) * 60 + (+(m[2] || 0)) : null; }
-function turmaDoHorario(turmas) {
-  var d = new Date(), dia = d.getDay(), min = d.getHours() * 60 + d.getMinutes();
-  for (var i = 0; i < turmas.length; i++) {
-    var t = String(turmas[i].titulo || '').toUpperCase();
-    var diaT = null;
-    Object.keys(DIAS).forEach(function (k) { if (diaT == null && t.indexOf(k) > -1) diaT = DIAS[k]; });
-    if (diaT == null || diaT !== dia) continue;
-    var faixa = t.match(/(\d{1,2}\s*[H:]\s*\d{0,2})\s*(?:ÀS|AS|A|-|–)\s*(\d{1,2}\s*[H:]\s*\d{0,2})/i);
-    if (!faixa) continue;
-    var ini = horaMin(faixa[1]), fim = horaMin(faixa[2]);
-    if (ini == null || fim == null) continue;
-    if (min >= ini - 30 && min <= fim) return turmas[i];
+/* O HORÁRIO DA TURMA, lido do título do card (Pedro, 15/09/2026: abrir sozinho a turma da aula de agora).
+   Os títulos são escritos à mão e variam: "ADVANCED - 2ª/4ª 17h30 às 18h45", "Básico (+18) - 4ª 18h45/21h15",
+   "Teens Connect 2 - Sáb - 10:30 ás 13:00", "Acadêmico Essentials 1- 2/4ª 17h30 as 18h45", "INTER/ADV - 5º 8h30 às 11h",
+   "Basic (+18) - Sábado 08h/10h30", "Teens Elementary 2 Acad - 5ª 08h30 às 11". Devolve {dias:[0-6], ini, fim} em minutos, ou null. */
+function horarioDaTurma(titulo) {
+  var t = String(titulo || '').split(/\n/)[0].replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ').trim();
+  var mT = /(\d{1,2})\s*(?:[h:]|hr)\s*(\d{2})?/i.exec(t);
+  if (!mT) return null;
+  var antes = t.slice(0, mT.index), depois = t.slice(mT.index);
+  var PAL = { 'dom': 0, 'seg': 1, 'segunda': 1, 'ter': 2, 'terca': 2, 'qua': 3, 'quarta': 3, 'qui': 4, 'quinta': 4, 'sex': 5, 'sexta': 5, 'sab': 6, 'sabado': 6 };
+  var pedacos = antes.split(/\s[-–]\s?|[-–]\s|\s[-–]/).map(function (p) { return p.trim(); }).filter(Boolean);
+  var dias = [];
+  for (var i = pedacos.length - 1; i >= 0 && !dias.length; i--) {
+    var p = pedacos[i].normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    (p.match(/[a-z]+/g) || []).forEach(function (w) { if (w in PAL && dias.indexOf(PAL[w]) < 0) dias.push(PAL[w]); });
+    if (/[ªº°]|\d\s*(\/|e\s)\s*\d/.test(pedacos[i])) (pedacos[i].match(/[2-7](?=\s*(?:[ªº°]|\/|e\s|$))/g) || []).forEach(function (d) { var n = (+d) - 1; if (dias.indexOf(n) < 0) dias.push(n); });
   }
-  return null;
+  if (!dias.length) return null;
+  var horas = [], re = /(\d{1,2})\s*(?:(?:[h:]|hr)\s*(\d{2})?h?|(?=\s*$))/gi, m;
+  while ((m = re.exec(depois)) && horas.length < 2) { var h = +m[1], mi = +(m[2] || 0); if (h <= 23 && mi < 60) horas.push(h * 60 + mi); }
+  if (!horas.length) return null;
+  var ini = horas[0], fim = horas[1] && horas[1] > ini ? horas[1] : ini + (dias.length > 1 ? 75 : 150);
+  return { dias: dias.sort(), ini: ini, fim: fim };
+}
+/* A turma da aula de AGORA: a que está acontecendo (do início ao fim), ou a que começa nos próximos 20 minutos.
+   Em aulas seguidas (17h30 às 18h45 e 18h45 às 20h) vale a que já começou. Fora do horário, nenhuma. */
+function turmaDoHorario(turmas) {
+  var d = new Date(), dia = d.getDay(), min = d.getHours() * 60 + d.getMinutes(), logo = null;
+  for (var i = 0; i < turmas.length; i++) {
+    var h = horarioDaTurma(turmas[i].titulo);
+    if (!h || h.dias.indexOf(dia) < 0) continue;
+    if (min >= h.ini && min < h.fim) return turmas[i];
+    if (!logo && min >= h.ini - 20 && min < h.ini) logo = turmas[i];
+  }
+  return logo;
 }
 function erro(e) {
   var msg = (e && e.message) || 'erro';
