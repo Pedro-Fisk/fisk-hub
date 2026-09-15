@@ -48,6 +48,7 @@
   .achados-al button:hover, .achados-al button:focus-visible{ background: #eef3fb; outline: none; }
   .achados-al small{ color: var(--gray); }
   .achados-al .vazio{ padding: .6rem .8rem; color: var(--gray); }
+  .pill.outro-prof{ background: #fff4e0; color: #8a4b00; border: 1px solid #f3c77a; }
   .al.visitante{ outline: 3px dashed #7c3aed; outline-offset: -3px; }
   .al .visita{ font-size: .78rem; font-weight: 800; color: #7c3aed; background: #f1ebff; border-radius: 99px; padding: .15rem .6rem; }
   .al .tirar{ font: inherit; font-size: .8rem; border: 1px solid #c9d4e8; background: #fff; border-radius: 99px; padding: .15rem .6rem; cursor: pointer; }
@@ -824,6 +825,30 @@ function corDoEstagio(plano) {
   var cor = plano.cor || '#1d3685', tab = plano.corTab || '#912d99', ac = plano.acento || '#d4e909';
   return '--tab:' + tab + ';--ac:' + ac + ';--acTxt:' + (lumCor(ac) > 0.6 ? '#3a3400' : '#fff') + ';--pil:' + (lumCor(cor) < 0.55 ? '#dce6f2' : cor) + ';--mar:' + (lumCor(cor) < 0.55 ? cor : '#1d3685');
 }
+/* AULA COM OUTRO PROFESSOR (Pedro, 15/09/2026): turma juntada, substituição, reposição. As marcas guardam quem
+   marcou e quando; se nos últimos 30 dias alguém que não é você marcou algo deste aluno, o cartão avisa
+   "aula com Fulano em dd.mm" (a mais recente de cada um). O corte ("Antes do Planner") não conta. */
+function outrosProfs(a) {
+  var s = sessao() || {};
+  var eu = s.master ? (function () { try { return (JSON.parse(localStorage.getItem('fisk_actas') || 'null') || {}).name || ''; } catch (e) { return ''; } })() : (s.name || '');
+  var n = function (v) { return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); };
+  var meu = n(eu), meuPri = meu.split(' ')[0];
+  var itens = (((estado.dados[a.raf] || {}).planner || {}).itens) || {};
+  var limite = Date.now() - 30 * 864e5, por = {};
+  Object.keys(itens).forEach(function (id) {
+    var it = itens[id] || {};
+    [[it.pq, it.pt], [it.aq, it.at]].forEach(function (par) {
+      var quem = n(par[0]), t = Number(par[1]) || 0;
+      if (!quem || !t || t < limite || it.ant === 1 || quem === 'ANTES DO PLANNER') return;
+      if (meu && (quem === meu || quem.split(' ')[0] === meuPri)) return;
+      if (!por[quem] || por[quem].t < t) por[quem] = { t: t, nome: String(par[0]).trim().split(/\s+/)[0] };
+    });
+  });
+  var lista = Object.keys(por).map(function (k) { return por[k]; }).sort(function (x, y) { return y.t - x.t; });
+  if (!lista.length) return '';
+  var dd = function (t) { var d = new Date(t); return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2); };
+  return '<span class="pill outro-prof" title="Marcas feitas por outro professor nos últimos 30 dias">👥 aula com ' + lista.slice(0, 2).map(function (x) { return esc(x.nome) + ' em ' + dd(x.t); }).join(' · ') + '</span>';
+}
 function cartaoAluno(a) {
   var plano = planoDe(a.book);
   var ctx = ctxDe(a);
@@ -840,6 +865,7 @@ function cartaoAluno(a) {
   if (a.visitante) card.classList.add('visitante');
   cab.innerHTML = '<span class="nome">' + esc(a.nome) + '</span>' + (a.visitante ? '<span class="visita" title="Aluno trazido pela busca">de outra turma' + (a.turma ? ' · ' + esc(a.turma) : '') + '</span><button type="button" class="tirar" data-tirar="' + esc(a.raf) + '">Tirar da tela</button>' : '') + '<span class="livro' + (plano ? ' cor' : '') + '">' + esc(a.book || '') + '</span>' +
     (plan ? '<span class="pill nv-' + esc(plan.nivel || 'emdia') + '">' + (a._pos + 1) + 'º · ' + esc(nivelRot[plan.nivel] || plan.nivel || '') + '</span>' : (estado.plano ? '<span class="pill fora">fora do roteiro</span>' : '')) +
+    outrosProfs(a) +
     '<span class="pill pos">📍 ' + esc(pos.rot) + (pos.tema ? ' · ' + esc(pos.tema) : '') + '</span>' +
     (atras > 0 ? '<span class="pill atras">' + atras + ' aula' + (atras === 1 ? '' : 's') + ' atrás do plano</span>' : '') +
     (ckAtual && ckAtual.feito ? '<span class="pill chk">✓ Checking ' + esc(pos.id) + (ckAtual.nota != null ? ' · <span class="nota-priv">nota ' + esc(ckAtual.nota) + '</span>' : '') + '</span>' : '<span class="pill chk falta">Checking ' + esc(pos.id) + ' pendente</span>') +
@@ -983,7 +1009,7 @@ var obsTimer = {};
 function caixaObs(a) {
   var box = document.createElement('div'); box.className = 'obs';
   var d = estado.dados[a.raf] || {}; var atual = (d.planner && d.planner.obs) || '';
-  box.innerHTML = '<label>📝 Anotações sobre ' + esc(a.nome.split(' ')[0]) + ' (só você vê)</label>' +
+  box.innerHTML = '<label>📝 Anotações sobre ' + esc(a.nome.split(' ')[0]) + ' (só professores veem; o aluno não)</label>' +
     '<textarea maxlength="600" placeholder="Ex.: aniversário na próxima aula; conversar com a família; pediu mais exercícios de listening…"></textarea>' +
     '<div class="st"></div>' +
     '<button type="button" class="ec" disabled title="Em breve: a anotação vai para o e-counseling do aluno">➕ Adicionar ao e-counseling (em breve)</button>';
