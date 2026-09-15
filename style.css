@@ -110,6 +110,24 @@
 @media (prefers-reduced-motion:reduce){
   .card-hogwarts,.card-hogwarts::after{animation:none}
 }
+/* O LANÇAMENTO DO PLANNER (Pedro, 15/09/2026): a Turma de hoje em azul-marinho com um brilho em volta, para ser
+   o card que o professor acha primeiro. O brilho pulsa devagar; com movimento reduzido fica parado. */
+.card-turmahoje, body.theme-dark .card-turmahoje{
+  --accent:#d4e909;
+  background:linear-gradient(145deg,#1d3685 0%,#142a6b 100%);
+  border-color:#3b5bc4; color:#fff;
+  box-shadow:0 0 0 2px rgba(212,233,9,.55), 0 0 26px 6px rgba(59,91,196,.55);
+  animation:hubThGlow 2.8s ease-in-out infinite;
+}
+.card-turmahoje:hover, body.theme-dark .card-turmahoje:hover{ border-color:#d4e909; box-shadow:0 0 0 2px #d4e909, 0 0 34px 10px rgba(59,91,196,.7); }
+.card-turmahoje h2{color:#fff}
+.card-turmahoje p{color:rgba(255,255,255,.84)}
+.card-turmahoje .icon{background:rgba(212,233,9,.16);color:#d4e909}
+@keyframes hubThGlow{
+  0%,100%{box-shadow:0 0 0 2px rgba(212,233,9,.45), 0 0 18px 3px rgba(59,91,196,.45)}
+  50%{box-shadow:0 0 0 2px rgba(212,233,9,.8), 0 0 32px 9px rgba(59,91,196,.75)}
+}
+@media (prefers-reduced-motion:reduce){ .card-turmahoje{animation:none} }
 
 /* Cards que só navegam (estágio → teste → forma) não abrem PDF: o cursor de
    link já basta, mas o ícone segue o mesmo padrão dos cards de documento. */
