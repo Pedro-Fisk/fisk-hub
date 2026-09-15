@@ -48,6 +48,9 @@
   .achados-al button:hover, .achados-al button:focus-visible{ background: #eef3fb; outline: none; }
   .achados-al small{ color: var(--gray); }
   .achados-al .vazio{ padding: .6rem .8rem; color: var(--gray); }
+  .pill.prio-btn{ margin-left:auto; background:#1d3685; color:#fff; border:0; cursor:pointer; font: inherit; font-weight:800; }
+  .pill.prio{ font-weight:800; }
+  .pill.prio.nv-alta{ background:#fde2e2; color:#a11a1a; } .pill.prio.nv-media{ background:#fff1d6; color:#8a5300; } .pill.prio.nv-emdia{ background:#e3f5e8; color:#1f6b35; } .pill.prio.nv-semdados{ background:#eef1f6; color:#555; }
   .pill.outro-prof{ background: #fff4e0; color: #8a4b00; border: 1px solid #f3c77a; }
   .al.visitante{ outline: 3px dashed #7c3aed; outline-offset: -3px; }
   .al .visita{ font-size: .78rem; font-weight: 800; color: #7c3aed; background: #f1ebff; border-radius: 99px; padding: .15rem .6rem; }
@@ -422,6 +425,73 @@ function normNome(s) { return String(s || '').normalize('NFD').replace(/[\u0300-
 function chaveAtend() { var d = new Date(); return 'th:atend:' + estado.escola + '|' + estado.prof + '|' + estado.turma + '|' + d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
 function lerAtendidos() { try { return JSON.parse(localStorage.getItem(chaveAtend()) || '{}'); } catch (e) { return {}; } }
 function guardaAtendidos() { try { localStorage.setItem(chaveAtend(), JSON.stringify(estado.atendidos)); } catch (e) {} }
+/* ── ORDEM DE PRIORIDADE NA HORA (Pedro, 15/09/2026, teste da direção) ──
+   A mesma régua do Planejador (planejador.html: nível só pelo atraso, 4+ alta, 1-3 média; faltas desempatam; blocos de
+   mesma lição), com o que só a Turma de hoje sabe: dentro da faixa, quem terminou a lição e está pronto para o Checking
+   sobe. Vale para a turma, os alunos trazidos pela busca e o plantão. Reordena só no clique, nunca sozinha. */
+var PRIO_NIVEL = { alta: 0, media: 1, emdia: 2, semdados: 3 };
+function prioDados(a) {
+  var d = estado.dados[a.raf] || {}, situ = d.situacao || {};
+  var atraso = typeof a.aulasAtraso === 'number' ? a.aulasAtraso : (typeof situ.atraso === 'number' ? situ.atraso : null);
+  var cels = (situ.cels || []).filter(function (c) { return c.s === 'dada' || c.s === 'falta'; });
+  var pct = typeof a.pctFaltas === 'number' ? a.pctFaltas : (cels.length ? Math.round(cels.filter(function (c) { return c.s === 'falta'; }).length / cels.length * 100) : 0);
+  var nivel = atraso == null ? 'semdados' : atraso >= 4 ? 'alta' : atraso >= 1 ? 'media' : 'emdia';
+  var plano = planoDe(a.book), pronto = false, licao = null;
+  try {
+    var ctx = ctxDe(a), pos = posicaoDe(a, plano, ctx);
+    licao = /^L\d+$/.test(pos.id || '') ? +pos.id.slice(1) : null;
+    if (plano) {
+      var ee = PlannerV2.estadoEtapa(plano, pos.id, ctx), reg = (ctx.planner.plano.checking || {})[pos.id];
+      if (ee && ee.aulas.some(function (au) { return au.checking; }) && !(reg && reg.feito)) {
+        pronto = ee.aulas.every(function (au) { return au.checking || au.itens.every(function (it) { return it.breve || (it.quem === 'aluno' ? (it.a || it.plat) : true); }); });
+      }
+    }
+  } catch (e) {}
+  return { atraso: atraso, pct: pct, nivel: nivel, pronto: pronto, licao: licao, book: String(a.book || '').trim().toLowerCase() };
+}
+function ordenarPorPrioridade() {
+  var lista = estado.alunos.map(function (a, i) { a._prio = prioDados(a); a._orig = i; return a; });
+  lista.sort(function (x, y) {
+    var ax = estado.atendidos[x.raf] ? 1 : 0, ay = estado.atendidos[y.raf] ? 1 : 0;
+    if (ax !== ay) return ax - ay;
+    var px = x._prio, py = y._prio;
+    return (PRIO_NIVEL[px.nivel] - PRIO_NIVEL[py.nivel]) || ((py.atraso || 0) - (px.atraso || 0)) || ((py.pronto ? 1 : 0) - (px.pronto ? 1 : 0)) || (py.pct - px.pct) || String(x.nome).localeCompare(String(y.nome), 'pt-BR');
+  });
+  /* blocos: quem está no mesmo livro e a uma lição de distância sobe para logo depois do mais urgente */
+  var out = [], usado = lista.map(function () { return false; });
+  for (var i = 0; i < lista.length; i++) {
+    if (usado[i]) continue; out.push(lista[i]); usado[i] = true;
+    var b = lista[i]._prio; if (b.licao == null || estado.atendidos[lista[i].raf]) continue;
+    for (var j = i + 1; j < lista.length; j++) {
+      var c = lista[j]._prio;
+      if (usado[j] || c.licao == null || c.book !== b.book || Math.abs(c.licao - b.licao) > 1 || estado.atendidos[lista[j].raf]) continue;
+      out.push(lista[j]); usado[j] = true;
+    }
+  }
+  out.forEach(function (a, k) { a._rank = estado.atendidos[a.raf] ? null : k + 1; });
+  estado.alunos = out;
+}
+function alternaPrioridade() {
+  var antes = {}; document.querySelectorAll('#alunos .al').forEach(function (c) { antes[c.dataset.raf] = c.getBoundingClientRect().top; });
+  if (estado.prioridade) {
+    estado.prioridade = false;
+    estado.alunos.forEach(function (a) { a._rank = null; });
+    if (estado.alunos[0] && estado.alunos[0]._orig != null) estado.alunos.sort(function (x, y) { return (x._orig == null ? 9999 : x._orig) - (y._orig == null ? 9999 : y._orig); });
+    else aplicarFila();
+  } else {
+    estado.prioridade = true;
+    ordenarPorPrioridade();
+  }
+  desenharTurma();
+  /* FLIP: cada cartão desliza da posição antiga para a nova */
+  document.querySelectorAll('#alunos .al').forEach(function (c) {
+    var t0 = antes[c.dataset.raf]; if (t0 == null) return;
+    var dy = t0 - c.getBoundingClientRect().top; if (!dy) return;
+    c.style.transition = 'none'; c.style.transform = 'translateY(' + dy + 'px)';
+    requestAnimationFrame(function () { c.style.transition = 'transform .45s ease'; c.style.transform = ''; });
+  });
+  var pri = document.querySelector('#alunos .al'); if (pri && estado.prioridade) { var y = pri.getBoundingClientRect().top + window.scrollY - 90; window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' }); }
+}
 function aplicarFila() {
   var plano = estado.plano, pos = {};
   if (plano && Array.isArray(plano.ordem)) plano.ordem.forEach(function (o, i) { pos[normNome(o.nome)] = { i: i, o: o }; });
@@ -497,7 +567,7 @@ function atender(a) {
   var antes = {};
   document.querySelectorAll('#alunos .al').forEach(function (el) { antes[el.dataset.raf] = el.getBoundingClientRect().top; });
   if (estado.atendidos[a.raf]) delete estado.atendidos[a.raf]; else estado.atendidos[a.raf] = Date.now();
-  guardaAtendidos(); aplicarFila(); desenharTurma(); pintaFila();
+  guardaAtendidos(); if (estado.prioridade) ordenarPorPrioridade(); else aplicarFila(); desenharTurma(); pintaFila();
   var quieto = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var cartoes = Array.prototype.slice.call(document.querySelectorAll('#alunos .al'));
   var maior = 0;
@@ -682,7 +752,7 @@ function erro(e) {
 
 /* ── a turma: os alunos do card (com RAF) e o planner de cada um ── */
 function carregarTurma(escola, prof, linha, titulo) {
-  estado.escola = escola; estado.prof = prof; estado.turma = titulo; estado.plantao = false;
+  estado.escola = escola; estado.prof = prof; estado.turma = titulo; estado.plantao = false; estado.prioridade = false;
   $('alunos').innerHTML = ''; $('resumo').hidden = true; $('legenda').hidden = true;
   status('🔄 Lendo a turma no card…');
   /* o panorama é rota de GET no backend (doGet); por POST ele cai na guarda
@@ -739,7 +809,7 @@ function nPessoa(v) { return String(v || '').normalize('NFD').replace(/[\u0300-\
 function ehMonitor(prof) { var s = sessao() || {}; return MONITORES.some(function (m) { var x = nPessoa(m); return x && (x === nPessoa(prof) || x === nPessoa(s.name) || nPessoa(s.name).indexOf(x + ' ') === 0); }); }
 function ehPlantao(titulo) { return /\bLC\b|plant[aã]o|learning\s*center|centro de estudos/i.test(String(titulo || '')); }
 function carregarPlantao(escola, prof) {
-  estado.escola = escola; estado.prof = prof; estado.turma = 'Plantão de dúvidas'; estado.plantao = true;
+  estado.escola = escola; estado.prof = prof; estado.turma = 'Plantão de dúvidas'; estado.plantao = true; estado.prioridade = false;
   estado.alunos = []; estado.dados = estado.dados || {}; estado.plano = null; estado.pessoais = [];
   estado.atendidos = lerAtendidos();
   juntaVisitantes(); aplicarFila();
@@ -838,6 +908,14 @@ function desenharTurma() {
   estado.alunos.forEach(function (a) { caixa.appendChild(cartaoAluno(a)); var ck = (estado.dados[a.raf] || {}).planner; if (ck && ck.checking && Object.keys(ck.checking).some(function (k) { return ck.checking[k].feito; })) nCk++; });
   $('resumo').hidden = false;
   $('resumo').innerHTML = '<b>' + estado.alunos.length + '</b> alunos ' + (estado.plantao ? 'no' : 'em') + ' <b>' + esc(estado.turma) + '</b> · <b>' + nCk + '</b> com algum Checking registrado';
+  /* ORDENAR POR PRIORIDADE (Pedro, 15/09/2026): em teste, só na sessão da direção (master). */
+  if ((sessao() || {}).master && estado.alunos.length > 1) {
+    var bo = document.createElement('button'); bo.type = 'button'; bo.className = 'pill prio-btn';
+    bo.textContent = estado.prioridade ? '↺ Voltar à ordem ' + (estado.plantao ? 'de chegada' : 'da turma') : '⚡ Ordenar por prioridade';
+    bo.title = 'Atraso de conteúdo primeiro (4+ aulas = alta, 1 a 3 = média); dentro da faixa, quem está pronto para o Checking; faltas desempatam; mesma lição fica junta; atendidos no fim';
+    bo.addEventListener('click', function () { alternaPrioridade(); });
+    $('resumo').appendChild(bo);
+  }
 }
 
 /* AS CORES DO ESTÁGIO (Pedro, 14/09/2026: "cada estágio terá uma cor diferente"):
@@ -852,6 +930,13 @@ function corDoEstagio(plano) {
 /* AULA COM OUTRO PROFESSOR (Pedro, 15/09/2026): turma juntada, substituição, reposição. As marcas guardam quem
    marcou e quando; se nos últimos 30 dias alguém que não é você marcou algo deste aluno, o cartão avisa
    "aula com Fulano em dd.mm" (a mais recente de cada um). O corte ("Antes do Planner") não conta. */
+function prioMotivo(p) {
+  var partes = [p.nivel === 'alta' ? 'prioridade alta' : p.nivel === 'media' ? 'prioridade média' : p.nivel === 'emdia' ? 'em dia' : 'sem dados'];
+  if (p.atraso) partes.push(p.atraso + ' aula' + (p.atraso === 1 ? '' : 's') + ' atrás');
+  if (p.pronto) partes.push('pronto para o Checking');
+  if (p.pct >= 30) partes.push(p.pct + '% faltas');
+  return partes.join(' · ');
+}
 function outrosProfs(a) {
   var s = sessao() || {};
   var eu = s.master ? (function () { try { return (JSON.parse(localStorage.getItem('fisk_actas') || 'null') || {}).name || ''; } catch (e) { return ''; } })() : (s.name || '');
@@ -888,7 +973,8 @@ function cartaoAluno(a) {
   if (estado.atendidos[a.raf]) card.classList.add('atendido');
   if (a.visitante) card.classList.add('visitante');
   cab.innerHTML = '<span class="nome">' + esc(a.nome) + '</span>' + (a.visitante ? '<span class="visita" title="Aluno trazido pela busca">' + (estado.plantao ? 'plantão' : 'de outra turma') + (a.turma ? ' · ' + esc(String(a.turma).split('\n')[0]) : '') + '</span><button type="button" class="tirar" data-tirar="' + esc(a.raf) + '">Tirar da tela</button>' : '') + '<span class="livro' + (plano ? ' cor' : '') + '">' + esc(a.book || '') + '</span>' +
-    (plan ? '<span class="pill nv-' + esc(plan.nivel || 'emdia') + '">' + (a._pos + 1) + 'º · ' + esc(nivelRot[plan.nivel] || plan.nivel || '') + '</span>' : (estado.plano ? '<span class="pill fora">fora do roteiro</span>' : '')) +
+    (estado.prioridade ? '' : plan ? '<span class="pill nv-' + esc(plan.nivel || 'emdia') + '">' + (a._pos + 1) + 'º · ' + esc(nivelRot[plan.nivel] || plan.nivel || '') + '</span>' : (estado.plano ? '<span class="pill fora">fora do roteiro</span>' : '')) +
+    (estado.prioridade && a._rank ? '<span class="pill prio nv-' + esc(a._prio.nivel) + '" title="' + esc(prioMotivo(a._prio)) + '">⚡ ' + a._rank + 'º · ' + esc(prioMotivo(a._prio)) + '</span>' : '') +
     outrosProfs(a) +
     '<span class="pill pos">📍 ' + esc(pos.rot) + (pos.tema ? ' · ' + esc(pos.tema) : '') + '</span>' +
     (atras > 0 ? '<span class="pill atras">' + atras + ' aula' + (atras === 1 ? '' : 's') + ' atrás do plano</span>' : '') +
