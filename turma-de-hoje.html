@@ -51,6 +51,7 @@
   .pill.prio-btn{ margin-left:auto; background:#1d3685; color:#fff; border:0; cursor:pointer; font: inherit; font-weight:800; }
   .pill.prio{ font-weight:800; }
   .pill.prio.nv-alta{ background:#fde2e2; color:#a11a1a; } .pill.prio.nv-media{ background:#fff1d6; color:#8a5300; } .pill.prio.nv-emdia{ background:#e3f5e8; color:#1f6b35; } .pill.prio.nv-semdados{ background:#eef1f6; color:#555; }
+  .pill.sem-at{ background:#fdeaea; color:#a11a1a; border:1px solid #f0b4b4; font-weight:800; }
   .pill.outro-prof{ background: #fff4e0; color: #8a4b00; border: 1px solid #f3c77a; }
   .al.visitante{ outline: 3px dashed #7c3aed; outline-offset: -3px; }
   .al .visita{ font-size: .78rem; font-weight: 800; color: #7c3aed; background: #f1ebff; border-radius: 99px; padding: .15rem .6rem; }
@@ -983,6 +984,33 @@ function corDoEstagio(plano) {
 /* AULA COM OUTRO PROFESSOR (Pedro, 15/09/2026): turma juntada, substituição, reposição. As marcas guardam quem
    marcou e quando; se nos últimos 30 dias alguém que não é você marcou algo deste aluno, o cartão avisa
    "aula com Fulano em dd.mm" (a mais recente de cada um). O corte ("Antes do Planner") não conta. */
+/* SEM ATENDIMENTO (Pedro, 15/09/2026): quantas aulas o aluno teve desde a última vez que UM PROFESSOR tocou no
+   planner dele (marca, ou Checking registrado). O corte do lançamento não conta como atendimento. Conta pelas aulas
+   dadas no card, não por dias: duas semanas de férias não viram abandono. */
+function semAtendimento(a) {
+  var d = estado.dados[a.raf] || {}, pl = d.planner || {}, ultimo = 0;
+  Object.keys(pl.itens || {}).forEach(function (id) {
+    var it = pl.itens[id] || {};
+    if (it.ant === 1) return;
+    [[it.pq, it.pt], [it.aq, it.at]].forEach(function (par) {
+      if (par[0] && String(par[0]).trim() && String(par[0]).trim().toUpperCase() !== 'ANTES DO PLANNER') ultimo = Math.max(ultimo, Number(par[1]) || 0);
+    });
+  });
+  Object.keys(pl.checking || {}).forEach(function (k) { ultimo = Math.max(ultimo, Number((pl.checking[k] || {}).quando) || 0); });
+  var cels = ((d.situacao || {}).cels || []).filter(function (c) { return c.s === 'dada' && c.d; });
+  if (!cels.length) return null;
+  if (!ultimo) return { aulas: cels.length, nunca: true };
+  var iso = new Date(ultimo); iso = iso.getFullYear() + '-' + ('0' + (iso.getMonth() + 1)).slice(-2) + '-' + ('0' + iso.getDate()).slice(-2);
+  var depois = cels.filter(function (c) { return c.d > iso; }).length;
+  return depois ? { aulas: depois, desde: iso } : null;
+}
+function avisoAtendimento(a) {
+  var s = semAtendimento(a); if (!s || s.aulas < 2) return '';
+  var pri = String(a.nome || '').trim().split(/\s+/)[0];
+  var txt = s.nunca ? pri + ' ainda não recebeu atendimento registrado em ' + s.aulas + ' aula' + (s.aulas === 1 ? '' : 's')
+                    : pri + ' não recebe atendimento há ' + s.aulas + ' aula' + (s.aulas === 1 ? '' : 's');
+  return '<span class="pill sem-at" title="Nenhuma marca de professor nem Checking no planner deste aluno desde então">⚠️ ' + esc(txt) + '</span>';
+}
 function prioMotivo(p) {
   var partes = [p.nivel === 'alta' ? 'prioridade alta' : p.nivel === 'media' ? 'prioridade média' : p.nivel === 'emdia' ? 'em dia' : 'sem dados'];
   if (p.atraso) partes.push(p.atraso + ' aula' + (p.atraso === 1 ? '' : 's') + ' atrás');
@@ -1029,6 +1057,7 @@ function cartaoAluno(a) {
   cab.innerHTML = '<span class="nome">' + esc(a.nome) + '</span>' + (a.visitante ? '<span class="visita" title="Aluno trazido pela busca">' + (estado.plantao ? 'plantão' : 'de outra turma') + (a.turma ? ' · ' + esc(String(a.turma).split('\n')[0]) : '') + '</span><button type="button" class="tirar" data-tirar="' + esc(a.raf) + '">Tirar da tela</button>' : '') + '<span class="livro' + (plano ? ' cor' : '') + '">' + esc(a.book || '') + '</span>' +
     (estado.prioridade ? '' : plan ? '<span class="pill nv-' + esc(plan.nivel || 'emdia') + '">' + (a._pos + 1) + 'º · ' + esc(nivelRot[plan.nivel] || plan.nivel || '') + '</span>' : (estado.plano ? '<span class="pill fora">fora do roteiro</span>' : '')) +
     (estado.prioridade && a._rank ? '<span class="pill prio nv-' + esc(a._prio.nivel) + '" title="' + esc(prioMotivo(a._prio)) + '">⚡ ' + a._rank + 'º · ' + esc(prioMotivo(a._prio)) + '</span>' : '') +
+    avisoAtendimento(a) +
     outrosProfs(a) +
     '<span class="pill pos">📍 ' + esc(pos.rot) + (pos.tema ? ' · ' + esc(pos.tema) : '') + '</span>' +
     (atras > 0 ? '<span class="pill atras">' + atras + ' aula' + (atras === 1 ? '' : 's') + ' atrás do plano</span>' : '') +
