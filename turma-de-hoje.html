@@ -350,7 +350,7 @@
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260915a"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260915d"></script>
 <!-- o guia do Checking, lição a lição: a base comum e um arquivo por livro (Essentials, Transitions e Fluency 1 e 2, In Focus, Inmediato 1 a 3) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=376d37037e"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=9630e2ddde"></script>
@@ -1047,11 +1047,12 @@ function notasDe(a, pes) {
   var out = {};
   [['T1', pes && pes.notasAv1], ['T2', pes && pes.notasAv2]].forEach(function (par) {
     var t = par[0], c = notasDaCelula(par[1]), g = guardadas[t] || {};
-    var n = { card: !!c, data: c && c.data || null, cardCrit: c ? c.cardCrit : {}, media: [c ? c.media : null, null, null] };
+    var n = { card: !!c, data: c && c.data || null, cardCrit: c ? c.cardCrit : {}, media: [c ? c.media : null, null, null], corrigida: {}, cardOrig: {} };
     ['l', 'w', 'o', 'p'].forEach(function (k) {
       var arr = [null, null, null];
       [0, 1, 2].forEach(function (i) { var v = g[k] && g[k][i]; if (typeof v === 'number') arr[i] = v; });
-      if (c && c.cardCrit[k]) arr[0] = c[k];
+      /* a 1ª coluna vem do card, a não ser que o professor tenha corrigido (15/09/2026) */
+      if (c && c.cardCrit[k]) { if (arr[0] != null && arr[0] !== c[k]) { n.corrigida[k] = 1; n.cardOrig[k] = c[k]; } else arr[0] = c[k]; }
       n[k] = arr;
     });
     out[t] = n;
