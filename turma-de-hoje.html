@@ -1104,7 +1104,7 @@ document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && 
 function guiaDe(book) {
   /* o guia do livro: Essentials 1 → GUIA_CHECKING_E1, Essentials 2 → E2 (14/09/2026) */
   var m = String(book || '').toLowerCase().replace(/\s+/g, ' ').trim().match(/^(essentials|transitions|fluency) ([12])$/);
-  if (/^in focus/.test(String(book || '').toLowerCase().trim())) return window.GUIA_CHECKING_IF || null;
+  if (/^in focus(?!\s*review)/.test(String(book || '').toLowerCase().trim())) return window.GUIA_CHECKING_IF || null;
   var mEs = String(book || '').toLowerCase().trim().match(/inmediato\s*([123])/);
   if (mEs) return window['GUIA_CHECKING_I' + mEs[1]] || null;
   return (m && window['GUIA_CHECKING_' + m[1].charAt(0).toUpperCase() + m[2]]) || null;

@@ -148,7 +148,7 @@ function token() { try { return (JSON.parse(localStorage.getItem('fisk_prof') ||
 /* o guia do livro: Essentials 1 → GUIA_CHECKING_E1, Essentials 2 → E2 (14/09/2026) */
 var mLivro = String(book || '').toLowerCase().replace(/\s+/g, ' ').trim().match(/^(essentials|transitions|fluency) ([12])$/);
 var G = (mLivro && window['GUIA_CHECKING_' + mLivro[1].charAt(0).toUpperCase() + mLivro[2]]) || null;
-if (!G && /^in focus/i.test(String(book || '').trim())) G = window.GUIA_CHECKING_IF || null;
+if (!G && /^in focus(?!\s*review)/i.test(String(book || '').trim())) G = window.GUIA_CHECKING_IF || null;
 /* os Inmediato (14/09/2026): 'Inmediato 1' → GUIA_CHECKING_I1 */
 var mEs = String(book || '').toLowerCase().trim().match(/inmediato\s*([123])/);
 if (!G && mEs) G = window['GUIA_CHECKING_I' + mEs[1]] || null;
