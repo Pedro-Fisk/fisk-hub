@@ -353,7 +353,7 @@
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260915e"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260915f"></script>
 <!-- o guia do Checking, lição a lição: a base comum e um arquivo por livro (Essentials, Transitions e Fluency 1 e 2, In Focus, Inmediato 1 a 3) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=376d37037e"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=9630e2ddde"></script>
@@ -830,7 +830,7 @@ function quadroKS(a, plano, pos, ctx) {
 /* a data de cada aula, do card: a mesma régua do planner do aluno (datasDaEtapa) */
 function datasDasAulas(plano, etapaId, ctx) {
   var etapa = plano.etapas.find(function (e) { return e.id === etapaId; }); if (!etapa) return [];
-  var cels = (ctx.cels || []).filter(function (c) { return c && c.c && etapa.celulas.indexOf(c.c) > -1 && (c.s === 'dada' || c.s === 'plano' || c.s === 'falta'); });
+  var cels = (ctx.cels || []).filter(function (c) { return c && c.c && (PlannerV2.temCel ? PlannerV2.temCel(etapa.celulas, c.c) : etapa.celulas.indexOf(c.c) > -1) && (c.s === 'dada' || c.s === 'plano' || c.s === 'falta'); });
   return etapa.aulas.map(function (a, i) { return cels[i] || null; });
 }
 function pilulaData(d, atual) {
