@@ -248,6 +248,7 @@
   .aula .it.pode:hover{ background: rgba(255,255,255,.65); }
   .aula .it.xp{ background: var(--ac, #d4e909); color: var(--acTxt, #3a3400); }
   .aula .it.feito{ color: #0f1f4e; }
+  .it.breve{ opacity: .45; filter: grayscale(1); cursor: default; }
   .aula .it.feito .tx{ opacity: .6; }
   .aula .it .pg{ font-weight: 700; opacity: .7; font-size: .78rem; color: inherit; }
   .aula .it .quem{ color: #54648d; }
@@ -349,7 +350,7 @@
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914m"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914n"></script>
 <!-- o guia do Checking, lição a lição (Essentials 1) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260914d"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
@@ -866,14 +867,15 @@ function linhaItem(a, it) {
   var classes = it.classes || [], toque = it.toque || null;
   var feito = it.quem === 'aluno' ? (it.a || it.plat) : it.feito;
   var b = document.createElement('button'); b.type = 'button'; b.dataset.id = it.id;   /* o id do gabarito: a sincronia com o papel e as outras vistas é conferida por ele */
-  b.className = 'it' + (toque ? ' pode' : '') + (feito ? ' feito' : '') + (it.marca === 'expl' || /^(bi|pi|qi)$/.test(it.code || '') ? ' xp' : '');
+  b.className = 'it' + (toque ? ' pode' : '') + (feito ? ' feito' : '') + (it.marca === 'expl' || /^(bi|pi|qi)$/.test(it.code || '') ? ' xp' : '') + (it.breve ? ' breve' : '');
+  if (it.breve) b.disabled = true;   /* o Pre-Checking desligado (Pedro, 14/09/2026): cinza, "soon" */
   var mk = '<span class="mk ' + classes.join(' ') + '"></span>';
   var qd = it.pt ? (function (d) { return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2); })(new Date(it.pt)) : '';
   var capa = '';
   if (it.code === 'va') { var ep = (String(it.nm).match(/(\d+)/) || [])[1] || '1'; capa = '<img class="capa" alt="" src="https://portalfisk.com.br/assets/img/videobook/' + livroId(a.book) + '/' + ep + '-cover.jpg" onerror="this.remove()">'; }
   /* só o primeiro nome na linha miúda; o nome inteiro fica no title */
   var quem = it.pq ? '<span class="quem" title="' + esc('Confirmado por ' + it.pq + (qd ? ' em ' + qd : '')) + '">✓ ' + esc(String(it.pq).trim().split(/\s+/)[0]) + (qd ? ' · ' + qd : '') + '</span>' : '';
-  b.innerHTML = mk + capa + '<span class="tx' + (quem ? ' com-quem' : '') + '">' + esc(it.nm) + quem + '</span>' + (it.pg ? '<span class="pg">' + esc(it.pg) + '</span>' : '');
+  b.innerHTML = mk + capa + '<span class="tx' + (quem ? ' com-quem' : '') + '">' + esc(it.nm) + (it.breve ? ' · soon' : '') + quem + '</span>' + (it.pg ? '<span class="pg">' + esc(it.pg) + '</span>' : '');
   b.title = toque ? 'Toque: a sua metade, depois a bolinha inteira, depois vazia'
     : (it.marca === 'tri' ? 'A tarefa é só do aluno' : (it.marca === 'aluno' ? 'Só o aluno marca: o professor não tem como ver' : (it.plat || it.marca === 'plataforma' ? 'A plataforma preenche' : '')));
   if (toque) b.addEventListener('click', function () { confirmar(a, it.id, toque); });
