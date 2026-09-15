@@ -350,7 +350,7 @@
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914n"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260915a"></script>
 <!-- o guia do Checking, lição a lição: a base comum e um arquivo por livro (Essentials, Transitions e Fluency 1 e 2, In Focus, Inmediato 1 a 3) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=376d37037e"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=9630e2ddde"></script>
@@ -375,7 +375,7 @@ var CRITERIOS = [['vocabulary', '🔤 Vocabulário'], ['fluency', '💬 Fluênci
 /* Os dez gabaritos v2 moram no portal e descem sob demanda, pelo livro: nenhum
    professor precisa dos outros nove. 'Essentials 1' → plano-essentials-1.v2.js
    → window.PLANO_ESSENTIALS_1 (13/09/2026). */
-var PLANO_V = '20260914d';
+var PLANO_V = '20260915a';
 function livroId(book) { return String(book || '').trim().toLowerCase().replace(/\s+/g, '-'); }
 function planoGlobal(book) { return 'PLANO_' + livroId(book).toUpperCase().replace(/-/g, '_'); }
 var planoCarregando = {};
@@ -877,7 +877,7 @@ function linhaItem(a, it) {
   var classes = it.classes || [], toque = it.toque || null;
   var feito = it.quem === 'aluno' ? (it.a || it.plat) : it.feito;
   var b = document.createElement('button'); b.type = 'button'; b.dataset.id = it.id;   /* o id do gabarito: a sincronia com o papel e as outras vistas é conferida por ele */
-  b.className = 'it' + (toque ? ' pode' : '') + (feito ? ' feito' : '') + (it.marca === 'expl' || /^(bi|pi|qi)$/.test(it.code || '') ? ' xp' : '') + (it.breve ? ' breve' : '');
+  b.className = 'it' + (toque ? ' pode' : '') + (feito ? ' feito' : '') + (it.marca === 'expl' || /^(bi|pi|po|qi)$/.test(it.code || '') ? ' xp' : '') + (it.breve ? ' breve' : '');
   if (it.breve) b.disabled = true;   /* o Pre-Checking desligado (Pedro, 14/09/2026): cinza, "soon" */
   var mk = '<span class="mk ' + classes.join(' ') + '"></span>';
   var qd = it.pt ? (function (d) { return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2); })(new Date(it.pt)) : '';
@@ -1026,6 +1026,8 @@ function notasDaCelula(txt) {
   if (mE) { o.l = num(mE[1]); o.cardCrit.l = 1; }
   if (mW) { o.w = num(mW[1]); o.cardCrit.w = 1; }
   if (mM) { o.media = num(mM[1]); o.cardCrit.media = 1; }
+  /* a data do lançamento: "Lançamento de nota - dd/mm/aaaa" (a linha "Report Card N · created on" do planner) */
+  var mD = t.match(/(\d{2})\/(\d{2})\/\d{4}/); if (mD) o.data = mD[1] + '/' + mD[2];
   if (!mE && !mW) {
     var linhas = t.split('\n'), ult = linhas[linhas.length - 1], re = /(?:^|\s)([A-H])\s*([0-9]+(?:[.,][0-9]+)?)/g, m, L = {};
     while ((m = re.exec(ult))) L[m[1]] = num(m[2]);
@@ -1045,7 +1047,7 @@ function notasDe(a, pes) {
   var out = {};
   [['T1', pes && pes.notasAv1], ['T2', pes && pes.notasAv2]].forEach(function (par) {
     var t = par[0], c = notasDaCelula(par[1]), g = guardadas[t] || {};
-    var n = { card: !!c, cardCrit: c ? c.cardCrit : {}, media: [c ? c.media : null, null, null] };
+    var n = { card: !!c, data: c && c.data || null, cardCrit: c ? c.cardCrit : {}, media: [c ? c.media : null, null, null] };
     ['l', 'w', 'o', 'p'].forEach(function (k) {
       var arr = [null, null, null];
       [0, 1, 2].forEach(function (i) { var v = g[k] && g[k][i]; if (typeof v === 'number') arr[i] = v; });

@@ -28,7 +28,7 @@
 <div class="topo"><a class="voltar" href="turma-de-hoje.html" id="voltar">← Turma de hoje</a><h1>🦅 Plano de curso</h1><span class="sub" id="quem"></span></div>
 <div class="status" id="status">Lendo o planner…</div>
 <div id="corpo"></div>
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914n"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260915a"></script>
 <script>
 var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
 var $ = function (id) { return document.getElementById(id); };
@@ -40,7 +40,7 @@ function planoGlobal(b) { return 'PLANO_' + livroId(b).toUpperCase().replace(/-/
 function carregaPlano(b) {
   if (!livroId(b)) return Promise.resolve(null);
   if (window[planoGlobal(b)]) return Promise.resolve(window[planoGlobal(b)]);
-  return new Promise(function (res) { var sc = document.createElement('script'); sc.src = 'https://portalfisk.com.br/assets/plano-' + livroId(b) + '.v2.js?v=20260914d'; sc.onload = function () { res(window[planoGlobal(b)] || null); }; sc.onerror = function () { res(null); }; document.head.appendChild(sc); });
+  return new Promise(function (res) { var sc = document.createElement('script'); sc.src = 'https://portalfisk.com.br/assets/plano-' + livroId(b) + '.v2.js?v=20260915a'; sc.onload = function () { res(window[planoGlobal(b)] || null); }; sc.onerror = function () { res(null); }; document.head.appendChild(sc); });
 }
 function status(msg, err) { var e = $('status'); e.textContent = msg || ''; e.className = 'status' + (err ? ' err' : ''); e.hidden = !msg; }
 /* A Turma de hoje abre o planner completo por cima dela desde 14/09/2026, e
