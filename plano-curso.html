@@ -40,7 +40,7 @@ function planoGlobal(b) { return 'PLANO_' + livroId(b).toUpperCase().replace(/-/
 function carregaPlano(b) {
   if (!livroId(b)) return Promise.resolve(null);
   if (window[planoGlobal(b)]) return Promise.resolve(window[planoGlobal(b)]);
-  return new Promise(function (res) { var sc = document.createElement('script'); sc.src = 'https://portalfisk.com.br/assets/plano-' + livroId(b) + '.v2.js?v=20260915b'; sc.onload = function () { res(window[planoGlobal(b)] || null); }; sc.onerror = function () { res(null); }; document.head.appendChild(sc); });
+  return new Promise(function (res) { var sc = document.createElement('script'); sc.src = 'https://portalfisk.com.br/assets/plano-' + livroId(b) + '.v2.js?v=20260915c'; sc.onload = function () { res(window[planoGlobal(b)] || null); }; sc.onerror = function () { res(null); }; document.head.appendChild(sc); });
 }
 function status(msg, err) { var e = $('status'); e.textContent = msg || ''; e.className = 'status' + (err ? ' err' : ''); e.hidden = !msg; }
 /* A Turma de hoje abre o planner completo por cima dela desde 14/09/2026, e
