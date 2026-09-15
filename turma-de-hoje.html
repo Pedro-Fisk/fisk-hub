@@ -39,6 +39,18 @@
   .cascata select{ width: 100%; padding: .55rem .7rem; border: 1.5px solid var(--ui-bd); border-radius: 10px; font-family: var(--font-body); font-size: .92rem; background: var(--white); color: var(--black); }
   .status{ font-size: .88rem; color: var(--gray); padding: .5rem 0 0; }
   .status.err{ color: var(--red-dark); font-weight: 700; }
+  .busca-al{ position: relative; margin-top: .7rem; }
+  .busca-al label{ display: block; font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--gray); margin-bottom: .25rem; }
+  .busca-al input{ width: 100%; font: inherit; font-size: 1rem; padding: .6rem .8rem; border: 2px solid #c9d4e8; border-radius: 10px; background: #fff; color: #14161c; }
+  .busca-al input:focus{ outline: none; border-color: #1d3685; }
+  .achados-al{ position: absolute; left: 0; right: 0; top: 100%; z-index: 30; background: #fff; border: 1px solid #c9d4e8; border-radius: 10px; margin-top: .25rem; max-height: 320px; overflow: auto; box-shadow: 0 8px 24px rgba(20,22,28,.15); }
+  .achados-al button{ display: flex; width: 100%; gap: .6rem; align-items: baseline; text-align: left; background: none; border: 0; border-bottom: 1px solid #eef1f6; padding: .6rem .8rem; font: inherit; color: #14161c; cursor: pointer; }
+  .achados-al button:hover, .achados-al button:focus-visible{ background: #eef3fb; outline: none; }
+  .achados-al small{ color: var(--gray); }
+  .achados-al .vazio{ padding: .6rem .8rem; color: var(--gray); }
+  .al.visitante{ outline: 3px dashed #7c3aed; outline-offset: -3px; }
+  .al .visita{ font-size: .78rem; font-weight: 800; color: #7c3aed; background: #f1ebff; border-radius: 99px; padding: .15rem .6rem; }
+  .al .tirar{ font: inherit; font-size: .8rem; border: 1px solid #c9d4e8; background: #fff; border-radius: 99px; padding: .15rem .6rem; cursor: pointer; }
   .resumo{ display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin: .2rem 0 .6rem; font-size: .84rem; color: var(--gray); }
   .resumo b{ color: var(--black); }
 
@@ -338,6 +350,12 @@
       <div><label for="selTurma">Turma</label><select id="selTurma" disabled><option value="" disabled selected>Turma…</option></select></div>
     </div>
     <div class="status" id="status">Escolha a turma. Os alunos e a posição de cada um vêm do card.</div>
+    <!-- outro aluno (Pedro, 15/09/2026): turmas juntadas por falta; o aluno buscado entra embaixo, sem tirar os da turma -->
+    <div class="busca-al">
+      <label for="qAluno">🔎 Trazer outro aluno</label>
+      <input id="qAluno" type="search" autocomplete="off" placeholder="Nome completo ou RAF de qualquer aluno da escola">
+      <div id="achadosAluno" class="achados-al" hidden></div>
+    </div>
     <div class="legenda" id="legenda" hidden>
       <span><i class="mk l-a" style="width:18px;height:18px;border-width:2px"></i> o aluno marcou</span>
       <span><i class="mk r-prof" style="width:18px;height:18px;border-width:2px"></i> você confirmou</span>
@@ -394,7 +412,7 @@ function carregaPlano(book) {
   });
   return planoCarregando[id];
 }
-var estado = { escola: '', prof: '', turma: '', alunos: [], dados: {}, aberto: '', plano: null, atendidos: {} };
+var estado = { escola: '', prof: '', turma: '', alunos: [], dados: {}, aberto: '', plano: null, atendidos: {}, visitantes: [] };
 /* ── a fila do Planejador e o "aluno atendido" ──
    A ordem vem do que o professor salvou no Planejador (planejamentoLe); quem
    não está na fila vai para o fim, marcado. "Aluno atendido" manda o cartão
@@ -651,10 +669,79 @@ function carregarTurma(escola, prof, linha, titulo) {
         status(semRaf.length ? semRaf.length + ' aluno(s) sem RAF no card ficaram de fora.' : '');
         $('legenda').hidden = false;
         pintaFila();
+        juntaVisitantes();
         desenharTurma();
       });
   }).catch(erro);
 }
+
+/* ── OUTRO ALUNO NA TURMA (Pedro, 15/09/2026) ──
+   Turmas juntadas por falta: o professor busca por nome ou RAF (a mesma busca do Dossiê, `alunoBusca`, na lista de
+   matrículas) e o aluno entra no FIM da lista, com borda roxa, sem tirar ninguém da turma. Fica enquanto a tela
+   estiver aberta, inclusive se trocar de turma; "Tirar da tela" só esconde (nada é apagado). */
+function juntaVisitantes() {
+  estado.visitantes.forEach(function (v) {
+    if (!estado.alunos.some(function (a) { return a.raf === v.raf; })) estado.alunos.push(v);
+  });
+}
+function trazerAluno(al) {
+  $('achadosAluno').hidden = true; $('qAluno').value = '';
+  var ja = estado.alunos.some(function (a) { return a.raf === al.raf; });
+  if (ja) { var c = document.querySelector('.al[data-raf="' + al.raf + '"]'); if (c) { c.scrollIntoView({ behavior: 'smooth', block: 'start' }); } toast(al.name + ' já está na tela.'); return; }
+  if (!al.book) { toast('⚠️ ' + al.name + ' está sem livro na lista de matrículas.'); return; }
+  var v = { nome: al.name, raf: al.raf, book: al.book, turma: al.turma, visitante: true, _pos: 1000 };
+  status('🔄 Lendo o planner de ' + al.name + '…');
+  estado.dados = estado.dados || {};
+  Promise.all([
+    post({ action: 'plannerTurma', alunos: [{ raf: al.raf, book: al.book, turma: al.turma }] }),
+    carregaPlano(al.book)
+  ]).then(function (rs) {
+    Object.assign(estado.dados, rs[0].alunos || {});
+    if (!estado.recursos || !estado.recursos.length) estado.recursos = rs[0].recursos || [];
+    estado.visitantes.push(v); estado.alunos.push(v);
+    status('');
+    $('legenda').hidden = false;
+    desenharTurma();
+    var c = document.querySelector('.al[data-raf="' + al.raf + '"]'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }).catch(function (e) { status(''); toast('⚠️ Não consegui abrir o planner de ' + al.name + ' (' + e.message + ').'); });
+}
+function tirarVisitante(raf) {
+  estado.visitantes = estado.visitantes.filter(function (v) { return v.raf !== raf; });
+  estado.alunos = estado.alunos.filter(function (a) { return !(a.visitante && a.raf === raf); });
+  desenharTurma();
+}
+(function () {
+  var q = $('qAluno'), box = $('achadosAluno'), timer = null, ultima = '';
+  function mostra(lista, termo) {
+    if (q.value.trim() !== termo) return;
+    box.hidden = false;
+    if (!lista.length) { box.innerHTML = '<div class="vazio">Nenhum aluno com esse nome ou RAF.</div>'; return; }
+    box.innerHTML = lista.map(function (a, i) {
+      return '<button type="button" data-i="' + i + '"><b>' + esc(a.name) + '</b><small>' + esc(a.raf) + ' · ' + esc(a.book || 'sem livro') + (a.turma ? ' · ' + esc(a.turma) : '') + '</small></button>';
+    }).join('');
+    box._lista = lista;
+  }
+  q.addEventListener('input', function () {
+    clearTimeout(timer);
+    var termo = q.value.trim();
+    if (termo.length < 3) { box.hidden = true; return; }
+    timer = setTimeout(function () {
+      ultima = termo;
+      box.hidden = false; box.innerHTML = '<div class="vazio">Procurando…</div>';
+      post({ action: 'alunoBusca', q: termo }).then(function (r) { mostra(r.alunos || [], termo); })
+        .catch(function (e) { if (q.value.trim() === termo) box.innerHTML = '<div class="vazio">⚠️ ' + esc(e.message) + '</div>'; });
+    }, 300);
+  });
+  box.addEventListener('click', function (ev) {
+    var b = ev.target.closest('button[data-i]'); if (!b) return;
+    trazerAluno(box._lista[+b.dataset.i]);
+  });
+  q.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape') { box.hidden = true; }
+    if (ev.key === 'Enter' && box._lista && box._lista.length === 1 && !box.hidden) { ev.preventDefault(); trazerAluno(box._lista[0]); }
+  });
+  document.addEventListener('click', function (ev) { if (!ev.target.closest('.busca-al')) box.hidden = true; });
+})();
 
 function ctxDe(a) {
   var d = estado.dados[a.raf] || { planner: { itens: {}, checking: {} }, feitos: [], atividades: {}, evidencia: [], situacao: null };
@@ -706,7 +793,8 @@ function cartaoAluno(a) {
   var plan = a._plan;
   var nivelRot = { alta: 'prioridade alta', media: 'prioridade média', emdia: 'em dia', semdados: 'sem dados' };
   if (estado.atendidos[a.raf]) card.classList.add('atendido');
-  cab.innerHTML = '<span class="nome">' + esc(a.nome) + '</span><span class="livro' + (plano ? ' cor' : '') + '">' + esc(a.book || '') + '</span>' +
+  if (a.visitante) card.classList.add('visitante');
+  cab.innerHTML = '<span class="nome">' + esc(a.nome) + '</span>' + (a.visitante ? '<span class="visita" title="Aluno trazido pela busca">de outra turma' + (a.turma ? ' · ' + esc(a.turma) : '') + '</span><button type="button" class="tirar" data-tirar="' + esc(a.raf) + '">Tirar da tela</button>' : '') + '<span class="livro' + (plano ? ' cor' : '') + '">' + esc(a.book || '') + '</span>' +
     (plan ? '<span class="pill nv-' + esc(plan.nivel || 'emdia') + '">' + (a._pos + 1) + 'º · ' + esc(nivelRot[plan.nivel] || plan.nivel || '') + '</span>' : (estado.plano ? '<span class="pill fora">fora do roteiro</span>' : '')) +
     '<span class="pill pos">📍 ' + esc(pos.rot) + (pos.tema ? ' · ' + esc(pos.tema) : '') + '</span>' +
     (atras > 0 ? '<span class="pill atras">' + atras + ' aula' + (atras === 1 ? '' : 's') + ' atrás do plano</span>' : '') +
@@ -714,6 +802,7 @@ function cartaoAluno(a) {
     (plano ? '' : '<span class="acoes"><button type="button" class="btn btn-ck" data-ck>' + (ckAtual && ckAtual.feito ? 'Editar Checking' : 'Registrar Checking') + '</button></span>') +
     (plano ? '<button type="button" class="pill aguia" data-aguia title="O plano de curso inteiro, do começo ao fim">🦅 Ver planner completo</button>' : '');
   card.appendChild(cab);
+  var btTirar = cab.querySelector('[data-tirar]'); if (btTirar) btTirar.addEventListener('click', function () { tirarVisitante(a.raf); });
   var btAguia = cab.querySelector('[data-aguia]');
   if (btAguia) btAguia.addEventListener('click', function () { abrirAguia(a); });
   var corpo = document.createElement('div'); corpo.className = 'al-corpo';
