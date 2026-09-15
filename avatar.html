@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Avatar · Fisk Hub</title>
+<link rel="icon" href="assets/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<!-- ══ MY AVATAR, PARA O PROFESSOR (15/09/2026) ════════════════════════════
+     Pedido do Pedro: "os professores têm avatares próprios, e começam com
+     bastante dinheiro, já que não vão repor depois. A ideia é o professor
+     entender a plataforma usando ela propriamente dita."
+
+     ⚠️ O MOTOR, O CATÁLOGO E A TELA SÃO CARREGADOS DO PORTAL, e não copiados:
+     é o mesmo raciocínio do hogwarts.html. São mais de 700 peças, a loja do
+     dia e as regras de preço; uma cópia aqui seria uma segunda loja que um
+     dia discordaria da dos alunos.
+
+     ⚠️ A IDENTIDADE É O TOKEN DO HUB. A chave no servidor é `PROF:<NOME>`,
+     mas quem diz o nome é o `_profs` a partir do token da sessão
+     (profResolveLinha_ no Avatar.js). O nome que viaja aqui é só rótulo.
+
+     O orçamento é fixo (F$ 30.000 e 30.000 de Magic Mana), tudo que tem
+     cadeado já vem aberto e o Study Pass vem completo: é para conhecer a loja
+     inteira. O voto do professor no Item do Mês fica guardado mas não conta. -->
+
+<link rel="stylesheet" href="https://portalfisk.com.br/assets/avatar.css">
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  :root{--font-h:'Poppins',system-ui,sans-serif;--font-b:'Nunito',system-ui,sans-serif}
+  body{margin:0;font-family:var(--font-b);background:#11152b}
+  .screen{display:block}
+  [hidden]{display:none !important}
+  .av-sem{max-width:420px;margin:18vh auto 0;padding:1.4rem;border-radius:16px;background:#1a1f3f;color:#eef1ff;text-align:center;font:600 1rem var(--font-b)}
+  .av-sem a{color:#f6c343}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="moedaPix" viewBox="0 0 8 8">
+    <g shape-rendering="crispEdges">
+      <g fill="#7a4a08">
+        <rect x="2" y="0" width="4" height="1"/><rect x="1" y="1" width="6" height="1"/>
+        <rect x="0" y="2" width="8" height="4"/>
+        <rect x="1" y="6" width="6" height="1"/><rect x="2" y="7" width="4" height="1"/>
+      </g>
+      <g fill="#e0a52b">
+        <rect x="2" y="1" width="4" height="1"/><rect x="1" y="2" width="6" height="4"/>
+        <rect x="2" y="6" width="4" height="1"/>
+      </g>
+      <g fill="#ffd76a"><rect x="2" y="2" width="4" height="3"/></g>
+      <rect x="2" y="2" width="1" height="1" fill="#fff6d5"/>
+      <rect x="3" y="5" width="2" height="1" fill="#c98a1c"/>
+    </g>
+  </symbol>
+</svg>
+
+<div class="screen av active" id="screen-avatar">
+  <header class="av-top">
+    <button class="av-back" id="av-back" type="button">← Fisk Hub</button>
+    <div class="av-brand">
+      <svg viewBox="0 0 26 26" aria-hidden="true"><path d="M13 2l10 5.5v11L13 24 3 18.5v-11z" fill="#f6c343"/><path d="M13 13l10-5.5v11L13 24z" fill="#c9922e"/><path d="M13 13L3 7.5v11L13 24z" fill="#e0a93a"/><path d="M13 2l10 5.5L13 13 3 7.5z" fill="#ffe08a"/></svg>
+      <span>MY AVATAR</span>
+    </div>
+    <div class="av-wallet" id="av-wallet"></div>
+    <div class="hero-actions"></div>
+  </header>
+  <div class="av-body" id="av-body"></div>
+</div>
+
+<script src="assets/fisk-shared.js"></script>
+<script>
+  /* A APP_KEY é pública por desenho (ver hogwarts.html). */
+  window.PORTAL_CONFIG = {
+    endpoint: 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec',
+    appKey: 'fisk_0719bacbecc857f61d1e'
+  };
+</script>
+<script src="https://portalfisk.com.br/assets/mana.js"></script>
+<script src="https://portalfisk.com.br/assets/avatar-engine.js"></script>
+<script src="https://portalfisk.com.br/assets/avatar-catalogo.js"></script>
+<script src="https://portalfisk.com.br/assets/avatar.js"></script>
+<script>
+(function(){
+  'use strict';
+  var sessao = (typeof fiskSessao === 'function') ? fiskSessao() : null;
+  var nome = sessao && (sessao.name || sessao.nome) ? String(sessao.name || sessao.nome) : '';
+  /* sem sessão não há de quem é o avatar: volta para o login do Hub */
+  if (!nome || !sessao.token) { location.replace('index.html'); return; }
+
+  function esc(s){ var d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; }
+  /* uma tela só: o "voltar" do avatar é voltar para o Hub */
+  function show(id){ if (id !== 'screen-avatar') location.href = 'index.html'; }
+
+  if (!window.FiskAvatar || !window.FiskAvatarEngine || !window.FISK_AVATAR_CATALOGO) {
+    document.getElementById('av-body').innerHTML = '<p class="av-sem">My Avatar is not answering right now. Please try again in a moment, or go back to the <a href="index.html">Fisk Hub</a>.</p>';
+    return;
+  }
+  var av = window.FiskAvatar({
+    esc: esc, show: show,
+    ehFamilia: function(){ return false; },
+    ehKids: function(){ return false; },
+    base: 'https://portalfisk.com.br/',
+    get student(){ return { raf: 'PROF:' + nome, name: nome, book: '', master: false, prof: true, profToken: sessao.token }; }
+  });
+  av.openAvatar();
+})();
+</script>
+</body>
+</html>

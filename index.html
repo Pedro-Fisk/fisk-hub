@@ -381,6 +381,22 @@
       <p data-i18n="card-hw-p">Descubra a sua casa de Hogwarts, a mesma brincadeira que está na tela dos alunos</p>
     </a>
 
+    <!-- ══ MY AVATAR DO PROFESSOR (15/09/2026, pedido do Pedro) ═════════════
+         O avatar voxel que os alunos vão ter no Portal, com orçamento fixo de
+         professor (ver avatar.html). Nasce escondido: quem decide é o
+         AVATAR_PROFS_ABERTO, lá embaixo, e até lá só a direção (master) vê. -->
+    <a class="card card-avatar" id="card-avatar" href="avatar.html" style="display:none">
+      <span class="badge" data-i18n="av-badge">Novo</span>
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2.5l8 4.4v9.2l-8 4.4-8-4.4V6.9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M4 6.9l8 4.4 8-4.4M12 11.3v9.2" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>My Avatar</h2>
+      <p data-i18n="card-av-p">Monte o seu avatar e conheça a loja que os alunos vão usar. Você começa com F$ 30.000</p>
+    </a>
+
     <a class="card is-soon" href="#" aria-disabled="true" tabindex="-1">
       <span class="badge" data-i18n="soon">Em breve</span>
       <div class="icon">
@@ -547,6 +563,8 @@
         'card-met-p':      'Pratique para o exame MET com simulados interativos',
         'card-siele-h2':   'Treino SIELE',
         'card-siele-p':    'Pratique para o exame SIELE de espanhol, na modalidade S1',
+        'av-badge':        'Novo',
+        'card-av-p':       'Monte o seu avatar e conheça a loja que os alunos vão usar. Você começa com F$ 30.000',
         'card-hw-h2':      'A Cerimônia de Seleção',
         'card-hw-p':       'Descubra a sua casa de Hogwarts, a mesma brincadeira que está na tela dos alunos',
         'hw-badge':        'Por tempo limitado',
@@ -628,6 +646,8 @@
         'card-met-p':      'Practice for the MET exam with interactive simulations',
         'card-siele-h2':   'SIELE Drills',
         'card-siele-p':    'Practice for the SIELE Spanish exam, S1 modality',
+        'av-badge':        'New',
+        'card-av-p':       'Build your avatar and get to know the shop your students will use. You start with F$ 30,000',
         'card-hw-h2':      'The Sorting Ceremony',
         'card-hw-p':       'Find your Hogwarts house, the same game your students have on their screens',
         'hw-badge':        'Limited time',
@@ -709,6 +729,8 @@
         'card-met-p':      'Practica para el examen MET con simulacros interactivos',
         'card-siele-h2':   'Entrenamiento SIELE',
         'card-siele-p':    'Practica para el examen SIELE de español, modalidad S1',
+        'av-badge':        'Nuevo',
+        'card-av-p':       'Arma tu avatar y conoce la tienda que usarán tus alumnos. Empiezas con F$ 30.000',
         'card-hw-h2':      'La Ceremonia de Selección',
         'card-hw-p':       'Descubre tu casa de Hogwarts, el mismo juego que tus alumnos tienen en pantalla',
         'hw-badge':        'Por tiempo limitado',
@@ -1216,10 +1238,15 @@
       /* O PILOTO DA TURMA DE HOJE (Pedro, 14/09/2026): a direção e o professor de teste. Para abrir para todos,
          esvazie a trava (e a da própria turma-de-hoje.html, que tem a mesma lista). */
       var TURMA_HOJE_PILOTO = ['CARLOS ALBERTO'];
+      /* MY AVATAR DO PROFESSOR: `true` abre o card para todos os professores.
+         Antes, o backend com o Avatar.js novo precisa estar implantado. */
+      var AVATAR_PROFS_ABERTO = false;
       function normPiloto(v){ return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
       function updateToolLinks(){
         var sv0 = saved(), th = document.querySelector('a.card-turmahoje');
         if (th) th.style.display = (sv0 && (sv0.master || TURMA_HOJE_PILOTO.some(function(n){ return normPiloto(n) === normPiloto(sv0.name); }))) ? '' : 'none';
+        var avc = document.getElementById('card-avatar');
+        if (avc) avc.style.display = (sv0 && (AVATAR_PROFS_ABERTO || sv0.master)) ? '' : 'none';
         var p = window._actingProf();
         document.querySelectorAll('main.grid a.card, .md-cta').forEach(function(a){
           if (!a.getAttribute('data-base')){ a.setAttribute('data-base', (a.getAttribute('href')||'').split('?')[0].split('#')[0]); }
