@@ -110,9 +110,10 @@
 <main id="main"><div class="erro">Loading the guide…</div></main>
 
 <script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914n"></script>
-<script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=25a7e1101e"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=8d505afa15"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=9630e2ddde"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e2.js?v=d46def0a40"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-t1.js?v=e9a53aa8f8"></script>
 <script>
 var $ = function (id) { return document.getElementById(id); };
 var q = new URLSearchParams(location.search);
@@ -145,7 +146,7 @@ var estado = { i: 0, feitas: {} };
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
 if (!G || !L) {
-  $('main').innerHTML = '<div class="erro">There is no guide for ' + esc(book) + ' · ' + esc(licaoId) + ' yet. Essentials 1 and 2 have a guide for now.</div>';
+  $('main').innerHTML = '<div class="erro">There is no guide for ' + esc(book) + ' · ' + esc(licaoId) + ' yet. Essentials 1, Essentials 2 and Transitions 1 have a guide for now.</div>';
 } else {
   $('rot').textContent = 'Checking · ' + L.rot + ' · ' + L.tema;
   $('aluno').textContent = aluno ? 'with ' + aluno : '';
