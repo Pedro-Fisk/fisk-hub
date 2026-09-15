@@ -383,10 +383,12 @@
 
     <!-- ══ MY AVATAR DO PROFESSOR (15/09/2026, pedido do Pedro) ═════════════
          O avatar voxel que os alunos vão ter no Portal, com orçamento fixo de
-         professor (ver avatar.html). Nasce escondido: quem decide é o
-         AVATAR_PROFS_ABERTO, lá embaixo, e até lá só a direção (master) vê. -->
-    <a class="card card-avatar" id="card-avatar" href="avatar.html" style="display:none">
-      <span class="badge" data-i18n="av-badge">Novo</span>
+         professor (ver avatar.html). Pedido do Pedro (15/09/2026): o card
+         APARECE para os professores, mas cinza e com "Em breve", sem abrir.
+         Quem decide é o AVATAR_PROFS_ABERTO, lá embaixo; a direção (master)
+         entra para testar. -->
+    <a class="card card-avatar is-soon" id="card-avatar" href="#" aria-disabled="true" tabindex="-1">
+      <span class="badge" data-i18n="soon">Em breve</span>
       <div class="icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 2.5l8 4.4v9.2l-8 4.4-8-4.4V6.9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
@@ -1239,14 +1241,22 @@
          esvazie a trava (e a da própria turma-de-hoje.html, que tem a mesma lista). */
       var TURMA_HOJE_PILOTO = ['CARLOS ALBERTO'];
       /* MY AVATAR DO PROFESSOR: `true` abre o card para todos os professores.
-         Antes, o backend com o Avatar.js novo precisa estar implantado. */
+         Com `false` (pedido do Pedro, 15/09/2026) o card fica cinza com "Em
+         breve" e só a direção entra. A mesma trava mora no avatar.html. */
       var AVATAR_PROFS_ABERTO = false;
       function normPiloto(v){ return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
       function updateToolLinks(){
         var sv0 = saved(), th = document.querySelector('a.card-turmahoje');
         if (th) th.style.display = (sv0 && (sv0.master || TURMA_HOJE_PILOTO.some(function(n){ return normPiloto(n) === normPiloto(sv0.name); }))) ? '' : 'none';
         var avc = document.getElementById('card-avatar');
-        if (avc) avc.style.display = (sv0 && (AVATAR_PROFS_ABERTO || sv0.master)) ? '' : 'none';
+        if (avc){
+          var avAberto = !!(sv0 && (AVATAR_PROFS_ABERTO || sv0.master));
+          avc.classList.toggle('is-soon', !avAberto);
+          avc.setAttribute('href', avAberto ? 'avatar.html' : '#');
+          if (avAberto){ avc.removeAttribute('aria-disabled'); avc.removeAttribute('tabindex'); }
+          else { avc.setAttribute('aria-disabled', 'true'); avc.setAttribute('tabindex', '-1'); }
+          var avb = avc.querySelector('.badge'); if (avb) avb.hidden = avAberto;
+        }
         var p = window._actingProf();
         document.querySelectorAll('main.grid a.card, .md-cta').forEach(function(a){
           if (!a.getAttribute('data-base')){ a.setAttribute('data-base', (a.getAttribute('href')||'').split('?')[0].split('#')[0]); }

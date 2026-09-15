@@ -88,6 +88,11 @@
   var nome = sessao && (sessao.name || sessao.nome) ? String(sessao.name || sessao.nome) : '';
   /* sem sessão não há de quem é o avatar: volta para o login do Hub */
   if (!nome || !sessao.token) { location.replace('index.html'); return; }
+  /* AINDA FECHADO PARA OS PROFESSORES (pedido do Pedro, 15/09/2026): o card
+     da home está cinza com "Em breve", e o endereço direto também não abre.
+     Só a direção (master) entra. Abrir = `true` aqui e no index.html. */
+  var AVATAR_PROFS_ABERTO = false;
+  if (!AVATAR_PROFS_ABERTO && !sessao.master) { location.replace('index.html'); return; }
 
   function esc(s){ var d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; }
   /* uma tela só: o "voltar" do avatar é voltar para o Hub */
