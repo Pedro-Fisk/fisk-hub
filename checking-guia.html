@@ -117,6 +117,7 @@
 <script src="https://portalfisk.com.br/assets/checking/guia-t2.js?v=9f51eeedb5"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-f1.js?v=168dda2a8e"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-f2.js?v=793d94a10f"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-if.js?v=bf2cd2ef09"></script>
 <script>
 var $ = function (id) { return document.getElementById(id); };
 var q = new URLSearchParams(location.search);
@@ -144,12 +145,13 @@ function token() { try { return (JSON.parse(localStorage.getItem('fisk_prof') ||
 /* o guia do livro: Essentials 1 → GUIA_CHECKING_E1, Essentials 2 → E2 (14/09/2026) */
 var mLivro = String(book || '').toLowerCase().replace(/\s+/g, ' ').trim().match(/^(essentials|transitions|fluency) ([12])$/);
 var G = (mLivro && window['GUIA_CHECKING_' + mLivro[1].charAt(0).toUpperCase() + mLivro[2]]) || null;
+if (!G && /^in focus/i.test(String(book || '').trim())) G = window.GUIA_CHECKING_IF || null;
 var L = G && G.licoes.find(function (x) { return x.id === licaoId; });
 var estado = { i: 0, feitas: {} };
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
 if (!G || !L) {
-  $('main').innerHTML = '<div class="erro">There is no guide for ' + esc(book) + ' · ' + esc(licaoId) + ' yet. Essentials, Transitions and Fluency (1 and 2) have a guide for now.</div>';
+  $('main').innerHTML = '<div class="erro">There is no guide for ' + esc(book) + ' · ' + esc(licaoId) + ' yet. Essentials, Transitions, Fluency and In Focus have a guide for now.</div>';
 } else {
   $('rot').textContent = 'Checking · ' + L.rot + ' · ' + L.tema;
   $('aluno').textContent = aluno ? 'with ' + aluno : '';

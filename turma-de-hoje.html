@@ -351,7 +351,7 @@
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
 <script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914n"></script>
-<!-- o guia do Checking, lição a lição: a base comum e um arquivo por livro (Essentials, Transitions e Fluency, 1 e 2) -->
+<!-- o guia do Checking, lição a lição: a base comum e um arquivo por livro (Essentials, Transitions e Fluency 1 e 2, In Focus) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=8d505afa15"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=9630e2ddde"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e2.js?v=d46def0a40"></script>
@@ -359,6 +359,7 @@
 <script src="https://portalfisk.com.br/assets/checking/guia-t2.js?v=9f51eeedb5"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-f1.js?v=168dda2a8e"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-f2.js?v=793d94a10f"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-if.js?v=bf2cd2ef09"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
 <script>
 fiskInitThemeToggle('themeToggle');
@@ -1098,6 +1099,7 @@ document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && 
 function guiaDe(book) {
   /* o guia do livro: Essentials 1 → GUIA_CHECKING_E1, Essentials 2 → E2 (14/09/2026) */
   var m = String(book || '').toLowerCase().replace(/\s+/g, ' ').trim().match(/^(essentials|transitions|fluency) ([12])$/);
+  if (/^in focus/.test(String(book || '').toLowerCase().trim())) return window.GUIA_CHECKING_IF || null;
   return (m && window['GUIA_CHECKING_' + m[1].charAt(0).toUpperCase() + m[2]]) || null;
 }
 function guiaHTML(book, licaoId, nome, raf) {
