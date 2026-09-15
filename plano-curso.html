@@ -40,7 +40,7 @@ function planoGlobal(b) { return 'PLANO_' + livroId(b).toUpperCase().replace(/-/
 function carregaPlano(b) {
   if (!livroId(b)) return Promise.resolve(null);
   if (window[planoGlobal(b)]) return Promise.resolve(window[planoGlobal(b)]);
-  return new Promise(function (res) { var sc = document.createElement('script'); sc.src = 'https://portalfisk.com.br/assets/plano-' + livroId(b) + '.v2.js?v=20260915c'; sc.onload = function () { res(window[planoGlobal(b)] || null); }; sc.onerror = function () { res(null); }; document.head.appendChild(sc); });
+  return new Promise(function (res) { var sc = document.createElement('script'); sc.src = 'https://portalfisk.com.br/assets/plano-' + livroId(b) + '.v2.js?v=20260915g'; sc.onload = function () { res(window[planoGlobal(b)] || null); }; sc.onerror = function () { res(null); }; document.head.appendChild(sc); });
 }
 function status(msg, err) { var e = $('status'); e.textContent = msg || ''; e.className = 'status' + (err ? ' err' : ''); e.hidden = !msg; }
 /* A Turma de hoje abre o planner completo por cima dela desde 14/09/2026, e
@@ -53,6 +53,47 @@ $('voltar').addEventListener('click', function (ev) {
   window.close();
   setTimeout(function () { location.href = 'turma-de-hoje.html'; }, 250);   /* o navegador recusou fechar */
 });
+/* o que a Turma de hoje deixou para esta aba (abrirEmOutraAba): vale por 10 minutos */
+var pes = {};
+try { var h = JSON.parse(localStorage.getItem('pc:' + raf) || 'null'); if (h && Date.now() - h.t < 10 * 60000) pes = h; } catch (e) {}
+if (!nome && pes.nome) nome = pes.nome;
+function notasDaCelula(txt) {
+  var t = String(txt || '').trim(); if (!t) return null;
+  var num = function (x) { return x == null ? null : Number(String(x).replace(',', '.')); };
+  var o = { card: true, cardCrit: {}, l: null, w: null, o: null, p: null, media: null };
+  var mE = t.match(/prova de escuta:\s*([0-9]+(?:[.,][0-9]+)?)/i), mW = t.match(/prova de escrita:\s*([0-9]+(?:[.,][0-9]+)?)/i), mM = t.match(/m[ée]dia[^0-9\n]*([0-9]+(?:[.,][0-9]+)?)/i);
+  if (mE) { o.l = num(mE[1]); o.cardCrit.l = 1; }
+  if (mW) { o.w = num(mW[1]); o.cardCrit.w = 1; }
+  if (mM) { o.media = num(mM[1]); o.cardCrit.media = 1; }
+  /* a data do lançamento: "Lançamento de nota - dd/mm/aaaa" (a linha "Report Card N · created on" do planner) */
+  var mD = t.match(/(\d{2})\/(\d{2})\/\d{4}/); if (mD) o.data = mD[1] + '/' + mD[2];
+  if (!mE && !mW) {
+    var linhas = t.split('\n'), ult = linhas[linhas.length - 1], re = /(?:^|\s)([A-H])\s*([0-9]+(?:[.,][0-9]+)?)/g, m, L = {};
+    while ((m = re.exec(ult))) L[m[1]] = num(m[2]);
+    var med = function (xs) { return xs.every(function (x) { return x != null; }) ? xs.reduce(function (s, x) { return s + x; }, 0) / xs.length : null; };
+    if (L.A != null) { o.l = L.A; o.cardCrit.l = 1; }
+    if (L.B != null) { o.w = L.B; o.cardCrit.w = 1; }
+    var or = med([L.C, L.D, L.E]), pa = med([L.F, L.G, L.H]);
+    if (or != null) { o.o = or; o.cardCrit.o = 1; }
+    if (pa != null) { o.p = pa; o.cardCrit.p = 1; }
+  }
+  return o;
+}
+function notasDe(guardadas) {
+  var out = {};
+  [['T1', pes.notasAv1], ['T2', pes.notasAv2]].forEach(function (par) {
+    var t = par[0], c = notasDaCelula(par[1]), g = (guardadas || {})[t] || {};
+    var n = { card: !!c, data: c && c.data || null, cardCrit: c ? c.cardCrit : {}, media: [c ? c.media : null, null, null], corrigida: {}, cardOrig: {} };
+    ['l', 'w', 'o', 'p'].forEach(function (k) {
+      var arr = [null, null, null];
+      [0, 1, 2].forEach(function (i) { var v = g[k] && g[k][i]; if (typeof v === 'number') arr[i] = v; });
+      if (c && c.cardCrit[k]) { if (arr[0] != null && arr[0] !== c[k]) { n.corrigida[k] = 1; n.cardOrig[k] = c[k]; } else arr[0] = c[k]; }
+      n[k] = arr;
+    });
+    out[t] = n;
+  });
+  return out;
+}
 $('quem').textContent = (nome ? nome + ' · ' : '') + (book || '') + (raf ? ' · ' + raf : '');
 document.title = 'Plano de curso' + (nome ? ' · ' + nome : '') + ' · Fisk';
 if (!raf || !book) { status('Faltou o aluno: abra esta página pelo botão da Turma de hoje.', true); }
@@ -72,7 +113,25 @@ else Promise.all([
      (ou desfaz) em qualquer aula, inclusive antiga; a marca aparece na hora
      e o servidor confirma atrás (Pedro, 14/09/2026) */
   var salvando = Promise.resolve();
-  function desenha() { PlannerV2.planoCompleto($('corpo'), plano, ctx, { nome: nome, raf: raf, prof: prof, turma: turma, escola: escola, hist: d.hist || [], aoClicar: clicar }); }
+  function desenha() {
+    var y = window.scrollY;
+    PlannerV2.planoCompleto($('corpo'), plano, ctx, { nome: nome, raf: raf, prof: prof, turma: turma, escola: escola, hist: d.hist || [], aoClicar: clicar,
+      aluno: { nome: nome, nascimento: pes.nascimento || '', telefone: pes.telefone || '', respNome: pes.respNome || '', respTel: pes.respTel || '' },
+      notas: notasDe(ctx.planner.plano.notas),
+      aoNota: (j.recursos || []).indexOf('notas') > -1 ? salvaNota : null });
+    window.scrollTo(0, y);
+  }
+  /* a nota da tabela das provas, como na Turma de hoje: vazio apaga (volta a do card) */
+  function salvaNota(t, crit, k, v) {
+    var pl = ctx.planner.plano; pl.notas = pl.notas || {}; pl.notas[t] = pl.notas[t] || {};
+    var arr = (pl.notas[t][crit] || [null, null, null]).slice(); arr[k] = v; pl.notas[t][crit] = arr;
+    desenha();
+    var patch = { notas: {} }; patch.notas[t] = {}; patch.notas[t][crit] = {}; patch.notas[t][crit][k] = v;
+    salvando = salvando.then(function () {
+      return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plannerProf', token: token(), raf: raf, book: book, patch: patch }) }).then(function (r) { return r.json(); });
+    }).then(function (r) { if (!r || r.ok === false) throw new Error((r && (r.erro || r.error)) || 'não salvou'); })
+      .catch(function (e) { status('⚠️ A nota não salvou (' + (e && e.message || e) + '). Digite de novo.', true); });
+  }
   /* o toque em três tempos da régua do portal (14/09/2026): a metade do
      professor → a bolinha inteira, com a do aluno em nome dele → vazia */
   function clicar(it, st) {
@@ -81,6 +140,7 @@ else Promise.all([
     var itens = ctx.planner.plano.itens = ctx.planner.plano.itens || {};
     var antes = JSON.stringify(itens[it.id] || null);
     var reg = Object.assign({}, itens[it.id] || {});
+    delete reg.ant;   /* mexeu: deixa de ser do corte */
     if ('p' in marca) { if (marca.p) { reg.p = 1; reg.pq = prof || 'você'; reg.pt = Date.now(); } else { delete reg.p; delete reg.pq; delete reg.pt; } }
     if ('a' in marca) { if (marca.a) { reg.a = 1; reg.aq = prof || 'você'; reg.at = Date.now(); } else { delete reg.a; delete reg.aq; delete reg.at; } }
     if (reg.p || reg.a) itens[it.id] = reg; else delete itens[it.id];

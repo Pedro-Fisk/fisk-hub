@@ -397,7 +397,7 @@ var CRITERIOS = [['vocabulary', '🔤 Vocabulário'], ['fluency', '💬 Fluênci
 /* Os dez gabaritos v2 moram no portal e descem sob demanda, pelo livro: nenhum
    professor precisa dos outros nove. 'Essentials 1' → plano-essentials-1.v2.js
    → window.PLANO_ESSENTIALS_1 (13/09/2026). */
-var PLANO_V = '20260915c';
+var PLANO_V = '20260915g';
 function livroId(b) { var s = String(b || '').trim().toLowerCase(); if (/focus\s*review|review\s*focus/.test(s)) return 'in-focus-review'; if (/^(grammar\s*)?review\b/.test(s)) return 'review'; if (/pathways/.test(s)) return 'pathways'; return s.replace(/\s+/g, '-'); }   /* os dois Reviews (15/09/2026): o card escreve o nome de vários jeitos */
 function planoGlobal(book) { return 'PLANO_' + livroId(book).toUpperCase().replace(/-/g, '_'); }
 var planoCarregando = {};
@@ -870,11 +870,13 @@ function cartaoAluno(a) {
     (atras > 0 ? '<span class="pill atras">' + atras + ' aula' + (atras === 1 ? '' : 's') + ' atrás do plano</span>' : '') +
     (ckAtual && ckAtual.feito ? '<span class="pill chk">✓ Checking ' + esc(pos.id) + (ckAtual.nota != null ? ' · <span class="nota-priv">nota ' + esc(ckAtual.nota) + '</span>' : '') + '</span>' : '<span class="pill chk falta">Checking ' + esc(pos.id) + ' pendente</span>') +
     (plano ? '' : '<span class="acoes"><button type="button" class="btn btn-ck" data-ck>' + (ckAtual && ckAtual.feito ? 'Editar Checking' : 'Registrar Checking') + '</button></span>') +
-    (plano ? '<button type="button" class="pill aguia" data-aguia title="O plano de curso inteiro, do começo ao fim">🦅 Ver planner completo</button>' : '');
+    (plano ? '<button type="button" class="pill aguia" data-aguia title="O plano de curso inteiro, do começo ao fim">🦅 Ver planner completo</button><button type="button" class="pill aguia nova" data-aba title="Abrir o planner completo numa aba nova do navegador">↗ Outra aba</button>' : '');
   card.appendChild(cab);
   var btTirar = cab.querySelector('[data-tirar]'); if (btTirar) btTirar.addEventListener('click', function () { tirarVisitante(a.raf); });
   var btAguia = cab.querySelector('[data-aguia]');
   if (btAguia) btAguia.addEventListener('click', function () { abrirAguia(a); });
+  var btAba = cab.querySelector('[data-aba]');
+  if (btAba) btAba.addEventListener('click', function () { abrirEmOutraAba(a); });
   var corpo = document.createElement('div'); corpo.className = 'al-corpo';
   var esq = document.createElement('div'); esq.className = 'esq';
   corpo.appendChild(esq); corpo.appendChild(caixaObs(a));
@@ -1162,6 +1164,15 @@ function desenhaAguia() {
     aoClicar: function (it, st) { var marca = PlannerV2.toqueProf(it, st); if (marca) confirmar(a, it.id, marca); }
   });
   aguia.ov.scrollTop = y;
+}
+/* O PLANNER COMPLETO EM OUTRA ABA (Pedro, 15/09/2026). A página avulsa (plano-curso.html) lê o planner do servidor;
+   o que só a leitura da turma do card tem (telefone, aniversário, as células das provas) vai pelo localStorage,
+   que as duas abas dividem, e nunca pela URL. */
+function abrirEmOutraAba(a) {
+  var pes = pessoaisDe(a) || {};
+  try { localStorage.setItem('pc:' + a.raf, JSON.stringify({ t: Date.now(), nome: String(pes.nome || a.nome || '').replace(/\s*\([^)]*\)/g, '').trim(), nascimento: pes.nascimentoTxt || pes.nascimento || '', telefone: pes.telAluno || '', respNome: pes.respNome || '', respTel: pes.respTel || '', notasAv1: pes.notasAv1 || '', notasAv2: pes.notasAv2 || '' })); } catch (e) {}
+  var q = new URLSearchParams({ raf: a.raf, book: a.book || '', prof: estado.prof || '', turma: estado.turma || '', escola: estado.escola || '' });
+  window.open('plano-curso.html?' + q.toString(), '_blank');
 }
 /* o aluno na leitura da turma do card: pelo RAF quando ela traz, senão pelo
    nome sem as anotações entre parênteses da secretaria */
