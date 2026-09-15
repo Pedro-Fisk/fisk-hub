@@ -436,7 +436,7 @@ function prioDados(a) {
   var cels = (situ.cels || []).filter(function (c) { return c.s === 'dada' || c.s === 'falta'; });
   var pct = typeof a.pctFaltas === 'number' ? a.pctFaltas : (cels.length ? Math.round(cels.filter(function (c) { return c.s === 'falta'; }).length / cels.length * 100) : 0);
   var nivel = atraso == null ? 'semdados' : atraso >= 4 ? 'alta' : atraso >= 1 ? 'media' : 'emdia';
-  var plano = planoDe(a.book), pronto = false, licao = null;
+  var plano = planoDe(a.book), pronto = false, expl = false, licao = null;
   try {
     var ctx = ctxDe(a), pos = posicaoDe(a, plano, ctx);
     licao = /^L\d+$/.test(pos.id || '') ? +pos.id.slice(1) : null;
@@ -445,9 +445,23 @@ function prioDados(a) {
       if (ee && ee.aulas.some(function (au) { return au.checking; }) && !(reg && reg.feito)) {
         pronto = ee.aulas.every(function (au) { return au.checking || au.itens.every(function (it) { return it.breve || (it.quem === 'aluno' ? (it.a || it.plat) : true); }); });
       }
+      /* ESPERANDO A EXPLANATION (Pedro, 15/09/2026): as duas coisas que só o professor faz na mesa são a
+         Exploration/Explanation e o Checking. Se o próximo item da lição é a explicação e ela ainda não foi dada,
+         o aluno está parado esperando por ele. */
+      if (ee) {
+        var espera = null;
+        ee.aulas.forEach(function (au) {
+          au.itens.forEach(function (it) {
+            if (espera || it.breve) return;
+            var feito = it.quem === 'aluno' ? (it.a || it.plat) : it.feito;
+            if (!feito) espera = it;
+          });
+        });
+        expl = !!(espera && (espera.marca === 'expl' || /^(xa|xb|xp)/.test(String(espera.code || ''))));
+      }
     }
   } catch (e) {}
-  return { atraso: atraso, pct: pct, nivel: nivel, pronto: pronto, licao: licao, book: String(a.book || '').trim().toLowerCase() };
+  return { atraso: atraso, pct: pct, nivel: nivel, pronto: pronto, expl: expl, licao: licao, book: String(a.book || '').trim().toLowerCase() };
 }
 function ordenarPorPrioridade() {
   var lista = estado.alunos.map(function (a, i) { a._prio = prioDados(a); a._orig = i; return a; });
@@ -455,7 +469,7 @@ function ordenarPorPrioridade() {
     var ax = estado.atendidos[x.raf] ? 1 : 0, ay = estado.atendidos[y.raf] ? 1 : 0;
     if (ax !== ay) return ax - ay;
     var px = x._prio, py = y._prio;
-    return (PRIO_NIVEL[px.nivel] - PRIO_NIVEL[py.nivel]) || ((py.atraso || 0) - (px.atraso || 0)) || ((py.pronto ? 1 : 0) - (px.pronto ? 1 : 0)) || (py.pct - px.pct) || String(x.nome).localeCompare(String(y.nome), 'pt-BR');
+    return (PRIO_NIVEL[px.nivel] - PRIO_NIVEL[py.nivel]) || ((py.atraso || 0) - (px.atraso || 0)) || (((py.pronto || py.expl) ? 1 : 0) - ((px.pronto || px.expl) ? 1 : 0)) || (py.pct - px.pct) || String(x.nome).localeCompare(String(y.nome), 'pt-BR');
   });
   /* blocos: quem está no mesmo livro e a uma lição de distância sobe para logo depois do mais urgente */
   var out = [], usado = lista.map(function () { return false; });
@@ -951,7 +965,7 @@ function desenharTurma() {
   if ((sessao() || {}).master && estado.alunos.length > 1) {
     var bo = document.createElement('button'); bo.type = 'button'; bo.className = 'pill prio-btn';
     bo.textContent = estado.prioridade ? '↺ Voltar à ordem ' + (estado.plantao ? 'de chegada' : 'da turma') : '⚡ Ordenar por prioridade';
-    bo.title = 'Atraso de conteúdo primeiro (4+ aulas = alta, 1 a 3 = média); dentro da faixa, quem está pronto para o Checking; faltas desempatam; mesma lição fica junta; atendidos no fim';
+    bo.title = 'Atraso de conteúdo primeiro (4+ aulas = alta, 1 a 3 = média); dentro da faixa, quem espera a Exploration ou o Checking; faltas desempatam; mesma lição fica junta; atendidos no fim';
     bo.addEventListener('click', function () { alternaPrioridade(); });
     $('resumo').appendChild(bo);
   }
@@ -973,6 +987,7 @@ function prioMotivo(p) {
   var partes = [p.nivel === 'alta' ? 'prioridade alta' : p.nivel === 'media' ? 'prioridade média' : p.nivel === 'emdia' ? 'em dia' : 'sem dados'];
   if (p.atraso) partes.push(p.atraso + ' aula' + (p.atraso === 1 ? '' : 's') + ' atrás');
   if (p.pronto) partes.push('pronto para o Checking');
+  if (p.expl) partes.push('esperando a Exploration');
   if (p.pct >= 30) partes.push(p.pct + '% faltas');
   return partes.join(' · ');
 }
