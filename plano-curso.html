@@ -35,7 +35,7 @@ var $ = function (id) { return document.getElementById(id); };
 var q = new URLSearchParams(location.search);
 var raf = q.get('raf') || '', book = q.get('book') || '', nome = q.get('nome') || '', prof = q.get('prof') || '', turma = q.get('turma') || '', escola = q.get('escola') || '';
 function token() { try { return (JSON.parse(localStorage.getItem('fisk_prof') || 'null') || {}).token || ''; } catch (e) { return ''; } }
-function livroId(b) { var s = String(b || '').trim().toLowerCase(); if (/focus\s*review|review\s*focus/.test(s)) return 'in-focus-review'; if (/^(grammar\s*)?review\b/.test(s)) return 'review'; return s.replace(/\s+/g, '-'); }   /* os dois Reviews (15/09/2026): o card escreve o nome de vários jeitos */
+function livroId(b) { var s = String(b || '').trim().toLowerCase(); if (/focus\s*review|review\s*focus/.test(s)) return 'in-focus-review'; if (/^(grammar\s*)?review\b/.test(s)) return 'review'; if (/pathways/.test(s)) return 'pathways'; return s.replace(/\s+/g, '-'); }   /* os dois Reviews (15/09/2026): o card escreve o nome de vários jeitos */
 function planoGlobal(b) { return 'PLANO_' + livroId(b).toUpperCase().replace(/-/g, '_'); }
 function carregaPlano(b) {
   if (!livroId(b)) return Promise.resolve(null);

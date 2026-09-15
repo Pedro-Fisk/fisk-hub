@@ -141,7 +141,7 @@ function aplicaSugestoes(planoV2) {
 }
 /* o gabarito v2 do livro desce do portal sob demanda (o mesmo desenho da Turma de hoje) */
 var PLANO_V = '20260915c';
-function livroId(b) { var s = String(b || '').trim().toLowerCase(); if (/focus\s*review|review\s*focus/.test(s)) return 'in-focus-review'; if (/^(grammar\s*)?review\b/.test(s)) return 'review'; return s.replace(/\s+/g, '-'); }   /* os dois Reviews (15/09/2026): o card escreve o nome de vários jeitos */
+function livroId(b) { var s = String(b || '').trim().toLowerCase(); if (/focus\s*review|review\s*focus/.test(s)) return 'in-focus-review'; if (/^(grammar\s*)?review\b/.test(s)) return 'review'; if (/pathways/.test(s)) return 'pathways'; return s.replace(/\s+/g, '-'); }   /* os dois Reviews (15/09/2026): o card escreve o nome de vários jeitos */
 function planoGlobal(b) { return 'PLANO_' + livroId(b).toUpperCase().replace(/-/g, '_'); }
 (function () { if (!livroId(book) || window[planoGlobal(book)]) return; var sc = document.createElement('script'); sc.src = 'https://portalfisk.com.br/assets/plano-' + livroId(book) + '.v2.js?v=' + PLANO_V; document.head.appendChild(sc); })();
 function token() { try { return (JSON.parse(localStorage.getItem('fisk_prof') || 'null') || {}).token || ''; } catch (e) { return ''; } }
