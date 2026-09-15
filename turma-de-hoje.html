@@ -351,8 +351,10 @@
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
 <script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260914n"></script>
-<!-- o guia do Checking, lição a lição (Essentials 1) -->
-<script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=20260914d"></script>
+<!-- o guia do Checking, lição a lição: a base comum e um arquivo por livro (Essentials 1 e 2) -->
+<script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=25a7e1101e"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=9630e2ddde"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-e2.js?v=d46def0a40"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
 <script>
 fiskInitThemeToggle('themeToggle');
@@ -1090,9 +1092,9 @@ document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && 
 
 /* ── o guia do Checking: o roteiro da mesa, bloco a bloco (GUIA_CHECKING_E1) ── */
 function guiaDe(book) {
-  var b = String(book || '').toLowerCase().replace(/\s+/g, ' ');
-  if (b === 'essentials 1' && window.GUIA_CHECKING_E1) return window.GUIA_CHECKING_E1;
-  return null;
+  /* o guia do livro: Essentials 1 → GUIA_CHECKING_E1, Essentials 2 → E2 (14/09/2026) */
+  var m = String(book || '').toLowerCase().replace(/\s+/g, ' ').trim().match(/^(essentials|transitions|fluency) ([12])$/);
+  return (m && window['GUIA_CHECKING_' + m[1].charAt(0).toUpperCase() + m[2]]) || null;
 }
 function guiaHTML(book, licaoId, nome, raf) {
   var g = guiaDe(book); if (!g) return '';
