@@ -431,8 +431,8 @@ function guardaAtendidos() { try { localStorage.setItem(chaveAtend(), JSON.strin
    mesma lição), com o que só a Turma de hoje sabe: dentro da faixa, quem terminou a lição e está pronto para o Checking
    sobe. Vale para a turma, os alunos trazidos pela busca e o plantão. Reordena só no clique, nunca sozinha. */
 var PRIO_NIVEL = { alta: 0, media: 1, emdia: 2, semdados: 3 };
-/* quem vê o botão enquanto está em teste: a direção e o professor do piloto (Pedro, 15/09/2026) */
-var PRIO_TESTE = ['CARLOS ALBERTO'];
+/* quem vê o botão enquanto está em teste: só a direção (Pedro, 15/09/2026: "tire do Carlos, eu só queria ver") */
+var PRIO_TESTE = [];
 function podeOrdenar() {
   var s = sessao() || {};
   if (s.master) return true;
