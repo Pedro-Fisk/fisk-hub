@@ -186,6 +186,16 @@
   .fila-info.sem .btn-recarrega{ border-color: var(--ui-bd); color: var(--ui-ink); }
   .fila-info.sem{ background: var(--ui-soft); border-color: var(--ui-line); }
   .fila-info.sem b{ color: var(--ui-ink); }
+  .fila-info.roteiro{ flex-direction: column; align-items: stretch; }
+  .prio-grande{ width: 100%; border: 0; border-radius: 14px; background: #1d3685; color: #fff; font-family: var(--font-body); font-weight: 800; font-size: 1.05rem; padding: .8rem 1rem; cursor: pointer; box-shadow: 0 4px 0 #0f2260; }
+  .prio-grande:focus-visible, .rt-btn:focus-visible{ outline: 3px solid #d4e909; outline-offset: 2px; }
+  .rt-linha{ display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+  .rt-info{ margin-right: auto; }
+  .rt-data{ display: inline-flex; align-items: center; gap: .35rem; font-weight: 700; color: var(--ui-ink); }
+  .rt-data input{ font-family: var(--font-body); font-size: .85rem; border: 1.5px solid var(--ui-line); border-radius: 8px; padding: .2rem .4rem; }
+  .rt-btn{ border: 1.5px solid #155a48; background: #fff; color: #155a48; border-radius: 999px; padding: .3rem .8rem; font-family: var(--font-body); font-weight: 800; font-size: .82rem; cursor: pointer; }
+  .rt-btn.forte{ background: #31a889; border-color: #31a889; color: #fff; }
+  .rt-btn:disabled{ opacity: .7; cursor: default; }
   .pill.nv-alta{ background: #fde2e2; color: #8a1c1c; }
   .pill.nv-media{ background: #fdf6e6; color: #6b4d0f; }
   .pill.nv-emdia{ background: #e4f3f1; color: #155a48; }
@@ -382,7 +392,7 @@
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260916d"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260916e"></script>
 <!-- o guia do Checking, lição a lição: a base comum e um arquivo por livro (Essentials, Transitions e Fluency 1 e 2, In Focus, Inmediato 1 a 3) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=376d37037e"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=9630e2ddde"></script>
@@ -395,6 +405,7 @@
 <script src="https://portalfisk.com.br/assets/checking/guia-i1.js?v=551896a136"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-i2.js?v=56bd0516a9"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-i3.js?v=e326479afd"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
 <script>
 fiskInitThemeToggle('themeToggle');
@@ -440,6 +451,7 @@ var PRIO_NIVEL = { alta: 0, media: 1, emdia: 2, semdados: 3 };
 /* quem vê o botão enquanto está em teste: só a direção (Pedro, 15/09/2026: "tire do Carlos, eu só queria ver") */
 var PRIO_TESTE = ['CARLOS ALBERTO'];   /* Carlos liberado de novo em 16/09/2026 */
 function podeOrdenar() {
+  return true;   /* para todos os professores desde 16/09/2026 */
   var s = sessao() || {};
   if (s.master) return true;
   var n = nPessoa(s.name);
@@ -512,7 +524,7 @@ function alternaPrioridade() {
     estado.prioridade = true;
     ordenarPorPrioridade();
   }
-  desenharTurma();
+  desenharTurma(); pintaFila();
   /* FLIP calmo (Pedro, 15/09/2026): cada cartão parte de onde estava e caminha 1,1 s até o lugar novo, com uma leve
      inclinação e sombra de "papel levantado"; quem se move mais sai um pouquinho depois. Som só no fim. */
   var lento = !window.matchMedia || !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -602,25 +614,130 @@ function aplicarFila() {
     return x._pos - y._pos;
   });
 }
+/* ── O PLANEJADOR DENTRO DA TURMA DE HOJE (Pedro e Natália, 16/09/2026) ──
+   O Planejador deixa de ser uma tela à parte. Aqui mesmo o professor ordena (por prioridade ou atendendo), escolhe
+   a data da aula e SALVA o roteiro (a mesma aba `_planejamento`: no dia da aula a turma abre nessa ordem), copia a
+   ordem simples e grava o PDF na pasta da turma. A "atividade do dia" saiu: o planner já diz onde o aluno está. */
+function dataRoteiroPadrao() { var p = estado.plano; if (p && p.data && p.data >= hojeIsoTH()) return p.data; return hojeIsoTH(); }
 function pintaFila() {
   var f = $('fila'); var plano = estado.plano;
   var nAt = Object.keys(estado.atendidos).length;
+  f.className = 'fila-info roteiro' + (plano && plano.ordem && plano.ordem.length ? '' : ' sem');
+  var info;
   if (plano && plano.ordem && plano.ordem.length) {
     var na = estado.alunos.filter(function (a) { return a._plan; }).length;
     var d = plano.data ? plano.data.split('-').reverse().join('/') : '';
-    f.className = 'fila-info';
-    f.innerHTML = '📋 <b>Fila do Planejador' + (plano.hoje ? ' de hoje' : ' de ' + esc(d)) + '</b>' + (plano.quem ? ' · ' + esc(plano.quem) : '') + ' · ' + na + ' de ' + estado.alunos.length + ' alunos na ordem' +
-      (nAt ? ' · <b>' + nAt + ' atendido' + (nAt === 1 ? '' : 's') + '</b>' : '') +
-      '<a href="planejador.html" target="_blank" rel="noopener" data-planejador>Ajustar no Planejador ↗</a>';
-  } else {
-    f.className = 'fila-info sem';
-    f.innerHTML = '📋 <b>Sem fila do Planejador para esta turma.</b> Os alunos estão na ordem do card.' + (nAt ? ' · <b>' + nAt + ' atendido' + (nAt === 1 ? '' : 's') + '</b>' : '') +
-      '<a href="planejador.html" target="_blank" rel="noopener" data-planejador>Montar a fila no Planejador ↗</a>';
-  }
-  f.insertAdjacentHTML('beforeend', '<button type="button" class="btn-recarrega" data-recarrega title="Lê de novo a fila e as anotações do Planejador, e as marcas dos alunos">↻ Recarregar</button>');
+    info = '📋 <b>Roteiro salvo' + (plano.hoje ? ' para hoje' : ' em ' + esc(d)) + '</b>' + (plano.quem ? ' · ' + esc(plano.quem) : '') + ' · ' + na + ' de ' + estado.alunos.length + ' na ordem';
+  } else info = '📋 <b>Sem roteiro salvo.</b> Os alunos estão na ordem do card.';
+  if (nAt) info += ' · <b>' + nAt + ' atendido' + (nAt === 1 ? '' : 's') + '</b>';
+  var prio = estado.alunos.length > 1 ? '<button type="button" class="prio-grande" data-prio>' + (estado.prioridade ? '↺ Voltar à ordem ' + (estado.plantao ? 'de chegada' : 'da turma') : '⚡ Ordenar por prioridade') + '</button>' : '';
+  f.innerHTML = prio +
+    '<div class="rt-linha"><span class="rt-info">' + info + '</span>' +
+    (estado.plantao ? '' : '<label class="rt-data">Aula de <input type="date" data-rtdata value="' + dataRoteiroPadrao() + '"></label>' +
+      '<button type="button" class="rt-btn forte" data-rtsalva>💾 Salvar roteiro</button>' +
+      '<button type="button" class="rt-btn" data-rtcopia>📋 Copiar ordem</button>' +
+      '<button type="button" class="rt-btn" data-rtpdf>📄 PDF na pasta da turma</button>') +
+    '<button type="button" class="btn-recarrega" data-recarrega title="Lê de novo o roteiro, as anotações e as marcas dos alunos">↻ Recarregar</button></div>';
+  var bp = f.querySelector('[data-prio]');
+  if (bp) { bp.title = 'Atraso de conteúdo primeiro (4+ aulas = alta, 1 a 3 = média); dentro da faixa, quem espera a Exploration ou o Checking; faltas desempatam; mesma lição fica junta; atendidos e faltas no fim'; bp.addEventListener('click', function () { alternaPrioridade(); }); }
   f.querySelector('[data-recarrega]').addEventListener('click', function () { recarregarFila(this); });
-  f.querySelector('[data-planejador]').addEventListener('click', function () { estado.foiAoPlanejador = true; });
+  var bs = f.querySelector('[data-rtsalva]'); if (bs) bs.addEventListener('click', function () { salvarRoteiro(this); });
+  var bc = f.querySelector('[data-rtcopia]'); if (bc) bc.addEventListener('click', function () { copiarRoteiro(this); });
+  var bd = f.querySelector('[data-rtpdf]'); if (bd) bd.addEventListener('click', function () { pdfRoteiro(this); });
   f.hidden = false;
+}
+function dataRoteiro() { var i = document.querySelector('[data-rtdata]'); return (i && i.value) || hojeIsoTH(); }
+function ordemRoteiro() {
+  return estado.alunos.filter(function (a) { return !faltouHoje(a); }).map(function (a) {
+    var pr = null; try { pr = prioDados(a); } catch (e) {}
+    return { nome: String(a.nome || '').replace(/\s*\([^)]*\)/g, '').trim(), raf: a.raf, nivel: (pr && pr.nivel) || (a._plan && a._plan.nivel) || '', nota: ((estado.dados[a.raf] || {}).planner || {}).obs || '', a: a };
+  });
+}
+function salvarRoteiro(bt) {
+  var ordem = ordemRoteiro(); if (!ordem.length) return;
+  var data = dataRoteiro(), velho = bt.textContent;
+  bt.disabled = true; bt.textContent = 'Salvando…';
+  return post({ action: 'planejamentoSalva', escola: estado.escola, prof: estado.prof, turma: estado.turma, data: data,
+    ordem: ordem.map(function (o) { return { nome: o.nome, nivel: o.nivel, atividade: '', nota: '' }; }) })
+    .then(function (r) {
+      bt.textContent = '✓ Roteiro salvo para ' + String(r.data || data).split('-').reverse().slice(0, 2).join('/');
+      if ((r.data || data) === hojeIsoTH()) estado.plano = { data: r.data || data, hoje: true, quem: r.quem || '', ordem: ordem.map(function (o) { return { nome: o.nome, nivel: o.nivel }; }) };
+      setTimeout(function () { bt.disabled = false; bt.textContent = velho; if ((r.data || data) === hojeIsoTH()) { aplicarFila(); pintaFila(); desenharTurma(); } }, 2200);
+      return r;
+    }).catch(function (e) { bt.disabled = false; bt.textContent = velho; toast('⚠️ Não salvou o roteiro (' + e.message + ').'); });
+}
+function textoRoteiro() {
+  var d = dataRoteiro().split('-').reverse().join('/');
+  return 'Roteiro · ' + String(estado.turma || '').split('\n')[0] + ' · ' + d + '\n' + ordemRoteiro().map(function (o, i) { return (i + 1) + '. ' + o.nome; }).join('\n');
+}
+function copiarRoteiro(bt) {
+  var txt = textoRoteiro(), velho = bt.textContent;
+  var ok = function () { bt.textContent = '✓ Copiado'; setTimeout(function () { bt.textContent = velho; }, 1800); };
+  (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(txt) : Promise.reject()).then(ok).catch(function () {
+    var ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select();
+    var foi = false; try { foi = document.execCommand('copy'); } catch (e) {} ta.remove();
+    if (foi) ok(); else window.prompt('Copie o roteiro:', txt);
+  });
+}
+function tituloNomeTH(n) { return String(n || '').toLowerCase().replace(/(^|[\s'’-])([a-zà-ÿ])/g, function (m, sep, c) { return sep + c.toUpperCase(); }).trim().replace(/\.+$/, ''); }
+async function montarPdfRoteiro() {
+  var PDF = PDFLib, W = 540, H = 780, M = 26, CW = W - 2 * M;
+  var doc = await PDF.PDFDocument.create();
+  var helv = await doc.embedFont(PDF.StandardFonts.Helvetica), bold = await doc.embedFont(PDF.StandardFonts.HelveticaBold), ital = await doc.embedFont(PDF.StandardFonts.HelveticaOblique);
+  var PILL_L = PDF.rgb(0.855, 0.925, 0.98), BD = PDF.rgb(0.169, 0.302, 0.439), DARK = PDF.rgb(0.133, 0.243, 0.353), SOFT = PDF.rgb(0.949, 0.965, 0.98),
+      INK = PDF.rgb(0.12, 0.12, 0.12), GRAY = PDF.rgb(0.42, 0.46, 0.5), WHITE = PDF.rgb(1, 1, 1);
+  var PRICO = { alta: PDF.rgb(0.75, 0.22, 0.17), media: PDF.rgb(0.72, 0.53, 0.04), emdia: PDF.rgb(0.15, 0.53, 0.43) };
+  var page, y;
+  function um(t) { return String(t == null ? '' : t).replace(/\s+/g, ' ').trim().replace(/[^\x20-\x7e\xa0-\xff]/g, ''); }
+  function fit(t, f, s, max) { t = um(t); while (t.length > 1 && f.widthOfTextAtSize(t, s) > max) t = t.slice(0, -2) + '…'; return t; }
+  function wrap(t, f, s, max) { var out = [], a = ''; um(t).split(' ').forEach(function (w) { var tt = a ? a + ' ' + w : w; if (f.widthOfTextAtSize(tt, s) > max) { if (a) out.push(a); a = w; } else a = tt; }); if (a) out.push(a); return out; }
+  function caixa(x, top, w, h, o) { page.drawRectangle(Object.assign({ x: x, y: top - h, width: w, height: h }, o)); }
+  function nova(primeira) {
+    page = doc.addPage([W, H]); y = H - M;
+    if (primeira) {
+      caixa(M, y, CW, 26, { color: PILL_L, borderColor: BD, borderWidth: 1 });
+      var t = 'ROTEIRO DE ATENDIMENTO'; page.drawText(t, { x: (W - bold.widthOfTextAtSize(t, 12.5)) / 2, y: y - 17, size: 12.5, font: bold, color: DARK }); y -= 36;
+      [['Professor(a): ', tituloNomeTH(estado.prof)], ['Turma: ', String(estado.turma || '').split('\n')[0]], ['Data da aula: ', dataRoteiro().split('-').reverse().join('/')]].forEach(function (c) {
+        page.drawText(c[0], { x: M, y: y - 10, size: 9.5, font: bold, color: INK });
+        page.drawText(fit(c[1], helv, 9.5, CW - 90), { x: M + bold.widthOfTextAtSize(c[0], 9.5), y: y - 10, size: 9.5, font: helv, color: INK }); y -= 15;
+      });
+      y -= 8;
+    }
+    caixa(M, y, CW, 15, { color: PILL_L, borderColor: BD, borderWidth: 1 });
+    page.drawText('#', { x: M + 7, y: y - 10.5, size: 8, font: bold, color: DARK });
+    page.drawText('ALUNO', { x: M + 30, y: y - 10.5, size: 8, font: bold, color: DARK });
+    page.drawText('ONDE ESTÁ NO PLANNER', { x: M + 232, y: y - 10.5, size: 8, font: bold, color: DARK });
+    y -= 18;
+  }
+  nova(true);
+  ordemRoteiro().forEach(function (o, i) {
+    var a = o.a, plano = planoDe(a.book), onde = '';
+    try { var ps = posicaoDe(a, plano, ctxDe(a)); onde = (a.book ? a.book + ' · ' : '') + ps.rot + (ps.tema ? ' · ' + ps.tema : ''); } catch (e) {}
+    var atras = Number(a.aulasAtraso) || 0; if (atras > 0) onde += ' · ' + atras + ' aula' + (atras === 1 ? '' : 's') + ' atrás';
+    var L = wrap(onde, helv, 8, CW - 238), N = o.nota ? wrap(o.nota, ital, 7.5, CW - 238) : [];
+    var h = Math.max(24, 12 + L.length * 10 + N.length * 9 + 4);
+    if (y - h < M + 8) nova(false);
+    if (i % 2 === 1) caixa(M, y, CW, h, { color: SOFT });
+    caixa(M + 3, y - (h - 17) / 2, 17, 17, { color: PRICO[o.nivel] || GRAY });
+    var rs = String(i + 1); page.drawText(rs, { x: M + 3 + (17 - bold.widthOfTextAtSize(rs, 9)) / 2, y: y - (h - 17) / 2 - 12, size: 9, font: bold, color: WHITE });
+    page.drawText(fit(o.nome, bold, 9.5, 196), { x: M + 30, y: y - 14, size: 9.5, font: bold, color: INK });
+    var yy = y - 14;
+    L.forEach(function (l) { page.drawText(l, { x: M + 232, y: yy, size: 8, font: helv, color: INK }); yy -= 10; });
+    N.forEach(function (l) { page.drawText(l, { x: M + 232, y: yy, size: 7.5, font: ital, color: GRAY }); yy -= 9; });
+    y -= h + 3;
+  });
+  return await doc.save();
+}
+function pdfRoteiro(bt) {
+  if (!window.PDFLib) { toast('⚠️ A biblioteca de PDF não carregou. Recarregue a página.'); return; }
+  if (typeof fiskEnviarParaPasta !== 'function') { toast('⚠️ O envio ao Drive não carregou. Recarregue a página.'); return; }
+  var prof = tituloNomeTH(estado.prof), dm = dataRoteiro().split('-').reverse().slice(0, 2).join('.');
+  fiskEnviarParaPasta(bt, async function () {
+    var bytes = await montarPdfRoteiro();
+    return { token: token(), tipo: 'turma', escola: estado.escola, professor: estado.prof, turma: estado.turma,
+      filename: 'Plano de aula do dia ' + dm + (prof ? ' - Prof ' + prof : '') + '.pdf', bytes: bytes,
+      substituiPrefixo: 'Plano de aula do dia ', substituiSufixo: prof ? (' - Prof ' + prof + '.pdf') : '.pdf' };
+  }).catch(function () {});
 }
 /* ── recarregar a fila (Pedro, 14/09/2026) ──
    O professor abre a Turma, percebe que não fez o plano, monta a fila no
@@ -1058,14 +1175,7 @@ function desenharTurma() {
   estado.alunos.forEach(function (a) { caixa.appendChild(cartaoAluno(a)); var ck = (estado.dados[a.raf] || {}).planner; if (ck && ck.checking && Object.keys(ck.checking).some(function (k) { return ck.checking[k].feito; })) nCk++; });
   $('resumo').hidden = false;
   $('resumo').innerHTML = '<b>' + estado.alunos.length + '</b> alunos ' + (estado.plantao ? 'no' : 'em') + ' <b>' + esc(estado.turma) + '</b> · <b>' + nCk + '</b> com algum Checking registrado';
-  /* ORDENAR POR PRIORIDADE (Pedro, 15/09/2026): em teste, só na sessão da direção (master). */
-  if (podeOrdenar() && estado.alunos.length > 1) {
-    var bo = document.createElement('button'); bo.type = 'button'; bo.className = 'pill prio-btn';
-    bo.textContent = estado.prioridade ? '↺ Voltar à ordem ' + (estado.plantao ? 'de chegada' : 'da turma') : '⚡ Ordenar por prioridade';
-    bo.title = 'Atraso de conteúdo primeiro (4+ aulas = alta, 1 a 3 = média); dentro da faixa, quem espera a Exploration ou o Checking; faltas desempatam; mesma lição fica junta; atendidos no fim';
-    bo.addEventListener('click', function () { alternaPrioridade(); });
-    $('resumo').appendChild(bo);
-  }
+  /* o botão de prioridade mora na barra do roteiro (pintaFila), grande e numa linha só dele (16/09/2026) */
 }
 
 /* AS CORES DO ESTÁGIO (Pedro, 14/09/2026: "cada estágio terá uma cor diferente"):
@@ -1180,7 +1290,7 @@ function cartaoAluno(a) {
      vazia: desde 14/09/2026 as duas são o mesmo campo, e o Planejador grava lá */
   var obsSrv = ((estado.dados[a.raf] || {}).planner || {}).obs || '';
   var notaFila = plan && plan.nota && !obsSrv ? plan.nota : '';
-  if (plan && (plan.atividade || notaFila)) {
+  if (false && plan && (plan.atividade || notaFila)) {   /* a atividade do dia saiu com o Planejador (16/09/2026) */
     var pa = document.createElement('div'); pa.className = 'plano-ativ';
     pa.innerHTML = (plan.atividade ? '🎯 ' + esc(plan.atividade) : '') + (notaFila ? ' <i>· ' + esc(notaFila) + '</i>' : '');
     card.appendChild(pa);
@@ -1263,7 +1373,7 @@ function quadroKS(a, plano, pos, ctx) {
   if (!ks || (!ks.sugeridos.length && !mostraMais)) return null;
   var feitos = ks.sugeridos.filter(function (x) { return x.feito; }).length;
   var cel = document.createElement('div'); cel.className = 'aula ks';
-  cel.innerHTML = '<div class="t" title="O que o gabarito sugere para esta lição (✓ e a melhor nota) e o que mais o aluno fez no portal">Keep Studying' +
+  cel.innerHTML = '<div class="t" title="As duas sugestões da lição, as mesmas do aluno (✓ e a melhor nota), e o que mais ele fez no portal">Extras · Suggested Practice' +
     (ks.sugeridos.length ? '<span class="dt">' + feitos + ' de ' + ks.sugeridos.length + '</span>' : '') + '</div>';
   var lista = document.createElement('div'); lista.className = 'lista';
   var nS = ks.sugeridos.length;
