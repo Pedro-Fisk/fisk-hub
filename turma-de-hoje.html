@@ -197,6 +197,11 @@
   .btn-atend{ background: var(--green); color: #fff; padding: .7rem 1rem; font-size: .92rem; box-shadow: 0 3px 0 var(--green-dark); width: 100%; justify-content: center; }
   .al .atend .quando{ width: 100%; text-align: center; }
   .al.atendido{ opacity: .72; }
+  .al.faltou{ opacity: .5; filter: grayscale(1); }
+  .al.faltou .al-corpo{ display: none; }
+  .al .atend .btn-atend{ width: auto; flex: 1 1 auto; }
+  .btn-falta{ background: #fff; color: var(--gray); border: 2px solid var(--gray-light); box-shadow: none; padding: .62rem 1.1rem; font-size: .92rem; flex: 0 0 auto; }
+  .al.faltou .btn-falta{ background: var(--gray-light); }
   .al.atendido .btn-atend{ background: var(--gray-light); color: var(--gray); box-shadow: none; }
   .al .atend .quando{ font-size: .8rem; color: #155a48; font-weight: 700; }
   .it.salvando{ opacity: .5; }
@@ -476,7 +481,7 @@ function prioDados(a) {
 function ordenarPorPrioridade() {
   var lista = estado.alunos.map(function (a, i) { a._prio = prioDados(a); if (a._orig == null) a._orig = i; return a; });   /* a ordem original é gravada UMA vez */
   lista.sort(function (x, y) {
-    var ax = estado.atendidos[x.raf] ? 1 : 0, ay = estado.atendidos[y.raf] ? 1 : 0;
+    var ax = fimDe(x), ay = fimDe(y);
     if (ax !== ay) return ax - ay;
     var px = x._prio, py = y._prio;
     return (PRIO_NIVEL[px.nivel] - PRIO_NIVEL[py.nivel]) || ((py.atraso || 0) - (px.atraso || 0)) || (((py.pronto || py.expl) ? 1 : 0) - ((px.pronto || px.expl) ? 1 : 0)) || (py.pct - px.pct) || String(x.nome).localeCompare(String(y.nome), 'pt-BR');
@@ -485,14 +490,14 @@ function ordenarPorPrioridade() {
   var out = [], usado = lista.map(function () { return false; });
   for (var i = 0; i < lista.length; i++) {
     if (usado[i]) continue; out.push(lista[i]); usado[i] = true;
-    var b = lista[i]._prio; if (b.licao == null || estado.atendidos[lista[i].raf]) continue;
+    var b = lista[i]._prio; if (b.licao == null || fimDe(lista[i])) continue;
     for (var j = i + 1; j < lista.length; j++) {
       var c = lista[j]._prio;
-      if (usado[j] || c.licao == null || c.book !== b.book || Math.abs(c.licao - b.licao) > 1 || estado.atendidos[lista[j].raf]) continue;
+      if (usado[j] || c.licao == null || c.book !== b.book || Math.abs(c.licao - b.licao) > 1 || fimDe(lista[j])) continue;
       out.push(lista[j]); usado[j] = true;
     }
   }
-  out.forEach(function (a, k) { a._rank = estado.atendidos[a.raf] ? null : k + 1; });
+  out.forEach(function (a, k) { a._rank = fimDe(a) ? null : k + 1; });
   estado.alunos = out;
 }
 function alternaPrioridade() {
@@ -556,14 +561,44 @@ function somDeConquista() {
     });
   } catch (e) {}
 }
+/* A FALTA NA TURMA DE HOJE (Pedro, 16/09/2026): "Faltou" deixa o cartão cinza, manda para o fim da lista (depois
+   dos atendidos) e escreve "a" na célula de hoje do card, só se ela estava vazia ou com o placeholder. O que a
+   secretaria ou o professor já lançaram à mão no card manda. No plantão não há botão: lá não é aula. */
+function hojeIsoTH() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+function faltouHoje(a) {
+  if (estado.plantao) return false;
+  var f = (estado.faltas || {})[a.raf];
+  if (f === false) return false;
+  if (f) return true;
+  var cels = ((estado.dados[a.raf] || {}).situacao || {}).cels || [], h = hojeIsoTH();
+  return cels.some(function (c) { return c && c.d === h && c.s === 'falta'; });
+}
+function fimDe(a) { return faltouHoje(a) ? 2 : (estado.atendidos[a.raf] ? 1 : 0); }
+function marcarFalta(a) {
+  estado.faltas = estado.faltas || {};
+  var desfazer = faltouHoje(a);
+  var antes = estado.faltas[a.raf];
+  estado.faltas[a.raf] = !desfazer;
+  reordenaComAnimacao(a);
+  post({ action: 'plannerFalta', raf: a.raf, book: a.book, desfazer: desfazer }).then(function (r) {
+    var c = r.card || {};
+    if (c.escreveu != null) toast(desfazer ? '📇 Card: falta de hoje desfeita.' : '📇 Card: "a" (falta) na aula de hoje.');
+    else if (c.jaEstava) toast('📇 O card já tinha "' + c.jaEstava + '" hoje e não foi alterado.');
+    else if (c.motivo) toast('📇 Card não alterado: ' + c.motivo + '.');
+  }).catch(function (e) {
+    if (antes === undefined) delete estado.faltas[a.raf]; else estado.faltas[a.raf] = antes;
+    reordenaComAnimacao(a);
+    toast('⚠️ Não salvou a falta (' + e.message + '). Tente de novo.');
+  });
+}
 function aplicarFila() {
   var plano = estado.plano, pos = {};
   if (plano && Array.isArray(plano.ordem)) plano.ordem.forEach(function (o, i) { pos[normNome(o.nome)] = { i: i, o: o }; });
   estado.alunos.forEach(function (a) { var p = pos[normNome(a.nome)]; a._plan = p ? p.o : null; if (a.visitante) return; a._pos = p ? p.i : 999; });   /* quem veio pela busca fica na ordem em que chegou, depois da turma */
   estado.alunos.sort(function (x, y) {
-    var ax = estado.atendidos[x.raf] ? 1 : 0, ay = estado.atendidos[y.raf] ? 1 : 0;
+    var ax = fimDe(x), ay = fimDe(y);
     if (ax !== ay) return ax - ay;
-    if (ax) return (estado.atendidos[x.raf] || 0) - (estado.atendidos[y.raf] || 0);
+    if (ax === 1) return (estado.atendidos[x.raf] || 0) - (estado.atendidos[y.raf] || 0);
     return x._pos - y._pos;
   });
 }
@@ -628,10 +663,14 @@ document.addEventListener('visibilitychange', function () {
    para a nova (FLIP): o atendido desce por cima, com sombra, e os outros
    sobem. Quem pediu menos movimento no sistema vê a troca direta. */
 function atender(a) {
+  if (estado.atendidos[a.raf]) delete estado.atendidos[a.raf]; else estado.atendidos[a.raf] = Date.now();
+  guardaAtendidos();
+  reordenaComAnimacao(a, true);
+}
+function reordenaComAnimacao(a, foiAtender) {
   var antes = {};
   document.querySelectorAll('#alunos .al').forEach(function (el) { antes[el.dataset.raf] = el.getBoundingClientRect().top; });
-  if (estado.atendidos[a.raf]) delete estado.atendidos[a.raf]; else estado.atendidos[a.raf] = Date.now();
-  guardaAtendidos(); if (estado.prioridade) ordenarPorPrioridade(); else aplicarFila(); desenharTurma(); pintaFila();
+  if (estado.prioridade) ordenarPorPrioridade(); else aplicarFila(); desenharTurma(); pintaFila();
   var quieto = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var cartoes = Array.prototype.slice.call(document.querySelectorAll('#alunos .al'));
   var maior = 0;
@@ -654,8 +693,8 @@ function atender(a) {
     setTimeout(function () { cartoes.forEach(function (el) { el.style.transition = ''; el.style.position = ''; el.style.zIndex = ''; el.style.boxShadow = ''; }); }, dur + 60);
   }
   /* depois que ele desceu, o próximo da fila fica à vista */
-  if (estado.atendidos[a.raf]) setTimeout(function () {
-    var prox = document.querySelector('#alunos .al:not(.atendido)');
+  if (estado.atendidos[a.raf] || faltouHoje(a)) setTimeout(function () {
+    var prox = document.querySelector('#alunos .al:not(.atendido):not(.faltou)');
     if (prox) { var r = prox.getBoundingClientRect(); if (r.top < 0 || r.top > window.innerHeight * .6) prox.scrollIntoView({ block: 'start', behavior: quieto ? 'auto' : 'smooth' }); }
   }, quieto ? 0 : Math.min(1500, 650 + maior / 8) + 80);
 }
@@ -670,6 +709,7 @@ function get(params) {
 }
 function post(body) {
   body.token = token();
+  if (body.action === 'plannerProf' && estado.plantao) body.semCard = true;   /* plantão não é aula: o card não muda (Pedro, 16/09/2026) */
   return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
     .then(fiskJson).then(function (j) { if (!j || j.ok === false) throw new Error((j && (j.erro || j.error)) || 'Não consegui.'); return j; });
 }
@@ -1112,6 +1152,7 @@ function cartaoAluno(a) {
   var plan = a._plan;
   var nivelRot = { alta: 'prioridade alta', media: 'prioridade média', emdia: 'em dia', semdados: 'sem dados' };
   if (estado.atendidos[a.raf]) card.classList.add('atendido');
+  if (faltouHoje(a)) card.classList.add('faltou');
   if (a.visitante) card.classList.add('visitante');
   cab.innerHTML = '<span class="nome">' + esc(a.nome) + '</span>' + (a.visitante ? '<span class="visita" title="Aluno trazido pela busca">' + (estado.plantao ? 'plantão' : 'de outra turma') + (a.turma ? ' · ' + esc(String(a.turma).split('\n')[0]) : '') + '</span><button type="button" class="tirar" data-tirar="' + esc(a.raf) + '">Tirar da tela</button>' : '') + '<span class="livro' + (plano ? ' cor' : '') + '">' + esc(a.book || '') + '</span>' +
     (estado.prioridade ? '' : plan ? '<span class="pill nv-' + esc(plan.nivel || 'emdia') + '">' + (a._pos + 1) + 'º · ' + esc(nivelRot[plan.nivel] || plan.nivel || '') + '</span>' : (estado.plano ? '<span class="pill fora">fora do roteiro</span>' : '')) +
@@ -1192,6 +1233,13 @@ function cartaoAluno(a) {
   ba.textContent = estado.atendidos[a.raf] ? '↺ Desfazer atendido' : '✓ Aluno atendido';
   ba.addEventListener('click', function () { atender(a); });
   at.appendChild(ba);
+  if (!estado.plantao) {
+    var bf = document.createElement('button'); bf.type = 'button'; bf.className = 'btn btn-falta';
+    bf.textContent = faltouHoje(a) ? '↺ Desfazer falta' : '✗ Faltou';
+    bf.title = 'Lança "a" na aula de hoje do card, se a célula ainda estiver vazia ou só com o placeholder';
+    bf.addEventListener('click', function () { marcarFalta(a); });
+    at.appendChild(bf);
+  }
   if (estado.atendidos[a.raf]) { var q = document.createElement('span'); q.className = 'quando'; var dt = new Date(estado.atendidos[a.raf]); q.textContent = 'Atendido às ' + ('0' + dt.getHours()).slice(-2) + ':' + ('0' + dt.getMinutes()).slice(-2); at.appendChild(q); }
   card.appendChild(at);
   cardReal.querySelectorAll('[data-ck]').forEach(function (b) { b.addEventListener('click', function () { abrirChecking(cardReal, a, plano, pos); }); });
@@ -1424,6 +1472,7 @@ function abrirEmOutraAba(a) {
   var pes = pessoaisDe(a) || {};
   try { localStorage.setItem('pc:' + a.raf, JSON.stringify({ t: Date.now(), nome: String(pes.nome || a.nome || '').replace(/\s*\([^)]*\)/g, '').trim(), nascimento: pes.nascimentoTxt || pes.nascimento || '', telefone: pes.telAluno || '', respNome: pes.respNome || '', respTel: pes.respTel || '', notasAv1: pes.notasAv1 || '', notasAv2: pes.notasAv2 || '' })); } catch (e) {}
   var q = new URLSearchParams({ raf: a.raf, book: a.book || '', prof: estado.prof || '', turma: estado.turma || '', escola: estado.escola || '' });
+  if (estado.plantao) q.set('plantao', '1');
   window.open('plano-curso.html?' + q.toString(), '_blank');
 }
 /* o aluno na leitura da turma do card: pelo RAF quando ela traz, senão pelo

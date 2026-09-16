@@ -140,7 +140,7 @@ else Promise.all([
     desenha();
     var patch = { notas: {} }; patch.notas[t] = {}; patch.notas[t][crit] = {}; patch.notas[t][crit][k] = v;
     salvando = salvando.then(function () {
-      return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plannerProf', token: token(), raf: raf, book: book, patch: patch }) }).then(function (r) { return r.json(); });
+      return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plannerProf', token: token(), raf: raf, book: book, patch: patch, semCard: q.get('plantao') === '1' }) }).then(function (r) { return r.json(); });
     }).then(function (r) { if (!r || r.ok === false) throw new Error((r && (r.erro || r.error)) || 'não salvou'); })
       .catch(function (e) { status('⚠️ A nota não salvou (' + (e && e.message || e) + '). Digite de novo.', true); });
   }
@@ -159,7 +159,7 @@ else Promise.all([
     desenha();
     var patch = { itens: {} }; patch.itens[it.id] = marca;
     salvando = salvando.then(function () {
-      return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plannerProf', token: token(), raf: raf, book: book, patch: patch }) }).then(function (r) { return r.json(); });
+      return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plannerProf', token: token(), raf: raf, book: book, patch: patch, semCard: q.get('plantao') === '1' }) }).then(function (r) { return r.json(); });
     }).then(function (r) {
       if (!r || r.ok === false) throw new Error((r && (r.erro || r.error)) || 'não salvou');
       if (r.card && r.card.escreveu) status('📇 Card: ' + r.card.escreveu + ' na aula de hoje.');
