@@ -256,6 +256,7 @@
           Ainda não está valendo — por enquanto os campos ficam só de amostra.</p>
         <label>1ª aula (conversação mais formal)
           <input type="text" id="conv1" disabled placeholder="ex.: Everyday Life (Buddy Talks)"></label>
+          <p class="status" id="convAviso" hidden style="margin:.3rem 0 0"></p>
         <label>2ª aula (do livro / conversation booklet / material complementar)
           <input type="text" id="conv2" disabled placeholder="ex.: Pair Work do livro + Conversation Booklet"></label>
       </div>
@@ -443,6 +444,29 @@ function initFragment() {
     .then(onTurma).catch(function (e) { erroDeSessaoOuCascata(e); });
 }
 
+/* A AULA DESTA SEMANA JÁ FOI LANÇADA NO CARD? (Pedro, 15/09/2026: "o plano sai referente a semanas anteriores")
+   O Planejador só sabe o que o card sabe: enquanto a aula de hoje/desta semana não estiver escrita na coluna do dia,
+   a última lição de cada aluno é a da semana passada, e o plano sai com ela. Isso não é defeito da conta — mas a tela
+   precisa dizer, em vez de deixar o professor achar que a ferramenta errou. */
+function avisoDoCard() {
+  var alunos = (turma && turma.alunos) || [];
+  var hoje = new Date(); hoje = hoje.getFullYear() + '-' + ('0' + (hoje.getMonth() + 1)).slice(-2) + '-' + ('0' + hoje.getDate()).slice(-2);
+  var ultDada = '', ultPrevistaPassada = '';
+  alunos.forEach(function (a) {
+    (a.cels || []).forEach(function (c) {
+      if (!c || !c.d || c.d > hoje) return;
+      if ((c.s === 'dada' || c.s === 'falta') && c.d > ultDada) ultDada = c.d;
+      if (c.s === 'plano' && c.d < hoje && c.d > ultPrevistaPassada) ultPrevistaPassada = c.d;
+    });
+  });
+  var br = function (d) { return d.split('-').reverse().join('/'); };
+  if (!ultDada) return { txt: 'Este plano parte do card, e o card ainda não tem nenhuma aula dada nesta turma.', cls: 'err' };
+  /* aula JÁ PASSADA e ainda não lançada: aí o plano fica mesmo velho */
+  var atrasadas = ultPrevistaPassada && ultPrevistaPassada > ultDada;
+  if (atrasadas) return { txt: '⚠️ A aula de ' + br(ultPrevistaPassada) + ' ainda não foi lançada no card: este plano parte da de ' + br(ultDada) + '. Lance a aula (no card ou na Turma de hoje) e recarregue.', cls: 'err' };
+  if (ultDada < hoje) return { txt: '✓ Turma lida ao vivo. Este plano parte da última aula lançada no card, a de ' + br(ultDada) + ' — a de hoje entra quando você lançar.', cls: 'ok' };
+  return '';
+}
 /* ============ PRIORIZAÇÃO ============ */
 var isNum = function (v) { return typeof v === 'number' && !isNaN(v); };
 
@@ -589,7 +613,8 @@ function onTurma(dados) {
   $('painelTurma').hidden = false;
   if (turma.nomePlanilha) $('tituloConectar').textContent = '🔗 Conectar ao card,' + turma.nomePlanilha;
   $('tituloTurma').textContent = '📋 Fila de atendimento,' + (turma.turma || '');
-  statusCard('✓ Turma lida ao vivo. Fila montada por prioridade.', 'ok');
+  var av = avisoDoCard();
+  statusCard(av ? av.txt : '✓ Turma lida ao vivo. Fila montada por prioridade.', av ? av.cls : 'ok');
   renderFila();
   sincronizarNotas();   // a anotação é a mesma da Turma de hoje (servidor)
   $('painelTurma').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -965,6 +990,10 @@ var convAuto = { c1: '', c2: '' };
 function aplicarConversaAuto() {
   var c = conversaDaData();
   var i1 = $('conv1'), i2 = $('conv2');
+  /* o calendário institucional aqui só tem os meses já transcritos; sem o mês, os campos ficam livres e a tela diz
+     por quê, em vez de sugerir a atividade do mês errado (Pedro, 15/09/2026) */
+  var av = $('convAviso');
+  if (av) { var v = ($('dataAula') && $('dataAula').value) || ''; av.hidden = !!c || !v; av.textContent = c ? '' : 'Sem calendário de conversação carregado para este mês: escreva as atividades à mão.'; }
   if (!c) return;
   if (i1 && (i1.value === '' || i1.value === convAuto.c1)) i1.value = c.conv1;
   if (i2 && (i2.value === '' || i2.value === convAuto.c2)) i2.value = c.conv2;
