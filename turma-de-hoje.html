@@ -51,6 +51,7 @@
   .pill.prio-btn{ margin-left:auto; background:#1d3685; color:#fff; border:0; cursor:pointer; font: inherit; font-weight:800; }
   .pill.prio{ font-weight:800; }
   .pill.prio.nv-alta{ background:#fde2e2; color:#a11a1a; } .pill.prio.nv-media{ background:#fff1d6; color:#8a5300; } .pill.prio.nv-emdia{ background:#e3f5e8; color:#1f6b35; } .pill.prio.nv-semdados{ background:#eef1f6; color:#555; }
+  .al-cab .pill{ max-width: 100%; white-space: normal; }
   .pill.sem-at{ background:#fdeaea; color:#a11a1a; border:1px solid #f0b4b4; font-weight:800; }
   .pill.outro-prof{ background: #fff4e0; color: #8a4b00; border: 1px solid #f3c77a; }
   .al.visitante{ outline: 3px dashed #7c3aed; outline-offset: -3px; }
@@ -473,7 +474,7 @@ function prioDados(a) {
   return { atraso: atraso, pct: pct, nivel: nivel, pronto: pronto, expl: expl, licao: licao, book: String(a.book || '').trim().toLowerCase() };
 }
 function ordenarPorPrioridade() {
-  var lista = estado.alunos.map(function (a, i) { a._prio = prioDados(a); a._orig = i; return a; });
+  var lista = estado.alunos.map(function (a, i) { a._prio = prioDados(a); if (a._orig == null) a._orig = i; return a; });   /* a ordem original é gravada UMA vez */
   lista.sort(function (x, y) {
     var ax = estado.atendidos[x.raf] ? 1 : 0, ay = estado.atendidos[y.raf] ? 1 : 0;
     if (ax !== ay) return ax - ay;
@@ -499,8 +500,9 @@ function alternaPrioridade() {
   if (estado.prioridade) {
     estado.prioridade = false;
     estado.alunos.forEach(function (a) { a._rank = null; });
-    if (estado.alunos[0] && estado.alunos[0]._orig != null) estado.alunos.sort(function (x, y) { return (x._orig == null ? 9999 : x._orig) - (y._orig == null ? 9999 : y._orig); });
-    else aplicarFila();
+    estado.alunos.sort(function (x, y) { return (x._orig == null ? 9999 : x._orig) - (y._orig == null ? 9999 : y._orig); });
+    estado.alunos.forEach(function (a) { delete a._orig; });
+    aplicarFila();
   } else {
     estado.prioridade = true;
     ordenarPorPrioridade();
@@ -719,6 +721,8 @@ function initCascata() {
   selEscola.addEventListener('change', function () {
     if (!selEscola.value) return;
     var escola = selEscola.value;
+    /* aluno trazido pela busca é da OUTRA escola: some junto com a troca (auditoria de 15/09/2026) */
+    if (estado.escola && estado.escola !== escola && estado.visitantes.length) { estado.visitantes = []; estado.alunos = estado.alunos.filter(function (a) { return !a.visitante; }); }
     selProf.innerHTML = '<option value="" disabled selected>Carregando…</option>'; selProf.disabled = true;
     selTurma.innerHTML = '<option value="" disabled selected>Turma…</option>'; selTurma.disabled = true;
     lista('profs:' + escola, { action: 'card', fn: 'profs', escola: escola }, 'profs', function (profs) {
@@ -781,7 +785,7 @@ function horarioDaTurma(titulo) {
   for (var i = pedacos.length - 1; i >= 0 && !dias.length; i--) {
     var p = pedacos[i].normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
     (p.match(/[a-z]+/g) || []).forEach(function (w) { if (w in PAL && dias.indexOf(PAL[w]) < 0) dias.push(PAL[w]); });
-    if (/[ªº°]|\d\s*(\/|e\s)\s*\d/.test(pedacos[i])) (pedacos[i].match(/[2-7](?=\s*(?:[ªº°]|\/|e\s|$))/g) || []).forEach(function (d) { var n = (+d) - 1; if (dias.indexOf(n) < 0) dias.push(n); });
+    if (/[ªº°]|\d[aA]?\s*(\/|e\s)\s*\d/.test(pedacos[i])) (pedacos[i].match(/[2-7](?=\s*(?:[ªº°aA]|\/|e\s|$))/g) || []).forEach(function (d) { var n = (+d) - 1; if (dias.indexOf(n) < 0) dias.push(n); });
   }
   if (!dias.length) return null;
   var horas = [], re = /(\d{1,2})\s*(?:(?:[h:]|hr)\s*(\d{2})?h?|(?=\s*$))/gi, m;
@@ -843,7 +847,11 @@ function carregarTurma(escola, prof, linha, titulo) {
       post({ action: 'planejamentoLe', escola: escola, prof: prof, turma: nomeTurma }).catch(function () { return { plano: null }; }),
       Promise.all(Object.keys(livros).map(function (k) { return carregaPlano(livros[k]); }))
     ]).then(function (rs) {
+        /* o visitante fica na tela ao trocar de turma: o planner dele NÃO pode ser apagado pela leitura da turma nova
+           (auditoria de 15/09/2026: o cartão voltava para a Introduction e a marca ia para a lição errada) */
+        var antes = estado.dados || {};
         estado.dados = rs[0].alunos || {};
+        estado.visitantes.forEach(function (v) { if (!estado.dados[v.raf] && antes[v.raf]) estado.dados[v.raf] = antes[v.raf]; });
         estado.recursos = rs[0].recursos || [];
         estado.plano = rs[1] && rs[1].plano || null;
         aplicarFila();
@@ -887,7 +895,8 @@ function juntaVisitantes() {
 }
 function trazerAluno(al) {
   $('achadosAluno').hidden = true; $('qAluno').value = '';
-  var ja = estado.alunos.some(function (a) { return a.raf === al.raf; });
+  var rafN = function (v) { return String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); };
+  var ja = estado.alunos.some(function (a) { return rafN(a.raf) === rafN(al.raf); });
   if (ja) { var c = document.querySelector('.al[data-raf="' + al.raf + '"]'); if (c) { c.scrollIntoView({ behavior: 'smooth', block: 'start' }); } toast(al.name + ' já está na tela.'); return; }
   if (!al.book) { toast('⚠️ ' + al.name + ' está sem livro na lista de matrículas.'); return; }
   var v = { nome: al.name, raf: al.raf, book: al.book, turma: al.turma, visitante: true, _pos: 1000 + estado.visitantes.length };
@@ -1007,7 +1016,9 @@ function semAtendimento(a) {
   Object.keys(pl.checking || {}).forEach(function (k) { ultimo = Math.max(ultimo, Number((pl.checking[k] || {}).quando) || 0); });
   var cels = ((d.situacao || {}).cels || []).filter(function (c) { return c.s === 'dada' && c.d; });
   if (!cels.length) return null;
-  if (!ultimo) return { aulas: cels.length, nunca: true };
+  /* sem NENHUM atendimento registrado o aviso não vale: no dia do lançamento ninguém tem marca, e a turma inteira
+     abriria com alerta vermelho (auditoria de 15/09/2026). A conta começa no primeiro atendimento. */
+  if (!ultimo) return null;
   var iso = new Date(ultimo); iso = iso.getFullYear() + '-' + ('0' + (iso.getMonth() + 1)).slice(-2) + '-' + ('0' + iso.getDate()).slice(-2);
   var depois = cels.filter(function (c) { return c.d > iso; }).length;
   return depois ? { aulas: depois, desde: iso } : null;
@@ -1015,8 +1026,7 @@ function semAtendimento(a) {
 function avisoAtendimento(a) {
   var s = semAtendimento(a); if (!s || s.aulas < 2) return '';
   var pri = String(a.nome || '').trim().split(/\s+/)[0];
-  var txt = s.nunca ? pri + ' ainda não recebeu atendimento registrado em ' + s.aulas + ' aula' + (s.aulas === 1 ? '' : 's')
-                    : pri + ' não recebe atendimento há ' + s.aulas + ' aula' + (s.aulas === 1 ? '' : 's');
+  var txt = pri + ' não recebe atendimento há ' + s.aulas + ' aula' + (s.aulas === 1 ? '' : 's');
   return '<span class="pill sem-at" title="Nenhuma marca de professor nem Checking no planner deste aluno desde então">⚠️ ' + esc(txt) + '</span>';
 }
 function prioMotivo(p) {
@@ -1039,8 +1049,10 @@ function outrosProfs(a) {
     [[it.pq, it.pt], [it.aq, it.at]].forEach(function (par) {
       var quem = n(par[0]), t = Number(par[1]) || 0;
       if (!quem || !t || t < limite || it.ant === 1 || quem === 'ANTES DO PLANNER') return;
-      if (meu && (quem === meu || quem.split(' ')[0] === meuPri)) return;
-      if (!por[quem] || por[quem].t < t) por[quem] = { t: t, nome: String(par[0]).trim().split(/\s+/)[0] };
+      /* só o nome INTEIRO conta como "sou eu": dois Carlos na escola escondiam o aviso um do outro (auditoria de 15/09/2026).
+         Quando a sessão tem um nome de uma palavra só, o primeiro nome ainda serve. */
+      if (meu && (quem === meu || (meu.indexOf(' ') < 0 && quem.split(' ')[0] === meuPri))) return;
+      if (!por[quem] || por[quem].t < t) { var pn = String(par[0]).trim().split(/\s+/)[0]; por[quem] = { t: t, nome: pn.charAt(0).toUpperCase() + pn.slice(1).toLowerCase() }; }
     });
   });
   var lista = Object.keys(por).map(function (k) { return por[k]; }).sort(function (x, y) { return y.t - x.t; });
