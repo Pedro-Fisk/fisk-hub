@@ -438,7 +438,7 @@ function guardaAtendidos() { try { localStorage.setItem(chaveAtend(), JSON.strin
    sobe. Vale para a turma, os alunos trazidos pela busca e o plantão. Reordena só no clique, nunca sozinha. */
 var PRIO_NIVEL = { alta: 0, media: 1, emdia: 2, semdados: 3 };
 /* quem vê o botão enquanto está em teste: só a direção (Pedro, 15/09/2026: "tire do Carlos, eu só queria ver") */
-var PRIO_TESTE = [];
+var PRIO_TESTE = ['CARLOS ALBERTO'];   /* Carlos liberado de novo em 16/09/2026 */
 function podeOrdenar() {
   var s = sessao() || {};
   if (s.master) return true;
