@@ -28,7 +28,7 @@
 <div class="topo"><a class="voltar" href="turma-de-hoje.html" id="voltar">← Turma de hoje</a><h1>🦅 Plano de curso</h1><span class="sub" id="quem"></span></div>
 <div class="status" id="status">Lendo o planner…</div>
 <div id="corpo"></div>
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260915h"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260915i"></script>
 <script>
 var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
 var $ = function (id) { return document.getElementById(id); };
@@ -57,19 +57,29 @@ $('voltar').addEventListener('click', function (ev) {
 var pes = {};
 try { var h = JSON.parse(localStorage.getItem('pc:' + raf) || 'null'); if (h && Date.now() - h.t < 10 * 60000) pes = h; } catch (e) {}
 if (!nome && pes.nome) nome = pes.nome;
+if (!pes.notasAv1 && !pes.notasAv2) setTimeout(function () { var e = document.getElementById('status'); if (e && !e.textContent) { e.textContent = 'As notas do boletim não vieram nesta aba (abra pelo botão "Outra aba" da Turma de hoje). A tabela mostra só o que o professor digitou.'; e.className = 'status'; e.hidden = false; } }, 1200);
+/* a média da célula (auditoria de 15/09/2026): a busca solta pegava a PRIMEIRA aparição da palavra, e uma observação
+   da secretaria ("média baixa: conversar com a mãe 2 vezes") virava a nota. A linha que COMEÇA com "média" manda. */
+function mediaDaCelula(t) {
+  var linhas = String(t || '').split('\n'), re = /m[ée]dia[^0-9\n]{0,60}([0-9]+(?:[.,][0-9]+)?)/i, achou = null;
+  linhas.forEach(function (l) { var m = re.exec(l); if (m && (/^\s*m[ée]dia/i.test(l) || !achou)) achou = m; });
+  return achou;
+}
 function notasDaCelula(txt) {
   var t = String(txt || '').trim(); if (!t) return null;
   var num = function (x) { return x == null ? null : Number(String(x).replace(',', '.')); };
   var o = { card: true, cardCrit: {}, l: null, w: null, o: null, p: null, media: null };
-  var mE = t.match(/prova de escuta:\s*([0-9]+(?:[.,][0-9]+)?)/i), mW = t.match(/prova de escrita:\s*([0-9]+(?:[.,][0-9]+)?)/i), mM = t.match(/m[ée]dia[^0-9\n]*([0-9]+(?:[.,][0-9]+)?)/i);
+  var mE = t.match(/prova de escuta:\s*([0-9]+(?:[.,][0-9]+)?)/i), mW = t.match(/prova de escrita:\s*([0-9]+(?:[.,][0-9]+)?)/i), mM = mediaDaCelula(t);
   if (mE) { o.l = num(mE[1]); o.cardCrit.l = 1; }
   if (mW) { o.w = num(mW[1]); o.cardCrit.w = 1; }
   if (mM) { o.media = num(mM[1]); o.cardCrit.media = 1; }
   /* a data do lançamento: "Lançamento de nota - dd/mm/aaaa" (a linha "Report Card N · created on" do planner) */
   var mD = t.match(/(\d{2})\/(\d{2})\/\d{4}/); if (mD) o.data = mD[1] + '/' + mD[2];
   if (!mE && !mW) {
-    var linhas = t.split('\n'), ult = linhas[linhas.length - 1], re = /(?:^|\s)([A-H])\s*([0-9]+(?:[.,][0-9]+)?)/g, m, L = {};
-    while ((m = re.exec(ult))) L[m[1]] = num(m[2]);
+    /* a linha das letras pode não ser a última (observação escrita depois do lançamento): vale a que tiver mais letras */
+    var linhas = t.split('\n'), re = /(?:^|\s)([A-H])\s*([0-9]+(?:[.,][0-9]+)?)/g, m, L = {}, melhor = '', nMelhor = 0;
+    linhas.forEach(function (l) { var n = (l.match(/(?:^|\s)[A-H]\s*[0-9]/g) || []).length; if (n > nMelhor) { nMelhor = n; melhor = l; } });
+    while ((m = re.exec(melhor))) L[m[1]] = num(m[2]);
     var med = function (xs) { return xs.every(function (x) { return x != null; }) ? xs.reduce(function (s, x) { return s + x; }, 0) / xs.length : null; };
     if (L.A != null) { o.l = L.A; o.cardCrit.l = 1; }
     if (L.B != null) { o.w = L.B; o.cardCrit.w = 1; }
@@ -118,7 +128,9 @@ else Promise.all([
     PlannerV2.planoCompleto($('corpo'), plano, ctx, { nome: nome, raf: raf, prof: prof, turma: turma, escola: escola, hist: d.hist || [], aoClicar: clicar,
       aluno: { nome: nome, nascimento: pes.nascimento || '', telefone: pes.telefone || '', respNome: pes.respNome || '', respTel: pes.respTel || '' },
       notas: notasDe(ctx.planner.plano.notas),
-      aoNota: (j.recursos || []).indexOf('notas') > -1 ? salvaNota : null });
+      /* sem os dados do card (link direto, outro navegador, passados os 10 min), a coluna 1 não vira campo: digitar ali
+         gravaria uma "correção" por cima de uma nota que a tela nem leu (auditoria de 15/09/2026) */
+      aoNota: (j.recursos || []).indexOf('notas') > -1 ? salvaNota : null, semCard: !pes.notasAv1 && !pes.notasAv2 });
     window.scrollTo(0, y);
   }
   /* a nota da tabela das provas, como na Turma de hoje: vazio apaga (volta a do card) */

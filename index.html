@@ -1717,9 +1717,16 @@
         return fetch(API+'?'+qs).then(fiskJson)
           .then(function(j){ if (!j || !j.ok) throw new Error((j && j.erro) || 'panorama falhou'); return j; });
       }
+      /* "média (com todos os critérios do boletim): 8,2" — o \s* antigo esbarrava no parêntese e a média voltava null em
+         TODAS as células do formato novo (auditoria de 15/09/2026). Pega o número depois da palavra, com o que houver no meio. */
+      function mediaDaCelula_(s){
+        var linhas = String(s).split('\n'), re = /m[ée]dia[^0-9\n]{0,60}([0-9]+(?:[.,][0-9]+)?)/i, achou = null;
+        linhas.forEach(function(l){ var m = re.exec(l); if (m && (/^\s*m[ée]dia/i.test(l) || !achou)) achou = m; });
+        return achou;
+      }
       function notaDe(c){
         if (c == null || c === '') return null;
-        var s = String(c), m = s.match(/m[eé]dia\s*([0-9]+(?:[.,][0-9]+)?)/i);
+        var s = String(c), m = mediaDaCelula_(s);
         if (m) return parseFloat(m[1].replace(',', '.'));
         var m2 = s.trim().match(/^([0-9]+(?:[.,][0-9]+)?)$/);
         return m2 ? parseFloat(m2[1].replace(',', '.')) : null;

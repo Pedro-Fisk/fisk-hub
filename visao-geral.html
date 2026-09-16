@@ -391,10 +391,17 @@ function panorama(escola, prof) {
 }
 
 /* nota da célula do card: "[EST] 15/03 · média 7,5\nA8 B7…" ou número puro */
+/* "média (com todos os critérios do boletim): 8,2" — o \s* antigo esbarrava no parêntese e a média voltava null em
+   TODAS as células do formato novo (auditoria de 15/09/2026). Pega o número depois da palavra, com o que houver no meio. */
+function mediaDaCelula_(s){
+  var linhas = String(s).split('\n'), re = /m[ée]dia[^0-9\n]{0,60}([0-9]+(?:[.,][0-9]+)?)/i, achou = null;
+  linhas.forEach(function(l){ var m = re.exec(l); if (m && (/^\s*m[ée]dia/i.test(l) || !achou)) achou = m; });
+  return achou;
+}
 function notaDe(cell) {
   if (cell == null || cell === '') return null;
   var s = String(cell);
-  var m = s.match(/m[eé]dia\s*([0-9]+(?:[.,][0-9]+)?)/i);
+  var m = mediaDaCelula_(s);
   if (m) return parseFloat(m[1].replace(',', '.'));
   var m2 = s.trim().match(/^([0-9]+(?:[.,][0-9]+)?)$/);
   return m2 ? parseFloat(m2[1].replace(',', '.')) : null;

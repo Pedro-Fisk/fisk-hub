@@ -376,7 +376,7 @@
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260915h"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260915i"></script>
 <!-- o guia do Checking, lição a lição: a base comum e um arquivo por livro (Essentials, Transitions e Fluency 1 e 2, In Focus, Inmediato 1 a 3) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=376d37037e"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=9630e2ddde"></script>
@@ -1392,19 +1392,28 @@ function pessoaisDe(a) {
    "[EST] … · média 8,2" e a última linha "A9 B5,5 C8 D8 E9 F10 G9 H10", onde
    Oral = média de C, D, E e Participação = média de F, G, H, a mesma conta do
    boletim. Célula preenchida = boletim criado, mesmo sem número legível. */
+/* a média da célula (auditoria de 15/09/2026): a busca solta pegava a PRIMEIRA aparição da palavra, e uma observação
+   da secretaria ("média baixa: conversar com a mãe 2 vezes") virava a nota. A linha que COMEÇA com "média" manda. */
+function mediaDaCelula(t) {
+  var linhas = String(t || '').split('\n'), re = /m[ée]dia[^0-9\n]{0,60}([0-9]+(?:[.,][0-9]+)?)/i, achou = null;
+  linhas.forEach(function (l) { var m = re.exec(l); if (m && (/^\s*m[ée]dia/i.test(l) || !achou)) achou = m; });
+  return achou;
+}
 function notasDaCelula(txt) {
   var t = String(txt || '').trim(); if (!t) return null;
   var num = function (x) { return x == null ? null : Number(String(x).replace(',', '.')); };
   var o = { card: true, cardCrit: {}, l: null, w: null, o: null, p: null, media: null };
-  var mE = t.match(/prova de escuta:\s*([0-9]+(?:[.,][0-9]+)?)/i), mW = t.match(/prova de escrita:\s*([0-9]+(?:[.,][0-9]+)?)/i), mM = t.match(/m[ée]dia[^0-9\n]*([0-9]+(?:[.,][0-9]+)?)/i);
+  var mE = t.match(/prova de escuta:\s*([0-9]+(?:[.,][0-9]+)?)/i), mW = t.match(/prova de escrita:\s*([0-9]+(?:[.,][0-9]+)?)/i), mM = mediaDaCelula(t);
   if (mE) { o.l = num(mE[1]); o.cardCrit.l = 1; }
   if (mW) { o.w = num(mW[1]); o.cardCrit.w = 1; }
   if (mM) { o.media = num(mM[1]); o.cardCrit.media = 1; }
   /* a data do lançamento: "Lançamento de nota - dd/mm/aaaa" (a linha "Report Card N · created on" do planner) */
   var mD = t.match(/(\d{2})\/(\d{2})\/\d{4}/); if (mD) o.data = mD[1] + '/' + mD[2];
   if (!mE && !mW) {
-    var linhas = t.split('\n'), ult = linhas[linhas.length - 1], re = /(?:^|\s)([A-H])\s*([0-9]+(?:[.,][0-9]+)?)/g, m, L = {};
-    while ((m = re.exec(ult))) L[m[1]] = num(m[2]);
+    /* a linha das letras pode não ser a última (observação escrita depois do lançamento): vale a que tiver mais letras */
+    var linhas = t.split('\n'), re = /(?:^|\s)([A-H])\s*([0-9]+(?:[.,][0-9]+)?)/g, m, L = {}, melhor = '', nMelhor = 0;
+    linhas.forEach(function (l) { var n = (l.match(/(?:^|\s)[A-H]\s*[0-9]/g) || []).length; if (n > nMelhor) { nMelhor = n; melhor = l; } });
+    while ((m = re.exec(melhor))) L[m[1]] = num(m[2]);
     var med = function (xs) { return xs.every(function (x) { return x != null; }) ? xs.reduce(function (s, x) { return s + x; }, 0) / xs.length : null; };
     if (L.A != null) { o.l = L.A; o.cardCrit.l = 1; }
     if (L.B != null) { o.w = L.B; o.cardCrit.w = 1; }
