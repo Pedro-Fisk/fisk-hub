@@ -247,7 +247,19 @@
       <p data-i18n="card-turmahoje-p">Cada aluno na lição em que está, e o registro do Checking</p>
     </a>
 
-    <!-- o Planejador da Próxima Aula saiu do Hub em 16/09/2026: o roteiro agora é feito na Turma de hoje -->
+    <!-- O PLANEJADOR ATÉ O LANÇAMENTO (16/09/2026): o roteiro agora é feito na Turma de hoje. O card fica só para quem
+         ainda não tem a Turma de hoje (updateToolLinks o esconde assim que ela abre para o professor) -->
+    <a class="card card-lessonplan" href="planejador.html">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2.5" y="3.5" width="19" height="13" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8 20.5h8M12 16.5v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M6 8h7M6 11h9M6 13.5h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2 data-i18n="card-lessonplan-h2">Planejador da Próxima Aula</h2>
+      <p data-i18n="card-lessonplan-p">Ordem de prioridade de atendimento na próxima aula</p>
+    </a>
 
     <a class="card card-termo" href="termo-atraso.html">
       <div class="icon">
@@ -1161,6 +1173,8 @@
       function updateToolLinks(){
         var sv0 = saved(), th = document.querySelector('a.card-turmahoje');
         if (th) th.style.display = (sv0 && (sv0.master || turmaHojeAberta(sv0) || TURMA_HOJE_PILOTO.some(function(n){ var x = normPiloto(sv0.name), y = normPiloto(n); return x === y || x.indexOf(y + ' ') === 0; }))) ? '' : 'none';
+        var lp = document.querySelector('a.card-lessonplan');
+        if (lp) lp.style.display = (th && th.style.display !== 'none') ? 'none' : '';   /* quem tem a Turma de hoje não precisa do Planejador */
         var avc = document.getElementById('card-avatar');
         if (avc){
           var avAberto = !!(sv0 && (AVATAR_PROFS_ABERTO || sv0.master));
