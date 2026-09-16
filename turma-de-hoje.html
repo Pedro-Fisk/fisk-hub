@@ -688,6 +688,9 @@ var TURMA_HOJE_PILOTO = ['CARLOS ALBERTO'];
 function turmaHojeLiberada() {
   var s = sessao() || {};
   var n = function (v) { return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); };
+  /* O LANÇAMENTO (Pedro, 16/09/2026): quinta 17/09, 13h15 em Caçapava e 17h30 em Taubaté (a mesma regra do index.html) */
+  var abreEm = { 'CACAPAVA': Date.parse('2026-09-17T13:15:00-03:00'), 'TAUBATE': Date.parse('2026-09-17T17:30:00-03:00') }, agora = Date.now();
+  if (String(s.escolas || s.escola || '').split(',').some(function (e) { return agora >= (abreEm[n(e).replace(/[^A-Z]/g, '')] || Infinity); })) return true;
   return !!(s.master || TURMA_HOJE_PILOTO.some(function (p) { return n(p) === n(s.name) || n(s.name).indexOf(n(p) + ' ') === 0; }));   /* "Carlos Alberto da Silva" também */
 }
 function initCascata() {
@@ -721,6 +724,7 @@ function initCascata() {
   selEscola.addEventListener('change', function () {
     if (!selEscola.value) return;
     var escola = selEscola.value;
+    carregaLC(escola);
     /* aluno trazido pela busca é da OUTRA escola: some junto com a troca (auditoria de 15/09/2026) */
     if (estado.escola && estado.escola !== escola && estado.visitantes.length) { estado.visitantes = []; estado.alunos = estado.alunos.filter(function (a) { return !a.visitante; }); }
     selProf.innerHTML = '<option value="" disabled selected>Carregando…</option>'; selProf.disabled = true;
@@ -746,6 +750,9 @@ function initCascata() {
       if (antes && (antes === PLANTAO || turmas.some(function (t) { return String(t.linhaTitulo) === antes; }))) { selTurma.value = antes; return; }
       var agora = turmaDoHorario(turmas);
       /* o horário do plantão escrito no card ("LC FIXO - 5ª 15h às 17h30") abre o plantão, não a lista daquela linha */
+      /* a tabela das Learning Center sessions diz quem é monitor e quando (Pedro, 16/09/2026) */
+      var lc = lcAgora(escola, prof);
+      if (lc) { status('🙋 Learning Center session (' + lc.inicio + (lc.fim ? '–' + lc.fim : '') + '): busque cada aluno pelo nome ou RAF.'); escolhe(selTurma, PLANTAO); return; }
       if (agora && ehPlantao(agora.titulo)) { status('🕒 Horário do plantão de dúvidas.'); escolhe(selTurma, PLANTAO); return; }
       if (agora) { status('🕒 Turma do horário de agora: ' + agora.titulo.split('\n')[0] + '. Troque acima se for outra.'); escolhe(selTurma, agora.linhaTitulo); return; }
       if (ehMonitor(prof)) { status('🙋 Plantão de dúvidas: busque cada aluno pelo nome ou RAF.'); escolhe(selTurma, PLANTAO); return; }
@@ -876,7 +883,39 @@ function carregarTurma(escola, prof, linha, titulo) {
 var PLANTAO = '__plantao';
 var MONITORES = [];   /* nomes das contas dos monitores, como no login do Hub (ex.: 'NICOLE'); vazio até o Pedro dizer quem são */
 function nPessoa(v) { return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
-function ehMonitor(prof) { var s = sessao() || {}; return MONITORES.some(function (m) { var x = nPessoa(m); return x && (x === nPessoa(prof) || x === nPessoa(s.name) || nPessoa(s.name).indexOf(x + ' ') === 0); }); }
+/* OS MONITORES SÃO A TABELA DO LEARNING CENTER (Pedro, 16/09/2026): a mesma grade que o aluno vê no portal
+   (rota aberta plantaoList). Quem está na grade num horário é monitor naquele horário; a Turma de hoje abre
+   no plantão. A grade fica guardada no aparelho e é relida a cada visita. */
+var LC = {};
+function carregaLC(escola) {
+  try { var c = JSON.parse(localStorage.getItem('th:lc:' + escola) || 'null'); if (c) LC[escola] = c; } catch (e) {}
+  fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plantaoList', unidade: escola }) })
+    .then(fiskJson).then(function (j) {
+      if (!j || !j.ok) return;
+      LC[escola] = j.itens || [];
+      try { localStorage.setItem('th:lc:' + escola, JSON.stringify(LC[escola])); } catch (e) {}
+    }).catch(function () {});
+}
+function mesmaPessoa(tabela, prof) {
+  var t = nPessoa(tabela).replace(/^(PROF(A|ESSORA?)?\.?\s+|TEACHER\s+)/, ''), p = nPessoa(prof);
+  if (!t || !p) return false;
+  if (t === p || p.indexOf(t + ' ') === 0 || t.indexOf(p + ' ') === 0) return true;
+  /* a grade costuma trazer só o primeiro nome ("Nicole") */
+  return t.indexOf(' ') < 0 && p.split(' ')[0] === t;
+}
+function lcAgora(escola, prof) {
+  var itens = LC[escola] || [], s = sessao() || {};
+  var d = new Date(), dia = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'][d.getDay()], min = d.getHours() * 60 + d.getMinutes();
+  var mm = function (h) { var m = /^(\d{1,2}):(\d{2})/.exec(String(h || '')); return m ? (+m[1]) * 60 + (+m[2]) : null; };
+  return itens.find(function (it) {
+    if (it.dia !== dia || !(mesmaPessoa(it.professor, prof) || mesmaPessoa(it.professor, s.name))) return false;
+    var ini = mm(it.inicio), fim = mm(it.fim); if (ini == null) return false; if (fim == null) fim = ini + 75;
+    return min >= ini - 10 && min < fim;
+  }) || null;
+}
+/* os monitores da grade também dão aula: fora do horário de LC eles caem na turma deles, e não no plantão */
+function ehMonitor(prof) { return ehMonitor0(prof); }
+function ehMonitor0(prof) { var s = sessao() || {}; return MONITORES.some(function (m) { var x = nPessoa(m); return x && (x === nPessoa(prof) || x === nPessoa(s.name) || nPessoa(s.name).indexOf(x + ' ') === 0); }); }
 function ehPlantao(titulo) { return /\bLC\b|plant[aã]o|learning\s*center|centro de estudos/i.test(String(titulo || '')); }
 function carregarPlantao(escola, prof) {
   estado.escola = escola; estado.prof = prof; estado.turma = 'Plantão de dúvidas'; estado.plantao = true; estado.prioridade = false;

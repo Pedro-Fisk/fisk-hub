@@ -1163,9 +1163,14 @@
          breve" e só a direção entra. A mesma trava mora no avatar.html. */
       var AVATAR_PROFS_ABERTO = false;
       function normPiloto(v){ return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
+      /* O LANÇAMENTO (Pedro, 16/09/2026): quinta 17/09, 13h15 em Caçapava e 17h30 em Taubaté. A mesma regra na turma-de-hoje.html */
+      function turmaHojeAberta(sv){
+        var abreEm = { 'CACAPAVA': Date.parse('2026-09-17T13:15:00-03:00'), 'TAUBATE': Date.parse('2026-09-17T17:30:00-03:00') }, agora = Date.now();
+        return String((sv && (sv.escolas || sv.escola)) || '').split(',').some(function(e){ return agora >= (abreEm[normPiloto(e).replace(/[^A-Z]/g, '')] || Infinity); });
+      }
       function updateToolLinks(){
         var sv0 = saved(), th = document.querySelector('a.card-turmahoje');
-        if (th) th.style.display = (sv0 && (sv0.master || TURMA_HOJE_PILOTO.some(function(n){ var x = normPiloto(sv0.name), y = normPiloto(n); return x === y || x.indexOf(y + ' ') === 0; }))) ? '' : 'none';
+        if (th) th.style.display = (sv0 && (sv0.master || turmaHojeAberta(sv0) || TURMA_HOJE_PILOTO.some(function(n){ var x = normPiloto(sv0.name), y = normPiloto(n); return x === y || x.indexOf(y + ' ') === 0; }))) ? '' : 'none';
         var avc = document.getElementById('card-avatar');
         if (avc){
           var avAberto = !!(sv0 && (AVATAR_PROFS_ABERTO || sv0.master));
