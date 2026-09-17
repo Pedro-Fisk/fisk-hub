@@ -652,16 +652,16 @@ function pintaFila() {
   if (plano && plano.ordem && plano.ordem.length) {
     var na = estado.alunos.filter(function (a) { return a._plan; }).length;
     var d = plano.data ? plano.data.split('-').reverse().join('/') : '';
-    info = '📋 <b>Roteiro salvo' + (plano.hoje ? ' para hoje' : ' em ' + esc(d)) + '</b>' + (plano.quem ? ' · ' + esc(plano.quem) : '') + ' · ' + na + ' de ' + estado.alunos.length + ' na ordem';
-  } else info = '📋 <b>Sem roteiro salvo.</b> Os alunos estão na ordem do card.';
+    info = '📋 <b>Ordem salva' + (plano.hoje ? ' para hoje' : ' em ' + esc(d)) + '</b>' + (plano.quem ? ' · ' + esc(plano.quem) : '') + ' · ' + na + ' de ' + estado.alunos.length + ' na ordem';
+  } else info = '📋 <b>Sem ordem salva.</b> Os alunos estão na ordem do card.';
   if (nAt) info += ' · <b>' + nAt + ' atendido' + (nAt === 1 ? '' : 's') + '</b>';
   var prio = estado.alunos.length > 1 ? '<button type="button" class="prio-grande" data-prio>' + (estado.prioridade ? '↺ Voltar à ordem ' + (estado.plantao ? 'de chegada' : 'da turma') : '⚡ Ordenar por prioridade') + '</button>' : '';
   f.innerHTML = prio +
     '<div class="rt-linha"><span class="rt-info">' + info + '</span>' +
     (estado.plantao ? '' : '<label class="rt-data">Aula de <input type="date" data-rtdata value="' + dataRoteiroPadrao() + '"></label>' +
-      '<button type="button" class="rt-btn forte" data-rtsalva>💾 Salvar roteiro</button>' +
+      '<button type="button" class="rt-btn forte" data-rtsalva title="Guarda esta ordem para a aula da data escolhida">Salvar ordem</button>' +
       '<button type="button" class="rt-btn" data-rtcopia>📋 Copiar ordem</button>' +
-      '<button type="button" class="rt-btn" data-rtpdf>📄 PDF na pasta da turma</button>') +
+      '<button type="button" class="rt-btn" data-rtpdf>💾 Salvar PDF da ordem na pasta da turma</button>') +
     '<button type="button" class="btn-recarrega" data-recarrega title="Lê de novo o roteiro, as anotações e as marcas dos alunos">↻ Recarregar</button></div>';
   var bp = f.querySelector('[data-prio]');
   if (bp) { bp.title = 'Atraso de conteúdo primeiro (4+ aulas = alta, 1 a 3 = média); dentro da faixa, quem espera a Exploration ou o Checking; faltas desempatam; mesma lição fica junta; atendidos e faltas no fim'; bp.addEventListener('click', function () { alternaPrioridade(); }); }
@@ -685,11 +685,11 @@ function salvarRoteiro(bt) {
   return post({ action: 'planejamentoSalva', escola: estado.escola, prof: estado.prof, turma: estado.turma, data: data,
     ordem: ordem.map(function (o) { return { nome: o.nome, nivel: o.nivel, atividade: '', nota: '' }; }) })
     .then(function (r) {
-      bt.textContent = '✓ Roteiro salvo para ' + String(r.data || data).split('-').reverse().slice(0, 2).join('/');
+      bt.textContent = '✓ Ordem salva para ' + String(r.data || data).split('-').reverse().slice(0, 2).join('/');
       if ((r.data || data) === hojeIsoTH()) estado.plano = { data: r.data || data, hoje: true, quem: r.quem || '', ordem: ordem.map(function (o) { return { nome: o.nome, nivel: o.nivel }; }) };
       setTimeout(function () { bt.disabled = false; bt.textContent = velho; if ((r.data || data) === hojeIsoTH()) { aplicarFila(); pintaFila(); desenharTurma(); } }, 2200);
       return r;
-    }).catch(function (e) { bt.disabled = false; bt.textContent = velho; toast('⚠️ Não salvou o roteiro (' + e.message + ').'); });
+    }).catch(function (e) { bt.disabled = false; bt.textContent = velho; toast('⚠️ Não salvou a ordem (' + e.message + ').'); });
 }
 function textoRoteiro() {
   var d = dataRoteiro().split('-').reverse().join('/');
