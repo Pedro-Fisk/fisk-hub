@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Turma de hoje, FISK</title>
+<title>Minha aula, FISK</title>
 <link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04c">
 <link rel="stylesheet" href="assets/casa-tema.css?v=9">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
@@ -187,6 +187,7 @@
   .fila-info.sem{ background: var(--ui-soft); border-color: var(--ui-line); }
   .fila-info.sem b{ color: var(--ui-ink); }
   .fila-info.roteiro{ flex-direction: column; align-items: stretch; }
+  .rt-ontem{ background:#fff4c2; color:#6b4e00; border-radius:8px; padding:.15rem .5rem }
   .prio-grande{ width: 100%; border: 0; border-radius: 14px; background: #1d3685; color: #fff; font-family: var(--font-body); font-weight: 800; font-size: 1.05rem; padding: .8rem 1rem; cursor: pointer; box-shadow: 0 4px 0 #0f2260; }
   .prio-grande:focus-visible, .rt-btn:focus-visible{ outline: 3px solid #d4e909; outline-offset: 2px; }
   .rt-linha{ display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
@@ -359,7 +360,7 @@
   <a class="back-link" href="index.html">&larr; Voltar ao Hub</a>
   <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
   <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
-  <h1>Turma de hoje</h1>
+  <h1>Minha aula</h1>
   <p>Cada aluno na lição em que está &middot; confirme o que viu e registre o <i>Checking</i></p>
 </header>
 
@@ -440,7 +441,7 @@ var estado = { escola: '', prof: '', turma: '', alunos: [], dados: {}, aberto: '
    não está na fila vai para o fim, marcado. "Aluno atendido" manda o cartão
    para baixo e o próximo sobe; fica no aparelho, por turma e dia. */
 function normNome(s) { return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toLowerCase(); }
-function chaveAtend() { var d = new Date(); return 'th:atend:' + estado.escola + '|' + estado.prof + '|' + estado.turma + '|' + d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+function chaveAtend() { var d = new Date(); if (estado.ontem) d.setDate(d.getDate() - 1); return 'th:atend:' + estado.escola + '|' + estado.prof + '|' + estado.turma + '|' + d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
 function lerAtendidos() { try { return JSON.parse(localStorage.getItem(chaveAtend()) || '{}'); } catch (e) { return {}; } }
 function guardaAtendidos() { try { localStorage.setItem(chaveAtend(), JSON.stringify(estado.atendidos)); } catch (e) {} }
 /* ── ORDEM DE PRIORIDADE NA HORA (Pedro, 15/09/2026, teste da direção) ──
@@ -602,12 +603,25 @@ function somDeConquista() {
    dos atendidos) e escreve "a" na célula de hoje do card, só se ela estava vazia ou com o placeholder. O que a
    secretaria ou o professor já lançaram à mão no card manda. No plantão não há botão: lá não é aula. */
 function hojeIsoTH() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+/* A AULA DE ONTEM (Pedro, 17/09/2026): quem não conseguiu preencher na aula lança até o fim do dia seguinte. O
+   servidor só aceita ontem, só se o aluno não tem aula hoje, só em célula vazia, e registra o lançamento tardio. */
+function ontemIsoTH() { var d = new Date(); d.setDate(d.getDate() - 1); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+function diaAlvoTH() { return estado.ontem ? ontemIsoTH() : hojeIsoTH(); }
+function rotDiaTH() { return estado.ontem ? 'de ontem (' + ontemIsoTH().split('-').reverse().slice(0, 2).join('/') + ')' : 'de hoje'; }
+function alternaOntem() {
+  estado.ontem = !estado.ontem;
+  estado.faltas = {};
+  try { estado.atendidos = JSON.parse(localStorage.getItem(chaveAtend()) || '{}') || {}; } catch (e) { estado.atendidos = {}; }
+  if (estado.prioridade) ordenarPorPrioridade(); else aplicarFila();
+  desenharTurma(); pintaFila();
+  toast(estado.ontem ? '📅 Lançando a aula ' + rotDiaTH() + '. O que você marcar agora vai para a célula de ontem do card.' : '📅 De volta à aula de hoje.');
+}
 function faltouHoje(a) {
   if (estado.plantao) return false;
   var f = (estado.faltas || {})[a.raf];
   if (f === false) return false;
   if (f) return true;
-  var cels = ((estado.dados[a.raf] || {}).situacao || {}).cels || [], h = hojeIsoTH();
+  var cels = ((estado.dados[a.raf] || {}).situacao || {}).cels || [], h = diaAlvoTH();
   return cels.some(function (c) { return c && c.d === h && c.s === 'falta'; });
 }
 function fimDe(a) { return faltouHoje(a) ? 2 : (estado.atendidos[a.raf] ? 1 : 0); }
@@ -619,8 +633,8 @@ function marcarFalta(a) {
   reordenaComAnimacao(a);
   post({ action: 'plannerFalta', raf: a.raf, book: a.book, desfazer: desfazer }).then(function (r) {
     var c = r.card || {};
-    if (c.escreveu != null) toast(desfazer ? '📇 Card: falta de hoje desfeita.' : '📇 Card: "a" (falta) na aula de hoje.');
-    else if (c.jaEstava) toast('📇 O card já tinha "' + c.jaEstava + '" hoje e não foi alterado.');
+    if (c.escreveu != null) toast(desfazer ? '📇 Card: falta ' + rotDiaTH() + ' desfeita.' : '📇 Card: "a" (falta) na aula ' + rotDiaTH() + '.');
+    else if (c.jaEstava) toast('📇 O card já tinha "' + c.jaEstava + '" na aula ' + rotDiaTH() + ' e não foi alterado.');
     else if (c.motivo) toast('📇 Card não alterado: ' + c.motivo + '.');
   }).catch(function (e) {
     if (antes === undefined) delete estado.faltas[a.raf]; else estado.faltas[a.raf] = antes;
@@ -654,6 +668,7 @@ function pintaFila() {
     var d = plano.data ? plano.data.split('-').reverse().join('/') : '';
     info = '📋 <b>Ordem salva' + (plano.hoje ? ' para hoje' : ' em ' + esc(d)) + '</b>' + (plano.quem ? ' · ' + esc(plano.quem) : '') + ' · ' + na + ' de ' + estado.alunos.length + ' na ordem';
   } else info = '📋 <b>Sem ordem salva.</b> Os alunos estão na ordem do card.';
+  if (estado.ontem) info = '<span class="rt-ontem">📅 <b>Lançando a aula de ontem (' + esc(ontemIsoTH().split('-').reverse().slice(0, 2).join('/')) + ')</b> · presença e falta vão para a célula de ontem do card, só se estiver vazia</span> · ' + info;
   if (nAt) info += ' · <b>' + nAt + ' atendido' + (nAt === 1 ? '' : 's') + '</b>';
   var prio = estado.alunos.length > 1 ? '<button type="button" class="prio-grande" data-prio>' + (estado.prioridade ? '↺ Voltar à ordem ' + (estado.plantao ? 'de chegada' : 'da turma') : '⚡ Ordenar por prioridade') + '</button>' : '';
   f.innerHTML = prio +
@@ -662,10 +677,12 @@ function pintaFila() {
       '<button type="button" class="rt-btn forte" data-rtsalva title="Guarda esta ordem para a aula da data escolhida">Salvar ordem</button>' +
       '<button type="button" class="rt-btn" data-rtcopia>📋 Copiar ordem</button>' +
       '<button type="button" class="rt-btn" data-rtpdf>💾 Salvar PDF da ordem na pasta da turma</button>') +
+    (estado.plantao ? '' : '<button type="button" class="rt-btn' + (estado.ontem ? ' forte' : '') + '" data-ontem title="Não conseguiu preencher na aula? Lance a aula de ontem até o fim de hoje">' + (estado.ontem ? '↩ Voltar para a aula de hoje' : '📅 Lançar a aula de ontem') + '</button>') +
     '<button type="button" class="btn-recarrega" data-recarrega title="Lê de novo o roteiro, as anotações e as marcas dos alunos">↻ Recarregar</button></div>';
   var bp = f.querySelector('[data-prio]');
   if (bp) { bp.title = 'Atraso de conteúdo primeiro (4+ aulas = alta, 1 a 3 = média); dentro da faixa, quem espera a Exploration ou o Checking; faltas desempatam; mesma lição fica junta; atendidos e faltas no fim'; bp.addEventListener('click', function () { alternaPrioridade(); }); }
   f.querySelector('[data-recarrega]').addEventListener('click', function () { recarregarFila(this); });
+  var bo = f.querySelector('[data-ontem]'); if (bo) bo.addEventListener('click', alternaOntem);
   var bs = f.querySelector('[data-rtsalva]'); if (bs) bs.addEventListener('click', function () { salvarRoteiro(this); });
   var bc = f.querySelector('[data-rtcopia]'); if (bc) bc.addEventListener('click', function () { copiarRoteiro(this); });
   var bd = f.querySelector('[data-rtpdf]'); if (bd) bd.addEventListener('click', function () { pdfRoteiro(this); });
@@ -851,7 +868,9 @@ function get(params) {
 }
 function post(body) {
   body.token = token();
-  if (body.action === 'plannerProf' && estado.plantao) body.semCard = true;   /* plantão não é aula: o card não muda (Pedro, 16/09/2026) */
+  if (body.action === 'plannerProf' && estado.plantao) body.semCard = true;
+  if ((body.action === 'plannerProf' || body.action === 'plannerFalta') && estado.ontem && !estado.plantao) body.data = ontemIsoTH();
+  if (body.action === 'plannerFalta' && !body.quem) body.quem = (sessao() || {}).name || estado.prof || '';   /* plantão não é aula: o card não muda (Pedro, 16/09/2026) */
   return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
     .then(fiskJson).then(function (j) { if (!j || j.ok === false) throw new Error((j && (j.erro || j.error)) || 'Não consegui.'); return j; });
 }
@@ -876,7 +895,7 @@ function turmaHojeLiberada() {
   return !!(s.master || TURMA_HOJE_PILOTO.some(function (p) { return n(p) === n(s.name) || n(s.name).indexOf(n(p) + ' ') === 0; }));   /* "Carlos Alberto da Silva" também */
 }
 function initCascata() {
-  if (!turmaHojeLiberada()) { status('🔒 A Turma de hoje está em piloto com um professor de teste. Em breve para todos.', true); return; }
+  if (!turmaHojeLiberada()) { status('🔒 A Minha aula está em piloto com um professor de teste. Em breve para todos.', true); return; }
   var selEscola = $('selEscola'), selProf = $('selProf'), selTurma = $('selTurma');
   /* quem entrou já diz a escola e o professor (pedido do Pedro, 13/09): a
      cascata se preenche sozinha e só a turma fica para escolher; e se o
@@ -1007,7 +1026,7 @@ function erro(e) {
 
 /* ── a turma: os alunos do card (com RAF) e o planner de cada um ── */
 function carregarTurma(escola, prof, linha, titulo) {
-  estado.escola = escola; estado.prof = prof; estado.turma = titulo; estado.plantao = false; estado.prioridade = false;
+  estado.escola = escola; estado.prof = prof; estado.turma = titulo; estado.plantao = false; estado.prioridade = false; estado.ontem = false;
   $('alunos').innerHTML = ''; $('resumo').hidden = true; $('legenda').hidden = true;
   status('🔄 Lendo a turma no card…');
   /* o panorama é rota de GET no backend (doGet); por POST ele cai na guarda
@@ -1100,7 +1119,7 @@ function ehMonitor(prof) { return ehMonitor0(prof); }
 function ehMonitor0(prof) { var s = sessao() || {}; return MONITORES.some(function (m) { var x = nPessoa(m); return x && (x === nPessoa(prof) || x === nPessoa(s.name) || nPessoa(s.name).indexOf(x + ' ') === 0); }); }
 function ehPlantao(titulo) { return /\bLC\b|plant[aã]o|learning\s*center|centro de estudos/i.test(String(titulo || '')); }
 function carregarPlantao(escola, prof) {
-  estado.escola = escola; estado.prof = prof; estado.turma = 'Plantão de dúvidas'; estado.plantao = true; estado.prioridade = false;
+  estado.escola = escola; estado.prof = prof; estado.turma = 'Plantão de dúvidas'; estado.plantao = true; estado.prioridade = false; estado.ontem = false;
   estado.alunos = []; estado.dados = estado.dados || {}; estado.plano = null; estado.pessoais = [];
   estado.atendidos = lerAtendidos();
   juntaVisitantes(); aplicarFila();
@@ -1536,7 +1555,8 @@ function confirmar(a, id, marca) {
     console.log('plannerProf', id, marca, r);
     if (pendentes[a.raf] && pendentes[a.raf][id] === marca) delete pendentes[a.raf][id];
     if (r.planner) { estado.dados[a.raf].planner = aplicaNotasPendentes(a.raf, aplicaPendentes(a.raf, r.planner)); redesenhar(a); }
-    if (r.card && r.card.escreveu) toast('📇 Card: ' + r.card.escreveu + ' na aula de hoje.');
+    if (r.card && r.card.escreveu) toast('📇 Card: ' + r.card.escreveu + ' na aula ' + rotDiaTH() + '.');
+    else if (estado.ontem && r.card && r.card.motivo) toast('📇 Card não alterado: ' + r.card.motivo + '.');
   }).catch(function (e) {
     if (pendentes[a.raf] && pendentes[a.raf][id] === marca) delete pendentes[a.raf][id];
     console.error('plannerProf falhou', id, e);

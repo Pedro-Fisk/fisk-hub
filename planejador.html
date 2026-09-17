@@ -238,7 +238,7 @@
       <label class="topdata">📅 Data desta aula planejada
         <input type="date" id="dataAula"></label>
       <div class="doc-actions">
-        <button type="button" class="btn btn-fila js-fila" title="A ordem desta fila passa a ser a ordem dos alunos na Turma de hoje">💾 Salvar fila para a Turma de hoje</button>
+        <button type="button" class="btn btn-fila js-fila" title="A ordem desta fila passa a ser a ordem dos alunos na Minha aula">💾 Salvar fila para a Minha aula</button>
         <button type="button" class="btn btn-ghost js-copiar">📋 Copiar roteiro</button>
         <button type="button" class="btn btn-pdf js-pdf">📄 Gerar PDF</button>
         <button type="button" class="btn btn-drive js-drive">📁 Enviar para pasta da turma</button>
@@ -280,7 +280,7 @@
          está aqui embaixo e não deve ter de subir para entregar o plano -->
     <div class="finalizar" id="finalizar">
       <div class="doc-actions">
-        <button type="button" class="btn btn-fila js-fila">💾 Salvar fila para a Turma de hoje</button>
+        <button type="button" class="btn btn-fila js-fila">💾 Salvar fila para a Minha aula</button>
         <button type="button" class="btn btn-ghost js-copiar">📋 Copiar roteiro</button>
         <button type="button" class="btn btn-pdf js-pdf">📄 Gerar PDF do plano de aula</button>
         <button type="button" class="btn btn-drive js-drive">📁 Enviar para pasta da turma</button>
@@ -463,7 +463,7 @@ function avisoDoCard() {
   if (!ultDada) return { txt: 'Este plano parte do card, e o card ainda não tem nenhuma aula dada nesta turma.', cls: 'err' };
   /* aula JÁ PASSADA e ainda não lançada: aí o plano fica mesmo velho */
   var atrasadas = ultPrevistaPassada && ultPrevistaPassada > ultDada;
-  if (atrasadas) return { txt: '⚠️ A aula de ' + br(ultPrevistaPassada) + ' ainda não foi lançada no card: este plano parte da de ' + br(ultDada) + '. Lance a aula (no card ou na Turma de hoje) e recarregue.', cls: 'err' };
+  if (atrasadas) return { txt: '⚠️ A aula de ' + br(ultPrevistaPassada) + ' ainda não foi lançada no card: este plano parte da de ' + br(ultDada) + '. Lance a aula (no card ou na Minha aula) e recarregue.', cls: 'err' };
   if (ultDada < hoje) return { txt: '✓ Turma lida ao vivo. Este plano parte da última aula lançada no card, a de ' + br(ultDada) + ' — a de hoje entra quando você lançar.', cls: 'ok' };
   return '';
 }
@@ -760,7 +760,7 @@ function renderFila() {
         '<div class="metr">' + chips(a) + estudoChip(a.nome) + '</div>' +
         '<div class="sug">' + sugestao(a) + '</div>' +
         (a.atrasoAproximado ? '<div class="aviso">⚠ Conta aproximada: a última aula do aluno (“' + esc(a.ultimaAula || '') + '”) está fora do gabarito; o atraso foi medido pela última lição reconhecida (' + esc(a.ultimaLicao || '?') + '). Confira no card.</div>' : '') +
-        '<textarea class="nota-in" data-i="' + i + '" rows="1" maxlength="600" placeholder="✏️ anotação do professor (ex.: explanation, checking, entregar written task…). Aparece também na Turma de hoje" title="A mesma anotação da Turma de hoje">' + esc(nota) + '</textarea>' +
+        '<textarea class="nota-in" data-i="' + i + '" rows="1" maxlength="600" placeholder="✏️ anotação do professor (ex.: explanation, checking, entregar written task…). Aparece também na Minha aula" title="A mesma anotação da Turma de hoje">' + esc(nota) + '</textarea>' +
       '</div>';
     }).join('');
     ligarLinhas();
@@ -1066,11 +1066,11 @@ function salvarFila(silencioso) {
                            turma: turma.turma || '', data: data, ordem: ordem }) })
     .then(fiskJson).then(function (r) {
       if (!r || !r.ok) throw new Error((r && (r.error || r.erro)) || 'não salvou');
-      bts.forEach(function (b) { b.disabled = false; b.classList.add('ok'); b.textContent = '✓ Fila salva para ' + (r.data || 'hoje') + ' · a Turma de hoje já usa esta ordem'; });
-      setTimeout(function () { bts.forEach(function (b) { b.classList.remove('ok'); b.textContent = '💾 Salvar fila para a Turma de hoje'; }); }, 4000);
+      bts.forEach(function (b) { b.disabled = false; b.classList.add('ok'); b.textContent = '✓ Fila salva para ' + (r.data || 'hoje') + ' · a Minha aula já usa esta ordem'; });
+      setTimeout(function () { bts.forEach(function (b) { b.classList.remove('ok'); b.textContent = '💾 Salvar fila para a Minha aula'; }); }, 4000);
     }).catch(function (e) {
       bts.forEach(function (b) { b.disabled = false; b.textContent = '⚠️ ' + e.message; });
-      setTimeout(function () { bts.forEach(function (b) { b.textContent = '💾 Salvar fila para a Turma de hoje'; }); }, 4000);
+      setTimeout(function () { bts.forEach(function (b) { b.textContent = '💾 Salvar fila para a Minha aula'; }); }, 4000);
     });
 }
 ligarAcao('.js-fila', function () { salvarFila(false); });

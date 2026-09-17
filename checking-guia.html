@@ -257,7 +257,7 @@ function pintaFeedback(main) {
       .then(function (r) { return r.json(); })
       .then(function (r) {
         if (!r || !r.ok) throw new Error((r && (r.error || r.erro)) || 'not saved');
-        var okEl = box.querySelector('[data-ok]'); okEl.hidden = false; okEl.textContent = T2('✓ Feedback saved. Only the grade is left, in Turma de hoje.', '✓ Feedback guardado. Solo falta la nota, en Turma de hoje.');
+        var okEl = box.querySelector('[data-ok]'); okEl.hidden = false; okEl.textContent = T2('✓ Feedback saved. Only the grade is left, in Minha aula.', '✓ Feedback guardado. Solo falta la nota, en Minha aula.');
         try { if (window.opener) window.opener.postMessage({ tipo: 'checking', raf: raf, planner: r.planner }, '*'); } catch (e) {}
         salvar.textContent = T2('✓ Saved · close', '✓ Guardado · cerrar'); salvar.disabled = false; salvar.onclick = function () { window.close(); };
       }).catch(function (e) { salvar.disabled = false; salvar.textContent = '⚠️ ' + e.message + T2(' · try again', ' · intentar de nuevo'); });

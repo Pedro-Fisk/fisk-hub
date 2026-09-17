@@ -25,7 +25,7 @@
 </style>
 </head>
 <body>
-<div class="topo"><a class="voltar" href="turma-de-hoje.html" id="voltar">← Turma de hoje</a><h1>🦅 Plano de curso</h1><span class="sub" id="quem"></span></div>
+<div class="topo"><a class="voltar" href="turma-de-hoje.html" id="voltar">← Minha aula</a><h1>🦅 Plano de curso</h1><span class="sub" id="quem"></span></div>
 <div class="status" id="status">Lendo o planner…</div>
 <div id="corpo"></div>
 <script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260917b"></script>
@@ -57,7 +57,7 @@ $('voltar').addEventListener('click', function (ev) {
 var pes = {};
 try { var h = JSON.parse(localStorage.getItem('pc:' + raf) || 'null'); if (h && Date.now() - h.t < 10 * 60000) pes = h; } catch (e) {}
 if (!nome && pes.nome) nome = pes.nome;
-if (!pes.notasAv1 && !pes.notasAv2) setTimeout(function () { var e = document.getElementById('status'); if (e && !e.textContent) { e.textContent = 'As notas do boletim não vieram nesta aba (abra pelo botão "Outra aba" da Turma de hoje). A tabela mostra só o que o professor digitou.'; e.className = 'status'; e.hidden = false; } }, 1200);
+if (!pes.notasAv1 && !pes.notasAv2) setTimeout(function () { var e = document.getElementById('status'); if (e && !e.textContent) { e.textContent = 'As notas do boletim não vieram nesta aba (abra pelo botão "Ver planner completo" da Minha aula). A tabela mostra só o que o professor digitou.'; e.className = 'status'; e.hidden = false; } }, 1200);
 /* a média da célula (auditoria de 15/09/2026): a busca solta pegava a PRIMEIRA aparição da palavra, e uma observação
    da secretaria ("média baixa: conversar com a mãe 2 vezes") virava a nota. A linha que COMEÇA com "média" manda. */
 function mediaDaCelula(t) {
@@ -106,7 +106,7 @@ function notasDe(guardadas) {
 }
 $('quem').textContent = (nome ? nome + ' · ' : '') + (book || '') + (raf ? ' · ' + raf : '');
 document.title = 'Plano de curso' + (nome ? ' · ' + nome : '') + ' · Fisk';
-if (!raf || !book) { status('Faltou o aluno: abra esta página pelo botão da Turma de hoje.', true); }
+if (!raf || !book) { status('Faltou o aluno: abra esta página pelo botão da Minha aula.', true); }
 else Promise.all([
   carregaPlano(book),
   fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plannerTurma', token: token(), alunos: [{ raf: raf, book: book, turma: turma }] }) }).then(function (r) { return r.json(); })
