@@ -1792,11 +1792,11 @@ function guiaHTML(book, licaoId, nome, raf) {
     var corpo = '<table>' + linhas.map(function (ln) {
       return '<tr class="' + (ln.quem === 'A' ? 'aluno' : 'prof') + '"><td class="diz">' + esc(ln.diz) + '</td><td class="nota">' + esc(ln.nota) + '</td></tr>';
     }).join('') + '</table>';
-    return '<div class="bl"><h5>' + (r.ic ? r.ic + ' ' : '') + esc(r.t || k) + ' <span class="min">' + (r.min || '') + ' min</span></h5><p class="o">' + esc(r.o || '') + '</p>' + corpo +
+    return '<div class="bl"><h5>' + (r.ic ? r.ic + ' ' : '') + esc(r.t || k) + '</h5><p class="o">' + esc(r.o || '') + '</p>' + corpo +
       '<button type="button" class="feito-btn">' + (g.idioma === 'es' ? '✓ Hecho' : '✓ Done') + '</button></div>';
   }
   var grande = 'checking-guia.html?book=' + encodeURIComponent(book) + '&licao=' + encodeURIComponent(licaoId) + '&aluno=' + encodeURIComponent(nome || '') + '&raf=' + encodeURIComponent(raf || '');
-  return '<details class="guia" open><summary>📋 Guia do Checking · ' + esc(l.rot) + ' · ' + esc(l.tema) + '<span class="tempo">' + g.ROTEIRO.reduce(function (t, r) { return t + (r.min || 0); }, 0) + ' min com ' + esc(primeiro) + '</span></summary>' +
+  return '<details class="guia" open><summary>📋 Guia do Checking · ' + esc(l.rot) + ' · ' + esc(l.tema) + '<span class="tempo">com ' + esc(primeiro) + '</span></summary>' +
     '<div class="vozes"><span><i style="background:#a8b907"></i>' + (g.idioma === 'es' ? 'Dice el profesor' : 'Teacher says') + '</span><span><i style="background:#1d3685"></i>' + (g.idioma === 'es' ? 'Dice el alumno' : 'Student says') + '</span></div>' +
     '<a class="tela-grande" href="' + grande + '" target="_blank" rel="noopener">🖥️ Abrir em tela grande, para fazer junto com ' + esc(primeiro) + '</a>' +
     g.ROTEIRO.map(function (r) { return bloco(r.k); }).join('') + '</details>';

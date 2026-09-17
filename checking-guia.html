@@ -188,7 +188,7 @@ function pinta() {
   if (estado.i >= G.ROTEIRO.length) { pintaFeedback(main); return; }
   var r = G.ROTEIRO[estado.i];
   var cab = document.createElement('div'); cab.className = 'bloco-cab';
-  cab.innerHTML = '<h1>' + (r.ic ? r.ic + ' ' : '') + (estado.i + 1) + '. ' + esc(r.t) + '</h1><span class="min">' + r.min + ' min</span>' +
+  cab.innerHTML = '<h1>' + (r.ic ? r.ic + ' ' : '') + (estado.i + 1) + '. ' + esc(r.t) + '</h1>' +
     '<div class="legenda"><span class="p"><i></i>' + T2('Teacher says', 'Dice el profesor') + '</span><span class="a"><i></i>' + T2('Student says', 'Dice el alumno') + '</span></div>';
   main.appendChild(cab);
   var box = document.createElement('div'); box.className = 'linhas';
@@ -218,7 +218,7 @@ function pinta() {
 function pintaFeedback(main) {
   var primeiro = aluno ? aluno.split(' ')[0] : 'the student';
   var box = document.createElement('div'); box.className = 'fb';
-  box.innerHTML = '<div class="bloco-cab"><h1>' + (G.ROTEIRO.length + 1) + '. Feedback</h1><span class="min">1 min</span></div>' +
+  box.innerHTML = '<div class="bloco-cab"><h1>' + (G.ROTEIRO.length + 1) + '. Feedback</h1></div>' +
     '<div class="grupo bom"><h2>👍 ' + esc(primeiro) + T2(', you were best at…', ', lo que mejor hiciste fue…') + '</h2><div class="chips" data-melhor>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</div></div>' +
     '<div class="grupo ruim"><h2>👎 ' + T2('Let\'s work on…', 'Vamos a trabajar…') + '</h2><div class="chips" data-melhorar>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</div></div>' +
     '<div class="grupo"><h2>🎯 ' + T2('To improve more, you should…', 'Para mejorar más, deberías…') + '</h2><div class="chips" data-pedidos></div></div>' +
