@@ -293,6 +293,11 @@
   .aula .btn-ck{ margin-top: auto; }
   .aula .it + .btn-ck{ margin-top: .6rem; }
   .aula .libera{ color: #54648d; }
+  .aula .sug1{ margin: .5rem .55rem .55rem; background: #e4f3f1; border: 1px solid #cfe6e1; border-radius: 10px; padding: .35rem .55rem; display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+  .aula .sug1 .st{ flex-basis: 100%; font-size: .66rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #155a48; }
+  .aula .sug1 .nm{ font-weight: 800; color: #0f1f4e; font-size: .92rem; }
+  .aula .sug1.ok .nm{ text-decoration: line-through; opacity: .7; }
+  .aula .sug1 .pct{ margin-left: auto; background: #fff; border-radius: 999px; padding: 0 .5rem; font-weight: 800; color: #155a48; font-size: .78rem; }
   .aula .ck-feito{ margin-top: auto; display: flex; align-items: center; gap: .65rem; background: var(--ac, #d4e909); color: var(--acTxt, #3a3400); border-radius: 10px; padding: .5rem .7rem; }
   .aula .it + .ck-feito{ margin-top: .6rem; }
   .aula .ck-feito .mk{ border-color: var(--acTxt, #3a3400); }
@@ -426,7 +431,7 @@ body.theme-dark .pl-salvar{ background: #10261f; }
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260917f"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260917g"></script>
 <!-- o guia do Checking, lição a lição: a base comum e um arquivo por livro (Essentials, Transitions e Fluency 1 e 2, In Focus, Inmediato 1 a 3) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=376d37037e"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=9630e2ddde"></script>
@@ -1379,6 +1384,8 @@ function cartaoAluno(a) {
     if (est) {
       var grade = document.createElement('div'); grade.className = 'aulas';
       var datas = datasDasAulas(plano, pos.id, ctx);
+      var ksTudo = PlannerV2.keepStudying ? PlannerV2.keepStudying(plano, pos.id, ctx, { hist: (estado.dados[a.raf] || {}).hist, recuo: 21 }) : null;
+      var ksSug = ksTudo && ksTudo.sugeridos;
       est.aulas.forEach(function (au, ai) {
         var col = document.createElement('div'); col.className = 'aula' + (au.atual ? ' atual' : '');
         col.innerHTML = '<div class="t">Class ' + au.n + ' <b>' + esc(au.papel) + '</b>' + pilulaData(datas[ai], au.atual) + '</div>';
@@ -1404,6 +1411,15 @@ function cartaoAluno(a) {
           lista.appendChild(bt);
           var prox = plano.etapas[plano.etapas.indexOf(plano.etapas.find(function (e) { return e.id === pos.id; })) + 1];
           if (prox) { var lb = document.createElement('p'); lb.className = 'libera'; lb.textContent = (ckAtual && ckAtual.feito ? 'Checking registrado: ' + prox.rot + ' liberada para o aluno.' : 'Ao registrar, a ' + prox.rot + ' é liberada para o aluno.'); lista.appendChild(lb); }
+        }
+        /* UMA SUGESTÃO POR AULA (17/09/2026): o mesmo bloco verde que o aluno vê */
+        var sug1 = (ksSug || []).filter(function (x) { return x.aula === ai; })[0];
+        if (sug1) {
+          var sb = document.createElement('div'); sb.className = 'sug1' + (sug1.feito ? ' ok' : '');
+          sb.dataset.id = sug1.id; sb.dataset.tool = sug1.tool;
+          sb.innerHTML = '<span class="st">Extras · Suggested Practice</span><span class="nm">' + sug1.icone + ' ' + esc(sug1.nm) + '</span>' +
+            (sug1.feito ? '<span class="pct">' + (typeof sug1.pct === 'number' ? Math.round(sug1.pct) + '%' : '✓') + '</span>' : '');
+          col.appendChild(sb);
         }
         grade.appendChild(col);
       });
@@ -1448,26 +1464,16 @@ function quadroKS(a, plano, pos, ctx) {
   if (!PlannerV2.keepStudying) return null;   /* planner-v2.js de antes do quadro, preso num cache */
   var ks = PlannerV2.keepStudying(plano, pos.id, ctx, { hist: (estado.dados[a.raf] || {}).hist, recuo: 21 });
   var o = ks && ks.outros, mostraMais = !!(o && (o.grupos.length || !o.total));
-  if (!ks || (!ks.sugeridos.length && !mostraMais)) return null;
-  var feitos = ks.sugeridos.filter(function (x) { return x.feito; }).length;
+  /* AS SUGESTÕES SAÍRAM DAQUI (17/09/2026): cada uma mora na sua aula. Aqui fica o que ele fez ALÉM delas. */
+  if (!mostraMais) return null;
   var cel = document.createElement('div'); cel.className = 'aula ks';
-  cel.innerHTML = '<div class="t" title="As duas sugestões da lição, as mesmas do aluno (✓ e a melhor nota), e o que mais ele fez no portal">Extras · Suggested Practice' +
-    (ks.sugeridos.length ? '<span class="dt">' + feitos + ' de ' + ks.sugeridos.length + '</span>' : '') + '</div>';
+  cel.innerHTML = '<div class="t" title="O que o aluno fez no portal além da prática sugerida de cada aula">Também fez no portal</div>';
   var lista = document.createElement('div'); lista.className = 'lista';
-  var nS = ks.sugeridos.length;
-  var sug = document.createElement('div'); sug.className = 'ks-sug c' + (nS <= 4 ? Math.max(1, nS) : (nS <= 6 ? 3 : 4));
-  ks.sugeridos.forEach(function (x) {
-    var r = document.createElement('div'); r.className = 'ksi' + (x.feito ? ' feito' : ''); r.title = x.nm; r.dataset.id = x.id; r.dataset.tool = x.tool;
-    r.innerHTML = '<span class="ic">' + x.icone + '</span><span class="nm">' + esc(x.nm) + '</span>' +
-      (x.feito ? '<span class="pct">' + (typeof x.pct === 'number' ? Math.round(x.pct) + '%' : '✓') + '</span>' : '');
-    sug.appendChild(r);
-  });
-  lista.appendChild(sug);
   if (mostraMais) {
     var desde = o.recuo ? 'nos últimos ' + o.recuo + ' dias' : 'desde ' + o.ini.split('-').reverse().slice(0, 2).join('.');
     var mais = document.createElement('div'); mais.className = 'ks-mais';
     mais.innerHTML = o.total
-      ? '<b>' + (ks.sugeridos.length ? 'Também fez no portal' : 'Fez no portal') + ' · ' + desde + '</b>' + o.grupos.map(function (g) {
+      ? '<b>' + desde + '</b>' + o.grupos.map(function (g) {
           return '<span' + (g.ids && g.ids.length ? ' title="' + esc(g.ids.join(', ')) + '"' : '') + '>' + g.icone + ' ' + esc(g.rot.pt) + ' ×' + g.n + (g.best !== null ? ' <i>' + Math.round(g.best) + '%</i>' : '') + '</span>';
         }).join('')
       : '<b>Nada no portal ' + desde + '</b>';
