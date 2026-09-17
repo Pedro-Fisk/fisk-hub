@@ -1179,6 +1179,7 @@
         if (avc){
           var avAberto = !!(sv0 && (AVATAR_PROFS_ABERTO || sv0.master));
           avc.classList.toggle('is-soon', !avAberto);
+          avc.style.display = avAberto ? '' : 'none';   /* surpresa para os professores (Pedro, 17/09/2026): nem o "Em breve" aparece */
           avc.setAttribute('href', avAberto ? 'avatar.html' : '#');
           if (avAberto){ avc.removeAttribute('aria-disabled'); avc.removeAttribute('tabindex'); }
           else { avc.setAttribute('aria-disabled', 'true'); avc.setAttribute('tabindex', '-1'); }
