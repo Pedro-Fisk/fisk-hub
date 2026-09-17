@@ -351,6 +351,39 @@
   .mk.dep-prof{ border-color: var(--prof); }
   .mk.plat{ background: #1d3685 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/64% no-repeat; border-color: #1d3685; }
   .aula .it.xp .mk.dep-prof, .aula .it.xp .mk.cheia-prof{ border-color: #3a3400; }
+
+/* painel do Planejador e cards mais baixos (Pedro, 17/09/2026) */
+.fila-info.roteiro, .fila-info.roteiro.sem{ gap: .65rem; padding: .75rem .9rem; background: #fff; border: 1px solid var(--ui-line, #d6deea); border-radius: 16px; box-shadow: 0 2px 10px rgba(15,31,78,.06); }
+.pl-topo{ display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .7rem; }
+.pl-tit{ font-family: var(--font-heading); font-weight: 900; font-size: 1rem; color: #1d3685; letter-spacing: .01em; }
+.fila-info .pl-rec{ margin-left: auto; }
+.pl-topo .rt-info{ flex-basis: 100%; font-size: .82rem; color: #54648d; }
+.pl-topo .rt-info b{ color: #155a48; }
+.fila-info.sem .pl-topo .rt-info b{ color: #1d3685; }
+.fila-info .pl-rec{ border: 0; background: #eef2fa; color: #1d3685; padding: .3rem .75rem; }
+.fila-info .pl-rec:hover{ background: #dfe7f5; }
+.pl-acoes{ display: flex; flex-wrap: wrap; align-items: stretch; gap: .5rem; }
+.pl-acoes .prio-grande{ width: auto; flex: 1 1 220px; font-size: .95rem; padding: .55rem 1rem; border-radius: 12px; box-shadow: 0 3px 0 #0f2260; }
+.pl-acoes .prio-grande.on{ background: #fff; color: #1d3685; box-shadow: inset 0 0 0 2px #1d3685; }
+.pl-salvar{ display: flex; align-items: stretch; border: 1.5px solid #31a889; border-radius: 12px; overflow: hidden; background: #f3fbf9; }
+.pl-salvar .rt-data{ padding: 0 .5rem 0 .75rem; font-size: .8rem; color: #155a48; }
+.pl-salvar .rt-data input{ border: 0; background: transparent; font-weight: 800; color: #155a48; padding: .2rem 0; }
+.pl-salvar .rt-btn{ border: 0; border-radius: 0; padding: .45rem 1rem; }
+.pl-saidas{ display: flex; flex-wrap: wrap; gap: .4rem; }
+.pl-saidas .rt-btn{ border: 1px solid var(--ui-line, #d6deea); color: #1d3685; border-radius: 12px; padding: .45rem .8rem; font-weight: 700; }
+.pl-saidas .rt-btn:hover{ border-color: #1d3685; background: #f5f8fd; }
+body.theme-dark .fila-info.roteiro{ background: #172232; border-color: #2e4560; }
+body.theme-dark .pl-tit, body.theme-dark .pl-saidas .rt-btn{ color: #dbe6f3; }
+body.theme-dark .pl-saidas .rt-btn{ background: #101a28; border-color: #2e4560; }
+body.theme-dark .pl-salvar{ background: #10261f; }
+.aula .t{ padding: .35rem .7rem; }
+.aula .t b, body.theme-dark .aula .t b{ font-size: .98rem; }
+.aula .lista{ padding: .3rem .45rem .45rem; gap: 0; }
+.aula .it, body.theme-dark .aula .it{ min-height: 34px; padding: .15rem .45rem; font-size: .92rem; line-height: 1.25; }
+.aula .it .mk{ flex-basis: 26px; width: 26px; height: 26px; }
+.aula .it .mk.tri{ height: 23px; }
+.aula .btn-ck, .aula .ck-feito{ padding-top: .4rem; padding-bottom: .4rem; }
+.aula .it + .btn-ck, .aula .it + .ck-feito{ margin-top: .4rem; }
 </style>
 </head>
 <body>
@@ -671,14 +704,16 @@ function pintaFila() {
   if (estado.ontem) info = '<span class="rt-ontem">📅 <b>Lançando a aula de ontem (' + esc(ontemIsoTH().split('-').reverse().slice(0, 2).join('/')) + ')</b> · presença e falta vão para a célula de ontem do card, só se estiver vazia</span> · ' + info;
   if (nAt) info += ' · <b>' + nAt + ' atendido' + (nAt === 1 ? '' : 's') + '</b>';
   var prio = estado.alunos.length > 1 ? '<button type="button" class="prio-grande" data-prio>' + (estado.prioridade ? '↺ Voltar à ordem ' + (estado.plantao ? 'de chegada' : 'da turma') : '⚡ Ordenar por prioridade') + '</button>' : '';
-  f.innerHTML = prio +
-    '<div class="rt-linha"><span class="rt-info">' + info + '</span>' +
-    (estado.plantao ? '' : '<label class="rt-data">Aula de <input type="date" data-rtdata value="' + dataRoteiroPadrao() + '"></label>' +
-      '<button type="button" class="rt-btn forte" data-rtsalva title="Guarda esta ordem para a aula da data escolhida">Salvar ordem</button>' +
-      '<button type="button" class="rt-btn" data-rtcopia>📋 Copiar ordem</button>' +
-      '<button type="button" class="rt-btn" data-rtpdf>💾 Salvar PDF da ordem na pasta da turma</button>') +
-    (estado.plantao ? '' : '<button type="button" class="rt-btn' + (estado.ontem ? ' forte' : '') + '" data-ontem title="Não conseguiu preencher na aula? Lance a aula de ontem até o fim de hoje">' + (estado.ontem ? '↩ Voltar para a aula de hoje' : '📅 Lançar a aula de ontem') + '</button>') +
-    '<button type="button" class="btn-recarrega" data-recarrega title="Lê de novo o roteiro, as anotações e as marcas dos alunos">↻ Recarregar</button></div>';
+  /* painel do Planejador (Pedro, 17/09): título e situação em cima; ordenar, data + salvar, e as saídas agrupadas.
+     O "Lançar a aula de ontem" saiu da tela até algum professor pedir (o servidor continua aceitando). */
+  f.innerHTML = '<div class="pl-topo"><span class="pl-tit">Planejador</span>' +
+    '<button type="button" class="btn-recarrega pl-rec" data-recarrega title="Lê de novo o roteiro, as anotações e as marcas dos alunos">↻ Recarregar</button><span class="rt-info">' + info + '</span></div>' +
+    '<div class="pl-acoes">' + prio.replace('class="prio-grande"', 'class="prio-grande' + (estado.prioridade ? ' on' : '') + '"') +
+    (estado.plantao ? '' : '<div class="pl-salvar"><label class="rt-data">Aula de <input type="date" data-rtdata value="' + dataRoteiroPadrao() + '"></label>' +
+      '<button type="button" class="rt-btn forte" data-rtsalva title="Guarda esta ordem para a aula da data escolhida">Salvar ordem</button></div>' +
+      '<div class="pl-saidas"><button type="button" class="rt-btn" data-rtcopia>📋 Copiar ordem</button>' +
+      '<button type="button" class="rt-btn" data-rtpdf title="Grava o PDF da ordem na pasta da turma">💾 Salvar PDF da ordem na pasta da turma</button></div>') +
+    '</div>';
   var bp = f.querySelector('[data-prio]');
   if (bp) { bp.title = 'Atraso de conteúdo primeiro (4+ aulas = alta, 1 a 3 = média); dentro da faixa, quem espera a Exploration ou o Checking; faltas desempatam; mesma lição fica junta; atendidos e faltas no fim'; bp.addEventListener('click', function () { alternaPrioridade(); }); }
   f.querySelector('[data-recarrega]').addEventListener('click', function () { recarregarFila(this); });
