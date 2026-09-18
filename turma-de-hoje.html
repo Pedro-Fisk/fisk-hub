@@ -464,7 +464,7 @@ var CRITERIOS = [['vocabulary', '🔤 Vocabulário'], ['fluency', '💬 Fluênci
 /* Os dez gabaritos v2 moram no portal e descem sob demanda, pelo livro: nenhum
    professor precisa dos outros nove. 'Essentials 1' → plano-essentials-1.v2.js
    → window.PLANO_ESSENTIALS_1 (13/09/2026). */
-var PLANO_V = '20260915g';
+var PLANO_V = '20260918a';
 function livroId(b) { var s = String(b || '').trim().toLowerCase(); if (/focus\s*review|review\s*focus/.test(s)) return 'in-focus-review'; if (/^(grammar\s*)?review\b/.test(s)) return 'review'; if (/pathways/.test(s)) return 'pathways'; return s.replace(/\s+/g, '-'); }   /* os dois Reviews (15/09/2026): o card escreve o nome de vários jeitos */
 function planoGlobal(book) { return 'PLANO_' + livroId(book).toUpperCase().replace(/-/g, '_'); }
 var planoCarregando = {};
