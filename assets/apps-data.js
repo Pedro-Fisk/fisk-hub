@@ -24,6 +24,8 @@
               'fun'      o joguinho, um por LIVRO
               'geral'    vale para qualquer estágio
               'ra'       realidade aumentada, preso a um livro
+              'parceiro' NÃO é da franqueadora: app de outra empresa que a
+                         escola indica para um estágio (o Linguix, no In Focus)
               'escola'   NÃO é do aluno: uso interno da escola/professor
      blocos   em que parte do curso ele aparece (para o filtro da página)
      onde     texto curto que responde "em que estágio eu uso isto?"
@@ -46,7 +48,7 @@
               A régua de quem casa com o quê é a Circular 29/25, não o nome.
 */
 window.FISK_APPS = {
-  atualizado: '05/09/2026',
+  atualizado: '18/09/2026',
   /* Os blocos e, dentro de cada um, OS ESTÁGIOS QUE A ESCOLA DÁ. A pergunta
      que o professor faz não é "quais apps existem para Kids", é "o que o meu
      aluno do Teens Connect 2 precisa baixar" — então o estágio é o filtro que
@@ -186,6 +188,15 @@ window.FISK_APPS = {
     { nome: 'Fisk e-book Speed', tipo: 'geral', blocos: ['adultos'],
       onde: 'Speed 1, 2 e 3', desc: 'O leitor dos livros da série Speed.',
       android: 'com.mbr.NewFiskeBook', ios: '1585643280', rx: ['speed'], icone: 'https://pedro-fisk.github.io/fisk-hub/assets/apps/fisk-e-book-speed.png' },
+
+    /* ── Parceiros: de outra empresa, indicados pela escola ──────────────── */
+    /* Linguix (Linguix Digital LTDA), pedido do Pedro em 18/09/2026: vídeos
+       autênticos para o último estágio. Não está na Circular 29/25 porque não
+       é da Fundação Fisk. */
+    { nome: 'Linguix', tipo: 'parceiro', blocos: ['adultos'],
+      onde: 'In Focus',
+      desc: 'Vídeos autênticos em inglês com exercícios interativos baseados neles, e ranking de pontos.',
+      android: 'com.linguix.studentApp', ios: '1534365317', rx: ['in\\s*focus'], icone: 'https://pedro-fisk.github.io/fisk-hub/assets/apps/linguix.png' },
 
     /* ── Da escola: nunca vão para o aluno ───────────────────────────────── */
     { nome: 'Fisk Helper', tipo: 'escola', blocos: ['escola'],
