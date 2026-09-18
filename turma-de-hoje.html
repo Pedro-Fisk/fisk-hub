@@ -63,6 +63,13 @@
   /* o aluno */
   .al{ background: var(--white); border: 1px solid var(--surface-border-color); border-radius: var(--surface-radius); box-shadow: var(--surface-shadow); margin: 0 auto .8rem; max-width: 1500px; overflow: hidden; }
   .al-cab{ display: flex; align-items: center; gap: .7rem; padding: .75rem 1rem; flex-wrap: wrap; }
+  .al-cab .mover{ display: inline-flex; gap: .2rem; align-items: center; }
+  .al-cab .mover button{ border: 1.5px solid var(--ui-line, #d6deea); background: #fff; color: #1d3685; border-radius: 8px; min-width: 30px; height: 30px; font-weight: 900; cursor: pointer; font-family: inherit; line-height: 1; }
+  .al-cab .mover .arrasta{ cursor: grab; touch-action: none; font-size: 1.05rem; }
+  .al-cab .mover button:hover{ border-color: #1d3685; background: #f3f6fc; }
+  .al.arrastando{ position: relative; z-index: 50; box-shadow: 0 22px 44px rgba(20,22,28,.28); opacity: .96; transition: none; }
+  .al.arrastando .al-cab .mover .arrasta{ cursor: grabbing; }
+  body.theme-dark .al-cab .mover button{ background: #172232; color: #dbe6f3; border-color: #2e4560; }
   .al-cab .nome{ font-family: var(--font-heading); font-weight: 700; font-size: 1.02rem; }
   .al-cab .livro{ font-size: .8rem; color: var(--gray); }
   .pill{ display: inline-flex; align-items: center; gap: .3rem; font-size: .74rem; font-weight: 800; padding: .2rem .6rem; border-radius: 99px; white-space: nowrap; background: var(--ui-soft); color: var(--ui-ink); }
@@ -1256,10 +1263,60 @@ function licoesDoLivro(plano) {
 function desenharTurma() {
   var caixa = $('alunos'); caixa.innerHTML = '';
   var nCk = 0;
-  estado.alunos.forEach(function (a) { caixa.appendChild(cartaoAluno(a)); var ck = (estado.dados[a.raf] || {}).planner; if (ck && ck.checking && Object.keys(ck.checking).some(function (k) { return ck.checking[k].feito; })) nCk++; });
+  estado.alunos.forEach(function (a) { var cc = cartaoAluno(a); cc.dataset.raf = cc.dataset.raf || a.raf; caixa.appendChild(cc); var ck = (estado.dados[a.raf] || {}).planner; if (ck && ck.checking && Object.keys(ck.checking).some(function (k) { return ck.checking[k].feito; })) nCk++; });
   $('resumo').hidden = false;
   $('resumo').innerHTML = '<b>' + estado.alunos.length + '</b> alunos ' + (estado.plantao ? 'no' : 'em') + ' <b>' + esc(estado.turma) + '</b> · <b>' + nCk + '</b> com algum Checking registrado';
   /* o botão de prioridade mora na barra do roteiro (pintaFila), grande e numa linha só dele (16/09/2026) */
+  ligaArrastar(caixa);
+}
+/* ── ARRASTAR A ORDEM (pedido dos professores, 18/09/2026) ──
+   Voltou o que o Planejador tinha: o professor segura a alça ⠿ do cartão e arrasta para onde quiser, antes ou depois
+   de "Ordenar por prioridade" (a ferramenta sugere, o professor decide). Como os cartões são altos, há também ↑ ↓.
+   A ordem nova vale na hora; "Salvar ordem" guarda para a data escolhida, como sempre. */
+function aplicaOrdemDaTela(caixa) {
+  var pos = {}; caixa.querySelectorAll(':scope > .al').forEach(function (c, i) { pos[c.dataset.raf] = i; });
+  estado.alunos.sort(function (x, y) { return (pos[x.raf] == null ? 999 : pos[x.raf]) - (pos[y.raf] == null ? 999 : pos[y.raf]); });
+  if (estado.prioridade) estado.alunos.forEach(function (a, k) { a._rank = fimDe(a) ? null : k + 1; });
+  estado.ordemManual = true;
+  desenharTurma(); pintaFila();
+  toast('↕️ Ordem alterada. Toque em "Salvar ordem" para guardar para a aula.');
+}
+function ligaArrastar(caixa) {
+  caixa.querySelectorAll(':scope > .al').forEach(function (card) {
+    var sobe = card.querySelector('.mover .sobe'), desce = card.querySelector('.mover .desce'), alca = card.querySelector('.mover .arrasta');
+    if (sobe) sobe.addEventListener('click', function () { var p = card.previousElementSibling; if (p && p.classList.contains('al')) { caixa.insertBefore(card, p); aplicaOrdemDaTela(caixa); var n = caixa.querySelector('.al[data-raf="' + card.dataset.raf + '"]'); if (n) n.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } });
+    if (desce) desce.addEventListener('click', function () { var nx = card.nextElementSibling; if (nx && nx.classList.contains('al')) { caixa.insertBefore(nx, card); aplicaOrdemDaTela(caixa); var n = caixa.querySelector('.al[data-raf="' + card.dataset.raf + '"]'); if (n) n.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } });
+    if (!alca) return;
+    alca.addEventListener('pointerdown', function (ev) {
+      ev.preventDefault();
+      var y0 = ev.clientY, moveu = false, rolagem = null, ultimoY = ev.clientY;
+      try { alca.setPointerCapture(ev.pointerId); } catch (e) {}
+      card.classList.add('arrastando');
+      function troca(y) {
+        var r = card.getBoundingClientRect(), meio = r.top + r.height / 2;
+        var p = card.previousElementSibling, nx = card.nextElementSibling;
+        if (p && p.classList.contains('al')) { var rp = p.getBoundingClientRect(); if (meio < rp.top + Math.min(rp.height / 2, 160)) { caixa.insertBefore(card, p); y0 -= rp.height + 16; moveu = true; } }
+        if (nx && nx.classList.contains('al')) { var rn = nx.getBoundingClientRect(); if (r.bottom > rn.top + Math.min(rn.height / 2, 160)) { caixa.insertBefore(nx, card); y0 += rn.height + 16; moveu = true; } }
+        card.style.transform = 'translateY(' + (y - y0) + 'px) rotate(1deg)';
+      }
+      function mexe(e) {
+        ultimoY = e.clientY; troca(e.clientY);
+        var borda = 70, h = window.innerHeight;
+        clearInterval(rolagem); rolagem = null;
+        if (e.clientY < borda || e.clientY > h - borda) {
+          var dir = e.clientY < borda ? -1 : 1;
+          rolagem = setInterval(function () { window.scrollBy(0, dir * 18); y0 -= dir * 18; troca(ultimoY); }, 16);
+        }
+      }
+      function solta() {
+        clearInterval(rolagem);
+        alca.removeEventListener('pointermove', mexe); alca.removeEventListener('pointerup', solta); alca.removeEventListener('pointercancel', solta);
+        card.classList.remove('arrastando'); card.style.transform = '';
+        if (moveu) aplicaOrdemDaTela(caixa);
+      }
+      alca.addEventListener('pointermove', mexe); alca.addEventListener('pointerup', solta); alca.addEventListener('pointercancel', solta);
+    });
+  });
 }
 
 /* AS CORES DO ESTÁGIO (Pedro, 14/09/2026: "cada estágio terá uma cor diferente"):
@@ -1348,7 +1405,7 @@ function cartaoAluno(a) {
   if (estado.atendidos[a.raf]) card.classList.add('atendido');
   if (faltouHoje(a)) card.classList.add('faltou');
   if (a.visitante) card.classList.add('visitante');
-  cab.innerHTML = '<span class="nome">' + esc(a.nome) + '</span>' + (a.visitante ? '<span class="visita" title="Aluno trazido pela busca">' + (estado.plantao ? 'plantão' : 'de outra turma') + (a.turma ? ' · ' + esc(String(a.turma).split('\n')[0]) : '') + '</span><button type="button" class="tirar" data-tirar="' + esc(a.raf) + '">Tirar da tela</button>' : '') + '<span class="livro' + (plano ? ' cor' : '') + '">' + esc(a.book || '') + '</span>' +
+  cab.innerHTML = '<span class="mover"><button type="button" class="arrasta" aria-label="Arrastar ' + esc(a.nome) + ' para outra posição" title="Segure e arraste para mudar a ordem">⠿</button><button type="button" class="sobe" aria-label="Subir ' + esc(a.nome) + '" title="Subir uma posição">↑</button><button type="button" class="desce" aria-label="Descer ' + esc(a.nome) + '" title="Descer uma posição">↓</button></span><span class="nome">' + esc(a.nome) + '</span>' + (a.visitante ? '<span class="visita" title="Aluno trazido pela busca">' + (estado.plantao ? 'plantão' : 'de outra turma') + (a.turma ? ' · ' + esc(String(a.turma).split('\n')[0]) : '') + '</span><button type="button" class="tirar" data-tirar="' + esc(a.raf) + '">Tirar da tela</button>' : '') + '<span class="livro' + (plano ? ' cor' : '') + '">' + esc(a.book || '') + '</span>' +
     (estado.prioridade ? '' : plan ? '<span class="pill nv-' + esc(plan.nivel || 'emdia') + '">' + (a._pos + 1) + 'º · ' + esc(nivelRot[plan.nivel] || plan.nivel || '') + '</span>' : (estado.plano ? '<span class="pill fora">fora do roteiro</span>' : '')) +
     (estado.prioridade && a._rank ? '<span class="pill prio nv-' + esc(a._prio.nivel) + '" title="' + esc(prioMotivo(a._prio)) + '">⚡ ' + a._rank + 'º · ' + esc(prioMotivo(a._prio)) + '</span>' : '') +
     avisoAtendimento(a) +
