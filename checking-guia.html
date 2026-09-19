@@ -127,7 +127,7 @@ var q = new URLSearchParams(location.search);
 var book = q.get('book') || 'Essentials 1', licaoId = (q.get('licao') || 'L1').toUpperCase(), aluno = q.get('aluno') || '', raf = q.get('raf') || '';
 var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
 var CRITERIOS = [['vocabulary', '🔤 Vocabulary'], ['fluency', '💬 Fluency'], ['structure', '🧱 Structure'], ['pronunciation', '🗣️ Pronunciation'], ['listening', '👂 Listening']];
-var fb = { melhor: '', melhorar: [], pedidos: [], bilhete: '', auto: [], recusados: [] };
+var fb = { melhores: [], melhorar: [], pedidos: [], bilhete: '', auto: [], recusados: [] };   /* 19/09/2026: vários elogios, e a nota não existe mais */
 /* a ligação dimensão → pedido (PlannerV2.pedidosSugeridos, a mesma da Turma de hoje):
    o que entrou sozinho sai sozinho; o que o professor tirou à mão não volta */
 function sugestoesDe(planoV2) {
@@ -229,10 +229,12 @@ function pintaFeedback(main) {
   var prontos = (window.PlannerV2 && PlannerV2.pedidosDa && planoV2) ? PlannerV2.pedidosDa(planoV2, licaoId) : [];
   var cp = box.querySelector('[data-pedidos]');
   cp.innerHTML = prontos.map(function (c) { return '<button type="button" class="chip" data-id="' + esc(c.id) + '">' + (c.tipo === 'extra' ? '★ ' : (c.code === 'ex' ? '▶ ' : '🎧 ')) + esc(c.en) + '</button>'; }).join('') || '<span class="sub">No ready suggestions for this lesson.</span>';
-  box.querySelectorAll('[data-melhor] .chip').forEach(function (c) { c.classList.toggle('on', c.dataset.v === fb.melhor); c.addEventListener('click', function () {
-    fb.melhor = fb.melhor === c.dataset.v ? '' : c.dataset.v; fb.melhorar = fb.melhorar.filter(function (v) { return v !== fb.melhor; }); aplicaSugestoes(planoV2); pinta(); }); });
+  box.querySelectorAll('[data-melhor] .chip').forEach(function (c) { c.classList.toggle('on', fb.melhores.indexOf(c.dataset.v) > -1); c.addEventListener('click', function () {
+    var i = fb.melhores.indexOf(c.dataset.v);
+    if (i > -1) fb.melhores.splice(i, 1); else { fb.melhores.push(c.dataset.v); fb.melhorar = fb.melhorar.filter(function (v) { return v !== c.dataset.v; }); }
+    aplicaSugestoes(planoV2); pinta(); }); });
   box.querySelectorAll('[data-melhorar] .chip').forEach(function (c) { c.classList.toggle('on', fb.melhorar.indexOf(c.dataset.v) > -1); c.addEventListener('click', function () {
-    var i = fb.melhorar.indexOf(c.dataset.v); if (i > -1) fb.melhorar.splice(i, 1); else { fb.melhorar.push(c.dataset.v); if (fb.melhor === c.dataset.v) fb.melhor = ''; } aplicaSugestoes(planoV2); pinta(); }); });
+    var i = fb.melhorar.indexOf(c.dataset.v); if (i > -1) fb.melhorar.splice(i, 1); else { fb.melhorar.push(c.dataset.v); fb.melhores = fb.melhores.filter(function (v) { return v !== c.dataset.v; }); } aplicaSugestoes(planoV2); pinta(); }); });
   var sug = sugestoesDe(planoV2);
   cp.querySelectorAll('.chip').forEach(function (c) {
     var d = sug.destaque[c.dataset.id]; c.classList.toggle('sug', !!d);
@@ -252,12 +254,12 @@ function pintaFeedback(main) {
   salvar.addEventListener('click', function () {
     if (!raf) { window.close(); return; }
     salvar.disabled = true; salvar.textContent = T2('Saving…', 'Guardando…');
-    var checking = { licao: licaoId, feito: 1, melhor: fb.melhor || null, melhorar: fb.melhorar.slice(), pedidos: fb.pedidos.slice(), bilhete: fb.bilhete.trim() };
+    var checking = { licao: licaoId, feito: 1, melhores: fb.melhores.slice(), melhor: fb.melhores[0] || null, melhorar: fb.melhorar.slice(), pedidos: fb.pedidos.slice(), bilhete: fb.bilhete.trim() };
     fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plannerProf', token: token(), raf: raf, book: book, patch: { checking: checking } }) })
       .then(function (r) { return r.json(); })
       .then(function (r) {
         if (!r || !r.ok) throw new Error((r && (r.error || r.erro)) || 'not saved');
-        var okEl = box.querySelector('[data-ok]'); okEl.hidden = false; okEl.textContent = T2('✓ Feedback saved. Only the grade is left, in Minha aula.', '✓ Feedback guardado. Solo falta la nota, en Minha aula.');
+        var okEl = box.querySelector('[data-ok]'); okEl.hidden = false; okEl.textContent = T2('✓ Checking saved. The next lesson is open for the student.', '✓ Verificación guardada. La lección siguiente ya está abierta para el alumno.');
         try { if (window.opener) window.opener.postMessage({ tipo: 'checking', raf: raf, planner: r.planner }, '*'); } catch (e) {}
         salvar.textContent = T2('✓ Saved · close', '✓ Guardado · cerrar'); salvar.disabled = false; salvar.onclick = function () { window.close(); };
       }).catch(function (e) { salvar.disabled = false; salvar.textContent = '⚠️ ' + e.message + T2(' · try again', ' · intentar de nuevo'); });

@@ -1515,7 +1515,7 @@ function gradeDaLicao(a, plano, etapaId, ctx, reg, ehAtual) {
     if (au.checking) {
       /* o Checking REALIZADO aparece na aula como estado, e não só como o
          botão "Editar" (Pedro, 14/09/2026): o verde-amarelo do CHECK do
-         planner completo, a bolinha verde de quem marcou, e a nota, o
+         planner completo, a bolinha verde de quem marcou, o
          critério melhor, o dia e o professor. Editar vira botão de contorno. */
       var ckFeito = !!(ckL && ckL.feito);
       if (ckFeito) col.classList.add('ck-ok');   /* a aula inteira muda de cor quando o Checking já foi feito */
