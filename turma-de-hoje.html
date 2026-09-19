@@ -91,7 +91,8 @@
   .aula{ border: 1px solid var(--ui-line); border-radius: 12px; padding: .55rem .65rem; background: #f8fafc; }
   .aula.atual{ border: 2px solid var(--ui); background: var(--white); }
   .nav-lic{ display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; padding: 0 1rem .5rem; }
-  .nav-lic .vendo{ flex: 1 1 auto; text-align: center; font-size: .92rem; }
+  .nav-lic.baixo{ justify-content: center; padding-top: 0; }
+  .nav-lic .vendo{ flex: 1 1 auto; font-size: .92rem; }
   .nav-lic .vendo em{ font-style: normal; color: var(--ui); font-weight: 700; }
   .btn-nav{ border: 2px solid var(--mar, #1d3685); background: var(--white); color: var(--mar, #1d3685); border-radius: 999px; padding: .3rem .8rem; font: inherit; font-weight: 800; font-size: .88rem; cursor: pointer; }
   .btn-nav:disabled{ opacity: .3; cursor: default; }
@@ -1397,20 +1398,22 @@ function outrosProfs(a) {
   var dd = function (t) { var d = new Date(t); return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2); };
   return '<span class="pill outro-prof" title="Marcas feitas por outro professor nos últimos 30 dias">👥 aula com ' + lista.slice(0, 2).map(function (x) { return esc(x.nome) + ' em ' + dd(x.t); }).join(' · ') + '</span>';
 }
-/* a barra das setas: ◀ lição anterior · a lição vista · próxima ▶, e "voltar à atual" quando saiu dela */
-function navLicoes(a, plano, iv, ir) {
-  var nav = document.createElement('div'); nav.className = 'nav-lic';
-  var ant = plano.etapas[iv - 1], prx = plano.etapas[iv + 1], ev = plano.etapas[iv];
-  var mover = function (d) { estado.verDesloc = estado.verDesloc || {}; estado.verDesloc[a.raf] = iv + d - ir; redesenhar(a); };
-  var b1 = document.createElement('button'); b1.type = 'button'; b1.className = 'btn-nav'; b1.textContent = '◀ ' + (ant ? ant.rot : ''); b1.disabled = !ant;
-  b1.setAttribute('aria-label', ant ? 'Ver ' + ant.rot : 'Não há lição anterior'); b1.addEventListener('click', function () { mover(-1); });
-  var b2 = document.createElement('button'); b2.type = 'button'; b2.className = 'btn-nav'; b2.textContent = (prx ? prx.rot : '') + ' ▶'; b2.disabled = !prx;
-  b2.setAttribute('aria-label', prx ? 'Ver ' + prx.rot : 'Não há próxima lição'); b2.addEventListener('click', function () { mover(1); });
-  var meio = document.createElement('span'); meio.className = 'vendo';
-  meio.innerHTML = (iv === ir ? 'Lição atual: ' : 'Vendo: ') + '<b>' + esc(ev.rot) + '</b>' + (ev.tema ? ' · ' + esc(ev.tema) : '') + (iv > ir ? ' <em>(à frente)</em>' : iv < ir ? ' <em>(anterior)</em>' : '');
-  nav.appendChild(b1); nav.appendChild(meio);
-  if (iv !== ir) { var bv = document.createElement('button'); bv.type = 'button'; bv.className = 'btn-nav volta'; bv.textContent = '📍 Voltar à atual'; bv.addEventListener('click', function () { estado.verDesloc[a.raf] = 0; redesenhar(a); }); nav.appendChild(bv); }
-  nav.appendChild(b2);
+/* as setas das lições, NA VERTICAL como o carrossel do aluno (Pedro, 19/09/2026): ▲ a anterior em cima das aulas,
+   ▼ a próxima embaixo; no topo, a lição vista e "voltar à atual" quando saiu dela */
+function navLicoes(a, plano, iv, ir, onde) {
+  var nav = document.createElement('div'); nav.className = 'nav-lic ' + onde;
+  var ev = plano.etapas[iv], alvo = plano.etapas[iv + (onde === 'cima' ? -1 : 1)];
+  var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'btn-nav';
+  bt.textContent = (onde === 'cima' ? '▲ ' : '▼ ') + (alvo ? alvo.rot : (onde === 'cima' ? 'início do livro' : 'fim do livro')); bt.disabled = !alvo;
+  bt.setAttribute('aria-label', alvo ? 'Ver ' + alvo.rot : 'Não há mais lições');
+  bt.addEventListener('click', function () { estado.verDesloc = estado.verDesloc || {}; estado.verDesloc[a.raf] = iv + (onde === 'cima' ? -1 : 1) - ir; redesenhar(a); });
+  nav.appendChild(bt);
+  if (onde === 'cima') {
+    var meio = document.createElement('span'); meio.className = 'vendo';
+    meio.innerHTML = (iv === ir ? 'Lição atual: ' : 'Vendo: ') + '<b>' + esc(ev.rot) + '</b>' + (ev.tema ? ' · ' + esc(ev.tema) : '') + (iv > ir ? ' <em>(à frente)</em>' : iv < ir ? ' <em>(anterior)</em>' : '');
+    nav.appendChild(meio);
+    if (iv !== ir) { var bv = document.createElement('button'); bv.type = 'button'; bv.className = 'btn-nav volta'; bv.textContent = '📍 Voltar à atual'; bv.addEventListener('click', function () { estado.verDesloc[a.raf] = 0; redesenhar(a); }); nav.appendChild(bv); }
+  }
   return nav;
 }
 function cartaoAluno(a) {
@@ -1472,7 +1475,7 @@ function cartaoAluno(a) {
   if (plano) {
     var est = PlannerV2.estadoEtapa(plano, pos.id, ctx);
     if (est) {
-      if (idxVer > -1) card.appendChild(navLicoes(a, plano, idxVer, idxReal));
+      if (idxVer > -1) card.appendChild(navLicoes(a, plano, idxVer, idxReal, 'cima'));
       var grade = document.createElement('div'); grade.className = 'aulas';
       var datas = datasDasAulas(plano, pos.id, ctx);
       var ksTudo = PlannerV2.keepStudying ? PlannerV2.keepStudying(plano, pos.id, ctx, { hist: (estado.dados[a.raf] || {}).hist, recuo: 21 }) : null;
@@ -1515,6 +1518,7 @@ function cartaoAluno(a) {
         grade.appendChild(col);
       });
       card.appendChild(grade);
+      if (idxVer > -1) card.appendChild(navLicoes(a, plano, idxVer, idxReal, 'baixo'));
       var ks = quadroKS(a, plano, pos, ctx); if (ks) card.appendChild(ks);
     }
   } else {
