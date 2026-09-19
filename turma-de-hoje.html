@@ -91,6 +91,13 @@
   .aula{ border: 1px solid var(--ui-line); border-radius: 12px; padding: .55rem .65rem; background: #f8fafc; }
   .aula.atual{ border: 2px solid var(--ui); background: var(--white); }
   .nav-lic{ display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; padding: 0 1rem .5rem; }
+  .janela-lic{ overflow-y: auto; overscroll-behavior: contain; scroll-snap-type: y mandatory; margin: 0 1rem .9rem; border-radius: 12px; }
+  .janela-lic:focus-visible{ outline: 3px solid var(--ui); outline-offset: 2px; }
+  .passo-lic{ scroll-snap-align: start; display: flex; flex-direction: column; gap: .4rem; padding: .3rem 0 .5rem; }
+  .passo-lic .aulas{ padding: 0; }
+  .rot-lic{ font-weight: 800; font-size: .85rem; letter-spacing: .02em; color: var(--mar, #1d3685); }
+  .passo-lic.atual .rot-lic{ color: var(--ui); }
+  @media (prefers-reduced-motion: reduce){ .janela-lic{ scroll-behavior: auto; } }
   .nav-lic .setas{ display: inline-flex; gap: 8px; }
   .btn-seta{ width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--mar, #1d3685); background: var(--white); color: var(--mar, #1d3685); font-size: 18px; font-weight: 900; cursor: pointer; font-family: inherit; }
   .btn-seta:disabled{ opacity: .3; cursor: default; }
@@ -1401,39 +1408,116 @@ function outrosProfs(a) {
   var dd = function (t) { var d = new Date(t); return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2); };
   return '<span class="pill outro-prof" title="Marcas feitas por outro professor nos últimos 30 dias">👥 aula com ' + lista.slice(0, 2).map(function (x) { return esc(x.nome) + ' em ' + dd(x.t); }).join(' · ') + '</span>';
 }
-/* as setas das lições, ▲ e ▼ lado a lado como no carrossel do aluno (Pedro, 19/09/2026), com a lição vista
-   ao lado e "voltar à atual" quando saiu dela */
-function navLicoes(a, plano, iv, ir) {
+/* A JANELA DAS LIÇÕES (Pedro, 19/09/2026: "as 3 aulas rolando num scroll vertical, igual à visão do aluno"):
+   todas as lições do livro empilhadas, cada uma com as suas três aulas; a janela mostra uma por vez, encaixa
+   ao rolar e abre na lição do aluno. ▲ e ▼ lado a lado descem e sobem uma lição. Sem cadeado: é o professor.
+   A lição vista fica guardada, para a janela não voltar ao início quando o cartão se redesenha após uma marca. */
+function trilhaDeLicoes(a, plano, ctx, reg, ir) {
+  var box = document.createElement('div'); box.className = 'trilha-lic';
   var nav = document.createElement('div'); nav.className = 'nav-lic';
-  var ev = plano.etapas[iv], setas = document.createElement('span'); setas.className = 'setas';
-  [[-1, '▲'], [1, '▼']].forEach(function (d) {
-    var alvo = plano.etapas[iv + d[0]];
-    var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'btn-seta'; bt.textContent = d[1]; bt.disabled = !alvo;
-    bt.title = alvo ? alvo.rot : 'Não há mais lições'; bt.setAttribute('aria-label', alvo ? 'Ver ' + alvo.rot : 'Não há mais lições');
-    bt.addEventListener('click', function () { estado.verDesloc = estado.verDesloc || {}; estado.verDesloc[a.raf] = iv + d[0] - ir; redesenhar(a); });
-    setas.appendChild(bt);
+  var setas = document.createElement('span'); setas.className = 'setas';
+  var sobe = document.createElement('button'), desce = document.createElement('button');
+  [[sobe, '▲', 'Lição anterior'], [desce, '▼', 'Próxima lição']].forEach(function (x) { x[0].type = 'button'; x[0].className = 'btn-seta'; x[0].textContent = x[1]; x[0].setAttribute('aria-label', x[2]); setas.appendChild(x[0]); });
+  var vendo = document.createElement('span'); vendo.className = 'vendo';
+  var volta = document.createElement('button'); volta.type = 'button'; volta.className = 'btn-nav volta'; volta.textContent = '📍 Voltar à atual'; volta.hidden = true;
+  nav.appendChild(setas); nav.appendChild(vendo); nav.appendChild(volta);
+  var jan = document.createElement('div'); jan.className = 'janela-lic'; jan.tabIndex = 0; jan.setAttribute('aria-label', 'Lições de ' + a.nome + ', role para ver as outras');
+  var passos = [];
+  plano.etapas.forEach(function (e, i) {
+    var g = gradeDaLicao(a, plano, e.id, ctx, reg);
+    if (!g) return;
+    var ps = document.createElement('div'); ps.className = 'passo-lic' + (i === ir ? ' atual' : ''); ps.dataset.i = i;
+    var rot = document.createElement('div'); rot.className = 'rot-lic'; rot.textContent = e.rot + (e.tema ? ' · ' + e.tema : '') + (i === ir ? '  📍 lição atual' : '');
+    ps.appendChild(rot); ps.appendChild(g); jan.appendChild(ps); passos.push(ps);
   });
-  nav.appendChild(setas);
-  var meio = document.createElement('span'); meio.className = 'vendo';
-  meio.innerHTML = (iv === ir ? 'Lição atual: ' : 'Vendo: ') + '<b>' + esc(ev.rot) + '</b>' + (ev.tema ? ' · ' + esc(ev.tema) : '') + (iv > ir ? ' <em>(à frente)</em>' : iv < ir ? ' <em>(anterior)</em>' : '');
-  nav.appendChild(meio);
-  if (iv !== ir) { var bv = document.createElement('button'); bv.type = 'button'; bv.className = 'btn-nav volta'; bv.textContent = '📍 Voltar à atual'; bv.addEventListener('click', function () { estado.verDesloc[a.raf] = 0; redesenhar(a); }); nav.appendChild(bv); }
-  return nav;
+  box.appendChild(nav); box.appendChild(jan);
+  var vista = function () {
+    var t = jan.scrollTop, melhor = passos[0];
+    passos.forEach(function (p) { if (Math.abs(p.offsetTop - jan.offsetTop - t) < Math.abs(melhor.offsetTop - jan.offsetTop - t)) melhor = p; });
+    return melhor;
+  };
+  var marca = function () {
+    var p = vista(); if (!p) return;
+    var i = +p.dataset.i, e = plano.etapas[i];
+    estado.verLic = estado.verLic || {}; estado.verLic[a.raf] = e.id;
+    vendo.innerHTML = (i === ir ? 'Lição atual: ' : 'Vendo: ') + '<b>' + esc(e.rot) + '</b>' + (e.tema ? ' · ' + esc(e.tema) : '') + (i > ir ? ' <em>(à frente)</em>' : i < ir ? ' <em>(anterior)</em>' : '');
+    volta.hidden = i === ir;
+    var k = passos.indexOf(p); sobe.disabled = k <= 0; desce.disabled = k >= passos.length - 1;
+  };
+  var vai = function (p, suave) { if (p) jan.scrollTo({ top: p.offsetTop - jan.offsetTop, behavior: suave ? 'smooth' : 'auto' }); };
+  sobe.addEventListener('click', function () { vai(passos[passos.indexOf(vista()) - 1], true); });
+  desce.addEventListener('click', function () { vai(passos[passos.indexOf(vista()) + 1], true); });
+  volta.addEventListener('click', function () { vai(passos.filter(function (p) { return +p.dataset.i === ir; })[0], true); });
+  var t0; jan.addEventListener('scroll', function () { clearTimeout(t0); t0 = setTimeout(marca, 80); }, { passive: true });
+  /* a altura: a da maior lição, para o encaixe ser sempre de uma lição inteira; depois abre na guardada ou na atual */
+  var ajusta = function () {
+    if (!jan.isConnected) { requestAnimationFrame(ajusta); return; }
+    passos.forEach(function (p) { p.style.minHeight = ''; });
+    var h = Math.max.apply(null, passos.map(function (p) { return p.offsetHeight; }));
+    passos.forEach(function (p) { p.style.minHeight = h + 'px'; });
+    jan.style.height = h + 'px';
+    var guardada = (estado.verLic || {})[a.raf];
+    var alvo = passos.filter(function (p) { return plano.etapas[+p.dataset.i].id === guardada; })[0] || passos.filter(function (p) { return +p.dataset.i === ir; })[0] || passos[0];
+    vai(alvo, false); marca();
+  };
+  requestAnimationFrame(ajusta);
+  return box;
+}
+/* as três aulas de UMA lição (a grade), para qualquer lição do livro: a Minha aula empilha várias numa
+   janela que rola na vertical, como o carrossel do aluno (Pedro, 19/09/2026) */
+function gradeDaLicao(a, plano, etapaId, ctx, reg) {
+  var est = PlannerV2.estadoEtapa(plano, etapaId, ctx);
+  if (!est) return null;
+  var ckL = reg[etapaId];
+  var grade = document.createElement('div'); grade.className = 'aulas';
+  var datas = datasDasAulas(plano, etapaId, ctx);
+  var ksTudo = PlannerV2.keepStudying ? PlannerV2.keepStudying(plano, etapaId, ctx, { hist: (estado.dados[a.raf] || {}).hist, recuo: 21 }) : null;
+  var ksSug = ksTudo && ksTudo.sugeridos;
+  est.aulas.forEach(function (au, ai) {
+    var col = document.createElement('div'); col.className = 'aula' + (au.atual ? ' atual' : '');
+    col.innerHTML = '<div class="t">Class ' + au.n + ' <b>' + esc(au.papel) + '</b>' + pilulaData(datas[ai], au.atual) + '</div>';
+    var lista = document.createElement('div'); lista.className = 'lista'; col.appendChild(lista);
+    au.itens.forEach(function (it) { lista.appendChild(linhaItem(a, it)); });
+    /* o Checking mora na aula em que acontece (pedido do Pedro, 13/09) */
+    if (au.checking) {
+      /* o Checking REALIZADO aparece na aula como estado, e não só como o
+         botão "Editar" (Pedro, 14/09/2026): o verde-amarelo do CHECK do
+         planner completo, a bolinha verde de quem marcou, e a nota, o
+         critério melhor, o dia e o professor. Editar vira botão de contorno. */
+      var ckFeito = !!(ckL && ckL.feito);
+      if (ckFeito) {
+        var quando = ckL.quando ? (function (d) { return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2); })(new Date(ckL.quando)) : '';
+        var melhor = (CRITERIOS.find(function (c) { return c[0] === ckL.melhor; }) || [null, ''])[1].replace(/^\S+\s/, '');
+        var partes = [(ckL.nota != null && ckL.nota !== '') ? '<span class="nota-priv">nota ' + esc(ckL.nota) + '</span>' : '', melhor ? 'melhor em ' + esc(melhor.toLowerCase()) : '', esc(quando), ckL.quem ? esc(String(ckL.quem).trim().split(/\s+/)[0]) : ''].filter(Boolean);
+        var feitoBox = document.createElement('div'); feitoBox.className = 'ck-feito';
+        feitoBox.innerHTML = '<span class="mk cheia-prof"></span><span class="ck-tx"><b>✓ Checking realizado</b>' + (partes.length ? '<small>' + partes.join(' · ') + '</small>' : '') + '</span>';
+        lista.appendChild(feitoBox);
+      }
+      var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'btn ' + (ckFeito ? 'btn-ck-editar' : 'btn-ck'); bt.dataset.ck = etapaId;
+      bt.textContent = ckFeito ? 'Editar Checking' : 'Registrar Checking';
+      lista.appendChild(bt);
+      var prox = plano.etapas[plano.etapas.indexOf(plano.etapas.find(function (e) { return e.id === etapaId; })) + 1];
+      if (prox) { var lb = document.createElement('p'); lb.className = 'libera'; lb.textContent = (ckL && ckL.feito ? 'Checking registrado: ' + prox.rot + ' liberada para o aluno.' : 'Ao registrar, a ' + prox.rot + ' é liberada para o aluno.'); lista.appendChild(lb); }
+    }
+    /* UMA SUGESTÃO POR AULA (17/09/2026): o mesmo bloco verde que o aluno vê */
+    var sug1 = (ksSug || []).filter(function (x) { return x.aula === ai; })[0];
+    if (sug1) {
+      var sb = document.createElement('div'); sb.className = 'sug1' + (sug1.feito ? ' ok' : '');
+      sb.dataset.id = sug1.id; sb.dataset.tool = sug1.tool;
+      sb.innerHTML = '<span class="st">Extras · Suggested Practice</span><span class="nm">' + sug1.icone + ' ' + esc(sug1.nm) + '</span>' +
+        (sug1.feito ? '<span class="pct">' + (typeof sug1.pct === 'number' ? Math.round(sug1.pct) + '%' : '✓') + '</span>' : '');
+      col.appendChild(sb);
+    }
+    grade.appendChild(col);
+  });
+  return grade;
 }
 function cartaoAluno(a) {
   var plano = planoDe(a.book);
   var ctx = ctxDe(a);
   var pos = posicaoDe(a, plano, ctx), posReal = pos;
-  /* NAVEGAR NAS LIÇÕES (pedido dos professores, 19/09/2026): as setas trocam a lição mostrada, como o carrossel
-     do aluno, sem cadeado; o 📍 do cabeçalho continua na lição em que ele está. Checking e marcas valem para a lição vista. */
-  var desloc = (estado.verDesloc || {})[a.raf] || 0, idxReal = -1, idxVer = -1;
-  if (plano) {
-    idxReal = plano.etapas.findIndex(function (e) { return e.id === posReal.id; });
-    if (idxReal > -1) {
-      idxVer = Math.max(0, Math.min(plano.etapas.length - 1, idxReal + desloc));
-      if (idxVer !== idxReal) { var ev = plano.etapas[idxVer]; pos = { id: ev.id, rot: ev.rot, tema: ev.tema }; }
-    }
-  }
+  /* a lição real do aluno no livro: a janela das lições abre nela */
+  var idxReal = plano ? plano.etapas.findIndex(function (e) { return e.id === posReal.id; }) : -1;
   var reg = ctx.planner.plano.checking || {};
   var ckAtual = reg[pos.id];
   var card = document.createElement('section'); card.className = 'al'; card.dataset.raf = a.raf;
@@ -1479,49 +1563,7 @@ function cartaoAluno(a) {
   if (plano) {
     var est = PlannerV2.estadoEtapa(plano, pos.id, ctx);
     if (est) {
-      if (idxVer > -1) card.appendChild(navLicoes(a, plano, idxVer, idxReal));
-      var grade = document.createElement('div'); grade.className = 'aulas';
-      var datas = datasDasAulas(plano, pos.id, ctx);
-      var ksTudo = PlannerV2.keepStudying ? PlannerV2.keepStudying(plano, pos.id, ctx, { hist: (estado.dados[a.raf] || {}).hist, recuo: 21 }) : null;
-      var ksSug = ksTudo && ksTudo.sugeridos;
-      est.aulas.forEach(function (au, ai) {
-        var col = document.createElement('div'); col.className = 'aula' + (au.atual ? ' atual' : '');
-        col.innerHTML = '<div class="t">Class ' + au.n + ' <b>' + esc(au.papel) + '</b>' + pilulaData(datas[ai], au.atual) + '</div>';
-        var lista = document.createElement('div'); lista.className = 'lista'; col.appendChild(lista);
-        au.itens.forEach(function (it) { lista.appendChild(linhaItem(a, it)); });
-        /* o Checking mora na aula em que acontece (pedido do Pedro, 13/09) */
-        if (au.checking) {
-          /* o Checking REALIZADO aparece na aula como estado, e não só como o
-             botão "Editar" (Pedro, 14/09/2026): o verde-amarelo do CHECK do
-             planner completo, a bolinha verde de quem marcou, e a nota, o
-             critério melhor, o dia e o professor. Editar vira botão de contorno. */
-          var ckFeito = !!(ckAtual && ckAtual.feito);
-          if (ckFeito) {
-            var quando = ckAtual.quando ? (function (d) { return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2); })(new Date(ckAtual.quando)) : '';
-            var melhor = (CRITERIOS.find(function (c) { return c[0] === ckAtual.melhor; }) || [null, ''])[1].replace(/^\S+\s/, '');
-            var partes = [(ckAtual.nota != null && ckAtual.nota !== '') ? '<span class="nota-priv">nota ' + esc(ckAtual.nota) + '</span>' : '', melhor ? 'melhor em ' + esc(melhor.toLowerCase()) : '', esc(quando), ckAtual.quem ? esc(String(ckAtual.quem).trim().split(/\s+/)[0]) : ''].filter(Boolean);
-            var feitoBox = document.createElement('div'); feitoBox.className = 'ck-feito';
-            feitoBox.innerHTML = '<span class="mk cheia-prof"></span><span class="ck-tx"><b>✓ Checking realizado</b>' + (partes.length ? '<small>' + partes.join(' · ') + '</small>' : '') + '</span>';
-            lista.appendChild(feitoBox);
-          }
-          var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'btn ' + (ckFeito ? 'btn-ck-editar' : 'btn-ck'); bt.dataset.ck = '1';
-          bt.textContent = ckFeito ? 'Editar Checking' : 'Registrar Checking';
-          lista.appendChild(bt);
-          var prox = plano.etapas[plano.etapas.indexOf(plano.etapas.find(function (e) { return e.id === pos.id; })) + 1];
-          if (prox) { var lb = document.createElement('p'); lb.className = 'libera'; lb.textContent = (ckAtual && ckAtual.feito ? 'Checking registrado: ' + prox.rot + ' liberada para o aluno.' : 'Ao registrar, a ' + prox.rot + ' é liberada para o aluno.'); lista.appendChild(lb); }
-        }
-        /* UMA SUGESTÃO POR AULA (17/09/2026): o mesmo bloco verde que o aluno vê */
-        var sug1 = (ksSug || []).filter(function (x) { return x.aula === ai; })[0];
-        if (sug1) {
-          var sb = document.createElement('div'); sb.className = 'sug1' + (sug1.feito ? ' ok' : '');
-          sb.dataset.id = sug1.id; sb.dataset.tool = sug1.tool;
-          sb.innerHTML = '<span class="st">Extras · Suggested Practice</span><span class="nm">' + sug1.icone + ' ' + esc(sug1.nm) + '</span>' +
-            (sug1.feito ? '<span class="pct">' + (typeof sug1.pct === 'number' ? Math.round(sug1.pct) + '%' : '✓') + '</span>' : '');
-          col.appendChild(sb);
-        }
-        grade.appendChild(col);
-      });
-      card.appendChild(grade);
+      card.appendChild(trilhaDeLicoes(a, plano, ctx, reg, idxReal));
       var ks = quadroKS(a, plano, pos, ctx); if (ks) card.appendChild(ks);
     }
   } else {
@@ -1544,7 +1586,7 @@ function cartaoAluno(a) {
   }
   if (estado.atendidos[a.raf]) { var q = document.createElement('span'); q.className = 'quando'; var dt = new Date(estado.atendidos[a.raf]); q.textContent = 'Atendido às ' + ('0' + dt.getHours()).slice(-2) + ':' + ('0' + dt.getMinutes()).slice(-2); at.appendChild(q); }
   card.appendChild(at);
-  cardReal.querySelectorAll('[data-ck]').forEach(function (b) { b.addEventListener('click', function () { abrirChecking(cardReal, a, plano, pos); }); });
+  cardReal.querySelectorAll('[data-ck]').forEach(function (b) { b.addEventListener('click', function () { var e = plano && plano.etapas.find(function (x) { return x.id === b.dataset.ck; }); abrirChecking(cardReal, a, plano, e ? { id: e.id, rot: e.rot, tema: e.tema } : pos); }); });
   if (estado.aberto === a.raf) abrirChecking(cardReal, a, plano, pos);
   return cardReal;
 }
