@@ -287,7 +287,9 @@ var CORES = [
   { id: 'blue',   n: 4, nome: 'Blue',   cor: '#2563eb' },
   { id: 'red',    n: 5, nome: 'Red',    cor: '#d81f26' }
 ];
-/* PILOTO (19/09/2026): só a direção até a leitura ser validada com folhas de alunos reais */
+/* PILOTO (19/09/2026): nasceu só para a direção e abriu para todos no mesmo dia, depois do teste do Pedro com
+   folhas reais. `false` volta ao piloto (a mesma chave mora no index.html) */
+var CORRETOR_ABERTO = true;
 var CORRETOR_PILOTO = ['PEDRO (DIREÇÃO)'];
 
 var $ = function (id) { return document.getElementById(id); };
@@ -729,7 +731,7 @@ $('copiarLote').addEventListener('click', function () {
   try { fiskInitUserMenu(); } catch (e) {}
   var s = sessao();
   if (!s || !s.token) { geral('⚠️ Entre no Fisk Hub para usar o corretor. <a href="index.html" style="font-weight:800">Ir para o login →</a>', true); $('p1').hidden = $('p2').hidden = $('p3').hidden = true; return; }
-  var piloto = s.master || s.director || CORRETOR_PILOTO.some(function (p) { return norm(p) === norm(s.name); });
+  var piloto = CORRETOR_ABERTO || s.master || s.director || CORRETOR_PILOTO.some(function (p) { return norm(p) === norm(s.name); });
   if (!piloto) { geral('🔒 O corretor está em teste com a direção. Em breve para todos.', true); $('p1').hidden = $('p2').hidden = $('p3').hidden = true; return; }
   try { estado.cor = localStorage.getItem('cmet:cor') || ''; } catch (e) {}
   $('dataSim').value = hoje();

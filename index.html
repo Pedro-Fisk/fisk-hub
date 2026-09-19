@@ -249,8 +249,8 @@
       <p data-i18n="card-turmahoje-p">Visão geral de todos os planners da turma</p>
     </a>
 
-    <!-- PILOTO (Pedro, 19/09/2026): o corretor do simulado MET aparece só para a direção (CORRETOR_PILOTO, no
-         script, a mesma lista da corretor-met.html); nasce escondido e updateToolLinks decide -->
+    <!-- O corretor do simulado MET (19/09/2026): aberto para todos os professores (CORRETOR_ABERTO, no script);
+         nasce escondido e updateToolLinks decide, porque sem login não há o que corrigir -->
     <a class="card card-met card-corretor" href="corretor-met.html" style="display:none">
       <div class="icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1183,7 +1183,9 @@
       /* O PILOTO DA TURMA DE HOJE (Pedro, 14/09/2026): a direção e o professor de teste. Para abrir para todos,
          esvazie a trava (e a da própria turma-de-hoje.html, que tem a mesma lista). */
       var TURMA_HOJE_PILOTO = ['CARLOS ALBERTO'];
-      /* O CORRETOR DO SIMULADO MET (19/09/2026): só a direção até a leitura ser validada com folhas reais */
+      /* O CORRETOR DO SIMULADO MET (19/09/2026): nasceu só para a direção; aberto para todos os professores no mesmo
+         dia, depois do teste do Pedro com folhas reais. `false` volta ao piloto (a mesma chave mora na corretor-met.html) */
+      var CORRETOR_ABERTO = true;
       var CORRETOR_PILOTO = ['PEDRO (DIREÇÃO)'];
       /* MY AVATAR DO PROFESSOR: `true` abre o card para todos os professores.
          Com `false` (pedido do Pedro, 15/09/2026) o card fica cinza com "Em
@@ -1199,7 +1201,7 @@
         var sv0 = saved(), th = document.querySelector('a.card-turmahoje');
         if (th) th.style.display = (sv0 && (sv0.master || turmaHojeAberta(sv0) || TURMA_HOJE_PILOTO.some(function(n){ var x = normPiloto(sv0.name), y = normPiloto(n); return x === y || x.indexOf(y + ' ') === 0; }))) ? '' : 'none';
         var cmet = document.querySelector('a.card-corretor');
-        if (cmet) cmet.style.display = (sv0 && (sv0.master || sv0.director || CORRETOR_PILOTO.some(function(n){ return normPiloto(sv0.name) === normPiloto(n); }))) ? '' : 'none';
+        if (cmet) cmet.style.display = (sv0 && (CORRETOR_ABERTO || sv0.master || sv0.director || CORRETOR_PILOTO.some(function(n){ return normPiloto(sv0.name) === normPiloto(n); }))) ? '' : 'none';
         var lp = document.querySelector('a.card-lessonplan');
         if (lp) lp.style.display = (th && th.style.display !== 'none') ? 'none' : '';   /* quem tem a Turma de hoje não precisa do Planejador */
         var avc = document.getElementById('card-avatar');
