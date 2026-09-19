@@ -293,7 +293,7 @@ var CORRETOR_PILOTO = ['PEDRO (DIREÇÃO)'];
 
 var $ = function (id) { return document.getElementById(id); };
 var estado = { cor: '', aluno: null, leitura: null, resp: {}, mexidas: {}, resolvidas: {}, nota: null, alunosProf: [] };
-var TPL = null, GAB = null, REFS = null;
+var TPL = null, GAB = null, REFS = null, PTR = null;
 
 function sessao() { try { return JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) { return null; } }
 function token() { var s = sessao(); return (s && s.token) || ''; }
@@ -338,6 +338,8 @@ var motorPronto = Promise.all([
   carregaImgCinza(BASE + 'ref1.png' + V),
   carregaImgCinza(BASE + 'ref2.png' + V)
 ]).then(function (rs) { TPL = rs[0]; GAB = rs[1]; REFS = { r1: rs[2], r2: rs[3] }; });
+/* a ficha Points to Review do Study Guide 2026 (páginas 31 e 32), das cinco cores: ponto, capítulo e página de 51 a 70 */
+fetch(BASE + 'points-to-review.json' + V).then(function (r) { return r.json(); }).then(function (j) { PTR = j; }).catch(function () {});
 
 /* ── 1. a cor ── */
 function pintaCores() {
@@ -646,10 +648,31 @@ function mostraResultado() {
     '<p class="hint">' + esc(estado.aluno.nome) + ' · simulado #' + cor.n + ' ' + cor.nome + ' · ' + esc(dataBr($('dataSim').value)) + '</p>' +
     '<div class="final ' + (fin.pass ? 'pass' : 'nopass') + '">' + (fin.pass ? '✅ ' : '❌ ') + fin.rot + ' &nbsp;·&nbsp; nota para o card: ' + notaCard(sc) + '</div>' +
     '<div class="copie">✍️ <span>Copie esta tabela na folha do aluno, no quadro <i>SCORE</i> da frente, e marque a cor #' + cor.n + ' ' + cor.nome + ' em <i>PRACTICE TEST</i>.</span></div>' +
-    tabelaScore(sc, fin) +
+    tabelaScore(sc, fin) + blocoPTR(resp, key) +
     '<div class="erros"><b>Erros no <i>Listening</i> (' + errosL.length + '):</b> ' + lista(errosL) + '</div>' +
     '<div class="erros"><b>Erros no <i>Reading &amp; Grammar</i> (' + errosR.length + '):</b> ' + lista(errosR) + '</div>' +
     '<p class="hint" style="margin-top:.6rem">Cada erro aparece como "questão: marcou → certa". Use para o <i>Points to Review</i> com o aluno. O aluno vê só a tabela, nunca as respostas certas.</p>';
+}
+/* O POINTS TO REVIEW PREENCHIDO: as questões de gramática erradas, com o ponto e onde estudar, e o balanço por capítulo.
+   Substitui marcar os X à mão no Study Guide; a conversa com o aluno continua (Guia de Procedimentos). */
+var CAPS = { 1: 'Connectors', 2: 'Gerunds & Infinitives', 3: 'Phrasal Verbs & Prepositions', 4: 'Inversion & Emphasis', 5: 'Pronouns & Determiners',
+  6: 'Comparatives & Superlatives', 7: 'Embedded Questions & Word Order', 8: 'Conditionals & Subjunctive', 9: 'Adverbs, Modals & Tags', 10: 'Tenses', 11: 'Relative Clauses & Passive' };
+function blocoPTR(resp, key) {
+  var f = PTR && PTR[estado.cor];
+  if (!f) return '';
+  var erradas = [];
+  for (var q = 51; q <= 70; q++) if (resp[q] !== key[q - 1]) erradas.push(q);
+  if (!erradas.length) return '<div class="copie" style="background:#e3f5e8;border-color:#9fd3ae;color:#1f6b35">📋 <span><i>Points to Review</i>: nenhum erro de gramática neste simulado.</span></div>';
+  var porCap = {};
+  erradas.forEach(function (q) { var p = f[q]; if (p) porCap[p.cap] = (porCap[p.cap] || 0) + 1; });
+  var caps = Object.keys(porCap).sort(function (a, b) { return porCap[b] - porCap[a] || a - b; });
+  return '<div class="rv-ptr" style="margin-top:.9rem"><h3 style="margin:.2rem 0 .4rem;font-size:1rem">📋 <i>Points to Review</i> preenchido</h3>' +
+    '<p class="hint" style="margin:0 0 .5rem">As questões de gramática que o aluno errou, com o ponto e onde estudar no <i>Study Guide</i>. Use na conversa com ele.</p>' +
+    '<table class="lote"><tr><th>Q</th><th>Point to review</th><th>Capítulo</th></tr>' +
+    erradas.map(function (q) { var p = f[q] || {}; return '<tr><td><b>' + q + '</b></td><td>' + esc(p.ponto || '') + '</td><td>' + (p.cap ? p.cap + ' · p.' + String(p.pag).padStart(2, '0') : '') + '</td></tr>'; }).join('') +
+    '</table><p class="hint" style="margin:.6rem 0 0"><b>Balanço por capítulo:</b> ' +
+    caps.map(function (c) { return esc(CAPS[c] || ('Cap. ' + c)) + ' ' + porCap[c] + (porCap[c] >= 3 ? ' ⚠️' : ''); }).join(' · ') +
+    (caps.some(function (c) { return porCap[c] >= 3; }) ? '<br>⚠️ Três ou mais erros no mesmo capítulo é um padrão: comece por ele.' : '') + '</p></div>';
 }
 /* o quadro SCORE da frente da folha, na mesma ordem e com os mesmos rótulos, para o professor copiar */
 function tabelaScore(sc, fin) {
