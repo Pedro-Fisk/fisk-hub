@@ -599,6 +599,7 @@ function read(photo0, tpl, refs, opts) {
   res.qualidade = q;
   var probs = conferirFoto(q, opts);
   if (probs.length) return recusa(probs, log, q);
+  res.baixaResolucao = q.pxPorPt < Object.assign({}, PADRAO, opts.padrao || {}).pxPorPtIdeal;
   res.ok = true; res.log = log; res.off = off; res.H = H2; res.corners = corners; res.norm = N; res.s = s;
   return res;
 }
@@ -654,11 +655,14 @@ function bgPhoto(photo) {
 }
 
 /* ---------- padrão de envio: na dúvida, recusa ---------- */
-var PADRAO = { pxPorPt: 1.5, ancora: 0.6, curva: 4, linhas: 0.95, luz: 0.7, brilho: 0.45, nitidez: 0.25, ruido: 0.05 };
+/* pxPorPt: abaixo de 0,8 recusa; entre 0,8 e 1,5 (a foto que passou pelo WhatsApp) ACEITA, mas marca
+   `baixaResolucao` e a tela obriga o professor a conferir a folha endireitada (pedido do Pedro, 19/09/2026:
+   "o prof consegue confirmar antes de corrigir oficialmente"). As outras travas não mudaram. */
+var PADRAO = { pxPorPt: 0.8, pxPorPtIdeal: 1.5, ancora: 0.6, curva: 4, linhas: 0.95, luz: 0.7, brilho: 0.45, nitidez: 0.2, ruido: 0.05 };
 var AVISOS = {
   bordas: 'A folha precisa aparecer inteira, com os quatro cantos dentro da foto.',
   verso: 'Confira se é o lado das bolinhas (página 2), e não a frente com o nome.',
-  resolucao: 'A folha ficou pequena na foto. Aproxime o celular até ela ocupar quase toda a tela, e use a foto direto da câmera (não a que passou pelo WhatsApp).',
+  resolucao: 'A foto está com resolução muito baixa para ler as bolinhas. Aproxime o celular até a folha ocupar quase toda a tela.',
   curva: 'A folha está dobrada ou curvada. Apoie numa mesa, bem lisa.',
   angulo: 'Fotografe de cima, com o celular paralelo à folha.',
   sombra: 'Há sombra ou luz desigual sobre a folha. Cuidado com a sombra do celular e da mão.',

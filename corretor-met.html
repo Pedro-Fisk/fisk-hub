@@ -238,6 +238,8 @@
     <div class="btns">
       <button type="button" class="btn sec" id="verFolha">🗺️ Ver a folha endireitada</button>
     </div>
+    <div class="copie" id="avisoBaixa" hidden>🔎 <span>Esta foto tem resolução baixa (provavelmente passou pelo WhatsApp). A leitura foi feita, mas <b>confira a folha endireitada</b>: cada círculo verde tem de estar em cima da bolinha que o aluno pintou.
+      <label style="display:flex;gap:.5rem;align-items:center;margin-top:.5rem;font-weight:800;cursor:pointer"><input type="checkbox" id="conferiFolha" style="width:20px;height:20px"> Conferi: as marcações batem com a folha</label></span></div>
     <div class="folha-wrap" id="folhaWrap" hidden>
       <div class="legenda-folha">
         <span><i class="lg verde"></i> verde: cruzamento validado pela plataforma</span>
@@ -274,7 +276,7 @@
 </main>
 
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
-<script src="assets/corretor-met/omr-met.js?v=20260919a"></script>
+<script src="assets/corretor-met/omr-met.js?v=20260919b"></script>
 <script>
 'use strict';
 var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
@@ -529,6 +531,12 @@ function mostraConferencia() {
     }).join('') + '</div>';
     Array.prototype.forEach.call(box.querySelectorAll('.duvida'), function (el) { recorteLinha(el.querySelector('canvas'), +el.dataset.q); });
   } else box.innerHTML = '';
+  /* FOTO DE RESOLUÇÃO BAIXA (a que passou pelo WhatsApp): aceita, mas o professor confere a folha endireitada
+     antes de corrigir (pedido do Pedro, 19/09/2026). A folha já abre, e o Confirmar espera a caixa. */
+  var baixa = !!estado.leitura.baixaResolucao;
+  $('avisoBaixa').hidden = !baixa;
+  $('conferiFolha').checked = false;
+  if (baixa && $('folhaWrap').hidden) $('verFolha').click();
   pintaGrade();
   atualizaConfirmar();
   setTimeout(function () { $('p4').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
@@ -568,8 +576,10 @@ $('gradeL').addEventListener('click', cliqueGrade);
 $('gradeR').addEventListener('click', cliqueGrade);
 function atualizaConfirmar() {
   var falta = duvidas().filter(function (x) { return !estado.resolvidas[x.q]; }).length;
-  $('confirmar').disabled = falta > 0;
-  $('statusConf').textContent = falta ? 'Falta conferir ' + falta + (falta === 1 ? ' questão' : ' questões') + ' marcada' + (falta === 1 ? '' : 's') + ' em amarelo.' : '';
+  var faltaFolha = !!(estado.leitura && estado.leitura.baixaResolucao && !$('conferiFolha').checked);
+  $('confirmar').disabled = falta > 0 || faltaFolha;
+  $('statusConf').textContent = falta ? 'Falta conferir ' + falta + (falta === 1 ? ' questão' : ' questões') + ' marcada' + (falta === 1 ? '' : 's') + ' em amarelo.'
+    : (faltaFolha ? 'Confira a folha endireitada e marque a caixa acima para liberar a correção.' : '');
 }
 /* o recorte da linha na foto endireitada, para conferir sem pegar a folha */
 function recorteLinha(cv, q) {
@@ -585,6 +595,7 @@ function recorteLinha(cv, q) {
   ctx.putImageData(id, 0, 0);
   cv.style.width = Math.min(w, 360) + 'px';
 }
+$('conferiFolha').addEventListener('change', atualizaConfirmar);
 $('verFolha').addEventListener('click', function () {
   $('folhaWrap').hidden = !$('folhaWrap').hidden;
   $('verFolha').textContent = $('folhaWrap').hidden ? '🗺️ Ver a folha endireitada' : '🙈 Esconder a folha';
