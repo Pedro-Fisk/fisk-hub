@@ -31,9 +31,12 @@
      onde     texto curto que responde "em que estágio eu uso isto?"
      android  pacote no Google Play (null = não existe para Android)
      ios      id numérico na App Store (null = não existe para iPhone)
-     web      quando o app TAMBÉM roda no navegador, o endereço. Só o Cyber
+     web      quando o app TAMBÉM roda no navegador, o endereço. O Cyber
               Fisk 3.0 tem: é a mesma plataforma, e o aluno que não pode
               instalar (aparelho cheio, celular emprestado) entra por ali.
+     soWeb    true quando é SÓ site, sem app de loja (o Focus Online Practice):
+              aí não se desenha o aviso "sem Android / sem iPhone", que faria a
+              família procurar na loja um app que nunca existiu.
      icone    o ícone do app, baixado das lojas e servido POR ESTE REPOSITÓRIO
               (assets/apps/). A URL é absoluta de propósito: o Portal do Aluno
               lê este arquivo de outro domínio, e caminho relativo quebraria lá.
@@ -48,7 +51,7 @@
               A régua de quem casa com o quê é a Circular 29/25, não o nome.
 */
 window.FISK_APPS = {
-  atualizado: '18/09/2026',
+  atualizado: '19/09/2026',
   /* Os blocos e, dentro de cada um, OS ESTÁGIOS QUE A ESCOLA DÁ. A pergunta
      que o professor faz não é "quais apps existem para Kids", é "o que o meu
      aluno do Teens Connect 2 precisa baixar" — então o estágio é o filtro que
@@ -112,6 +115,15 @@ window.FISK_APPS = {
       onde: 'Essentials 1 a In Focus, e o espanhol — um app para todos',
       desc: 'A plataforma oficial do aluno de jovens e adultos. É um só para todos os estágios.',
       android: 'com.mbr.cyber30', ios: '1491785193', web: 'https://cyber.fisk.com.br:175/cyberfisknew/', rx: ['essentials', 'transitions?', 'fluency', 'in\\s*focus', 'speed\\s*[123]', 'inmediato'], icone: 'https://pedro-fisk.github.io/fisk-hub/assets/apps/cyber-fisk-3-0.png' },
+
+    /* Focus Online Practice (pedido do Pedro, 19/09/2026): o site de exercícios
+       extras do In Focus, da própria Fisk. Só site. O rx exclui o In Focus
+       Review, que é outro estágio e casaria com /in focus/. */
+    { nome: 'Focus Online Practice', tipo: 'cyber', blocos: ['adultos'],
+      onde: 'In Focus',
+      desc: 'O site da Fisk com exercícios extras do livro In Focus, para praticar fora da aula.',
+      android: null, ios: null, soWeb: true, web: 'https://focus.fisk.com.br:176/focus/html/login.html',
+      rx: ['in\\s*focus(?!\\s*review)'], icone: 'https://pedro-fisk.github.io/fisk-hub/assets/apps/focus-online-practice.png' },
 
     /* ── Cyber Fun: o joguinho, um por livro ─────────────────────────────── */
     { nome: 'Cyber Fun Magic Way', tipo: 'fun', blocos: ['kids'],
@@ -196,7 +208,7 @@ window.FISK_APPS = {
     { nome: 'Linguix', tipo: 'parceiro', blocos: ['adultos'],
       onde: 'In Focus',
       desc: 'Vídeos autênticos em inglês com exercícios interativos baseados neles, e ranking de pontos.',
-      android: 'com.linguix.studentApp', ios: '1534365317', rx: ['in\\s*focus'], icone: 'https://pedro-fisk.github.io/fisk-hub/assets/apps/linguix.png' },
+      android: 'com.linguix.studentApp', ios: '1534365317', rx: ['in\\s*focus(?!\\s*review)'], icone: 'https://pedro-fisk.github.io/fisk-hub/assets/apps/linguix.png' },
 
     /* ── Da escola: nunca vão para o aluno ───────────────────────────────── */
     { nome: 'Fisk Helper', tipo: 'escola', blocos: ['escola'],

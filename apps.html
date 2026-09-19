@@ -110,7 +110,7 @@
     <p>Ferramenta desenvolvida exclusivamente para uso interno das escolas Fisk. A utilização deste sistema e de seu conteúdo por pessoas ou instituições não autorizadas, incluindo professores particulares, é proibida. Desenvolvido por @fiskcacapava e @taubatefisk</p>
   </footer>
 
-<script src="assets/apps-data.js?v=2026-09-18a"></script>
+<script src="assets/apps-data.js?v=2026-09-19a"></script>
 <script src="assets/fisk-shared.js?v=2026-09-07a"></script>
 <script>
 (function () {
@@ -148,6 +148,8 @@
     var h = '<div class="ap-lojas">';
     /* a versão web vem PRIMEIRO quando existe: é a que abre sem instalar nada,
        e é a saída para o aluno com o celular cheio ou emprestado */
+    /* só site (Focus Online Practice): um botão, e nenhum aviso de loja */
+    if (a.soWeb) return h + '<a class="ap-loja" target="_blank" rel="noopener" href="' + a.web + '">🌐 Abrir o site</a></div>';
     if (a.web) h += '<a class="ap-loja" target="_blank" rel="noopener" href="' + a.web + '">🌐 Versão web</a>';
     h += a.android
       ? '<a class="ap-loja" target="_blank" rel="noopener" href="https://play.google.com/store/apps/details?id=' +
