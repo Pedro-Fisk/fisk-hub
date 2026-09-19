@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Corretor do simulado MET, FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04c">
+<link rel="stylesheet" href="assets/casa-tema.css?v=9">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+<!-- ═══════════════════════════════════════════════════════════════════════
+     CORRETOR DO SIMULADO MET (19/09/2026): o professor fotografa o verso da
+     folha de respostas do simulado presencial e a nota sai daqui.
+
+     A LEITURA NÃO É IA OLHANDO A FOTO. É leitura óptica com molde (a mesma
+     ideia da máquina oficial): assets/corretor-met/omr-met.js encaixa a foto
+     no molde tirado do PDF da folha e mede a escuridão de cada bolinha.
+     Roda no aparelho: a foto não sai do celular.
+
+     Três regras do Pedro que moldam a tela:
+     1. O professor CONFERE a leitura antes de ver o gabarito.
+     2. O nome vem do professor (lista das turmas dele, ou a busca), nunca da
+        folha: aluno esquece o nome ou escreve em cursiva.
+     3. Foto ruim é RECUSADA com o motivo ("seja bem exigente"): na dúvida,
+        pede outra foto em vez de arriscar nota errada.
+
+     Os limites de qualidade, a medição e os testes estão em
+     ~/Claude/Projects/corretor-met/ (testes/suite.js).
+     ═══════════════════════════════════════════════════════════════════════ -->
+<style>
+  body{ padding-bottom: 4rem; }
+  main{ max-width: 980px; margin: 0 auto; padding: 0 1rem; }
+  .painel{ background: var(--white); border: 1px solid var(--surface-border-color); border-radius: var(--surface-radius); box-shadow: var(--surface-shadow); padding: 1rem 1.2rem; margin: 1.2rem 0; }
+  .painel h2{ font-family: var(--font-heading); color: var(--ui-dark); font-size: 1.1rem; margin: 0 0 .2rem; }
+  .painel .hint{ color: var(--gray); font-size: .88rem; margin: 0 0 .8rem; }
+  .painel[aria-disabled="true"]{ opacity: .45; pointer-events: none; }
+  label.mini{ display: block; font-size: .74rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--gray); margin-bottom: .25rem; }
+  select, input[type=date], input[type=search]{ width: 100%; padding: .55rem .7rem; border: 1.5px solid var(--ui-bd); border-radius: 10px; font-family: var(--font-body); font-size: .95rem; background: var(--white); color: var(--black); box-sizing: border-box; }
+  .linha2{ display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: .6rem; }
+  .status{ font-size: .88rem; color: var(--gray); padding: .4rem 0 0; }
+  .status.err{ color: var(--red-dark); font-weight: 700; }
+
+  /* 1. a cor */
+  .cores{ display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: .8rem; }
+  .cor{ display: inline-flex; align-items: center; gap: .45rem; border: 2px solid var(--ui-bd); background: var(--white); color: var(--black); border-radius: 99px; padding: .45rem .9rem .45rem .5rem; font: inherit; font-weight: 700; cursor: pointer; }
+  .cor i{ width: 20px; height: 20px; border-radius: 50%; display: inline-block; border: 1px solid rgba(0,0,0,.15); }
+  .cor[aria-pressed="true"]{ border-color: var(--ui-dark); background: var(--ui-soft); box-shadow: 0 0 0 2px var(--ui-dark) inset; }
+
+  /* 2. o aluno */
+  .alunos{ margin-top: .7rem; max-height: 360px; overflow: auto; border: 1px solid var(--surface-border-color); border-radius: 10px; }
+  .alunos .grupo{ font-size: .74rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--gray); background: var(--ui-soft); padding: .35rem .8rem; position: sticky; top: 0; }
+  .alunos button, .achados button{ display: flex; width: 100%; gap: .6rem; align-items: baseline; text-align: left; background: none; border: 0; border-bottom: 1px solid #eef1f6; padding: .6rem .8rem; font: inherit; color: var(--black); cursor: pointer; }
+  .alunos button:hover, .achados button:hover{ background: #eef3fb; }
+  .alunos button.feito{ color: var(--gray); }
+  .alunos button.feito::after{ content: '✓ corrigido'; margin-left: auto; font-size: .76rem; font-weight: 800; color: #1f6b35; }
+  .alunos small, .achados small{ color: var(--gray); }
+  .alunos .vazio, .achados .vazio{ padding: .7rem .8rem; color: var(--gray); }
+  .tag-if{ font-size: .7rem; font-weight: 800; background: #e4f3f1; color: #155a48; border-radius: 99px; padding: .05rem .45rem; }
+  .busca{ position: relative; margin-top: .9rem; }
+  .achados{ position: absolute; left: 0; right: 0; top: 100%; z-index: 30; background: var(--white); border: 1px solid #c9d4e8; border-radius: 10px; margin-top: .25rem; max-height: 320px; overflow: auto; box-shadow: 0 8px 24px rgba(20,22,28,.15); }
+  .escolhido{ display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; background: #eef6ff; border: 2px solid var(--ui-mid); border-radius: 12px; padding: .7rem .9rem; margin-top: .8rem; }
+  .escolhido b{ font-family: var(--font-heading); font-size: 1.05rem; }
+  .escolhido .trocar{ margin-left: auto; }
+  .pill{ display: inline-flex; align-items: center; font-size: .74rem; font-weight: 800; padding: .2rem .6rem; border-radius: 99px; background: var(--ui-soft); color: var(--ui-ink); }
+  .pill.outro{ background: #fff4e0; color: #8a4b00; }
+
+  /* botões */
+  .btn{ display: inline-flex; align-items: center; justify-content: center; gap: .4rem; border: 0; border-radius: 12px; padding: .75rem 1.1rem; font: inherit; font-weight: 800; cursor: pointer; background: var(--ui); color: #fff; }
+  .btn:hover{ background: var(--ui-dark); }
+  .btn.sec{ background: var(--white); color: var(--ui-dark); border: 2px solid var(--ui-bd); }
+  .btn.grande{ font-size: 1.05rem; padding: .95rem 1.3rem; }
+  .btn:disabled{ opacity: .45; cursor: not-allowed; }
+  .btns{ display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .8rem; }
+
+  /* 3. a foto */
+  .padrao{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: .3rem .9rem; list-style: none; padding: 0; margin: 0 0 .4rem; font-size: .9rem; }
+  .padrao li::before{ content: '✓ '; color: #1f6b35; font-weight: 900; }
+  .lendo{ display: flex; align-items: center; gap: .6rem; padding: .8rem 0; font-weight: 700; color: var(--ui-dark); }
+  .lendo::before{ content: ''; width: 20px; height: 20px; border: 3px solid var(--ui-soft); border-top-color: var(--ui); border-radius: 50%; animation: gira .8s linear infinite; }
+  @keyframes gira{ to{ transform: rotate(360deg); } }
+  .recusa{ background: #fdf1f1; border: 2px solid #f0b4b4; border-radius: 12px; padding: .9rem 1rem; margin-top: .8rem; }
+  .recusa h3{ margin: 0 0 .4rem; color: #a11a1a; font-size: 1rem; }
+  .recusa ul{ margin: .2rem 0 0 1.1rem; padding: 0; }
+  .recusa li{ margin: .25rem 0; }
+
+  /* 4. a conferência */
+  .placar{ display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: .6rem; }
+  .placar .pill.ok{ background: #e3f5e8; color: #1f6b35; }
+  .placar .pill.rev{ background: #fff1d6; color: #8a5300; }
+  .duvidas{ display: grid; gap: .6rem; margin: .4rem 0 1rem; }
+  .duvida{ border: 2px solid #f3c77a; background: #fffaf0; border-radius: 12px; padding: .6rem .7rem; display: grid; grid-template-columns: auto 1fr; gap: .4rem .8rem; align-items: center; }
+  .duvida.resolvida{ border-color: #9fd3ae; background: #f3fbf5; }
+  .duvida .qn{ font-family: var(--font-heading); font-weight: 800; font-size: 1.1rem; min-width: 2.2rem; }
+  .duvida canvas{ max-width: 100%; height: auto; border-radius: 6px; border: 1px solid #e3d3b0; grid-column: 1 / -1; }
+  .duvida .porque{ font-size: .82rem; color: #8a5300; }
+  .opcs{ display: flex; gap: .3rem; flex-wrap: wrap; }
+  .opcs button{ min-width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--ui-bd); background: var(--white); color: var(--black); font: inherit; font-weight: 800; cursor: pointer; }
+  .opcs button.branco{ border-radius: 99px; padding: 0 .7rem; font-size: .8rem; }
+  .opcs button.sugestao{ border-style: dashed; border-color: #c07a00; }
+  .opcs button.marcada{ background: var(--ui-dark); color: #fff; border-color: var(--ui-dark); }
+  .grade-titulo{ font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--gray); margin: .8rem 0 .3rem; }
+  /* numeração descendo pela coluna, como na folha (1 a 13, 14 a 26…) */
+  .grade{ columns: 4 165px; column-gap: .8rem; }
+  .gq{ break-inside: avoid; margin-bottom: .25rem; }
+  .gq{ display: flex; align-items: center; gap: .3rem; padding: .15rem .3rem; border-radius: 8px; }
+  .gq .n{ width: 2rem; text-align: right; font-weight: 800; font-size: .85rem; color: var(--gray); }
+  .gq button{ width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--ui-bd); background: var(--white); color: var(--gray); font: inherit; font-size: .72rem; font-weight: 800; cursor: pointer; padding: 0; }
+  .gq button.marcada{ background: var(--ui-dark); color: #fff; border-color: var(--ui-dark); }
+  .gq.rev{ background: #fff1d6; }
+  .gq.mexida .n::after{ content: '✎'; color: var(--ui-mid); margin-left: 2px; }
+  .folha-wrap{ margin-top: .6rem; }
+  .folha-wrap canvas{ width: 100%; height: auto; border: 1px solid var(--surface-border-color); border-radius: 8px; }
+
+  /* 5. o resultado */
+  .res{ display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: .7rem; }
+  .res .caixa{ border: 2px solid var(--surface-border-color); border-radius: 12px; padding: .8rem 1rem; }
+  .res .caixa .rot{ font-size: .75rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--gray); }
+  .res .caixa .val{ font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: var(--ui-dark); }
+  .res .caixa .cefr{ font-size: 1rem; font-weight: 800; margin-left: .4rem; }
+  .final{ margin-top: .8rem; border-radius: 12px; padding: .8rem 1rem; font-weight: 800; font-size: 1.05rem; }
+  .final.pass{ background: #e3f5e8; color: #1f6b35; }
+  .final.nopass{ background: #fdeaea; color: #a11a1a; }
+  .erros{ font-size: .88rem; margin-top: .7rem; line-height: 1.6; }
+  .erros span{ display: inline-block; background: #fdf1f1; border-radius: 6px; padding: 0 .35rem; margin: 0 .2rem .2rem 0; }
+
+  /* a tabela SCORE, igual à impressa na frente da folha */
+  .copie{ display: flex; gap: .6rem; align-items: flex-start; background: #fff8e1; border: 2px solid #f2c230; border-radius: 12px; padding: .7rem .9rem; margin: .9rem 0 .5rem; font-weight: 700; color: #6b4d0f; }
+  .score-wrap{ overflow-x: auto; }
+  table.score{ border-collapse: collapse; width: 100%; min-width: 560px; font-size: .9rem; }
+  table.score th, table.score td{ border: 1.5px solid #9aa3ad; padding: .45rem .5rem; text-align: center; vertical-align: middle; }
+  table.score .cab{ background: #6b7280; color: #fff; font-family: var(--font-heading); letter-spacing: .12em; font-size: .95rem; }
+  table.score th{ background: #eef0f3; font-size: .74rem; text-transform: uppercase; letter-spacing: .03em; }
+  table.score td.esq{ text-align: left; }
+  table.score .num{ font-family: var(--font-heading); font-size: 1.15rem; font-weight: 800; }
+  table.score .marca{ font-weight: 800; }
+  table.score .fin-pass{ color: #1f6b35; font-weight: 800; }
+  table.score .fin-no{ color: #a11a1a; font-weight: 800; }
+  table.score tr.escolhido-fin td{ background: #e3f5e8; }
+  table.score tr.escolhido-fin.no td{ background: #fdeaea; }
+  body.theme-dark table.score th{ background: #1d2a3b; }
+  body.theme-dark .copie{ background: #2a2412; color: #f2d98a; }
+  body.theme-dark table.score tr.escolhido-fin td{ background: #14271b; }
+  body.theme-dark table.score tr.escolhido-fin.no td{ background: #2b1616; }
+
+  /* as corrigidas */
+  table.lote{ width: 100%; border-collapse: collapse; font-size: .88rem; }
+  table.lote th, table.lote td{ text-align: left; padding: .45rem .4rem; border-bottom: 1px solid #eef1f6; }
+  table.lote th{ font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--gray); }
+  .toast{ position: fixed; left: 50%; bottom: 1.2rem; transform: translateX(-50%); background: #14161c; color: #fff; padding: .7rem 1rem; border-radius: 10px; z-index: 99; font-weight: 700; }
+
+  body.theme-dark .alunos button:hover, body.theme-dark .achados button:hover{ background: #1d2a3b; }
+  body.theme-dark .duvida{ background: #2a2412; border-color: #7a5a1a; }
+  body.theme-dark .duvida.resolvida{ background: #14271b; border-color: #2f6b43; }
+  body.theme-dark .escolhido{ background: #172232; }
+  body.theme-dark .recusa{ background: #2b1616; border-color: #7a2d2d; }
+  body.theme-dark .gq.rev{ background: #3a2e12; }
+</style>
+</head>
+<body>
+<script>try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
+
+<header class="hero">
+  <a class="back-link" href="index.html">&larr; Voltar ao Hub</a>
+  <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
+  <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+  <h1>Corretor do simulado MET</h1>
+  <p>Fotografe o verso da folha de respostas &middot; confira a leitura &middot; veja a nota</p>
+</header>
+
+<main>
+  <div class="status" id="statusGeral" hidden></div>
+
+  <!-- 1. o simulado -->
+  <section class="painel" id="p1">
+    <h2>🎨 1. Qual simulado?</h2>
+    <p class="hint">A cor está marcada na frente da folha.</p>
+    <div class="cores" id="cores"></div>
+    <div class="linha2">
+      <div><label class="mini" for="dataSim">Data do simulado</label><input type="date" id="dataSim"><div class="status" style="padding-top:.3rem">Vem com a data de hoje. Toque para mudar se o simulado foi em outro dia.</div></div>
+    </div>
+  </section>
+
+  <!-- 2. o aluno -->
+  <section class="painel" id="p2">
+    <h2>👤 2. De quem é a folha?</h2>
+    <p class="hint">Escolha o aluno na lista das suas turmas. O nome vem daqui, nunca da folha.</p>
+    <div class="linha2">
+      <div><label class="mini" for="selEscola">Escola</label><select id="selEscola" disabled><option>Carregando…</option></select></div>
+      <div><label class="mini" for="selProf">Professor(a)</label><select id="selProf" disabled><option>Professor(a)…</option></select></div>
+      <div><label class="mini" for="filtro">Filtrar meus alunos</label><input id="filtro" type="search" placeholder="Nome ou RAF" autocomplete="off"></div>
+    </div>
+    <div class="alunos" id="listaAlunos"><div class="vazio">Escolha a escola e o professor.</div></div>
+    <div class="busca">
+      <label class="mini" for="qOutro">🔎 Procurar outro aluno</label>
+      <input id="qOutro" type="search" autocomplete="off" placeholder="Nome ou RAF de qualquer aluno da escola">
+      <div id="achados" class="achados" hidden></div>
+    </div>
+    <div id="escolhido" class="escolhido" hidden></div>
+  </section>
+
+  <!-- 3. a foto -->
+  <section class="painel" id="p3" aria-disabled="true">
+    <h2>📷 3. Foto do verso (as bolinhas)</h2>
+    <p class="hint">Para a foto ser aceita:</p>
+    <ul class="padrao">
+      <li>a folha inteira, com os quatro cantos</li>
+      <li>apoiada numa mesa, bem lisa</li>
+      <li>tirada de cima, celular paralelo à folha</li>
+      <li>luz clara, sem sombra da mão ou do celular</li>
+      <li>firme, esperando a câmera focar</li>
+      <li>direto da câmera (não pelo WhatsApp)</li>
+    </ul>
+    <div class="btns">
+      <label class="btn grande" for="fotoCam">📷 Fotografar</label>
+      <label class="btn sec" for="fotoGal">🖼️ Escolher da galeria</label>
+      <input id="fotoCam" type="file" accept="image/*" capture="environment" hidden>
+      <input id="fotoGal" type="file" accept="image/*" hidden>
+    </div>
+    <div id="fotoEstado"></div>
+  </section>
+
+  <!-- 4. a conferência -->
+  <section class="painel" id="p4" hidden>
+    <h2>🔍 4. Confira a leitura</h2>
+    <p class="hint">Isto é o que a foto mostra, antes de comparar com o gabarito. Toque numa letra para corrigir.</p>
+    <div class="placar" id="placar"></div>
+    <div id="duvidasBox"></div>
+    <div class="grade-titulo"><i>Listening</i> (1 a 50)</div>
+    <div class="grade" id="gradeL"></div>
+    <div class="grade-titulo"><i>Reading &amp; Grammar</i> (51 a 100)</div>
+    <div class="grade" id="gradeR"></div>
+    <div class="btns">
+      <button type="button" class="btn sec" id="verFolha">🗺️ Ver a folha endireitada</button>
+    </div>
+    <div class="folha-wrap" id="folhaWrap" hidden><canvas id="folhaCanvas"></canvas></div>
+    <div class="btns">
+      <button type="button" class="btn grande" id="confirmar">✅ Confirmar leitura e corrigir</button>
+    </div>
+    <div class="status" id="statusConf"></div>
+  </section>
+
+  <!-- 5. o resultado -->
+  <section class="painel" id="p5" hidden>
+    <h2>🏁 5. Resultado</h2>
+    <div id="resultado"></div>
+    <div class="btns">
+      <button type="button" class="btn grande" id="proximo">➕ Salvar e corrigir o próximo aluno</button>
+      <button type="button" class="btn sec" id="ajustar">✏️ Voltar e ajustar a leitura</button>
+      <button type="button" class="btn sec" disabled title="Em breve">📤 Lançar no card (em breve)</button>
+    </div>
+  </section>
+
+  <!-- as corrigidas nesta sessão -->
+  <section class="painel" id="pLote" hidden>
+    <h2>📋 Corrigidas hoje neste aparelho</h2>
+    <div style="overflow:auto"><table class="lote" id="tabLote"></table></div>
+    <div class="btns">
+      <button type="button" class="btn sec" id="copiarLote">📋 Copiar a tabela</button>
+    </div>
+  </section>
+</main>
+
+<script src="assets/fisk-shared.js?v=2026-09-07a"></script>
+<script src="assets/corretor-met/omr-met.js?v=20260919a"></script>
+<script>
+'use strict';
+var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
+var BASE = 'assets/corretor-met/', V = '?v=20260919a';
+var CORES = [
+  { id: 'green',  n: 1, nome: 'Green',  cor: '#2e9e4f' },
+  { id: 'purple', n: 2, nome: 'Purple', cor: '#7c3aed' },
+  { id: 'yellow', n: 3, nome: 'Yellow', cor: '#f2c230' },
+  { id: 'blue',   n: 4, nome: 'Blue',   cor: '#2563eb' },
+  { id: 'red',    n: 5, nome: 'Red',    cor: '#d81f26' }
+];
+/* PILOTO (19/09/2026): só a direção até a leitura ser validada com folhas de alunos reais */
+var CORRETOR_PILOTO = ['PEDRO (DIREÇÃO)'];
+
+var $ = function (id) { return document.getElementById(id); };
+var estado = { cor: '', aluno: null, leitura: null, resp: {}, mexidas: {}, resolvidas: {}, nota: null, alunosProf: [] };
+var TPL = null, GAB = null, REFS = null;
+
+function sessao() { try { return JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) { return null; } }
+function token() { var s = sessao(); return (s && s.token) || ''; }
+function esc(s) { return fiskEsc(String(s == null ? '' : s)); }
+function norm(s) { return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
+function toast(msg) { var t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 3200); }
+function geral(msg, err) { var el = $('statusGeral'); el.hidden = !msg; el.innerHTML = msg || ''; el.className = 'status' + (err ? ' err' : ''); }
+function get(params) {
+  params.token = token();
+  var qs = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
+  return fetch(EP + '?' + qs).then(fiskJson).then(function (j) { if (j && (j.erro || j.error)) throw new Error(j.erro || j.error); return j; });
+}
+function post(body) {
+  body.token = token();
+  return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
+    .then(fiskJson).then(function (j) { if (!j || j.ok === false) throw new Error((j && (j.erro || j.error)) || 'Não consegui.'); return j; });
+}
+function hoje() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function ehInFocus(book) { return /focus/i.test(String(book || '')); }
+
+/* ── o motor: molde, gabaritos e as duas referências da folha ── */
+function carregaImgCinza(url) {
+  return new Promise(function (ok, falha) {
+    var im = new Image();
+    im.onload = function () {
+      var c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight;
+      var x = c.getContext('2d'); x.drawImage(im, 0, 0);
+      ok(cinza(x.getImageData(0, 0, c.width, c.height)));
+    };
+    im.onerror = function () { falha(new Error('Não consegui carregar ' + url)); };
+    im.src = url;
+  });
+}
+function cinza(id) {
+  var n = id.width * id.height, d = new Float32Array(n), p = id.data;
+  for (var i = 0; i < n; i++) d[i] = (0.299 * p[4 * i] + 0.587 * p[4 * i + 1] + 0.114 * p[4 * i + 2]) / 255;
+  return { w: id.width, h: id.height, d: d };
+}
+var motorPronto = Promise.all([
+  fetch(BASE + 'template.json' + V).then(function (r) { return r.json(); }),
+  fetch(BASE + 'gabaritos.json' + V).then(function (r) { return r.json(); }),
+  carregaImgCinza(BASE + 'ref1.png' + V),
+  carregaImgCinza(BASE + 'ref2.png' + V)
+]).then(function (rs) { TPL = rs[0]; GAB = rs[1]; REFS = { r1: rs[2], r2: rs[3] }; });
+
+/* ── 1. a cor ── */
+function pintaCores() {
+  $('cores').innerHTML = CORES.map(function (c) {
+    return '<button type="button" class="cor" data-cor="' + c.id + '" aria-pressed="' + (estado.cor === c.id) + '"><i style="background:' + c.cor + '"></i>#' + c.n + ' ' + c.nome + '</button>';
+  }).join('');
+}
+$('cores').addEventListener('click', function (ev) {
+  var b = ev.target.closest('[data-cor]'); if (!b) return;
+  estado.cor = b.dataset.cor;
+  try { localStorage.setItem('cmet:cor', estado.cor); } catch (e) {}
+  pintaCores(); liberaFoto();
+  if (estado.nota) mostraResultado();   /* trocou a cor depois de corrigir: refaz a conta */
+});
+
+/* ── 2. o aluno: as turmas do professor, e a busca na escola ── */
+function montarSelect(sel, ph, itens) {
+  sel.innerHTML = '<option value="" disabled selected>' + ph + '</option>' + itens.map(function (i) { return '<option value="' + esc(i) + '">' + esc(i) + '</option>'; }).join('');
+  sel.disabled = false;
+}
+function initAlunos() {
+  var s = sessao() || {}, selE = $('selEscola'), selP = $('selProf');
+  var eu = s.master ? (function () { try { return (JSON.parse(localStorage.getItem('fisk_actas') || 'null') || {}).name || ''; } catch (e) { return ''; } })() : (s.name || '');
+  var minhas = String(s.escolas || s.escola || '').split(/[,;]/).map(function (x) { return x.trim(); }).filter(Boolean);
+  get({ action: 'card', fn: 'escolas' }).then(function (j) {
+    var escolas = j.escolas || [];
+    montarSelect(selE, 'Escola…', escolas);
+    var minha = escolas.find(function (e) { return minhas.some(function (m) { return norm(e).indexOf(norm(m)) > -1; }); }) || (escolas.length === 1 ? escolas[0] : '');
+    if (minha) { selE.value = minha; selE.dispatchEvent(new Event('change')); }
+  }).catch(function (e) { geral('⚠️ Não consegui ler as escolas: ' + esc(e.message), true); });
+  selE.addEventListener('change', function () {
+    selP.innerHTML = '<option>Carregando…</option>'; selP.disabled = true;
+    $('listaAlunos').innerHTML = '<div class="vazio">Escolha o professor.</div>';
+    get({ action: 'card', fn: 'profs', escola: selE.value }).then(function (j) {
+      var profs = j.profs || [];
+      montarSelect(selP, 'Professor(a)…', profs);
+      /* pré-seleciona quem entrou, sem travar: substituição é comum */
+      var meu = profs.find(function (p) { return eu && norm(p) === norm(eu); }) || profs.find(function (p) { return eu && norm(p).indexOf(norm(eu).split(' ')[0]) === 0; });
+      if (meu) { selP.value = meu; selP.dispatchEvent(new Event('change')); }
+    }).catch(function (e) { geral('⚠️ ' + esc(e.message), true); });
+  });
+  selP.addEventListener('change', function () { carregaAlunosProf(selE.value, selP.value); });
+}
+function carregaAlunosProf(escola, prof) {
+  var chave = 'cmet:alunos:' + escola + '|' + prof, guardada = null;
+  try { guardada = JSON.parse(localStorage.getItem(chave) || 'null'); } catch (e) {}
+  if (guardada) { estado.alunosProf = guardada; pintaAlunos(); }
+  else $('listaAlunos').innerHTML = '<div class="vazio">🔄 Lendo as turmas no card…</div>';
+  get({ action: 'panoramaProf', escola: escola, prof: prof }).then(function (j) {
+    var lista = (j.alunos || []).filter(function (a) { return !a.saiu && a.raf; })
+      .map(function (a) { return { nome: a.nome, raf: a.raf, turma: a.turma, book: a.book, escola: escola, prof: prof }; });
+    try { localStorage.setItem(chave, JSON.stringify(lista)); } catch (e) {}
+    if ($('selProf').value !== prof) return;
+    estado.alunosProf = lista; pintaAlunos();
+  }).catch(function (e) { if (!guardada) $('listaAlunos').innerHTML = '<div class="vazio">⚠️ ' + esc(e.message) + '</div>'; });
+}
+function jaCorrigidos() { var m = {}; lote().forEach(function (x) { m[x.raf + '|' + x.cor] = true; }); return m; }
+function pintaAlunos() {
+  var f = norm($('filtro').value), feitos = jaCorrigidos();
+  var lista = estado.alunosProf.filter(function (a) { return !f || norm(a.nome).indexOf(f) > -1 || String(a.raf).indexOf(f) > -1; });
+  if (!lista.length) { $('listaAlunos').innerHTML = '<div class="vazio">' + (estado.alunosProf.length ? 'Nenhum aluno com esse nome.' : 'Nenhum aluno ativo nas turmas deste professor.') + '</div>'; return; }
+  /* turmas com aluno do In Focus primeiro: é quem faz o simulado do MET */
+  var grupos = {};
+  lista.forEach(function (a) { (grupos[a.turma] = grupos[a.turma] || []).push(a); });
+  var nomes = Object.keys(grupos).sort(function (x, y) {
+    var fx = grupos[x].some(function (a) { return ehInFocus(a.book); }) ? 0 : 1, fy = grupos[y].some(function (a) { return ehInFocus(a.book); }) ? 0 : 1;
+    return (fx - fy) || x.localeCompare(y, 'pt-BR');
+  });
+  var html = '';
+  nomes.forEach(function (t) {
+    html += '<div class="grupo">' + esc(t) + '</div>';
+    grupos[t].sort(function (x, y) { return x.nome.localeCompare(y.nome, 'pt-BR'); }).forEach(function (a) {
+      var i = estado.alunosProf.indexOf(a);
+      html += '<button type="button" data-i="' + i + '"' + (feitos[a.raf + '|' + estado.cor] ? ' class="feito"' : '') + '><b>' + esc(a.nome) + '</b>' + (ehInFocus(a.book) ? '<span class="tag-if">In Focus</span>' : '<small>' + esc(a.book || 'sem livro') + '</small>') + '</button>';
+    });
+  });
+  $('listaAlunos').innerHTML = html;
+}
+$('filtro').addEventListener('input', pintaAlunos);
+$('listaAlunos').addEventListener('click', function (ev) {
+  var b = ev.target.closest('button[data-i]'); if (!b) return;
+  escolheAluno(estado.alunosProf[+b.dataset.i], false);
+});
+(function () {
+  var q = $('qOutro'), box = $('achados'), timer = null;
+  q.addEventListener('input', function () {
+    clearTimeout(timer);
+    var termo = q.value.trim();
+    if (termo.length < 3) { box.hidden = true; return; }
+    timer = setTimeout(function () {
+      box.hidden = false; box.innerHTML = '<div class="vazio">Procurando…</div>';
+      post({ action: 'alunoBusca', q: termo }).then(function (r) {
+        if (q.value.trim() !== termo) return;
+        var lista = r.alunos || [];
+        box._lista = lista;
+        box.innerHTML = lista.length ? lista.map(function (a, i) {
+          return '<button type="button" data-i="' + i + '"><b>' + esc(a.name) + '</b><small>' + esc(a.raf) + ' · ' + esc(a.book || 'sem livro') + (a.turma ? ' · ' + esc(a.turma) : '') + '</small></button>';
+        }).join('') : '<div class="vazio">Nenhum aluno com esse nome ou RAF.</div>';
+      }).catch(function (e) { if (q.value.trim() === termo) box.innerHTML = '<div class="vazio">⚠️ ' + esc(e.message) + '</div>'; });
+    }, 300);
+  });
+  box.addEventListener('click', function (ev) {
+    var b = ev.target.closest('button[data-i]'); if (!b) return;
+    var a = box._lista[+b.dataset.i];
+    box.hidden = true; q.value = '';
+    escolheAluno({ nome: a.name, raf: a.raf, turma: a.turma, book: a.book, escola: $('selEscola').value, prof: '' }, true);
+  });
+  q.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') box.hidden = true; });
+  document.addEventListener('click', function (ev) { if (!ev.target.closest('.busca')) box.hidden = true; });
+})();
+function escolheAluno(a, deFora) {
+  estado.aluno = a; estado.aluno.deFora = deFora;
+  $('escolhido').hidden = false;
+  $('escolhido').innerHTML = '✍️ Corrigindo <b>' + esc(a.nome) + '</b><span class="pill">' + esc(a.turma || 'sem turma') + '</span>' +
+    (deFora ? '<span class="pill outro">de outra turma</span>' : '') +
+    '<button type="button" class="btn sec trocar" id="trocarAluno">Trocar</button>';
+  $('trocarAluno').onclick = function () { estado.aluno = null; $('escolhido').hidden = true; liberaFoto(); $('p2').scrollIntoView({ behavior: 'smooth' }); };
+  limpaLeitura();
+  liberaFoto();
+  setTimeout(function () { $('p3').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
+}
+function liberaFoto() {
+  var ok = !!(estado.cor && estado.aluno);
+  $('p3').setAttribute('aria-disabled', ok ? 'false' : 'true');
+  if (!ok && !estado.cor && estado.aluno) $('fotoEstado').innerHTML = '<p class="status err">Escolha a cor do simulado lá em cima.</p>';
+  else if (ok && /err/.test($('fotoEstado').innerHTML) && !$('fotoEstado').querySelector('.recusa')) $('fotoEstado').innerHTML = '';
+}
+
+/* ── 3. a foto: carrega, reduz, lê ── */
+function fotoParaCinza(file) {
+  return new Promise(function (ok, falha) {
+    var url = URL.createObjectURL(file), im = new Image();
+    im.onload = function () {
+      /* 2600 px no lado maior: sobra resolução (o padrão pede 1,5 px/pt; aqui dá ~3) e o celular não engasga */
+      var f = Math.min(1, 2600 / Math.max(im.naturalWidth, im.naturalHeight));
+      var c = document.createElement('canvas'); c.width = Math.round(im.naturalWidth * f); c.height = Math.round(im.naturalHeight * f);
+      var x = c.getContext('2d'); x.drawImage(im, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      ok(cinza(x.getImageData(0, 0, c.width, c.height)));
+    };
+    im.onerror = function () { URL.revokeObjectURL(url); falha(new Error('Não consegui abrir essa imagem.')); };
+    im.src = url;
+  });
+}
+function recebeFoto(ev) {
+  var file = ev.target.files && ev.target.files[0]; ev.target.value = '';
+  if (!file) return;
+  limpaLeitura();
+  $('fotoEstado').innerHTML = '<div class="lendo">Lendo as bolinhas…</div>';
+  var t0 = Date.now();
+  motorPronto.then(function () { return fotoParaCinza(file); }).then(function (g) {
+    return new Promise(function (ok) { setTimeout(function () { ok(OMRMET.read(g, TPL, REFS)); }, 30); });   /* deixa o "Lendo" pintar antes da conta */
+  }).then(function (r) {
+    if (!r.ok) return mostraRecusa(r);
+    estado.leitura = r;
+    r.questoes.forEach(function (x) { estado.resp[x.q] = x.resp; });
+    $('fotoEstado').innerHTML = '<p class="status">✓ Foto aceita (' + ((Date.now() - t0) / 1000).toFixed(1) + ' s).</p>';
+    mostraConferencia();
+  }).catch(function (e) { $('fotoEstado').innerHTML = '<p class="status err">⚠️ ' + esc(e.message) + '</p>'; });
+}
+$('fotoCam').addEventListener('change', recebeFoto);
+$('fotoGal').addEventListener('change', recebeFoto);
+function mostraRecusa(r) {
+  $('fotoEstado').innerHTML = '<div class="recusa"><h3>Sua foto não está no padrão de envio.</h3>' +
+    '<ul>' + (r.avisos || []).map(function (a) { return '<li>' + esc(a) + '</li>'; }).join('') + '</ul>' +
+    '<div class="btns"><label class="btn" for="fotoCam">📷 Tirar outra foto</label></div></div>';
+}
+function limpaLeitura() {
+  estado.leitura = null; estado.resp = {}; estado.mexidas = {}; estado.resolvidas = {}; estado.nota = null;
+  $('p4').hidden = true; $('p5').hidden = true; $('folhaWrap').hidden = true; $('fotoEstado').innerHTML = '';
+}
+
+/* ── 4. a conferência ── */
+var L = 'ABCD';
+var PORQUE = { fraca: 'marca fraca', dupla: 'duas bolinhas escuras', branco: '' };
+function duvidas() { return estado.leitura.questoes.filter(function (x) { return x.status === 'fraca' || x.status === 'dupla'; }); }
+function mostraConferencia() {
+  $('p4').hidden = false;
+  var dv = duvidas(), ok = 100 - dv.length;
+  $('placar').innerHTML = '<span class="pill ok">✓ ' + ok + ' lidas com segurança</span>' + (dv.length ? '<span class="pill rev">⚠ ' + dv.length + ' para você conferir</span>' : '');
+  var box = $('duvidasBox');
+  if (dv.length) {
+    box.innerHTML = '<div class="grade-titulo">Confira estas primeiro</div><div class="duvidas">' + dv.map(function (x) {
+      return '<div class="duvida" data-q="' + x.q + '"><span class="qn">' + x.q + '.</span><div><div class="opcs">' +
+        L.split('').map(function (l) { return '<button type="button" data-l="' + l + '"' + (x.resp === l ? ' class="sugestao"' : '') + '>' + l + '</button>'; }).join('') +
+        '<button type="button" class="branco" data-l="">em branco</button></div><div class="porque">' + PORQUE[x.status] + (x.resp ? ', parece ' + x.resp : '') + '</div></div><canvas></canvas></div>';
+    }).join('') + '</div>';
+    Array.prototype.forEach.call(box.querySelectorAll('.duvida'), function (el) { recorteLinha(el.querySelector('canvas'), +el.dataset.q); });
+  } else box.innerHTML = '';
+  pintaGrade();
+  atualizaConfirmar();
+  setTimeout(function () { $('p4').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
+}
+$('duvidasBox').addEventListener('click', function (ev) {
+  var b = ev.target.closest('button[data-l]'); if (!b) return;
+  var q = +b.closest('.duvida').dataset.q;
+  estado.resp[q] = b.dataset.l || null; estado.resolvidas[q] = true; estado.mexidas[q] = true;
+  var d = b.closest('.duvida'); d.classList.add('resolvida');
+  Array.prototype.forEach.call(d.querySelectorAll('button[data-l]'), function (x) { x.classList.toggle('marcada', x === b); });
+  pintaGrade(); atualizaConfirmar();
+});
+function pintaGrade() {
+  var dv = {}; duvidas().forEach(function (x) { dv[x.q] = true; });
+  function linha(q) {
+    var r = estado.resp[q];
+    return '<div class="gq' + (dv[q] && !estado.resolvidas[q] ? ' rev' : '') + (estado.mexidas[q] ? ' mexida' : '') + '" data-q="' + q + '"><span class="n">' + q + '</span>' +
+      L.split('').map(function (l) { return '<button type="button" data-l="' + l + '"' + (r === l ? ' class="marcada"' : '') + '>' + l + '</button>'; }).join('') + '</div>';
+  }
+  var a = '', b = '';
+  for (var q = 1; q <= 50; q++) a += linha(q);
+  for (q = 51; q <= 100; q++) b += linha(q);
+  $('gradeL').innerHTML = a; $('gradeR').innerHTML = b;
+  if (!$('folhaWrap').hidden) desenhaFolha();
+}
+function cliqueGrade(ev) {
+  var b = ev.target.closest('button[data-l]'); if (!b) return;
+  var q = +b.closest('.gq').dataset.q, l = b.dataset.l;
+  estado.resp[q] = estado.resp[q] === l ? null : l;   /* tocar na marcada deixa em branco */
+  estado.mexidas[q] = true; estado.resolvidas[q] = true;
+  var d = document.querySelector('.duvida[data-q="' + q + '"]');
+  if (d) { d.classList.add('resolvida'); Array.prototype.forEach.call(d.querySelectorAll('button[data-l]'), function (x) { x.classList.toggle('marcada', (x.dataset.l || null) === estado.resp[q]); }); }
+  pintaGrade(); atualizaConfirmar();
+  if (estado.nota) mostraResultado();
+}
+$('gradeL').addEventListener('click', cliqueGrade);
+$('gradeR').addEventListener('click', cliqueGrade);
+function atualizaConfirmar() {
+  var falta = duvidas().filter(function (x) { return !estado.resolvidas[x.q]; }).length;
+  $('confirmar').disabled = falta > 0;
+  $('statusConf').textContent = falta ? 'Falta conferir ' + falta + (falta === 1 ? ' questão' : ' questões') + ' marcada' + (falta === 1 ? '' : 's') + ' em amarelo.' : '';
+}
+/* o recorte da linha na foto endireitada, para conferir sem pegar a folha */
+function recorteLinha(cv, q) {
+  var r = estado.leitura, N = r.norm, s = r.s, b = TPL.bubbles[q], o = r.off[q];
+  var x0 = Math.round((b[0][0] - 30 + o[0]) * s), x1 = Math.round((b[3][0] + 10 + o[0]) * s);
+  var y0 = Math.round((b[0][1] - 10 + o[1]) * s), y1 = Math.round((b[0][1] + 10 + o[1]) * s);
+  var w = x1 - x0, h = y1 - y0; cv.width = w; cv.height = h;
+  var ctx = cv.getContext('2d'), id = ctx.createImageData(w, h);
+  for (var y = 0; y < h; y++) for (var x = 0; x < w; x++) {
+    var yy = y0 + y, xx = x0 + x, v = (yy >= 0 && xx >= 0 && yy < N.h && xx < N.w) ? N.d[yy * N.w + xx] : 1, k = 4 * (y * w + x);
+    id.data[k] = id.data[k + 1] = id.data[k + 2] = Math.round(v * 255); id.data[k + 3] = 255;
+  }
+  ctx.putImageData(id, 0, 0);
+  cv.style.width = Math.min(w, 360) + 'px';
+}
+$('verFolha').addEventListener('click', function () {
+  $('folhaWrap').hidden = !$('folhaWrap').hidden;
+  $('verFolha').textContent = $('folhaWrap').hidden ? '🗺️ Ver a folha endireitada' : '🙈 Esconder a folha';
+  if (!$('folhaWrap').hidden) desenhaFolha();
+});
+function desenhaFolha() {
+  var r = estado.leitura, N = r.norm, s = r.s, cv = $('folhaCanvas');
+  cv.width = N.w; cv.height = N.h;
+  var ctx = cv.getContext('2d'), id = ctx.createImageData(N.w, N.h);
+  for (var i = 0; i < N.d.length; i++) { var v = Math.round(N.d[i] * 255); id.data[4 * i] = id.data[4 * i + 1] = id.data[4 * i + 2] = v; id.data[4 * i + 3] = 255; }
+  ctx.putImageData(id, 0, 0);
+  var dv = {}; duvidas().forEach(function (x) { dv[x.q] = true; });
+  ctx.lineWidth = 2.2 * s / 2;
+  for (var q = 1; q <= 100; q++) {
+    var l = estado.resp[q]; if (!l) continue;
+    var c = TPL.bubbles[q][L.indexOf(l)], o = r.off[q];
+    ctx.strokeStyle = estado.mexidas[q] ? '#2563eb' : (dv[q] ? '#d98a00' : '#1f9d55');
+    ctx.beginPath(); ctx.arc((c[0] + o[0]) * s, (c[1] + o[1]) * s, 7 * s, 0, 2 * Math.PI); ctx.stroke();
+  }
+}
+
+/* ── 5. a nota ── */
+var PASSA = ['B1', 'B2', 'C1'];
+function resultadoFinal(cl, cr) {
+  /* a tabela da própria folha: WITH HONORS = C1 nas duas; ABOVE EXPECTATIONS = C1 numa;
+     PASS = B1 ou B2 no mínimo nas duas; NO PASS = abaixo de B1 */
+  if (PASSA.indexOf(cl) < 0 || PASSA.indexOf(cr) < 0) return { rot: 'NO PASS', pass: false };
+  if (cl === 'C1' && cr === 'C1') return { rot: 'WITH HONORS', pass: true };
+  if (cl === 'C1' || cr === 'C1') return { rot: 'ABOVE EXPECTATIONS', pass: true };
+  return { rot: 'PASS', pass: true };
+}
+$('confirmar').addEventListener('click', function () {
+  if (!estado.cor) { toast('Escolha a cor do simulado.'); $('p1').scrollIntoView({ behavior: 'smooth' }); return; }
+  mostraResultado();
+  setTimeout(function () { $('p5').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
+});
+function mostraResultado() {
+  var key = GAB[estado.cor], resp = {};
+  for (var q = 1; q <= 100; q++) resp[q] = estado.resp[q] || null;
+  var sc = OMRMET.score(resp, key), fin = resultadoFinal(sc.cefrL, sc.cefrR), cor = CORES.find(function (c) { return c.id === estado.cor; });
+  /* a seção 2 da folha separa Grammar (51-70, 20 questões) de Reading (71-100, 30), nas cinco cores */
+  var gram = 0, read = 0;
+  for (q = 51; q <= 100; q++) if (resp[q] && resp[q] === key[q - 1]) { if (q <= 70) gram++; else read++; }
+  sc.grammar = gram; sc.readingSo = read;
+  estado.nota = { sc: sc, fin: fin, cor: cor };
+  var errosL = sc.erros.filter(function (q) { return q <= 50; }), errosR = sc.erros.filter(function (q) { return q > 50; });
+  function lista(qs) {
+    return qs.length ? qs.map(function (q) { return '<span>' + q + ': ' + (resp[q] || 'branco') + ' → ' + key[q - 1] + '</span>'; }).join('') : 'nenhum';
+  }
+  $('p5').hidden = false;
+  $('resultado').innerHTML =
+    '<p class="hint">' + esc(estado.aluno.nome) + ' · simulado #' + cor.n + ' ' + cor.nome + ' · ' + esc(dataBr($('dataSim').value)) + '</p>' +
+    '<div class="final ' + (fin.pass ? 'pass' : 'nopass') + '">' + (fin.pass ? '✅ ' : '❌ ') + fin.rot + ' &nbsp;·&nbsp; nota para o card: ' + notaCard(sc) + '</div>' +
+    '<div class="copie">✍️ <span>Copie esta tabela na folha do aluno, no quadro <i>SCORE</i> da frente, e marque a cor #' + cor.n + ' ' + cor.nome + ' em <i>PRACTICE TEST</i>.</span></div>' +
+    tabelaScore(sc, fin) +
+    '<div class="erros"><b>Erros no <i>Listening</i> (' + errosL.length + '):</b> ' + lista(errosL) + '</div>' +
+    '<div class="erros"><b>Erros no <i>Reading &amp; Grammar</i> (' + errosR.length + '):</b> ' + lista(errosR) + '</div>' +
+    '<p class="hint" style="margin-top:.6rem">Cada erro aparece como "questão: marcou → certa". Use para o <i>Points to Review</i> com o aluno. O aluno vê só a tabela, nunca as respostas certas.</p>';
+}
+/* o quadro SCORE da frente da folha, na mesma ordem e com os mesmos rótulos, para o professor copiar */
+function tabelaScore(sc, fin) {
+  function pct(n) { return Math.round(n / 50 * 100) + '%'; }
+  function mel(c) { return PASSA.indexOf(c) < 0 ? '(<b>x</b>) yes &nbsp;( ) no' : '( ) yes &nbsp;(<b>x</b>) no'; }
+  function niveis(c) {
+    return ['C1', 'B2', 'B1', 'A2'].map(function (n) { return '(' + (c === n ? '<b>x</b>' : '&nbsp;') + ') ' + n; }).join('<br>') + (c === 'abaixo de A2' ? '<br><b>abaixo de A2</b>' : '');
+  }
+  var cl = sc.cefrL, cr = sc.cefrR;
+  var linhas = [['WITH HONORS', 'C1 in two sections'], ['ABOVE EXPECTATIONS', 'C1 in one section'], ['PASS', 'Min. level B1 or B2 in both sections'], ['NO PASS', 'Below B1']];
+  return '<div class="score-wrap"><table class="score">' +
+    '<tr><td class="cab" colspan="7">SCORE</td></tr>' +
+    '<tr><th>Section</th><th colspan="2"># of questions</th><th>Correct answers / scores</th><th>%</th><th>CEFR</th><th>Needs improvement</th></tr>' +
+    '<tr><td class="esq"><b>1</b> Listening</td><td colspan="2">(1-50)<br>50</td><td><span class="num">' + sc.listening + '</span> / 50</td><td class="marca">' + pct(sc.listening) + '</td><td class="esq">' + niveis(cl) + '</td><td>' + mel(cl) + '</td></tr>' +
+    '<tr><td class="esq" rowspan="2"><b>2</b> Reading &amp; Grammar</td><td>Grammar<br>(51-70)</td><td rowspan="2">Grammar<br>+<br>Reading<br>(50)</td><td><span class="num">' + sc.grammar + '</span> / 20</td>' +
+      '<td class="marca" rowspan="2">' + pct(sc.reading) + '</td><td class="esq" rowspan="2">' + niveis(cr) + '</td><td rowspan="2">' + mel(cr) + '</td></tr>' +
+    '<tr><td>Reading<br>(71-100)</td><td><span class="num">' + sc.readingSo + '</span> / 30<br><small>total: <b>' + sc.reading + '</b> / 50</small></td></tr>' +
+    linhas.map(function (l, i) {
+      var eu = l[0] === fin.rot;
+      return '<tr' + (eu ? ' class="escolhido-fin' + (fin.pass ? '' : ' no') + '"' : '') + '>' + (i === 0 ? '<td class="esq" rowspan="4"><b>Final Result</b></td>' : '') +
+        '<td colspan="2" class="esq ' + (eu ? (fin.pass ? 'fin-pass' : 'fin-no') : '') + '">' + (eu ? '(<b>x</b>) ' : '( ) ') + l[0] + '</td><td colspan="2" class="esq"><small>' + l[1] + '</small></td>' +
+        '<td colspan="2" class="esq">' + (eu ? 'Section 1 = <b>' + esc(cl) + '</b> &nbsp; Section 2 = <b>' + esc(cr) + '</b>' : '<small>Section 1 = __ Section 2 = __</small>') + '</td></tr>';
+    }).join('') +
+    '</table></div>';
+}
+function notaCard(sc) { return esc(sc.cefrL.replace('abaixo de A2', '<A2') + '/' + sc.cefrR.replace('abaixo de A2', '<A2')); }
+function dataBr(iso) { var m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})$/); return m ? m[3] + '/' + m[2] + '/' + m[1] : ''; }
+$('ajustar').addEventListener('click', function () { $('p4').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+
+/* ── as corrigidas: ficam no aparelho, por dia ── */
+function chaveLote() { return 'cmet:lote:' + hoje(); }
+function lote() { try { return JSON.parse(localStorage.getItem(chaveLote()) || '[]'); } catch (e) { return []; } }
+$('proximo').addEventListener('click', function () {
+  var n = estado.nota, a = estado.aluno, resp = '', btn = $('proximo');
+  if (!n) return;
+  for (var q = 1; q <= 100; q++) resp += estado.resp[q] || '-';
+  var dataSim = $('dataSim').value;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dataSim)) { toast('Confira a data do simulado.'); $('p1').scrollIntoView({ behavior: 'smooth' }); return; }
+  btn.disabled = true; btn.textContent = '⏳ Salvando…';
+  /* grava no servidor: é daí que a tabela chega ao Portal do Aluno (met-fisico.js no backend) */
+  post({ action: 'metFisicoSalva', raf: a.raf, nome: a.nome, escola: a.escola || $('selEscola').value || '', turma: a.turma || '',
+         cor: estado.cor, data: dataSim, listening: n.sc.listening, grammar: n.sc.grammar, reading: n.sc.readingSo,
+         respostas: resp, conferidas: Object.keys(estado.mexidas).length }).then(function () {
+    var l = lote().filter(function (x) { return !(x.raf === a.raf && x.cor === estado.cor && x.data === dataSim); });   /* corrigir de novo substitui */
+    l.push({ nome: a.nome, raf: a.raf, turma: a.turma || '', escola: a.escola || '', cor: estado.cor, data: dataSim,
+             L: n.sc.listening, G: n.sc.grammar, Rd: n.sc.readingSo, R: n.sc.reading, cefrL: n.sc.cefrL, cefrR: n.sc.cefrR, final: n.fin.rot, resp: resp,
+             conferidas: Object.keys(estado.mexidas).length, em: Date.now() });
+    try { localStorage.setItem(chaveLote(), JSON.stringify(l)); } catch (e) {}
+    toast('✓ ' + a.nome.split(' ')[0] + ' salvo. O aluno já vê a tabela no Portal. Escolha o próximo.');
+    estado.aluno = null; $('escolhido').hidden = true; limpaLeitura(); liberaFoto();
+    $('filtro').value = ''; pintaLote(); pintaAlunos();
+    $('p2').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }).catch(function (e) {
+    toast('⚠️ Não salvei: ' + e.message + '. Tente de novo.');
+  }).then(function () { btn.disabled = false; btn.textContent = '➕ Salvar e corrigir o próximo aluno'; });
+});
+function pintaLote() {
+  var l = lote();
+  $('pLote').hidden = !l.length;
+  if (!l.length) return;
+  $('tabLote').innerHTML = '<tr><th>Aluno</th><th>Cor</th><th>Data</th><th>List.</th><th>R&amp;G</th><th>Nota</th><th>Resultado</th></tr>' +
+    l.map(function (x) {
+      var c = CORES.find(function (k) { return k.id === x.cor; }) || { nome: x.cor };
+      return '<tr><td>' + esc(x.nome) + '</td><td>' + esc(c.nome) + '</td><td>' + esc(dataBr(x.data)) + '</td><td>' + x.L + '</td><td>' + x.R + '</td><td>' + notaCard({ cefrL: x.cefrL, cefrR: x.cefrR }) + '</td><td>' + esc(x.final) + '</td></tr>';
+    }).join('');
+}
+$('copiarLote').addEventListener('click', function () {
+  var txt = ['Aluno\tRAF\tTurma\tSimulado\tData\tListening\tGrammar\tReading\tR&G\tCEFR L\tCEFR R&G\tResultado'].concat(lote().map(function (x) {
+    return [x.nome, x.raf, x.turma, x.cor, dataBr(x.data), x.L, x.G, x.Rd, x.R, x.cefrL, x.cefrR, x.final].join('\t');
+  })).join('\n');
+  (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function () { toast('✓ Tabela copiada. Cole numa planilha.'); })
+    .catch(function () { toast('Não consegui copiar neste aparelho.'); });
+});
+
+/* ── início ── */
+(function () {
+  try { fiskInitThemeToggle('themeToggle'); } catch (e) {}
+  try { fiskInitUserMenu(); } catch (e) {}
+  var s = sessao();
+  if (!s || !s.token) { geral('⚠️ Entre no Fisk Hub para usar o corretor. <a href="index.html" style="font-weight:800">Ir para o login →</a>', true); $('p1').hidden = $('p2').hidden = $('p3').hidden = true; return; }
+  var piloto = s.master || s.director || CORRETOR_PILOTO.some(function (p) { return norm(p) === norm(s.name); });
+  if (!piloto) { geral('🔒 O corretor está em teste com a direção. Em breve para todos.', true); $('p1').hidden = $('p2').hidden = $('p3').hidden = true; return; }
+  try { estado.cor = localStorage.getItem('cmet:cor') || ''; } catch (e) {}
+  $('dataSim').value = hoje();
+  pintaCores(); initAlunos(); pintaLote();
+  motorPronto.catch(function (e) { geral('⚠️ Não consegui carregar o corretor: ' + esc(e.message) + '. Recarregue a página.', true); });
+})();
+</script>
+</body>
+</html>
