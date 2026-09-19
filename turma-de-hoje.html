@@ -341,14 +341,17 @@
   .aula .sug1 .nm{ font-weight: 800; color: #0f1f4e; font-size: .92rem; }
   .aula .sug1.ok .nm{ text-decoration: line-through; opacity: .7; }
   .aula .sug1 .pct{ margin-left: auto; background: #fff; border-radius: 999px; padding: 0 .5rem; font-weight: 800; color: #155a48; font-size: .78rem; }
-  .aula .ck-feito{ margin-top: auto; display: flex; align-items: center; gap: .65rem; background: var(--ac, #d4e909); color: var(--acTxt, #3a3400); border-radius: 10px; padding: .5rem .7rem; }
+  /* CHECKING FEITO É VERDE (Pedro, 19/09/2026): antes o bloco pegava a cor do estágio, a mesma do botão de
+     registrar, e de longe os dois liam igual. Agora feito = verde, a fazer = o amarelo do botão. */
+  .aula .ck-feito{ margin-top: auto; display: flex; align-items: center; gap: .65rem; background: #e3f4ec; color: #14532d; border: 1.5px solid #34a06f; border-radius: 10px; padding: .5rem .7rem; }
   .aula .it + .ck-feito{ margin-top: .6rem; }
-  .aula .ck-feito .mk{ border-color: var(--acTxt, #3a3400); }
+  .aula.ck-ok .t{ background: #14532d; }   /* o cabeçalho da aula do Checking feito também fica verde */
+  .aula .ck-feito .mk{ border-color: #14532d; background: #34a06f; }
   .aula .btn-ck{ background: var(--ac, #d4e909); color: var(--acTxt, #3f4703); }
   .al-cab .livro.cor{ background: var(--tab); color: #fff; border-radius: 999px; padding: .1rem .6rem; font-weight: 800; }
   .aula .ck-feito b{ display: block; font-family: var(--font-heading); font-size: .95rem; line-height: 1.2; }
   .aula .ck-feito small{ display: block; font-size: .76rem; font-weight: 700; opacity: .85; line-height: 1.3; }
-  .btn-ck-editar{ width: 100%; margin-top: .45rem; justify-content: center; background: #fff; color: #1d3685; border: 1.5px solid #1d3685; padding: .38rem .9rem; font-size: .8rem; }
+  .btn-ck-editar{ width: 100%; margin-top: .45rem; justify-content: center; background: #f2f5f9; color: #54648d; border: 1.5px solid #c3ccdb; padding: .38rem .9rem; font-size: .8rem; box-shadow: none; }
   /* ── O QUADRO DO KEEP STUDYING (Pedro, 14/09/2026): a célula verde da
      coluna do planner completo, numa linha própria embaixo das aulas. Como
      quarta coluna ele espremia as aulas (a coluna delas não passa de 1198 px,
@@ -375,7 +378,7 @@
   .ks-mais b{ font-size: .64rem; text-transform: uppercase; letter-spacing: .06em; margin-right: .3rem; }
   .ks-mais span{ background: #fff; border-radius: 999px; padding: .05rem .5rem; font-weight: 800; color: #0f1f4e; }
   .ks-mais span i{ font-style: normal; color: #155a48; }
-  .btn-ck-editar:hover{ background: #eef2fa; }
+  .btn-ck-editar:hover{ background: #e7ecf4; color: #1d3685; border-color: #9fb0c9; }
   /* a nota do Checking é só do professor: com as anotações escondidas (tela na TV), ela borra junto */
   body.sem-obs .nota-priv{ filter: blur(5px); user-select: none; }
   /* e no planner completo por cima da turma: a nota do Checking (.pv2-priv) e a tabela das provas (Pedro, 14/09/2026: a TV mostrava) */
@@ -1515,6 +1518,7 @@ function gradeDaLicao(a, plano, etapaId, ctx, reg, ehAtual) {
          planner completo, a bolinha verde de quem marcou, e a nota, o
          critério melhor, o dia e o professor. Editar vira botão de contorno. */
       var ckFeito = !!(ckL && ckL.feito);
+      if (ckFeito) col.classList.add('ck-ok');   /* a aula inteira muda de cor quando o Checking já foi feito */
       if (ckFeito) {
         var quando = ckL.quando ? (function (d) { return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2); })(new Date(ckL.quando)) : '';
         var melhor = (CRITERIOS.find(function (c) { return c[0] === ckL.melhor; }) || [null, ''])[1].replace(/^\S+\s/, '');
