@@ -135,6 +135,14 @@
   .mk.tri.on{ background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,3 27.5,24.5 2.5,24.5' fill='%23d91e9e' stroke='%23d91e9e' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
   .legenda{ font-size: .95rem; color: var(--gray); display: flex; flex-wrap: wrap; gap: 1.1rem; padding: .5rem 0 0; align-items: center; }
   .legenda i{ display: inline-block; vertical-align: middle; margin-right: .25rem; }
+  /* MINHA AULA ENXUTA (Pedro, 19/09/2026): a legenda abre num toque; o resto da lista está no comentário do cartão */
+  .leg-det summary{ cursor: pointer; font-weight: 800; color: var(--ui); list-style: none; }
+  .leg-det summary::-webkit-details-marker{ display: none; }
+  .pl-mais{ position: relative; }
+  .pl-mais > summary{ list-style: none; cursor: pointer; height: 100%; display: flex; align-items: center; }
+  .pl-mais > summary::-webkit-details-marker{ display: none; }
+  .pl-mais-menu{ position: absolute; right: 0; top: calc(100% + 6px); z-index: 20; display: flex; flex-direction: column; gap: 6px; background: var(--white, #fff); border: 1px solid var(--ui-bd, #d6deea); border-radius: 12px; padding: 8px; box-shadow: 0 8px 22px rgba(15,31,78,.15); white-space: nowrap; }
+  .leg-det[open] .leg-itens{ display: flex; flex-wrap: wrap; gap: 1.1rem; padding-top: .4rem; }
   .aula .t .dt{ margin-left: auto; text-transform: none; letter-spacing: 0; font-size: .72rem; font-weight: 800; background: #eef2fa; color: var(--gray); border-radius: 999px; padding: .1rem .5rem; }
   .aula .t .dt.dada{ background: #e4f3f1; color: #155a48; } .aula .t .dt.falta, .aula .t .dt.tarde{ background: #fde8e8; color: #b91c1c; } .aula .t .dt.semdata{ opacity: .6; }
   .it .capa{ width: 44px; height: 28px; object-fit: cover; border-radius: 5px; flex: 0 0 44px; border: 1px solid var(--ui-line); }
@@ -424,7 +432,6 @@ body.theme-dark .pl-salvar{ background: #10261f; }
   <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
   <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
   <h1>Minha aula</h1>
-  <p>Cada aluno na lição em que está &middot; confirme o que viu e registre o <i>Checking</i></p>
 </header>
 
 <main>
@@ -442,11 +449,11 @@ body.theme-dark .pl-salvar{ background: #10261f; }
       <div id="achadosAluno" class="achados-al" hidden></div>
     </div>
     <div class="legenda" id="legenda" hidden>
-      <span><i class="mk l-a" style="width:18px;height:18px;border-width:2px"></i> o aluno marcou</span>
+      <details class="leg-det"><summary>? Legenda das marcas</summary><div class="leg-itens"><span><i class="mk l-a" style="width:18px;height:18px;border-width:2px"></i> o aluno marcou</span>
       <span><i class="mk r-prof" style="width:18px;height:18px;border-width:2px"></i> você confirmou</span>
       <span><i class="mk cheia-prof" style="width:18px;height:18px;border-width:2px"></i> o professor marcou</span>
       <span><i class="mk quad plat" style="width:18px;height:18px;border-width:2px;border-radius:5px"></i> o portal comprovou</span>
-      <span><i class="mk tri" style="width:18px;height:16px"></i> tarefa: só o aluno marca</span>
+      <span><i class="mk tri" style="width:18px;height:16px"></i> tarefa: só o aluno marca</span></div></details>
       <button type="button" class="obs-toggle" id="obsToggle">🙈 Esconder as anotações (tela na TV)</button>
     </div>
   </div>
@@ -729,7 +736,7 @@ function pintaFila() {
   if (plano && plano.ordem && plano.ordem.length) {
     var na = estado.alunos.filter(function (a) { return a._plan; }).length;
     var d = plano.data ? plano.data.split('-').reverse().join('/') : '';
-    info = '📋 <b>Ordem salva' + (plano.hoje ? ' para hoje' : ' em ' + esc(d)) + '</b>' + (plano.quem ? ' · ' + esc(plano.quem) : '') + ' · ' + na + ' de ' + estado.alunos.length + ' na ordem';
+    info = '📋 <b>Ordem salva' + (plano.hoje ? ' para hoje' : ' em ' + esc(d)) + '</b>' + ' · ' + na + ' de ' + estado.alunos.length + ' na ordem';
   } else info = '📋 <b>Sem ordem salva.</b> Os alunos estão na ordem do card.';
   if (estado.ontem) info = '<span class="rt-ontem">📅 <b>Lançando a aula de ontem (' + esc(ontemIsoTH().split('-').reverse().slice(0, 2).join('/')) + ')</b> · presença e falta vão para a célula de ontem do card, só se estiver vazia</span> · ' + info;
   if (nAt) info += ' · <b>' + nAt + ' atendido' + (nAt === 1 ? '' : 's') + '</b>';
@@ -741,8 +748,8 @@ function pintaFila() {
     '<div class="pl-acoes">' + prio.replace('class="prio-grande"', 'class="prio-grande' + (estado.prioridade ? ' on' : '') + '"') +
     (estado.plantao ? '' : '<div class="pl-salvar"><label class="rt-data">Aula de <input type="date" data-rtdata value="' + dataRoteiroPadrao() + '"></label>' +
       '<button type="button" class="rt-btn forte" data-rtsalva title="Guarda esta ordem para a aula da data escolhida">Salvar ordem</button></div>' +
-      '<div class="pl-saidas"><button type="button" class="rt-btn" data-rtcopia>📋 Copiar ordem</button>' +
-      '<button type="button" class="rt-btn" data-rtpdf title="Grava o PDF da ordem na pasta da turma">💾 Salvar PDF da ordem na pasta da turma</button></div>') +
+      '<details class="pl-saidas pl-mais"><summary class="rt-btn">⋯ Mais</summary><div class="pl-mais-menu"><button type="button" class="rt-btn" data-rtcopia>📋 Copiar ordem</button>' +
+      '<button type="button" class="rt-btn" data-rtpdf title="Grava o PDF da ordem na pasta da turma">💾 Salvar PDF na pasta da turma</button></div></details>') +
     '</div>';
   var bp = f.querySelector('[data-prio]');
   if (bp) { bp.title = 'Atraso de conteúdo primeiro (4+ aulas = alta, 1 a 3 = média); dentro da faixa, quem espera a Exploration ou o Checking; faltas desempatam; mesma lição fica junta; atendidos e faltas no fim'; bp.addEventListener('click', function () { alternaPrioridade(); }); }
@@ -1283,7 +1290,7 @@ function desenharTurma() {
   var nCk = 0;
   estado.alunos.forEach(function (a) { var cc = cartaoAluno(a); cc.dataset.raf = cc.dataset.raf || a.raf; caixa.appendChild(cc); var ck = (estado.dados[a.raf] || {}).planner; if (ck && ck.checking && Object.keys(ck.checking).some(function (k) { return ck.checking[k].feito; })) nCk++; });
   $('resumo').hidden = false;
-  $('resumo').innerHTML = '<b>' + estado.alunos.length + '</b> alunos ' + (estado.plantao ? 'no' : 'em') + ' <b>' + esc(estado.turma) + '</b> · <b>' + nCk + '</b> com algum Checking registrado';
+  $('resumo').innerHTML = '<b>' + estado.alunos.length + '</b> alunos · <b>' + nCk + '</b> com Checking';   /* a turma já está no menu de cima */
   /* o botão de prioridade mora na barra do roteiro (pintaFila), grande e numa linha só dele (16/09/2026) */
   ligaArrastar(caixa);
 }
@@ -1427,8 +1434,7 @@ function trilhaDeLicoes(a, plano, ctx, reg, ir) {
     var g = gradeDaLicao(a, plano, e.id, ctx, reg, i === ir);
     if (!g) return;
     var ps = document.createElement('div'); ps.className = 'passo-lic' + (i === ir ? ' atual' : ''); ps.dataset.i = i;
-    var rot = document.createElement('div'); rot.className = 'rot-lic'; rot.textContent = e.rot + (e.tema ? ' · ' + e.tema : '') + (i === ir ? '  📍 lição atual' : '');
-    ps.appendChild(rot); ps.appendChild(g); jan.appendChild(ps); passos.push(ps);
+    ps.appendChild(g);   /* sem rótulo: a linha das setas diz a lição que está na janela */ jan.appendChild(ps); passos.push(ps);
   });
   box.appendChild(nav); box.appendChild(jan);
   var vista = function () {
@@ -1440,7 +1446,7 @@ function trilhaDeLicoes(a, plano, ctx, reg, ir) {
     var p = vista(); if (!p) return;
     var i = +p.dataset.i, e = plano.etapas[i];
     estado.verLic = estado.verLic || {}; estado.verLic[a.raf] = e.id;
-    vendo.innerHTML = (i === ir ? 'Lição atual: ' : 'Vendo: ') + '<b>' + esc(e.rot) + '</b>' + (e.tema ? ' · ' + esc(e.tema) : '') + (i > ir ? ' <em>(à frente)</em>' : i < ir ? ' <em>(anterior)</em>' : '');
+    vendo.innerHTML = (i === ir ? 'Lição atual: ' : 'Vendo: ') + '<b>' + esc(e.rot) + '</b>' + (e.tema && e.tema !== e.rot ? ' · ' + esc(e.tema) : '') + (i > ir ? ' <em>(à frente)</em>' : i < ir ? ' <em>(anterior)</em>' : '');
     volta.hidden = i === ir;
     var k = passos.indexOf(p); sobe.disabled = k <= 0; desce.disabled = k >= passos.length - 1;
   };
@@ -1478,7 +1484,7 @@ function gradeDaLicao(a, plano, etapaId, ctx, reg, ehAtual) {
     var col = document.createElement('div'); col.className = 'aula' + ((ehAtual && au.atual) ? ' atual' : '');
     col.innerHTML = '<div class="t">Class ' + au.n + ' <b>' + esc(au.papel) + '</b>' + pilulaData(datas[ai], (ehAtual && au.atual)) + '</div>';
     var lista = document.createElement('div'); lista.className = 'lista'; col.appendChild(lista);
-    au.itens.forEach(function (it) { lista.appendChild(linhaItem(a, it)); });
+    au.itens.forEach(function (it) { if (!it.breve) lista.appendChild(linhaItem(a, it)); });   /* o Pre-Checking desligado não aparece */
     /* o Checking mora na aula em que acontece (pedido do Pedro, 13/09) */
     if (au.checking) {
       /* o Checking REALIZADO aparece na aula como estado, e não só como o
@@ -1505,7 +1511,7 @@ function gradeDaLicao(a, plano, etapaId, ctx, reg, ehAtual) {
     if (sug1) {
       var sb = document.createElement('div'); sb.className = 'sug1' + (sug1.feito ? ' ok' : '');
       sb.dataset.id = sug1.id; sb.dataset.tool = sug1.tool;
-      sb.innerHTML = '<span class="st">Extras · Suggested Practice</span><span class="nm">' + sug1.icone + ' ' + esc(sug1.nm) + '</span>' +
+      sb.innerHTML = '<span class="st">Extra</span><span class="nm">' + sug1.icone + ' ' + esc(sug1.nm) + '</span>' +
         (sug1.feito ? '<span class="pct">' + (typeof sug1.pct === 'number' ? Math.round(sug1.pct) + '%' : '✓') + '</span>' : '');
       col.appendChild(sb);
     }
@@ -1531,13 +1537,13 @@ function cartaoAluno(a) {
   if (faltouHoje(a)) card.classList.add('faltou');
   if (a.visitante) card.classList.add('visitante');
   cab.innerHTML = '<span class="mover"><button type="button" class="arrasta" aria-label="Arrastar ' + esc(a.nome) + ' para outra posição" title="Segure e arraste para mudar a ordem">⠿</button><button type="button" class="sobe" aria-label="Subir ' + esc(a.nome) + '" title="Subir uma posição">↑</button><button type="button" class="desce" aria-label="Descer ' + esc(a.nome) + '" title="Descer uma posição">↓</button></span><span class="nome">' + esc(a.nome) + '</span>' + (a.visitante ? '<span class="visita" title="Aluno trazido pela busca">' + (estado.plantao ? 'plantão' : 'de outra turma') + (a.turma ? ' · ' + esc(String(a.turma).split('\n')[0]) : '') + '</span><button type="button" class="tirar" data-tirar="' + esc(a.raf) + '">Tirar da tela</button>' : '') + '<span class="livro' + (plano ? ' cor' : '') + '">' + esc(a.book || '') + '</span>' +
-    (estado.prioridade ? '' : plan ? '<span class="pill nv-' + esc(plan.nivel || 'emdia') + '">' + (a._pos + 1) + 'º · ' + esc(nivelRot[plan.nivel] || plan.nivel || '') + '</span>' : (estado.plano ? '<span class="pill fora">fora do roteiro</span>' : '')) +
+    (estado.prioridade ? '' : plan ? '<span class="pill nv-' + esc(plan.nivel || 'emdia') + '">' + esc(nivelRot[plan.nivel] || plan.nivel || '') + '</span>' : (estado.plano ? '<span class="pill fora">fora do roteiro</span>' : '')) +
     (estado.prioridade && a._rank ? '<span class="pill prio nv-' + esc(a._prio.nivel) + '" title="' + esc(prioMotivo(a._prio)) + '">⚡ ' + a._rank + 'º · ' + esc(prioMotivo(a._prio)) + '</span>' : '') +
     avisoAtendimento(a) +
     outrosProfs(a) +
-    '<span class="pill pos">📍 ' + esc(posReal.rot) + (posReal.tema ? ' · ' + esc(posReal.tema) : '') + '</span>' +
+    (plano ? '' : '<span class="pill pos">📍 ' + esc(posReal.rot) + '</span>') +   /* com planner, a linha das setas já diz a lição */
     (atras > 0 ? '<span class="pill atras">' + atras + ' aula' + (atras === 1 ? '' : 's') + ' atrás do plano</span>' : '') +
-    (ckAtual && ckAtual.feito ? '<span class="pill chk">✓ Checking ' + esc(pos.id) + (ckAtual.nota != null ? ' · <span class="nota-priv">nota ' + esc(ckAtual.nota) + '</span>' : '') + '</span>' : '<span class="pill chk falta">Checking ' + esc(pos.id) + ' pendente</span>') +
+    (ckAtual && ckAtual.feito ? '<span class="pill chk">✓ Checking ' + esc(pos.id) + (ckAtual.nota != null ? ' · <span class="nota-priv">nota ' + esc(ckAtual.nota) + '</span>' : '') + '</span>' : '') +   /* pendente: o botão Registrar Checking já diz */
     (plano ? '' : '<span class="acoes"><button type="button" class="btn btn-ck" data-ck>' + (ckAtual && ckAtual.feito ? 'Editar Checking' : 'Registrar Checking') + '</button></span>') +
     (plano ? '<button type="button" class="pill aguia" data-aba title="O plano de curso inteiro, numa aba nova do navegador">🦅 Ver planner completo ↗</button>' : '');
   card.appendChild(cab);
@@ -1631,7 +1637,7 @@ function datasDasAulas(plano, etapaId, ctx) {
 }
 function pilulaData(d, atual) {
   var hoje = new Date(); var iso = hoje.getFullYear() + '-' + ('0' + (hoje.getMonth() + 1)).slice(-2) + '-' + ('0' + hoje.getDate()).slice(-2);
-  if (!d || !d.d) return atual ? '<span class="agora">agora</span>' : '<span class="dt semdata">sem data</span>';
+  if (!d || !d.d) return atual ? '<span class="agora">agora</span>' : '';   /* "sem data" é o normal da aula futura */
   var p = d.d.split('-'), rot = p[2] + '.' + p[1];
   if (d.d === iso) return '<span class="agora">hoje · ' + rot + '</span>';
   if (d.s === 'dada') return '<span class="dt dada">' + rot + ' · dada</span>';
@@ -1646,10 +1652,10 @@ var obsTimer = {};
 function caixaObs(a) {
   var box = document.createElement('div'); box.className = 'obs';
   var d = estado.dados[a.raf] || {}; var atual = (d.planner && d.planner.obs) || '';
-  box.innerHTML = '<label>📝 Anotações sobre ' + esc(a.nome.split(' ')[0]) + ' (só professores veem; o aluno não)</label>' +
+  box.innerHTML = '<label>📝 Anotações · só professores</label>' +
     '<textarea maxlength="600" placeholder="Ex.: aniversário na próxima aula; conversar com a família; pediu mais exercícios de listening…"></textarea>' +
     '<div class="st"></div>' +
-    '<button type="button" class="ec" disabled title="Em breve: a anotação vai para o e-counseling do aluno">➕ Adicionar ao e-counseling (em breve)</button>';
+    '';   /* o botão do e-counseling volta quando existir */
   var ta = box.querySelector('textarea'), st = box.querySelector('.st');
   ta.value = atual;
   function salvar() {
