@@ -258,9 +258,8 @@
     <h2>🏁 5. Resultado</h2>
     <div id="resultado"></div>
     <div class="btns">
-      <button type="button" class="btn grande" id="proximo">➕ Salvar e corrigir o próximo aluno</button>
+      <button type="button" class="btn grande" id="proximo">➕ Salvar, lançar no card e corrigir o próximo</button>
       <button type="button" class="btn sec" id="ajustar">✏️ Voltar e ajustar a leitura</button>
-      <button type="button" class="btn sec" disabled title="Em breve">📤 Lançar no card (em breve)</button>
     </div>
   </section>
 
@@ -689,37 +688,41 @@ $('proximo').addEventListener('click', function () {
   for (var q = 1; q <= 100; q++) resp += estado.resp[q] || '-';
   var dataSim = $('dataSim').value;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dataSim)) { toast('Confira a data do simulado.'); $('p1').scrollIntoView({ behavior: 'smooth' }); return; }
-  btn.disabled = true; btn.textContent = '⏳ Salvando…';
+  btn.disabled = true; btn.textContent = '⏳ Salvando e lançando no card…';
   /* grava no servidor: é daí que a tabela chega ao Portal do Aluno (met-fisico.js no backend) */
   post({ action: 'metFisicoSalva', raf: a.raf, nome: a.nome, escola: a.escola || $('selEscola').value || '', turma: a.turma || '',
          cor: estado.cor, data: dataSim, listening: n.sc.listening, grammar: n.sc.grammar, reading: n.sc.readingSo,
-         respostas: resp, conferidas: Object.keys(estado.mexidas).length }).then(function () {
+         respostas: resp, conferidas: Object.keys(estado.mexidas).length }).then(function (j) {
+    /* o servidor também lança a nota nas colunas TEST do card (met-fisico.js, metFisLancaCard_) */
+    var card = (j && j.card) || { ok: false, motivo: 'sem resposta do card' };
+    var cardTxt = card.ok ? 'TEST ' + card.test : '⚠️ ' + (card.motivo || 'não lançado');
     var l = lote().filter(function (x) { return !(x.raf === a.raf && x.cor === estado.cor && x.data === dataSim); });   /* corrigir de novo substitui */
     l.push({ nome: a.nome, raf: a.raf, turma: a.turma || '', escola: a.escola || '', cor: estado.cor, data: dataSim,
              L: n.sc.listening, G: n.sc.grammar, Rd: n.sc.readingSo, R: n.sc.reading, cefrL: n.sc.cefrL, cefrR: n.sc.cefrR, final: n.fin.rot, resp: resp,
-             conferidas: Object.keys(estado.mexidas).length, em: Date.now() });
+             conferidas: Object.keys(estado.mexidas).length, card: cardTxt, em: Date.now() });
     try { localStorage.setItem(chaveLote(), JSON.stringify(l)); } catch (e) {}
-    toast('✓ ' + a.nome.split(' ')[0] + ' salvo. O aluno já vê a tabela no Portal. Escolha o próximo.');
+    if (card.ok) toast('✓ ' + a.nome.split(' ')[0] + ' salvo e lançado no TEST ' + card.test + ' do card (' + (j.notaCard || '') + ').');
+    else alert('A correção de ' + a.nome + ' foi salva e o aluno já vê a tabela no Portal, mas a nota NÃO foi lançada no card:\n\n' + (card.motivo || 'motivo desconhecido') + '.\n\nLance à mão no card, se for o caso.');
     estado.aluno = null; $('escolhido').hidden = true; limpaLeitura(); liberaFoto();
     $('filtro').value = ''; pintaLote(); pintaAlunos();
     $('p2').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }).catch(function (e) {
     toast('⚠️ Não salvei: ' + e.message + '. Tente de novo.');
-  }).then(function () { btn.disabled = false; btn.textContent = '➕ Salvar e corrigir o próximo aluno'; });
+  }).then(function () { btn.disabled = false; btn.textContent = '➕ Salvar, lançar no card e corrigir o próximo'; });
 });
 function pintaLote() {
   var l = lote();
   $('pLote').hidden = !l.length;
   if (!l.length) return;
-  $('tabLote').innerHTML = '<tr><th>Aluno</th><th>Cor</th><th>Data</th><th>List.</th><th>R&amp;G</th><th>Nota</th><th>Resultado</th></tr>' +
+  $('tabLote').innerHTML = '<tr><th>Aluno</th><th>Cor</th><th>Data</th><th>List.</th><th>R&amp;G</th><th>Nota</th><th>Resultado</th><th>Card</th></tr>' +
     l.map(function (x) {
       var c = CORES.find(function (k) { return k.id === x.cor; }) || { nome: x.cor };
-      return '<tr><td>' + esc(x.nome) + '</td><td>' + esc(c.nome) + '</td><td>' + esc(dataBr(x.data)) + '</td><td>' + x.L + '</td><td>' + x.R + '</td><td>' + notaCard({ cefrL: x.cefrL, cefrR: x.cefrR }) + '</td><td>' + esc(x.final) + '</td></tr>';
+      return '<tr><td>' + esc(x.nome) + '</td><td>' + esc(c.nome) + '</td><td>' + esc(dataBr(x.data)) + '</td><td>' + x.L + '</td><td>' + x.R + '</td><td>' + notaCard({ cefrL: x.cefrL, cefrR: x.cefrR }) + '</td><td>' + esc(x.final) + '</td><td>' + esc(x.card || '') + '</td></tr>';
     }).join('');
 }
 $('copiarLote').addEventListener('click', function () {
-  var txt = ['Aluno\tRAF\tTurma\tSimulado\tData\tListening\tGrammar\tReading\tR&G\tCEFR L\tCEFR R&G\tResultado'].concat(lote().map(function (x) {
-    return [x.nome, x.raf, x.turma, x.cor, dataBr(x.data), x.L, x.G, x.Rd, x.R, x.cefrL, x.cefrR, x.final].join('\t');
+  var txt = ['Aluno\tRAF\tTurma\tSimulado\tData\tListening\tGrammar\tReading\tR&G\tCEFR L\tCEFR R&G\tResultado\tCard'].concat(lote().map(function (x) {
+    return [x.nome, x.raf, x.turma, x.cor, dataBr(x.data), x.L, x.G, x.Rd, x.R, x.cefrL, x.cefrR, x.final, x.card || ''].join('\t');
   })).join('\n');
   (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function () { toast('✓ Tabela copiada. Cole numa planilha.'); })
     .catch(function () { toast('Não consegui copiar neste aparelho.'); });
