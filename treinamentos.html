@@ -80,7 +80,19 @@
   .tn-box-head a:hover{background:#d81f26}
   .tn-close{background:none;border:none;color:#c9d2d8;font-size:22px;cursor:pointer;padding:2px 6px;line-height:1}
   .tn-close:hover{color:#fff}
-  .tn-frame{aspect-ratio:16/9;width:100%;border:none;background:#000}
+  .tn-stage{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:#000}
+  .tn-env{position:absolute;inset:0}
+  .tn-frame{width:100%;height:100%;border:none;background:#000;display:block}
+  /* NO CELULAR, O PLAYER DO DRIVE MONTADO GRANDE E REDUZIDO (19/09/2026).
+     O /preview do Drive toca por dentro num player do YouTube que, em quadro
+     estreito, troca para a cortina de toque e sai desarranjada (barra no topo,
+     botões soltos, peças cortadas). Não há como mexer nela por dentro: é outra
+     origem. Montado a 768x576 (4:3) e reduzido por transform no invólucro, ela
+     cabe inteira e o toque funciona. Mesmo conserto do Portal do Aluno
+     (portal.css, .drv-cel), testado no iPhone. Vale só para o Drive: vídeo do
+     YouTube embutido aqui já se comporta. */
+  .tn-stage.drv-cel{aspect-ratio:4/3}
+  .tn-stage.drv-cel .tn-env{inset:auto;left:0;top:0;width:768px;height:576px;transform-origin:0 0}
 
   footer{text-align:center;padding:1.4rem 1.5rem;color:#77828a;font-size:.78rem}
   footer p{margin:0 auto;max-width:720px;line-height:1.5}
@@ -149,7 +161,9 @@
         <a id="tnModalOpen" href="#" target="_blank" rel="noopener">Abrir no Drive</a>
         <button type="button" class="tn-close" id="tnModalClose" aria-label="Fechar">✕</button>
       </div>
-      <iframe class="tn-frame" id="tnFrame" allow="autoplay; fullscreen" allowfullscreen></iframe>
+      <div class="tn-stage" id="tnStage"><div class="tn-env" id="tnEnv">
+        <iframe class="tn-frame" id="tnFrame" allow="autoplay; fullscreen" allowfullscreen></iframe>
+      </div></div>
     </div>
   </div>
 
@@ -347,14 +361,26 @@ var TN_EP='https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOm
 
   /* ---- player ---- */
   const modal=document.getElementById('tnModal'), frame=document.getElementById('tnFrame');
+  const stage=document.getElementById('tnStage'), env=document.getElementById('tnEnv');
+  /* ver o comentário do .drv-cel no CSS: no celular o player do Drive é
+     montado a 768 de largura e reduzido até caber */
+  function ajustarPalco(){
+    if(!stage.classList.contains('drv-cel')) { env.style.transform=''; return; }
+    const k=stage.clientWidth/768;
+    if(k>0) env.style.transform='scale('+k+')';
+  }
+  window.addEventListener('resize', ajustarPalco);
   function openModal(item){
     const d=dataBr(item.quando);
     document.getElementById('tnModalTitle').textContent=item.titulo+(d?' · '+d:'');
     const pdf=document.getElementById('tnModalPdf');
     pdf.hidden=!item.pdf; if(item.pdf) pdf.href=item.pdf;
     document.getElementById('tnModalOpen').href=item.video;
-    frame.src=embedUrl(item.video);
+    const url=embedUrl(item.video);
+    stage.classList.toggle('drv-cel', /drive\.google\.com/.test(url) && window.innerWidth<=800);
+    frame.src=url;
     modal.classList.add('open');
+    ajustarPalco();
   }
   function closeModal(){ modal.classList.remove('open'); frame.src=''; }
   document.getElementById('tnModalClose').onclick=closeModal;
