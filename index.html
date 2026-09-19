@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04c">
   <!-- a casa do professor veste a faixa do topo (campanha de 09/2026) -->
   <link rel="stylesheet" href="assets/casa-tema.css?v=9">
-<link rel="stylesheet" href="style.css?v=2026-09-16a">
+<link rel="stylesheet" href="style.css?v=2026-09-19a">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 </head>
@@ -330,6 +330,21 @@
       <p data-i18n="card-overview-p">Atraso, faltas, notas e acessos ao Portal dos seus alunos em um só painel</p>
     </a>
 
+    <!-- ACOMPANHAMENTO DO ALUNO (19/09/2026): era a busca no topo da home; virou card quando a home ficou só com as
+         ferramentas. A página tem a busca própria (aluno.html). -->
+    <a class="card card-acomp" href="aluno.html">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="10" cy="8" r="3.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M3.5 20c0-3.6 2.9-6 6.5-6 1.4 0 2.7.4 3.7 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="17" cy="16.5" r="3" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M19.2 18.7l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2 data-i18n="card-acomp-h2">Acompanhamento do Aluno</h2>
+      <p data-i18n="card-acomp-p">Busque um aluno por nome ou RAF e veja o que ele fez na plataforma</p>
+    </a>
+
     <!-- Os aplicativos que a franqueadora publica nas lojas: qual serve a qual
          estágio, e o link para baixar nas duas plataformas. Fica ANTES dos
          cards "Em breve" porque já funciona. -->
@@ -496,6 +511,8 @@
         'card-turmahoje-p':  'Visão geral de todos os planners da turma',
         'card-corretor-h2':  'MET Practice Test Grader',
         'card-corretor-p':   'Fotografe a folha de respostas e veja a nota',
+        'card-acomp-h2':     'Acompanhamento do Aluno',
+        'card-acomp-p':      'Busque um aluno por nome ou RAF e veja o que ele fez na plataforma',
         'card-lessonplan-h2': 'Planejador da Próxima Aula',
         'card-lessonplan-p':  'Ordem de prioridade de atendimento na próxima aula',
         'card-termo-h2':   'Gerador de Termo de Atraso',
@@ -579,6 +596,8 @@
         'card-turmahoje-p':  'An overview of every planner in the class',
         'card-corretor-h2':  'MET Practice Test Grader',
         'card-corretor-p':   'Photograph the answer sheet and get the score',
+        'card-acomp-h2':     'Student Progress',
+        'card-acomp-p':      'Search a student by name or RAF and see what they did on the platform',
         'card-lessonplan-h2': 'Next Class Planner',
         'card-lessonplan-p':  'Attendance priority order for the next class',
         'card-termo-h2':   'Late Notice Generator',
@@ -662,6 +681,8 @@
         'card-turmahoje-p':  'Vista general de todos los planners del grupo',
         'card-corretor-h2':  'MET Practice Test Grader',
         'card-corretor-p':   'Fotografía la hoja de respuestas y ve la nota',
+        'card-acomp-h2':     'Seguimiento del Alumno',
+        'card-acomp-p':      'Busca un alumno por nombre o RAF y ve lo que hizo en la plataforma',
         'card-lessonplan-h2': 'Planificador de la Próxima Clase',
         'card-lessonplan-p':  'Orden de prioridad de atención para la próxima clase',
         'card-termo-h2':   'Generador de Aviso de Atraso',
@@ -1643,6 +1664,10 @@
       var API = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
       var LIM = 4, TTL = 30 * 60 * 1000;
       var sec = document.getElementById('miniDash'), box = document.getElementById('mdKpis');
+      /* HOME SÓ COM AS FERRAMENTAS (Pedro, 19/09/2026): o resumo da Visão Geral e a busca do Acompanhamento saíram
+         do topo; a Visão Geral e o Acompanhamento do Aluno são cards da grade. `true` religa o bloco. */
+      var MINIDASH_LIGADO = false;
+      if (!MINIDASH_LIGADO) { if (sec) sec.hidden = true; return; }
       var dataCache = null;
 
       function sess(){ try{ return JSON.parse(localStorage.getItem('fisk_prof')||'null'); }catch(e){ return null; } }
@@ -2084,6 +2109,10 @@
     var s = null;
     try { s = JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) {}
     if (!s || !s.token) return;
+    /* HOME SÓ COM AS FERRAMENTAS (Pedro, 19/09/2026): o painel da casa saiu do topo (aparecia vazio no acesso da
+       direção). A casa continua vestindo a faixa e no menu do professor. `true` religa o painel. */
+    var HWP_LIGADO = false;
+    if (!HWP_LIGADO) return;
     fetch(EP, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action:'hwProf', token: s.token }) })
       .then(function(r){ return r.json(); })
