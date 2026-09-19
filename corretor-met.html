@@ -2,7 +2,11 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- shrink-to-fit=no: sem ele, o navegador embutido do iPhone diminui o ZOOM da
+     página inteira quando acha que algum bloco é mais largo que a tela, e o
+     cabeçalho (que para na largura da tela) fica estreito ao lado do resto.
+     Foto do Pedro em 19/09/2026, no navegador dentro do aplicativo. -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
 <title>MET Practice Test Grader, FISK</title>
 <link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04c">
 <link rel="stylesheet" href="assets/casa-tema.css?v=9">
@@ -27,6 +31,11 @@
      ~/Claude/Projects/corretor-met/ (testes/suite.js).
      ═══════════════════════════════════════════════════════════════════════ -->
 <style>
+  /* NADA PODE ESTICAR A PÁGINA PARA O LADO. Quem precisa de mais largura (a
+     tabela SCORE, a do lote) rola dentro da própria caixa; `clip` recorta sem
+     criar área de rolagem e, ao contrário de `hidden`, não quebra o `sticky`
+     dos grupos da lista de alunos. */
+  html, body{ max-width: 100%; overflow-x: clip; }
   body{ padding-bottom: 4rem; }
   main{ max-width: 980px; margin: 0 auto; padding: 0 1rem; }
   .painel{ background: var(--white); border: 1px solid var(--surface-border-color); border-radius: var(--surface-radius); box-shadow: var(--surface-shadow); padding: 1rem 1.2rem; margin: 1.2rem 0; }
@@ -775,6 +784,27 @@ $('copiarLote').addEventListener('click', function () {
   pintaCores(); initAlunos(); pintaLote();
   motorPronto.catch(function (e) { geral('⚠️ Não consegui carregar o corretor: ' + esc(e.message) + '. Recarregue a página.', true); });
 })();
+</script>
+<!-- MEDIDOR (só com ?diag=1 no endereço): diz a largura real da página no
+     aparelho e quais blocos passam da tela. Não roda para ninguém sem a flag. -->
+<script>
+if (/[?&]diag=1/.test(location.search)) {
+  setTimeout(function () {
+    var vv = window.visualViewport || {}, de = document.documentElement;
+    var largos = [].slice.call(document.querySelectorAll('*')).map(function (e) {
+      var r = e.getBoundingClientRect(), cs = getComputedStyle(e);
+      return { q: e.tagName + (e.id ? '#' + e.id : '') + (typeof e.className === 'string' && e.className ? '.' + e.className.split(' ')[0] : ''),
+               dir: Math.round(r.right), larg: Math.round(r.width), pos: cs.position, none: cs.display === 'none' };
+    }).filter(function (x) { return !x.none && x.dir > de.clientWidth + 1; })
+      .sort(function (a, b) { return b.dir - a.dir; }).slice(0, 6);
+    var cx = document.createElement('div');
+    cx.style.cssText = 'position:fixed;inset:auto 0 0 0;z-index:99999;background:#111;color:#0f0;font:11px ui-monospace,monospace;padding:8px;white-space:pre-wrap;max-height:45vh;overflow:auto';
+    cx.textContent = 'tela ' + innerWidth + ' · clientWidth ' + de.clientWidth + ' · scrollWidth ' + de.scrollWidth +
+      '\nzoom ' + (vv.scale || '?') + ' · visual ' + Math.round(vv.width || 0) +
+      '\n' + (largos.length ? largos.map(function (x) { return x.q + ' larg ' + x.larg + ' dir ' + x.dir + ' (' + x.pos + ')'; }).join('\n') : 'nenhum bloco passa da tela');
+    document.body.appendChild(cx);
+  }, 1500);
+}
 </script>
 </body>
 </html>
