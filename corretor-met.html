@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Corretor do simulado MET, FISK</title>
+<title>MET Practice Test Grader, FISK</title>
 <link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04c">
 <link rel="stylesheet" href="assets/casa-tema.css?v=9">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
@@ -108,6 +108,13 @@
   .gq.rev{ background: #fff1d6; }
   .gq.mexida .n::after{ content: '✎'; color: var(--ui-mid); margin-left: 2px; }
   .folha-wrap{ margin-top: .6rem; }
+  .legenda-folha{ display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; font-size: .86rem; margin-bottom: .5rem; }
+  .legenda-folha span{ display: inline-flex; align-items: center; gap: .4rem; }
+  .legenda-folha .lg{ display: inline-block; width: 16px; height: 16px; border-radius: 50%; border: 3px solid; }
+  .legenda-folha .lg.verde{ border-color: #1f9d55; }
+  .legenda-folha .lg.azul{ border-color: #2563eb; }
+  .legenda-folha .lg.laranja{ border-color: #d98a00; }
+  .legenda-folha .lg.amarelo{ width: 26px; border-radius: 3px; border: 1.5px solid #d9a400; background: rgba(250, 204, 21, .45); }
   .folha-wrap canvas{ width: 100%; height: auto; border: 1px solid var(--surface-border-color); border-radius: 8px; }
 
   /* 5. o resultado */
@@ -162,7 +169,7 @@
   <a class="back-link" href="index.html">&larr; Voltar ao Hub</a>
   <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
   <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
-  <h1>Corretor do simulado MET</h1>
+  <h1>MET Practice Test Grader</h1>
   <p>Fotografe o verso da folha de respostas &middot; confira a leitura &middot; veja a nota</p>
 </header>
 
@@ -231,7 +238,15 @@
     <div class="btns">
       <button type="button" class="btn sec" id="verFolha">🗺️ Ver a folha endireitada</button>
     </div>
-    <div class="folha-wrap" id="folhaWrap" hidden><canvas id="folhaCanvas"></canvas></div>
+    <div class="folha-wrap" id="folhaWrap" hidden>
+      <div class="legenda-folha">
+        <span><i class="lg verde"></i> verde: cruzamento validado pela plataforma</span>
+        <span><i class="lg azul"></i> azul: opção validada pelo professor</span>
+        <span><i class="lg amarelo"></i> amarelo: questão em branco validada pelo professor</span>
+        <span><i class="lg laranja"></i> laranja: dúvida que ainda falta conferir</span>
+      </div>
+      <canvas id="folhaCanvas"></canvas>
+    </div>
     <div class="btns">
       <button type="button" class="btn grande" id="confirmar">✅ Confirmar leitura e corrigir</button>
     </div>
@@ -418,7 +433,7 @@ $('listaAlunos').addEventListener('click', function (ev) {
         var lista = r.alunos || [];
         box._lista = lista;
         box.innerHTML = lista.length ? lista.map(function (a, i) {
-          return '<button type="button" data-i="' + i + '"><b>' + esc(a.name) + '</b><small>' + esc(a.raf) + ' · ' + esc(a.book || 'sem livro') + (a.turma ? ' · ' + esc(a.turma) : '') + '</small></button>';
+          return '<button type="button" data-i="' + i + '"><b>' + esc(a.name) + '</b><small>' + esc(a.raf) + ' · ' + esc(a.book || 'sem livro') + (a.turma ? ' · ' + esc(a.turma) : '') + (a.prof ? ' · prof. ' + esc(a.prof) : (a.escola ? ' · ' + esc(a.escola) : '')) + '</small></button>';
         }).join('') : '<div class="vazio">Nenhum aluno com esse nome ou RAF.</div>';
       }).catch(function (e) { if (q.value.trim() === termo) box.innerHTML = '<div class="vazio">⚠️ ' + esc(e.message) + '</div>'; });
     }, 300);
@@ -427,7 +442,7 @@ $('listaAlunos').addEventListener('click', function (ev) {
     var b = ev.target.closest('button[data-i]'); if (!b) return;
     var a = box._lista[+b.dataset.i];
     box.hidden = true; q.value = '';
-    escolheAluno({ nome: a.name, raf: a.raf, turma: a.turma, book: a.book, escola: $('selEscola').value, prof: '' }, true);
+    escolheAluno({ nome: a.name, raf: a.raf, turma: a.turma, book: a.book, escola: a.escola || $('selEscola').value, prof: a.prof || '' }, true);
   });
   q.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') box.hidden = true; });
   document.addEventListener('click', function (ev) { if (!ev.target.closest('.busca')) box.hidden = true; });
@@ -436,7 +451,7 @@ function escolheAluno(a, deFora) {
   estado.aluno = a; estado.aluno.deFora = deFora;
   $('escolhido').hidden = false;
   $('escolhido').innerHTML = '✍️ Corrigindo <b>' + esc(a.nome) + '</b><span class="pill">' + esc(a.turma || 'sem turma') + '</span>' +
-    (deFora ? '<span class="pill outro">de outra turma</span>' : '') +
+    (deFora ? '<span class="pill outro">' + (a.prof ? 'turma de ' + esc(a.prof) : 'de outra turma') + '</span>' : '') +
     '<button type="button" class="btn sec trocar" id="trocarAluno">Trocar</button>';
   $('trocarAluno').onclick = function () { estado.aluno = null; $('escolhido').hidden = true; liberaFoto(); $('p2').scrollIntoView({ behavior: 'smooth' }); };
   limpaLeitura();
@@ -581,7 +596,16 @@ function desenhaFolha() {
   var dv = {}; duvidas().forEach(function (x) { dv[x.q] = true; });
   ctx.lineWidth = 2.2 * s / 2;
   for (var q = 1; q <= 100; q++) {
-    var l = estado.resp[q]; if (!l) continue;
+    var l = estado.resp[q];
+    /* o professor decidiu "em branco" (questão zerada): um retângulo amarelo sobre as quatro letras (pedido do Pedro, 19/09/2026) */
+    if (!l && estado.mexidas[q]) {
+      var b0 = TPL.bubbles[q][0], b3 = TPL.bubbles[q][3], ob = r.off[q];
+      ctx.fillStyle = 'rgba(250, 204, 21, .45)'; ctx.strokeStyle = '#d9a400';
+      var rx = (b0[0] - 7 + ob[0]) * s, ry = (b0[1] - 7 + ob[1]) * s, rw = (b3[0] - b0[0] + 14) * s, rh = 14 * s;
+      ctx.fillRect(rx, ry, rw, rh); ctx.strokeRect(rx, ry, rw, rh);
+      continue;
+    }
+    if (!l) continue;
     var c = TPL.bubbles[q][L.indexOf(l)], o = r.off[q];
     ctx.strokeStyle = estado.mexidas[q] ? '#2563eb' : (dv[q] ? '#d98a00' : '#1f9d55');
     ctx.beginPath(); ctx.arc((c[0] + o[0]) * s, (c[1] + o[1]) * s, 7 * s, 0, 2 * Math.PI); ctx.stroke();
