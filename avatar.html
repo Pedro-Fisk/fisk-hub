@@ -108,6 +108,9 @@
     ehFamilia: function(){ return false; },
     ehKids: function(){ return false; },
     base: 'https://portalfisk.com.br/',
+    /* a vitrine dos professores (18/09/2026): enquanto não entram três, a
+       direção vê uma prévia com colegas inventados (avisada na tela) */
+    vitrineDeMentira: !!sessao.master,
     get student(){ return { raf: 'PROF:' + nome, name: nome, book: '', master: false, prof: true, profToken: sessao.token }; }
   });
   av.openAvatar();
