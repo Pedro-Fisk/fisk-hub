@@ -1424,7 +1424,7 @@ function trilhaDeLicoes(a, plano, ctx, reg, ir) {
   var jan = document.createElement('div'); jan.className = 'janela-lic'; jan.tabIndex = 0; jan.setAttribute('aria-label', 'Lições de ' + a.nome + ', role para ver as outras');
   var passos = [];
   plano.etapas.forEach(function (e, i) {
-    var g = gradeDaLicao(a, plano, e.id, ctx, reg);
+    var g = gradeDaLicao(a, plano, e.id, ctx, reg, i === ir);
     if (!g) return;
     var ps = document.createElement('div'); ps.className = 'passo-lic' + (i === ir ? ' atual' : ''); ps.dataset.i = i;
     var rot = document.createElement('div'); rot.className = 'rot-lic'; rot.textContent = e.rot + (e.tema ? ' · ' + e.tema : '') + (i === ir ? '  📍 lição atual' : '');
@@ -1465,17 +1465,18 @@ function trilhaDeLicoes(a, plano, ctx, reg, ir) {
 }
 /* as três aulas de UMA lição (a grade), para qualquer lição do livro: a Minha aula empilha várias numa
    janela que rola na vertical, como o carrossel do aluno (Pedro, 19/09/2026) */
-function gradeDaLicao(a, plano, etapaId, ctx, reg) {
+function gradeDaLicao(a, plano, etapaId, ctx, reg, ehAtual) {
   var est = PlannerV2.estadoEtapa(plano, etapaId, ctx);
   if (!est) return null;
   var ckL = reg[etapaId];
+  /* "agora" e o contorno da aula atual só na lição em que o aluno está: nas outras, o estadoEtapa também marca uma */
   var grade = document.createElement('div'); grade.className = 'aulas';
   var datas = datasDasAulas(plano, etapaId, ctx);
   var ksTudo = PlannerV2.keepStudying ? PlannerV2.keepStudying(plano, etapaId, ctx, { hist: (estado.dados[a.raf] || {}).hist, recuo: 21 }) : null;
   var ksSug = ksTudo && ksTudo.sugeridos;
   est.aulas.forEach(function (au, ai) {
-    var col = document.createElement('div'); col.className = 'aula' + (au.atual ? ' atual' : '');
-    col.innerHTML = '<div class="t">Class ' + au.n + ' <b>' + esc(au.papel) + '</b>' + pilulaData(datas[ai], au.atual) + '</div>';
+    var col = document.createElement('div'); col.className = 'aula' + ((ehAtual && au.atual) ? ' atual' : '');
+    col.innerHTML = '<div class="t">Class ' + au.n + ' <b>' + esc(au.papel) + '</b>' + pilulaData(datas[ai], (ehAtual && au.atual)) + '</div>';
     var lista = document.createElement('div'); lista.className = 'lista'; col.appendChild(lista);
     au.itens.forEach(function (it) { lista.appendChild(linhaItem(a, it)); });
     /* o Checking mora na aula em que acontece (pedido do Pedro, 13/09) */
