@@ -267,6 +267,16 @@
   body.theme-dark .obs{ background: #26301a; border-color: #2e4560; }
   body.theme-dark .obs textarea{ background: #101a28; color: #dbe6f3; border-color: #4a5a3a; }
   @media (max-width: 760px){ .al-corpo{ grid-template-columns: 1fr; } .obs{ border-left: 0; border-top: 1px solid var(--ui-line); } }
+  /* A INTERNET DA SALA (19/09/2026): marca feita sem rede não se perde. Ela fica na fila do aparelho, o aviso
+     amarelo diz quantas estão esperando, e o envio tenta sozinho quando a rede volta. */
+  /* AJUDA NA PRÓPRIA TELA (19/09/2026): um "?" ao lado do bloco, com duas linhas. O guia em PDF ninguém abre no meio da aula. */
+  .dica{ border: 1.5px solid var(--ui-bd, #d6deea); background: var(--white, #fff); color: var(--ui, #1d3685); width: 20px; height: 20px; border-radius: 50%; font: 800 .72rem/1 var(--font-body); cursor: pointer; padding: 0; flex: 0 0 auto; }
+  .dica:hover{ border-color: var(--ui, #1d3685); }
+  .dica-tx{ background: #eef4ff; border: 1.5px solid #cddcf5; border-radius: 10px; padding: .5rem .8rem; font-size: .85rem; font-weight: 600; color: #1f2d57; margin: .4rem 0; max-width: 62ch; }
+  body.theme-dark .dica-tx{ background: #16233a; border-color: #2e4560; color: #dbe6f3; }
+  .fila-off[hidden]{ display: none; }   /* o display:flex abaixo ganharia do hidden */
+  .fila-off{ max-width: 1500px; margin: 0 auto .6rem; background: #fff4d6; border: 1.5px solid #e5b62b; color: #4a3a10; border-radius: 12px; padding: .6rem .9rem; font-weight: 800; display: flex; gap: .8rem; align-items: center; flex-wrap: wrap; }
+  .fila-off button{ border: 1.5px solid #b8890f; background: #fff; color: #6b4d0f; border-radius: 999px; padding: .35rem .9rem; font: inherit; font-size: .85rem; cursor: pointer; }
   .toast{ position: fixed; left: 50%; bottom: 1.4rem; transform: translateX(-50%); background: #1d3685; color: #fff; padding: .7rem 1.1rem; border-radius: 999px; font-weight: 800; font-size: .9rem; box-shadow: 0 8px 24px rgba(0,0,0,.25); z-index: 150; }
   /* o planner completo abre POR CIMA da turma, com os dados que ela já tem
      (Pedro, 14/09/2026): acima do menu do professor (60), abaixo do aviso
@@ -457,6 +467,7 @@ body.theme-dark .pl-salvar{ background: #10261f; }
       <button type="button" class="obs-toggle" id="obsToggle">🙈 Esconder as anotações (tela na TV)</button>
     </div>
   </div>
+  <div id="fila-off" class="fila-off" hidden></div>
   <div id="resumo" class="resumo" style="max-width:1500px;margin:0 auto .6rem" hidden></div>
   <div id="fila" class="fila-info" hidden></div>
   <div id="alunos"></div>
@@ -751,6 +762,8 @@ function pintaFila() {
       '<details class="pl-saidas pl-mais"><summary class="rt-btn">⋯ Mais</summary><div class="pl-mais-menu"><button type="button" class="rt-btn" data-rtcopia>📋 Copiar ordem</button>' +
       '<button type="button" class="rt-btn" data-rtpdf title="Grava o PDF da ordem na pasta da turma">💾 Salvar PDF na pasta da turma</button></div></details>') +
     '</div>';
+  var topo = f.querySelector('.pl-topo');
+  if (topo) topo.insertAdjacentElement('afterend', poeDica(topo, 'O Planejador decide a ORDEM dos alunos nesta tela: por prioridade, ou a que você arrastar. "Salvar ordem" guarda essa fila para a aula do dia.'));
   var bp = f.querySelector('[data-prio]');
   if (bp) { bp.title = 'Atraso de conteúdo primeiro (4+ aulas = alta, 1 a 3 = média); dentro da faixa, quem espera a Exploration ou o Checking; faltas desempatam; mesma lição fica junta; atendidos e faltas no fim'; bp.addEventListener('click', function () { alternaPrioridade(); }); }
   f.querySelector('[data-recarrega]').addEventListener('click', function () { recarregarFila(this); });
@@ -945,6 +958,15 @@ function post(body) {
   if (body.action === 'plannerFalta' && !body.quem) body.quem = (sessao() || {}).name || estado.prof || '';   /* plantão não é aula: o card não muda (Pedro, 16/09/2026) */
   return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
     .then(fiskJson).then(function (j) { if (!j || j.ok === false) throw new Error((j && (j.erro || j.error)) || 'Não consegui.'); return j; });
+}
+/* o "?" e o texto que ele abre: o texto nasce escondido e aparece só quando alguém pergunta */
+function poeDica(onde, texto) {
+  var b = document.createElement('button'); b.type = 'button'; b.className = 'dica'; b.textContent = '?';
+  b.setAttribute('aria-label', 'O que é isto'); b.title = texto;
+  var tx = document.createElement('div'); tx.className = 'dica-tx'; tx.textContent = texto; tx.hidden = true;
+  b.addEventListener('click', function (ev) { ev.preventDefault(); ev.stopPropagation(); tx.hidden = !tx.hidden; });
+  onde.appendChild(b);
+  return tx;
 }
 function toast(msg) { var t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 3200); }
 function esc(s) { return fiskEsc(String(s == null ? '' : s)); }
@@ -1428,6 +1450,7 @@ function trilhaDeLicoes(a, plano, ctx, reg, ir) {
   var vendo = document.createElement('span'); vendo.className = 'vendo';
   var volta = document.createElement('button'); volta.type = 'button'; volta.className = 'btn-nav volta'; volta.textContent = '📍 Voltar à atual'; volta.hidden = true;
   nav.appendChild(setas); nav.appendChild(vendo); nav.appendChild(volta);
+  nav.appendChild(poeDica(nav, 'As setas mostram outra lição do livro: dá para explicar e marcar a lição seguinte sem esperar o card mudar. Para o aluno nada fica bloqueado por aqui.'));
   var jan = document.createElement('div'); jan.className = 'janela-lic'; jan.tabIndex = 0; jan.setAttribute('aria-label', 'Lições de ' + a.nome + ', role para ver as outras');
   var passos = [];
   plano.etapas.forEach(function (e, i) {
@@ -1503,6 +1526,7 @@ function gradeDaLicao(a, plano, etapaId, ctx, reg, ehAtual) {
       var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'btn ' + (ckFeito ? 'btn-ck-editar' : 'btn-ck'); bt.dataset.ck = etapaId;
       bt.textContent = ckFeito ? 'Editar Checking' : 'Registrar Checking';
       lista.appendChild(bt);
+      if (ehAtual) lista.appendChild(poeDica(lista, 'O Checking é a conversa do fim da lição: você marca em que o aluno foi melhor, o que ele precisa melhorar e deixa pedidos. Registrar libera a próxima lição no portal dele e paga F$ 250.'));
       var prox = plano.etapas[plano.etapas.indexOf(plano.etapas.find(function (e) { return e.id === etapaId; })) + 1];
       if (prox) { var lb = document.createElement('p'); lb.className = 'libera'; lb.textContent = (ckL && ckL.feito ? 'Checking registrado: ' + prox.rot + ' liberada para o aluno.' : 'Ao registrar, a ' + prox.rot + ' é liberada para o aluno.'); lista.appendChild(lb); }
     }
@@ -1722,6 +1746,50 @@ function aplicaPendentes(raf, planner) {
 /* OTIMISTA (pedido do Pedro, 13/09): a bolinha muda na hora, e o servidor
    confirma por trás. Se o servidor recusar ou demorar mais de 25 s, a marca
    volta e o professor é avisado. Toques seguidos no mesmo item vão em fila. */
+/* ── a fila de quando a internet cai ──────────────────────────────────────
+   Antes, marca que não salvou voltava atrás e o professor tinha que tocar de
+   novo depois da aula. Agora, quando o erro é de REDE (e só nesse caso), a
+   marca fica na tela e o pedido espera no aparelho. A fila é enviada quando a
+   rede volta, a cada 20 s e ao abrir a página. Erro do servidor continua
+   desfazendo a marca: ali o problema não é esperar. */
+var FILA_K = 'th:fila:v1';
+function filaLe() { try { return JSON.parse(localStorage.getItem(FILA_K) || '[]'); } catch (e) { return []; } }
+function filaGrava(f) { try { localStorage.setItem(FILA_K, JSON.stringify(f.slice(-300))); } catch (e) {} pintaFilaOff(); }
+function ehDeRede(e) {
+  if (!navigator.onLine) return true;
+  var m = String((e && e.message) || e || '');
+  return /failed to fetch|load failed|networkerror|network request|demorou demais|conexão|connection/i.test(m);
+}
+function filaEnfileira(item) { var f = filaLe(); f.push(item); filaGrava(f); }
+function pintaFilaOff() {
+  var el = $('fila-off'); if (!el) return;
+  var f = filaLe();
+  if (!f.length) { el.hidden = true; el.innerHTML = ''; return; }
+  el.hidden = false;
+  el.innerHTML = '<span>⏳ ' + f.length + ' marca' + (f.length === 1 ? '' : 's') + ' esperando a internet. Elas estão guardadas neste aparelho e vão sozinhas quando a rede voltar.</span>' +
+    '<button type="button" data-fila-agora>Tentar agora</button>';
+  el.querySelector('[data-fila-agora]').addEventListener('click', function () { filaDrena(true); });
+}
+var filaEnviando = false;
+function filaDrena(avisar) {
+  if (filaEnviando) return;
+  var f = filaLe(); if (!f.length) return;
+  filaEnviando = true;
+  var item = f[0];
+  post({ action: 'plannerProf', raf: item.raf, book: item.book, patch: item.patch }).then(function () {
+    var g = filaLe(); g.shift(); filaGrava(g);
+    filaEnviando = false;
+    if (g.length) filaDrena(avisar); else toast('✓ Marcas guardadas enviadas.');
+  }).catch(function (e) {
+    filaEnviando = false;
+    if (!ehDeRede(e)) { var g = filaLe(); g.shift(); filaGrava(g); toast('⚠️ Uma marca guardada não foi aceita: ' + e.message); }
+    else if (avisar) toast('⚠️ Ainda sem internet. As marcas continuam guardadas.');
+  });
+}
+window.addEventListener('online', function () { filaDrena(false); });
+setInterval(function () { if (filaLe().length) filaDrena(false); }, 20000);
+document.addEventListener('DOMContentLoaded', function () { pintaFilaOff(); setTimeout(function () { filaDrena(false); }, 1500); });
+
 function confirmar(a, id, marca) {
   var d = estado.dados[a.raf] = estado.dados[a.raf] || { planner: { itens: {}, checking: {} } };
   d.planner = d.planner || { itens: {}, checking: {} }; d.planner.itens = d.planner.itens || {};
@@ -1748,6 +1816,11 @@ function confirmar(a, id, marca) {
   }).catch(function (e) {
     if (pendentes[a.raf] && pendentes[a.raf][id] === marca) delete pendentes[a.raf][id];
     console.error('plannerProf falhou', id, e);
+    if (ehDeRede(e)) {   /* rede caiu: a marca fica na tela e o pedido espera no aparelho */
+      filaEnfileira({ raf: a.raf, book: a.book, patch: patch, quando: Date.now() });
+      toast('📴 Sem internet: guardei a marca e envio quando a rede voltar.');
+      return;
+    }
     var v = JSON.parse(antes); if (v) estado.dados[a.raf].planner.itens[id] = v; else delete estado.dados[a.raf].planner.itens[id];
     redesenhar(a);
     toast('⚠️ Não salvou (' + e.message + '). A marca voltou; tente de novo.');

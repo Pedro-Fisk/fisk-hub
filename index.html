@@ -74,6 +74,10 @@
     body.theme-dark .prof-actas{background:#2a1b45;border-color:#7C3AED;color:#d7c4fb;}
     /* o subtexto da Minha aula em branco, sobre o azul (Pedro, 17/09/2026) */
   .card.card-turmahoje p{ color:#fff; opacity:.92 }
+  .mais-usadas{ max-width:1180px; margin:0 auto .9rem; display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; padding:0 1rem; }
+  .mais-usadas .mu-rot{ font-weight:800; font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ui, #1d3685); opacity:.75; }
+  .mais-usadas .mu-chip{ border:1.5px solid var(--ui-bd, #d6deea); background:var(--white, #fff); color:var(--ui, #1d3685); border-radius:999px; padding:.4rem .9rem; font-weight:800; font-size:.86rem; text-decoration:none; }
+  .mais-usadas .mu-chip:hover{ border-color:var(--ui, #1d3685); }
 </style>
 
   <div id="profGate">
@@ -161,6 +165,9 @@
     <div class="hwp-taca" id="hwpTaca" hidden></div>
   </section>
 
+  <!-- MAIS USADAS (19/09/2026): a home tem muita ferramenta e o professor usa quatro ou cinco por dia. A faixa é
+       montada pelo próprio aparelho, contando os cliques nos cards; nada sai daqui e nada é escondido da grade. -->
+  <nav id="maisUsadas" class="mais-usadas" hidden aria-label="Suas ferramentas mais usadas"></nav>
   <main class="grid">
     <!-- POLÍTICA DE ABAS (31/07/2026): ferramenta do ecossistema abre na MESMA
          aba, para o botão de voltar dela funcionar como navegação de verdade;
@@ -2147,5 +2154,36 @@
     }
   })();
   </script>
+<script>
+/* conta os cliques nos cards neste aparelho e mostra os quatro mais usados no topo */
+(function () {
+  var K = 'hub:uso:v1', BOX = document.getElementById('maisUsadas');
+  function le() { try { return JSON.parse(localStorage.getItem(K) || '{}'); } catch (e) { return {}; } }
+  function grava(u) { try { localStorage.setItem(K, JSON.stringify(u)); } catch (e) {} }
+  document.addEventListener('click', function (ev) {
+    var c = ev.target.closest && ev.target.closest('main.grid a.card');
+    if (!c) return;
+    var h = c.getAttribute('href'), t = (c.querySelector('h2') || {}).textContent;
+    if (!h || !t) return;
+    var u = le(); u[h] = { n: ((u[h] || {}).n || 0) + 1, t: t.trim(), q: Date.now() }; grava(u);
+  });
+  function pinta() {
+    if (!BOX) return;
+    var u = le();
+    var lista = Object.keys(u).map(function (h) { return { h: h, n: u[h].n || 0, t: u[h].t, q: u[h].q || 0 }; })
+      .filter(function (x) { return x.n >= 2 && x.t; })
+      .sort(function (a, b) { return b.n - a.n || b.q - a.q; }).slice(0, 4);
+    if (lista.length < 2) { BOX.hidden = true; return; }   /* com uma só não vale a faixa */
+    BOX.hidden = false;
+    BOX.innerHTML = '<span class="mu-rot">Você mais usa</span>' + lista.map(function (x) {
+      var vivo = document.querySelector('main.grid a.card[href="' + x.h.replace(/"/g, '\\"') + '"]');
+      if (!vivo || vivo.offsetParent === null) return '';   /* card escondido para este professor não entra */
+      return '<a class="mu-chip" href="' + x.h + '">' + x.t.replace(/[<>&]/g, '') + '</a>';
+    }).join('');
+    if (!BOX.querySelector('.mu-chip')) BOX.hidden = true;
+  }
+  setTimeout(pinta, 400);   /* depois de a sessão decidir quais cards aparecem */
+})();
+</script>
 </body>
 </html>
