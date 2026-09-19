@@ -91,7 +91,10 @@
   .aula{ border: 1px solid var(--ui-line); border-radius: 12px; padding: .55rem .65rem; background: #f8fafc; }
   .aula.atual{ border: 2px solid var(--ui); background: var(--white); }
   .nav-lic{ display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; padding: 0 1rem .5rem; }
-  .nav-lic.baixo{ justify-content: center; padding-top: 0; }
+  .nav-lic .setas{ display: inline-flex; gap: 8px; }
+  .btn-seta{ width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--mar, #1d3685); background: var(--white); color: var(--mar, #1d3685); font-size: 18px; font-weight: 900; cursor: pointer; font-family: inherit; }
+  .btn-seta:disabled{ opacity: .3; cursor: default; }
+  .btn-seta:focus-visible{ outline: 3px solid var(--ui); outline-offset: 2px; }
   .nav-lic .vendo{ flex: 1 1 auto; font-size: .92rem; }
   .nav-lic .vendo em{ font-style: normal; color: var(--ui); font-weight: 700; }
   .btn-nav{ border: 2px solid var(--mar, #1d3685); background: var(--white); color: var(--mar, #1d3685); border-radius: 999px; padding: .3rem .8rem; font: inherit; font-weight: 800; font-size: .88rem; cursor: pointer; }
@@ -1398,22 +1401,23 @@ function outrosProfs(a) {
   var dd = function (t) { var d = new Date(t); return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2); };
   return '<span class="pill outro-prof" title="Marcas feitas por outro professor nos últimos 30 dias">👥 aula com ' + lista.slice(0, 2).map(function (x) { return esc(x.nome) + ' em ' + dd(x.t); }).join(' · ') + '</span>';
 }
-/* as setas das lições, NA VERTICAL como o carrossel do aluno (Pedro, 19/09/2026): ▲ a anterior em cima das aulas,
-   ▼ a próxima embaixo; no topo, a lição vista e "voltar à atual" quando saiu dela */
-function navLicoes(a, plano, iv, ir, onde) {
-  var nav = document.createElement('div'); nav.className = 'nav-lic ' + onde;
-  var ev = plano.etapas[iv], alvo = plano.etapas[iv + (onde === 'cima' ? -1 : 1)];
-  var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'btn-nav';
-  bt.textContent = (onde === 'cima' ? '▲ ' : '▼ ') + (alvo ? alvo.rot : (onde === 'cima' ? 'início do livro' : 'fim do livro')); bt.disabled = !alvo;
-  bt.setAttribute('aria-label', alvo ? 'Ver ' + alvo.rot : 'Não há mais lições');
-  bt.addEventListener('click', function () { estado.verDesloc = estado.verDesloc || {}; estado.verDesloc[a.raf] = iv + (onde === 'cima' ? -1 : 1) - ir; redesenhar(a); });
-  nav.appendChild(bt);
-  if (onde === 'cima') {
-    var meio = document.createElement('span'); meio.className = 'vendo';
-    meio.innerHTML = (iv === ir ? 'Lição atual: ' : 'Vendo: ') + '<b>' + esc(ev.rot) + '</b>' + (ev.tema ? ' · ' + esc(ev.tema) : '') + (iv > ir ? ' <em>(à frente)</em>' : iv < ir ? ' <em>(anterior)</em>' : '');
-    nav.appendChild(meio);
-    if (iv !== ir) { var bv = document.createElement('button'); bv.type = 'button'; bv.className = 'btn-nav volta'; bv.textContent = '📍 Voltar à atual'; bv.addEventListener('click', function () { estado.verDesloc[a.raf] = 0; redesenhar(a); }); nav.appendChild(bv); }
-  }
+/* as setas das lições, ▲ e ▼ lado a lado como no carrossel do aluno (Pedro, 19/09/2026), com a lição vista
+   ao lado e "voltar à atual" quando saiu dela */
+function navLicoes(a, plano, iv, ir) {
+  var nav = document.createElement('div'); nav.className = 'nav-lic';
+  var ev = plano.etapas[iv], setas = document.createElement('span'); setas.className = 'setas';
+  [[-1, '▲'], [1, '▼']].forEach(function (d) {
+    var alvo = plano.etapas[iv + d[0]];
+    var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'btn-seta'; bt.textContent = d[1]; bt.disabled = !alvo;
+    bt.title = alvo ? alvo.rot : 'Não há mais lições'; bt.setAttribute('aria-label', alvo ? 'Ver ' + alvo.rot : 'Não há mais lições');
+    bt.addEventListener('click', function () { estado.verDesloc = estado.verDesloc || {}; estado.verDesloc[a.raf] = iv + d[0] - ir; redesenhar(a); });
+    setas.appendChild(bt);
+  });
+  nav.appendChild(setas);
+  var meio = document.createElement('span'); meio.className = 'vendo';
+  meio.innerHTML = (iv === ir ? 'Lição atual: ' : 'Vendo: ') + '<b>' + esc(ev.rot) + '</b>' + (ev.tema ? ' · ' + esc(ev.tema) : '') + (iv > ir ? ' <em>(à frente)</em>' : iv < ir ? ' <em>(anterior)</em>' : '');
+  nav.appendChild(meio);
+  if (iv !== ir) { var bv = document.createElement('button'); bv.type = 'button'; bv.className = 'btn-nav volta'; bv.textContent = '📍 Voltar à atual'; bv.addEventListener('click', function () { estado.verDesloc[a.raf] = 0; redesenhar(a); }); nav.appendChild(bv); }
   return nav;
 }
 function cartaoAluno(a) {
@@ -1475,7 +1479,7 @@ function cartaoAluno(a) {
   if (plano) {
     var est = PlannerV2.estadoEtapa(plano, pos.id, ctx);
     if (est) {
-      if (idxVer > -1) card.appendChild(navLicoes(a, plano, idxVer, idxReal, 'cima'));
+      if (idxVer > -1) card.appendChild(navLicoes(a, plano, idxVer, idxReal));
       var grade = document.createElement('div'); grade.className = 'aulas';
       var datas = datasDasAulas(plano, pos.id, ctx);
       var ksTudo = PlannerV2.keepStudying ? PlannerV2.keepStudying(plano, pos.id, ctx, { hist: (estado.dados[a.raf] || {}).hist, recuo: 21 }) : null;
@@ -1518,7 +1522,6 @@ function cartaoAluno(a) {
         grade.appendChild(col);
       });
       card.appendChild(grade);
-      if (idxVer > -1) card.appendChild(navLicoes(a, plano, idxVer, idxReal, 'baixo'));
       var ks = quadroKS(a, plano, pos, ctx); if (ks) card.appendChild(ks);
     }
   } else {
