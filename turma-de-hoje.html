@@ -90,6 +90,13 @@
   .aulas{ display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: .6rem; padding: 0 1rem .9rem; }
   .aula{ border: 1px solid var(--ui-line); border-radius: 12px; padding: .55rem .65rem; background: #f8fafc; }
   .aula.atual{ border: 2px solid var(--ui); background: var(--white); }
+  .nav-lic{ display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; padding: 0 1rem .5rem; }
+  .nav-lic .vendo{ flex: 1 1 auto; text-align: center; font-size: .92rem; }
+  .nav-lic .vendo em{ font-style: normal; color: var(--ui); font-weight: 700; }
+  .btn-nav{ border: 2px solid var(--mar, #1d3685); background: var(--white); color: var(--mar, #1d3685); border-radius: 999px; padding: .3rem .8rem; font: inherit; font-weight: 800; font-size: .88rem; cursor: pointer; }
+  .btn-nav:disabled{ opacity: .3; cursor: default; }
+  .btn-nav.volta{ background: var(--mar, #1d3685); color: #fff; }
+  .btn-nav:focus-visible{ outline: 3px solid var(--ui); outline-offset: 2px; }
   .aula .t{ display: flex; align-items: baseline; gap: .5rem; font-size: .74rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--gray); margin-bottom: .35rem; }
   .aula .t b{ color: var(--ui-ink); font-size: .84rem; letter-spacing: 0; text-transform: none; font-family: var(--font-heading); }
   .aula .t .agora{ margin-left: auto; background: var(--ui); color: #fff; border-radius: 99px; padding: .05rem .5rem; font-size: .68rem; }
@@ -438,7 +445,7 @@ body.theme-dark .pl-salvar{ background: #10261f; }
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260918a"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260919a"></script>
 <!-- o guia do Checking, lição a lição: a base comum e um arquivo por livro (Essentials, Transitions e Fluency 1 e 2, In Focus, Inmediato 1 a 3) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=376d37037e"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=9630e2ddde"></script>
@@ -1390,10 +1397,36 @@ function outrosProfs(a) {
   var dd = function (t) { var d = new Date(t); return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2); };
   return '<span class="pill outro-prof" title="Marcas feitas por outro professor nos últimos 30 dias">👥 aula com ' + lista.slice(0, 2).map(function (x) { return esc(x.nome) + ' em ' + dd(x.t); }).join(' · ') + '</span>';
 }
+/* a barra das setas: ◀ lição anterior · a lição vista · próxima ▶, e "voltar à atual" quando saiu dela */
+function navLicoes(a, plano, iv, ir) {
+  var nav = document.createElement('div'); nav.className = 'nav-lic';
+  var ant = plano.etapas[iv - 1], prx = plano.etapas[iv + 1], ev = plano.etapas[iv];
+  var mover = function (d) { estado.verDesloc = estado.verDesloc || {}; estado.verDesloc[a.raf] = iv + d - ir; redesenhar(a); };
+  var b1 = document.createElement('button'); b1.type = 'button'; b1.className = 'btn-nav'; b1.textContent = '◀ ' + (ant ? ant.rot : ''); b1.disabled = !ant;
+  b1.setAttribute('aria-label', ant ? 'Ver ' + ant.rot : 'Não há lição anterior'); b1.addEventListener('click', function () { mover(-1); });
+  var b2 = document.createElement('button'); b2.type = 'button'; b2.className = 'btn-nav'; b2.textContent = (prx ? prx.rot : '') + ' ▶'; b2.disabled = !prx;
+  b2.setAttribute('aria-label', prx ? 'Ver ' + prx.rot : 'Não há próxima lição'); b2.addEventListener('click', function () { mover(1); });
+  var meio = document.createElement('span'); meio.className = 'vendo';
+  meio.innerHTML = (iv === ir ? 'Lição atual: ' : 'Vendo: ') + '<b>' + esc(ev.rot) + '</b>' + (ev.tema ? ' · ' + esc(ev.tema) : '') + (iv > ir ? ' <em>(à frente)</em>' : iv < ir ? ' <em>(anterior)</em>' : '');
+  nav.appendChild(b1); nav.appendChild(meio);
+  if (iv !== ir) { var bv = document.createElement('button'); bv.type = 'button'; bv.className = 'btn-nav volta'; bv.textContent = '📍 Voltar à atual'; bv.addEventListener('click', function () { estado.verDesloc[a.raf] = 0; redesenhar(a); }); nav.appendChild(bv); }
+  nav.appendChild(b2);
+  return nav;
+}
 function cartaoAluno(a) {
   var plano = planoDe(a.book);
   var ctx = ctxDe(a);
-  var pos = posicaoDe(a, plano, ctx);
+  var pos = posicaoDe(a, plano, ctx), posReal = pos;
+  /* NAVEGAR NAS LIÇÕES (pedido dos professores, 19/09/2026): as setas trocam a lição mostrada, como o carrossel
+     do aluno, sem cadeado; o 📍 do cabeçalho continua na lição em que ele está. Checking e marcas valem para a lição vista. */
+  var desloc = (estado.verDesloc || {})[a.raf] || 0, idxReal = -1, idxVer = -1;
+  if (plano) {
+    idxReal = plano.etapas.findIndex(function (e) { return e.id === posReal.id; });
+    if (idxReal > -1) {
+      idxVer = Math.max(0, Math.min(plano.etapas.length - 1, idxReal + desloc));
+      if (idxVer !== idxReal) { var ev = plano.etapas[idxVer]; pos = { id: ev.id, rot: ev.rot, tema: ev.tema }; }
+    }
+  }
   var reg = ctx.planner.plano.checking || {};
   var ckAtual = reg[pos.id];
   var card = document.createElement('section'); card.className = 'al'; card.dataset.raf = a.raf;
@@ -1410,7 +1443,7 @@ function cartaoAluno(a) {
     (estado.prioridade && a._rank ? '<span class="pill prio nv-' + esc(a._prio.nivel) + '" title="' + esc(prioMotivo(a._prio)) + '">⚡ ' + a._rank + 'º · ' + esc(prioMotivo(a._prio)) + '</span>' : '') +
     avisoAtendimento(a) +
     outrosProfs(a) +
-    '<span class="pill pos">📍 ' + esc(pos.rot) + (pos.tema ? ' · ' + esc(pos.tema) : '') + '</span>' +
+    '<span class="pill pos">📍 ' + esc(posReal.rot) + (posReal.tema ? ' · ' + esc(posReal.tema) : '') + '</span>' +
     (atras > 0 ? '<span class="pill atras">' + atras + ' aula' + (atras === 1 ? '' : 's') + ' atrás do plano</span>' : '') +
     (ckAtual && ckAtual.feito ? '<span class="pill chk">✓ Checking ' + esc(pos.id) + (ckAtual.nota != null ? ' · <span class="nota-priv">nota ' + esc(ckAtual.nota) + '</span>' : '') + '</span>' : '<span class="pill chk falta">Checking ' + esc(pos.id) + ' pendente</span>') +
     (plano ? '' : '<span class="acoes"><button type="button" class="btn btn-ck" data-ck>' + (ckAtual && ckAtual.feito ? 'Editar Checking' : 'Registrar Checking') + '</button></span>') +
@@ -1439,6 +1472,7 @@ function cartaoAluno(a) {
   if (plano) {
     var est = PlannerV2.estadoEtapa(plano, pos.id, ctx);
     if (est) {
+      if (idxVer > -1) card.appendChild(navLicoes(a, plano, idxVer, idxReal));
       var grade = document.createElement('div'); grade.className = 'aulas';
       var datas = datasDasAulas(plano, pos.id, ctx);
       var ksTudo = PlannerV2.keepStudying ? PlannerV2.keepStudying(plano, pos.id, ctx, { hist: (estado.dados[a.raf] || {}).hist, recuo: 21 }) : null;
