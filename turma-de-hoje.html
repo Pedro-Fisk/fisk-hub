@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Minha aula, FISK</title>
-<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04c">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-09-20a">
 <link rel="stylesheet" href="assets/casa-tema.css?v=9">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <!-- ═══════════════════════════════════════════════════════════════════════
@@ -257,7 +257,10 @@
   .obs label{ font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #7a5b00; }
   .obs textarea{ width: 100%; min-height: 110px; resize: vertical; font-family: var(--font-body); font-size: .88rem; padding: .55rem .65rem; border: 1.5px solid #e8d48a; border-radius: 10px; background: #fff; color: var(--black); }
   .obs .st{ font-size: .74rem; color: var(--gray); min-height: 1em; }
-  .obs .ec{ font-size: .78rem; border: 1.5px dashed var(--ui-bd); background: transparent; color: var(--gray); border-radius: 999px; padding: .4rem .8rem; font-family: var(--font-body); font-weight: 800; cursor: not-allowed; }
+  /* o botão do e-counseling deixou de ser promessa em 20/09/2026 */
+  .obs .ec{ font-size: .78rem; border: 1.5px solid var(--ui-bd); background: transparent; color: var(--ui-dark, #223e5a); border-radius: 999px; padding: .4rem .8rem; font-family: var(--font-body); font-weight: 800; cursor: pointer; }
+  .obs .ec:hover{ background: var(--ui-soft, #e9eff5); }
+  .obs .ec-linha{ display: flex; gap: .4rem; flex-wrap: wrap; }
   /* esconder as anotações BORRA a caixa e não mexe na largura das aulas:
      a tela mudando de proporção na TV era um susto (Pedro, 14/09/2026) */
   body.sem-obs .obs > *{ filter: blur(7px); pointer-events: none; user-select: none; }
@@ -491,7 +494,7 @@ body.theme-dark .pl-salvar{ background: #10261f; }
 <script src="https://portalfisk.com.br/assets/checking/guia-i2.js?v=56bd0516a9"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-i3.js?v=e326479afd"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-<script src="assets/fisk-shared.js?v=2026-09-07a"></script>
+<script src="assets/fisk-shared.js?v=2026-09-20a"></script>
 <script>
 fiskInitThemeToggle('themeToggle');
 fiskInitUserMenu();
@@ -1675,8 +1678,22 @@ function pilulaData(d, atual) {
 }
 /* ── a anotação livre do professor (pedido do Pedro, 13/09) ──
    Fica na linha do planner do aluno (`obs`), só o professor lê. Salva ao
-   parar de escrever (1,2 s) e ao sair do campo. O botão do e-counseling é
-   promessa: fica visível e desligado até a integração existir. */
+   parar de escrever (1,2 s) e ao sair do campo.
+
+   ── O E-COUNSELING ENTROU AQUI EM 20/09/2026 ─────────────────────────────
+   O botão era promessa desde 13/09 e agora cumpre, e é DESTA tela que ele
+   faz mais sentido: é aqui que o professor está durante a aula, com o aluno
+   na frente. Dois gestos diferentes, de propósito:
+
+   · "💬 Counseling" abre o documento do aluno numa gaveta, por cima desta
+     tela, sem perder a turma de vista.
+   · "➕ Registrar no counseling" leva o que está escrito na anotação para a
+     mesma gaveta, JÁ NO CAMPO, para o professor conferir e salvar.
+
+   A anotação NÃO vira registro sozinha, e isso é decisão: ela é rascunho do
+   dia ("trazer o livro", "faltou de novo"), some quando o professor apaga, e
+   o counseling é registro permanente que ninguém apaga. Copiar tudo
+   automaticamente encheria o documento do aluno de bilhete de recado. */
 var obsTimer = {};
 function caixaObs(a) {
   var box = document.createElement('div'); box.className = 'obs';
@@ -1684,9 +1701,22 @@ function caixaObs(a) {
   box.innerHTML = '<label>📝 Anotações · só professores</label>' +
     '<textarea maxlength="600" placeholder="Ex.: aniversário na próxima aula; conversar com a família; pediu mais exercícios de listening…"></textarea>' +
     '<div class="st"></div>' +
-    '';   /* o botão do e-counseling volta quando existir */
+    '<div class="ec-linha">' +
+      '<button type="button" class="ec" data-ec="abrir">💬 Counseling</button>' +
+      '<button type="button" class="ec" data-ec="mandar" hidden>➕ Registrar no counseling</button>' +
+    '</div>';
   var ta = box.querySelector('textarea'), st = box.querySelector('.st');
+  var btAbrir = box.querySelector('[data-ec=abrir]'), btMandar = box.querySelector('[data-ec=mandar]');
+  function ctxCounseling(texto) {
+    return { escola: estado.escola, professor: estado.prof, turma: estado.turma,
+             aluno: a.nome, estagio: a.book || '', texto: texto || '' };
+  }
+  btAbrir.addEventListener('click', function () { fiskCounselingGaveta(ctxCounseling('')); });
+  btMandar.addEventListener('click', function () { fiskCounselingGaveta(ctxCounseling(ta.value.trim())); });
+  function pintaEc() { btMandar.hidden = !ta.value.trim(); }
+  ta.addEventListener('input', pintaEc);
   ta.value = atual;
+  pintaEc();
   function salvar() {
     var v = ta.value.trim();
     if (v === ((estado.dados[a.raf] || {}).planner || {}).obs && v !== '') return;

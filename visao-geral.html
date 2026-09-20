@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Visão Geral das Turmas, FISK</title>
-<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04c">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-09-20a">
   <!-- a casa do professor veste a faixa do topo (campanha de 09/2026) -->
   <link rel="stylesheet" href="assets/casa-tema.css?v=9">
 <meta name="theme-color" content="#161414">
@@ -128,6 +128,9 @@
   .atn .info{font-size:.76rem;color:var(--gray);font-weight:700}
   .atn .chips{margin-left:auto;display:flex;gap:.3rem;flex-wrap:wrap}
   .chip{font-size:.7rem;font-weight:800;padding:.12rem .5rem;border-radius:99px;background:var(--blue-soft);color:var(--blue-ink);white-space:nowrap}
+  /* o chip que é botão: mesmo tamanho dos outros, mas clicável */
+  button.chip.csl{border:1px solid var(--blue-bd);cursor:pointer;background:transparent;font-size:.78rem;line-height:1.1}
+  button.chip.csl:hover{background:var(--blue-soft)}
   .chip.bad{background:var(--alta-soft);color:var(--alta)}
   .chip.warn{background:var(--media-soft);color:var(--media)}
   .hintbox{background:var(--blue-soft);border-radius:10px;padding:.55rem .8rem;font-size:.8rem;
@@ -325,7 +328,7 @@
   Ferramenta interna das escolas Fisk Taubaté · Caçapava.
 </footer>
 
-<script src="assets/fisk-shared.js?v=2026-09-07a"></script>
+<script src="assets/fisk-shared.js?v=2026-09-20a"></script>
 <script>
 /* ============================================================
    Visão Geral das Turmas — agrega TODAS as turmas de um professor
@@ -848,10 +851,28 @@ function render(escola, prof, dados) {
       '<span class="chip ' + (a._atraso >= LIMITE_ATRASO ? 'bad' : 'warn') + '">' + a._atraso + ' aula' + (a._atraso > 1 ? 's' : '') + ' de atraso</span>' +
       (typeof a.pctFaltas === 'number' && a.pctFaltas > 0 ? '<span class="chip">' + Math.round(a.pctFaltas) + '% faltas</span>' : '') +
       (a._nota != null ? '<span class="chip">nota ' + fmtNota(a._nota) + '</span>' : '') +
+      /* O E-COUNSELING NA LISTA DE ATENÇÃO (20/09/2026): esta lista é
+         exatamente a dos alunos sobre quem há o que registrar, e sem isto o
+         professor teria de sair da tela e procurar o aluno de novo. */
+      '<button type="button" class="chip csl" data-csl="' + esc(a.nome) +
+        '" data-turma="' + esc(a._turma) + '" data-book="' + esc(a.book || '') +
+        '" title="Abrir o E-counseling deste aluno">💬</button>' +
       '</span></div>';
   }).join('') : '<p class="sub">🎉 Nenhum aluno atrasado nas turmas analisadas.</p>';
   $('painelAtencao').hidden = false;
 }
+
+/* Um ouvinte só para todos os botões de counseling da tela: a lista é
+   repintada a cada análise, e ligar botão a botão vazaria ouvinte a cada
+   repintura. */
+document.addEventListener('click', function (ev) {
+  var b = ev.target.closest('[data-csl]');
+  if (!b || typeof fiskCounselingGaveta !== 'function') return;
+  fiskCounselingGaveta({
+    escola: $('selEscola').value, professor: $('selProf').value,
+    turma: b.dataset.turma || '', aluno: b.dataset.csl, estagio: b.dataset.book || ''
+  });
+});
 
 /* ============ PONTE NOME → RAF ============
    O card não conhece RAF: ele guarda nome, atraso e faltas. Quem tem a

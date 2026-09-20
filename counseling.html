@@ -5,11 +5,11 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>E-counseling, FISK</title>
-<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04c">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-09-20a">
 <link rel="stylesheet" href="assets/casa-tema.css?v=9">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
-<script src="assets/fisk-shared.js?v=2026-09-07a"></script>
+<script src="assets/fisk-shared.js?v=2026-09-20a"></script>
 <style>
   /* A paleta do chrome vem do kit compartilhado (--ui*). Com fallback: se o
      professor ainda tiver o kit antigo em cache, --ui não existe e o botão
@@ -76,6 +76,17 @@
   .aba{background:var(--gray-light);border:0;border-radius:99px;padding:.35rem .9rem;
        font-weight:800;font-size:.82rem;cursor:pointer;color:var(--blue-pill)}
   .aba.on{background:var(--blue);color:var(--white)}
+
+  /* ── Modo gaveta ──────────────────────────────────────────────────────
+     A mesma página, aberta de dentro de outra ferramenta. Some o que já foi
+     decidido por quem abriu (o cabeçalho e a escolha da turma) e o painel
+     do aluno deixa de ser cartão dentro de cartão: a gaveta já é a moldura. */
+  body.em-gaveta .hero, body.em-gaveta #painelCard{ display:none }
+  body.em-gaveta main{ padding:.8rem; max-width:none }
+  body.em-gaveta .painel{ border:0; box-shadow:none; padding:.2rem .3rem 1rem;
+                          border-bottom:2px solid var(--gray-light); border-radius:0 }
+  body.em-gaveta #painelEscrever{ border-bottom:0 }
+  body.em-gaveta #tituloAluno{ font-size:1rem }
 </style>
 </head>
 <body>
@@ -90,7 +101,7 @@
 
 <main>
 
-  <section class="painel">
+  <section class="painel" id="painelCard">
     <h2>🔗 Conectar ao card</h2>
     <p class="aviso" id="statusCard">Escolha a escola, o professor e a turma, os alunos vêm ao vivo do card.</p>
     <div class="linha-campos" id="cascata" style="margin:.6rem 0">
@@ -175,6 +186,23 @@
 var API_URL = FISK_HUB_EP;
 var alunoSel = null, turmaSel = null, dadosDoc = null;
 
+/* ── MODO GAVETA (embed=1) ───────────────────────────────────────────────
+ * O uso principal desta tela NÃO é ela mesma: é ser aberta de onde o
+ * professor já está (Minha aula, Planejador, lista da turma) pelo
+ * `fiskCounselingGaveta` do kit compartilhado. Abrir uma tela dedicada,
+ * escolher a turma e procurar o aluno de novo custaria o mesmo que abrir o
+ * documento no Drive, que é justamente o trabalho que isto veio tirar.
+ *
+ * No modo gaveta o aluno já vem decidido pela URL: a cascata e o cabeçalho
+ * somem, e a tela abre direto no documento. A página cheia continua
+ * existindo para quem chega pelo card da home. */
+var Q = new URLSearchParams(location.search);
+var EMBED = Q.get('embed') === '1' && !!Q.get('aluno');
+var CTX_URL = EMBED ? {
+  escola: Q.get('escola') || '', professor: Q.get('prof') || '',
+  turma: Q.get('turma') || '', aluno: Q.get('aluno') || ''
+} : null;
+
 function tokenSessao() {
   try { var s = JSON.parse(localStorage.getItem('fisk_prof') || 'null'); return (s && s.token) || ''; }
   catch (e) { return ''; }
@@ -210,15 +238,17 @@ function montarSelect(sel, placeholder, itens) {
    A pré-seleção NUNCA trava o seletor: substituição é frequente e todo
    professor acessa as turmas de todos (regra firme do Pedro). */
 var selEscola = $('selEscola'), selProf = $('selProf'), selTurma = $('selTurma');
-selEscola.innerHTML = '<option value="" disabled selected>Carregando escolas…</option>';
-selEscola.disabled = true;
-ind('indEscola', 'spin');
-api({ fn: 'escolas' }).then(function (j) {
-  montarSelect(selEscola, 'Escolha a escola…', j.escolas.map(function (e) { return { v: e, t: e }; }));
-  ind('indEscola', 'ok');
-  if (!location.search) fiskReporTurma(selEscola, 'escola');
-  prefillDaURL();
-}).catch(function (e) { ind('indEscola', ''); erroApi(e); });
+if (!EMBED) {
+  selEscola.innerHTML = '<option value="" disabled selected>Carregando escolas…</option>';
+  selEscola.disabled = true;
+  ind('indEscola', 'spin');
+  api({ fn: 'escolas' }).then(function (j) {
+    montarSelect(selEscola, 'Escolha a escola…', j.escolas.map(function (e) { return { v: e, t: e }; }));
+    ind('indEscola', 'ok');
+    if (!location.search) fiskReporTurma(selEscola, 'escola');
+    prefillDaURL();
+  }).catch(function (e) { ind('indEscola', ''); erroApi(e); });
+}
 
 selEscola.addEventListener('change', function () {
   if (!selEscola.value) return;
@@ -327,6 +357,7 @@ function montarLista(dados) {
 }
 
 function contexto() {
+  if (CTX_URL) return CTX_URL;
   return {
     escola: selEscola.value, professor: selProf.value,
     turma: (turmaSel && turmaSel.turma) || '',
@@ -478,8 +509,18 @@ $('btnSalvar').addEventListener('click', function () {
   });
 });
 
-fiskInitThemeToggle('themeToggle');
-fiskInitUserMenu();
+if (EMBED) {
+  /* Na gaveta, o cabeçalho e a cascata são ruído: quem abriu já sabe de quem
+     é o documento, e o painel de trás continua visível. O <body> ganha a
+     classe para o CSS encolher o resto. */
+  document.body.classList.add('em-gaveta');
+  selecionar({ nome: CTX_URL.aluno, book: Q.get('estagio') || '' });
+  var pre = Q.get('texto');
+  if (pre) $('fTexto').value = pre;
+} else {
+  fiskInitThemeToggle('themeToggle');
+  fiskInitUserMenu();
+}
 fiskRegistrarUso('E-counseling');
 </script>
 </body>

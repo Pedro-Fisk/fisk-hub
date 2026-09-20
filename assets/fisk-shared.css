@@ -400,37 +400,41 @@ body, .hero, .btn, .btn-generate, .btn-ghost, .modal-card, .theme-toggle, .mic-b
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   GAVETA DO ACOMPANHAMENTO DO ALUNO (fiskAcompanhamento no fisk-shared.js)
+   GAVETA LATERAL (fiskAcompanhamento e fiskCounseling no fisk-shared.js)
    ═══════════════════════════════════════════════════════════════════════════
  * Abre à direita e deixa a lista visível atrás: o professor está comparando
  * alunos, então perder a lista a cada clique é perder o trabalho.
+ *
+ * O desenho era do Acompanhamento e virou CLASSE em 20/09/2026, quando o
+ * E-counseling passou a abrir do mesmo jeito. Duas gavetas com aparências
+ * diferentes na mesma página seriam duas gramáticas para o mesmo gesto.
  * No celular não há "ao lado" — vira tela cheia, que é o comportamento certo
  * para 375px de largura. */
-#fiskAcompGaveta{ position:fixed; inset:0; z-index:9000; pointer-events:none; }
-#fiskAcompGaveta .fk-acomp-fundo{ position:absolute; inset:0; background:rgba(12,12,14,.35);
+.fk-gaveta{ position:fixed; inset:0; z-index:9000; pointer-events:none; }
+.fk-gaveta .fk-acomp-fundo{ position:absolute; inset:0; background:rgba(12,12,14,.35);
   opacity:0; transition:opacity .2s ease; }
 /* Largura: a primeira versão tinha 560px fixos e o conteúdo ficava espremido
    numa coluna estreita — KPIs quebrando de dois em dois e tabela de notas
    apertada. Agora acompanha a tela (46vw), com piso para o notebook pequeno e
    teto para não virar a página inteira no monitor grande: a lista atrás
    precisa continuar visível, senão a gaveta perdeu a razão de existir. */
-#fiskAcompGaveta .fk-acomp-painel{ position:absolute; top:0; right:0; height:100%;
+.fk-gaveta .fk-acomp-painel{ position:absolute; top:0; right:0; height:100%;
   width:clamp(460px, 46vw, 880px); max-width:96vw;
   background:var(--white,#fff); box-shadow:-14px 0 40px rgba(0,0,0,.18);
   display:flex; flex-direction:column; transform:translateX(100%); transition:transform .22s ease; }
-#fiskAcompGaveta.on{ pointer-events:auto; }
-#fiskAcompGaveta.on .fk-acomp-fundo{ opacity:1; }
-#fiskAcompGaveta.on .fk-acomp-painel{ transform:none; }
-#fiskAcompGaveta .fk-acomp-topo{ display:flex; align-items:center; gap:.5rem;
+.fk-gaveta.on{ pointer-events:auto; }
+.fk-gaveta.on .fk-acomp-fundo{ opacity:1; }
+.fk-gaveta.on .fk-acomp-painel{ transform:none; }
+.fk-gaveta .fk-acomp-topo{ display:flex; align-items:center; gap:.5rem;
   padding:.6rem .8rem; border-bottom:2px solid var(--blue-line,#e3ecf5);
   font-family:var(--font-heading); font-size:.95rem; }
-#fiskAcompGaveta .fk-acomp-x, #fiskAcompGaveta .fk-acomp-abrir{
+.fk-gaveta .fk-acomp-x, .fk-gaveta .fk-acomp-abrir{
   border:none; background:transparent; cursor:pointer; font-size:1rem; line-height:1;
   color:var(--gray,#6b7280); padding:.35rem .5rem; border-radius:8px; text-decoration:none; }
-#fiskAcompGaveta .fk-acomp-x:hover, #fiskAcompGaveta .fk-acomp-abrir:hover{ background:rgba(0,0,0,.06); }
-#fiskAcompGaveta iframe{ flex:1; width:100%; border:none; background:var(--bg,#f4f6f8); }
-body.theme-dark #fiskAcompGaveta .fk-acomp-painel{ background:#161414; }
+.fk-gaveta .fk-acomp-x:hover, .fk-gaveta .fk-acomp-abrir:hover{ background:rgba(0,0,0,.06); }
+.fk-gaveta iframe{ flex:1; width:100%; border:none; background:var(--bg,#f4f6f8); }
+body.theme-dark .fk-gaveta .fk-acomp-painel{ background:#161414; }
 body.fk-acomp-aberto{ overflow:hidden; }
 @media (max-width:640px){
-  #fiskAcompGaveta .fk-acomp-painel{ width:100%; }
+  .fk-gaveta .fk-acomp-painel{ width:100%; }
 }

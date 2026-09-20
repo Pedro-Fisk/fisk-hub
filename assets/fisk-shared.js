@@ -832,24 +832,28 @@ function fiskEstudoEmCasa(idx, nome) {
  * o backend do acompanhamento já não tem cache de propósito (o caso de uso é
  * "ele acabou de fazer?"), então a consulta aconteceria de qualquer jeito.
  */
-function fiskAcompanhamento(raf, opts) {
-  if (!raf) return;
-  opts = opts || {};
-  var g = document.getElementById('fiskAcompGaveta');
+/* A MECÂNICA DA GAVETA, sem saber o que vai dentro (20/09/2026).
+ * Nasceu no Acompanhamento e foi extraída quando o E-counseling passou a
+ * abrir do mesmo jeito: o fundo, o painel que desliza, o Esc, o clique fora e
+ * o "zerar o src ao fechar" são os mesmos nos dois, e mantê-los em duas
+ * cópias garantiria que um dia só um deles ganhasse a próxima correção. */
+function fiskGaveta_(cfg) {
+  var g = document.getElementById(cfg.id);
   if (!g) {
     g = document.createElement('div');
-    g.id = 'fiskAcompGaveta';
+    g.id = cfg.id;
+    g.className = 'fk-gaveta';
     g.innerHTML =
       '<div class="fk-acomp-fundo"></div>' +
-      '<aside class="fk-acomp-painel" role="dialog" aria-label="Acompanhamento do aluno">' +
+      '<aside class="fk-acomp-painel" role="dialog" aria-label="' + cfg.rotulo + '">' +
         '<div class="fk-acomp-topo">' +
-          '<b id="fiskAcompNome">Acompanhamento do Aluno</b>' +
+          '<b class="fk-gaveta-nome">' + cfg.rotulo + '</b>' +
           '<span style="flex:1"></span>' +
-          '<a class="fk-acomp-abrir" id="fiskAcompFull" target="_blank" rel="noopener" ' +
+          '<a class="fk-acomp-abrir fk-gaveta-full" target="_blank" rel="noopener" ' +
              'title="Abrir em página inteira">⤢</a>' +
           '<button type="button" class="fk-acomp-x" aria-label="Fechar">✕</button>' +
         '</div>' +
-        '<iframe id="fiskAcompFrame" title="Acompanhamento do aluno"></iframe>' +
+        '<iframe class="fk-gaveta-frame" title="' + cfg.rotulo + '"></iframe>' +
       '</aside>';
     document.body.appendChild(g);
     var fecha = function () {
@@ -858,7 +862,9 @@ function fiskAcompanhamento(raf, opts) {
       /* zera o src ao fechar: sem isso o próximo aluno aparece por um instante
          com os dados do anterior, que é o erro que mais confunde numa tela de
          conferência. */
-      setTimeout(function () { if (!g.classList.contains('on')) document.getElementById('fiskAcompFrame').src = 'about:blank'; }, 250);
+      setTimeout(function () {
+        if (!g.classList.contains('on')) g.querySelector('.fk-gaveta-frame').src = 'about:blank';
+      }, 250);
     };
     g.querySelector('.fk-acomp-fundo').addEventListener('click', fecha);
     g.querySelector('.fk-acomp-x').addEventListener('click', fecha);
@@ -866,13 +872,56 @@ function fiskAcompanhamento(raf, opts) {
       if (e.key === 'Escape' && g.classList.contains('on')) fecha();
     });
   }
-  var url = fiskHubBase() + 'aluno.html?raf=' + encodeURIComponent(raf) + '&embed=1' +
-            (opts.turma ? '&turma=' + encodeURIComponent(opts.turma) : '');
-  document.getElementById('fiskAcompFrame').src = url;
-  document.getElementById('fiskAcompFull').href = url.replace('&embed=1', '');
-  document.getElementById('fiskAcompNome').textContent = opts.nome || 'Acompanhamento do Aluno';
+  g.querySelector('.fk-gaveta-frame').src = cfg.url;
+  g.querySelector('.fk-gaveta-full').href = cfg.urlCheia || cfg.url;
+  g.querySelector('.fk-gaveta-nome').textContent = cfg.titulo || cfg.rotulo;
   g.classList.add('on');
   document.body.classList.add('fk-acomp-aberto');
+  return g;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   O E-COUNSELING ONDE O PROFESSOR JÁ ESTÁ (Pedro, 20/09/2026)
+   ═══════════════════════════════════════════════════════════════════════════
+ * Uma tela dedicada de counseling é quase o mesmo esforço que abrir o Doc no
+ * Drive: nos dois casos o professor larga o que estava fazendo, procura o
+ * aluno de novo e volta. O valor está em registrar DE ONDE ELE JÁ ESTÁ — da
+ * Minha aula, do Planejador, da lista da turma.
+ *
+ * É a mesma `counseling.html`, em `embed=1`: uma implementação só, que
+ * continua servindo de página cheia para quem chega por link. Mesma origem,
+ * então a sessão do localStorage vale lá dentro sem token na URL.
+ *
+ * ctx: { escola, professor, turma, aluno }
+ */
+function fiskCounselingGaveta(ctx) {
+  if (!ctx || !ctx.aluno) return;
+  var q = 'embed=1' +
+    '&escola=' + encodeURIComponent(ctx.escola || '') +
+    '&prof=' + encodeURIComponent(ctx.professor || '') +
+    '&turma=' + encodeURIComponent(String(ctx.turma || '').split('\n')[0]) +
+    '&aluno=' + encodeURIComponent(ctx.aluno) +
+    (ctx.estagio ? '&estagio=' + encodeURIComponent(ctx.estagio) : '') +
+    (ctx.texto ? '&texto=' + encodeURIComponent(ctx.texto) : '');
+  var base = fiskHubBase() + 'counseling.html?';
+  return fiskGaveta_({
+    id: 'fiskCounselingGaveta', rotulo: 'E-counseling',
+    titulo: '💬 ' + ctx.aluno,
+    url: base + q,
+    urlCheia: base + q.replace('embed=1&', '')
+  });
+}
+
+function fiskAcompanhamento(raf, opts) {
+  if (!raf) return;
+  opts = opts || {};
+  var url = fiskHubBase() + 'aluno.html?raf=' + encodeURIComponent(raf) + '&embed=1' +
+            (opts.turma ? '&turma=' + encodeURIComponent(opts.turma) : '');
+  return fiskGaveta_({
+    id: 'fiskAcompGaveta', rotulo: 'Acompanhamento do aluno',
+    titulo: opts.nome || 'Acompanhamento do Aluno',
+    url: url, urlCheia: url.replace('&embed=1', '')
+  });
 }
 
 /** Liga a gaveta a uma lista: todo clique em `seletor` dentro de `raiz` abre o
