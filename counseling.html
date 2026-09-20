@@ -197,8 +197,14 @@ var alunoSel = null, turmaSel = null, dadosDoc = null;
  * somem, e a tela abre direto no documento. A página cheia continua
  * existindo para quem chega pelo card da home. */
 var Q = new URLSearchParams(location.search);
-var EMBED = Q.get('embed') === '1' && !!Q.get('aluno');
-var CTX_URL = EMBED ? {
+/* `aluno=` na URL decide O QUE a tela mostra (um aluno só, direto);
+   `embed=1` decide COMO ela se veste (sem cabeçalho, sem cascata). São
+   coisas diferentes: o dossiê abre o counseling em ABA CHEIA quando ele
+   próprio já está dentro de uma gaveta, e ali o aluno vem pela URL sem que
+   a página deva perder o cabeçalho. */
+var Q_ALUNO = Q.get('aluno') || '';
+var EMBED = Q.get('embed') === '1' && !!Q_ALUNO;
+var CTX_URL = Q_ALUNO ? {
   escola: Q.get('escola') || '', professor: Q.get('prof') || '',
   turma: Q.get('turma') || '', aluno: Q.get('aluno') || ''
 } : null;
@@ -238,7 +244,7 @@ function montarSelect(sel, placeholder, itens) {
    A pré-seleção NUNCA trava o seletor: substituição é frequente e todo
    professor acessa as turmas de todos (regra firme do Pedro). */
 var selEscola = $('selEscola'), selProf = $('selProf'), selTurma = $('selTurma');
-if (!EMBED) {
+if (!CTX_URL) {
   selEscola.innerHTML = '<option value="" disabled selected>Carregando escolas…</option>';
   selEscola.disabled = true;
   ind('indEscola', 'spin');
@@ -509,11 +515,13 @@ $('btnSalvar').addEventListener('click', function () {
   });
 });
 
-if (EMBED) {
+if (CTX_URL) {
   /* Na gaveta, o cabeçalho e a cascata são ruído: quem abriu já sabe de quem
      é o documento, e o painel de trás continua visível. O <body> ganha a
-     classe para o CSS encolher o resto. */
-  document.body.classList.add('em-gaveta');
+     classe para o CSS encolher o resto. Em aba cheia, o cabeçalho fica. */
+  if (EMBED) document.body.classList.add('em-gaveta');
+  else { fiskInitThemeToggle('themeToggle'); fiskInitUserMenu(); }
+  $('painelCard').hidden = true;
   selecionar({ nome: CTX_URL.aluno, book: Q.get('estagio') || '' });
   var pre = Q.get('texto');
   if (pre) $('fTexto').value = pre;

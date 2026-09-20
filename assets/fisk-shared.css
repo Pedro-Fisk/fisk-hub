@@ -438,3 +438,29 @@ body.fk-acomp-aberto{ overflow:hidden; }
 @media (max-width:640px){
   .fk-gaveta .fk-acomp-painel{ width:100%; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BUSCA DE ALUNO PARA ABRIR O E-COUNSELING (fiskCounselingBusca)
+   ═══════════════════════════════════════════════════════════════════════════
+ * Caixa no alto, no lugar onde se espera um campo de busca, e não no meio da
+ * tela: o professor vem do menu, com o olho já no topo. Fecha no Esc e no
+ * clique fora, como a gaveta. */
+.fk-busca{ position:fixed; inset:0; z-index:9100; display:none; }
+.fk-busca.on{ display:block; }
+.fk-busca-fundo{ position:absolute; inset:0; background:rgba(12,12,14,.35); }
+.fk-busca-cx{ position:absolute; top:12vh; left:50%; transform:translateX(-50%);
+  width:min(520px, 92vw); background:var(--white,#fff); border-radius:16px;
+  box-shadow:0 24px 60px rgba(0,0,0,.28); padding:1rem 1.1rem; }
+.fk-busca-cx label{ display:block; font-family:var(--font-heading); font-weight:700;
+  font-size:.95rem; margin-bottom:.5rem; color:var(--ui-dark,#223e5a); }
+.fk-busca-cx input{ width:100%; padding:.6rem .8rem; font-size:1rem;
+  font-family:var(--font-body); border:2px solid var(--ui-bd,#9db6cb); border-radius:10px; }
+.fk-busca-lista{ max-height:46vh; overflow-y:auto; margin-top:.6rem; }
+.fk-busca-item{ display:flex; flex-direction:column; gap:.1rem; width:100%; text-align:left;
+  border:1px solid var(--gray-light,#e5e7eb); background:transparent; border-radius:10px;
+  padding:.5rem .7rem; margin-bottom:.35rem; cursor:pointer; font-family:var(--font-body); }
+.fk-busca-item:hover{ border-color:var(--ui,#2b4d70); background:var(--ui-soft,#e9eff5); }
+.fk-busca-item b{ font-size:.92rem; }
+.fk-busca-item span{ font-size:.76rem; color:var(--gray,#6b7280); }
+.fk-busca-vazio{ font-size:.85rem; color:var(--gray,#6b7280); margin:.6rem 0 0; }
+body.theme-dark .fk-busca-cx{ background:#161414; }

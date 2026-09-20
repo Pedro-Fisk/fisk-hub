@@ -380,6 +380,11 @@ function fiskInitUserMenu(opts) {
       (escolas ? '<span>' + fiskEsc(escolas.split(',').join(' + ')) + '</span>' : '') + '</div>' +
     '<a class="fu-item" href="' + base + 'index.html">🏠 Fisk Hub</a>' +
     '<a class="fu-item" href="' + base + 'visao-geral.html">📊 Minhas turmas</a>' +
+    /* O E-COUNSELING DE QUALQUER TELA (Pedro, 20/09/2026). Não é mais um
+       atalho para uma página: é a busca pelo nome do aluno aqui dentro, e a
+       gaveta abre por cima do que o professor estava fazendo. Vive no menu
+       porque o menu é a única coisa que existe nas vinte telas. */
+    '<button type="button" class="fu-item fu-csl">💬 E-counseling de um aluno</button>' +
     '<a class="fu-item" href="' + base + 'treinamentos.html">🎓 Treinamentos</a>' +
     /* o seletor de idioma só aparece onde a página SABE traduzir: um botão
        que não muda nada na tela é pior do que não ter botão */
@@ -420,6 +425,11 @@ function fiskInitUserMenu(opts) {
       if (typeof opts.onIdioma === 'function') opts.onIdioma(lang);
       fechar();
     });
+  });
+
+  menu.querySelector('.fu-csl').addEventListener('click', function () {
+    fechar();
+    fiskCounselingBusca();
   });
 
   menu.querySelector('.fu-sair').addEventListener('click', function () {
@@ -910,6 +920,72 @@ function fiskCounselingGaveta(ctx) {
     url: base + q,
     urlCheia: base + q.replace('embed=1&', '')
   });
+}
+
+/* A BUSCA QUE ABRE O COUNSELING, de qualquer tela do Hub (20/09/2026).
+ *
+ * Um campo, os alunos do professor logado e um clique. A lista vem do
+ * `fiskAlunosDoProf`, que a própria página já costuma ter carregado para a
+ * ponte nome→RAF, então digitar não custa ida à rede.
+ *
+ * ⚠️ A UNIDADE NÃO VIAJA daqui: a lista de acessos traz nome, turma e livro,
+ * mas não a escola. Quem resolve isso é o servidor, que procura nas duas e
+ * recusa quando o nome aparece nas duas (homônimo em unidades diferentes
+ * existe, e escrever no documento errado é pior do que pedir a escola).
+ */
+function fiskCounselingBusca() {
+  var cx = document.getElementById('fiskCslBusca');
+  if (!cx) {
+    cx = document.createElement('div');
+    cx.id = 'fiskCslBusca';
+    cx.className = 'fk-busca';
+    cx.innerHTML =
+      '<div class="fk-busca-fundo"></div>' +
+      '<div class="fk-busca-cx" role="dialog" aria-label="Abrir o E-counseling de um aluno">' +
+        '<label for="fkCslQ">💬 E-counseling · qual aluno?</label>' +
+        '<input id="fkCslQ" type="search" autocomplete="off" placeholder="Nome ou RAF do aluno…">' +
+        '<div class="fk-busca-lista" id="fkCslLista"></div>' +
+      '</div>';
+    document.body.appendChild(cx);
+    var fechaB = function () { cx.classList.remove('on'); };
+    cx.querySelector('.fk-busca-fundo').addEventListener('click', fechaB);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && cx.classList.contains('on')) fechaB();
+    });
+    var campo = cx.querySelector('#fkCslQ'), lista = cx.querySelector('#fkCslLista'), t = null;
+    campo.addEventListener('input', function () {
+      clearTimeout(t);
+      var q = campo.value.trim();
+      if (q.length < 2) { lista.innerHTML = ''; return; }
+      lista.innerHTML = '<p class="fk-busca-vazio">procurando…</p>';
+      t = setTimeout(function () {
+        fiskBuscaMeusAlunos(q).then(function (achados) {
+          if (!achados.length) {
+            lista.innerHTML = '<p class="fk-busca-vazio">Nenhum aluno seu com esse nome. ' +
+              'Pela turma, use a Minha aula ou a Visão Geral.</p>';
+            return;
+          }
+          lista.innerHTML = achados.map(function (a) {
+            return '<button type="button" class="fk-busca-item" data-nome="' + fiskEsc(a.name) +
+              '" data-turma="' + fiskEsc(a.turma || '') + '" data-book="' + fiskEsc(a.book || '') + '">' +
+              '<b>' + fiskEsc(a.name) + '</b><span>' + fiskEsc(a.turma || '') +
+              (a.book ? ' · ' + fiskEsc(a.book) : '') + '</span></button>';
+          }).join('');
+        });
+      }, 180);
+    });
+    lista.addEventListener('click', function (ev) {
+      var b = ev.target.closest('.fk-busca-item');
+      if (!b) return;
+      fechaB();
+      fiskCounselingGaveta({ escola: '', professor: '', turma: b.dataset.turma,
+                             aluno: b.dataset.nome, estagio: b.dataset.book });
+    });
+  }
+  cx.classList.add('on');
+  var inp = cx.querySelector('#fkCslQ');
+  inp.value = ''; cx.querySelector('#fkCslLista').innerHTML = '';
+  setTimeout(function () { inp.focus(); }, 30);
 }
 
 function fiskAcompanhamento(raf, opts) {

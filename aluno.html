@@ -277,6 +277,9 @@
         <div class="meta" id="alMeta"></div>
       </div>
       <div class="fd-pill" id="alFd" hidden></div>
+      <!-- O E-counseling ao lado da pasta (20/09/2026): esta é a página DO
+           aluno, e o documento de acompanhamento dele é o que faltava aqui. -->
+      <button type="button" class="btn-ver" id="btnCounseling" hidden>💬 E-counseling</button>
       <button type="button" class="btn-ver" id="btnPasta" hidden>📂 Pasta no Drive</button>
     </div>
     <div class="status" id="stPasta"></div>
@@ -527,9 +530,33 @@ function abrir(raf, turma){
   }).catch(function(){ $('alNome').textContent = '⚠️ Erro de conexão.'; });
 }
 
+/* O E-COUNSELING A PARTIR DO DOSSIÊ (20/09/2026).
+ * ⚠️ Dentro da gaveta NÃO abre outra gaveta: este dossiê já costuma estar
+ * embutido num iframe aberto por cima de outra tela, e empilhar um segundo
+ * painel deslizante ali dentro daria uma janela dentro da janela, com dois
+ * "fechar" e nenhum jeito óbvio de voltar. Embutido, vai para a aba cheia. */
+function ligarCounseling(st){
+  var b = $('btnCounseling');
+  if (!b || !st || !st.name) return;
+  b.hidden = false;
+  b.onclick = function(){
+    var ctx = { escola: '', professor: '', turma: st.turma || '',
+                aluno: st.name, estagio: st.book || '' };
+    if (EMBED || typeof fiskCounselingGaveta !== 'function'){
+      var q = 'escola=&prof=&turma=' + encodeURIComponent(String(ctx.turma).split('\n')[0]) +
+              '&aluno=' + encodeURIComponent(ctx.aluno) +
+              (ctx.estagio ? '&estagio=' + encodeURIComponent(ctx.estagio) : '');
+      window.open('counseling.html?' + q, '_blank', 'noopener');
+      return;
+    }
+    fiskCounselingGaveta(ctx);
+  };
+}
+
 function render(d){
   var st = d.student || {};
   $('alNome').textContent = st.name || '—';
+  ligarCounseling(st);
   $('alMeta').innerHTML = esc(st.turma || 'sem turma') + ' &middot; ' + esc(st.book || 'sem estágio') +
                           ' &middot; <b>' + esc(st.raf) + '</b>';
 
