@@ -744,6 +744,21 @@ $('proximo').addEventListener('click', function () {
              L: n.sc.listening, G: n.sc.grammar, Rd: n.sc.readingSo, R: n.sc.reading, cefrL: n.sc.cefrL, cefrR: n.sc.cefrR, final: n.fin.rot, resp: resp,
              conferidas: Object.keys(estado.mexidas).length, card: cardTxt, em: Date.now() });
     try { localStorage.setItem(chaveLote(), JSON.stringify(l)); } catch (e) {}
+    /* O E-counseling do aluno recebe a mesma linha (20/09/2026). No documento
+       do Nicolas havia três simulados digitados um a um pelo professor, no
+       formato "MET Green / Listening 40/50 B2 / Grammar 14/20 / Reading 19/30
+       / G+R = 33 B1" — é esse mesmo texto que sai daqui, montado no servidor.
+       Vai sem professor de propósito: quem corrige a pilha de folhas não sabe
+       (e não deve precisar saber) de quem é a pasta do aluno. */
+    if (typeof fiskCounseling === 'function') {
+      fiskCounseling({
+        escola: a.escola || $('selEscola').value || '', professor: '', turma: a.turma || '',
+        aluno: a.nome, origem: 'met',
+        campos: { cor: estado.cor, listening: n.sc.listening, listeningCefr: n.sc.cefrL,
+                  grammar: n.sc.grammar, reading: n.sc.readingSo,
+                  gr: n.sc.reading, grCefr: n.sc.cefrR, resultado: (n.fin && n.fin.rot) || '' }
+      });
+    }
     if (card.ok) toast('✓ ' + a.nome.split(' ')[0] + ' salvo e lançado no TEST ' + card.test + ' do card (' + (j.notaCard || '') + ').');
     else alert('A correção de ' + a.nome + ' foi salva e o aluno já vê a tabela no Portal, mas a nota NÃO foi lançada no card:\n\n' + (card.motivo || 'motivo desconhecido') + '.\n\nLance à mão no card, se for o caso.');
     estado.aluno = null; $('escolhido').hidden = true; limpaLeitura(); liberaFoto();

@@ -774,6 +774,26 @@ function salvarNaPasta(btn) {
   }).catch(function () { /* o helper já avisou o professor no alert */ });
 }
 
+/* O E-counseling do aluno também fica sabendo (20/09/2026): a notificação de
+   2nd chance é acompanhamento acadêmico, e a nota que a motivou é o dado que
+   explica a linha um semestre depois. Silencioso, e o servidor recusa
+   repetido: reemitir o mesmo comunicado não vira duas linhas. */
+function registrarNoCounseling() {
+  if (!alunoSel || typeof fiskCounseling !== 'function') return;
+  var abaixo = provasAbaixo(alunoSel);
+  var notas = abaixo.map(function (q) {
+    return (q === 'escrita' ? 'Escrita' : 'Auditiva') + ': ' + alunoSel[q];
+  }).join(' · ');
+  fiskCounseling({
+    escola: turma.escola,
+    professor: ($('fProf').value || turma.professor || turma.aba || '').trim(),
+    turma: turma.turma || turma.titulo || '',
+    aluno: alunoSel.nome,
+    origem: '2nd',
+    campos: { estagio: alunoSel.book || '', prova: abaixo.join(' e '), motivo: notas }
+  });
+}
+
 /* ---- 📤 lançar no card (nota na célula da última aula do aluno) ---- */
 function lancarNoCard() {
   if (!alunoSel || alunoSel.linhaCard == null || !turma || !turma.escola) {
@@ -793,6 +813,7 @@ function lancarNoCard() {
     professor: ($('fProf').value || turma.professor || turma.aba || '').trim()
   }).then(function () {
     statusDoc('✓ Lançado no card, na célula da última aula de ' + primeiroNome(alunoSel.nome) + '.', 'ok');
+    registrarNoCounseling();
   }).catch(function (e) {
     statusDoc('⚠️ ' + e.message, 'err');
   }).finally(function () { btns.forEach(function (b) { b.disabled = false; }); });

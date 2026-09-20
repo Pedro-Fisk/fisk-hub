@@ -69,6 +69,7 @@
 .card-siele        { --accent: #E4761B; } /* laranja do espanhol, para não confundir com o MET */
 .card-overview     { --accent: #7C3AED; } /* roxo do panorama estatístico */
 .card-acomp        { --accent: #0E7490; } /* ciano do Acompanhamento do Aluno */
+.card-ecounsel     { --accent: #9D174D; } /* vinho do E-counseling: é conversa com o aluno, não documento */
 #miniDash, #hwProf { display: none !important; } /* a home ficou só com as ferramentas (19/09/2026) */
 .card-portal       { --accent: #d81f26; } /* vermelho Fisk (pedido do Pedro, 16/09/2026) */
 .card-answerkeys   { --accent: #0F766E; } /* verde-petróleo dos gabaritos */

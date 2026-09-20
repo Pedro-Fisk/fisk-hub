@@ -648,6 +648,29 @@ function statusDoc(msg, cor) {
 function msgRegistro() {
   return '✓ Registrado no card, na aula mais próxima de hoje. A anotação diz qual.';
 }
+/* A MESMA informação também vai para o E-counseling do aluno (20/09/2026).
+   A tabela TERMOS DE ATRASO do documento pede exatamente o que esta tela já
+   tem na mão: professor, estágio, faltas, aulas atrasadas e a data de envio.
+   Era isso que o professor copiava à mão, quando copiava.
+   Vai depois do registro no card e não fala nada na tela: o documento é
+   registro secundário, e uma falha aqui não pode parecer falha do termo. */
+function registrarNoCounseling() {
+  if (modoLivre || !alunoSel || typeof fiskCounseling !== 'function') return;
+  var fProf = document.getElementById('fProf');
+  fiskCounseling({
+    escola: payload.escola,
+    professor: ((fProf && fProf.value) || payload.professor || payload.aba || '').trim(),
+    turma: payload.turma || '',
+    aluno: alunoSel.nome,
+    origem: 'termo',
+    campos: {
+      estagio: alunoSel.book || '',
+      faltas: alunoSel.faltas,
+      atrasadas: alunoSel.aulasAtraso,
+      texto: 'Termo de atraso gerado pelo Fisk Hub.'
+    }
+  });
+}
 function lancarNoCard() {
   if (modoLivre || !alunoSel || alunoSel.linhaCard == null) {
     statusDoc('Termo livre não tem aluno no card para marcar.', '#b8860b'); return;
@@ -659,7 +682,7 @@ function lancarNoCard() {
   statusDoc('⏳ Registrando no card…');
   api({ fn: 'registrarDoc', escola: payload.escola, prof: payload.aba, professor: payload.aba,
         linhaCard: alunoSel.linhaCard, idx: alunoSel.ultimaPresencaIdx, tipo: 'termo' })
-    .then(function () { statusDoc(msgRegistro(), '#1e8f4e'); })
+    .then(function () { statusDoc(msgRegistro(), '#1e8f4e'); registrarNoCounseling(); })
     .catch(function (e) { statusDoc('⚠️ ' + e.message, '#c0392b'); });
 }
 pares('btnDrive').forEach(function (btn) { btn.addEventListener('click', function () {

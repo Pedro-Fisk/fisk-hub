@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E-counseling, FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04c">
+<link rel="stylesheet" href="assets/casa-tema.css?v=9">
+<meta name="theme-color" content="#161414">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+<script src="assets/fisk-shared.js?v=2026-09-07a"></script>
+<style>
+  /* A paleta do chrome vem do kit compartilhado (--ui*). Com fallback: se o
+     professor ainda tiver o kit antigo em cache, --ui não existe e o botão
+     ficaria branco no branco. */
+  :root{ --blue:var(--ui,#2b4d70); --blue-mid:var(--ui-mid,#3d6b93); --blue-pill:var(--ui-pill,#1d3349);
+         --blue-soft:var(--ui-soft,#e9eff5); --blue-ink:var(--ui-ink,#1d3349); --blue-bd:var(--ui-bd,#9db6cb); }
+  [hidden]{ display:none !important; }
+  main{max-width:820px;margin:0 auto;padding:1.2rem;width:100%}
+  .painel{background:var(--white);border:2px solid var(--surface-border-color);
+          border-radius:var(--surface-radius);box-shadow:var(--surface-shadow);
+          padding:1.15rem 1.25rem;margin-bottom:1.1rem}
+  .painel-head{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center;justify-content:space-between}
+  .painel-head h2{margin:0}
+  .painel h2{margin:0 0 .4rem;font-family:var(--font-heading);font-weight:700;
+             font-size:1.05rem;color:var(--ui-dark,#223e5a)}
+  .aviso{font-size:.85rem;color:var(--gray)}
+  .linha-campos{display:flex;flex-wrap:wrap;gap:.7rem}
+  .campo{flex:1 1 160px}
+  .campo label{display:block;font-size:.78rem;font-weight:800;margin-bottom:.2rem}
+  .campo select, .campo input[type=text], .campo textarea{width:100%;padding:.45rem .6rem;
+    border:1px solid var(--gray-light);border-radius:8px;font-family:var(--font-body);font-size:.92rem}
+  .campo textarea{min-height:110px;resize:vertical}
+  .lista-alunos{display:flex;flex-direction:column;gap:.4rem;max-height:320px;overflow-y:auto}
+  .aluno-item{display:flex;align-items:center;gap:.6rem;padding:.5rem .7rem;
+              border:1px solid var(--gray-light);border-radius:10px;cursor:pointer;
+              font-size:.92rem;background:var(--white)}
+  .aluno-item:hover{border-color:var(--blue-mid)}
+  .aluno-item.sel{border-color:var(--blue);background:var(--blue-soft)}
+  .badge{margin-left:auto;font-size:.72rem;font-weight:800;padding:.15rem .5rem;
+         border-radius:99px;white-space:nowrap;background:var(--gray-light);color:var(--gray)}
+  .btn-generate{background:var(--green);color:var(--white);border:0;border-radius:12px;
+    font-size:1.05rem;font-weight:800;padding:.8rem 1.6rem;cursor:pointer;width:100%}
+  .btn-generate:hover{background:var(--green-dark)}
+  .btn-generate:disabled{opacity:.55;cursor:default}
+  .btn-sec{background:var(--black);color:var(--white);border:0;border-radius:10px;
+    font-weight:700;padding:.55rem 1rem;cursor:pointer;font-size:.85rem;text-decoration:none;
+    display:inline-block}
+  .doc-actions{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:flex-end}
+  .ind{display:inline-block;width:13px;height:13px;margin-left:.4rem;vertical-align:-2px}
+  .ind.spin{border:2px solid var(--gray-light);border-top-color:var(--blue);border-radius:50%;
+            animation:gira .7s linear infinite}
+  .ind.ok::after{content:'✓';color:var(--green);font-weight:800;font-size:.9rem}
+  @keyframes gira{to{transform:rotate(360deg)}}
+
+  /* A linha do tempo do documento. Cada registro é um cartão com o cabeçalho
+     (data, professor, estágio) em cima e o texto embaixo, que é como o
+     documento já se lê: a tabela de duas colunas do Docs não cabe no celular. */
+  .reg{border:1px solid var(--gray-light);border-left:4px solid var(--blue);
+       border-radius:10px;padding:.6rem .8rem;margin-bottom:.55rem;background:var(--white)}
+  .reg.termo{border-left-color:var(--red)}
+  .reg-cab{font-size:.76rem;font-weight:800;color:var(--blue-pill);margin-bottom:.25rem;
+           display:flex;gap:.5rem;flex-wrap:wrap}
+  .reg-cab span{background:var(--blue-soft);border-radius:99px;padding:.1rem .5rem}
+  .reg.termo .reg-cab span{background:#fdeaea}
+  .reg-txt{font-size:.9rem;white-space:pre-wrap;line-height:1.45}
+  .vazio{font-size:.88rem;color:var(--gray);font-style:italic;padding:.5rem 0}
+  .obs-basica{background:var(--blue-soft);border-radius:10px;padding:.6rem .8rem;
+              font-size:.88rem;white-space:pre-wrap;margin-bottom:.8rem}
+  .status{font-size:.85rem;font-weight:700;margin:.5rem 0 0}
+  .status.erro{color:var(--red)}
+  .status.ok{color:var(--green-dark,#1a7f37)}
+  .so-acrescenta{font-size:.78rem;color:var(--gray);margin-top:.5rem}
+  .abas{display:flex;gap:.4rem;margin-bottom:.7rem;flex-wrap:wrap}
+  .aba{background:var(--gray-light);border:0;border-radius:99px;padding:.35rem .9rem;
+       font-weight:800;font-size:.82rem;cursor:pointer;color:var(--blue-pill)}
+  .aba.on{background:var(--blue);color:var(--white)}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <a class="back-link" href="index.html">&larr; Voltar aos recursos</a>
+  <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
+  <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+  <h1>E-counseling</h1>
+  <p>O documento de acompanhamento do aluno, aberto e escrito daqui</p>
+</header>
+
+<main>
+
+  <section class="painel">
+    <h2>🔗 Conectar ao card</h2>
+    <p class="aviso" id="statusCard">Escolha a escola, o professor e a turma, os alunos vêm ao vivo do card.</p>
+    <div class="linha-campos" id="cascata" style="margin:.6rem 0">
+      <div class="campo"><label>Escola<span class="ind" id="indEscola"></span></label>
+        <select id="selEscola"></select>
+      </div>
+      <div class="campo"><label>Professor(a)<span class="ind" id="indProf"></span></label>
+        <select id="selProf" disabled></select>
+      </div>
+      <div class="campo" style="flex:2 1 240px"><label>Turma<span class="ind" id="indTurma"></span></label>
+        <select id="selTurma" disabled></select>
+      </div>
+    </div>
+    <div class="lista-alunos" id="listaAlunos"></div>
+  </section>
+
+  <section class="painel" hidden id="painelDoc">
+    <div class="painel-head">
+      <h2 id="tituloAluno">📄 Documento do aluno</h2>
+      <div class="doc-actions">
+        <a class="btn-sec" id="btnAbrirDoc" href="#" target="_blank" rel="noopener" hidden>📝 Abrir no Docs</a>
+        <a class="btn-sec" id="btnVerPasta" href="#" target="_blank" rel="noopener" hidden
+           style="background:var(--blue)">📂 Ver pasta</a>
+      </div>
+    </div>
+    <p class="status" id="statusDoc"></p>
+
+    <div id="semDoc" hidden>
+      <p class="aviso">Não há documento de counseling na pasta deste aluno. Posso criar um agora, no formato da escola.</p>
+      <div class="linha-campos" style="margin:.6rem 0;align-items:flex-end">
+        <div class="campo"><label>Faixa</label>
+          <select id="selFaixa">
+            <option value="criancas">Crianças</option>
+            <option value="adolescentes" selected>Adolescentes</option>
+            <option value="adultos">Adultos</option>
+          </select>
+        </div>
+        <div class="campo" style="flex:0 0 auto">
+          <button class="btn-sec" id="btnCriar" style="background:var(--blue)">➕ Criar o documento</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="conteudoDoc" hidden>
+      <div class="obs-basica" id="obsBasica" hidden></div>
+      <div class="abas">
+        <button class="aba on" id="abaAcad" type="button">Acompanhamento</button>
+        <button class="aba" id="abaTermo" type="button">Termos de atraso</button>
+      </div>
+      <div id="listaAcad"></div>
+      <div id="listaTermo" hidden></div>
+    </div>
+  </section>
+
+  <section class="painel" hidden id="painelEscrever">
+    <h2>✍️ Registrar no documento</h2>
+    <div class="linha-campos" style="margin-bottom:.6rem">
+      <div class="campo" style="flex:0 1 200px"><label>Estágio</label>
+        <input type="text" id="fEstagio" placeholder="ex.: FOC">
+      </div>
+    </div>
+    <div class="campo">
+      <label for="fTexto">O que registrar</label>
+      <textarea id="fTexto" placeholder="Ex.: conversou com a mãe sobre a frequência; combinamos revisão das lições 5 e 6 até a próxima aula."></textarea>
+    </div>
+    <p class="so-acrescenta">A data e o seu nome entram sozinhos. O registro só acrescenta: nada do que já está no documento é apagado ou alterado daqui.</p>
+    <button class="btn-generate" id="btnSalvar" style="margin-top:.7rem">💾 Salvar no documento</button>
+    <p class="status" id="statusSalvar"></p>
+  </section>
+
+</main>
+
+<script>
+/* ══ E-COUNSELING ═══════════════════════════════════════════════════════════
+ * O documento de counseling do aluno já existe no Drive, dentro da pasta dele.
+ * Esta página não guarda nada: lê e escreve no Doc, pelo backend
+ * (Counseling.js), que é quem sabe achar a pasta e as tabelas.
+ *
+ * Nunca houve, e não deve haver, botão de apagar: o registro de
+ * acompanhamento só acrescenta (decisão do Pedro, 20/09/2026).
+ * ═══════════════════════════════════════════════════════════════════════════ */
+var API_URL = FISK_HUB_EP;
+var alunoSel = null, turmaSel = null, dadosDoc = null;
+
+function tokenSessao() {
+  try { var s = JSON.parse(localStorage.getItem('fisk_prof') || 'null'); return (s && s.token) || ''; }
+  catch (e) { return ''; }
+}
+function api(params) {
+  var P = { action: 'card', token: tokenSessao() };
+  Object.keys(params).forEach(function (k) { P[k] = params[k]; });
+  var qs = Object.keys(P).map(function (k) { return k + '=' + encodeURIComponent(P[k]); }).join('&');
+  return fetch(API_URL + '?' + qs).then(fiskJson)
+    .then(function (j) { if (j.erro) throw new Error(j.erro); return j; });
+}
+/* As rotas do counseling são POST com corpo em texto puro: é o que evita o
+   preflight de CORS no Apps Script (mesmo padrão de todas as ferramentas). */
+function post(acao, extra) {
+  var body = { action: acao, token: tokenSessao() };
+  Object.keys(extra || {}).forEach(function (k) { body[k] = extra[k]; });
+  return fetch(API_URL, { method: 'POST', body: JSON.stringify(body) }).then(fiskJson);
+}
+function ind(id, estado) { document.getElementById(id).className = 'ind' + (estado ? ' ' + estado : ''); }
+function $(id) { return document.getElementById(id); }
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+  });
+}
+function montarSelect(sel, placeholder, itens) {
+  sel.innerHTML = '<option value="" disabled selected>' + placeholder + '</option>' +
+    itens.map(function (i) { return '<option value="' + esc(i.v) + '">' + esc(i.t) + '</option>'; }).join('');
+  sel.disabled = false;
+}
+
+/* ── a cascata de sempre: escola → professor → turma ──────────────────────
+   A pré-seleção NUNCA trava o seletor: substituição é frequente e todo
+   professor acessa as turmas de todos (regra firme do Pedro). */
+var selEscola = $('selEscola'), selProf = $('selProf'), selTurma = $('selTurma');
+selEscola.innerHTML = '<option value="" disabled selected>Carregando escolas…</option>';
+selEscola.disabled = true;
+ind('indEscola', 'spin');
+api({ fn: 'escolas' }).then(function (j) {
+  montarSelect(selEscola, 'Escolha a escola…', j.escolas.map(function (e) { return { v: e, t: e }; }));
+  ind('indEscola', 'ok');
+  if (!location.search) fiskReporTurma(selEscola, 'escola');
+  prefillDaURL();
+}).catch(function (e) { ind('indEscola', ''); erroApi(e); });
+
+selEscola.addEventListener('change', function () {
+  if (!selEscola.value) return;
+  selProf.innerHTML = '<option value="" disabled selected>Carregando professores…</option>';
+  selProf.disabled = true;
+  selTurma.innerHTML = '<option value="" disabled selected></option>';
+  selTurma.disabled = true;
+  ind('indProf', 'spin'); ind('indTurma', '');
+  api({ fn: 'profs', escola: selEscola.value }).then(function (j) {
+    montarSelect(selProf, 'Escolha o professor(a)…', j.profs.map(function (p) { return { v: p, t: p }; }));
+    ind('indProf', 'ok');
+    if (!location.search) fiskReporTurma(selProf, 'prof');
+  }).catch(function (e) { ind('indProf', ''); erroApi(e); });
+});
+
+selProf.addEventListener('change', function () {
+  if (!selProf.value) return;
+  selTurma.innerHTML = '<option value="" disabled selected>Carregando turmas…</option>';
+  selTurma.disabled = true;
+  ind('indTurma', 'spin');
+  api({ fn: 'turmas', escola: selEscola.value, prof: selProf.value }).then(function (j) {
+    montarSelect(selTurma, 'Escolha a turma…', j.turmas.map(function (t) {
+      return { v: t.linhaTitulo, t: t.titulo };
+    }));
+    ind('indTurma', 'ok');
+    if (!location.search) fiskReporTurma(selTurma, 'linha');
+  }).catch(function (e) { ind('indTurma', ''); erroApi(e); });
+});
+
+selTurma.addEventListener('change', function () {
+  if (!selTurma.value) return;
+  ind('indTurma', 'spin');
+  var pararEspera = fiskEsperando(function (txt) { $('statusCard').textContent = txt; },
+                                  ['Lendo a turma no card…', 'Ainda lendo, o card está devagar agora…']);
+  api({ fn: 'turma', escola: selEscola.value, prof: selProf.value, linha: selTurma.value })
+    .then(function (dados) {
+      pararEspera(); ind('indTurma', 'ok');
+      fiskLembrarTurma(selEscola.value, selProf.value, selTurma.value,
+        selTurma.options[selTurma.selectedIndex] ? selTurma.options[selTurma.selectedIndex].text : '');
+      turmaSel = dados;
+      montarLista(dados);
+    })
+    .catch(function (e) { pararEspera(); ind('indTurma', ''); erroApi(e); });
+});
+
+function prefillDaURL() {
+  var q = new URLSearchParams(location.search);
+  var escola = q.get('escola'), prof = q.get('prof');
+  if (!escola && !prof) return;
+  var t0 = Date.now();
+  var has = function (sel, val) { return [].some.call(sel.options, function (o) { return o.value === val; }); };
+  var i1 = setInterval(function () {
+    if (Date.now() - t0 > 15000) { clearInterval(i1); return; }
+    if (escola && has(selEscola, escola)) {
+      clearInterval(i1);
+      selEscola.value = escola; selEscola.dispatchEvent(new Event('change'));
+      if (!prof) return;
+      var i2 = setInterval(function () {
+        if (Date.now() - t0 > 15000) { clearInterval(i2); return; }
+        if (has(selProf, prof)) {
+          clearInterval(i2);
+          selProf.value = prof; selProf.dispatchEvent(new Event('change'));
+        }
+      }, 200);
+    }
+  }, 200);
+}
+
+function erroApi(err) {
+  var el = $('statusCard');
+  var msg = String((err && err.message) || err || '');
+  /* O seletor não pode ficar preso em "Carregando escolas…" depois do erro:
+     quem lê isso fica esperando uma lista que não vem mais. */
+  [selEscola, selProf, selTurma].forEach(function (s) {
+    if (s && /Carregando/.test(s.options[0] ? s.options[0].textContent : '')) {
+      s.options[0].textContent = 'não carregou';
+    }
+  });
+  el.className = 'status erro';
+  el.textContent = /sess/i.test(msg)
+    ? '🔒 ' + msg + ' Volte ao Fisk Hub e entre de novo.'
+    : '⚠️ ' + msg;
+}
+
+function montarLista(dados) {
+  alunoSel = null;
+  $('painelDoc').hidden = true;
+  $('painelEscrever').hidden = true;
+  $('statusCard').className = 'aviso';
+  $('statusCard').textContent = '✅ ' + String(dados.turma || '').split('\n')[0] +
+                                ' · ' + dados.alunos.length + ' alunos. Escolha quem você quer registrar.';
+  var ul = $('listaAlunos');
+  ul.innerHTML = '';
+  dados.alunos.forEach(function (a) {
+    var div = document.createElement('div');
+    div.className = 'aluno-item';
+    div.innerHTML = '<span>' + esc(a.nome) + '</span>' +
+                    (a.book ? '<span class="badge">' + esc(a.book) + '</span>' : '');
+    div.addEventListener('click', function () {
+      [].forEach.call(ul.children, function (c) { c.classList.remove('sel'); });
+      div.classList.add('sel');
+      selecionar(a);
+    });
+    ul.appendChild(div);
+  });
+}
+
+function contexto() {
+  return {
+    escola: selEscola.value, professor: selProf.value,
+    turma: (turmaSel && turmaSel.turma) || '',
+    aluno: (alunoSel && alunoSel.nome) || ''
+  };
+}
+
+function selecionar(a) {
+  alunoSel = a;
+  $('fEstagio').value = a.book || '';
+  $('fTexto').value = '';
+  $('statusSalvar').textContent = '';
+  $('painelDoc').hidden = false;
+  $('painelEscrever').hidden = true;
+  $('tituloAluno').textContent = '📄 ' + a.nome;
+  $('semDoc').hidden = true;
+  $('conteudoDoc').hidden = true;
+  $('btnAbrirDoc').hidden = true;
+  $('btnVerPasta').hidden = true;
+  var st = $('statusDoc');
+  st.className = 'status';
+  var pararEspera = fiskEsperando(function (txt) { st.textContent = txt; },
+    ['Procurando o documento na pasta do aluno…',
+     'Ainda procurando, a primeira busca do dia é a mais lenta…']);
+
+  post('counselingLer', contexto()).then(function (j) {
+    pararEspera();
+    if (!j || j.ok !== true) {
+      st.className = 'status erro';
+      st.textContent = '⚠️ ' + ((j && (j.erro || j.error)) || 'não consegui ler o documento');
+      return;
+    }
+    dadosDoc = j;
+    if (j.pastaUrl) { $('btnVerPasta').href = j.pastaUrl; $('btnVerPasta').hidden = false; }
+    if (j.semDoc) {
+      st.className = 'status';
+      st.textContent = 'Pasta encontrada: ' + j.pasta + '.';
+      $('semDoc').hidden = false;
+      return;
+    }
+    $('btnAbrirDoc').href = j.docUrl; $('btnAbrirDoc').hidden = false;
+    st.className = 'status ok';
+    st.textContent = '✓ ' + j.docNome + (j.aviso ? ' — ' + j.aviso : '');
+    if (j.aviso) st.className = 'status';
+    render(j);
+    $('conteudoDoc').hidden = false;
+    $('painelEscrever').hidden = false;
+  }).catch(function (e) {
+    pararEspera();
+    st.className = 'status erro';
+    st.textContent = '⚠️ ' + ((e && e.message) || e);
+  });
+}
+
+function cartao(r, tipo) {
+  var cab = [];
+  if (r.data) cab.push('<span>' + esc(r.data) + '</span>');
+  if (r.professor) cab.push('<span>' + esc(r.professor) + '</span>');
+  if (r.estagio) cab.push('<span>' + esc(r.estagio) + '</span>');
+  /* No termo a coluna da esquerda é o registro inteiro (faltas, atraso, datas);
+     no acompanhamento ela é só o cabeçalho, e o texto está na direita.
+     As duas linhas que já viraram pílula (professor e estágio) saem do corpo:
+     repetidas logo abaixo delas, viram ruído em cima do que interessa. */
+  var corpo = r.dir;
+  if (tipo === 'termo') {
+    var resto = r.esq.split('\n').filter(function (l) {
+      return !/^\s*(Professor|Est[áa]gio)\s*\(?a?\)?\s*:/i.test(l);
+    }).join('\n').trim();
+    corpo = resto + (r.dir ? '\n\n' + r.dir : '');
+  }
+  return '<div class="reg' + (tipo === 'termo' ? ' termo' : '') + '">' +
+         (cab.length ? '<div class="reg-cab">' + cab.join('') + '</div>' : '') +
+         '<div class="reg-txt">' + esc(corpo) + '</div></div>';
+}
+
+function render(j) {
+  var obs = $('obsBasica');
+  if (j.observacoes) { obs.textContent = j.observacoes; obs.hidden = false; }
+  else obs.hidden = true;
+
+  /* o mais recente em cima: o documento cresce para baixo, mas quem abre
+     quer ver o que aconteceu por último */
+  var acad = (j.academico || []).slice().reverse();
+  var termos = (j.termos || []).slice().reverse();
+  $('listaAcad').innerHTML = acad.length
+    ? acad.map(function (r) { return cartao(r, 'acad'); }).join('')
+    : '<p class="vazio">Nenhum registro de acompanhamento ainda. O primeiro pode ser o seu.</p>';
+  $('listaTermo').innerHTML = termos.length
+    ? termos.map(function (r) { return cartao(r, 'termo'); }).join('')
+    : '<p class="vazio">Nenhum termo de atraso registrado neste documento.</p>';
+  $('abaAcad').textContent = 'Acompanhamento' + (acad.length ? ' (' + acad.length + ')' : '');
+  $('abaTermo').textContent = 'Termos de atraso' + (termos.length ? ' (' + termos.length + ')' : '');
+}
+
+$('abaAcad').addEventListener('click', function () {
+  $('abaAcad').classList.add('on'); $('abaTermo').classList.remove('on');
+  $('listaAcad').hidden = false; $('listaTermo').hidden = true;
+});
+$('abaTermo').addEventListener('click', function () {
+  $('abaTermo').classList.add('on'); $('abaAcad').classList.remove('on');
+  $('listaTermo').hidden = false; $('listaAcad').hidden = true;
+});
+
+$('btnCriar').addEventListener('click', function () {
+  var b = this;
+  b.disabled = true; b.textContent = '⏳ Criando…';
+  var ctx = contexto(); ctx.faixa = $('selFaixa').value;
+  post('counselingCriar', ctx).then(function (j) {
+    b.disabled = false; b.textContent = '➕ Criar o documento';
+    if (!j || j.ok !== true) {
+      $('statusDoc').className = 'status erro';
+      $('statusDoc').textContent = '⚠️ ' + ((j && (j.erro || j.error)) || 'não consegui criar');
+      return;
+    }
+    $('semDoc').hidden = true;
+    selecionar(alunoSel);          /* relê: a tela passa a mostrar o documento novo */
+  }).catch(function (e) {
+    b.disabled = false; b.textContent = '➕ Criar o documento';
+    $('statusDoc').className = 'status erro';
+    $('statusDoc').textContent = '⚠️ ' + ((e && e.message) || e);
+  });
+});
+
+$('btnSalvar').addEventListener('click', function () {
+  var texto = $('fTexto').value.trim();
+  var st = $('statusSalvar');
+  if (!texto) { st.className = 'status erro'; st.textContent = 'Escreva a observação antes de salvar.'; return; }
+  var b = this;
+  b.disabled = true; b.textContent = '⏳ Gravando no documento…';
+  st.className = 'status'; st.textContent = '';
+  var ctx = contexto();
+  ctx.origem = 'manual';
+  ctx.campos = { texto: texto, estagio: $('fEstagio').value.trim() };
+  post('counselingEscrever', ctx).then(function (j) {
+    b.disabled = false; b.textContent = '💾 Salvar no documento';
+    if (!j || j.ok !== true) {
+      st.className = 'status erro';
+      st.textContent = '⚠️ ' + ((j && (j.erro || j.error)) || 'não consegui gravar');
+      return;
+    }
+    st.className = 'status ok';
+    st.textContent = j.jaExistia ? '✓ Este registro já estava no documento.' : '✓ Registrado no documento do aluno.';
+    $('fTexto').value = '';
+    selecionar(alunoSel);          /* relê para a linha nova aparecer na hora */
+  }).catch(function (e) {
+    b.disabled = false; b.textContent = '💾 Salvar no documento';
+    st.className = 'status erro';
+    st.textContent = '⚠️ ' + ((e && e.message) || e);
+  });
+});
+
+fiskInitThemeToggle('themeToggle');
+fiskInitUserMenu();
+fiskRegistrarUso('E-counseling');
+</script>
+</body>
+</html>

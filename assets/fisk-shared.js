@@ -472,6 +472,48 @@ function fiskRegistrarUso(ferramenta) {
   } catch (e) {}
 }
 
+/* ============================================================================
+   E-COUNSELING — a linha que a ferramenta escreve sozinha (20/09/2026)
+
+   O documento de counseling do aluno vive na pasta dele no Drive, e até aqui
+   o professor copiava à mão o que o sistema já sabia: as notas do simulado, o
+   termo enviado, a nota lançada. No documento do Nicolas dava para ver três
+   simulados do MET digitados um a um.
+
+   Daqui em diante quem escreve é a própria ferramenta, logo depois de fazer o
+   que já fazia. Três regras:
+
+   1. É SILENCIOSO E NÃO ATRAPALHA. O termo já foi gerado e registrado no card
+      quando esta chamada sai; se ela falhar, o professor não perde nada e não
+      leva um susto por causa de um registro secundário. Quem quiser mostrar o
+      resultado passa um `aoTerminar`.
+   2. A FORMA DO TEXTO É DO SERVIDOR. Aqui só viajam os campos crus
+      (`origem` + `campos`); quem monta a linha é o Counseling.js. São cinco
+      ferramentas escrevendo no mesmo documento, e cinco formatos diferentes
+      seriam cinco dialetos no documento do aluno.
+   3. NÃO DUPLICA. O servidor recusa linha idêntica, então clicar duas vezes,
+      ou gerar o mesmo termo de novo, não repete o registro.
+   ============================================================================ */
+function fiskCounseling(opts) {
+  try {
+    var s = fiskSessao();
+    if (!s || !s.token) return Promise.resolve(null);
+    if (!opts || !opts.aluno || !opts.escola) return Promise.resolve(null);
+    return fetch(FISK_HUB_EP, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'counselingEscrever', token: s.token,
+        escola: opts.escola, professor: opts.professor || '',
+        turma: String(opts.turma || '').split('\n')[0],
+        aluno: opts.aluno, origem: opts.origem || 'manual', campos: opts.campos || {}
+      })
+    }).then(function (r) { return r.json(); })
+      .then(function (j) { if (typeof opts.aoTerminar === 'function') opts.aoTerminar(j); return j; })
+      .catch(function () { return null; });
+  } catch (e) { return Promise.resolve(null); }
+}
+
 function fiskPulso(ferramenta) {
   if (window.__fiskPulso) return;          // uma página, um pulso
   window.__fiskPulso = true;
