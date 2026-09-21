@@ -163,6 +163,12 @@
   .ck .lin.crit.ruim label.rot{ color: #8a1c1c; }
   .ck .lin.crit.ruim .chip.on{ background: #d81f26; border-color: #d81f26; }
   .ck .lin.crit .chip{ padding: .5rem 1rem; }
+  /* o resultado do Checking (Pedro, 21/09/2026): o primeiro campo, e obrigatório */
+  .ck .lin.crit.res{ background: #f4f6fb; border: 1px solid #d7deeb; }
+  .ck .lin.crit.res .chip.on[data-v="aprovado"]{ background: #1f8a5b; border-color: #1f8a5b; }
+  .ck .lin.crit.res .chip.on[data-v="estudar"]{ background: #c2410c; border-color: #c2410c; }
+  .ck-feito.estudar{ background: #fff1e6; border-color: #f3c7a6; }
+  .ck-feito.estudar b{ color: #8a2d06; }
   .ck .notas{ display: flex; flex-wrap: wrap; gap: .35rem; }
   .ck .notas .chip{ min-width: 2.6rem; text-align: center; padding: .45rem .5rem; }
   .chip.on{ background: #1d3685; color: #fff; border-color: #1d3685; }
@@ -480,9 +486,9 @@ body.theme-dark .pl-salvar{ background: #10261f; }
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260919a"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=86f3946e17"></script>
 <!-- o guia do Checking, lição a lição: a base comum e um arquivo por livro (Essentials, Transitions e Fluency 1 e 2, In Focus, Inmediato 1 a 3) -->
-<script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=376d37037e"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=5a600e1933"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=9630e2ddde"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e2.js?v=d46def0a40"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-t1.js?v=e9a53aa8f8"></script>
@@ -1527,16 +1533,17 @@ function gradeDaLicao(a, plano, etapaId, ctx, reg, ehAtual) {
             var bons = (ckL.melhores && ckL.melhores.length ? ckL.melhores : (ckL.melhor ? [ckL.melhor] : []));
             var melhor = bons.map(function (v) { var c = CRITERIOS.find(function (x) { return x[0] === v; }); return c ? c[1].replace(/^\S+\s/, '').toLowerCase() : ''; }).filter(Boolean).join(', ');
         var partes = [melhor ? 'melhor em ' + esc(melhor) : '', esc(quando), ckL.quem ? esc(String(ckL.quem).trim().split(/\s+/)[0]) : ''].filter(Boolean);
-        var feitoBox = document.createElement('div'); feitoBox.className = 'ck-feito';
-        feitoBox.innerHTML = '<span class="mk cheia-prof"></span><span class="ck-tx"><b>✓ Checking realizado</b>' + (partes.length ? '<small>' + partes.join(' · ') + '</small>' : '') + '</span>';
+        var estudar = ckL.resultado === 'estudar';
+        var feitoBox = document.createElement('div'); feitoBox.className = 'ck-feito' + (estudar ? ' estudar' : '');
+        feitoBox.innerHTML = '<span class="mk cheia-prof"></span><span class="ck-tx"><b>' + (estudar ? '📚 Estude mais · refazer o Checking' : '✓ Checking aprovado') + '</b>' + (partes.length ? '<small>' + partes.join(' · ') + '</small>' : '') + '</span>';
         lista.appendChild(feitoBox);
       }
       var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'btn ' + (ckFeito ? 'btn-ck-editar' : 'btn-ck'); bt.dataset.ck = etapaId;
       bt.textContent = ckFeito ? 'Editar Checking' : 'Registrar Checking';
       lista.appendChild(bt);
-      if (ehAtual) lista.appendChild(poeDica(lista, 'O Checking é a conversa do fim da lição: você marca em que o aluno foi melhor, o que ele precisa melhorar e deixa pedidos. Registrar libera a próxima lição no portal dele e paga F$ 250.'));
+      if (ehAtual) lista.appendChild(poeDica(lista, 'O Checking é a conversa do fim da lição, toda falada: o aluno ouve e responde. No fim você escolhe Aprovado ou Estude mais, e nos dois pode marcar o que ele precisa melhorar e deixar pedidos. Aprovado libera a próxima lição e paga F$ 250.'));
       var prox = plano.etapas[plano.etapas.indexOf(plano.etapas.find(function (e) { return e.id === etapaId; })) + 1];
-      if (prox) { var lb = document.createElement('p'); lb.className = 'libera'; lb.textContent = (ckL && ckL.feito ? 'Checking registrado: ' + prox.rot + ' liberada para o aluno.' : 'Ao registrar, a ' + prox.rot + ' é liberada para o aluno.'); lista.appendChild(lb); }
+      if (prox) { var lb = document.createElement('p'); lb.className = 'libera'; lb.textContent = (ckL && ckL.feito ? (ckL.resultado === 'estudar' ? 'Estude mais: a ' + prox.rot + ' fica fechada até um novo Checking aprovado.' : 'Checking aprovado: ' + prox.rot + ' liberada para o aluno.') : 'Com o Aprovado, a ' + prox.rot + ' é liberada para o aluno.'); lista.appendChild(lb); }
     }
     /* UMA SUGESTÃO POR AULA (17/09/2026): o mesmo bloco verde que o aluno vê */
     var sug1 = (ksSug || []).filter(function (x) { return x.aula === ai; })[0];
@@ -2078,14 +2085,20 @@ function abrirChecking(card, a, plano, pos) {
     '<div data-guia></div>' +
     '<div class="registrado" data-reg hidden></div>' +
     '<div class="lin"><label class="rot">Lição</label><select data-licao>' + licoes.map(function (l) { return '<option value="' + esc(l.v) + '"' + (l.v === licao ? ' selected' : '') + '>' + esc(l.t) + '</option>'; }).join('') + '</select></div>' +
+    /* O RESULTADO (Pedro, 21/09/2026). Os elogios, o que melhorar e os pedidos
+       continuam valendo nos DOIS: quase todo aluno é aprovado com ajustes. O que
+       muda é a próxima lição: Aprovado libera e paga os F$; Estude mais segura. */
+    '<div class="lin crit res"><label class="rot">🏁 Resultado (obrigatório)</label><span data-res>' +
+      '<button type="button" class="chip" data-v="aprovado">✅ Aprovado</button>' +
+      '<button type="button" class="chip" data-v="estudar">📚 Estude mais</button></span></div>' +
     '<div class="lin crit bom"><label class="rot">👍 Em que foi melhor (quantos quiser; o aluno vê)</label><span data-melhor>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</span></div>' +
     '<div class="lin crit ruim"><label class="rot">👎 O que precisa melhorar (o aluno vê como pedidos)</label><span data-melhorar>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</span></div>' +
     '<div class="lin"><label class="rot">Pedidos para o aluno (até 8): toque nos prontos, que chegam com o botão do material, ou escreva. O que combina com o que precisa melhorar ganha ● e, se não depende do ponto, entra sozinho; na estrutura, escolha o vídeo e o Quick Practice do ponto fraco</label><span class="prontos" data-prontos></span><span class="pedidos" data-pedidos></span><input type="text" data-novo placeholder="Ou escreva um pedido e aperte Enter" maxlength="80"></div>' +
     '<div class="lin"><label class="rot">Bilhete (até 400 letras; o aluno lê no planner)</label><textarea data-bilhete maxlength="400" placeholder="Good job on pronunciation. Study Do / Does before Lesson 4."></textarea></div>' +
-    '<div class="fim"><button type="button" class="btn btn-ck" data-salvar>Registrar Checking</button><button type="button" class="btn btn-ghost" data-fechar>Fechar</button><span class="aviso" data-aviso>O registro paga F$ 250 ao aluno, uma vez por lição.</span></div>';
+    '<div class="fim"><button type="button" class="btn btn-ck" data-salvar>Registrar Checking</button><button type="button" class="btn btn-ghost" data-fechar>Fechar</button><span class="aviso" data-aviso>Aprovado libera a próxima lição e paga F$ 250, uma vez por lição. Estude mais segura a próxima lição até um novo Checking aprovado.</span></div>';
   card.appendChild(ck);
   var f = {
-    licao: ck.querySelector('[data-licao]'), melhor: ck.querySelector('[data-melhor]'), melhorar: ck.querySelector('[data-melhorar]'),
+    licao: ck.querySelector('[data-licao]'), res: ck.querySelector('[data-res]'), melhor: ck.querySelector('[data-melhor]'), melhorar: ck.querySelector('[data-melhorar]'),
     pedidos: ck.querySelector('[data-pedidos]'), novo: ck.querySelector('[data-novo]'),
     bilhete: ck.querySelector('[data-bilhete]'), reg: ck.querySelector('[data-reg]'), aviso: ck.querySelector('[data-aviso]'), salvar: ck.querySelector('[data-salvar]'),
     prontos: ck.querySelector('[data-prontos]')
@@ -2145,6 +2158,8 @@ function abrirChecking(card, a, plano, pos) {
     f.melhorar.querySelectorAll('.chip').forEach(function (c) { var on = (r.melhorar || []).indexOf(c.dataset.v) > -1; c.classList.toggle('on', on); c.classList.toggle('pior', on); });
     pedidos = (r.pedidos || []).slice(); autoPed = []; recusados = []; pintaPedidos(); sugestoes(false);
     f.bilhete.value = r.bilhete || '';
+    var jaRes = r.resultado || (r.feito ? 'aprovado' : '');   /* Checking de antes da mudança = aprovado (Pedro, 21/09/2026) */
+    f.res.querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('on', c.dataset.v === jaRes); });
     f.reg.hidden = !r.feito;
     if (r.feito) f.reg.textContent = '✓ Registrado' + (r.quem ? ' por ' + r.quem : '') + (r.quando ? ' em ' + new Date(r.quando).toLocaleDateString('pt-BR') : '') + '. Editar aqui atualiza o registro.';
     f.salvar.textContent = r.feito ? 'Salvar alterações' : 'Registrar Checking';
@@ -2167,16 +2182,23 @@ function abrirChecking(card, a, plano, pos) {
     pedidos.push(v.slice(0, 80)); f.novo.value = ''; pintaPedidos();
   });
   ck.querySelector('[data-fechar]').addEventListener('click', function () { ck.remove(); estado.aberto = ''; });
+  f.res.querySelectorAll('.chip').forEach(function (c) { c.addEventListener('click', function () {
+    f.res.querySelectorAll('.chip').forEach(function (x) { x.classList.toggle('on', x === c); });
+    f.aviso.className = 'aviso';
+  }); });
   f.salvar.addEventListener('click', function () {
     var melhores = Array.prototype.map.call(f.melhor.querySelectorAll('.chip.on'), function (c) { return c.dataset.v; }); var melhorar = Array.prototype.map.call(f.melhorar.querySelectorAll('.chip.on'), function (c) { return c.dataset.v; });
     if (f.novo.value.trim() && pedidos.length < 8) { pedidos.push(f.novo.value.trim().slice(0, 80)); f.novo.value = ''; }
-    var checking = { licao: f.licao.value, feito: 1, melhores: melhores, melhor: melhores[0] || null, melhorar: melhorar, pedidos: pedidos.slice(), bilhete: f.bilhete.value.trim() };
+    var resEl = f.res.querySelector('.chip.on'), resultado = resEl ? resEl.dataset.v : '';
+    if (!resultado) { f.aviso.textContent = '⚠️ Escolha o resultado: Aprovado ou Estude mais.'; f.aviso.className = 'aviso err'; f.res.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
+    var checking = { licao: f.licao.value, feito: 1, resultado: resultado, melhores: melhores, melhor: melhores[0] || null, melhorar: melhorar, pedidos: pedidos.slice(), bilhete: f.bilhete.value.trim() };
     /* A NOTA SAIU (pedido dos professores, 19/09/2026): o Checking registrado é que libera a próxima lição */
     f.salvar.disabled = true; f.aviso.textContent = 'Registrando…'; f.aviso.className = 'aviso';
     post({ action: 'plannerProf', raf: a.raf, book: a.book, patch: { checking: checking } }).then(function (r) {
       if (r.planner) estado.dados[a.raf] = Object.assign(estado.dados[a.raf] || {}, { planner: r.planner });
       var fd = r.fd;
-      toast(fd && fd.credito > 0 ? '✓ Checking ' + checking.licao + ' registrado · F$ ' + fd.credito + ' para ' + a.nome.split(' ')[0]
+      if (resultado === 'estudar') toast('📚 Checking ' + checking.licao + ' registrado: Estude mais. A próxima lição fica fechada até um novo Checking aprovado.');
+      else toast(fd && fd.credito > 0 ? '✓ Checking ' + checking.licao + ' aprovado · F$ ' + fd.credito + ' para ' + a.nome.split(' ')[0]
            : (fd && fd.jaPago ? '✓ Checking ' + checking.licao + ' atualizado (já tinha sido pago)'
            : (fd && fd.espelho ? '✓ Checking ' + checking.licao + ' registrado (aluno em piloto: sem F$)' : '✓ Checking ' + checking.licao + ' registrado')));
       estado.aberto = '';
@@ -2204,7 +2226,7 @@ window.addEventListener('message', function (ev) {
   estado.dados[a.raf] = Object.assign(estado.dados[a.raf] || {}, { planner: d.planner });
   estado.aberto = '';
   redesenhar(a);
-  toast('✓ Feedback de ' + a.nome.split(' ')[0] + ' registrado pela tela grande. Falta só a nota.');
+  toast('✓ Checking de ' + a.nome.split(' ')[0] + ' registrado pela tela grande.');
 });
 
 (function () {

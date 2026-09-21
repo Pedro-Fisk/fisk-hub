@@ -39,6 +39,14 @@
   /* AS DUAS VOZES (Pedro, 14/09/2026): a cor diz quem fala, a mesma do
      planner. Verde-oliva = o professor diz ou pergunta; azul-marinho = o
      aluno diz. Sem notas nesta tela: só o que se fala. */
+  /* o que o aluno faz no bloco, em letra grande: é a primeira coisa que ele lê */
+  .bloco-cab .faca{ width:100%; margin:4px 0 0; font-family:'Poppins',sans-serif; font-weight:700; font-size:clamp(20px,2.4vw,28px); color:var(--limae); }
+  .fb .grupo.res{ background:#fff; }
+  .fb .res-bts{ display:flex; gap:14px; flex-wrap:wrap; }
+  .fb .res-bt{ flex:1 1 220px; border:3px solid var(--lin); background:#fff; border-radius:18px; padding:16px 18px; cursor:pointer; font-family:'Poppins',sans-serif; font-weight:800; font-size:clamp(18px,2vw,24px); text-align:left; }
+  .fb .res-bt small{ display:block; font-family:'Nunito',sans-serif; font-weight:700; font-size:14px; color:var(--med); margin-top:4px; }
+  .fb .res-bt.on.ap{ border-color:#1f8a5b; background:#e4f3ec; color:#155a3c; }
+  .fb .res-bt.on.est{ border-color:#c2410c; background:#fff1e6; color:#8a2d06; }
   .legenda{ display:flex; gap:18px; flex-wrap:wrap; font-size:15px; font-weight:700; color:var(--med); }
   .legenda span{ display:inline-flex; align-items:center; gap:8px; }
   .legenda i{ width:14px; height:14px; border-radius:4px; display:inline-block; }
@@ -109,8 +117,8 @@
 </header>
 <main id="main"><div class="erro">Loading the guide…</div></main>
 
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260918a"></script>
-<script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=376d37037e"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=86f3946e17"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=5a600e1933"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=9630e2ddde"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e2.js?v=d46def0a40"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-t1.js?v=e9a53aa8f8"></script>
@@ -127,7 +135,7 @@ var q = new URLSearchParams(location.search);
 var book = q.get('book') || 'Essentials 1', licaoId = (q.get('licao') || 'L1').toUpperCase(), aluno = q.get('aluno') || '', raf = q.get('raf') || '';
 var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
 var CRITERIOS = [['vocabulary', '🔤 Vocabulary'], ['fluency', '💬 Fluency'], ['structure', '🧱 Structure'], ['pronunciation', '🗣️ Pronunciation'], ['listening', '👂 Listening']];
-var fb = { melhores: [], melhorar: [], pedidos: [], bilhete: '', auto: [], recusados: [] };   /* 19/09/2026: vários elogios, e a nota não existe mais */
+var fb = { resultado: '', melhores: [], melhorar: [], pedidos: [], bilhete: '', auto: [], recusados: [] };   /* resultado: 'aprovado' | 'estudar' (Pedro, 21/09/2026) */   /* 19/09/2026: vários elogios, e a nota não existe mais */
 /* a ligação dimensão → pedido (PlannerV2.pedidosSugeridos, a mesma da Turma de hoje):
    o que entrou sozinho sai sozinho; o que o professor tirou à mão não volta */
 function sugestoesDe(planoV2) {
@@ -157,6 +165,9 @@ var ES = !!(G && G.idioma === 'es');
 function T2(en, es) { return ES ? es : en; }
 if (ES) CRITERIOS = [['vocabulary', '🔤 Vocabulario'], ['fluency', '💬 Fluidez'], ['structure', '🧱 Estructura'], ['pronunciation', '🗣️ Pronunciación'], ['listening', '👂 Comprensión auditiva']];
 var L = G && G.licoes.find(function (x) { return x.id === licaoId; });
+/* A TELA GRANDE é o computador virado para o aluno: o Check-in (soProf) fica
+   de fora, é conversa do professor, sem nada para mostrar (Pedro, 21/09/2026). */
+var R = G ? G.ROTEIRO.filter(function (r) { return !r.soProf; }) : [];
 var estado = { i: 0, feitas: {} };
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
@@ -170,30 +181,36 @@ if (!G || !L) {
 }
 function pintaPassos() {
   var nav = $('passos'); nav.innerHTML = '';
-  G.ROTEIRO.forEach(function (r, i) {
+  R.forEach(function (r, i) {
     var b = document.createElement('button'); b.type = 'button'; b.textContent = i + 1; b.title = r.t;
     b.className = (i === estado.i ? 'on' : '') + (estado.feitas[r.k] ? ' ok' : '');
     b.addEventListener('click', function () { estado.i = i; pinta(); });
     nav.appendChild(b);
   });
   /* o feedback também tem número: é o passo seguinte ao último bloco */
-  var bFb = document.createElement('button'); bFb.type = 'button'; bFb.textContent = G.ROTEIRO.length + 1; bFb.title = 'Feedback';
-  bFb.className = estado.i >= G.ROTEIRO.length ? 'on' : '';
-  bFb.addEventListener('click', function () { estado.i = G.ROTEIRO.length; pinta(); });
+  var bFb = document.createElement('button'); bFb.type = 'button'; bFb.textContent = R.length + 1; bFb.title = 'Feedback';
+  bFb.className = estado.i >= R.length ? 'on' : '';
+  bFb.addEventListener('click', function () { estado.i = R.length; pinta(); });
   nav.appendChild(bFb);
 }
 function pinta() {
   var main = $('main'); main.innerHTML = '';
   pintaPassos();
-  if (estado.i >= G.ROTEIRO.length) { pintaFeedback(main); return; }
-  var r = G.ROTEIRO[estado.i];
+  if (estado.i >= R.length) { pintaFeedback(main); return; }
+  var r = R[estado.i];
   var cab = document.createElement('div'); cab.className = 'bloco-cab';
+  /* O CHECKING FALADO (Pedro, 21/09/2026): a tela diz ao aluno o que FAZER
+     ("Listen and answer"), e não mostra mais o começo pronto da resposta nem
+     a frase com buraco. O aluno ouve e responde de boca. */
+  var linhas = (G.linhasDe(L, r.k, { tv: true }) || []).filter(function (ln) { return ln.diz; });
+  var temAluno = linhas.some(function (ln) { return ln.quem === 'A'; });
   cab.innerHTML = '<h1>' + (r.ic ? r.ic + ' ' : '') + (estado.i + 1) + '. ' + esc(r.t) + '</h1>' +
-    '<div class="legenda"><span class="p"><i></i>' + T2('Teacher says', 'Dice el profesor') + '</span><span class="a"><i></i>' + T2('Student says', 'Dice el alumno') + '</span></div>';
+    (r.tv ? '<p class="faca">' + esc(r.tv) + '</p>' : '') +
+    (temAluno ? '<div class="legenda"><span class="p"><i></i>' + T2('Teacher says', 'Dice el profesor') + '</span><span class="a"><i></i>' + T2('Student repeats', 'El alumno repite') + '</span></div>' : '');
   main.appendChild(cab);
   var box = document.createElement('div'); box.className = 'linhas';
   /* só as falas: a linha sem "diz" é nota do professor, e nota não entra aqui */
-  (G.linhasDe(L, r.k) || []).filter(function (ln) { return ln.diz; }).forEach(function (ln) {
+  linhas.forEach(function (ln) {
     var aluno = ln.quem === 'A';
     var el = document.createElement('div'); el.className = 'linha ' + (aluno ? 'fala-aluno' : 'fala-prof');
     el.innerHTML = '<span class="quem">' + (aluno ? T2('Student', 'Alumno') : T2('Teacher', 'Profesor')) + '</span><div class="diz">' + esc(ln.diz) + '</div>';
@@ -205,7 +222,7 @@ function pinta() {
   var volta = document.createElement('button'); volta.type = 'button'; volta.className = 'btn btn-sec'; volta.textContent = T2('‹ Back', '‹ Atrás'); volta.disabled = estado.i === 0;
   volta.addEventListener('click', function () { estado.i = Math.max(0, estado.i - 1); pinta(); window.scrollTo(0, 0); });
   var feito = document.createElement('button'); feito.type = 'button'; feito.className = 'btn btn-feito';
-  feito.textContent = T2('✓ Done · next: ', '✓ Hecho · siguiente: ') + (estado.i + 1 < G.ROTEIRO.length ? G.ROTEIRO[estado.i + 1].t : 'Feedback');
+  feito.textContent = T2('✓ Done · next: ', '✓ Hecho · siguiente: ') + (estado.i + 1 < R.length ? R[estado.i + 1].t : 'Feedback');
   feito.addEventListener('click', function () { estado.feitas[r.k] = 1; estado.i++; pinta(); window.scrollTo(0, 0); });
   acoes.appendChild(volta); acoes.appendChild(feito);
   main.appendChild(acoes);
@@ -218,7 +235,16 @@ function pinta() {
 function pintaFeedback(main) {
   var primeiro = aluno ? aluno.split(' ')[0] : 'the student';
   var box = document.createElement('div'); box.className = 'fb';
-  box.innerHTML = '<div class="bloco-cab"><h1>' + (G.ROTEIRO.length + 1) + '. Feedback</h1></div>' +
+  /* O RESULTADO (Pedro, 21/09/2026). Nos DOIS os elogios, o que melhorar e
+     os pedidos continuam: quase todo aluno é aprovado com ajustes, e as
+     orientações não são só de quem ficou. O que muda é a próxima lição:
+     Approved libera e paga os F$; Study more segura a lição até um novo
+     Checking aprovado, contra a data prevista e contra o card. */
+  box.innerHTML = '<div class="bloco-cab"><h1>' + (R.length + 1) + '. Feedback</h1></div>' +
+    '<div class="grupo res"><h2>🏁 ' + T2('Result', 'Resultado') + '</h2><div class="res-bts">' +
+      '<button type="button" class="res-bt ap" data-res="aprovado">✅ ' + T2('Approved', 'Aprobado') + '<small>' + T2('Congratulations, let\'s move on!', '¡Felicidades, sigamos!') + '</small></button>' +
+      '<button type="button" class="res-bt est" data-res="estudar">📚 ' + T2('Study more', 'Estudia más') + '<small>' + T2('Review, then we do the Checking again', 'Repasa y hacemos la verificación de nuevo') + '</small></button>' +
+    '</div></div>' +
     '<div class="grupo bom"><h2>👍 ' + esc(primeiro) + T2(', you were best at…', ', lo que mejor hiciste fue…') + '</h2><div class="chips" data-melhor>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</div></div>' +
     '<div class="grupo ruim"><h2>👎 ' + T2('Let\'s work on…', 'Vamos a trabajar…') + '</h2><div class="chips" data-melhorar>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</div></div>' +
     '<div class="grupo"><h2>🎯 ' + T2('To improve more, you should…', 'Para mejorar más, deberías…') + '</h2><div class="chips" data-pedidos></div></div>' +
@@ -245,21 +271,28 @@ function pintaFeedback(main) {
     else if (fb.pedidos.length < 8) { fb.pedidos.push(c.dataset.id); fb.recusados = fb.recusados.filter(function (x) { return x !== c.dataset.id; }); }
     c.classList.toggle('on', i === -1); }); });
   var ta = box.querySelector('[data-bilhete]'); ta.value = fb.bilhete; ta.addEventListener('input', function () { fb.bilhete = ta.value; });
+  box.querySelectorAll('[data-res]').forEach(function (b) {
+    b.classList.toggle('on', fb.resultado === b.dataset.res);
+    b.addEventListener('click', function () { fb.resultado = b.dataset.res; box.querySelectorAll('[data-res]').forEach(function (x) { x.classList.toggle('on', x === b); }); });
+  });
 
   var acoes = document.createElement('div'); acoes.className = 'acoes';
   var volta = document.createElement('button'); volta.type = 'button'; volta.className = 'btn btn-sec'; volta.textContent = T2('‹ Back', '‹ Atrás');
-  volta.addEventListener('click', function () { estado.i = G.ROTEIRO.length - 1; pinta(); window.scrollTo(0, 0); });
+  volta.addEventListener('click', function () { estado.i = R.length - 1; pinta(); window.scrollTo(0, 0); });
   var salvar = document.createElement('button'); salvar.type = 'button'; salvar.className = 'btn btn-feito';
   salvar.textContent = raf ? T2('✓ Save feedback', '✓ Guardar el feedback') : T2('✓ Finish', '✓ Terminar');
   salvar.addEventListener('click', function () {
     if (!raf) { window.close(); return; }
+    if (!fb.resultado) { var okR = box.querySelector('[data-ok]'); okR.hidden = false; okR.textContent = T2('Choose the result first: Approved or Study more.', 'Elige el resultado primero: Aprobado o Estudia más.'); box.querySelector('.grupo.res').scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
     salvar.disabled = true; salvar.textContent = T2('Saving…', 'Guardando…');
-    var checking = { licao: licaoId, feito: 1, melhores: fb.melhores.slice(), melhor: fb.melhores[0] || null, melhorar: fb.melhorar.slice(), pedidos: fb.pedidos.slice(), bilhete: fb.bilhete.trim() };
+    var checking = { licao: licaoId, feito: 1, resultado: fb.resultado, melhores: fb.melhores.slice(), melhor: fb.melhores[0] || null, melhorar: fb.melhorar.slice(), pedidos: fb.pedidos.slice(), bilhete: fb.bilhete.trim() };
     fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plannerProf', token: token(), raf: raf, book: book, patch: { checking: checking } }) })
       .then(function (r) { return r.json(); })
       .then(function (r) {
         if (!r || !r.ok) throw new Error((r && (r.error || r.erro)) || 'not saved');
-        var okEl = box.querySelector('[data-ok]'); okEl.hidden = false; okEl.textContent = T2('✓ Checking saved. The next lesson is open for the student.', '✓ Verificación guardada. La lección siguiente ya está abierta para el alumno.');
+        var okEl = box.querySelector('[data-ok]'); okEl.hidden = false; okEl.textContent = fb.resultado === 'estudar'
+          ? T2('✓ Checking saved. Study more: the next lesson stays closed until a new Checking is approved.', '✓ Verificación guardada. Estudia más: la lección siguiente queda cerrada hasta una nueva verificación aprobada.')
+          : T2('✓ Checking saved. Approved: the next lesson is open for the student.', '✓ Verificación guardada. Aprobado: la lección siguiente ya está abierta para el alumno.');
         try { if (window.opener) window.opener.postMessage({ tipo: 'checking', raf: raf, planner: r.planner }, '*'); } catch (e) {}
         salvar.textContent = T2('✓ Saved · close', '✓ Guardado · cerrar'); salvar.disabled = false; salvar.onclick = function () { window.close(); };
       }).catch(function (e) { salvar.disabled = false; salvar.textContent = '⚠️ ' + e.message + T2(' · try again', ' · intentar de nuevo'); });
@@ -270,7 +303,7 @@ function pintaFeedback(main) {
 document.addEventListener('keydown', function (ev) {
   if (!L) return;
   if (ev.target && /TEXTAREA|INPUT/.test(ev.target.tagName)) return;
-  if (ev.key === 'ArrowRight' || ev.key === 'Enter') { estado.feitas[(G.ROTEIRO[estado.i] || {}).k] = 1; estado.i = Math.min(G.ROTEIRO.length, estado.i + 1); pinta(); }
+  if (ev.key === 'ArrowRight' || ev.key === 'Enter') { estado.feitas[(R[estado.i] || {}).k] = 1; estado.i = Math.min(R.length, estado.i + 1); pinta(); }
   if (ev.key === 'ArrowLeft') { estado.i = Math.max(0, estado.i - 1); pinta(); }
 });
 </script>
