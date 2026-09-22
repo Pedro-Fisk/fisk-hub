@@ -161,6 +161,27 @@
   table.lote{ width: 100%; border-collapse: collapse; font-size: .88rem; }
   table.lote th, table.lote td{ text-align: left; padding: .45rem .4rem; border-bottom: 1px solid #eef1f6; }
   table.lote th{ font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--gray); }
+  /* o histórico: uma linha por correção, que abre o detalhe */
+  .hist{ border: 1px solid var(--surface-border-color); border-radius: 10px; overflow: hidden; margin-top: .6rem; }
+  .hist .hdia{ font-size: .74rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--gray); background: var(--ui-soft); padding: .35rem .8rem; }
+  .hist details{ border-bottom: 1px solid #eef1f6; }
+  .hist details:last-child{ border-bottom: 0; }
+  .hist summary{ display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .7rem; padding: .6rem .8rem; cursor: pointer; list-style: none; }
+  .hist summary::-webkit-details-marker{ display: none; }
+  .hist summary::before{ content: '▸'; color: var(--gray); font-weight: 900; transition: transform .15s; }
+  .hist details[open] summary::before{ transform: rotate(90deg); }
+  .hist summary:hover{ background: #eef3fb; }
+  .hist .hn{ font-weight: 800; }
+  .hist .hcor{ display: inline-flex; align-items: center; gap: .3rem; font-size: .82rem; color: var(--gray); }
+  .hist .hcor i{ width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+  .hist .hnota{ margin-left: auto; font-weight: 800; font-size: .88rem; }
+  .hist .hnota.pass{ color: #1f6b35; } .hist .hnota.nopass{ color: #a11a1a; }
+  .hist .hcorpo{ padding: .2rem .9rem 1rem; }
+  .hist .hmeta{ font-size: .82rem; color: var(--gray); margin: .2rem 0 .4rem; }
+  .hist .hrev{ border-radius: 10px; padding: .6rem .8rem; margin-top: .8rem; background: #eef3fb; font-size: .9rem; }
+  .hist .vazio{ padding: .7rem .8rem; color: var(--gray); }
+  body.theme-dark .hist summary:hover{ background: #1d2a3b; }
+  body.theme-dark .hist .hrev{ background: #172232; }
   .toast{ position: fixed; left: 50%; bottom: 1.2rem; transform: translateX(-50%); background: #14161c; color: #fff; padding: .7rem 1rem; border-radius: 10px; z-index: 99; font-weight: 700; }
 
   body.theme-dark .alunos button:hover, body.theme-dark .achados button:hover{ background: #1d2a3b; }
@@ -274,10 +295,15 @@
     </div>
   </section>
 
-  <!-- as corrigidas nesta sessão -->
+  <!-- o histórico: as correções salvas no servidor, de quem corrigiu e dos alunos das turmas escolhidas -->
   <section class="painel" id="pLote" hidden>
-    <h2>📋 Corrigidas hoje neste aparelho</h2>
-    <div style="overflow:auto"><table class="lote" id="tabLote"></table></div>
+    <h2>📋 Histórico de correções</h2>
+    <p class="hint">As folhas que você corrigiu e as dos alunos das turmas escolhidas acima. Toque num aluno para ver a nota completa, como ele vê no Portal, com os erros e o <i>Points to Review</i>.</p>
+    <div class="linha2">
+      <div><label class="mini" for="filtroHist">Procurar no histórico</label><input id="filtroHist" type="search" placeholder="Nome, RAF ou turma" autocomplete="off"></div>
+    </div>
+    <div class="status" id="statusHist"></div>
+    <div class="hist" id="tabLote"></div>
     <div class="btns">
       <button type="button" class="btn sec" id="copiarLote">📋 Copiar a tabela</button>
     </div>
@@ -404,7 +430,7 @@ function carregaAlunosProf(escola, prof) {
       .map(function (a) { return { nome: a.nome, raf: a.raf, turma: a.turma, book: a.book, escola: escola, prof: prof }; });
     try { localStorage.setItem(chave, JSON.stringify(lista)); } catch (e) {}
     if ($('selProf').value !== prof) return;
-    estado.alunosProf = lista; pintaAlunos();
+    estado.alunosProf = lista; pintaAlunos(); carregaHistorico();
   }).catch(function (e) { if (!guardada) $('listaAlunos').innerHTML = '<div class="vazio">⚠️ ' + esc(e.message) + '</div>'; });
 }
 function jaCorrigidos() { var m = {}; lote().forEach(function (x) { m[x.raf + '|' + x.cor] = true; }); return m; }
@@ -659,16 +685,21 @@ function mostraResultado() {
   for (q = 51; q <= 100; q++) if (resp[q] && resp[q] === key[q - 1]) { if (q <= 70) gram++; else read++; }
   sc.grammar = gram; sc.readingSo = read;
   estado.nota = { sc: sc, fin: fin, cor: cor };
-  var errosL = sc.erros.filter(function (q) { return q <= 50; }), errosR = sc.erros.filter(function (q) { return q > 50; });
-  function lista(qs) {
-    return qs.length ? qs.map(function (q) { return '<span>' + q + ': ' + (resp[q] || 'branco') + ' → ' + key[q - 1] + '</span>'; }).join('') : 'nenhum';
-  }
   $('p5').hidden = false;
   $('resultado').innerHTML =
     '<p class="hint">' + esc(estado.aluno.nome) + ' · simulado #' + cor.n + ' ' + cor.nome + ' · ' + esc(dataBr($('dataSim').value)) + '</p>' +
     '<div class="final ' + (fin.pass ? 'pass' : 'nopass') + '">' + (fin.pass ? '✅ ' : '❌ ') + fin.rot + ' &nbsp;·&nbsp; nota para o card: ' + notaCard(sc) + '</div>' +
     '<div class="copie">✍️ <span>Copie esta tabela na folha do aluno, no quadro <i>SCORE</i> da frente, e marque a cor #' + cor.n + ' ' + cor.nome + ' em <i>PRACTICE TEST</i>.</span></div>' +
-    tabelaScore(sc, fin) + blocoPTR(resp, key) +
+    tabelaScore(sc, fin) + detalheErros(resp, key, estado.cor);
+}
+/* os erros e o Points to Review de uma folha: servem ao resultado da hora e a cada linha do histórico */
+function detalheErros(resp, key, cor) {
+  var errosL = [], errosR = [];
+  for (var q = 1; q <= 100; q++) if (resp[q] !== key[q - 1]) (q <= 50 ? errosL : errosR).push(q);
+  function lista(qs) {
+    return qs.length ? qs.map(function (q) { return '<span>' + q + ': ' + (resp[q] || 'branco') + ' → ' + key[q - 1] + '</span>'; }).join('') : 'nenhum';
+  }
+  return blocoPTR(resp, key, cor) +
     '<div class="erros"><b>Erros no <i>Listening</i> (' + errosL.length + '):</b> ' + lista(errosL) + '</div>' +
     '<div class="erros"><b>Erros no <i>Reading &amp; Grammar</i> (' + errosR.length + '):</b> ' + lista(errosR) + '</div>' +
     '<p class="hint" style="margin-top:.6rem">Cada erro aparece como "questão: marcou → certa". Use para o <i>Points to Review</i> com o aluno. O aluno vê só a tabela, nunca as respostas certas.</p>';
@@ -677,8 +708,8 @@ function mostraResultado() {
    Substitui marcar os X à mão no Study Guide; a conversa com o aluno continua (Guia de Procedimentos). */
 var CAPS = { 1: 'Connectors', 2: 'Gerunds & Infinitives', 3: 'Phrasal Verbs & Prepositions', 4: 'Inversion & Emphasis', 5: 'Pronouns & Determiners',
   6: 'Comparatives & Superlatives', 7: 'Embedded Questions & Word Order', 8: 'Conditionals & Subjunctive', 9: 'Adverbs, Modals & Tags', 10: 'Tenses', 11: 'Relative Clauses & Passive' };
-function blocoPTR(resp, key) {
-  var f = PTR && PTR[estado.cor];
+function blocoPTR(resp, key, cor) {
+  var f = PTR && PTR[cor];
   if (!f) return '';
   var erradas = [];
   for (var q = 51; q <= 70; q++) if (resp[q] !== key[q - 1]) erradas.push(q);
@@ -718,7 +749,7 @@ function tabelaScore(sc, fin) {
     }).join('') +
     '</table></div>';
 }
-function notaCard(sc) { return esc(sc.cefrL.replace('abaixo de A2', '<A2') + '/' + sc.cefrR.replace('abaixo de A2', '<A2')); }
+function notaCard(sc) { function c(v) { return String(v || '').replace(/abaixo de A2|Below A2/, '<A2'); } return esc(c(sc.cefrL) + '/' + c(sc.cefrR)); }
 function dataBr(iso) { var m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})$/); return m ? m[3] + '/' + m[2] + '/' + m[1] : ''; }
 $('ajustar').addEventListener('click', function () { $('p4').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
 
@@ -762,25 +793,99 @@ $('proximo').addEventListener('click', function () {
     if (card.ok) toast('✓ ' + a.nome.split(' ')[0] + ' salvo e lançado no TEST ' + card.test + ' do card (' + (j.notaCard || '') + ').');
     else alert('A correção de ' + a.nome + ' foi salva e o aluno já vê a tabela no Portal, mas a nota NÃO foi lançada no card:\n\n' + (card.motivo || 'motivo desconhecido') + '.\n\nLance à mão no card, se for o caso.');
     estado.aluno = null; $('escolhido').hidden = true; limpaLeitura(); liberaFoto();
-    $('filtro').value = ''; pintaLote(); pintaAlunos();
+    $('filtro').value = ''; pintaLote(); pintaAlunos(); carregaHistorico();
     $('p2').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }).catch(function (e) {
     toast('⚠️ Não salvei: ' + e.message + '. Tente de novo.');
   }).then(function () { btn.disabled = false; btn.textContent = '➕ Salvar, lançar no card e corrigir o próximo'; });
 });
-function pintaLote() {
-  var l = lote();
-  $('pLote').hidden = !l.length;
-  if (!l.length) return;
-  $('tabLote').innerHTML = '<tr><th>Aluno</th><th>Cor</th><th>Data</th><th>List.</th><th>R&amp;G</th><th>Nota</th><th>Resultado</th><th>Card</th></tr>' +
-    l.map(function (x) {
-      var c = CORES.find(function (k) { return k.id === x.cor; }) || { nome: x.cor };
-      return '<tr><td>' + esc(x.nome) + '</td><td>' + esc(c.nome) + '</td><td>' + esc(dataBr(x.data)) + '</td><td>' + x.L + '</td><td>' + x.R + '</td><td>' + notaCard({ cefrL: x.cefrL, cefrR: x.cefrR }) + '</td><td>' + esc(x.final) + '</td><td>' + esc(x.card || '') + '</td></tr>';
-    }).join('');
+/* O HISTÓRICO (22/09/2026, pedido do Pedro: "o professor quer ver aquele detalhamento de notas dos seus alunos, igual
+   aparece para o aluno"). Vem do servidor (metFisicoHistorico, met-fisico.js): as folhas que este professor salvou e as dos
+   alunos da lista de turmas escolhida, de qualquer dia e de qualquer aparelho. As 100 letras voltam junto, e o detalhe
+   (tabela SCORE, erros e Points to Review) é remontado aqui com o mesmo gabarito da correção. Sem rede, cai no que ficou
+   guardado neste aparelho hoje. */
+var historico = [], histDoServidor = false, histPedido = 0;
+function carregaHistorico() {
+  var n = ++histPedido;
+  $('statusHist').textContent = historico.length ? '' : '🔄 Lendo o histórico…';
+  if (!historico.length) pintaLote();
+  post({ action: 'metFisicoHistorico', rafs: estado.alunosProf.map(function (a) { return a.raf; }) }).then(function (j) {
+    if (n !== histPedido) return;
+    historico = j.linhas || []; histDoServidor = true;
+    $('statusHist').textContent = ''; pintaLote();
+  }).catch(function (e) {
+    if (n !== histPedido) return;
+    $('statusHist').textContent = '⚠️ Não consegui ler o histórico (' + e.message + '). Mostrando só as corrigidas hoje neste aparelho.';
+    histDoServidor = false; pintaLote();
+  });
 }
+/* a linha guardada no aparelho, no formato do servidor */
+function doLote(x) {
+  var c = CORES.find(function (k) { return k.id === x.cor; }) || { nome: x.cor, n: 0 };
+  function nv(v) { return String(v || '').replace('abaixo de A2', 'Below A2'); }
+  var fin = resultadoFinal(x.cefrL, x.cefrR);
+  return { raf: x.raf, nome: x.nome, turma: x.turma, escola: x.escola, cor: x.cor, corNome: c.nome, corN: c.n, data: x.data, respostas: x.resp,
+           listening: x.L, grammar: x.G, reading: x.Rd, rg: x.R, pctL: Math.round(x.L / 50 * 100), pctRG: Math.round(x.R / 50 * 100),
+           cefrL: nv(x.cefrL), cefrR: nv(x.cefrR), resultado: x.final, aprovado: fin.pass, conferidas: x.conferidas, professor: '', revisao: undefined, card: x.card };
+}
+function linhasHist() {
+  var base = histDoServidor ? historico.slice() : lote().map(doLote).reverse();
+  /* o cartão "lançado no TEST n" só o aparelho sabe: junta nas linhas de hoje */
+  var cards = {}; lote().forEach(function (x) { cards[x.raf + '|' + x.cor + '|' + x.data] = x.card; });
+  base.forEach(function (h) { if (!h.card) h.card = cards[h.raf + '|' + h.cor + '|' + h.data] || ''; });
+  var f = norm($('filtroHist').value);
+  return f ? base.filter(function (h) { return (norm(h.nome) + ' ' + norm(h.raf) + ' ' + norm(h.turma)).indexOf(f) > -1; }) : base;
+}
+function pintaLote() {
+  var todas = histDoServidor ? historico : lote(), ls = linhasHist();
+  $('pLote').hidden = !todas.length && !$('statusHist').textContent;
+  if (!todas.length) { $('tabLote').innerHTML = ''; return; }
+  if (!ls.length) { $('tabLote').innerHTML = '<div class="vazio">Nada com esse nome no histórico.</div>'; return; }
+  var html = '', dia = '';
+  ls.forEach(function (h, i) {
+    if (h.data !== dia) { dia = h.data; html += '<div class="hdia">' + esc(dataBr(dia)) + '</div>'; }
+    var c = CORES.find(function (k) { return k.id === h.cor; }) || { cor: '#999', nome: h.cor };
+    html += '<details data-h="' + i + '"><summary><span class="hn">' + esc(h.nome) + '</span>' +
+      '<span class="hcor"><i style="background:' + c.cor + '"></i>#' + (h.corN || '') + ' ' + esc(c.nome) + '</span>' +
+      '<small style="color:var(--gray)">L ' + h.listening + '/50 · R&amp;G ' + h.rg + '/50</small>' +
+      '<span class="hnota ' + (h.aprovado ? 'pass' : 'nopass') + '">' + (h.aprovado ? '✅ ' : '❌ ') + esc(h.resultado) + ' · ' + notaCard(h) + '</span></summary>' +
+      '<div class="hcorpo"></div></details>';
+  });
+  $('tabLote').innerHTML = html;
+  $('tabLote')._linhas = ls;
+}
+/* o detalhe só é montado quando o professor abre a linha: são até 400 alunos */
+$('tabLote').addEventListener('toggle', function (ev) {
+  var d = ev.target; if (!d.open || !d.matches('details[data-h]')) return;
+  var corpo = d.querySelector('.hcorpo'); if (corpo.dataset.pronto) return;
+  var h = ($('tabLote')._linhas || [])[+d.dataset.h]; if (!h) return;
+  corpo.dataset.pronto = '1';
+  corpo.innerHTML = detalheHist(h);
+}, true);
+function detalheHist(h) {
+  function nv(v) { return String(v || '').replace('Below A2', 'abaixo de A2'); }
+  var sc = { listening: h.listening, grammar: h.grammar, readingSo: h.reading, reading: h.rg, cefrL: nv(h.cefrL), cefrR: nv(h.cefrR) };
+  var fin = resultadoFinal(sc.cefrL, sc.cefrR), key = GAB && GAB[h.cor], resp = {}, txt = String(h.respostas || '');
+  for (var q = 1; q <= 100; q++) { var l = txt.charAt(q - 1); resp[q] = /[ABCD]/.test(l) ? l : null; }
+  var meta = [h.turma, h.raf, h.professor ? 'corrigido por ' + h.professor : '', h.conferidas ? h.conferidas + ' conferida' + (h.conferidas > 1 ? 's' : '') + ' à mão' : '', h.card ? 'card: ' + h.card : '']
+    .filter(Boolean).map(esc).join(' · ');
+  return '<div class="hmeta">' + meta + '</div>' + tabelaScore(sc, fin) + blocoRevisao(h) +
+    (key && txt.length === 100 ? detalheErros(resp, key, h.cor) : '<p class="hint">Sem as respostas desta folha para mostrar os erros.</p>');
+}
+/* o andamento da bateria de revisão que o aluno recebe no Portal com os pontos que errou */
+function blocoRevisao(h) {
+  var r = h.revisao;
+  if (r === undefined) return '';
+  if (!r || !r.pontos) return r ? '<div class="hrev">🎯 <b>Revisão no Portal:</b> nenhum ponto para revisar nesta folha.</div>' : '';
+  if (!r.feitos) return '<div class="hrev">🎯 <b>Revisão no Portal:</b> ' + r.pontos + ' ponto' + (r.pontos > 1 ? 's' : '') + ' para praticar · <b>o aluno ainda não começou</b>.</div>';
+  var pct = Math.round(r.acertos / r.feitos * 100);
+  return '<div class="hrev">🎯 <b>Revisão no Portal:</b> ' + (r.dominados >= r.pontos ? '🎉 dominou os ' + r.pontos + ' pontos' : r.dominados + ' de ' + r.pontos + ' pontos dominados') +
+    ' · ' + r.feitos + ' exercício' + (r.feitos > 1 ? 's' : '') + ', ' + pct + '% de acerto' + (r.ultima ? ' · último em ' + esc(dataBr(r.ultima)) : '') + '</div>';
+}
+$('filtroHist').addEventListener('input', pintaLote);
 $('copiarLote').addEventListener('click', function () {
-  var txt = ['Aluno\tRAF\tTurma\tSimulado\tData\tListening\tGrammar\tReading\tR&G\tCEFR L\tCEFR R&G\tResultado\tCard'].concat(lote().map(function (x) {
-    return [x.nome, x.raf, x.turma, x.cor, dataBr(x.data), x.L, x.G, x.Rd, x.R, x.cefrL, x.cefrR, x.final, x.card || ''].join('\t');
+  var txt = ['Aluno\tRAF\tTurma\tSimulado\tData\tListening\tGrammar\tReading\tR&G\tCEFR L\tCEFR R&G\tResultado\tCorrigido por\tCard'].concat(linhasHist().map(function (x) {
+    return [x.nome, x.raf, x.turma, x.corNome, dataBr(x.data), x.listening, x.grammar, x.reading, x.rg, x.cefrL, x.cefrR, x.resultado, x.professor || '', x.card || ''].join('\t');
   })).join('\n');
   (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function () { toast('✓ Tabela copiada. Cole numa planilha.'); })
     .catch(function () { toast('Não consegui copiar neste aparelho.'); });
@@ -796,7 +901,7 @@ $('copiarLote').addEventListener('click', function () {
   if (!piloto) { geral('🔒 O corretor está em teste com a direção. Em breve para todos.', true); $('p1').hidden = $('p2').hidden = $('p3').hidden = true; return; }
   try { estado.cor = localStorage.getItem('cmet:cor') || ''; } catch (e) {}
   $('dataSim').value = hoje();
-  pintaCores(); initAlunos(); pintaLote();
+  pintaCores(); initAlunos(); pintaLote(); carregaHistorico();
   motorPronto.catch(function (e) { geral('⚠️ Não consegui carregar o corretor: ' + esc(e.message) + '. Recarregue a página.', true); });
 })();
 </script>
