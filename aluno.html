@@ -241,6 +241,13 @@
             margin-bottom:1.1rem; }
   body.theme-dark #pnRadar{ --surface:#1e1c1c; --surface-2:#262323; --border:#3a3535; }
   #pnRadar .rd-card{ border-width:2px; }
+  .rf-modal{ position:fixed; inset:0; background:rgba(10,20,32,.55); z-index:60; display:flex; align-items:flex-start; justify-content:center; padding:3vh 12px; overflow:auto; }
+  .rf-caixa{ background:var(--white); border-radius:16px; width:100%; max-width:640px; box-shadow:0 20px 60px rgba(0,0,0,.3); overflow:hidden; }
+  .rf-topo{ display:flex; align-items:center; gap:.5rem; padding:.8rem 1rem; background:var(--ui,#2b4d70); color:#fff; font-family:var(--font-heading); }
+  .rf-topo b{ flex:1; } .rf-x{ border:0; background:rgba(255,255,255,.15); color:#fff; width:32px; height:32px; border-radius:50%; cursor:pointer; }
+  .rf-info{ padding:.7rem 1rem; font-size:.86rem; line-height:1.5; border-bottom:1px solid var(--gray-light); }
+  .rf-info.aviso{ background:#fbf3df; }
+  #rfFrame{ display:block; width:100%; height:78vh; border:0; background:#f3f6f9; }
 </style>
 </head>
 <body>
@@ -287,6 +294,8 @@
            aluno, e o documento de acompanhamento dele é o que faltava aqui. -->
       <button type="button" class="btn-ver" id="btnCounseling" hidden>💬 E-counseling</button>
       <button type="button" class="btn-ver" id="btnPasta" hidden>📂 Pasta no Drive</button>
+      <!-- o relatório do mês que a família recebe por e-mail (22/09/2026): a prévia, exatamente como sairia hoje -->
+      <button type="button" class="btn-ver" id="btnRelFam" hidden>📬 Relatório da família</button>
     </div>
     <div class="status" id="stPasta"></div>
     <!-- Aluno de dois cursos (inglês e espanhol): a turma, o estágio, o
@@ -338,6 +347,15 @@
   </div>
 
 </main>
+
+<!-- a prévia do relatório do mês: o e-mail num iframe isolado, com o destinatário em cima -->
+<div class="rf-modal" id="rfModal" hidden role="dialog" aria-modal="true" aria-label="Prévia do relatório do mês">
+  <div class="rf-caixa">
+    <div class="rf-topo"><b>📬 Relatório do mês para a família</b><button type="button" class="rf-x" id="rfFecha" aria-label="Fechar">✕</button></div>
+    <div class="rf-info" id="rfInfo"></div>
+    <iframe id="rfFrame" title="Prévia do e-mail" sandbox></iframe>
+  </div>
+</div>
 
 <script>
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -597,6 +615,7 @@ function render(d){
   renderPassivo(d.passivo);
   renderFala(d.fala);
   $('btnPasta').hidden = (d.escopo !== 'equipe');   // a pasta é do professor, não do aluno
+  $('btnRelFam').hidden = (d.escopo !== 'equipe');
 }
 $('alCursos').addEventListener('click', function(ev){
   var b = ev.target.closest('.curso-b'); if (!b) return;
@@ -902,6 +921,36 @@ function radarAbrir(raf, nome){
                    '(ele vem do Portal do Aluno). O que o aluno fez continua logo abaixo.</p></div>';
   });
 }
+
+/* ── O RELATÓRIO DO MÊS DA FAMÍLIA: a prévia ─────────────────────────────────
+ * O servidor monta o e-mail com o MESMO código do envio (Relatorio-familia.js),
+ * então o que aparece aqui é o que a família recebe. O iframe vai com `sandbox`
+ * vazio: é HTML de e-mail, e nada nele precisa rodar. */
+function relFamPrevia(){
+  if (!atual) return;
+  var b = $('btnRelFam'); b.disabled = true;
+  $('rfModal').hidden = false; $('rfInfo').className = 'rf-info';
+  $('rfInfo').textContent = 'Montando o relatório com o radar do aluno…';
+  $('rfFrame').srcdoc = '';
+  post({ action:'relFamPrevia', token: token(), raf: atual }).then(function(res){
+    b.disabled = false;
+    if (!res || !res.ok){ $('rfInfo').className = 'rf-info aviso'; $('rfInfo').textContent = '⚠️ ' + ((res && res.error) || 'Não consegui montar a prévia.'); return; }
+    if (res.vazio){
+      $('rfInfo').className = 'rf-info aviso';
+      $('rfInfo').innerHTML = 'Este aluno <b>não receberia</b> o relatório: não teve nenhuma atividade no portal no último mês. ' +
+        'Um relatório vazio só diria o que ele não fez, então ele fica de fora.';
+      return;
+    }
+    $('rfInfo').className = 'rf-info' + (res.fora ? ' aviso' : '');
+    $('rfInfo').innerHTML = (res.para ? 'Vai para <b>' + esc(res.para) + '</b> (' + (res.quem === 'aluno' ? 'o próprio aluno, 18+' : 'o responsável') + '). ' : '') +
+      (res.fora ? '⚠️ ' + esc(res.fora) + ' ' : '') + '<br>Assunto: <b>' + esc(res.assunto) + '</b>';
+    $('rfFrame').srcdoc = '<!doctype html><meta charset="utf-8"><body style="margin:0">' + res.html;
+  }).catch(function(){ b.disabled = false; $('rfInfo').className = 'rf-info aviso'; $('rfInfo').textContent = '⚠️ Erro de conexão.'; });
+}
+$('btnRelFam').addEventListener('click', relFamPrevia);
+$('rfFecha').addEventListener('click', function(){ $('rfModal').hidden = true; });
+$('rfModal').addEventListener('click', function(ev){ if (ev.target === $('rfModal')) $('rfModal').hidden = true; });
+document.addEventListener('keydown', function(ev){ if (ev.key === 'Escape') $('rfModal').hidden = true; });
 
 /* ── Minhas turmas: navegar sem digitar ──────────────────────────────────
    O professor raramente lembra o nome exato do aluno — ele lembra a TURMA.
