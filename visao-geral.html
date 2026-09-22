@@ -476,7 +476,7 @@ function prefill() {
 /* ============ O RADAR DA TURMA ============ */
 var EIXOS = [
   { id:'L', nome:'Listening', ic:'🎧' }, { id:'R', nome:'Reading', ic:'📖' }, { id:'S', nome:'Speaking', ic:'🎤' },
-  { id:'W', nome:'Writing', ic:'✍️' }, { id:'G', nome:'Grammar & Vocabulary', curto:'Grammar & Vocab.', ic:'🧩' }
+  { id:'W', nome:'Writing', ic:'✍️' }, { id:'G', nome:'Structure & Vocabulary', curto:'Structure & Vocab.', ic:'🧩' }
 ];
 var DOMINIO = 70;
 var _alunos = [], _turmas = [], _turmaSel = '', _ordem = { col: 'nome', asc: true };
@@ -502,7 +502,7 @@ function constancia(c){
 function pto(i, v, R){ var a = (-90 + i * 72) * Math.PI / 180, r = R * v / 100; return [r * Math.cos(a), r * Math.sin(a)]; }
 function poli(vals, R){ return vals.map(function(v, i){ return pto(i, v, R).map(function(n){ return n.toFixed(1); }).join(','); }).join(' '); }
 function radarSVG(eixos, o){
-  /* com rótulos, a moldura é mais larga que alta: "Grammar" e "Reading" saem pelos lados */
+  /* com rótulos, a moldura é mais larga que alta: "Structure" e "Reading" saem pelos lados */
   o = o || {}; var R = o.R || 44, W = R + (o.rotulos ? 92 : 8), H = R + (o.rotulos ? 40 : 8);
   var vals = EIXOS.map(function(e){ var v = eixos[e.id] && eixos[e.id].agora; return v == null ? DOMINIO : v; });
   var s = '<svg viewBox="' + (-W) + ' ' + (-H) + ' ' + (2 * W) + ' ' + (2 * H + 12) + '" role="img" aria-label="radar">';
@@ -516,7 +516,7 @@ function radarSVG(eixos, o){
     if (o.rotulos){
       var q = pto(i, 100, R + 16), anc = q[0] > 5 ? 'start' : q[0] < -5 ? 'end' : 'middle';
       s += '<text x="' + q[0].toFixed(1) + '" y="' + (q[1] + (q[1] < -5 ? -4 : q[1] > 5 ? 12 : 4)).toFixed(1) + '" text-anchor="' + anc + '" font-size="13" font-family="Nunito" font-weight="800" fill="#cfe0f5">' +
-           e.ic + ' ' + (e.curto ? 'Grammar' : e.nome) + '</text>' +
+           e.ic + ' ' + (e.curto ? 'Structure' : e.nome) + '</text>' +
            '<text x="' + q[0].toFixed(1) + '" y="' + (q[1] + (q[1] < -5 ? 13 : q[1] > 5 ? 29 : 21)).toFixed(1) + '" text-anchor="' + anc + '" font-size="15" font-family="Poppins" font-weight="700" fill="' + corTela(v.agora) + '">' + (v.agora == null ? '—' : v.agora + '%') + '</text>';
     }
   });
@@ -635,7 +635,7 @@ function pinta(prof){
 var COLS = [
   { id:'nome', t:'Aluno', v:function(a){ return a.nome; } },
   { id:'turma', t:'Turma', v:function(a){ return String(a.turma || '').split('\n')[0]; } }
-].concat(EIXOS.map(function(e){ return { id:e.id, t:e.ic + ' ' + (e.id === 'G' ? 'Grammar' : e.nome), num:true, v:function(a){ var x = a.eixos[e.id]; return x && x.agora != null ? x.agora : null; } }; }))
+].concat(EIXOS.map(function(e){ return { id:e.id, t:e.ic + ' ' + (e.id === 'G' ? 'Structure' : e.nome), num:true, v:function(a){ var x = a.eixos[e.id]; return x && x.agora != null ? x.agora : null; } }; }))
  .concat([
   { id:'cons', t:'🧭 Constância', num:true, v:function(a){ return a.cons; } },
   { id:'ck', t:'Último checking', v:function(a){ return a.r && a.r.checking ? a.r.checking.quando : null; } },
