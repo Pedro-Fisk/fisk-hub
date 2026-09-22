@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Acompanhamento do Aluno, FISK</title>
+<title>Radar do Aluno, FISK</title>
 <link rel="stylesheet" href="assets/fisk-shared.css?v=2026-09-20a">
   <!-- a casa do professor veste a faixa do topo (campanha de 09/2026) -->
   <link rel="stylesheet" href="assets/casa-tema.css?v=9">
@@ -235,6 +235,12 @@
   body.theme-dark .painel{ background:#1e1c1c; }
   body.theme-dark .ativ-top{ background:#1e1c1c; }
   body.theme-dark .aluno-head .nome{ color:#dce7f2; }
+  /* o radar vem do portal e fala a língua de variáveis de lá */
+  #pnRadar{ --font-h:var(--font-heading); --font-b:var(--font-body); --surface:var(--white); --surface-2:var(--ui-soft,#e9eff5);
+            --border:var(--ui-line,#a8bfd2); --text:var(--black); --text-soft:var(--gray); --shadow:var(--surface-shadow);
+            margin-bottom:1.1rem; }
+  body.theme-dark #pnRadar{ --surface:#1e1c1c; --surface-2:#262323; --border:#3a3535; }
+  #pnRadar .rd-card{ border-width:2px; }
 </style>
 </head>
 <body>
@@ -244,8 +250,8 @@
   <a class="back-link" href="index.html">&larr; Voltar ao Hub</a>
   <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
   <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
-  <h1>Acompanhamento do Aluno</h1>
-  <p>O que o aluno fez no portal, quando, e com que aproveitamento</p>
+  <h1>Radar do Aluno</h1>
+  <p>As cinco habilidades, a constância e onde focar, e o que ele fez no portal, com data e hora</p>
 </header>
 
 <main>
@@ -291,16 +297,11 @@
     <div class="resumo" id="alKpis"></div>
   </div>
 
-  <!-- 3 · tudo o que o aluno fez, numa lista só -->
-  <!-- 4 · diagnóstico: onde o aluno está, somando tudo o que já respondeu -->
-  <div class="painel" id="pnDiag" hidden>
-    <h2>🎯 Onde o aluno está</h2>
-    <p class="sub">Desempenho acumulado por ponto gramatical, somando Quick Practice e
-      Treino MET. A régua é a mesma que o aluno vê no portal dele: <b>70% de acerto</b>
-      para considerar dominado, e nada é afirmado antes de <b>6 questões</b> no ponto.</p>
-    <label class="dg-toggle"><input type="checkbox" id="dgAnt"><span>Incluir estágios anteriores</span></label>
-    <div id="alDiag"></div>
-  </div>
+  <!-- O RADAR (22/09/2026). Substitui o KPI de aproveitamento, o "Onde o aluno está", o "Onde a escuta
+       falha" e a tabela de notas: é o mesmo radar que o aluno vê no portal, desenhado pelo MESMO arquivo
+       (portalfisk.com.br/assets/radar.js, em modo professor). Abaixo dele fica o que prova o radar: a
+       lista do que ele fez, o que ouviu e as gravações. -->
+  <div id="pnRadar" hidden></div>
 
   <div class="painel" id="pnAtiv" hidden>
     <h2>🎬 O que o aluno fez</h2>
@@ -324,18 +325,6 @@
     <div id="alPassivo"></div>
   </div>
 
-  <!-- 6 · escuta por habilidade: o padrão que se repete, não o resultado de um
-       exercício. O aluno vê o dele no fim de cada atividade do Listening Lab;
-       aqui é a soma do estágio, com o mais fraco em cima. -->
-  <div class="painel" id="pnEscuta" hidden>
-    <h2>🎧 Onde a escuta falha</h2>
-    <p class="sub">Desempenho por <b>habilidade de escuta</b>, somando todas as tentativas do
-      Listening Lab. Conta <b>todas</b>, e não a melhor: quem refez três vezes e continuou
-      errando inferência precisa aparecer errando inferência. O registro por habilidade
-      começou em <b>12/08/2026</b>, então o que veio antes não entra aqui.</p>
-    <div id="alEscuta"></div>
-  </div>
-
   <!-- 6b · fala: o Speaking Lab. O professor NÃO corrige aqui, e isso é
        decisão de produto: quem corrige é o motor. O que esta seção oferece é
        poder OUVIR, quando ele quiser, sem nenhuma ação obrigatória. -->
@@ -348,17 +337,6 @@
     <div id="alFala"></div>
   </div>
 
-  <!-- 7 · notas: o semestre em curso à vista, o histórico atrás de um clique -->
-  <div class="painel" id="pnNotas" hidden>
-    <h2>📊 Notas e boletins</h2>
-    <p class="sub">As avaliações do <b>semestre em curso</b> aparecem assim que carregam.
-      Os semestres <b>anteriores</b> ficam atrás de um clique — histórico de nota não precisa
-      estar aberto na tela o tempo todo. Só para quem tem sessão da equipe.</p>
-    <div id="alNotas"></div>
-    <button type="button" class="btn-ver" id="btnNotas" hidden>Ver semestres anteriores</button>
-    <div id="alNotasAnt"></div>
-    <div class="status" id="stNotas"></div>
-  </div>
 </main>
 
 <script>
@@ -503,12 +481,12 @@ function buscar(){
 $('q').addEventListener('input', function(){ clearTimeout(timer); timer = setTimeout(buscar, 160); });
 $('achados').addEventListener('click', function(e){
   var b = e.target.closest('.achado'); if (!b) return;
-  abrir(b.dataset.raf);
+  abrir(b.dataset.raf, '', (b.querySelector('b') || {}).textContent || '');
 });
 
 /* ── acompanhamento ── */
 var atual = null, atualTurma = '';
-function abrir(raf, turma){
+function abrir(raf, turma, nome){
   atual = raf; atualTurma = turma || '';
   $('pnAluno').hidden = false;
   $('alNome').textContent = 'Carregando…';
@@ -516,12 +494,8 @@ function abrir(raf, turma){
   $('alFd').hidden = true; $('alAgora').hidden = true;
   $('alCursos').hidden = true; $('alCursos').innerHTML = '';
   $('btnPasta').hidden = true; $('btnPasta').disabled = false; $('stPasta').textContent = '';
-  $('pnAtiv').hidden = true; $('pnNotas').hidden = true; $('pnDiag').hidden = true;
-  /* zerar TUDO do aluno anterior, e não só o que se vê: a lista de semestres
-     anteriores ficava na memória e o botão a mostraria para o próximo aluno. */
-  $('alNotas').innerHTML = ''; $('alNotasAnt').innerHTML = ''; $('stNotas').textContent = '';
-  _notasAnteriores = [];
-  $('btnNotas').hidden = true; $('btnNotas').disabled = false;
+  $('pnAtiv').hidden = true;
+  radarAbrir(raf, nome);
   if (!EMBED) $('pnAluno').scrollIntoView({ behavior:'smooth', block:'start' });
 
   post({ action:'alunoDiagnostico', token: token(), raf: raf, turma: atualTurma }).then(function(res){
@@ -581,8 +555,6 @@ function render(d){
   }
 
   var ativ = (d.atividades || []).filter(function(a){ return a.vezes > 0; });
-  var pcts = ativ.map(function(a){ return a.melhorPct; }).filter(function(p){ return p != null; });
-  var media = pcts.length ? Math.round(pcts.reduce(function(s,v){ return s+v; },0)/pcts.length) : null;
   var ultima = ativ.length ? ativ[0] : null;   // o backend já devolve por última vez, decrescente
 
   /* A pergunta que o professor faz em sala vem primeiro, e em destaque. */
@@ -615,25 +587,16 @@ function render(d){
             atr === 0 ? 'Conteúdo' : 'Atraso de conteúdo',
             atr >= 4 ? 'alta' : atr >= 1 ? 'media' : 'emdia')
       : '') +
-    kpi(ativ.length, 'Atividades feitas') +
-    kpi(media == null ? '—' : media + '%', 'Aproveitamento médio', classePct(media)) +
     kpi((d.acesso && d.acesso.count) || 0, 'Acessos ao portal') +
     kpi(d.acesso && d.acesso.last ? haQuanto(d.acesso.last) : 'nunca', 'Último acesso') +
-    (sit.faltas != null ? kpi(sit.faltas, 'Faltas', sit.faltas >= 4 ? 'alta' : sit.faltas >= 2 ? 'media' : 'emdia') : '') +
     (sit.pctEstagio != null ? kpi(sit.pctEstagio + '%', 'Progresso do estágio') : '') +
     (sit.ultimaLicao ? kpi(sit.ultimaLicao, 'Última lição dada') : '');
 
-  dgProvas = (d.provas || []).filter(function(p){ return p && p.topicos && p.topicos.length; });
-  dgEstagio = st.book || '';
-  renderDiagnostico();
-
+  if (st.name && !_radarAluno.name) _radarAluno.name = st.name;
   renderAtividades(fundir(ativ, d.provas || []));
   renderPassivo(d.passivo);
-  renderEscuta(d.escuta);
   renderFala(d.fala);
-  $('pnNotas').hidden = (d.escopo !== 'equipe');
   $('btnPasta').hidden = (d.escopo !== 'equipe');   // a pasta é do professor, não do aluno
-  if (d.escopo === 'equipe') carregarNotas(st.raf);
 }
 $('alCursos').addEventListener('click', function(ev){
   var b = ev.target.closest('.curso-b'); if (!b) return;
@@ -693,115 +656,6 @@ function fundir(ativ, provas) {
   }).sort(function (a, b) { return (b.ultima || 0) - (a.ultima || 0); });
 }
 
-/* ══ Diagnóstico acumulado ═══════════════════════════════════════════════════
-   "O que o aluno fez" é o histórico; isto é o retrato. A régua (70% para
-   dominar, piso de 6 questões antes de afirmar) vem do `diagnostico.js` do
-   fisk-simulador, o MESMO módulo que o Portal do Aluno carrega — se cada tela
-   tivesse a sua cópia, um dia o professor e o aluno discordariam sobre o mesmo
-   aluno. Falhou o carregamento, o painel some e o resto do dossiê fica de pé. */
-/* Ver a nota sobre a versão no portal: sem ela o navegador do professor
-   continua com a régua antiga. Os dois devem subir juntos. */
-var DG_BASE = 'https://pedro-fisk.github.io/fisk-simulador/';
-var DG_V = '2026-09-01b';
-var dgProvas = [], dgEstagio = '', dgPronto = null;
-
-function dgCarregar(){
-  if (dgPronto) return dgPronto;
-  dgPronto = new Promise(function(ok){
-    if (window.FiskDiagnostico) return ok(true);
-    var el = document.createElement('script');
-    el.src = DG_BASE + 'assets/diagnostico.js?v=' + DG_V;
-    el.onload = function(){ ok(true); };
-    el.onerror = function(){ ok(false); };
-    document.head.appendChild(el);
-  }).then(function(tem){
-    return tem ? window.FiskDiagnostico.carregarMapa(DG_BASE + 'topicos.json?v=' + DG_V) : null;
-  }).catch(function(){ return null; });
-  return dgPronto;
-}
-
-function dgCor(faixa){
-  return faixa === 'domina' ? '#16A34A' : faixa === 'progresso' ? '#D97706' : '#DC2626';
-}
-
-function dgLinhas(pontos){
-  return pontos.map(function(p){
-    var cor = dgCor(p.faixa);
-    return '<div class="dg-item">' +
-      '<span class="dg-nome">' + esc(p.topico) + '</span>' +
-      (p.onde ? '<span class="dg-onde">' + esc(p.onde.rotulo) + '</span>' : '') +
-      '<span class="dg-barra"><i style="width:' + p.pct + '%;background:' + cor + '"></i></span>' +
-      '<span class="dg-pct" style="color:' + cor + '">' + p.c + ' de ' + p.q + '</span>' +
-      (p.praticar ? '<a class="dg-btn" href="' + p.praticar.url + '" target="_blank" rel="noopener">' +
-                    esc(p.praticar.rotulo === 'Praticar' ? 'Abrir exercícios' : p.praticar.rotulo) + '</a>' : '') +
-    '</div>';
-  }).join('');
-}
-
-function dgGrupo(titulo, pontos, classe, ajuda){
-  if (!pontos.length) return '';
-  return '<div class="dg-grupo ' + (classe || '') + '"><h4>' + titulo + '</h4>' +
-    dgLinhas(pontos) + (ajuda ? '<div class="dg-ajuda">' + ajuda + '</div>' : '') + '</div>';
-}
-
-function dgNomes(ps, n){
-  n = n || 3;
-  var nomes = ps.slice(0, n).map(function(p){ return p.topico; }).join(', ');
-  return nomes + (ps.length > n ? ' e mais ' + (ps.length - n) : '');
-}
-function dgTextoProfessor(d){
-  var partes = [];
-  if (d.domina.length)   partes.push('Já demonstra domínio em ' + dgNomes(d.domina) + '.');
-  if (d.desafios.length) partes.push('Precisa de trabalho em ' + dgNomes(d.desafios) + '.');
-  else if (d.progresso.length) partes.push('Está perto de firmar ' + dgNomes(d.progresso) + '.');
-  if (!partes.length) return 'Ainda são poucos exercícios para dizer onde ele está firme.';
-  if (d.semDado.length) {
-    partes.push(d.semDado.length === 1
-      ? 'Outro ponto ainda tem poucas questões respondidas.'
-      : 'Outros ' + d.semDado.length + ' pontos ainda têm poucas questões respondidas.');
-  }
-  return partes.join(' ');
-}
-
-function renderDiagnostico(){
-  var box = $('alDiag');
-  if (!box) return;
-  if (!dgProvas.length) { $('pnDiag').hidden = true; return; }
-  $('pnDiag').hidden = false;
-  box.innerHTML = '<p class="sub">Carregando…</p>';
-
-  dgCarregar().then(function(mapa){
-    if (!window.FiskDiagnostico) { $('pnDiag').hidden = true; return; }
-    var incluir = $('dgAnt') && $('dgAnt').checked;
-    var d = window.FiskDiagnostico.montar({
-      provas: dgProvas, mapa: mapa, estagio: dgEstagio, incluirAnteriores: incluir
-      /* De propósito SEM `aluno`: o link do professor não leva o RAF. Se
-         levasse, um clique dele abriria a ferramenta logado como o aluno e a
-         tentativa entraria no histórico do aluno como se fosse dele. */
-    });
-    if (!d.pontos.length) {
-      box.innerHTML = '<p class="sub">Sem exercícios com tópico neste recorte.' +
-        (incluir ? '' : ' Marque "incluir estágios anteriores" para ver o que ele fez antes.') + '</p>';
-      return;
-    }
-    var html = '';
-    if (!incluir && d.estagio) {
-      html += '<div class="dg-ajuda" style="margin:-.4rem 0 .7rem">Só o estágio atual · ' +
-              esc(d.estagio) + ' · ' + d.tentativas + ' tentativa' + (d.tentativas > 1 ? 's' : '') + '</div>';
-    }
-    /* O `comentario` do módulo fala COM o aluno ("você já domina"). Aqui quem
-       lê é o professor, então o texto é montado em terceira pessoa a partir das
-       mesmas faixas. A régua continua sendo a de lá; muda só a voz. */
-    html += '<div class="dg-comentario">' + esc(dgTextoProfessor(d)) + '</div>';
-    html += dgGrupo('⚠️ Trabalhar com ele agora', d.desafios, 'focar');
-    html += dgGrupo('🔸 Quase lá', d.progresso, '');
-    html += dgGrupo('✅ Já domina', d.domina, '');
-    html += dgGrupo('⏳ Sem dado suficiente', d.semDado, '',
-                    'Menos de ' + d.regra.piso + ' questões respondidas: não dá para afirmar nada ainda.');
-    box.innerHTML = html;
-  });
-}
-
 function renderAtividades(ativ){
   $('pnAtiv').hidden = false;
   if (!ativ.length){ $('alAtiv').innerHTML = '<div class="vazio">Nenhuma atividade concluída ainda.</div>'; return; }
@@ -828,69 +682,6 @@ function renderAtividades(ativ){
  * Por isso o mais fraco vem em cima (o servidor já ordena) e a barra é o que
  * salta. A régua de cor é a mesma das outras telas: 70% dominado, abaixo de 50%
  * é o que pede aula. */
-/* O CATÁLOGO DAS OITO NÃO É COPIADO PARA CÁ (12/08/2026). Ele mora num lugar
-   só, no portal (listening/data/habilidades.json), e esta tela lê de lá pela
-   rede. Chegou a existir uma cópia em assets/, com a regra "mexeu lá, recopie";
-   ela durou algumas horas e morreu pelo argumento que já vale para o
-   `diagnostico.js`, carregado do fisk-simulador pelas duas telas: cópia é como
-   aluno e professor acabam discordando sobre o mesmo aluno.
-   Os dois servidores mandam `access-control-allow-origin: *`, conferido em
-   12/08/2026, então a leitura de fora funciona.
-   A RESERVA ABAIXO é o que impede a tela de depender do portal estar no ar:
-   nome e ícone das oito, embutidos. O que só existe lá é a explicação longa e
-   a dica, que são para o ALUNO — o dossiê nunca precisou delas. Portal fora do
-   ar vira, no pior caso, um nome desatualizado; nunca uma tela quebrada. */
-var HAB_RESERVA = [
-  ['reconhecer_pergunta','❓','Reconhecer a pergunta'],
-  ['detalhe','🔎','Detalhe explícito'],
-  ['ideia_principal','🎯','Ideia principal'],
-  ['acao_seguinte','➡️','Ação seguinte'],
-  ['sugestao_pedido','🤝','Sugestão e pedido'],
-  ['atitude','😀','Atitude e sentimento'],
-  ['proposito','🧭','Propósito'],
-  ['sentido_implicito','💭','Sentido implícito']
-];
-var HABS = { habilidades: HAB_RESERVA.map(function(r){
-               return { id: r[0], ic: r[1], pt: { nome: r[2], desc: '' } }; }) };
-var _ultimaEscuta = null;
-fetch('https://portalfisk.com.br/listening/data/habilidades.json')
-  .then(function(r){ return r.json(); })
-  .then(function(j){
-    if (!j || !j.habilidades || !j.habilidades.length) return;   // resposta estranha: fica a reserva
-    HABS = j;
-    if (_ultimaEscuta) renderEscuta(_ultimaEscuta);
-  })
-  .catch(function(){});
-function habNome(id){
-  var h = HABS && (HABS.habilidades||[]).filter(function(x){ return x.id === id; })[0];
-  return h ? { nome: h.pt.nome, ic: h.ic, desc: h.pt.desc } : { nome: id, ic: '🎧', desc: '' };
-}
-function renderEscuta(e){
-  _ultimaEscuta = e;
-  $('pnEscuta').hidden = false;
-  var box = $('alEscuta');
-  if (!e || !e.habilidades || !e.habilidades.length){
-    box.innerHTML = '<div class="vazio">Nenhuma atividade do Listening Lab registrada por habilidade ' +
-      'para este aluno. O recorte começou em <b>12/08/2026</b>: antes disso o exercício era gravado, ' +
-      'mas sem dizer que habilidade ele treinava.</div>';
-    return;
-  }
-  box.innerHTML = e.habilidades.map(function(h){
-    var m = habNome(h.hab);
-    var cor = corPct(h.pct);
-    return '<div class="es-l" title="'+esc(m.desc)+'">' +
-      '<span class="es-ic">'+m.ic+'</span>' +
-      '<span class="es-nome">'+esc(m.nome)+'</span>' +
-      '<span class="es-n">'+h.c+' de '+h.q+'</span>' +
-      '<span class="es-bar"><i style="width:'+(h.pct==null?0:h.pct)+'%;background:'+cor+'"></i></span>' +
-      '<span class="es-pct" style="color:'+cor+'">'+(h.pct==null?'—':h.pct+'%')+'</span>' +
-    '</div>';
-  }).join('') +
-  '<div class="vazio">' + e.tentativas + ' atividade' + (e.tentativas===1?'':'s') + ' de escuta' +
-  (e.ultimo ? ' · última ' + haQuanto(e.ultimo) : '') + '. Uma habilidade com poucas questões respondidas ' +
-  'diz pouco: olhe o número ao lado da barra antes de concluir.</div>';
-}
-
 /* Fala, do Speaking Lab. Uma linha por PRÁTICA e, dentro dela, o melhor de
  * cada item — o professor quer saber como foi a preparação do checking, não
  * ver dezoito tentativas. O botão de ouvir busca o áudio pela rota
@@ -1049,68 +840,68 @@ function topicos(tops){
   }).join('');
 }
 
-/* ── notas ────────────────────────────────────────────────────────────────
- * Duas mudanças em 04/08/2026, a pedido do Pedro: o Acompanhamento passou a
- * ser o lugar ÚNICO do histórico do aluno, então a nota do semestre em curso
- * não pode mais estar escondida — ela carrega sozinha. O que continua atrás
- * de um clique é o histórico dos semestres anteriores.
- *
- * A busca é uma só: o backend devolve tudo (os cards de hoje mais o do 1º
- * semestre) com a marca `atual`, e a separação é feita aqui. Clicar em "ver
- * anteriores" não vai ao servidor de novo — o dado já está na mão.
- *
- * Por que carrega DEPOIS e não junto: ler nota abre os cards das duas
- * escolas, e é a parte cara. Segurar a tela por causa dela quebraria o caso
- * de uso que originou a página — o professor conferindo, no meio da aula, se
- * o aluno fez mesmo a atividade. Então a página pinta primeiro e a nota entra
- * quando chega. O backend guarda 3h em cache, então a segunda visita é rápida. */
-function tabelaNotas(linhas){
-  var nota = function(v){
-    if (v == null || v === '') return '<span style="color:var(--gray)">—</span>';
-    return '<b style="color:'+(Number(v) >= 6 ? 'var(--emdia)' : 'var(--alta)')+'">'+
-           esc(String(v).replace('.', ','))+'</b>';
-  };
-  return '<table class="dossie"><thead><tr><th>Estágio</th><th>Turma</th>' +
-    '<th class="num">1ª av.</th><th class="num">2ª av.</th><th class="num">Final</th></tr></thead><tbody>' +
-    linhas.map(function(b){
-      return '<tr><td>'+esc(b.book || '—')+'</td>' +
-             '<td>'+esc(b.turma || '')+'<div class="ativ-sub">'+esc(b.escola || '')+'</div></td>' +
-             '<td class="num">'+nota(b.av1)+'</td><td class="num">'+nota(b.av2)+'</td>' +
-             '<td class="num">'+nota(b.final)+'</td></tr>';
-    }).join('') + '</tbody></table>';
+/* ── O RADAR ────────────────────────────────────────────────────────────────
+ * O desenho e a leitura moram no PORTAL (assets/radar.js), e esta página só o
+ * carrega em modo professor: é a regra "dado de outro repositório se lê, não se
+ * copia", aplicada ao código. Se cada tela tivesse o seu radar, um dia o
+ * professor e o aluno veriam números diferentes para o mesmo aluno.
+ * ⚠️ RADAR_V: ao publicar um radar.js novo no portal, suba aqui com os 10
+ * primeiros caracteres do md5 dele, senão o navegador do professor segue com o
+ * arquivo antigo. Na bancada local (localhost) o arquivo vem da cópia ao lado.
+ * Se o portal estiver fora do ar, o painel avisa e o resto da página fica de pé. */
+var RADAR_V = '0ef2f23fe5';
+var RADAR_BASE = /^(localhost|127\.)/.test(location.hostname) ? '../portal/' : 'https://portalfisk.com.br/';
+var _radarPronto = null, _radarAluno = {};
+function radarCarrega(){
+  if (window.FiskRadar) return Promise.resolve();
+  if (_radarPronto) return _radarPronto;
+  _radarPronto = new Promise(function(ok, falha){
+    var el = document.createElement('script');
+    el.src = RADAR_BASE + 'assets/radar.js?v=' + RADAR_V;
+    el.onload = function(){ ok(); };
+    el.onerror = function(){ _radarPronto = null; falha(new Error('radar')); };
+    document.head.appendChild(el);
+  });
+  return _radarPronto;
 }
-
-var _notasAnteriores = [];
-function carregarNotas(raf){
-  _notasAnteriores = [];
-  $('alNotas').innerHTML = ''; $('alNotasAnt').innerHTML = '';
-  $('btnNotas').hidden = true; $('btnNotas').disabled = false;
-  $('btnNotas').textContent = 'Ver semestres anteriores';
-  $('stNotas').className = 'status'; $('stNotas').textContent = 'Buscando as notas nos cards…';
-  post({ action:'alunoDiagnostico', token: token(), raf: raf, notas: '1' }).then(function(res){
-    if (raf !== atual) return;            // o professor já trocou de aluno: resposta velha
-    $('stNotas').textContent = '';
-    var linhas = (res && res.notas && res.notas.boletins) || [];
-    /* `atual` só existe a partir de 04/08/2026; resposta em cache antiga vem
-       sem ele, e aí é melhor mostrar a linha do que escondê-la. */
-    var agora = linhas.filter(function(b){ return b.atual !== false; });
-    _notasAnteriores = linhas.filter(function(b){ return b.atual === false; });
-    $('alNotas').innerHTML = agora.length ? tabelaNotas(agora)
-      : '<div class="vazio">Nenhuma nota lançada neste semestre ainda.</div>';
-    if (_notasAnteriores.length){
-      $('btnNotas').hidden = false;
-      $('btnNotas').textContent = 'Ver semestres anteriores (' + _notasAnteriores.length + ')';
-    }
+/* As notas do radar (aba "Checkings e boletins") vêm da mesma leitura dos
+   cards que esta página sempre usou: token da equipe, as duas escolas, com a
+   marca `atual`. A resposta fica guardada por aluno: trocar de aba não relê. */
+var _notasDe = {};
+function notasDo(raf){
+  if (_notasDe[raf]) return _notasDe[raf];
+  _notasDe[raf] = post({ action:'alunoDiagnostico', token: token(), raf: raf, notas: '1' }).then(function(res){
+    return ((res && res.notas && res.notas.boletins) || []).map(function(b){
+      return { book: b.book, av1: b.av1, av2: b.av2, final: b.final, atual: b.atual !== false };
+    });
+  });
+  _notasDe[raf].catch(function(){ delete _notasDe[raf]; });
+  return _notasDe[raf];
+}
+function radarAbrir(raf, nome){
+  var pn = $('pnRadar');
+  _radarAluno = { raf: raf, name: nome || '' };
+  pn.hidden = false; pn.innerHTML = '';
+  radarCarrega().then(function(){
+    if (_radarAluno.raf !== raf) return;          // o professor já trocou de aluno
+    window.FiskRadar({
+      $: $, esc: esc, prof: true, alvo: pn,
+      lang: function(){ return 'pt'; },
+      student: function(){ return _radarAluno; },
+      buscar: function(r, fresco){
+        return post({ action:'radarAluno', token: token(), raf: r, fresco: fresco ? 1 : 0 }).then(function(j){
+          if (!j || !j.ok || !j.eixos) throw new Error((j && j.error) || 'sem radar');
+          return j;
+        });
+      },
+      cabecalho: function(d){ if (d.aluno && d.aluno.nome && !_radarAluno.name) _radarAluno.name = d.aluno.nome; },
+      boletins: function(){ return notasDo(raf); }
+    }).abrir();
   }).catch(function(){
-    if (raf !== atual) return;
-    $('stNotas').className = 'status err'; $('stNotas').textContent = '⚠️ Não consegui ler as notas.';
+    pn.innerHTML = '<div class="painel"><h2>📡 Radar</h2><p class="sub">⚠️ Não consegui carregar o radar agora ' +
+                   '(ele vem do Portal do Aluno). O que o aluno fez continua logo abaixo.</p></div>';
   });
 }
-$('btnNotas').addEventListener('click', function(){
-  $('alNotasAnt').innerHTML = '<h3 style="margin:.9rem 0 .2rem;font-size:.9rem">Semestres anteriores</h3>' +
-                              tabelaNotas(_notasAnteriores);
-  $('btnNotas').hidden = true;
-});
 
 /* ── Minhas turmas: navegar sem digitar ──────────────────────────────────
    O professor raramente lembra o nome exato do aluno — ele lembra a TURMA.
@@ -1165,7 +956,7 @@ $('alTurmas').addEventListener('click', function(ev){
   var cab = ev.target.closest('.tg-cab');
   if (cab){ var t = cab.getAttribute('data-t'); _turmasAbertas[t] = !_turmasAbertas[t]; carregarTurmas(); return; }
   var al = ev.target.closest('.at-nome');
-  if (al) abrir(al.dataset.raf);
+  if (al) abrir(al.dataset.raf, '', al.textContent || '');
 });
 
 /* ── pasta do aluno no Drive ──────────────────────────────────────────────

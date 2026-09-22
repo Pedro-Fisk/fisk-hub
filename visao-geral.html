@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Visão Geral das Turmas, FISK</title>
+<title>Radar da Turma, FISK</title>
 <link rel="stylesheet" href="assets/fisk-shared.css?v=2026-09-20a">
   <!-- a casa do professor veste a faixa do topo (campanha de 09/2026) -->
   <link rel="stylesheet" href="assets/casa-tema.css?v=9">
@@ -176,6 +176,43 @@
   a.ac-link{color:inherit;text-decoration:none;border-bottom:1px dotted var(--blue-bd)}
   a.ac-link:hover{color:var(--blue);border-bottom-style:solid}
   body.theme-dark td .tsub{color:#9aa6b1}
+
+  /* ── o radar da turma ── */
+  .rt-chips{display:flex;flex-wrap:wrap;gap:.35rem;margin:.2rem 0 .9rem}
+  .rt-chip{border:1.5px solid var(--blue-bd);background:transparent;color:var(--blue);border-radius:999px;padding:.28rem .85rem;
+           cursor:pointer;font-family:var(--font-heading);font-weight:700;font-size:.8rem}
+  .rt-chip[aria-pressed="true"]{background:var(--blue);color:#fff}
+  body.theme-dark .rt-chip{color:#8ab4dd} body.theme-dark .rt-chip[aria-pressed="true"]{color:#fff}
+  .rt-topo{display:grid;grid-template-columns:minmax(260px,360px) 1fr;gap:1rem;align-items:center}
+  @media (max-width:640px){ .rt-topo{grid-template-columns:1fr} }
+  .rt-radar{background:radial-gradient(120% 90% at 50% 40%,#0c3a55 0%,#0e2544 45%,#081324 100%);border-radius:18px;padding:.6rem;color:#e8f1ff}
+  .rt-radar svg{display:block;width:100%;height:auto}
+  .rt-eixos{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.5rem}
+  .rt-eixo{border:1.5px solid var(--blue-bd);border-radius:12px;padding:.55rem .7rem;background:var(--blue-soft)}
+  .rt-eixo .t{font-size:.78rem;font-weight:800;color:var(--blue-ink)}
+  .rt-eixo b{display:block;font-family:var(--font-heading);font-size:1.45rem;line-height:1.15}
+  .rt-eixo small{display:block;font-size:.72rem;color:var(--gray);margin-top:.1rem}
+  .rt-foco{margin-top:.8rem;padding:.7rem .85rem;border-radius:12px;background:var(--blue-soft);border-left:4px solid var(--blue);font-size:.92rem;line-height:1.5}
+  .rt-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:.6rem;margin-top:.4rem}
+  .rt-al{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.2rem;border:2px solid var(--surface-border-color);
+         border-radius:14px;padding:.6rem .5rem .7rem;background:var(--white);cursor:pointer;font:inherit;color:inherit;transition:transform .15s,box-shadow .15s}
+  .rt-al:hover,.rt-al:focus-visible{transform:translateY(-2px);box-shadow:0 8px 20px rgba(43,77,112,.16);border-color:var(--blue-bd)}
+  .rt-al .mini{width:118px;height:118px;border-radius:50%;background:radial-gradient(circle at 50% 45%,#0f3150,#081324)}
+  .rt-al .nm{font-family:var(--font-heading);font-weight:700;font-size:.86rem;line-height:1.2;margin-top:.15rem}
+  .rt-al .sb{font-size:.72rem;color:var(--gray)}
+  .rt-al .pills{display:flex;flex-wrap:wrap;gap:.25rem;justify-content:center;margin-top:.15rem}
+  .rt-al.sem{cursor:default;opacity:.75}
+  .pill.cinza{background:var(--blue-soft);color:var(--gray)}
+  .rt-tab{width:100%;border-collapse:collapse;font-size:.86rem}
+  .rt-tab th{text-align:left;padding:0;border-bottom:2px solid var(--blue-bd)}
+  .rt-tab th button{all:unset;cursor:pointer;display:block;padding:.45rem .5rem;font-weight:800;font-size:.76rem;color:var(--blue-ink);white-space:nowrap}
+  .rt-tab th button .seta{opacity:.45;font-size:.7rem}
+  .rt-tab th button[aria-sort] .seta{opacity:1}
+  .rt-tab td{padding:.42rem .5rem;border-bottom:1px solid var(--gray-light);white-space:nowrap}
+  .rt-tab td.n{font-weight:800;text-align:center}
+  .rt-tab tr:hover td{background:var(--blue-soft)}
+  .rt-tab a{color:inherit;font-weight:700;text-decoration:none} .rt-tab a:hover{text-decoration:underline}
+  .rt-ok{color:var(--emdia)} .rt-mid{color:var(--media)} .rt-low{color:var(--alta)} .rt-x{color:var(--gray);font-weight:600!important}
 </style>
 </head>
 <body>
@@ -185,18 +222,18 @@
   <a class="back-link" href="index.html">&larr; Voltar ao Hub</a>
   <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
   <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
-  <h1>Visão Geral das Turmas</h1>
-  <p>Atraso, faltas, notas e acessos ao Portal &middot; todas as suas turmas</p>
+  <h1>Radar da Turma</h1>
+  <p>As cinco habilidades de cada aluno num relance, e onde focar com a turma</p>
 </header>
 
 <main>
   <!-- 1 · escolha do professor -->
   <div class="painel">
     <h2>🔗 Suas turmas</h2>
-    <p class="sub">A análise abre <b>nas suas turmas</b> automaticamente. Está substituindo alguém?
-      Troque o professor no seletor — o acesso é livre, como nas outras ferramentas.</p>
+    <p class="sub">O radar abre <b>nas suas turmas</b> automaticamente. Está substituindo alguém?
+      Troque o professor no seletor, o acesso é livre como nas outras ferramentas.</p>
     <div id="vgActAsWrap" hidden style="margin-bottom:.7rem">
-      <label style="display:block;font-size:.78rem;font-weight:800;color:var(--roxo);margin-bottom:.25rem">👑 Acesso da direção, ver o painel de um professor:</label>
+      <label style="display:block;font-size:.78rem;font-weight:800;color:var(--roxo);margin-bottom:.25rem">👑 Acesso da direção, ver o radar de um professor:</label>
       <select id="vgActAs" class="vg-actas"></select>
     </div>
     <div class="row" style="align-items:flex-end">
@@ -208,119 +245,36 @@
         <label class="rot">Professor(a)<span id="indProf" class="ind"></span></label>
         <select id="selProf" disabled><option value="" disabled selected>Professor(a)…</option></select>
       </div>
-      <button type="button" class="btn btn-main" id="btnAnalisar" disabled>📊 Analisar</button>
+      <button type="button" class="btn btn-main" id="btnAnalisar" disabled>📡 Ver o radar</button>
     </div>
     <div class="status" id="statusCard"></div>
   </div>
 
-
-  <!-- "Meus alunos" subiu para cá em 04/08/2026. A tela abria com quatro
-       blocos de análise antes da lista de alunos, e o professor tinha de
-       rolar por gráficos para chegar ao que ele mais usa: achar um aluno.
-       As análises não foram jogadas fora — continuam inteiras, atrás do
-       botão abaixo, para quem está fazendo leitura de turma e não
-       atendimento individual. -->
-  <!-- 5 · acessos ao Portal do Aluno (era uma ferramenta separada no Hub) -->
-  <div class="painel is-colapsavel" id="painelAcessos">
-    <h2>👥 Meus alunos</h2>
-    <p class="sub">Todas as suas turmas, para bater o olho. Abra uma turma e clique no aluno
-      para ver o <b>acompanhamento</b> dele. A busca alcança a escola inteira, inclusive alunos de
-      outros professores.</p>
-    <div class="status" id="acStatus">🔄 Carregando…</div>
-    <div id="acCorpo" hidden>
-      <div class="resumo" style="margin-top:.7rem">
-        <div class="kpi"><b id="ac-total">0</b><span>Alunos</span></div>
-        <div class="kpi emdia"><b id="ac-ent">0</b><span>Já entraram</span></div>
-        <div class="kpi alta"><b id="ac-nunca">0</b><span>Nunca fizeram nada</span></div>
-        <div class="kpi"><b id="ac-7d">0</b><span>Ativos nos 7 dias</span></div>
-      </div>
-      <div class="row" style="margin:.7rem 0 .5rem">
-        <div style="flex:1 1 200px"><select id="acTurma"><option value="">Todas as turmas</option></select></div>
-        <div style="flex:1 1 170px"><select id="acFiltro">
-          <option value="">Todos</option>
-          <option value="sim">Só quem já entrou</option>
-          <option value="nao">Só quem nunca entrou</option>
-          <option value="parado">Entrou, mas não fez nada</option>
-          <option value="sumido">Sem atividade há 7 dias</option>
-        </select></div>
-        <div style="flex:1 1 170px"><input type="search" id="acBusca" placeholder="Buscar aluno…"
-          style="width:100%;padding:.5rem .6rem;border:1px solid var(--gray-light);border-radius:9px;
-                 font-family:var(--font-body);font-size:.92rem;background:var(--white);color:var(--black)"></div>
-      </div>
-      <div id="acLinhas"></div>
-      <p class="sub" style="margin:.8rem 0 0">O aluno entra em <b>portalfisk.com.br</b> usando o RAF.
-        <b>Entrar não é fazer</b>: a coluna de atividade conta exercício concluído, não visita.</p>
-    </div>
-  </div>
-
-  <!-- Bloco recolhível igual a todos os outros da página: mesmo h2, mesma
-       seta ▾, mesmo mecanismo (colapsaveis()). A primeira versão era um botão
-       solto com o estilo do kit compartilhado, que não é o desta tela — ele
-       chamava atenção por destoar, não por importar. -->
-  <div class="painel is-colapsavel is-fechado" id="painelAnalises">
-    <h2>📊 Análise das turmas</h2>
-    <p class="sub" style="margin:.2rem 0 0">Panorama, faltas × ritmo, tabela por turma e
-      alunos que pedem atenção.</p>
-  </div>
-
-  <div id="analises" hidden>
-  <!-- 2 · panorama -->
-  <div class="painel" id="painelGeral" hidden>
-    <h2 id="tituloGeral">📊 Panorama geral</h2>
-    <div class="resumo" id="kpis"></div>
-    <div class="viz-row" id="vizRow">
-      <div class="viz-card">
-        <h3>Situação de conteúdo</h3>
-        <p class="viz-sub">quanto da sua turma está em dia com o cronograma</p>
-        <div class="viz-donut" id="vizDonut"></div>
-      </div>
-      <div class="viz-card">
-        <h3>Turmas que mais pedem atenção</h3>
-        <p class="viz-sub">% de alunos em dia. Da que mais precisa para a que menos precisa</p>
-        <div class="rank" id="vizRank"></div>
+  <!-- 2 · a turma: o radar médio, o que puxa para baixo e cada aluno em miniatura -->
+  <div class="painel" id="pnTurma" hidden>
+    <h2 id="rtTitulo">📡 Radar da turma</h2>
+    <div class="rt-chips" id="rtChips" role="group" aria-label="Turma"></div>
+    <div class="rt-topo">
+      <div class="rt-radar" id="rtRadar"></div>
+      <div>
+        <div class="rt-eixos" id="rtEixos"></div>
+        <div class="rt-foco" id="rtFoco"></div>
       </div>
     </div>
-    <div class="distrib" id="distrib"></div>
   </div>
 
-  <!-- 2b · faltas × atraso -->
-  <div class="painel is-colapsavel" id="painelDisp" hidden>
-    <h2>🎯 Falta ou ritmo?</h2>
-    <p class="sub">Cada ponto é um aluno. Quem está no alto e à <b>esquerda</b> vem às aulas e mesmo
-      assim está atrasado — é atraso de ritmo, não de presença, e costuma ser o atendimento mais
-      urgente. Quem está à direita falta muito: aí a conversa é sobre assiduidade.</p>
-    <div class="viz-scatter" id="vizDisp"><div class="viz-tip" id="vizTip"></div></div>
+  <div class="painel" id="pnAlunos" hidden>
+    <h2>👥 Cada aluno</h2>
+    <p class="sub">O radar de cada um em miniatura: a linha tracejada é o domínio (70%), e o ponto vazado é habilidade
+      sem evidência suficiente. Clique no aluno para abrir o radar completo dele.</p>
+    <div class="rt-grade" id="rtGrade"></div>
   </div>
 
-  <!-- 3 · por turma -->
-  <div class="painel is-colapsavel" id="painelTurmas" hidden>
-    <h2>🏫 Por turma</h2>
-    <div class="table-wrap">
-      <table>
-        <thead><tr>
-          <th>Turma</th><th class="num">Alunos</th><th class="num">Em dia</th>
-          <th class="num">Atrasados</th><th class="num">Críticos (4+)</th>
-          <th class="num">Faltas médias</th><th class="num">Média de notas</th><th>Situação</th>
-        </tr></thead>
-        <tbody id="linhasTurmas"></tbody>
-      </table>
-    </div>
-    <div class="foranote" id="foraNote" hidden></div>
-  </div>
-
-  <!-- 4 · lista de atenção -->
-  <div class="painel is-colapsavel" id="painelAtencao" hidden>
-    <h2>⚠️ Alunos que pedem atenção</h2>
-    <p class="sub">Os mais atrasados de todas as turmas analisadas — os mesmos que o
-      botão "Ordenar por prioridade" da <a href="turma-de-hoje.html">Minha aula</a> coloca no topo da fila.</p>
-    <div class="atn" id="listaAtencao"></div>
-    <div class="hintbox">
-      <b>Como ler:</b> o atraso é a distância entre a última lição feita e a lição prevista
-      no cronograma (mesma régua do Planejador e do Termo de Atraso: <b>4+ aulas = crítico</b>).
-      As notas vêm das avaliações lançadas no card — turmas sem nota lançada aparecem com “—”.
-      Tudo é <b>só leitura</b>: nada é gravado no card.
-    </div>
-  </div>
+  <div class="painel" id="pnTabela" hidden>
+    <h2>📋 A turma em tabela</h2>
+    <p class="sub">Clique no nome de uma coluna para reordenar. A <b>constância</b> soma a presença nas aulas e os dias
+      de estudo em casa nos últimos 30 dias (meta: 12).</p>
+    <div class="table-wrap"><table class="rt-tab" id="rtTab"></table></div>
   </div>
 </main>
 
@@ -331,11 +285,16 @@
 <script src="assets/fisk-shared.js?v=2026-09-20a"></script>
 <script>
 /* ============================================================
-   Visão Geral das Turmas — agrega TODAS as turmas de um professor
-   (fn=turmas + fn=turma da mesma API do card) e monta o panorama:
-   KPIs, distribuição de atraso, tabela por turma e lista de atenção.
-   Só leitura. Abre pré-selecionada no professor logado (fisk_prof),
-   mas o seletor fica livre (substituições são frequentes).
+   RADAR DA TURMA (22/09/2026). Substitui a Visão Geral das Turmas,
+   que o Pedro tirou de vez: ninguém a abria, e o que ela contava
+   (atraso, faltas, notas) virava tabela burocrática. Agora a tela
+   responde "como está o inglês de cada aluno, e onde focar com a
+   turma", com o mesmo radar que o aluno vê no portal.
+   Duas leituras: o `panoramaProf` diz quem está em cada turma (com o
+   RAF), e o `radarTurma` devolve os cinco eixos de cada um. O clique
+   num aluno abre o Radar do Aluno na gaveta (aluno.html?embed=1).
+   Abre pré-selecionada no professor logado (fisk_prof), e o seletor
+   fica livre (substituições são frequentes).
    ============================================================ */
 var API_URL = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
 var LIMITE_ATRASO = 4; // mesma régua do termo/planejador
@@ -343,7 +302,7 @@ var LIMITE_ATRASO = 4; // mesma régua do termo/planejador
 var $ = function (id) { return document.getElementById(id); };
 fiskInitThemeToggle('themeToggle');
 fiskInitUserMenu();
-fiskRegistrarUso("Visão Geral");
+fiskRegistrarUso("Radar da Turma");
 
 function statusCard(msg, kind) { var s = $('statusCard'); s.textContent = msg || ''; s.className = 'status' + (kind ? ' ' + kind : ''); }
 
@@ -514,648 +473,220 @@ function prefill() {
   statusCard('Escolha a escola e o professor.');
 }
 
-/* ============ ANÁLISE ============ */
+/* ============ O RADAR DA TURMA ============ */
+var EIXOS = [
+  { id:'L', nome:'Listening', ic:'🎧' }, { id:'R', nome:'Reading', ic:'📖' }, { id:'S', nome:'Speaking', ic:'🎤' },
+  { id:'W', nome:'Writing', ic:'✍️' }, { id:'G', nome:'Grammar & Vocabulary', curto:'Grammar & Vocab.', ic:'🧩' }
+];
+var DOMINIO = 70;
+var _alunos = [], _turmas = [], _turmaSel = '', _ordem = { col: 'nome', asc: true };
+
+function nivel(v){ return v == null ? 'x' : v >= DOMINIO ? 'ok' : v >= 50 ? 'mid' : 'low'; }
+function corTela(v){ return v == null ? '#8fa9c9' : v >= DOMINIO ? '#34d399' : v >= 50 ? '#fbbf24' : '#fb7185'; }
+function haQuanto(ts){
+  if (!ts) return '';
+  var d = Math.floor((Date.now() - ts) / 86400000);
+  return d <= 0 ? 'hoje' : d === 1 ? 'ontem' : 'há ' + d + ' dias';
+}
+function constancia(c){
+  if (!c) return null;
+  var p = [];
+  if (c.presenca) p.push(c.presenca.pct);
+  if (c.estudo) p.push(c.estudo.pct);
+  return p.length ? Math.round(p.reduce(function(a, b){ return a + b; }, 0) / p.length) : null;
+}
+
+/* O RADAR EM SVG, feito à mão (regra da casa: nenhuma biblioteca de gráfico). O mesmo desenho do portal em
+   ponto pequeno: eixo SEM DADO fica em cima da linha dos 70% com o ponto vazado, nunca puxado para o centro
+   (puxado, ele pintava de vermelho quem só não praticou ainda). */
+function pto(i, v, R){ var a = (-90 + i * 72) * Math.PI / 180, r = R * v / 100; return [r * Math.cos(a), r * Math.sin(a)]; }
+function poli(vals, R){ return vals.map(function(v, i){ return pto(i, v, R).map(function(n){ return n.toFixed(1); }).join(','); }).join(' '); }
+function radarSVG(eixos, o){
+  /* com rótulos, a moldura é mais larga que alta: "Grammar" e "Reading" saem pelos lados */
+  o = o || {}; var R = o.R || 44, W = R + (o.rotulos ? 92 : 8), H = R + (o.rotulos ? 40 : 8);
+  var vals = EIXOS.map(function(e){ var v = eixos[e.id] && eixos[e.id].agora; return v == null ? DOMINIO : v; });
+  var s = '<svg viewBox="' + (-W) + ' ' + (-H) + ' ' + (2 * W) + ' ' + (2 * H + 12) + '" role="img" aria-label="radar">';
+  [100, 50].forEach(function(r){ s += '<polygon points="' + poli([r, r, r, r, r], R) + '" fill="none" stroke="rgba(148,197,255,' + (r === 100 ? '.35' : '.15') + ')"/>'; });
+  EIXOS.forEach(function(e, i){ var p = pto(i, 100, R); s += '<line x1="0" y1="0" x2="' + p[0].toFixed(1) + '" y2="' + p[1].toFixed(1) + '" stroke="rgba(148,197,255,.18)"/>'; });
+  s += '<polygon points="' + poli(vals, R) + '" fill="rgba(96,165,250,.28)" stroke="#93c5fd" stroke-width="' + (o.rotulos ? 2.4 : 1.8) + '" stroke-linejoin="round"/>';
+  s += '<polygon points="' + poli([70, 70, 70, 70, 70], R) + '" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="1" stroke-dasharray="3 3"/>';
+  EIXOS.forEach(function(e, i){
+    var v = eixos[e.id] || {}, p = pto(i, vals[i], R), vazio = v.agora == null || v.pouca;
+    s += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="' + (o.rotulos ? 4.5 : 3.2) + '" fill="' + (vazio ? '#0e2544' : corTela(v.agora)) + '" stroke="' + corTela(v.agora) + '" stroke-width="1.6"/>';
+    if (o.rotulos){
+      var q = pto(i, 100, R + 16), anc = q[0] > 5 ? 'start' : q[0] < -5 ? 'end' : 'middle';
+      s += '<text x="' + q[0].toFixed(1) + '" y="' + (q[1] + (q[1] < -5 ? -4 : q[1] > 5 ? 12 : 4)).toFixed(1) + '" text-anchor="' + anc + '" font-size="13" font-family="Nunito" font-weight="800" fill="#cfe0f5">' +
+           e.ic + ' ' + (e.curto ? 'Grammar' : e.nome) + '</text>' +
+           '<text x="' + q[0].toFixed(1) + '" y="' + (q[1] + (q[1] < -5 ? 13 : q[1] > 5 ? 29 : 21)).toFixed(1) + '" text-anchor="' + anc + '" font-size="15" font-family="Poppins" font-weight="700" fill="' + corTela(v.agora) + '">' + (v.agora == null ? '—' : v.agora + '%') + '</text>';
+    }
+  });
+  return s + '</svg>';
+}
+
+/* ── a leitura: quem está em cada turma (card) e o radar de cada um (servidor) ── */
+function radarDaTurma(rafs){
+  /* o servidor aceita 60 por vez; mais que isso vai em lotes, lado a lado */
+  var lotes = [];
+  for (var i = 0; i < rafs.length; i += 60) lotes.push(rafs.slice(i, i + 60));
+  return Promise.all(lotes.map(function(l){
+    return fetch(API_URL, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+                            body: JSON.stringify({ action:'radarTurma', token: tokenSessao(), rafs: l }) })
+      .then(fiskJson).then(function(j){ if (!j || !j.ok) throw new Error((j && j.error) || 'o radar não veio'); return j.alunos || []; });
+  })).then(function(ls){ return [].concat.apply([], ls); });
+}
+
 function analisar(escola, prof) {
   var btn = $('btnAnalisar'); btn.disabled = true;
-  $('painelGeral').hidden = $('painelTurmas').hidden = $('painelAtencao').hidden = true;
+  $('pnTurma').hidden = $('pnAlunos').hidden = $('pnTabela').hidden = true;
   var pararEspera = fiskEsperando(statusCard, [
     'Lendo as turmas de ' + prof + ' no card…',
-    'Ainda lendo o card de ' + prof + ' — são todas as turmas de uma vez…',
-    'O card está demorando mais que o normal. Se passar de um minuto, tente de novo.'
+    'Montando o radar de cada aluno: o servidor lê tudo o que eles fizeram no portal…',
+    'Ainda montando, são todas as turmas de uma vez…',
+    'Está demorando mais que o normal. Se passar de um minuto, tente de novo.'
   ]);
-  /* UMA LEITURA. Antes eram 1 chamada para listar as turmas mais 1 por turma:
-     cada uma custava 6-7s pela ponte do card, e o lote em paralelo estourava o
-     tempo do Google e derrubava quem estivesse em outra ferramenta no mesmo
-     minuto (medido em 11/08/2026). O `panoramaProf` lê a aba inteira no
-     servidor e devolve tudo junto. */
   panorama(escola, prof).then(function (j) {
-    var turmas = j.turmas || [];
-    if (!turmas.length) { pararEspera(); statusCard('Nenhuma turma encontrada para ' + prof + '.', 'err'); btn.disabled = false; return; }
-    /* O render espera uma lista por turma, no formato do antigo `fn=turma`.
-       DESISTENTE FICA DE FORA: o card guarda a linha de quem saiu, e o
-       `fn=turma` já a descartava — mantê-la aqui inflaria todos os números. */
-    var blocos = {};
-    turmas.forEach(function (t) {
-      blocos[t.turma] = { turma: t.turma, _titulo: t.turma, linhaTitulo: t.linhaTitulo,
-                          professor: prof, aba: prof, alunos: [] };
+    var turmas = (j.turmas || []).map(function(t){ return t.turma; });
+    /* DESISTENTE FICA DE FORA: o card guarda a linha de quem saiu */
+    var alunos = (j.alunos || []).filter(function(a){ return a && a.nome && !a.saiu && turmas.indexOf(a.turma) >= 0; });
+    if (!alunos.length) { pararEspera(); statusCard('Nenhum aluno encontrado nas turmas de ' + prof + '.', 'err'); btn.disabled = false; return; }
+    var rafs = alunos.map(function(a){ return a.raf; }).filter(Boolean);
+    return radarDaTurma(rafs).then(function(rs){
+      var porRaf = {};
+      rs.forEach(function(r){ porRaf[String(r.raf).toUpperCase().replace(/[^A-Z0-9]/g, '')] = r; });
+      _alunos = alunos.map(function(a){
+        var r = porRaf[String(a.raf || '').toUpperCase().replace(/[^A-Z0-9]/g, '')] || null;
+        return { nome: a.nome, raf: a.raf, turma: a.turma, book: a.book, r: r,
+                 eixos: (r && r.eixos) || {}, cons: r ? constancia(r.constancia) : null };
+      });
+      _turmas = turmas.filter(function(t){ return _alunos.some(function(a){ return a.turma === t; }); });
+      if (_turmas.indexOf(_turmaSel) < 0) _turmaSel = '';
+      pararEspera(); statusCard(''); btn.disabled = false;
+      pinta(prof);
     });
-    (j.alunos || []).forEach(function (a) {
-      if (!a || !a.nome || a.saiu) return;
-      var b = blocos[a.turma];
-      if (b) b.alunos.push(a);
-    });
-    var dados = turmas.map(function (t) { return blocos[t.turma]; });
-    pararEspera();
-    btn.disabled = false;
-    render(escola, prof, dados);
   }).catch(function (e) { pararEspera(); statusCard('⚠️ ' + e.message, 'err'); btn.disabled = false; });
 }
 
-/* ============ GRÁFICOS (SVG na mão — a página não carrega biblioteca) ============ */
-
-/* Rosca de parte-do-todo com o número que interessa no meio. 3 a 4 fatias,
-   sempre com legenda escrita ao lado: a cor nunca é a única pista. */
-function donutSVG(segs, centroNum, centroRot) {
-  var R = 54, W = 22, C = 2 * Math.PI * R;
-  var tot = segs.reduce(function (s, x) { return s + x.n; }, 0) || 1;
-  var vis = segs.filter(function (s) { return s.n > 0; });
-  var off = 0, arcs = '';
-  vis.forEach(function (s) {
-    var len = s.n / tot * C;
-    var gap = vis.length > 1 ? 2 : 0;              // 2px de respiro entre fatias
-    var dash = Math.max(len - gap, 0.8);
-    arcs += '<circle cx="70" cy="70" r="' + R + '" fill="none" stroke="' + s.cor + '" stroke-width="' + W + '"' +
-            ' stroke-dasharray="' + dash + ' ' + (C - dash) + '" stroke-dashoffset="' + (-off) + '">' +
-            '<title>' + s.rot + ': ' + s.n + '</title></circle>';
-    off += len;
-  });
-  return '<svg width="140" height="140" viewBox="0 0 140 140" role="img" aria-label="Distribuição dos alunos por situação de conteúdo">' +
-    '<circle cx="70" cy="70" r="' + R + '" fill="none" stroke="var(--viz-grid)" stroke-width="' + W + '"/>' +
-    '<g transform="rotate(-90 70 70)">' + arcs + '</g>' +
-    '<text x="70" y="68" text-anchor="middle" font-family="var(--font-heading)" font-size="28" font-weight="800" fill="currentColor">' + centroNum + '</text>' +
-    '<text x="70" y="85" text-anchor="middle" font-size="9.5" font-weight="800" fill="var(--viz-ink)">' + centroRot + '</text></svg>';
+function daVez(){ return _alunos.filter(function(a){ return !_turmaSel || a.turma === _turmaSel; }); }
+function media(ls, id){
+  var vs = ls.map(function(a){ return a.eixos[id] && a.eixos[id].agora; }).filter(function(v){ return v != null; });
+  return vs.length ? Math.round(vs.reduce(function(s, v){ return s + v; }, 0) / vs.length) : null;
 }
 
-function legendaHTML(segs, tot) {
-  return '<div class="viz-legenda">' + segs.filter(function (s) { return s.n > 0; }).map(function (s) {
-    return '<span><i style="background:' + s.cor + '"></i>' + s.rot +
-      ' <b>' + s.n + '</b> · ' + Math.round(s.n / (tot || 1) * 100) + '%</span>';
-  }).join('') + '</div>';
-}
-
-/* Ranking de turmas por % em dia — uma cor só: o comprimento da barra já é o
-   dado, pintar por valor seria dizer a mesma coisa duas vezes. */
-function rankHTML(porTurma) {
-  var linhas = porTurma.map(function (t) {
-    var a = t.emdia + t.atras + t.crit;
-    return a ? { nome: t.titulo, pct: t.emdia / a * 100, crit: t.crit } : null;
-  }).filter(Boolean).sort(function (x, y) { return x.pct - y.pct; });
-  if (!linhas.length) return '<p class="viz-sub">Nenhuma turma com cronograma para comparar.</p>';
-  return linhas.map(function (l) {
-    return '<div class="r"><span class="rn" title="' + esc(l.nome) + '">' + esc(l.nome) + '</span>' +
-      '<span class="rt"><i style="width:' + Math.max(l.pct, 1.5) + '%;background:var(--blue-mid)"></i></span>' +
-      '<span class="rv">' + Math.round(l.pct) + '%</span></div>';
-  }).join('');
-}
-
-/* Dispersão faltas × atraso: separa "falta muito" de "vem e não rende" —
-   a distinção que decide o tipo de conversa com o aluno. */
-function dispersaoSVG(alunos) {
-  var pts = alunos.filter(function (a) {
-    return a._atraso != null && typeof a.pctFaltas === 'number' && !isNaN(a.pctFaltas);
-  });
-  if (pts.length < 2) return '';
-  var W = 640, H = 250, L = 40, Rr = 14, T = 12, B = 32;
-  var maxA = Math.max(6, Math.ceil(Math.max.apply(null, pts.map(function (p) { return p._atraso; })) / 2) * 2);
-  var maxF = Math.max(30, Math.ceil(Math.max.apply(null, pts.map(function (p) { return p.pctFaltas; })) / 10) * 10);
-  var px = function (f) { return L + (f / maxF) * (W - L - Rr); };
-  var py = function (a) { return H - B - (a / maxA) * (H - T - B); };
-
-  var g = '';
-  for (var i = 0; i <= 4; i++) {                      // grade horizontal, traço fino e discreto
-    var v = Math.round(maxA / 4 * i), y = py(v);
-    g += '<line x1="' + L + '" y1="' + y + '" x2="' + (W - Rr) + '" y2="' + y + '" stroke="var(--viz-grid)" stroke-width="1"/>' +
-         '<text class="vaxis" x="' + (L - 7) + '" y="' + (y + 3.5) + '" text-anchor="end">' + v + '</text>';
-  }
-  for (var f = 0; f <= maxF; f += (maxF > 60 ? 20 : 10)) {
-    g += '<text class="vaxis" x="' + px(f) + '" y="' + (H - B + 15) + '" text-anchor="middle">' + f + '%</text>';
-  }
-  // limiares: 4+ aulas dispara termo · 15% de faltas já é sinal de assiduidade
-  g += '<line x1="' + L + '" y1="' + py(LIMITE_ATRASO) + '" x2="' + (W - Rr) + '" y2="' + py(LIMITE_ATRASO) +
-       '" stroke="var(--viz-alta)" stroke-width="1" opacity=".45"/>' +
-       '<text class="quad" x="' + (W - Rr) + '" y="' + (py(LIMITE_ATRASO) - 5) + '" text-anchor="end">4+ aulas → termo</text>' +
-       '<line x1="' + px(15) + '" y1="' + T + '" x2="' + px(15) + '" y2="' + (H - B) +
-       '" stroke="var(--viz-media)" stroke-width="1" opacity=".45"/>' +
-       '<text class="quad" x="' + (px(15) + 5) + '" y="' + (T + 10) + '">15% de faltas</text>';
-
-  var marcas = pts.map(function (p) {
-    var cor = p._atraso >= LIMITE_ATRASO ? 'var(--viz-alta)' : (p._atraso >= 1 ? 'var(--viz-media)' : 'var(--viz-emdia)');
-    return '<circle class="pt" cx="' + px(p.pctFaltas).toFixed(1) + '" cy="' + py(p._atraso).toFixed(1) + '" r="5.5"' +
-      ' fill="' + cor + '" stroke="var(--white)" stroke-width="2"' +
-      ' data-n="' + esc(p.nome) + '" data-t="' + esc(p._turma || '') + '"' +
-      ' data-a="' + p._atraso + '" data-f="' + Math.round(p.pctFaltas) + '"><title>' +
-      esc(p.nome) + ' - ' + p._atraso + ' de atraso, ' + Math.round(p.pctFaltas) + '% de faltas</title></circle>';
-  }).join('');
-
-  return '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Faltas por atraso de conteúdo, um ponto por aluno">' +
-    g + marcas +
-    '<text class="vaxis" x="' + L + '" y="' + (H - 2) + '" font-weight="800">% de faltas →</text>' +
-    '<text class="vaxis" x="' + (L - 30) + '" y="' + (T + 4) + '" font-weight="800" transform="rotate(-90 ' + (L - 30) + ' ' + (T + 4) + ')">aulas de atraso →</text>' +
-    '</svg>';
-}
-
-/* o ponto é pequeno demais para ser a única forma de ler o valor: além do
-   <title> nativo, uma caixinha maior segue o mouse */
-function ligarTooltip(box, tip) {
-  box.addEventListener('mouseover', function (ev) {
-    var c = ev.target.closest ? ev.target.closest('.pt') : null; if (!c) return;
-    tip.innerHTML = '<b>' + c.getAttribute('data-n') + '</b><br>' + esc(c.getAttribute('data-t')) +
-      '<br>' + c.getAttribute('data-a') + ' aula(s) de atraso · ' + c.getAttribute('data-f') + '% de faltas';
-    tip.style.display = 'block';
-    var r = box.getBoundingClientRect(), b = c.getBoundingClientRect();
-    tip.style.left = Math.min(Math.max(b.left - r.left - 90, 4), r.width - 200) + 'px';
-    tip.style.top = (b.top - r.top - tip.offsetHeight - 8) + 'px';
-  });
-  box.addEventListener('mouseout', function (ev) {
-    if (ev.target.closest && ev.target.closest('.pt')) tip.style.display = 'none';
-  });
-}
-
-function temNota(v) { return !!(v && String(v).trim()); }
-
-function render(escola, prof, dados) {
-  var alunos = [];        // todos, com referência da turma
-  var porTurma = [];
-  dados.forEach(function (d) {
-    var lista = (d.alunos || []).filter(function (a) { return a && a.nome; });
-    var t = {
-      titulo: String(d._titulo || d.turma || '').split('\n')[0],
-      n: lista.length, emdia: 0, atras: 0, crit: 0, semdados: 0,
-      faltas: [], notas: [], av1: 0, av2: 0,
-      linhaTitulo: d.linhaTitulo, aba: d.aba || d.professor,
-      alunos: lista           // guardados para a linha da turma poder expandir
-    };
-    lista.forEach(function (a) {
-      a._turma = t.titulo;
-      a._linhaTitulo = t.linhaTitulo; a._aba = t.aba;   // p/ o link do 2nd Chance
-      if (temNota(a.notasAv1)) t.av1++;
-      if (temNota(a.notasAv2)) t.av2++;
-      var at = (typeof a.aulasAtraso === 'number' && !isNaN(a.aulasAtraso)) ? a.aulasAtraso : null;
-      a._atraso = at;
-      if (at == null) t.semdados++;
-      else if (at >= LIMITE_ATRASO) t.crit++;
-      else if (at >= 1) t.atras++;
-      else t.emdia++;
-      if (typeof a.pctFaltas === 'number' && !isNaN(a.pctFaltas)) t.faltas.push(a.pctFaltas);
-      var n1 = notaDe(a.notasAv1), n2 = notaDe(a.notasAv2);
-      a._nota = (n1 != null && n2 != null) ? (n1 + n2) / 2 : (n2 != null ? n2 : n1);
-      if (a._nota != null) t.notas.push(a._nota);
-      alunos.push(a);
-    });
-    t.mFaltas = t.faltas.length ? t.faltas.reduce(function (s, v) { return s + v; }, 0) / t.faltas.length : null;
-    t.mNotas = t.notas.length ? t.notas.reduce(function (s, v) { return s + v; }, 0) / t.notas.length : null;
-    porTurma.push(t);
-  });
-
-  var tot = alunos.length;
-  var comAtraso = alunos.filter(function (a) { return a._atraso != null; });
-  var emdia = comAtraso.filter(function (a) { return a._atraso === 0; }).length;
-  var atras = comAtraso.filter(function (a) { return a._atraso >= 1 && a._atraso < LIMITE_ATRASO; }).length;
-  var crit = comAtraso.filter(function (a) { return a._atraso >= LIMITE_ATRASO; }).length;
-  var semdados = tot - comAtraso.length;
-  var faltasAll = alunos.filter(function (a) { return typeof a.pctFaltas === 'number' && !isNaN(a.pctFaltas); })
-                        .map(function (a) { return a.pctFaltas; });
-  var mFaltas = faltasAll.length ? faltasAll.reduce(function (s, v) { return s + v; }, 0) / faltasAll.length : null;
-  var notasAll = alunos.filter(function (a) { return a._nota != null; }).map(function (a) { return a._nota; });
-  var mNotas = notasAll.length ? notasAll.reduce(function (s, v) { return s + v; }, 0) / notasAll.length : null;
-
-  statusCard('✓ ' + dados.length + ' turmas analisadas · ' + tot + ' alunos.', 'ok');
-  $('tituloGeral').textContent = '📊 Panorama geral,' + prof + ' · ' + escola;
-
-  /* KPIs */
-  $('kpis').innerHTML =
-    '<div class="kpi"><b>' + tot + '</b><span>Alunos</span><small>' + dados.length + ' turmas</small></div>' +
-    '<div class="kpi emdia"><b>' + emdia + '</b><span>Em dia</span><small>' + (comAtraso.length ? Math.round(emdia / comAtraso.length * 100) + '% dos analisáveis' : '-') + '</small></div>' +
-    '<div class="kpi media"><b>' + atras + '</b><span>Atrasados</span><small>1 a 3 aulas</small></div>' +
-    '<div class="kpi alta"><b>' + crit + '</b><span>Críticos</span><small>4+ aulas (termo)</small></div>' +
-    '<div class="kpi"><b>' + fmtPct(mFaltas) + '</b><span>Faltas médias</span><small>% por aluno</small></div>' +
-    '<div class="kpi roxa"><b>' + fmtNota(mNotas) + '</b><span>Média de notas</span><small>' + (notasAll.length ? notasAll.length + ' com nota' : 'nenhuma lançada') + '</small></div>';
-
-  /* rosca + ranking de turmas (substituem a antiga barra empilhada: mesma
-     informação, mas com o número que importa em destaque) */
-  /* quem não tem cronograma fica FORA da rosca: não é uma fatia do mesmo
-     bolo, é aluno que não dá para medir. Vai como nota embaixo da legenda,
-     assim o número do meio e os da legenda falam da mesma base. */
-  var segs = [
-    { n: emdia, cor: 'var(--viz-emdia)', rot: 'Em dia' },
-    { n: atras, cor: 'var(--viz-media)', rot: 'Atrasados (1–3)' },
-    { n: crit,  cor: 'var(--viz-alta)',  rot: 'Críticos (4+)' }
-  ];
-  var temViz = comAtraso.length > 0;
-  $('vizRow').hidden = !temViz;
-  if (temViz) {
-    $('vizDonut').innerHTML =
-      donutSVG(segs, Math.round(emdia / comAtraso.length * 100) + '%', 'EM DIA') +
-      '<div>' + legendaHTML(segs, comAtraso.length) +
-      (semdados ? '<p class="viz-sub" style="margin:.45rem 0 0">+ ' + semdados +
-                  ' sem análise de conteúdo (kids/teens)</p>' : '') + '</div>';
-    $('vizRank').innerHTML = rankHTML(porTurma);
-  }
-  $('distrib').innerHTML = temViz ? ''
-    : '<p class="sub">Estas turmas não têm cronograma com placeholders (ex.: kids). Análise de atraso indisponível; faltas e notas seguem valendo.</p>';
-  $('painelGeral').hidden = false;
-
-  /* dispersão faltas × atraso */
-  var svgDisp = temViz ? dispersaoSVG(alunos) : '';
-  $('painelDisp').hidden = !svgDisp;
-  if (svgDisp) {
-    var box = $('vizDisp');
-    box.innerHTML = svgDisp + '<div class="viz-tip" id="vizTip"></div>' +
-      '<div class="viz-legenda" style="flex-direction:row;gap:1rem;flex-wrap:wrap;margin-top:.5rem">' +
-      '<span><i style="background:var(--viz-emdia)"></i>Em dia</span>' +
-      '<span><i style="background:var(--viz-media)"></i>1 a 3 aulas</span>' +
-      '<span><i style="background:var(--viz-alta)"></i>4+ aulas</span></div>';
-    ligarTooltip(box, $('vizTip'));
-  }
-
-  /* Alunos de uma turma, para a linha que expande. Ordem: quem precisa de
-     atenção primeiro — o professor abre a turma para achar problema, não
-     para ler a chamada em ordem alfabética. */
-  function alunosDaTurma(t) {
-    var alunos = (t.alunos || []).slice().sort(function (a, b) {
-      var A = a._atraso == null ? -1 : a._atraso, B = b._atraso == null ? -1 : b._atraso;
-      return B - A || String(a.nome).localeCompare(String(b.nome));
-    });
-    if (!alunos.length) return '<p class="sub" style="margin:.4rem 0">Turma sem alunos no card.</p>';
-    return '<div class="alunos-turma">' + alunos.map(function (a) {
-      var at = a._atraso;
-      var cls = at == null ? 'neutra' : at >= LIMITE_ATRASO ? 'alta' : at >= 1 ? 'media' : 'emdia';
-      var sit = at == null ? 'sem análise' : at === 0 ? 'em dia'
-              : at + ' aula' + (at > 1 ? 's' : '') + ' de atraso';
-      return '<div class="at-aluno">' +
-        '<span class="pill ' + cls + '">' + sit + '</span>' +
-        linkAluno(a.nome, 'at-nome') +
-        '<span class="at-dados">' +
-          (typeof a.pctFaltas === 'number' && !isNaN(a.pctFaltas)
-             ? Math.round(a.pctFaltas) + '% faltas' : '') +
-          (a._nota != null ? ' · nota ' + fmtNota(a._nota) : '') +
-        '</span></div>';
-    }).join('') + '</div>';
-  }
-
-  /* tabela por turma */
-  $('linhasTurmas').innerHTML = porTurma.map(function (t, i) {
-    var analis = t.emdia + t.atras + t.crit;
-    var situ = !analis ? '<span class="pill neutra">sem cronograma</span>'
-      : t.crit ? '<span class="pill alta">' + t.crit + ' crítico' + (t.crit > 1 ? 's' : '') + '</span>'
-      : t.atras ? '<span class="pill media">atenção</span>'
-      : '<span class="pill emdia">em dia</span>';
-    var bar = analis
-      ? '<div class="minibar" title="em dia / atrasados / críticos">' +
-        (t.emdia ? '<i style="width:' + (t.emdia / analis * 100) + '%;background:var(--emdia)"></i>' : '') +
-        (t.atras ? '<i style="width:' + (t.atras / analis * 100) + '%;background:var(--media)"></i>' : '') +
-        (t.crit ? '<i style="width:' + (t.crit / analis * 100) + '%;background:var(--alta)"></i>' : '') + '</div>'
-      : '';
-    /* A linha da turma abre. O número "5 críticos" respondia QUANTOS mas
-       nunca QUEM, e era exatamente essa a pergunta seguinte do professor —
-       que só tinha como responder abrindo o card. Agora a turma expande e
-       lista os alunos, e cada aluno leva ao acompanhamento. */
-    return '<tr class="tr-turma" data-turma="' + i + '">' +
-      '<td><span class="tnome">' + esc(t.titulo) + '</span>' +
-        '<span class="tt-seta">▾</span>' +
-        (t.semdados && analis ? '<div class="tsub">' + t.semdados + ' sem análise</div>' : '') + '</td>' +
-      '<td class="num">' + t.n + '</td>' +
-      '<td class="num">' + (analis ? t.emdia : '-') + '</td>' +
-      '<td class="num">' + (analis ? t.atras : '-') + '</td>' +
-      '<td class="num">' + (analis ? t.crit : '-') + '</td>' +
-      '<td class="num">' + fmtPct(t.mFaltas) + '</td>' +
-      '<td class="num"><b>' + fmtNota(t.mNotas) + '</b></td>' +
-      '<td>' + situ + (bar ? '<div style="margin-top:.25rem">' + bar + '</div>' : '') + '</td></tr>' +
-      '<tr class="tr-alunos" id="turma-alunos-' + i + '" hidden><td colspan="8">' +
-        alunosDaTurma(t) + '</td></tr>';
-  }).join('');
-  $('painelTurmas').hidden = false;
-  (function ligarExpansaoTurmas() {
-    var tb = $('linhasTurmas');
-    if (tb._ligado) return;
-    tb._ligado = true;
-    tb.addEventListener('click', function (ev) {
-      // clique no NOME do aluno é navegação, não expansão
-      if (ev.target.closest('a')) return;
-      var tr = ev.target.closest('.tr-turma');
-      if (!tr) return;
-      var alvo = document.getElementById('turma-alunos-' + tr.dataset.turma);
-      if (!alvo) return;
-      alvo.hidden = !alvo.hidden;
-      tr.classList.toggle('is-aberta', !alvo.hidden);
-    });
-  })();
-  /* Os nomes só viram link quando a Chamada do Portal traz o RAF. Se ela
-     chegou depois desta renderização, repinta — senão os nomes ficariam em
-     texto puro até o professor analisar de novo. */
-  window._repintarLinks = function () { render(escola, prof, dados); };
-  var totSem = porTurma.reduce(function (s, t) { return s + (t.emdia + t.atras + t.crit ? 0 : t.n); }, 0);
-  $('foraNote').hidden = !totSem;
-  if (totSem) $('foraNote').innerHTML = '👶 <b>' + totSem + '</b> aluno(s) em turmas sem cronograma de placeholders (kids/teens). Para elas valem faltas e notas, sem análise de atraso.';
-
-
-  /* lista de atenção */
-  var top = alunos.filter(function (a) { return a._atraso != null && a._atraso >= 1; })
-    .sort(function (a, b) { return (b._atraso - a._atraso) || ((b.pctFaltas || 0) - (a.pctFaltas || 0)); })
-    .slice(0, 10);
-  $('listaAtencao').innerHTML = top.length ? top.map(function (a) {
-    var cls = a._atraso >= LIMITE_ATRASO ? ' is-alta' : '';
-    return '<div class="a' + cls + '">' + linkAluno(a.nome, 'nome') +
-      '<span class="info">' + esc(a._turma) + (a.book ? ' · ' + esc(a.book) : '') + '</span>' +
-      '<span class="chips">' +
-      '<span class="chip ' + (a._atraso >= LIMITE_ATRASO ? 'bad' : 'warn') + '">' + a._atraso + ' aula' + (a._atraso > 1 ? 's' : '') + ' de atraso</span>' +
-      (typeof a.pctFaltas === 'number' && a.pctFaltas > 0 ? '<span class="chip">' + Math.round(a.pctFaltas) + '% faltas</span>' : '') +
-      (a._nota != null ? '<span class="chip">nota ' + fmtNota(a._nota) + '</span>' : '') +
-      /* O E-COUNSELING NA LISTA DE ATENÇÃO (20/09/2026): esta lista é
-         exatamente a dos alunos sobre quem há o que registrar, e sem isto o
-         professor teria de sair da tela e procurar o aluno de novo. */
-      '<button type="button" class="chip csl" data-csl="' + esc(a.nome) +
-        '" data-turma="' + esc(a._turma) + '" data-book="' + esc(a.book || '') +
-        '" title="Abrir o E-counseling deste aluno">💬</button>' +
-      '</span></div>';
-  }).join('') : '<p class="sub">🎉 Nenhum aluno atrasado nas turmas analisadas.</p>';
-  $('painelAtencao').hidden = false;
-}
-
-/* Um ouvinte só para todos os botões de counseling da tela: a lista é
-   repintada a cada análise, e ligar botão a botão vazaria ouvinte a cada
-   repintura. */
-document.addEventListener('click', function (ev) {
-  var b = ev.target.closest('[data-csl]');
-  if (!b || typeof fiskCounselingGaveta !== 'function') return;
-  fiskCounselingGaveta({
-    escola: $('selEscola').value, professor: $('selProf').value,
-    turma: b.dataset.turma || '', aluno: b.dataset.csl, estagio: b.dataset.book || ''
-  });
-});
-
-/* ============ PONTE NOME → RAF ============
-   O card não conhece RAF: ele guarda nome, atraso e faltas. Quem tem a
-   correspondência é a matrícula do backend, que a Chamada do Portal já
-   carrega nesta mesma página. Guardando esse índice aqui, qualquer nome de
-   aluno na tela vira link para o acompanhamento — sem uma chamada a mais ao
-   servidor. Enquanto a Chamada não terminou de carregar, `rafDe` devolve
-   vazio e o nome fica em texto puro; quando ela chega, os blocos que
-   dependem disso são repintados. */
-var _rafPorNome = {};
-function chaveAluno(nome) {
-  return String(nome || '').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/\s+/g, ' ').trim();
-}
-function rafDe(nome) { return _rafPorNome[chaveAluno(nome)] || ''; }
-/* nome do aluno como link para o acompanhamento — texto puro se ainda não sabemos o RAF */
-function linkAluno(nome, classe) {
-  var raf = rafDe(nome);
-  var txt = esc(nome);
-  if (!raf) return '<span class="' + (classe || '') + '">' + txt + '</span>';
-  return '<a class="' + (classe || '') + ' ac-link" href="aluno.html?raf=' + encodeURIComponent(raf) + '">' + txt + '</a>';
-}
-
-/* ============ ACESSOS AO PORTAL DO ALUNO ============
-   Era uma ferramenta à parte no Hub; virou um card daqui porque a
-   informação é da turma, não do professor. Usa o token do login (SSO) —
-   nenhuma chave no front, que este repo é público. */
-(function acessos() {
-  var EP_HUB2 = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
-  var lista = [];
-  function sess() { try { return JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) { return null; } }
-  function quando(ts) {
-    if (!ts) return null;
-    var dias = Math.floor((Date.now() - ts) / 86400000);
-    if (dias <= 0) return 'hoje';
-    if (dias === 1) return 'ontem';
-    if (dias < 30) return 'há ' + dias + ' dias';
-    var d = new Date(ts), p = function (n) { return ('0' + n).slice(-2); };
-    return p(d.getDate()) + '/' + p(d.getMonth() + 1) + '/' + d.getFullYear();
-  }
-  function semAtividade(a) { return !a.totalAtividades; }
-  var _turmasAbertas = {};
-  function pinta() {
-    var t = $('acTurma').value, st = $('acFiltro').value, q = $('acBusca').value.trim().toLowerCase();
-    var vis = lista.filter(function (a) {
-      if (t && a.turma !== t) return false;
-      if (st === 'sim' && !a.last) return false;
-      if (st === 'nao' && a.last) return false;
-      /* "parado" é o caso que não existia antes e é o mais útil: o aluno abre
-         o portal, passeia e não conclui nada. Ele não aparecia em "nunca
-         entrou", então ninguém percebia. */
-      if (st === 'parado' && !(a.last && !a.totalAtividades)) return false;
-      if (st === 'sumido' && (a.atividade7d || 0) > 0) return false;
-      if (q && String(a.name).toLowerCase().indexOf(q) === -1) return false;
-      return true;
-    });
-    /* AGRUPADO POR TURMA, e não uma tabela corrida. O professor não chega
-       aqui procurando um nome — ele chega querendo ver as turmas dele. Uma
-       tabela de 51 linhas exige saber de antemão quem procurar; a lista por
-       turma se lê de relance. A busca continua ali para quando ele já sabe o
-       nome, inclusive de aluno de outro professor. */
-    var porTurma = {}, ordem = [];
-    vis.forEach(function (a) {
-      var t = a.turma || 'Sem turma';
-      if (!porTurma[t]) { porTurma[t] = []; ordem.push(t); }
-      porTurma[t].push(a);
-    });
-    if (!ordem.length) {
-      $('acLinhas').innerHTML = '<p class="sub">Nenhum aluno com esses filtros.</p>';
-      return;
-    }
-    /* Ordem da turma: a que tem mais aluno parado primeiro — é onde o
-       professor precisa agir. */
-    ordem.sort(function (x, y) {
-      var px = porTurma[x].filter(semAtividade).length, py = porTurma[y].filter(semAtividade).length;
-      return py - px || x.localeCompare(y);
-    });
-    $('acLinhas').innerHTML = ordem.map(function (t, i) {
-      var alunos = porTurma[t].slice().sort(function (a, b) {
-        return (a.ultimaAtividade || 0) - (b.ultimaAtividade || 0);   // quem sumiu primeiro
-      });
-      var parados = alunos.filter(semAtividade).length;
-      var aberta = _turmasAbertas[t] !== false;   // abertas por padrão: é para bater o olho
-      return '<div class="tg' + (aberta ? ' is-aberta' : '') + '" data-turma="' + i + '">' +
-        '<button type="button" class="tg-cab" data-t="' + esc(t).replace(/"/g, '&quot;') + '">' +
-          '<span class="tg-seta">▾</span>' +
-          '<b>' + esc(t) + '</b>' +
-          '<span class="tg-n">' + alunos.length + ' aluno' + (alunos.length > 1 ? 's' : '') + '</span>' +
-          (parados ? '<span class="pill alta">' + parados + ' sem atividade</span>' : '') +
-        '</button>' +
-        '<div class="tg-corpo"' + (aberta ? '' : ' hidden') + '>' +
-          alunos.map(function (a) {
-            var ua = a.ultimaAtividade || null;
-            var dias = ua ? Math.floor((Date.now() - ua) / 86400000) : null;
-            var cls = ua == null ? 'alta' : (dias <= 7 ? 'emdia' : 'media');
-            var rot = ua == null ? (a.last ? 'entrou, não fez' : 'nunca entrou') : quando(ua);
-            return '<div class="at-aluno">' +
-              '<span class="pill ' + cls + '">' + rot + '</span>' +
-              '<a class="at-nome ac-link" href="aluno.html?raf=' + encodeURIComponent(a.raf) + '">' +
-                esc(a.name) + '</a>' +
-              '<span class="at-dados">' + esc(a.book || '') +
-                ((a.atividade7d || 0) ? ' · ' + a.atividade7d + ' nos 7 dias' : '') + '</span>' +
-            '</div>';
-          }).join('') +
-        '</div></div>';
+function pinta(prof){
+  $('rtTitulo').textContent = '📡 Radar da turma' + (prof ? ' · ' + prof : '');
+  $('rtChips').innerHTML = '<button type="button" class="rt-chip" data-t="" aria-pressed="' + (!_turmaSel) + '">Todas (' + _alunos.length + ')</button>' +
+    _turmas.map(function(t){
+      var n = _alunos.filter(function(a){ return a.turma === t; }).length;
+      return '<button type="button" class="rt-chip" data-t="' + esc(t).replace(/"/g, '&quot;') + '" aria-pressed="' + (_turmaSel === t) + '">' + esc(String(t).split('\n')[0]) + ' (' + n + ')</button>';
     }).join('');
-  }
-  /* Este bloco era o ÚNICO da página que não obedecia ao seletor "ver como
-     professor": ele mandava só o token, e o servidor resolvia o professor
-     pelo LOGIN. Para a direção isso aparecia como "PEDRO (DIREÇÃO) · 0
-     turma(s)" — não era rótulo errado, era a consulta inteira feita para a
-     pessoa errada. Agora vai o professor escolhido, e recarrega quando a
-     escolha muda. */
-  /* UMA fonte de verdade para "qual professor" (corrigido em 04/08/2026).
-     Havia duas, e elas divergiam: a ANÁLISE seguia o seletor da cascata
-     (que o prefill preenche a partir da URL `?escola=&prof=`, do fisk_actas
-     ou do login, nessa ordem), e este bloco seguia SÓ o fisk_actas. Bastava
-     chegar por link com ?prof= — ou trocar o professor no seletor — para a
-     página mostrar a análise de um e a lista de alunos de outro, cada metade
-     parecendo certa sozinha. Agora vale o que está selecionado na tela;
-     o fisk_actas fica só como plano B, para antes de a cascata carregar. */
-  function profEscolhido() {
-    var sel = document.getElementById('selProf');
-    if (sel && sel.value) return sel.value;
-    try {
-      var a = JSON.parse(localStorage.getItem('fisk_actas') || 'null');
-      return (a && a.name) || '';
-    } catch (e) { return ''; }
-  }
-  var s = sess();
-  if (!s || !s.token) {
-    $('acStatus').className = 'status err';
-    $('acStatus').innerHTML = '⚠️ Entre no Fisk Hub com seu usuário e senha para ver os acessos. <a href="index.html">Ir para o login</a>';
-    return;
-  }
-  var ligado = false;
-  function carregar() {
-  $('acStatus').className = 'status';
-  $('acStatus').textContent = '⏳ Carregando…';
-  fetch(EP_HUB2, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                   body: JSON.stringify({ action: 'acessosProf', token: s.token, prof: profEscolhido() }) })
-    .then(fiskJson)
-    .then(function (res) {
-      if (!res.ok) { $('acStatus').className = 'status err'; $('acStatus').textContent = '⚠️ ' + (res.error || 'Não consegui carregar.'); return; }
-      lista = res.acessos || [];
-      lista.forEach(function (al) { if (al.raf && al.name) _rafPorNome[chaveAluno(al.name)] = al.raf; });
-      // agora os nomes das outras seções podem virar link
-      if (typeof window._repintarLinks === 'function') window._repintarLinks();
-      /* ENTROU ≠ FEZ. O terceiro número passou a ser "nunca fizeram nada",
-         que é a pergunta de verdade: aluno que abre o portal e não conclui
-         atividade nenhuma some da lista de "nunca entraram" e ninguém nota. */
-      var ent = lista.filter(function (a) { return a.last; });
-      var fez = lista.filter(function (a) { return a.totalAtividades > 0; });
-      var ativos7 = lista.filter(function (a) { return (a.atividade7d || 0) > 0; });
-      $('ac-total').textContent = lista.length;
-      $('ac-ent').textContent = ent.length;
-      $('ac-nunca').textContent = lista.length - fez.length;
-      $('ac-7d').textContent = ativos7.length;
-      var turmas = {}; lista.forEach(function (a) { turmas[a.turma] = true; });
-      $('acTurma').innerHTML = '<option value="">Todas as turmas</option>';
-      Object.keys(turmas).sort().forEach(function (t) {
-        var o = document.createElement('option'); o.value = t; o.textContent = t; $('acTurma').appendChild(o);
-      });
-      /* O servidor diz para QUEM ele respondeu, e nem sempre é quem está
-         selecionado: pedir por outro professor exige ser da direção, então
-         para o professor comum o `prof` enviado é ignorado e a resposta volta
-         com o dono do login. Antes isso passava calado, e a tela ficava com a
-         análise de um e a lista de outro — duas metades plausíveis. Agora,
-         quando as duas discordam, a tela avisa em vez de fingir coerência. */
-      var pedido = profEscolhido();
-      var chaveProf = function (s) {
-        return String(s || '').toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim();
-      };
-      var divergiu = pedido && res.prof && chaveProf(pedido) !== chaveProf(res.prof);
-      $('acStatus').className = divergiu ? 'status err' : 'status ok';
-      $('acStatus').textContent = divergiu
-        ? '⚠️ A análise acima é de ' + pedido + ', mas esta lista é de ' + res.prof +
-          ' — só a direção pode ver os alunos de outro professor.'
-        : '👩‍🏫 ' + res.prof + ' · ' + res.turmas + ' turma(s) · ' + lista.length + ' aluno(s)';
-      if (!ligado) {
-        ['acTurma', 'acFiltro', 'acBusca'].forEach(function (id) { $(id).addEventListener('input', pinta); });
-        $('acLinhas').addEventListener('click', function (ev) {
-          var cab = ev.target.closest('.tg-cab');
-          if (!cab) return;
-          var t = cab.getAttribute('data-t');
-          _turmasAbertas[t] = _turmasAbertas[t] === false;
-          pinta();
-        });
-        ligado = true;
-      }
-      pinta();
-      $('acCorpo').hidden = false;
-    })
-    /* MOSTRE O ERRO DE VERDADE. Isto aqui dizia "Sem conexão com o servidor"
-       para QUALQUER falha, e a frase é uma acusação errada na maioria dos
-       casos: o `fiskJson` já distingue "o Google pediu login", "o servidor
-       devolveu página de erro" e o HTTP que veio, e tudo isso era jogado fora.
-       Quem estava na tela via "sem conexão" com a internet funcionando e não
-       tinha o que fazer. Só quando o fetch falha de fato (rede caiu, offline)
-       é que a mensagem de conexão é a verdadeira. */
-    .catch(function (e) {
-      var msg = (e && e.message) || 'falha desconhecida';
-      var semRede = (e instanceof TypeError) || /Failed to fetch|NetworkError|Load failed/i.test(msg);
-      $('acStatus').className = 'status err';
-      $('acStatus').textContent = semRede
-        ? '⚠️ Sem conexão com o servidor. Confira a internet e recarregue a página.'
-        : '⚠️ ' + msg;
-    });
-  }
-  carregar();
-  // a direção troca de professor no seletor do topo: a chamada acompanha
-  window._acRecarregar = carregar;
+  var ls = daVez();
 
-  /* A cascata resolve DEPOIS desta primeira carga (ela vai ao card buscar
-     escolas e professores), e é ela quem define o professor da tela. Então
-     este bloco recarrega quando o seletor muda — inclusive na preseleção
-     automática, que dispara o mesmo evento 'change'. O guard evita a chamada
-     repetida quando o professor não mudou de fato. */
-  var _ultimoProf = null;
-  var selProf = document.getElementById('selProf');
-  if (selProf) {
-    selProf.addEventListener('change', function () {
-      if (!selProf.value || selProf.value === _ultimoProf) return;
-      _ultimoProf = selProf.value;
-      carregar();
-    });
-  }
-})();
+  /* o radar médio da turma: a média de quem TEM dado em cada eixo */
+  var med = {};
+  EIXOS.forEach(function(e){ var m = media(ls, e.id); med[e.id] = { agora: m }; });
+  $('rtRadar').innerHTML = radarSVG(med, { R: 100, rotulos: true });
+  $('rtEixos').innerHTML = EIXOS.map(function(e){
+    var m = med[e.id].agora, com = ls.filter(function(a){ return a.eixos[e.id] && a.eixos[e.id].agora != null; });
+    var abaixo = com.filter(function(a){ return a.eixos[e.id].agora < DOMINIO; }).length;
+    return '<div class="rt-eixo"><span class="t">' + e.ic + ' ' + (e.curto || e.nome) + '</span>' +
+      '<b class="rt-' + nivel(m) + '">' + (m == null ? '—' : m + '%') + '</b>' +
+      '<small>' + (com.length ? abaixo + ' de ' + com.length + ' abaixo de 70%' : 'ninguém com evidência ainda') + '</small></div>';
+  }).join('');
 
-/* Recolher e reabrir bloco. A escolha fica no navegador, por bloco: o
-   professor que nunca usa um deles o fecha uma vez e não o vê mais. */
-(function colapsaveis() {
-  var CHAVE = 'fisk_vg_fechados';
-  var fechados = {};
-  try { fechados = JSON.parse(localStorage.getItem(CHAVE) || '{}') || {}; } catch (e) {}
-  document.querySelectorAll('.painel.is-colapsavel').forEach(function (p) {
-    var h = p.querySelector('h2');
-    if (!h) return;
-    if (fechados[p.id]) p.classList.add('is-fechado');
-    h.setAttribute('role', 'button');
-    h.setAttribute('tabindex', '0');
-    var alterna = function () {
-      var fechou = p.classList.toggle('is-fechado');
-      h.setAttribute('aria-expanded', String(!fechou));
-      fechados[p.id] = fechou;
-      try { localStorage.setItem(CHAVE, JSON.stringify(fechados)); } catch (e) {}
-    };
-    h.setAttribute('aria-expanded', String(!p.classList.contains('is-fechado')));
-    h.addEventListener('click', alterna);
-    h.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alterna(); }
-    });
+  /* ONDE FOCAR COM A TURMA: o eixo em que mais alunos estão abaixo do domínio, e quem são */
+  var pior = EIXOS.map(function(e){
+    var ab = ls.filter(function(a){ var v = a.eixos[e.id]; return v && v.agora != null && !v.pouca && v.agora < DOMINIO; });
+    return { e: e, ab: ab };
+  }).sort(function(a, b){ return b.ab.length - a.ab.length; })[0];
+  var semNada = ls.filter(function(a){ return !EIXOS.some(function(e){ return a.eixos[e.id] && a.eixos[e.id].agora != null; }); });
+  var baixaCons = ls.filter(function(a){ return a.cons != null && a.cons < 50; });
+  var f = [];
+  if (pior && pior.ab.length) f.push('🎯 <b>' + pior.e.nome + '</b> é onde mais alunos estão abaixo de 70% (' + pior.ab.length + ' de ' + ls.length + '): ' +
+    pior.ab.slice(0, 6).map(function(a){ return esc(a.nome.split(' ')[0]); }).join(', ') + (pior.ab.length > 6 ? '…' : '') + '.');
+  if (baixaCons.length) f.push('🧭 <b>' + baixaCons.length + '</b> com constância abaixo de 50% (faltas ou pouco estudo em casa).');
+  if (semNada.length) f.push('⚪ <b>' + semNada.length + '</b> ainda sem nenhuma atividade no portal neste estágio.');
+  $('rtFoco').innerHTML = f.length ? f.join('<br>') : '👏 Nenhum eixo com alunos abaixo do domínio. Turma em dia!';
+
+  /* cada aluno em miniatura, o mais fraco em cima: é quem pede atenção primeiro */
+  var ord = ls.slice().sort(function(a, b){
+    var pa = EIXOS.map(function(e){ return a.eixos[e.id] && a.eixos[e.id].agora; }).filter(function(v){ return v != null; });
+    var pb = EIXOS.map(function(e){ return b.eixos[e.id] && b.eixos[e.id].agora; }).filter(function(v){ return v != null; });
+    var ma = pa.length ? Math.min.apply(null, pa) : 999, mb = pb.length ? Math.min.apply(null, pb) : 999;
+    return ma - mb || String(a.nome).localeCompare(String(b.nome), 'pt-BR');
   });
-})();
+  $('rtGrade').innerHTML = ord.map(function(a){
+    var r = a.r, fr = r && r.fraco ? EIXOS.filter(function(e){ return e.id === r.fraco; })[0] : null;
+    var ck = r && r.checking;
+    var pills = (fr ? '<span title="habilidade mais fraca" class="pill ' + (a.eixos[fr.id].agora < 50 ? 'alta' : a.eixos[fr.id].agora < 70 ? 'media' : 'emdia') + '">' + fr.ic + ' ' + a.eixos[fr.id].agora + '%</span>' : '') +
+      (a.cons != null ? '<span title="constância" class="pill ' + (a.cons >= 70 ? 'emdia' : a.cons >= 50 ? 'media' : 'alta') + '">🧭 ' + a.cons + '%</span>' : '') +
+      (ck ? '<span class="pill ' + (ck.resultado === 'estudar' ? 'media' : 'emdia') + '">' + esc(ck.licao) + (ck.resultado === 'estudar' ? ' 📚' : ' ✓') + '</span>' : '');
+    if (!a.raf) return '<div class="rt-al sem"><div class="nm">' + esc(a.nome) + '</div><div class="sb">sem RAF no card</div></div>';
+    return '<a class="rt-al ac-link" href="aluno.html?raf=' + encodeURIComponent(a.raf) + '" data-raf="' + esc(a.raf) + '" data-nome="' + esc(a.nome).replace(/"/g, '&quot;') + '" data-turma="' + esc(a.turma).replace(/"/g, '&quot;') + '">' +
+      '<div class="mini">' + radarSVG(a.eixos, { R: 44 }) + '</div>' +
+      '<div class="nm">' + esc(a.nome) + '</div><div class="sb">' + esc(a.book || '') + (r && r.ultima ? ' · ' + haQuanto(r.ultima) : '') + '</div>' +
+      '<div class="pills">' + (pills || '<span class="pill cinza">sem evidência ainda</span>') + '</div></a>';
+  }).join('');
+
+  $('pnTurma').hidden = $('pnAlunos').hidden = $('pnTabela').hidden = false;
+  tabela();
+}
+
+/* A TABELA, com as colunas que reordenam (pedido do Pedro para as tabelas do radar) */
+var COLS = [
+  { id:'nome', t:'Aluno', v:function(a){ return a.nome; } },
+  { id:'turma', t:'Turma', v:function(a){ return String(a.turma || '').split('\n')[0]; } }
+].concat(EIXOS.map(function(e){ return { id:e.id, t:e.ic + ' ' + (e.id === 'G' ? 'Grammar' : e.nome), num:true, v:function(a){ var x = a.eixos[e.id]; return x && x.agora != null ? x.agora : null; } }; }))
+ .concat([
+  { id:'cons', t:'🧭 Constância', num:true, v:function(a){ return a.cons; } },
+  { id:'ck', t:'Último checking', v:function(a){ return a.r && a.r.checking ? a.r.checking.quando : null; } },
+  { id:'ult', t:'Última atividade', v:function(a){ return a.r && a.r.ultima ? a.r.ultima : null; } }
+]);
+function tabela(){
+  var ls = daVez().slice(), o = _ordem, c = COLS.filter(function(k){ return k.id === o.col; })[0] || COLS[0];
+  ls.sort(function(a, b){
+    var p = c.v(a), q = c.v(b);
+    if (p == null && q == null) return 0; if (p == null) return 1; if (q == null) return -1;
+    var r = typeof p === 'number' && typeof q === 'number' ? p - q : String(p).localeCompare(String(q), 'pt-BR');
+    return o.asc ? r : -r;
+  });
+  var mostraTurma = !_turmaSel && _turmas.length > 1;
+  var cols = COLS.filter(function(k){ return k.id !== 'turma' || mostraTurma; });
+  $('rtTab').innerHTML = '<thead><tr>' + cols.map(function(k){
+    var on = k.id === o.col;
+    return '<th><button type="button" data-col="' + k.id + '"' + (on ? ' aria-sort="' + (o.asc ? 'ascending' : 'descending') + '"' : '') + '>' + esc(k.t) +
+           ' <span class="seta">' + (on ? (o.asc ? '▲' : '▼') : '↕') + '</span></button></th>';
+  }).join('') + '</tr></thead><tbody>' + ls.map(function(a){
+    return '<tr>' + cols.map(function(k){
+      var v = k.v(a);
+      if (k.id === 'nome') return '<td>' + (a.raf ? '<a class="ac-link" href="aluno.html?raf=' + encodeURIComponent(a.raf) + '" data-raf="' + esc(a.raf) + '" data-nome="' + esc(a.nome).replace(/"/g, '&quot;') + '">' + esc(a.nome) + '</a>' : esc(a.nome)) + '</td>';
+      if (k.id === 'turma') return '<td>' + esc(v) + '</td>';
+      if (k.num) {
+        var pouca = EIXOS.some(function(e){ return e.id === k.id; }) && a.eixos[k.id] && a.eixos[k.id].pouca;
+        return '<td class="n rt-' + nivel(v) + '"' + (pouca ? ' title="pouca evidência"' : '') + '>' + (v == null ? '—' : v + '%' + (pouca ? '*' : '')) + '</td>';
+      }
+      if (k.id === 'ck') { var ck = a.r && a.r.checking; return '<td>' + (ck ? esc(ck.licao) + ' ' + (ck.resultado === 'estudar' ? '<span class="pill media">Study more</span>' : '<span class="pill emdia">Approved</span>') + ' <small style="color:var(--gray)">' + haQuanto(ck.quando) + '</small>' : '<span style="color:var(--gray)">—</span>') + '</td>'; }
+      if (k.id === 'ult') return '<td>' + (v ? haQuanto(v) : '<span style="color:var(--gray)">nada ainda</span>') + '</td>';
+      return '<td>' + esc(v == null ? '' : v) + '</td>';
+    }).join('') + '</tr>';
+  }).join('') + '</tbody>';
+}
+
+$('rtChips').addEventListener('click', function(ev){
+  var b = ev.target.closest('.rt-chip'); if (!b) return;
+  _turmaSel = b.getAttribute('data-t') || ''; pinta($('selProf').value);
+});
+$('rtTab').addEventListener('click', function(ev){
+  var b = ev.target.closest('[data-col]'); if (!b) return;
+  var id = b.getAttribute('data-col'), num = COLS.some(function(k){ return k.id === id && (k.num || k.id === 'ck' || k.id === 'ult'); });
+  _ordem = _ordem.col === id ? { col: id, asc: !_ordem.asc } : { col: id, asc: !num };
+  tabela();
+});
 
 initCascade();
 
-/* ── Análises atrás de um botão (04/08/2026) ──────────────────────────────
-   Quatro blocos de gráfico e tabela abriam antes da lista de alunos, e o
-   professor tinha de rolar por todos para chegar ao que mais usa. Eles
-   continuam inteiros — só deixaram de ser a primeira coisa da tela.
-   O toggle mexe SÓ no contêiner: cada painel de dentro continua mandando na
-   própria visibilidade (vários só aparecem quando há dado), então esconder
-   por fora preserva a lógica que já existia. */
-(function analisesToggle(){
-  var pan = document.getElementById('painelAnalises'), cx = document.getElementById('analises');
-  if (!pan || !cx) return;
-  /* Quem manda no abre/fecha é o `colapsaveis()`, o mesmo de todos os blocos
-     — inclusive no teclado e no estado guardado. Aqui só espelhamos a classe
-     dele no contêiner das análises, que é irmão do painel e não filho (os
-     quatro blocos de dentro já são `.painel`, e aninhá-los daria borda dupla).
-     Observando a classe em vez de escutar o clique, o espelho vale para
-     qualquer caminho que a mude, sem depender da ordem dos handlers. */
-  var sync = function(){ cx.hidden = pan.classList.contains('is-fechado'); };
-  new MutationObserver(sync).observe(pan, { attributes:true, attributeFilter:['class'] });
-  sync();
-})();
-
-/* O nome do aluno abre o Acompanhamento numa GAVETA à direita, em vez de
-   trocar de página: aqui o professor está comparando alunos, e navegar
-   custaria recarregar esta tela a cada nome. O link continua sendo um <a>
-   de verdade — ctrl+clique, botão do meio e "abrir em nova aba" seguem
-   funcionando, e sem sessão a página cheia responde igual. */
+/* O aluno abre o Radar do Aluno numa GAVETA à direita (aluno.html?embed=1): o professor está comparando
+   alunos, e navegar custaria refazer esta leitura a cada nome. O link continua sendo um <a> de verdade —
+   ctrl+clique e "abrir em nova aba" seguem funcionando. */
 if (typeof fiskLigarAcompanhamento === 'function') fiskLigarAcompanhamento(document, 'a.ac-link');
 </script>
 </body>
