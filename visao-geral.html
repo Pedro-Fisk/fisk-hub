@@ -478,6 +478,27 @@ var EIXOS = [
   { id:'L', nome:'Listening', ic:'🎧' }, { id:'R', nome:'Reading', ic:'📖' }, { id:'S', nome:'Speaking', ic:'🎤' },
   { id:'W', nome:'Writing', ic:'✍️' }, { id:'G', nome:'Structure & Vocabulary', curto:'Structure & Vocab.', ic:'🧩' }
 ];
+
+/* ESPANHOL: turma de Inmediato lê o radar na língua do curso, igual ao que o aluno vê no portal.
+   O gatilho é o LIVRO do aluno, nunca o nome da turma: o card mistura os dois no mesmo nome
+   ("2 - Formandos: Focus / Inmediato 3"). Só vira espanhol quando TODO mundo à vista é do espanhol;
+   em turma mista fica em inglês, senão a mesma coluna teria dois nomes na mesma tabela. */
+var EIXOS_ES = { L:['Comprensión auditiva','Escucha'], R:['Lectura','Leer'], S:['Expresión oral','Hablar'],
+                 W:['Escritura','Escribir'], G:['Estructura y vocab.','Estructura'] };
+function livroEs(b){ return /inmediato|espa/i.test(String(b || '')); }
+function esTela(){
+  var bs = daVez().map(function(a){ return a.book; }).filter(Boolean);
+  return bs.length > 0 && bs.every(livroEs);
+}
+/* 'full' = o nome inteiro (ficha do eixo e foco), 'curto' = o rótulo do desenho, 'tab' = cabeçalho de coluna */
+function rotEixo(e, modo){
+  if (esTela()) return modo === 'curto' ? EIXOS_ES[e.id][1]
+                     : modo === 'tab' ? (e.id === 'G' ? EIXOS_ES.G[1] : EIXOS_ES[e.id][0])
+                     : EIXOS_ES[e.id][0];
+  if (modo === 'curto' || modo === 'tab') return e.id === 'G' ? 'Structure' : e.nome;
+  return e.curto || e.nome;
+}
+function seloCk(res){ return res === 'estudar' ? (esTela() ? 'Estudia más' : 'Study more') : (esTela() ? 'Aprobado' : 'Approved'); }
 var DOMINIO = 70;
 var _alunos = [], _turmas = [], _turmaSel = '', _ordem = { col: 'nome', asc: true };
 
@@ -516,7 +537,7 @@ function radarSVG(eixos, o){
     if (o.rotulos){
       var q = pto(i, 100, R + 16), anc = q[0] > 5 ? 'start' : q[0] < -5 ? 'end' : 'middle';
       s += '<text x="' + q[0].toFixed(1) + '" y="' + (q[1] + (q[1] < -5 ? -4 : q[1] > 5 ? 12 : 4)).toFixed(1) + '" text-anchor="' + anc + '" font-size="13" font-family="Nunito" font-weight="800" fill="#cfe0f5">' +
-           e.ic + ' ' + (e.curto ? 'Structure' : e.nome) + '</text>' +
+           e.ic + ' ' + rotEixo(e, 'curto') + '</text>' +
            '<text x="' + q[0].toFixed(1) + '" y="' + (q[1] + (q[1] < -5 ? 13 : q[1] > 5 ? 29 : 21)).toFixed(1) + '" text-anchor="' + anc + '" font-size="15" font-family="Poppins" font-weight="700" fill="' + corTela(v.agora) + '">' + (v.agora == null ? '—' : v.agora + '%') + '</text>';
     }
   });
@@ -588,7 +609,7 @@ function pinta(prof){
   $('rtEixos').innerHTML = EIXOS.map(function(e){
     var m = med[e.id].agora, com = ls.filter(function(a){ return a.eixos[e.id] && a.eixos[e.id].agora != null; });
     var abaixo = com.filter(function(a){ return a.eixos[e.id].agora < DOMINIO; }).length;
-    return '<div class="rt-eixo"><span class="t">' + e.ic + ' ' + (e.curto || e.nome) + '</span>' +
+    return '<div class="rt-eixo"><span class="t">' + e.ic + ' ' + rotEixo(e, 'full') + '</span>' +
       '<b class="rt-' + nivel(m) + '">' + (m == null ? '—' : m + '%') + '</b>' +
       '<small>' + (com.length ? abaixo + ' de ' + com.length + ' abaixo de 70%' : 'ninguém com evidência ainda') + '</small></div>';
   }).join('');
@@ -601,7 +622,7 @@ function pinta(prof){
   var semNada = ls.filter(function(a){ return !EIXOS.some(function(e){ return a.eixos[e.id] && a.eixos[e.id].agora != null; }); });
   var baixaCons = ls.filter(function(a){ return a.cons != null && a.cons < 50; });
   var f = [];
-  if (pior && pior.ab.length) f.push('🎯 <b>' + pior.e.nome + '</b> é onde mais alunos estão abaixo de 70% (' + pior.ab.length + ' de ' + ls.length + '): ' +
+  if (pior && pior.ab.length) f.push('🎯 <b>' + rotEixo(pior.e, 'full') + '</b> é onde mais alunos estão abaixo de 70% (' + pior.ab.length + ' de ' + ls.length + '): ' +
     pior.ab.slice(0, 6).map(function(a){ return esc(a.nome.split(' ')[0]); }).join(', ') + (pior.ab.length > 6 ? '…' : '') + '.');
   if (baixaCons.length) f.push('🧭 <b>' + baixaCons.length + '</b> com constância abaixo de 50% (faltas ou pouco estudo em casa).');
   if (semNada.length) f.push('⚪ <b>' + semNada.length + '</b> ainda sem nenhuma atividade no portal neste estágio.');
@@ -635,7 +656,9 @@ function pinta(prof){
 var COLS = [
   { id:'nome', t:'Aluno', v:function(a){ return a.nome; } },
   { id:'turma', t:'Turma', v:function(a){ return String(a.turma || '').split('\n')[0]; } }
-].concat(EIXOS.map(function(e){ return { id:e.id, t:e.ic + ' ' + (e.id === 'G' ? 'Structure' : e.nome), num:true, v:function(a){ var x = a.eixos[e.id]; return x && x.agora != null ? x.agora : null; } }; }))
+/* o cabeçalho do eixo NÃO fica pronto aqui: ele depende da turma escolhida (espanhol ou não),
+   e COLS é montado uma vez só, quando a página carrega */
+].concat(EIXOS.map(function(e){ return { id:e.id, e:e, num:true, v:function(a){ var x = a.eixos[e.id]; return x && x.agora != null ? x.agora : null; } }; }))
  .concat([
   { id:'cons', t:'🧭 Constância', num:true, v:function(a){ return a.cons; } },
   { id:'ck', t:'Último checking', v:function(a){ return a.r && a.r.checking ? a.r.checking.quando : null; } },
@@ -653,7 +676,7 @@ function tabela(){
   var cols = COLS.filter(function(k){ return k.id !== 'turma' || mostraTurma; });
   $('rtTab').innerHTML = '<thead><tr>' + cols.map(function(k){
     var on = k.id === o.col;
-    return '<th><button type="button" data-col="' + k.id + '"' + (on ? ' aria-sort="' + (o.asc ? 'ascending' : 'descending') + '"' : '') + '>' + esc(k.t) +
+    return '<th><button type="button" data-col="' + k.id + '"' + (on ? ' aria-sort="' + (o.asc ? 'ascending' : 'descending') + '"' : '') + '>' + esc(k.e ? k.e.ic + ' ' + rotEixo(k.e, 'tab') : k.t) +
            ' <span class="seta">' + (on ? (o.asc ? '▲' : '▼') : '↕') + '</span></button></th>';
   }).join('') + '</tr></thead><tbody>' + ls.map(function(a){
     return '<tr>' + cols.map(function(k){
@@ -664,7 +687,7 @@ function tabela(){
         var pouca = EIXOS.some(function(e){ return e.id === k.id; }) && a.eixos[k.id] && a.eixos[k.id].pouca;
         return '<td class="n rt-' + nivel(v) + '"' + (pouca ? ' title="pouca evidência"' : '') + '>' + (v == null ? '—' : v + '%' + (pouca ? '*' : '')) + '</td>';
       }
-      if (k.id === 'ck') { var ck = a.r && a.r.checking; return '<td>' + (ck ? esc(ck.licao) + ' ' + (ck.resultado === 'estudar' ? '<span class="pill media">Study more</span>' : '<span class="pill emdia">Approved</span>') + ' <small style="color:var(--gray)">' + haQuanto(ck.quando) + '</small>' : '<span style="color:var(--gray)">—</span>') + '</td>'; }
+      if (k.id === 'ck') { var ck = a.r && a.r.checking; return '<td>' + (ck ? esc(ck.licao) + ' ' + '<span class="pill ' + (ck.resultado === 'estudar' ? 'media' : 'emdia') + '">' + esc(seloCk(ck.resultado)) + '</span>' + ' <small style="color:var(--gray)">' + haQuanto(ck.quando) + '</small>' : '<span style="color:var(--gray)">—</span>') + '</td>'; }
       if (k.id === 'ult') return '<td>' + (v ? haQuanto(v) : '<span style="color:var(--gray)">nada ainda</span>') + '</td>';
       return '<td>' + esc(v == null ? '' : v) + '</td>';
     }).join('') + '</tr>';
