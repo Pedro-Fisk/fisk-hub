@@ -207,7 +207,7 @@
          ferramentas da SALA: entra direto com o RAF-chave 0000-000 (o modo
          professor do portal), onde o Quick Practice e o Minicourses levam o
          selo roxo "Teacher Mode" para projetar na TV. -->
-    <a class="card card-portal" href="https://portalfisk.com.br/#raf=0000-000">
+    <a class="card card-portal" id="card-portal" href="https://portalfisk.com.br/#raf=0000-000">
       <div class="icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="2.5" y="4" width="19" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/>
@@ -1315,7 +1315,23 @@
          o tempo logado só começaria a contar quando o professor abrisse a
          primeira ferramenta, e quem só passa para ver o mini-dash não
          apareceria em lugar nenhum. */
+      /* ══ A IDENTIDADE ATRAVESSA PARA O PORTAL (23/09/2026) ═══════════════
+         O card do Portal abre a chave de SALA `0000-000`, compartilhada por
+         toda a equipe: o que o professor faz lá dentro não tinha dono. O `pt`
+         leva o token da sessão DESTE Hub, e serve para uma coisa só — o
+         registro de uso ganhar nome. A sessão de lá continua sendo a de sala,
+         e nada do que ele faz vira dado de aluno.
+         Vai no FRAGMENTO, nunca na query: fragmento o navegador não envia ao
+         servidor nem põe no Referer, a mesma regra do RAF do aluno. */
+      function levaIdentidadeAoPortal(){
+        var card = document.getElementById('card-portal');
+        var s = (typeof fiskSessao === 'function') ? fiskSessao() : null;
+        if (!card || !s || !s.token) return;
+        card.href = 'https://portalfisk.com.br/#raf=0000-000&pt=' + encodeURIComponent(s.token);
+      }
+
       function registrarHome(){
+        levaIdentidadeAoPortal();
         if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Fisk Hub (início)');
         avisoNovidade();
         // campanha da direção, se houver alguma no ar para a equipe
