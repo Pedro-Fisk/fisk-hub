@@ -117,7 +117,7 @@
 </header>
 <main id="main"><div class="erro">Loading the guide…</div></main>
 
-<script src="https://portalfisk.com.br/assets/planner-v2.js?v=05d17ec941"></script>
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=c766456755"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=5a600e1933"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=9630e2ddde"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-e2.js?v=d46def0a40"></script>
@@ -148,7 +148,7 @@ function aplicaSugestoes(planoV2) {
   s.auto.forEach(function (id) { if (fb.pedidos.indexOf(id) < 0 && fb.recusados.indexOf(id) < 0 && fb.pedidos.length < 8) { fb.pedidos.push(id); fb.auto.push(id); } });
 }
 /* o gabarito v2 do livro desce do portal sob demanda (o mesmo desenho da Turma de hoje) */
-var PLANO_V = '20260918a';
+var PLANO_V = '20260923a';
 function livroId(b) { var s = String(b || '').trim().toLowerCase(); if (/focus\s*review|review\s*focus/.test(s)) return 'in-focus-review'; if (/^(grammar\s*)?review\b/.test(s)) return 'review'; if (/pathways/.test(s)) return 'pathways'; return s.replace(/\s+/g, '-'); }   /* os dois Reviews (15/09/2026): o card escreve o nome de vários jeitos */
 function planoGlobal(b) { return 'PLANO_' + livroId(b).toUpperCase().replace(/-/g, '_'); }
 (function () { if (!livroId(book) || window[planoGlobal(book)]) return; var sc = document.createElement('script'); sc.src = 'https://portalfisk.com.br/assets/plano-' + livroId(book) + '.v2.js?v=' + PLANO_V; document.head.appendChild(sc); })();
