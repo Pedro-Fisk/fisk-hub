@@ -81,13 +81,12 @@
 </style>
 
   <div id="profGate">
-    <div class="pg-top">
-      <div class="lang-toggle" id="langTogglePg">
-        <button class="lang-btn is-active" data-lang="pt" aria-label="Português">🇧🇷 PT</button>
-        <button class="lang-btn" data-lang="en" aria-label="English">🇺🇸 EN</button>
-        <button class="lang-btn" data-lang="es" aria-label="Español">🇪🇸 ES</button>
-      </div>
-    </div>
+    <!-- ⚠️ O SELETOR DE IDIOMA SAIU DAQUI EM 23/09/2026 (pedido do Pedro).
+         O Hub é a casa do professor e fala INGLÊS por padrão (`fisk-lang` ||
+         'en', logo abaixo); o Portal do Aluno na visão dele abre na língua do
+         card por onde ele entrou (ver docs/teacher-mode.md, no repositório do
+         portal). O bloco `applyLang` continua: é ele que traduz o Hub. -->
+    <div class="pg-top"></div>
     <div class="pg-card">
       <img class="pg-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
       <h1 class="pg-title" data-i18n="pg-title">Fisk Hub</h1>
@@ -206,8 +205,17 @@
          ele orienta a turma a usá-la. Desde 16/09/2026 é também a caixa de
          ferramentas da SALA: entra direto com o RAF-chave 0000-000 (o modo
          professor do portal), onde o Quick Practice e o Minicourses levam o
-         selo roxo "Teacher Mode" para projetar na TV. -->
-    <a class="card card-portal" id="card-portal" href="https://portalfisk.com.br/#raf=0000-000">
+         selo roxo "Teacher Mode" para projetar na TV.
+
+         ⚠️ DOIS CARDS DESDE 23/09/2026 (pedido do Pedro), um por curso. A
+         Nicolle e o Carlos dão inglês E espanhol, e com uma porta só o
+         professor de espanhol via as jornadas dos dois cursos na mesma
+         prateleira, com o título da de inglês escrito em espanhol: dava para
+         abrir a aula errada na TV sem perceber. O `curso=` diz ao portal de
+         qual professor é a visita; ele guarda a escolha, abre a tela na
+         língua daquele curso e mostra só o material dele.
+         Os dois levam o `pt` da identidade (ver `levaIdentidadeAoPortal`). -->
+    <a class="card card-portal" id="card-portal" href="https://portalfisk.com.br/#raf=0000-000&curso=en">
       <div class="icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="2.5" y="4" width="19" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/>
@@ -217,8 +225,22 @@
           <path d="M8.6 13.8c.5-1.6 1.8-2.5 3.4-2.5s2.9.9 3.4 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
         </svg>
       </div>
-      <h2 data-i18n="card-portal-h2">Portal do Aluno (visão do professor)</h2>
-      <p data-i18n="card-portal-p">As ferramentas do aluno no modo professor. Quick Practice e Minicourses têm Teacher Mode para projetar na TV</p>
+      <h2 data-i18n="card-portal-h2">Portal do Aluno (professor de inglês)</h2>
+      <p data-i18n="card-portal-p">As ferramentas do aluno no modo professor, em inglês. Quick Practice e Minicourses têm Teacher Mode para projetar na TV</p>
+    </a>
+
+    <a class="card card-portal-es" id="card-portal-es" href="https://portalfisk.com.br/#raf=0000-000&curso=es">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2.5" y="4" width="19" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8 20.5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M12 17v3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="12" cy="9.2" r="1.9" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M8.6 13.8c.5-1.6 1.8-2.5 3.4-2.5s2.9.9 3.4 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2 data-i18n="card-portal-es-h2">Portal do Aluno (professor de espanhol)</h2>
+      <p data-i18n="card-portal-es-p">A mesma visão, em espanhol: as jornadas e as ferramentas do curso de espanhol, com Teacher Mode para a TV</p>
     </a>
 
     <!-- O Quick Practice SAIU daqui em 16/09/2026 (pedido do Pedro): as
@@ -554,8 +576,10 @@
         'card-apps-p':      'Qual app serve a qual estágio, e o link para baixar no Android e no iPhone',
         'card-overview-h2': 'Radar da Turma',
         'card-overview-p':  'As cinco habilidades de cada aluno num relance, e onde focar com a turma',
-        'card-portal-h2':   'Portal do Aluno (visão do professor)',
-        'card-portal-p':    'As ferramentas do aluno no modo professor. Quick Practice e Minicourses têm Teacher Mode para projetar na TV',
+        'card-portal-h2':   'Portal do Aluno (professor de inglês)',
+        'card-portal-p':    'As ferramentas do aluno no modo professor, em inglês. Quick Practice e Minicourses têm Teacher Mode para projetar na TV',
+        'card-portal-es-h2':'Portal do Aluno (professor de espanhol)',
+        'card-portal-es-p': 'A mesma visão, em espanhol: as jornadas e as ferramentas do curso de espanhol, com Teacher Mode para a TV',
         'card-acessos-h2': 'Acessos dos Alunos',
         'card-acessos-p':  'Veja quem já entrou no Portal do Aluno e quem ainda não acessou',
         'card-checking-h2': 'Checking Guide',
@@ -639,8 +663,10 @@
         'card-apps-p':      'Which app belongs to which level, and where to download it on Android and iPhone',
         'card-overview-h2': 'Class Radar',
         'card-overview-p':  'Every student\'s five skills at a glance, and where to focus with the class',
-        'card-portal-h2':   'Student Portal (teacher view)',
-        'card-portal-p':    'The student tools in teacher mode. Quick Practice and Minicourses have a Teacher Mode to project on the TV',
+        'card-portal-h2':   'Student Portal (English teacher)',
+        'card-portal-p':    'The student tools in teacher mode, in English. Quick Practice and Minicourses have a Teacher Mode to project on the TV',
+        'card-portal-es-h2':'Student Portal (Spanish teacher)',
+        'card-portal-es-p': 'The same view, in Spanish: the journeys and tools of the Spanish course, with Teacher Mode for the TV',
         'card-acessos-h2': 'Student Access',
         'card-acessos-p':  'See who has logged in to the Student Portal and who hasn’t yet',
         'card-checking-h2': 'Checking Guide',
@@ -724,8 +750,10 @@
         'card-apps-p':      'Qué app sirve a cada nivel, y el enlace para descargar en Android y iPhone',
         'card-overview-h2': 'Radar del Grupo',
         'card-overview-p':  'Las cinco habilidades de cada alumno de un vistazo, y dónde enfocarse con el grupo',
-        'card-portal-h2':   'Portal del Alumno (vista del profesor)',
-        'card-portal-p':    'Las herramientas del alumno en modo profesor. Quick Practice y Minicourses tienen Teacher Mode para proyectar en la TV',
+        'card-portal-h2':   'Portal del Alumno (profesor de inglés)',
+        'card-portal-p':    'Las herramientas del alumno en modo profesor, en inglés. Quick Practice y Minicourses tienen Teacher Mode para proyectar en la TV',
+        'card-portal-es-h2':'Portal del Alumno (profesor de español)',
+        'card-portal-es-p': 'La misma vista, en español: los recorridos y las herramientas del curso de español, con Teacher Mode para la TV',
         'card-acessos-h2': 'Accesos de los Alumnos',
         'card-acessos-p':  'Mira quién ya entró al Portal del Alumno y quién todavía no',
         'card-checking-h2': 'Checking Guide',
@@ -1296,11 +1324,12 @@
         document.body.classList.remove('prof-out');
         document.body.classList.add('prof-in');
         fillBar(prof);
-        /* mesmo menu das ferramentas, no mesmo canto — aqui ele também troca o
-           idioma (o Hub sabe traduzir) e respeita o "sair da visão" da direção */
+        /* mesmo menu das ferramentas, no mesmo canto. ⚠️ SEM `onIdioma` desde
+           23/09/2026: sem ele o kit não desenha o seletor de idioma, e é assim
+           que o menu de idioma sai do Hub. Respeita o "sair da visão" da
+           direção. */
         if (typeof fiskInitUserMenu === 'function') {
           fiskInitUserMenu({
-            onIdioma: function(lang){ applyLang(lang); },
             onSair: function(){ $('profLogout').click(); }
           });
         }
@@ -1324,10 +1353,16 @@
          Vai no FRAGMENTO, nunca na query: fragmento o navegador não envia ao
          servidor nem põe no Referer, a mesma regra do RAF do aluno. */
       function levaIdentidadeAoPortal(){
-        var card = document.getElementById('card-portal');
         var s = (typeof fiskSessao === 'function') ? fiskSessao() : null;
-        if (!card || !s || !s.token) return;
-        card.href = 'https://portalfisk.com.br/#raf=0000-000&pt=' + encodeURIComponent(s.token);
+        if (!s || !s.token) return;
+        /* um card por curso desde 23/09/2026: o `curso` continua no endereço,
+           senão o professor de espanhol cairia na visão de inglês */
+        [['card-portal', 'en'], ['card-portal-es', 'es']].forEach(function (par) {
+          var card = document.getElementById(par[0]);
+          if (!card) return;
+          card.href = 'https://portalfisk.com.br/#raf=0000-000&curso=' + par[1] +
+                      '&pt=' + encodeURIComponent(s.token);
+        });
       }
 
       function registrarHome(){
@@ -1613,10 +1648,8 @@
       sub.addEventListener('click', submit);
       $('pgPass').addEventListener('keydown', function(e){ if (e.key === 'Enter') submit(); });
       $('pgPass2').addEventListener('keydown', function(e){ if (e.key === 'Enter') submit(); });
-      $('langTogglePg').addEventListener('click', function(e){
-        var b = e.target.closest('.lang-btn'); if (!b) return;
-        applyLang(b.dataset.lang); setMode(mode); setPlaceholders();
-      });
+      /* o seletor de idioma da tela de login saiu em 23/09/2026; sem o
+         elemento, este ouvinte estourava e levava junto as linhas de baixo */
       $('profLogout').addEventListener('click', function(){
         var era = saved();
         try{ localStorage.removeItem('fisk_prof'); localStorage.removeItem('fisk_actas'); localStorage.removeItem('fisk_minidash'); }catch(e){}
@@ -1681,9 +1714,9 @@
         fillBar(s); if (s.master) setupActAs(); updateToolLinks();  // já logado (prof-in veio do pre-paint)
         registrarHome();
         // quem já estava logado não passa pelo enter(): o menu é montado aqui
+        // (sem `onIdioma`, como no enter: o seletor de idioma saiu do Hub)
         if (typeof fiskInitUserMenu === 'function') {
           fiskInitUserMenu({
-            onIdioma: function(lang){ applyLang(lang); },
             onSair: function(){ $('profLogout').click(); }
           });
         }
@@ -1917,17 +1950,11 @@
       })();
 
       window._mdLoad = load;
-      /* Troca de idioma re-renderiza os rótulos dos KPIs.
-         O id é `langTogglePg` — apontava para um `langToggle` que não existe,
-         e o getElementById devolvia null: o addEventListener estourava e
-         levava junto a linha de baixo (a carga do mini-dash). Passava
-         despercebido porque o fillBar chama o _mdLoad de qualquer jeito ao
-         restaurar a sessão; o que realmente se perdia era a tradução dos
-         rótulos ao trocar de idioma. */
-      var lt = document.getElementById('langTogglePg');
-      if (lt) lt.addEventListener('click', function(){
-        setTimeout(function(){ if (dataCache && !sec.hidden) render(dataCache); }, 0);
-      });
+      /* O seletor de idioma saiu do Hub em 23/09/2026, então não há mais
+         troca de idioma na tela para re-renderizar os rótulos dos KPIs. A
+         guarda `if (lt)` ficou de lição: este ponto já derrubou a carga do
+         mini-dash uma vez, quando o id apontava para um elemento inexistente
+         e o addEventListener estourava. */
       if (document.body.classList.contains('prof-in')) load();
     })();
   </script>
