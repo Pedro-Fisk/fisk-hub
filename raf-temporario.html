@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAF temporário, FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-09-20a">
+<link rel="stylesheet" href="assets/casa-tema.css?v=9">
+<meta name="theme-color" content="#161414">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+<script src="assets/fisk-shared.js?v=2026-09-20a"></script>
+<style>
+  :root{ --blue:var(--ui,#2b4d70); --blue-mid:var(--ui-mid,#3d6b93); --blue-pill:var(--ui-pill,#1d3349);
+         --blue-soft:var(--ui-soft,#e9eff5); --blue-ink:var(--ui-ink,#1d3349); --blue-bd:var(--ui-bd,#9db6cb); }
+  [hidden]{ display:none !important; }
+  main{max-width:820px;margin:0 auto;padding:1.2rem;width:100%}
+  .painel{background:var(--white);border:2px solid var(--surface-border-color);
+          border-radius:var(--surface-radius);box-shadow:var(--surface-shadow);
+          padding:1.15rem 1.25rem;margin-bottom:1.1rem}
+  .painel h2{margin:0 0 .4rem;font-family:var(--font-heading);font-weight:700;
+             font-size:1.05rem;color:var(--ui-dark,#223e5a)}
+  .aviso{font-size:.85rem;color:var(--gray);margin:0 0 .6rem}
+  .linha-campos{display:flex;flex-wrap:wrap;gap:.7rem;margin-bottom:.7rem}
+  .campo{flex:1 1 160px}
+  .campo label{display:block;font-size:.78rem;font-weight:800;margin-bottom:.2rem}
+  .campo select, .campo input[type=text]{width:100%;padding:.45rem .6rem;
+    border:1px solid var(--gray-light);border-radius:8px;font-family:var(--font-body);font-size:.92rem}
+  .btn-generate{background:var(--green);color:var(--white);border:0;border-radius:12px;
+    font-size:1.05rem;font-weight:800;padding:.8rem 1.6rem;cursor:pointer;width:100%}
+  .btn-generate:hover{background:var(--green-dark)}
+  .btn-generate:disabled{opacity:.55;cursor:default}
+  .btn-sec{background:var(--black);color:var(--white);border:0;border-radius:10px;
+    font-weight:700;padding:.55rem 1rem;cursor:pointer;font-size:.85rem}
+  .btn-rev{background:transparent;color:var(--red);border:1px solid var(--red);border-radius:8px;
+    font-weight:700;padding:.3rem .7rem;cursor:pointer;font-size:.78rem}
+  .ind{display:inline-block;width:13px;height:13px;margin-left:.4rem;vertical-align:-2px}
+  .ind.spin{border:2px solid var(--gray-light);border-top-color:var(--blue);border-radius:50%;
+            animation:gira .7s linear infinite}
+  .ind.ok::after{content:'✓';color:var(--green);font-weight:800;font-size:.9rem}
+  @keyframes gira{to{transform:rotate(360deg)}}
+  .status{font-size:.85rem;font-weight:700;margin:.5rem 0 0}
+  .status.erro{color:var(--red)}
+  .status.ok{color:var(--green-dark,#1a7f37)}
+
+  /* O código é para ser DITADO em sala: grande, espaçado, fonte de largura fixa */
+  .resultado{border:2px dashed var(--blue-bd);background:var(--blue-soft);border-radius:14px;
+             padding:1rem;text-align:center;margin-top:.9rem}
+  .codigo{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:3rem;font-weight:800;
+          letter-spacing:.35em;color:var(--blue-ink);margin:.2rem 0 .3rem;padding-left:.35em}
+  .resultado p{margin:.2rem 0;font-size:.9rem}
+  .resultado .btns{display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-top:.7rem}
+
+  .lista{display:flex;flex-direction:column;gap:.45rem}
+  .item{display:flex;align-items:center;gap:.8rem;padding:.55rem .75rem;border:1px solid var(--gray-light);
+        border-radius:10px;background:var(--white);flex-wrap:wrap}
+  .item .cod{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:800;font-size:1.15rem;
+             letter-spacing:.12em;color:var(--blue-ink);min-width:4.2em}
+  .item .quem{flex:1 1 200px;font-size:.88rem;line-height:1.35}
+  .item .quem small{color:var(--gray)}
+  .item.morto{opacity:.55}
+  .selo{font-size:.72rem;font-weight:800;padding:.15rem .5rem;border-radius:99px;white-space:nowrap}
+  .selo.ativo{background:#dcfce7;color:#166534}
+  .selo.vencido, .selo.revogado{background:var(--gray-light);color:var(--gray)}
+  .vazio{font-size:.88rem;color:var(--gray);font-style:italic;padding:.3rem 0}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <a class="back-link" href="index.html">&larr; Voltar aos recursos</a>
+  <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
+  <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+  <h1>RAF temporário</h1>
+  <p>Acesso ao Portal do Aluno para o aluno novo que ainda não tem RAF</p>
+</header>
+
+<main>
+
+  <section class="painel" id="semSessao" hidden>
+    <h2>🔒 Entre no Fisk Hub primeiro</h2>
+    <p class="aviso">Só professor logado gera código. Volte à página inicial do Hub, entre com seu usuário e abra esta ferramenta de novo.</p>
+  </section>
+
+  <section class="painel" id="painelNovo">
+    <h2>🎟️ Gerar um código</h2>
+    <p class="aviso">O aluno digita o código no lugar do RAF e entra no portal do estágio da turma. O código vale 24 horas a partir de agora. Nada do que ele fizer com o código fica guardado (Fisk Dólares, histórico), porque é só uma ponte até o RAF oficial chegar ao card.</p>
+    <div class="linha-campos">
+      <div class="campo"><label>Escola<span class="ind" id="indEscola"></span></label>
+        <select id="selEscola"></select>
+      </div>
+      <div class="campo"><label>Professor(a)<span class="ind" id="indProf"></span></label>
+        <select id="selProf" disabled></select>
+      </div>
+      <div class="campo" style="flex:2 1 240px"><label>Turma<span class="ind" id="indTurma"></span></label>
+        <select id="selTurma" disabled></select>
+      </div>
+    </div>
+    <div class="linha-campos">
+      <div class="campo" style="flex:2 1 240px"><label for="fNome">Nome do aluno novo</label>
+        <input type="text" id="fNome" maxlength="80" autocomplete="off" placeholder="Ex.: João Pedro Almeida">
+      </div>
+      <div class="campo"><label for="fLivro">Livro</label>
+        <input type="text" id="fLivro" list="livros" autocomplete="off" placeholder="escolha a turma">
+        <datalist id="livros"></datalist>
+      </div>
+    </div>
+    <button class="btn-generate" id="btnGerar" disabled>🎟️ Gerar código</button>
+    <p class="status" id="statusGerar"></p>
+
+    <div class="resultado" id="resultado" hidden>
+      <p id="rAluno"></p>
+      <div class="codigo" id="rCodigo"></div>
+      <p id="rVence"></p>
+      <div class="btns">
+        <button class="btn-sec" id="btnCopiar" type="button">📋 Copiar mensagem para o aluno</button>
+      </div>
+      <p class="status" id="statusCopiar"></p>
+    </div>
+  </section>
+
+  <section class="painel" id="painelLista">
+    <h2 id="tituloLista">📋 Seus códigos</h2>
+    <p class="aviso" id="avisoLista">Os ativos e os que venceram nas últimas 48 horas.</p>
+    <div class="lista" id="lista"><p class="vazio">Carregando…</p></div>
+  </section>
+
+</main>
+
+<script>
+/* ══ RAF TEMPORÁRIO (29/09/2026) ═══════════════════════════════════════════
+ * O RAF vem da franqueadora e leva dias para chegar ao card. O professor gera
+ * aqui um código curto para o aluno novo entrar no portal enquanto isso. A
+ * lógica toda (validade, formato, quem vê o quê) mora no backend, RafTemp.js;
+ * esta página só pede e mostra.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+var API_URL = FISK_HUB_EP;
+var PORTAL = 'portalfisk.com.br';
+var turmaSel = null, ultimo = null;
+
+function $(id) { return document.getElementById(id); }
+function tokenSessao() {
+  try { var s = JSON.parse(localStorage.getItem('fisk_prof') || 'null'); return (s && s.token) || ''; }
+  catch (e) { return ''; }
+}
+function api(params) {
+  var P = { action: 'card', token: tokenSessao() };
+  Object.keys(params).forEach(function (k) { P[k] = params[k]; });
+  var qs = Object.keys(P).map(function (k) { return k + '=' + encodeURIComponent(P[k]); }).join('&');
+  return fetch(API_URL + '?' + qs).then(fiskJson)
+    .then(function (j) { if (j.erro) throw new Error(j.erro); return j; });
+}
+function post(acao, extra) {
+  var body = { action: acao, token: tokenSessao() };
+  Object.keys(extra || {}).forEach(function (k) { body[k] = extra[k]; });
+  return fetch(API_URL, { method: 'POST', body: JSON.stringify(body) }).then(fiskJson);
+}
+function ind(id, estado) { $(id).className = 'ind' + (estado ? ' ' + estado : ''); }
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+  });
+}
+function montarSelect(sel, placeholder, itens) {
+  sel.innerHTML = '<option value="" disabled selected>' + placeholder + '</option>' +
+    itens.map(function (i) { return '<option value="' + esc(i.v) + '">' + esc(i.t) + '</option>'; }).join('');
+  sel.disabled = false;
+}
+var DIAS = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+function quando(ms) {
+  var d = new Date(ms), p = function (n) { return (n < 10 ? '0' : '') + n; };
+  return DIAS[d.getDay()] + ' ' + p(d.getDate()) + '/' + p(d.getMonth() + 1) + ' às ' + p(d.getHours()) + 'h' + p(d.getMinutes());
+}
+function erroEm(el, err) {
+  var msg = String((err && err.message) || err || '');
+  el.className = 'status erro';
+  el.textContent = /sess/i.test(msg) ? '🔒 ' + msg : '⚠️ ' + msg;
+}
+
+/* ── a cascata de sempre: escola → professor → turma ──────────────────────
+   Todo professor acessa as turmas de todos (substituição é frequente). */
+var selEscola = $('selEscola'), selProf = $('selProf'), selTurma = $('selTurma');
+function iniciarCascata() {
+  selEscola.innerHTML = '<option value="" disabled selected>Carregando escolas…</option>';
+  selEscola.disabled = true;
+  ind('indEscola', 'spin');
+  api({ fn: 'escolas' }).then(function (j) {
+    montarSelect(selEscola, 'Escolha a escola…', j.escolas.map(function (e) { return { v: e, t: e }; }));
+    ind('indEscola', 'ok');
+    fiskReporTurma(selEscola, 'escola');
+  }).catch(function (e) { ind('indEscola', ''); erroEm($('statusGerar'), e); });
+}
+selEscola.addEventListener('change', function () {
+  if (!selEscola.value) return;
+  selProf.innerHTML = '<option value="" disabled selected>Carregando professores…</option>';
+  selProf.disabled = true;
+  selTurma.innerHTML = '<option value="" disabled selected></option>';
+  selTurma.disabled = true;
+  turmaSel = null; atualizarBotao();
+  ind('indProf', 'spin'); ind('indTurma', '');
+  api({ fn: 'profs', escola: selEscola.value }).then(function (j) {
+    montarSelect(selProf, 'Escolha o professor(a)…', j.profs.map(function (p) { return { v: p, t: p }; }));
+    ind('indProf', 'ok');
+    fiskReporTurma(selProf, 'prof');
+  }).catch(function (e) { ind('indProf', ''); erroEm($('statusGerar'), e); });
+});
+selProf.addEventListener('change', function () {
+  if (!selProf.value) return;
+  selTurma.innerHTML = '<option value="" disabled selected>Carregando turmas…</option>';
+  selTurma.disabled = true;
+  turmaSel = null; atualizarBotao();
+  ind('indTurma', 'spin');
+  api({ fn: 'turmas', escola: selEscola.value, prof: selProf.value }).then(function (j) {
+    montarSelect(selTurma, 'Escolha a turma…', j.turmas.map(function (t) { return { v: t.linhaTitulo, t: t.titulo }; }));
+    ind('indTurma', 'ok');
+    fiskReporTurma(selTurma, 'linha');
+  }).catch(function (e) { ind('indTurma', ''); erroEm($('statusGerar'), e); });
+});
+/* A turma é lida para saber o LIVRO: é ele que decide o que o aluno vê no
+   portal. Turma com mais de um livro (troca de estágio no meio) oferece
+   todos, com o mais comum já escrito. */
+selTurma.addEventListener('change', function () {
+  if (!selTurma.value) return;
+  ind('indTurma', 'spin');
+  $('fLivro').value = ''; $('fLivro').placeholder = 'lendo a turma…';
+  var st = $('statusGerar');
+  st.className = 'status';
+  var parar = fiskEsperando(function (txt) { st.textContent = txt; },
+                            ['Lendo a turma no card…', 'Ainda lendo, o card está devagar agora…']);
+  api({ fn: 'turma', escola: selEscola.value, prof: selProf.value, linha: selTurma.value })
+    .then(function (dados) {
+      parar(); ind('indTurma', 'ok'); st.textContent = '';
+      fiskLembrarTurma(selEscola.value, selProf.value, selTurma.value,
+        selTurma.options[selTurma.selectedIndex] ? selTurma.options[selTurma.selectedIndex].text : '');
+      turmaSel = dados;
+      var conta = {};
+      (dados.alunos || []).forEach(function (a) { var b = String(a.book || '').trim(); if (b) conta[b] = (conta[b] || 0) + 1; });
+      var livros = Object.keys(conta).sort(function (a, b) { return conta[b] - conta[a]; });
+      $('livros').innerHTML = livros.map(function (b) { return '<option value="' + esc(b) + '">'; }).join('');
+      $('fLivro').value = livros[0] || '';
+      $('fLivro').placeholder = livros.length ? '' : 'escreva como está no card';
+      if (!livros.length) {
+        st.className = 'status';
+        st.textContent = 'Esta turma ainda não tem aluno com livro no card. Escreva o livro como ele aparece no card (ex.: Essentials 1).';
+      }
+      atualizarBotao();
+      $('fNome').focus();
+    })
+    .catch(function (e) { parar(); ind('indTurma', ''); erroEm(st, e); });
+});
+
+function atualizarBotao() {
+  $('btnGerar').disabled = !(turmaSel && $('fNome').value.trim().length >= 3 && $('fLivro').value.trim());
+}
+$('fNome').addEventListener('input', atualizarBotao);
+$('fLivro').addEventListener('input', atualizarBotao);
+
+$('btnGerar').addEventListener('click', function () {
+  var b = this, st = $('statusGerar');
+  b.disabled = true; b.textContent = '⏳ Gerando…';
+  st.className = 'status'; st.textContent = '';
+  post('rafTempCriar', {
+    escola: selEscola.value,
+    turma: String((turmaSel && turmaSel.turma) || '').split('\n')[0],
+    book: $('fLivro').value.trim(),
+    nome: $('fNome').value.trim()
+  }).then(function (j) {
+    b.textContent = '🎟️ Gerar código';
+    if (!j || j.ok !== true) { atualizarBotao(); erroEm(st, (j && (j.error || j.erro)) || 'não consegui gerar'); return; }
+    mostrar(j.codigo, j.jaExistia);
+    $('fNome').value = '';
+    atualizarBotao();
+    carregarLista();
+  }).catch(function (e) { b.textContent = '🎟️ Gerar código'; atualizarBotao(); erroEm(st, e); });
+});
+
+function mostrar(c, jaExistia) {
+  ultimo = c;
+  $('rAluno').innerHTML = (jaExistia ? 'Este aluno já tinha um código ativo:<br>' : '') +
+    '<strong>' + esc(c.aluno) + '</strong> · ' + esc(c.book);
+  $('rCodigo').textContent = c.codigo;
+  $('rVence').textContent = 'Vale até ' + quando(c.vence) + '.';
+  $('statusCopiar').textContent = '';
+  $('resultado').hidden = false;
+  $('resultado').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+/* A mensagem que o professor cola no WhatsApp do aluno (ou da família) */
+function mensagem(c) {
+  return 'Olá, ' + String(c.aluno).split(' ')[0] + '! Seu acesso provisório ao Portal do Aluno Fisk:\n\n' +
+    '1. Entre em ' + PORTAL + '\n' +
+    '2. No lugar do RAF, digite: *' + c.codigo + '*\n\n' +
+    'O código vale até ' + quando(c.vence) + '. Quando o seu RAF oficial chegar, é só entrar com ele.';
+}
+$('btnCopiar').addEventListener('click', function () {
+  if (!ultimo) return;
+  var txt = mensagem(ultimo), st = $('statusCopiar');
+  var ok = function () { st.className = 'status ok'; st.textContent = '✓ Copiado. Cole no WhatsApp do aluno.'; };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt).then(ok, function () { window.prompt('Copie a mensagem:', txt); });
+  } else { window.prompt('Copie a mensagem:', txt); }
+});
+
+/* ── a lista: os vivos e os que venceram há pouco ─────────────────────── */
+var ROTULO = { ativo: 'ativo', vencido: 'venceu', revogado: 'revogado' };
+function carregarLista() {
+  post('rafTempListar', {}).then(function (j) {
+    var ul = $('lista');
+    if (!j || j.ok !== true) { ul.innerHTML = ''; erroEm($('avisoLista'), (j && (j.error || j.erro)) || 'não consegui listar'); return; }
+    $('tituloLista').textContent = j.todos ? '📋 Códigos de toda a escola' : '📋 Seus códigos';
+    if (!j.codigos.length) { ul.innerHTML = '<p class="vazio">Nenhum código nas últimas 48 horas.</p>'; return; }
+    ul.innerHTML = j.codigos.map(function (c) {
+      var vivo = c.situacao === 'ativo';
+      return '<div class="item' + (vivo ? '' : ' morto') + '">' +
+        '<span class="cod">' + esc(c.codigo) + '</span>' +
+        '<span class="quem"><strong>' + esc(c.aluno) + '</strong> · ' + esc(c.book) +
+        '<br><small>' + esc(c.turma || c.escola) + (j.todos ? ' · gerado por ' + esc(c.professor) : '') +
+        ' · ' + (vivo ? 'vale até ' + quando(c.vence) : 'venceu ' + quando(c.vence)) +
+        ' · ' + c.usos + (c.usos === 1 ? ' entrada' : ' entradas') + '</small></span>' +
+        '<span class="selo ' + c.situacao + '">' + ROTULO[c.situacao] + '</span>' +
+        (vivo ? '<button class="btn-rev" type="button" data-cod="' + esc(c.codigo) + '">Revogar</button>' : '') +
+        '</div>';
+    }).join('');
+  }).catch(function (e) { $('lista').innerHTML = ''; erroEm($('avisoLista'), e); });
+}
+$('lista').addEventListener('click', function (ev) {
+  var b = ev.target.closest('.btn-rev');
+  if (!b) return;
+  var cod = b.getAttribute('data-cod');
+  if (!confirm('Revogar o código ' + cod + '? O aluno sai do portal na próxima vez que a página carregar.')) return;
+  b.disabled = true; b.textContent = '…';
+  post('rafTempRevogar', { codigo: cod }).then(function (j) {
+    if (!j || j.ok !== true) { alert((j && (j.error || j.erro)) || 'não consegui revogar'); b.disabled = false; b.textContent = 'Revogar'; return; }
+    if (ultimo && ultimo.codigo === cod) $('resultado').hidden = true;
+    carregarLista();
+  }).catch(function (e) { alert(String((e && e.message) || e)); b.disabled = false; b.textContent = 'Revogar'; });
+});
+
+fiskInitThemeToggle('themeToggle');
+fiskInitUserMenu();
+if (!tokenSessao()) {
+  $('semSessao').hidden = false; $('painelNovo').hidden = true; $('painelLista').hidden = true;
+} else {
+  iniciarCascata();
+  carregarLista();
+  fiskRegistrarUso('RAF temporário');
+}
+</script>
+</body>
+</html>
