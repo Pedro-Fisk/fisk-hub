@@ -1406,6 +1406,42 @@
          desenho só escreve o que o aviso trouxer. */
       var AVISOS = [
       {
+        /* SÓ PARA QUEM TEM ALUNO DE SIMULADO (pedido do Pedro, 29/09/2026): professor que só dá aula para
+           criança não precisa saber disso. `publico:'met'` = tem aluno ativo de In Focus ou Fluency 2 no card
+           (ver `publicoMet`). */
+        id: 'fpa-e-simulados-2026-09',
+        ate: '2026-11-15',
+        publico: 'met',
+        link: { href: 'corretor-met.html' },
+        pt: { selo:'Novidade para o professor',
+              t:'As notas do Fisk Portas Abertas e dos simulados já chegam sozinhas ao aluno 🎓',
+              p1:'Os alunos que já apresentaram no <b>Fisk Portas Abertas</b> agora veem a avaliação deles no <b>Portal do Aluno</b>: um card novo, uma cortina de parabéns e o <b>Evaluation Report</b> que você preencheu, em tela e em PDF. O aluno recebe só o relatório dele, nunca um link do Drive da escola.',
+              p2:'E o simulado presencial corrigido pela <b>ferramenta do professor</b> (a foto da folha de respostas) segue sozinho para três lugares:',
+              li1:'o <b>card</b>: a data e a nota entram nas colunas TEST do aluno, na hora;',
+              li2:'o <b>Portal do Aluno</b>: o aluno vê a tabela SCORE completa e o que revisar;',
+              li3:'a <b>tabela de acompanhamento</b> da secretaria, com o detalhamento das seções como anotação na célula.',
+              cuidado:'Para o relatório do FPA aparecer, salve o PDF com <b>"Evaluation Report"</b> e o <b>nome completo do aluno</b> no título, como vocês já fazem. Ele chega ao portal no dia seguinte.',
+              btnLink:'Abrir o corretor de simulados 📷', btn:'Entendi 👍' },
+        en: { selo:'New for teachers',
+              t:'Fisk Portas Abertas and mock test grades now reach students automatically 🎓',
+              p1:'Students who have already presented at <b>Fisk Portas Abertas</b> can now see their evaluation in the <b>Student Portal</b>: a new card, a congratulations screen and the <b>Evaluation Report</b> you filled in, on screen and as a PDF. Each student gets only their own report, never a link to the school Drive.',
+              p2:'And a mock test graded with the <b>teacher tool</b> (the photo of the answer sheet) now goes by itself to three places:',
+              li1:'the <b>card</b>: the date and the grade go into the student\'s TEST columns right away;',
+              li2:'the <b>Student Portal</b>: the student sees the full SCORE table and what to review;',
+              li3:'the office\'s <b>tracking sheet</b>, with the section breakdown as a note on the cell.',
+              cuidado:'For the FPA report to show up, save the PDF with <b>"Evaluation Report"</b> and the student\'s <b>full name</b> in the title, as you already do. It reaches the portal the next day.',
+              btnLink:'Open the mock test grader 📷', btn:'Got it 👍' },
+        es: { selo:'Novedad para el profesor',
+              t:'Las notas del Fisk Portas Abertas y de los simulacros ya llegan solas al alumno 🎓',
+              p1:'Los alumnos que ya presentaron en el <b>Fisk Portas Abertas</b> ahora ven su evaluación en el <b>Portal del Alumno</b>: una tarjeta nueva, una pantalla de felicitación y el <b>Evaluation Report</b> que llenaste, en pantalla y en PDF. Cada alumno recibe solo su informe, nunca un enlace al Drive de la escuela.',
+              p2:'Y el simulacro presencial corregido con la <b>herramienta del profesor</b> (la foto de la hoja de respuestas) va solo a tres lugares:',
+              li1:'la <b>tarjeta (card)</b>: la fecha y la nota entran en las columnas TEST del alumno, al instante;',
+              li2:'el <b>Portal del Alumno</b>: el alumno ve la tabla SCORE completa y qué repasar;',
+              li3:'la <b>tabla de seguimiento</b> de la secretaría, con el detalle de las secciones como nota en la celda.',
+              cuidado:'Para que aparezca el informe del FPA, guarda el PDF con <b>"Evaluation Report"</b> y el <b>nombre completo del alumno</b> en el título, como ya lo hacen. Llega al portal al día siguiente.',
+              btnLink:'Abrir el corrector de simulacros 📷', btn:'Entendido 👍' },
+      },
+      {
         id: 'apps-da-fisk-2026-09',
         ate: '2026-11-30',
         link: { href: 'apps.html' },
@@ -1493,16 +1529,43 @@
           if (document.getElementById('av-mask')) return;   // já está na tela
           var d = new Date();
           var hoje = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-          var AVISO = null;
-          for (var i = 0; i < AVISOS.length; i++) {
+          /* A escolha virou assíncrona por causa do `publico`: saber se o professor tem aluno de simulado custa
+             uma leitura das turmas dele. Enquanto ela não volta, nada aparece (falha fechada, como o resto). */
+          (function escolhe(i){
+            if (i >= AVISOS.length) return;
             var a = AVISOS[i];
-            if (!a || !a.id) continue;
-            if (!/^\d{4}-\d{2}-\d{2}$/.test(a.ate)) continue;   // data torta: não mostra
-            if (hoje > a.ate) continue;                          // passou da validade
-            if (avisoVisto(a.id, s.name)) continue;
-            AVISO = a; break;
-          }
-          if (!AVISO) return;
+            if (!a || !a.id || !/^\d{4}-\d{2}-\d{2}$/.test(a.ate) || hoje > a.ate || avisoVisto(a.id, s.name)) return escolhe(i + 1);
+            if (a.publico === 'met') return publicoMet(s, function(ok){ if (ok) avisoMostra(a, s); else escolhe(i + 1); });
+            avisoMostra(a, s);
+          })(0);
+        }catch(e){ /* aviso nunca pode segurar o Hub */ }
+      }
+
+      /* O professor tem aluno que faz simulado do MET? Aluno ATIVO de In Focus ou Fluency 2 no card, nas escolas
+         dele (a mesma leitura `panoramaProf` do painel da home). Guardado por um dia no aparelho; leitura que falhou
+         em todas as escolas não é guardada, para tentar de novo na próxima entrada. A direção sempre vê. */
+      function publicoMet(s, cb){
+        try{
+          if (s.master) return cb(true);
+          var k = 'fisk_pub_met_' + s.name;
+          try { var c = JSON.parse(localStorage.getItem(k) || 'null'); if (c && Date.now() - c.t < 86400000) return cb(!!c.v); } catch(e){}
+          var escolas = String(s.escolas || s.escola || '').split(',').map(function(x){ return x.trim(); }).filter(Boolean);
+          var tem = false, ok = 0;
+          (function prox(i){
+            if (tem || i >= escolas.length){
+              if (tem || ok) { try { localStorage.setItem(k, JSON.stringify({ t: Date.now(), v: tem })); } catch(e){} }
+              return cb(tem);
+            }
+            panorama(escolas[i], s.name)
+              .then(function(j){ ok++; (j.alunos || []).forEach(function(a){ if (a && !a.saiu && /focus|fluency\s*2/i.test(String(a.book || ''))) tem = true; }); })
+              .catch(function(){})
+              .then(function(){ prox(i + 1); });
+          })(0);
+        }catch(e){ cb(false); }
+      }
+
+      function avisoMostra(AVISO, s){
+        try{
 
           var st = document.createElement('style');
           st.textContent =
