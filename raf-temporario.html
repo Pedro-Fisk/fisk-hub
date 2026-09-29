@@ -34,6 +34,7 @@
     font-weight:700;padding:.55rem 1rem;cursor:pointer;font-size:.85rem}
   .btn-rev{background:transparent;color:var(--red);border:1px solid var(--red);border-radius:8px;
     font-weight:700;padding:.3rem .7rem;cursor:pointer;font-size:.78rem}
+  .btn-rev.confirma{background:var(--red);color:var(--white)}
   .ind{display:inline-block;width:13px;height:13px;margin-left:.4rem;vertical-align:-2px}
   .ind.spin{border:2px solid var(--gray-light);border-top-color:var(--blue);border-radius:50%;
             animation:gira .7s linear infinite}
@@ -330,7 +331,13 @@ $('lista').addEventListener('click', function (ev) {
   var b = ev.target.closest('.btn-rev');
   if (!b) return;
   var cod = b.getAttribute('data-cod');
-  if (!confirm('Revogar o código ' + cod + '? O aluno sai do portal na próxima vez que a página carregar.')) return;
+  /* Confirmação na própria linha, sem o confirm() do navegador: o primeiro toque pergunta, o segundo revoga */
+  if (!b.classList.contains('confirma')) {
+    b.classList.add('confirma'); b.textContent = 'Confirmar?';
+    b.title = 'O aluno sai do portal na próxima vez que a página conversar com o servidor';
+    setTimeout(function () { if (!b.disabled) { b.classList.remove('confirma'); b.textContent = 'Revogar'; } }, 4000);
+    return;
+  }
   b.disabled = true; b.textContent = '…';
   post('rafTempRevogar', { codigo: cod }).then(function (j) {
     if (!j || j.ok !== true) { alert((j && (j.error || j.erro)) || 'não consegui revogar'); b.disabled = false; b.textContent = 'Revogar'; return; }
