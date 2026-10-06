@@ -421,7 +421,7 @@ var DOCS = {
                                              ultima: x.ultima, prevista: x.prevista, motivos: x.motivos, outros: x.outros, sugestoes: x.sugestoes, livres: x.livres }); },
     mensagem: function (x) { return fiskTermoMensagem(x.nome, nomeProprio(x.professor).split(' ')[0]); },
     counseling: function (x) { return { estagio: x.book || '', faltas: x.faltas, atrasadas: x.atraso, texto: 'Termo de atraso gerado pelo Fisk Hub (Buddy).' }; } },
-  '2nd': { ic: '🔁', nome: 'Comunicado de 2nd Chance', curto: 'Comunicado', motor: 'assets/segunda-chance-pdf.js?v=2026-10-06b',
+  '2nd': { ic: '🔁', nome: 'Comunicado de 2nd Chance', curto: 'Comunicado', motor: 'assets/segunda-chance-pdf.js?v=2026-10-06c',
     pdf: function (x) { return fisk2ndPDF({ nome: x.nome, estagio: x.book, prof: nomeProprio(x.professor), turma: String(x.turmaCheia || '').split('\n')[0].trim(), escrita: x.escrita, auditiva: x.auditiva,
                                            itens: fisk2ndItens({ licoes: x.licoes, marcadas: x.marcadas, livres: x.livres, escrita: x.escrita, auditiva: x.auditiva }) }); },
     mensagem: function (x) { return fisk2ndMensagem(x.nome, nomeProprio(x.professor).split(' ')[0]); },
