@@ -1148,9 +1148,11 @@ function fiskBuscaMeusAlunos(q) {
 /* ══ O BUDDY EM QUALQUER TELA (Pedro, 06/10/2026) ══════════════════════════
  * A bolinha do urso no canto de baixo, à direita, em toda página do Hub que
  * carrega este kit. Clicar abre uma janelinha com a conversa (buddy.html em
- * modo `mini`, dentro de um iframe): é sempre CONVERSA NOVA, sem histórico. O
- * histórico e as perguntas frequentes moram na página do Buddy, que a
- * janelinha oferece em "⤢ Página do Buddy".
+ * modo `mini`, dentro de um iframe). A CONVERSA ACOMPANHA O PROFESSOR de página
+ * em página (a janelinha guarda o que foi dito nesta aba e redesenha ao abrir;
+ * se ela estava aberta, reabre sozinha). Só recomeça em "Nova conversa". O
+ * histórico de conversas antigas e as perguntas frequentes moram na página do
+ * Buddy, que a janelinha oferece em "⤢ Página do Buddy".
  *
  * Só aparece para quem o servidor diz que pode usar o Buddy (`buddyInfo`), e a
  * resposta fica 30 minutos no aparelho para as outras páginas não perguntarem
@@ -1202,18 +1204,16 @@ function fiskBuscaMeusAlunos(q) {
     var fr = null;
     function abre(sim) {
       document.body.classList.toggle('fk-buddy-aberto', !!sim);
-      if (!sim) return;
-      if (!fr) {
-        fr = document.createElement('iframe'); fr.title = 'Buddy, auxiliar do professor'; fr.allow = 'microphone';
-        fr.src = base + 'buddy.html?mini=1'; jan.appendChild(fr);
-      } else {
-        /* reabrir é conversa nova */
-        try { fr.contentWindow.postMessage({ fiskBuddy: 'nova' }, new URL(fr.src, location.href).origin); } catch (e) {}
-      }
+      /* aberta numa página, aberta na próxima: quem está conversando não precisa reabrir a cada tela */
+      try { if (sim) sessionStorage.setItem('fisk_buddy_aberto', '1'); else sessionStorage.removeItem('fisk_buddy_aberto'); } catch (e) {}
+      if (!sim || fr) return;
+      fr = document.createElement('iframe'); fr.title = 'Buddy, auxiliar do professor'; fr.allow = 'microphone';
+      fr.src = base + 'buddy.html?mini=1'; jan.appendChild(fr);
     }
     bt.addEventListener('click', function () { abre(!document.body.classList.contains('fk-buddy-aberto')); });
     window.addEventListener('message', function (e) { if (e.data && e.data.fiskBuddy === 'fecha') abre(false); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && document.body.classList.contains('fk-buddy-aberto')) abre(false); });
+    try { if (sessionStorage.getItem('fisk_buddy_aberto') === '1') abre(true); } catch (e) {}
   }
   function vai() { pode().then(function (ok) { if (ok) monta(); }); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', vai); else vai();

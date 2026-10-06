@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="assets/casa-tema.css?v=9">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
-<script src="assets/fisk-shared.js?v=2026-10-06a"></script>
+<script src="assets/fisk-shared.js?v=2026-10-06b"></script>
 <script src="assets/buddy-conversas.js?v=2026-10-06i"></script>
 <style>
   [hidden]{ display:none !important; }
@@ -321,6 +321,45 @@ function poe(el) { var c = $('chat'); c.appendChild(el); c.scrollTop = c.scrollH
 function bolhaEu(t) { var d = document.createElement('div'); d.className = 'msg eu'; d.textContent = t; return poe(d); }
 function bolha(html) { var d = document.createElement('div'); d.className = 'msg'; d.innerHTML = html; return poe(d); }
 
+/* ── A JANELINHA ACOMPANHA O PROFESSOR (Pedro, 06/10/2026). A bolinha do Hub abre esta página dentro de um iframe, e
+   cada página nova é um iframe novo: sem isto, trocar de tela era perder a conversa. O que foi dito fica guardado
+   nesta aba do navegador (sessionStorage) e é redesenhado ao abrir; o fio da conversa com o modelo continua no
+   servidor (6 h). Recomeça com "Nova conversa", no limite de perguntas, ou quando o servidor abre outra. ── */
+var MEM_K = 'fisk_buddy_mini', MEM = [], restaurando = false;
+function memDono() { return String(sess().token || '').slice(0, 12) + '|' + comoQuem; }
+function memSalva() {
+  if (!MINI) return;
+  try { sessionStorage.setItem(MEM_K, JSON.stringify({ q: Date.now(), dono: memDono(), conversa: conversa, itens: MEM.slice(-40), turno: $('turnoTxt').textContent })); } catch (e) {}
+}
+function memPoe(it) { if (!MINI || restaurando) return; MEM.push(it); memSalva(); }
+function memLimpa() { MEM = []; try { sessionStorage.removeItem(MEM_K); } catch (e) {} }
+/* o cartão foi confirmado ou cancelado: ao redesenhar, ele volta como uma linha, sem botões */
+function memFecha(conv, id, txt) {
+  MEM.forEach(function (it) { if (it.t === 'props' && it.c === conv) it.l.forEach(function (p) { if (p.id && p.id === id) p._fim = txt; }); });
+  memSalva();
+}
+function memRestaura() {
+  if (!MINI) return false;
+  var g = null; try { g = JSON.parse(sessionStorage.getItem(MEM_K) || 'null'); } catch (e) { g = null; }
+  if (!g || !g.itens || !g.itens.length || g.dono !== memDono() || Date.now() - g.q > 6 * 3600000) return false;
+  restaurando = true; aberturaN++; $('chat').innerHTML = '';
+  try {
+    g.itens.forEach(function (it) {
+      if (it.t === 'eu') bolhaEu(it.x);
+      else if (it.t === 'bd') bolha(formata(it.x));
+      else if (it.t === 'props') {
+        it.l.filter(function (p) { return p._fim; }).forEach(function (p) { nota((p.aluno ? p.aluno + ': ' : '') + p._fim); });
+        mostraPropostas(it.l.filter(function (p) { return !p._fim; }), it.c);
+      }
+    });
+  } catch (e) {}
+  restaurando = false;
+  MEM = g.itens; conversa = g.conversa || ''; $('turnoTxt').textContent = g.turno || '';
+  nota('Esta é a conversa que você já tinha começado. Para outra, toque em "＋ Nova conversa".');
+  $('chat').scrollTop = $('chat').scrollHeight;
+  return true;
+}
+
 /* ── os passos à vista ── */
 var passosEl = null;
 function passo(t) {
@@ -465,6 +504,7 @@ function cartaoDoc(pr, idConversa) {
           .then(function (j) { if (!j || j.ok !== true) avisos.push('a linha do counseling não entrou' + (j && j.erro ? ' (' + j.erro + ')' : '')); });
       }).then(function () {
         feito = true; sim.remove(); nao.remove(); d.classList.add('feita');
+        memFecha(idConversa, pr.id, '✓ ' + D.curto.toLowerCase() + ' gerado e salvo na pasta do aluno.');
         var url = URL.createObjectURL(new Blob([pdf.bytes], { type: 'application/pdf' }));
         res.className = 'res ok';
         res.innerHTML = '✓ ' + D.curto + ' salvo' + (pasta.pasta ? ' em "' + esc(pasta.pasta) + '"' : ' na pasta do aluno') + '. ' +
@@ -497,7 +537,7 @@ function cartaoDoc(pr, idConversa) {
   nao.addEventListener('click', function () {
     sim.disabled = nao.disabled = true;
     post({ action: 'buddyConfirma', conversa: idConversa, id: pr.id, cancela: 1 }).catch(function () {});
-    sim.remove(); nao.remove(); d.classList.add('cancelada'); diz('Cancelado. Nada foi gerado.');
+    sim.remove(); nao.remove(); d.classList.add('cancelada'); diz('Cancelado. Nada foi gerado.'); memFecha(idConversa, pr.id, 'cancelado, nada foi gerado.');
   });
   poe(d);
   return gera;
@@ -523,7 +563,8 @@ function cartaoAcao(pr, idConversa) {
     post({ action: 'buddyConfirma', conversa: idConversa, id: pr.id, cancela: cancela ? 1 : '' }).then(function (r) {
       if (!r || r.ok !== true) { res.className = 'res err'; res.textContent = (r && r.error) || 'Não consegui gravar.'; sim.disabled = nao.disabled = false; return; }
       sim.remove(); nao.remove();
-      if (r.cancelada) { d.classList.add('cancelada'); res.textContent = 'Cancelado. Nada foi gravado.'; return; }
+      if (r.cancelada) { d.classList.add('cancelada'); res.textContent = 'Cancelado. Nada foi gravado.'; memFecha(idConversa, pr.id, 'cancelado, nada foi gravado.'); return; }
+      memFecha(idConversa, pr.id, '✓ ' + (r.feito || 'gravado.'));
       d.classList.add('feita'); res.className = 'res ok';
       res.innerHTML = '✓ ' + esc(r.feito || 'Gravado.') + (r.link ? ' <a href="' + esc(r.link) + '" target="_blank" rel="noopener" style="display:inline;background:none;color:#2563eb;padding:0;font-weight:800">abrir</a>' : '');
     }).catch(function () { res.className = 'res err'; res.textContent = 'Sem conexão. Tente de novo.'; sim.disabled = nao.disabled = false; });
@@ -534,6 +575,7 @@ function cartaoAcao(pr, idConversa) {
 }
 
 function mostraPropostas(props, idConv) {
+  if (props && props.length) memPoe({ t: 'props', l: props, c: idConv });
   var geradores = [];
   (props || []).forEach(function (pr) { var g = cartaoAcao(pr, idConv); if (DOCS[pr.acao] && g) geradores.push(g); });
   if (geradores.length > 1) {
@@ -555,11 +597,13 @@ function mostraPropostas(props, idConv) {
 
 function recebe(j) {
   if (!j) throw new Error('sem resposta');
+  /* o servidor abriu outra conversa (limite de perguntas ou validade): a janelinha passa a guardar só a nova */
+  if (j.conversa && conversa && j.conversa !== conversa) { var ult = -1; MEM.forEach(function (it, i) { if (it.t === 'eu') ult = i; }); MEM = ult >= 0 ? MEM.slice(ult) : []; }
   if (j.conversa) conversa = j.conversa;
   if (j.estado === 'andando') { passo(j.rotulo || 'pensando'); return post({ action: 'buddyPasso', conversa: conversa }).then(recebe); }
   fimPassos();
   if (j.ok === false) { bolha('<p>⚠️ ' + esc(j.error || 'Não consegui agora.') + '</p>'); return; }
-  if (j.resposta) acoesDe(bolha(formata(j.resposta)), j.resposta);
+  if (j.resposta) { acoesDe(bolha(formata(j.resposta)), j.resposta); memPoe({ t: 'bd', x: j.resposta }); }
   if (j.proposta && j.proposta.tipo === 'termo') {
     var p = j.proposta, d = document.createElement('div'); d.className = 'prop';
     d.innerHTML = '<b>📄 Termo de atraso · ' + esc(p.aluno) + '</b><p>' + esc(p.turma) + ' · ' + esc(p.escola) + '<br>' +
@@ -584,6 +628,7 @@ function recebe(j) {
     $('turnoTxt').textContent = 'pergunta ' + j.turno + ' de ' + j.maxTurnos + ' desta conversa';
     if (j.turno >= j.maxTurnos) nota('Esta conversa chegou ao limite de ' + j.maxTurnos + ' perguntas. A próxima abre uma conversa nova.');
   }
+  memSalva();
   carregaHist();
 }
 function pergunta(t, rotulo, depois) {
@@ -593,7 +638,7 @@ function pergunta(t, rotulo, depois) {
   var com = document.querySelector('.comeco'); if (com) com.remove();
   document.querySelectorAll('.depois').forEach(function (x) { x.remove(); });
   if (depois) depoisDaVez = depois;
-  bolhaEu(rotulo || t); $('txt').value = ''; ajusta(); $('txt').placeholder = 'Pergunte sobre suas turmas e alunos…';
+  bolhaEu(rotulo || t); memPoe({ t: 'eu', x: rotulo || t }); $('txt').value = ''; ajusta(); $('txt').placeholder = PH;
   trava(true); passo('pensando');
   post({ action: 'buddyPergunta', texto: t, conversa: conversa, rotulo: String(rotulo || t).slice(0, 160) }).then(recebe)
     .catch(function (e) { fimPassos(); bolha('<p>⚠️ ' + esc(String((e && e.message) || e)) + '</p>'); })
@@ -619,7 +664,7 @@ function rodapeConta() { $('restam').textContent = info ? 'restam ' + info.resta
     base = $('txt').value.trim(); base = base ? base + ' ' : '';
     try { rec.start(); } catch (e) {}
   });
-  rec.onstart = function () { ouvindo = true; bt.classList.add('ouvindo'); bt.title = 'Clique para parar de ouvir'; $('txt').placeholder = 'Estou ouvindo… fale e clique no microfone para parar'; };
+  rec.onstart = function () { ouvindo = true; bt.classList.add('ouvindo'); bt.title = 'Clique para parar de ouvir'; $('txt').placeholder = MINI ? 'Estou ouvindo…' : 'Estou ouvindo… fale e clique no microfone para parar'; };
   rec.onend = function () { ouvindo = false; bt.classList.remove('ouvindo'); bt.title = 'Falar a pergunta'; $('txt').placeholder = modoAnota ? PH_ANOTA : PH; $('txt').focus(); };
   rec.onerror = function (e) {
     ouvindo = false; bt.classList.remove('ouvindo');
@@ -637,7 +682,10 @@ function rodapeConta() { $('restam').textContent = info ? 'restam ' + info.resta
 /* ── anotação rápida (Pedro, 06/10/2026): no meio da aula o professor não quer formular pedido. Ele liga o 📝, dita
    ou escreve "a Bia terminou a lição 5 e errou os verbos irregulares" e envia. A mensagem vai marcada como anotação,
    e o Buddy acha a aluna e propõe direto o registro (célula da aula ou counseling), que ele confirma no cartão. ── */
-var modoAnota = false, PH = 'Pergunte sobre suas turmas e alunos…', PH_ANOTA = 'Anotação: diga o aluno e o que aconteceu (ex.: a Bia terminou a lição 5 e errou os verbos irregulares)';
+/* na janelinha a caixa é estreita: o texto de ajuda comprido quebrava em duas linhas e cortava */
+var modoAnota = false, PH = MINI ? 'Pergunte ao Buddy…' : 'Pergunte sobre suas turmas e alunos…',
+    PH_ANOTA = MINI ? 'Anotação: aluno e o que aconteceu' : 'Anotação: diga o aluno e o que aconteceu (ex.: a Bia terminou a lição 5 e errou os verbos irregulares)';
+$('txt').placeholder = PH;
 function anotacao(liga) {
   modoAnota = !!liga; $('anota').classList.toggle('ligado', modoAnota); $('anota').setAttribute('aria-pressed', modoAnota ? 'true' : 'false');
   $('txt').placeholder = modoAnota ? PH_ANOTA : PH; if (modoAnota) $('txt').focus();
@@ -699,7 +747,7 @@ var COMECO = ['Como está a saúde pedagógica das minhas turmas?', 'Quais aluno
               'Quem foi à tutoria?', 'Quem não está usando o portal?', 'Monte minhas prioridades da semana'];
 var aberturaN = 0;
 function abertura() {
-  conversa = ''; depoisDaVez = null; $('chat').innerHTML = ''; $('turnoTxt').textContent = ''; marcaAtual();
+  conversa = ''; depoisDaVez = null; $('chat').innerHTML = ''; $('turnoTxt').textContent = ''; marcaAtual(); memLimpa();
   var quem = comoQuem || sess().name || '', prim = String(quem).trim().split(/\s+/)[0] || '';
   prim = prim.charAt(0).toUpperCase() + prim.slice(1).toLowerCase();
   /* um segundo de "escrevendo…" antes de ele se apresentar; a vez é numerada para um clique em
@@ -747,7 +795,7 @@ function mostraSugestoes(vez) {
       aberturaN++; b.disabled = true; b.textContent = 'preparando…'; trava(true);
       post({ action: 'buddyPropoe', tipo: g.tipo, rafs: g.alunos.slice(0, 12).map(function (a) { return a.raf; }), conversa: conversa }).then(function (r) {
         if (!r || r.ok !== true) { nota((r && r.error) || 'Não consegui preparar agora.'); b.disabled = false; b.textContent = g.botao; return; }
-        conversa = r.conversa; b.parentNode.remove(); if (!d.querySelector('.sug-i')) d.remove();
+        conversa = r.conversa; memSalva(); b.parentNode.remove(); if (!d.querySelector('.sug-i')) d.remove();
         var com = document.querySelector('.comeco'); if (com) com.remove();
         nota(g.tipo === '2nd' ? 'Comunicados de 2nd chance preparados. Confira e confirme.' : 'Termos de atraso preparados. Confira e confirme.');
         mostraPropostas(r.propostas, r.conversa);
@@ -825,7 +873,7 @@ function fechaCortina() {
 $('fechaMini').addEventListener('click', function () { try { window.parent.postMessage({ fiskBuddy: 'fecha' }, location.origin); } catch (e) {} });
 window.addEventListener('message', function (e) {
   if (e.origin !== location.origin || !e.data || e.data.fiskBuddy !== 'nova') return;
-  if (!ocupado && info && !$('palco').hidden) abertura();
+  if (!ocupado && info && !$('palco').hidden && !MEM.length) abertura();
 });
 fiskInitThemeToggle('themeToggle');
 if (!MINI) fiskInitUserMenu();
@@ -848,7 +896,8 @@ function recusa(t, p) { fechaCortina(); $('fora').hidden = false; $('foraT').tex
       bolha('<p>A direção não tem turmas. Escolha lá em cima, em <b>responder como…</b>, o professor por quem você quer perguntar. Eu respondo com as turmas dele, e a medição de custo aparece embaixo de cada resposta.</p>');
       return;
     }
-    abertura(); carregaHist();
+    if (!memRestaura()) abertura();
+    carregaHist();
     fiskRegistrarUso('Buddy auxiliar');
   }).catch(function () { recusa('⚠️ Sem conexão', 'Não consegui falar com o servidor. Tente de novo em instantes.'); });
 })();
