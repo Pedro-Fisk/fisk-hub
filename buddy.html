@@ -10,12 +10,29 @@
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <script src="assets/fisk-shared.js?v=2026-09-20a"></script>
-<script src="assets/buddy-conversas.js?v=2026-10-06b"></script>
+<script src="assets/buddy-conversas.js?v=2026-10-06c"></script>
 <style>
   [hidden]{ display:none !important; }
   .hero{ padding-bottom:1.1rem; }
-  main{ max-width:1180px; margin:0 auto; padding:1.2rem; width:100%; }
-  .palco{ display:grid; grid-template-columns:300px minmax(0,1fr); gap:1.1rem; align-items:start; }
+  main{ max-width:1500px; margin:0 auto; padding:1.2rem; width:100%; }
+  .palco{ display:grid; grid-template-columns:240px minmax(0,1fr) 290px; gap:1rem; align-items:start; }
+
+  /* ── o histórico das conversas, à esquerda ── */
+  .hist{ background:var(--white); border:2px solid var(--surface-border-color); border-radius:18px; box-shadow:var(--surface-shadow); overflow:hidden;
+         position:sticky; top:1rem; max-height:calc(100vh - 2rem); display:flex; flex-direction:column; }
+  .hist-cab{ padding:.8rem .8rem .7rem; border-bottom:1px solid var(--gray-light); }
+  .hist-cab b{ font-family:var(--font-heading); font-size:1rem; color:var(--ui-dark,#223e5a); display:block; margin-bottom:.55rem; }
+  .hist-cab button{ width:100%; background:#2563eb; color:#fff; border:0; border-radius:12px; font-family:var(--font-body); font-weight:800; font-size:.9rem; padding:.55rem; cursor:pointer; }
+  .hist-cab button:disabled{ opacity:.5; cursor:default; }
+  .hist-lista{ overflow-y:auto; overscroll-behavior:contain; padding:.35rem; }
+  .hist-lista button{ width:100%; text-align:left; background:transparent; border:0; border-radius:10px; padding:.5rem .6rem; cursor:pointer; font-family:var(--font-body); color:var(--ui-ink,#1d3349); }
+  .hist-lista button:hover{ background:var(--ui-soft,#e9eff5); }
+  .hist-lista button.atual{ background:var(--ui-soft,#e9eff5); box-shadow:inset 3px 0 0 #2563eb; }
+  .hist-lista button b{ display:block; font-size:.86rem; font-weight:700; line-height:1.3; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+  .hist-lista button small{ font-size:.72rem; color:var(--gray); }
+  .hist-vazio{ font-size:.82rem; color:var(--gray); padding:.6rem .7rem; }
+  .nota-sis{ align-self:center; font-size:.8rem; color:#44607c; background:rgba(255,255,255,.7); border-radius:99px; padding:.25rem .8rem; text-align:center; }
+  body.theme-dark .nota-sis{ background:rgba(39,52,73,.85); color:#c2d0e0; }
 
   /* ── a árvore de conversas, à esquerda ── */
   .arvore{ background:var(--white); border:2px solid var(--surface-border-color); border-radius:18px; box-shadow:var(--surface-shadow);
@@ -51,7 +68,7 @@
                font-weight:700; font-size:.8rem; padding:.3rem .75rem; cursor:pointer; text-decoration:none; }
   .cab select option{ color:#1d2b3a; }
   .cab button:hover, .cab a.bt:hover{ background:rgba(255,255,255,.28); }
-  .cab .ideias-bt{ display:none; }
+  .cab .ideias-bt, .cab .hist-bt{ display:none; }
   .foto{ position:relative; width:48px; height:48px; border-radius:50%; background:#fff; flex:none; box-shadow:0 0 0 3px rgba(255,255,255,.4); }
   .foto span{ display:block; width:100%; height:100%; border-radius:50%; overflow:hidden; }
   .foto img{ display:block; width:100%; height:100%; transform:scale(1.35); transform-origin:50% 45%; }
@@ -75,6 +92,16 @@
   .prop{ align-self:stretch; max-width:86%; background:#fff; border:2px solid #2563eb; border-radius:14px; padding:.8rem 1rem; }
   .prop b{ font-family:var(--font-heading); color:#16243a; } .prop p{ margin:.25rem 0 .6rem; font-size:.92rem; color:#33506e; }
   .prop a{ display:inline-block; background:#2563eb; color:#fff; font-weight:800; text-decoration:none; border-radius:10px; padding:.55rem 1rem; font-size:.92rem; }
+  .prop .onde{ font-size:.8rem; color:#5b6b7c; margin:.1rem 0 .45rem; }
+  .prop blockquote{ margin:0 0 .65rem; padding:.55rem .75rem; background:#f1f5fb; border-left:4px solid #2563eb; border-radius:8px; font-size:.95rem; color:#1d2b3a; white-space:pre-wrap; }
+  .prop .bts{ display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+  .prop .bts button{ border:0; border-radius:10px; font-family:var(--font-body); font-weight:800; font-size:.92rem; padding:.55rem 1rem; cursor:pointer; }
+  .prop .bts .sim{ background:#16a34a; color:#fff; } .prop .bts .nao{ background:#e5eaf1; color:#33506e; }
+  .prop .bts button:disabled{ opacity:.55; cursor:default; }
+  .prop .res{ font-size:.9rem; font-weight:700; } .prop .res.ok{ color:#166534; } .prop .res.err{ color:#b91c1c; }
+  .prop.feita{ border-color:#16a34a; } .prop.cancelada{ border-color:#c5d3e3; opacity:.75; }
+  body.theme-dark .prop .res.ok{ color:#86efac; } body.theme-dark .prop .res.err{ color:#fca5a5; } body.theme-dark .prop .bts .nao{ background:#3a4a63; color:#e6edf6; }
+  body.theme-dark .prop blockquote{ background:#1f2937; color:#e6edf6; } body.theme-dark .prop .onde{ color:#a9b8ca; }
   .depois{ align-self:flex-start; display:flex; flex-wrap:wrap; gap:.4rem; max-width:92%; }
   .depois button, .comeco button{ border:1.5px solid #b9cbe0; background:rgba(255,255,255,.85); color:#1d3349; border-radius:99px; padding:.36rem .85rem; font-family:var(--font-body);
                font-weight:700; font-size:.84rem; cursor:pointer; text-align:left; }
@@ -121,16 +148,24 @@
   body.theme-dark .passos{ background:rgba(39,52,73,.85); color:#c2d0e0; } body.theme-dark .passos .p i{ background:#c2d0e0; }
   body.theme-dark .acoes{ border-top-color:#3a4a63; } body.theme-dark .acoes button{ border-color:#3a4a63; color:#c2d0e0; }
 
-  /* tela estreita: a árvore vira gaveta, aberta pelo botão "Ideias" */
+  /* tela média: as perguntas frequentes viram gaveta à direita, aberta por "Ideias" */
+  @media (max-width: 1180px){
+    .palco{ grid-template-columns:230px minmax(0,1fr); }
+    .cab .ideias-bt{ display:inline-block; }
+    .arvore{ position:fixed; z-index:70; right:0; top:0; bottom:0; width:min(330px, 90vw); max-height:none; border-radius:18px 0 0 18px;
+             transform:translateX(105%); transition:transform .22s ease; }
+    body.arv-aberta .arvore{ transform:none; }
+    body.arv-aberta .fundo, body.hist-aberta .fundo{ display:block; position:fixed; inset:0; z-index:69; background:rgba(15,23,42,.45); }
+  }
+  /* tela estreita: o histórico também vira gaveta, à esquerda */
   @media (max-width: 900px){
     main{ padding:.6rem; }
     .palco{ display:block; }
     .janela{ height:calc(100vh - 1.2rem); position:static; border-radius:16px; }
-    .cab .ideias-bt{ display:inline-block; }
-    .arvore{ position:fixed; z-index:70; left:0; top:0; bottom:0; width:min(330px, 90vw); max-height:none; border-radius:0 18px 18px 0;
-             transform:translateX(-105%); transition:transform .22s ease; }
-    body.arv-aberta .arvore{ transform:none; }
-    body.arv-aberta .fundo{ display:block; position:fixed; inset:0; z-index:69; background:rgba(15,23,42,.45); }
+    .cab .hist-bt{ display:inline-block; }
+    .hist{ position:fixed; z-index:70; left:0; top:0; bottom:0; width:min(300px, 86vw); max-height:none; border-radius:0 18px 18px 0;
+           transform:translateX(-105%); transition:transform .22s ease; }
+    body.hist-aberta .hist{ transform:none; }
     .msg, .prop{ max-width:94%; }
     .hero{ display:none; }   /* no celular a conversa precisa da tela inteira */
   }
@@ -161,9 +196,9 @@
   </section>
 
   <div class="palco" id="palco" hidden>
-    <nav class="arvore" id="arvore" aria-label="Perguntas prontas">
-      <div class="arv-cab"><b>💡 Perguntas frequentes</b><small>o que você pode perguntar ao Buddy, por tema</small></div>
-      <div class="arv-lista" id="arvLista"></div>
+    <nav class="hist" id="hist" aria-label="Suas conversas">
+      <div class="hist-cab"><b>💬 Conversas</b><button type="button" id="novaLado">＋ Nova conversa</button></div>
+      <div class="hist-lista" id="histLista"><p class="hist-vazio">Suas conversas com o Buddy aparecem aqui.</p></div>
     </nav>
 
     <div class="janela">
@@ -174,6 +209,7 @@
           <span class="selo">piloto</span>
           <select id="verComo" hidden aria-label="Responder como qual professor"></select>
           <a class="bt" id="ajustes" href="buddy-ajustes.html" hidden>⚙️ Ajustes</a>
+          <button type="button" class="hist-bt" id="histBt">💬 Conversas</button>
           <button type="button" class="ideias-bt" id="ideiasBt">💡 Ideias</button>
           <button type="button" id="nova">＋ Nova conversa</button>
           <a class="bt" href="index.html">← Hub</a>
@@ -184,10 +220,15 @@
         <textarea id="txt" rows="1" maxlength="2000" placeholder="Pergunte sobre suas turmas e alunos…" aria-label="Sua pergunta"></textarea>
         <button type="submit" id="enviar">Enviar</button>
       </form>
-      <div class="pe"><span id="restam"></span><span>Enter envia · Shift+Enter quebra a linha</span><span class="cont" id="cont"></span></div>
+      <div class="pe"><span id="restam"></span><span id="turnoTxt"></span><span>Enter envia · Shift+Enter quebra a linha</span><span class="cont" id="cont"></span></div>
     </div>
+
+    <nav class="arvore" id="arvore" aria-label="Perguntas prontas">
+      <div class="arv-cab"><b>💡 Perguntas frequentes</b><small>o que você pode perguntar ao Buddy, por tema</small></div>
+      <div class="arv-lista" id="arvLista"></div>
+    </nav>
   </div>
-  <p class="rodape" id="rodape" hidden>O Buddy só lê: card, faltas, atraso, notas, tutoria e uso do portal das suas turmas. Ele não grava nem envia nada. Confira os números antes de agir, e marque 👍 ou 👎 em cada resposta: é assim que a gente mede se ele está acertando.</p>
+  <p class="rodape" id="rodape" hidden>O Buddy lê card, faltas, atraso, notas, radar, counseling, tutoria e uso do portal das suas turmas. Ele só grava duas coisas, e só depois de você confirmar no cartão: uma linha no counseling e uma nota no card. Confira os números antes de agir, e marque 👍 ou 👎 em cada resposta: é assim que a gente mede se ele está acertando.</p>
 </main>
 <div class="fundo" id="fundo"></div>
 
@@ -316,6 +357,28 @@ function atalhos(lista) {
   poe(d);
 }
 
+/* o Buddy PROPÕE; quem grava é o clique do professor aqui. O servidor executa o que ELE guardou, não o que a tela manda */
+function cartaoAcao(pr, idConversa) {
+  var d = document.createElement('div'); d.className = 'prop';
+  d.innerHTML = '<b>' + (pr.acao === 'card' ? '📝 Nota no card' : '🗂️ Registro no counseling') + ' · ' + esc(pr.aluno) + '</b>' +
+    '<div class="onde">' + esc(pr.turma) + ' · ' + esc(pr.onde) + '</div><blockquote>' + esc(pr.texto) + '</blockquote>' +
+    '<div class="bts"><button type="button" class="sim">✓ Confirmar e gravar</button><button type="button" class="nao">Cancelar</button><span class="res"></span></div>';
+  var sim = d.querySelector('.sim'), nao = d.querySelector('.nao'), res = d.querySelector('.res');
+  function manda(cancela) {
+    sim.disabled = nao.disabled = true; res.className = 'res'; res.textContent = cancela ? '' : 'gravando…';
+    post({ action: 'buddyConfirma', conversa: idConversa, id: pr.id, cancela: cancela ? 1 : '' }).then(function (r) {
+      if (!r || r.ok !== true) { res.className = 'res err'; res.textContent = (r && r.error) || 'Não consegui gravar.'; sim.disabled = nao.disabled = false; return; }
+      sim.remove(); nao.remove();
+      if (r.cancelada) { d.classList.add('cancelada'); res.textContent = 'Cancelado. Nada foi gravado.'; return; }
+      d.classList.add('feita'); res.className = 'res ok';
+      res.innerHTML = '✓ ' + esc(r.feito || 'Gravado.') + (r.link ? ' <a href="' + esc(r.link) + '" target="_blank" rel="noopener" style="display:inline;background:none;color:#2563eb;padding:0;font-weight:800">abrir</a>' : '');
+    }).catch(function () { res.className = 'res err'; res.textContent = 'Sem conexão. Tente de novo.'; sim.disabled = nao.disabled = false; });
+  }
+  sim.addEventListener('click', function () { manda(false); });
+  nao.addEventListener('click', function () { manda(true); });
+  poe(d);
+}
+
 function recebe(j) {
   if (!j) throw new Error('sem resposta');
   if (j.conversa) conversa = j.conversa;
@@ -332,6 +395,7 @@ function recebe(j) {
       '<a href="' + esc(p.link) + '" target="_blank" rel="noopener">Abrir o Gerador de Termo, já na escola e no professor →</a>';
     poe(d);
   }
+  (j.propostas || []).forEach(function (pr) { cartaoAcao(pr, conversa); });
   if (j.medicao) {
     var m = document.createElement('div'); m.className = 'med';
     m.textContent = 'medição · ' + j.medicao.modelo + ' · ' + j.passos + ' chamadas · ' + j.medicao.tokens.toLocaleString('pt-BR') + ' tokens na conversa · US$ ' +
@@ -341,6 +405,12 @@ function recebe(j) {
   atalhos(depoisDaVez || window.BUDDY_DEPOIS_PADRAO);
   depoisDaVez = null;
   if (info && info.restamHoje > 0) { info.restamHoje--; rodapeConta(); }
+  /* a conversa tem fim: cada pergunta relê tudo o que veio antes, e a oitava custa bem mais que a primeira */
+  if (j.turno && j.maxTurnos) {
+    $('turnoTxt').textContent = 'pergunta ' + j.turno + ' de ' + j.maxTurnos + ' desta conversa';
+    if (j.turno >= j.maxTurnos) nota('Esta conversa chegou ao limite de ' + j.maxTurnos + ' perguntas. A próxima abre uma conversa nova.');
+  }
+  carregaHist();
 }
 function pergunta(t, rotulo, depois) {
   t = String(t || '').trim(); if (!t || ocupado) return;
@@ -350,7 +420,7 @@ function pergunta(t, rotulo, depois) {
   if (depois) depoisDaVez = depois;
   bolhaEu(rotulo || t); $('txt').value = ''; ajusta(); $('txt').placeholder = 'Pergunte sobre suas turmas e alunos…';
   trava(true); passo('pensando');
-  post({ action: 'buddyPergunta', texto: t, conversa: conversa }).then(recebe)
+  post({ action: 'buddyPergunta', texto: t, conversa: conversa, rotulo: String(rotulo || t).slice(0, 160) }).then(recebe)
     .catch(function (e) { fimPassos(); bolha('<p>⚠️ ' + esc(String((e && e.message) || e)) + '</p>'); })
     .then(function () { trava(false); });
 }
@@ -362,16 +432,58 @@ function rodapeConta() { $('restam').textContent = info ? 'restam ' + info.resta
 $('txt').addEventListener('input', ajusta);
 $('txt').addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); pergunta($('txt').value); } });
 $('form').addEventListener('submit', function (e) { e.preventDefault(); pergunta($('txt').value); });
-$('ideiasBt').addEventListener('click', function () { document.body.classList.toggle('arv-aberta'); });
-$('fundo').addEventListener('click', function () { document.body.classList.remove('arv-aberta'); });
+$('ideiasBt').addEventListener('click', function () { document.body.classList.remove('hist-aberta'); document.body.classList.toggle('arv-aberta'); });
+$('histBt').addEventListener('click', function () { document.body.classList.remove('arv-aberta'); document.body.classList.toggle('hist-aberta'); });
+$('fundo').addEventListener('click', function () { document.body.classList.remove('arv-aberta', 'hist-aberta'); });
 $('nova').addEventListener('click', function () { if (!ocupado) abertura(); });
+$('novaLado').addEventListener('click', function () { if (!ocupado) { document.body.classList.remove('hist-aberta'); abertura(); } });
+
+/* ── o histórico: reabrir uma conversa é ler texto guardado, não custa token ── */
+function nota(t) { var d = document.createElement('div'); d.className = 'nota-sis'; d.textContent = t; return poe(d); }
+function quandoFoi(ms) {
+  if (!ms) return '';
+  var d = new Date(ms), h = new Date(), dia = function (x) { return x.getFullYear() * 10000 + x.getMonth() * 100 + x.getDate(); };
+  var hm = ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+  if (dia(d) === dia(h)) return 'hoje, ' + hm;
+  return ('0' + d.getDate()).slice(-2) + '/' + ('0' + (d.getMonth() + 1)).slice(-2) + ', ' + hm;
+}
+function marcaAtual() { [].forEach.call($('histLista').querySelectorAll('button'), function (b) { b.className = b.getAttribute('data-id') === conversa && conversa ? 'atual' : ''; }); }
+function carregaHist() {
+  post({ action: 'buddyHistorico' }).then(function (j) {
+    var cs = (j && j.conversas) || [];
+    $('histLista').innerHTML = cs.length ? cs.map(function (c) {
+      return '<button type="button" data-id="' + esc(c.id) + '"><b>' + esc(c.titulo) + '</b><small>' + esc(quandoFoi(c.quando)) + '</small></button>';
+    }).join('') : '<p class="hist-vazio">Suas conversas com o Buddy aparecem aqui.</p>';
+    marcaAtual();
+  }).catch(function () {});
+}
+$('histLista').addEventListener('click', function (e) {
+  var b = e.target.closest ? e.target.closest('button') : null; if (!b || ocupado) return;
+  var id = b.getAttribute('data-id');
+  document.body.classList.remove('hist-aberta');
+  aberturaN++; $('chat').innerHTML = ''; nota('abrindo a conversa…'); trava(true);
+  post({ action: 'buddyConversa', id: id }).then(function (j) {
+    $('chat').innerHTML = '';
+    if (!j || j.ok !== true) { nota((j && j.error) || 'Não consegui abrir essa conversa.'); return; }
+    (j.turnos || []).forEach(function (t) {
+      bolhaEu(t.p); bolha(formata(t.r));
+      (t.a || []).forEach(function (a) { nota('proposta do Buddy: ' + a); });
+    });
+    /* viva no servidor: continua de onde parou. Vencida: a próxima pergunta abre outra, e ele fica sabendo antes */
+    conversa = j.continua ? id : ''; depoisDaVez = null;
+    $('turnoTxt').textContent = j.continua ? 'pergunta ' + (j.turnos || []).length + ' de ' + ((info && info.maxTurnos) || 8) + ' desta conversa' : '';
+    nota(j.continua ? 'Você pode continuar esta conversa.' : 'Esta conversa foi encerrada. Uma pergunta nova abre outra conversa.');
+    marcaAtual(); if (!conversa) b.className = 'atual';
+  }).catch(function () { $('chat').innerHTML = ''; nota('Sem conexão. Tente de novo.'); })
+    .then(function () { trava(false); });
+});
 
 /* ── a abertura: o Buddy se apresenta e oferece por onde começar ── */
 var COMECO = ['Como está a saúde pedagógica das minhas turmas?', 'Quais alunos estão faltando mais?', 'Quem está em atraso crítico?',
               'Quem foi à tutoria?', 'Quem não está usando o portal?', 'Monte minhas prioridades da semana'];
 var aberturaN = 0;
 function abertura() {
-  conversa = ''; depoisDaVez = null; $('chat').innerHTML = '';
+  conversa = ''; depoisDaVez = null; $('chat').innerHTML = ''; $('turnoTxt').textContent = ''; marcaAtual();
   var quem = comoQuem || sess().name || '', prim = String(quem).trim().split(/\s+/)[0] || '';
   prim = prim.charAt(0).toUpperCase() + prim.slice(1).toLowerCase();
   /* um segundo de "escrevendo…" antes de ele se apresentar; a vez é numerada para um clique em
@@ -403,7 +515,7 @@ function montaVerComo() {
   sel.addEventListener('change', function () {
     comoQuem = sel.value;
     try { if (comoQuem) localStorage.setItem('fisk_actas', JSON.stringify({ name: comoQuem, escolas: '' })); } catch (e) {}
-    if (comoQuem) { $('fora').hidden = true; $('palco').hidden = false; $('rodape').hidden = false; abertura(); }
+    if (comoQuem) { $('fora').hidden = true; $('palco').hidden = false; $('rodape').hidden = false; abertura(); carregaHist(); }
   });
 }
 
@@ -441,7 +553,7 @@ function recusa(t, p) { fechaCortina(); $('fora').hidden = false; $('foraT').tex
       bolha('<p>A direção não tem turmas. Escolha lá em cima, em <b>responder como…</b>, o professor por quem você quer perguntar. Eu respondo com as turmas dele, e a medição de custo aparece embaixo de cada resposta.</p>');
       return;
     }
-    abertura();
+    abertura(); carregaHist();
     fiskRegistrarUso('Buddy auxiliar');
   }).catch(function () { recusa('⚠️ Sem conexão', 'Não consegui falar com o servidor. Tente de novo em instantes.'); });
 })();

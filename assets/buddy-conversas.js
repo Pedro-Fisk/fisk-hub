@@ -14,7 +14,7 @@
  *   breve     true = ainda não dá (falta o dado no servidor). Aparece apagada,
  *             com o motivo em `porque`, para o professor saber que está a caminho
  *
- * REGRA: só entra aqui pergunta que as ferramentas do servidor (Buddy.js)
+ * REGRA: só entra aqui pergunta que as ferramentas do servidor (Buddy.js e Buddy-acoes.js)
  * conseguem responder com dado de verdade. Pergunta bonita sem dado atrás vira
  * resposta inventada, e é isso que o piloto existe para não deixar acontecer.
  * ═══════════════════════════════════════════════════════════════════════════ */
@@ -155,6 +155,18 @@ window.BUDDY_ARVORE = [
         porque: 'A geração em lote ainda não existe. Por enquanto o Buddy lista quem precisa e abre o gerador de cada um.' },
       { rot: 'Gerar os boletins da turma', breve: true,
         porque: 'O Buddy ainda não gera boletim. Use o Gerador de Boletins.' }
+    ] },
+
+  { id: 'registrar', ic: '✍️', tit: 'Registrar', sub: 'o Buddy escreve, você confirma',
+    perguntas: [
+      { rot: 'Anotar no card que o aluno vai faltar…', falta: 'aluno',
+        texto: 'Ponha uma nota na próxima aula do card avisando que vai faltar (ele me avisou) o aluno ' },
+      { rot: 'Pôr um recado na próxima aula de um aluno…', falta: 'aluno',
+        texto: 'Ponha uma nota na célula da próxima aula no card. Aluno e recado: ' },
+      { rot: 'Registrar uma orientação no counseling…', falta: 'aluno',
+        texto: 'Registre no counseling que hoje eu conversei e orientei o aluno. Aluno e o que foi combinado: ' },
+      { rot: 'Quem precisa de termo e ainda não tem…', falta: 'turma',
+        texto: 'Cruze o atraso com os documentos já gerados no card e liste quem tem 4 aulas ou mais de atraso e ainda não tem termo. Turma: ' }
     ] },
 
   { id: 'semana', ic: '🗓️', tit: 'Minha semana', sub: 'o que fazer com tudo isso',

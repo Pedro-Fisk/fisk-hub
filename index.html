@@ -554,10 +554,6 @@
         <span data-i18n="link-baamboozle">Plataforma Baamboozle</span>
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6h9v9M18 6L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
-      <a class="link-chip" href="https://lyricstraining.com/" target="_blank" rel="noopener">
-        <span>Lyrics Training</span>
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6h9v9M18 6L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </a>
       <a class="link-chip" href="https://www.newsinlevels.com" target="_blank" rel="noopener">
         <span>News in Levels</span>
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6h9v9M18 6L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -2324,12 +2320,17 @@
       b.hidden = !naoLidos; b.textContent = naoLidos > 9 ? '9+' : String(naoLidos);
       var it = document.querySelector('.fu-buddy .fu-n2'); if (it) { it.hidden = !naoLidos; it.textContent = b.textContent; }
     }
+    var abriuSozinho = false;
     function conta(){
       /* o número do Buddy conta só o que pede ciência; a tutoria é informação, não pendência */
       var n = msgs.filter(function(m){ return !m.ciente; }).length;
       sinoN.hidden = !n; sinoN.textContent = n > 9 ? '9+' : String(n);
       $$('bdN').hidden = !n; $$('bdN').textContent = sinoN.textContent;
       naoLidos = n; noNome();
+      /* HÁ NOVIDADE SEM LER: O MURAL ABRE SOZINHO (Pedro, 06/10/2026). O Carlos abriu o Hub com o mural minimizado
+         e não viu que ele existia. Uma vez por carregamento; quem tirou o mural da tela (✕) continua sem ele, e
+         quem não tem nada por ler fica como deixou. */
+      if (n && !abriuSozinho && LARGO.matches && document.body.classList.contains('bd-recolhido') && !document.body.classList.contains('bd-fora')) { abriuSozinho = true; abre(true); }
       ttN.hidden = !tut.length; ttN.textContent = String(tut.length);
     }
     /* O MURAL (Pedro, 06/10/2026). A coluna deixou de ser o Buddy: é o radar de novidades da escola, uma circular.
