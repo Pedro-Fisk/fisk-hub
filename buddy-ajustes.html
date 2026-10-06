@@ -142,7 +142,7 @@ function pinta(j) {
     '<div class="num"><b>' + usd(j.teto) + '</b><span>teto do mês</span></div><div class="num"><b>' + pct + '%</b><span>do teto usado</span></div>';
   $('barra').style.width = pct + '%'; $('barra').style.background = pct > 85 ? '#dc2626' : (pct > 60 ? '#d97706' : '#16a34a');
   $('teto').value = j.teto;
-  var sel = $('modelo'); sel.innerHTML = '<option value="">alternar os dois (piloto)</option>' + j.modelos.map(function (m) {
+  var sel = $('modelo'); sel.innerHTML = (j.modelos.length > 1 ? '<option value="">alternar os dois (piloto)</option>' : '') + j.modelos.map(function (m) {
     var p = j.precos[m]; return '<option value="' + m + '"' + (m === j.modeloFixo ? ' selected' : '') + '>' + m + ' · US$ ' + p.e + ' / ' + p.s + ' por milhão</option>'; }).join('');
   $('limites').textContent = 'Travas fixas no código: ' + j.limites.perguntasPorDia + ' perguntas por professor por dia, ' + j.limites.passosPorPergunta +
     ' chamadas ao modelo por pergunta e ' + j.limites.caracteres + ' caracteres por pergunta. Batido o teto do mês, o Buddy para até o mês virar.';
