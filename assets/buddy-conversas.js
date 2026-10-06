@@ -126,8 +126,8 @@ window.BUDDY_ARVORE = [
         depois: ['Quem não passou no simulado?'] },
       { rot: 'Quem não passou no simulado?',
         texto: 'Quais alunos meus tiveram resultado NO PASS no último simulado do MET, e em qual parte (Listening ou Grammar + Reading) ficaram abaixo?' },
-      { rot: 'Quem tem nota e ainda não tem boletim', breve: true,
-        porque: 'O servidor ainda não sabe quais boletins já foram gerados.' }
+      { rot: 'Ditar as notas do boletim de um aluno…', falta: 'aluno',
+        texto: 'Prepare o boletim. Vou dizer o aluno e as notas (escuta, escrita, fluência, pronúncia, vocabulário, participação, dedicação, socialização): ' }
     ] },
 
   { id: 'aluno', ic: '👤', tit: 'Um aluno', sub: 'a ficha de uma pessoa',
@@ -157,8 +157,8 @@ window.BUDDY_ARVORE = [
         texto: 'Crie o comunicado de 2nd chance do aluno ' },
       { rot: 'Gerar os comunicados de 2nd chance de uma turma…', falta: 'turma',
         texto: 'Crie o comunicado de 2nd chance de todos os alunos com prova escrita ou auditiva abaixo de 6,0 na avaliação mais recente, na turma ' },
-      { rot: 'Gerar os boletins da turma', breve: true,
-        porque: 'O Buddy ainda não gera boletim. Use o Gerador de Boletins.' }
+      { rot: 'Preparar o boletim de um aluno…', falta: 'aluno',
+        texto: 'Prepare o boletim. Vou dizer o aluno e as notas (escuta, escrita, fluência, pronúncia, vocabulário, participação, dedicação, socialização): ' }
     ] },
 
   { id: 'registrar', ic: '✍️', tit: 'Registrar', sub: 'o Buddy escreve, você confirma',

@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <script src="assets/fisk-shared.js?v=2026-09-20a"></script>
-<script src="assets/buddy-conversas.js?v=2026-10-06e"></script>
+<script src="assets/buddy-conversas.js?v=2026-10-06f"></script>
 <style>
   [hidden]{ display:none !important; }
   .hero{ padding-bottom:1.1rem; }
@@ -99,6 +99,7 @@
   .prop .bts .sim{ background:#16a34a; color:#fff; } .prop .bts .nao{ background:#e5eaf1; color:#33506e; }
   .prop .bts button:disabled{ opacity:.55; cursor:default; }
   .prop .res{ font-size:.9rem; font-weight:700; } .prop .res.ok{ color:#166534; } .prop .res.err{ color:#b91c1c; }
+  .prop .bts a.abre{ display:inline-block; background:#2563eb; color:#fff; font-weight:800; text-decoration:none; border-radius:10px; padding:.55rem 1rem; font-size:.92rem; }
   .prop a.lk{ display:inline; background:none; color:#2563eb; padding:0; font-weight:800; text-decoration:underline; font-size:inherit; }
   .prop.feita{ border-color:#16a34a; } .prop.cancelada{ border-color:#c5d3e3; opacity:.75; }
   body.theme-dark .prop .res.ok{ color:#86efac; } body.theme-dark .prop .res.err{ color:#fca5a5; } body.theme-dark .prop .bts .nao{ background:#3a4a63; color:#e6edf6; }
@@ -116,6 +117,10 @@
   .entrada textarea:focus{ border-color:#2563eb; }
   .entrada button{ background:#2563eb; color:#fff; border:0; border-radius:14px; font-weight:800; font-size:1rem; padding:.75rem 1.2rem; cursor:pointer; }
   .entrada button:disabled{ opacity:.5; cursor:default; }
+  .entrada button.mic{ background:#e9eff5; color:#1d3349; padding:.75rem .85rem; font-size:1.1rem; line-height:1; }
+  .entrada button.mic.ouvindo{ background:#dc2626; color:#fff; animation:pisca 1.2s ease-in-out infinite; }
+  @keyframes pisca{ 0%,100%{ box-shadow:0 0 0 0 rgba(220,38,38,.5); } 50%{ box-shadow:0 0 0 8px rgba(220,38,38,0); } }
+  body.theme-dark .entrada button.mic{ background:#273449; color:#e6edf6; } body.theme-dark .entrada button.mic.ouvindo{ background:#dc2626; color:#fff; }
   .pe{ display:flex; gap:.8rem; padding:0 1rem .6rem; background:#fff; font-size:.74rem; color:#6b7a8c; }
   .pe .cont{ margin-left:auto; } .pe .cont.perto{ color:#b45309; font-weight:800; }
   .aviso{ background:var(--white); border:2px solid var(--surface-border-color); border-radius:16px; padding:1.1rem 1.25rem; max-width:640px; margin:0 auto; }
@@ -219,6 +224,7 @@
       <div class="chat" id="chat" aria-live="polite"></div>
       <form class="entrada" id="form">
         <textarea id="txt" rows="1" maxlength="2000" placeholder="Pergunte sobre suas turmas e alunos…" aria-label="Sua pergunta"></textarea>
+        <button type="button" id="mic" class="mic" hidden title="Falar a pergunta" aria-label="Falar a pergunta">🎙️</button>
         <button type="submit" id="enviar">Enviar</button>
       </form>
       <div class="pe"><span id="restam"></span><span id="turnoTxt"></span><span>Enter envia · Shift+Enter quebra a linha</span><span class="cont" id="cont"></span></div>
@@ -229,7 +235,7 @@
       <div class="arv-lista" id="arvLista"></div>
     </nav>
   </div>
-  <p class="rodape" id="rodape" hidden>O Buddy lê card, faltas, atraso, notas, radar, counseling, tutoria e uso do portal das suas turmas. Ele só grava depois de você confirmar no cartão: uma linha no counseling, uma anotação na célula da aula no card, um termo de atraso ou um comunicado de 2nd chance. Confira os números antes de agir, e marque 👍 ou 👎 em cada resposta: é assim que a gente mede se ele está acertando.</p>
+  <p class="rodape" id="rodape" hidden>O Buddy lê card, faltas, atraso, notas, radar, counseling, tutoria e uso do portal das suas turmas. Ele só grava depois de você confirmar no cartão: uma linha no counseling, uma anotação na célula da aula no card, um termo de atraso ou um comunicado de 2nd chance. O boletim ele só prepara: quem finaliza é você, no gerador. Confira os números antes de agir, e marque 👍 ou 👎 em cada resposta: é assim que a gente mede se ele está acertando.</p>
 </main>
 <div class="fundo" id="fundo"></div>
 
@@ -442,6 +448,15 @@ function cartaoDoc(pr, idConversa) {
   return gera;
 }
 function cartaoAcao(pr, idConversa) {
+  if (pr.acao === 'boletim') {
+    /* boletim: o Buddy só organizou as notas. Quem lança é o gerador, com o boletim montado na frente do professor */
+    var xb = pr.dados || {}, db = document.createElement('div'); db.className = 'prop';
+    db.innerHTML = '<b>📊 Boletim · ' + esc(pr.aluno) + '</b><div class="onde">' + esc(pr.turma) + ' · ' + esc(xb.book || '') + (xb.jaTemPrimeira ? ' · 2ª avaliação (o card já tem a 1ª)' : ' · 1ª avaliação') + '</div>' +
+      '<blockquote>' + esc(pr.texto) + ((xb.faltam || []).length ? '<br><span style="color:#b45309">Sem nota: ' + esc(xb.faltam.join(', ')) + '. Dá para completar lá no boletim.</span>' : '') + '</blockquote>' +
+      '<div class="onde">Nada foi lançado. O gerador abre já neste aluno e com estas notas; você confere o boletim e finaliza lá.</div>' +
+      '<div class="bts"><a class="abre" href="' + esc(xb.link || '#') + '" target="_blank" rel="noopener">Abrir o boletim preenchido →</a></div>';
+    poe(db); return null;
+  }
   if (DOCS[pr.acao]) return cartaoDoc(pr, idConversa);
   var d = document.createElement('div'); d.className = 'prop';
   d.innerHTML = '<b>' + (pr.acao === 'card' ? '📝 Anotação na célula da aula' : '🗂️ Registro no counseling') + ' · ' + esc(pr.aluno) + '</b>' +
@@ -529,6 +544,36 @@ function ajusta() {
   var n = a.value.length, c = $('cont'); c.textContent = n > 1500 ? n + ' / 2000' : ''; c.className = 'cont' + (n > 1800 ? ' perto' : '');
 }
 function rodapeConta() { $('restam').textContent = info ? 'restam ' + info.restamHoje + ' perguntas hoje' : ''; }
+/* ── o microfone: o professor fala e o texto cai na caixa (Pedro, 06/10/2026). É o reconhecimento de voz do próprio
+   navegador: não passa pelo Buddy nem gasta token, e nada é enviado sozinho; ele lê, corrige se quiser e envia.
+   Navegador sem o recurso (Firefox) não mostra o botão. */
+(function () {
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition, bt = $('mic');
+  if (!SR || !bt) return;
+  bt.hidden = false;
+  var rec = new SR(), ouvindo = false, base = '';
+  rec.lang = 'pt-BR'; rec.continuous = true; rec.interimResults = true;
+  bt.addEventListener('click', function () {
+    if (ouvindo) { rec.stop(); return; }
+    if ($('txt').disabled) return;
+    base = $('txt').value.trim(); base = base ? base + ' ' : '';
+    try { rec.start(); } catch (e) {}
+  });
+  rec.onstart = function () { ouvindo = true; bt.classList.add('ouvindo'); bt.title = 'Clique para parar de ouvir'; $('txt').placeholder = 'Estou ouvindo… fale e clique no microfone para parar'; };
+  rec.onend = function () { ouvindo = false; bt.classList.remove('ouvindo'); bt.title = 'Falar a pergunta'; $('txt').placeholder = 'Pergunte sobre suas turmas e alunos…'; $('txt').focus(); };
+  rec.onerror = function (e) {
+    ouvindo = false; bt.classList.remove('ouvindo');
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') nota('O navegador bloqueou o microfone. Libere o microfone para este site (cadeado ao lado do endereço) e tente de novo.');
+  };
+  rec.onresult = function (e) {
+    var fim = '', meio = '';
+    for (var i = e.resultIndex; i < e.results.length; i++) { var t = e.results[i][0].transcript; if (e.results[i].isFinal) fim += t + ' '; else meio += t; }
+    if (fim) base += fim;
+    $('txt').value = (base + meio).replace(/\s+/g, ' ').trimStart().slice(0, 2000); ajusta();
+  };
+  /* enviar para de ouvir: senão o que ele falar depois cairia na pergunta seguinte */
+  $('form').addEventListener('submit', function () { if (ouvindo) rec.stop(); });
+})();
 $('txt').addEventListener('input', ajusta);
 $('txt').addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); pergunta($('txt').value); } });
 $('form').addEventListener('submit', function (e) { e.preventDefault(); pergunta($('txt').value); });
