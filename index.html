@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="assets/fisk-shared.css?v=2026-09-20a">
   <!-- a casa do professor veste a faixa do topo (campanha de 09/2026) -->
   <link rel="stylesheet" href="assets/casa-tema.css?v=9">
-<link rel="stylesheet" href="style.css?v=2026-10-06b">
+<link rel="stylesheet" href="style.css?v=2026-10-06d">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 </head>
@@ -166,30 +166,34 @@
 
   <!-- MAIS USADAS (19/09/2026): a home tem muita ferramenta e o professor usa quatro ou cinco por dia. A faixa é
        montada pelo próprio aparelho, contando os cliques nos cards; nada sai daqui e nada é escondido da grade. -->
-  <nav id="maisUsadas" class="mais-usadas" hidden aria-label="Suas ferramentas mais usadas"></nav>
   <div class="home-cols">
-  <main class="grid">
-    <!-- POLÍTICA DE ABAS (31/07/2026): ferramenta do ecossistema abre na MESMA
-         aba, para o botão de voltar dela funcionar como navegação de verdade;
-         em nova aba ele abria uma segunda cópia do Hub, com a original
-         esquecida atrás. Site de terceiro (os link-chip abaixo) e arquivo
-         continuam em nova aba: ali perder o Hub seria pior. -->
+  <div class="home-esq">
+  <nav id="maisUsadas" class="mais-usadas" hidden aria-label="Suas ferramentas mais usadas"></nav>
+  <!-- AS PRATELEIRAS (Pedro, 06/10/2026): as ferramentas do professor divididas em três, como as do aluno no
+       portal. `main.grid` continua sendo o contêiner (o "Mais usadas" e os atalhos procuram `main.grid a.card`);
+       quem desenha a grade agora é cada `.prat-grid`. Card novo entra na prateleira dele; sem lugar óbvio, em
+       "Outras ferramentas". -->
+  <main class="grid prats">
+    <section class="prat" id="prat-em-aula">
+      <h2 class="prat-t"><span aria-hidden="true">🎓</span> <span data-i18n="prat-aula">Em aula</span></h2>
+      <div class="prat-grid">
 
-
-    <a class="card card-planner" href="https://pedro-fisk.github.io/planner-fisk/">
+    <!-- PILOTO (Pedro, 14/09/2026): a Turma de hoje aparece só para a direção e para o professor de teste
+         (TURMA_HOJE_PILOTO, no script); nasce escondida e updateToolLinks decide -->
+    <a class="card card-turmahoje" href="turma-de-hoje.html" style="display:none">
       <div class="icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6 2.5h9l4 4v14.5a1 1 0 01-1 1H6a1 1 0 01-1-1v-17.5a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-          <path d="M15 2.5v4h4" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-          <rect x="7.3" y="11" width="2.2" height="2.2" rx="0.4" stroke="currentColor" stroke-width="1.3"/>
-          <path d="M11 12.1h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          <rect x="7.3" y="15.4" width="2.2" height="2.2" rx="0.4" stroke="currentColor" stroke-width="1.3"/>
-          <path d="M11 16.5h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="16.5" cy="9.5" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M2.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M14.5 18.5c.3-2.4 2-4 4.5-4 1.2 0 2.2.4 3 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M17 3.5l1 1 2-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-      <h2 data-i18n="card-planner-h2">Abridor de Planners</h2>
-      <p data-i18n="card-planner-p">Crie o PPT / Planner do aluno com as datas corretas</p>
+      <h2 data-i18n="card-turmahoje-h2">Minha aula</h2>
+      <p data-i18n="card-turmahoje-p">Visão geral de todos os planners da turma</p>
     </a>
+
 
     <a class="card card-conversation" href="https://conversation-maker.vercel.app/">
       <div class="icon">
@@ -201,6 +205,7 @@
       <h2 data-i18n="card-conv-h2">Conversation Maker</h2>
       <p data-i18n="card-conv-p">Crie conversações completas em powerpoint, prontas para usar</p>
     </a>
+
 
     <!-- O professor precisa ver a plataforma pelos olhos do aluno: é assim que
          ele orienta a turma a usá-la. Desde 16/09/2026 é também a caixa de
@@ -230,6 +235,7 @@
       <p data-i18n="card-portal-p">As ferramentas do aluno no modo professor, em inglês. Quick Practice e Minicourses têm Teacher Mode para projetar na TV</p>
     </a>
 
+
     <a class="card card-portal-es" id="card-portal-es" href="https://portalfisk.com.br/#raf=0000-000&curso=es">
       <div class="icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -243,6 +249,123 @@
       <h2 data-i18n="card-portal-es-h2">Portal do Aluno (professor de espanhol)</h2>
       <p data-i18n="card-portal-es-p">A mesma visão, em espanhol: Práctica Rápida e Minicursos, com Teacher Mode para projetar na TV</p>
     </a>
+      </div>
+    </section>
+    <section class="prat" id="prat-documentos">
+      <h2 class="prat-t"><span aria-hidden="true">📄</span> <span data-i18n="prat-docs">Documentos</span></h2>
+      <div class="prat-grid">
+    <!-- POLÍTICA DE ABAS (31/07/2026): ferramenta do ecossistema abre na MESMA
+         aba, para o botão de voltar dela funcionar como navegação de verdade;
+         em nova aba ele abria uma segunda cópia do Hub, com a original
+         esquecida atrás. Site de terceiro (os link-chip abaixo) e arquivo
+         continuam em nova aba: ali perder o Hub seria pior. -->
+
+
+    <a class="card card-planner" href="https://pedro-fisk.github.io/planner-fisk/">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 2.5h9l4 4v14.5a1 1 0 01-1 1H6a1 1 0 01-1-1v-17.5a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M15 2.5v4h4" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <rect x="7.3" y="11" width="2.2" height="2.2" rx="0.4" stroke="currentColor" stroke-width="1.3"/>
+          <path d="M11 12.1h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <rect x="7.3" y="15.4" width="2.2" height="2.2" rx="0.4" stroke="currentColor" stroke-width="1.3"/>
+          <path d="M11 16.5h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2 data-i18n="card-planner-h2">Abridor de Planners físicos</h2>
+      <p data-i18n="card-planner-p">Crie o PPT / Planner do aluno com as datas corretas</p>
+    </a>
+
+
+    <a class="card card-termo" href="termo-atraso.html">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 2.5h9l4 4v14.5a1 1 0 01-1 1H6a1 1 0 01-1-1v-17.5a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M15 2.5v4h4" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <circle cx="12" cy="14" r="3" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M12 12.5v1.5l1 1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2 data-i18n="card-termo-h2">Gerador de Termo de Atraso</h2>
+      <p data-i18n="card-termo-p">Gere termos de atraso para alunos com poucos cliques</p>
+    </a>
+
+
+    <!-- E-counseling: o Google Doc que já existe na pasta do aluno, aberto e
+         escrito daqui. Era um card "em breve" desde 24/07/2026. -->
+    <a class="card card-ecounsel" href="counseling.html">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 5.5a1.5 1.5 0 011.5-1.5h13A1.5 1.5 0 0120 5.5v9a1.5 1.5 0 01-1.5 1.5H9l-5 4v-14.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M12 12.6c-1.6-1.2-3-2.1-3-3.4a1.6 1.6 0 013-.8 1.6 1.6 0 013 .8c0 1.3-1.4 2.2-3 3.4z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2 data-i18n="card-ecounsel-h2">E-counseling</h2>
+      <p data-i18n="card-ecounsel-p">Registre ocorrências e desenvolvimento do aluno</p>
+    </a>
+
+
+    <a class="card card-2ndchance" href="2nd-chance.html">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 2.5h9l4 4v14.5a1 1 0 01-1 1H6a1 1 0 01-1-1v-17.5a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M15 2.5v4h4" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M9 15a3 3 0 104.24-2.74" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          <polyline points="11.5,10.5 9.5,12.5 11.5,12.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2 data-i18n="card-2ndchance-h2">Gerador de Notificação 2nd Chance</h2>
+      <p data-i18n="card-2ndchance-p">Envie quando o aluno precisa refazer a prova</p>
+    </a>
+
+
+    <a class="card card-boletim" href="boletins.html">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="8" r="6.25" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M12 3.5l1.2 2.6 2.8.35-2 2 .5 2.85L12 9.9l-2.5 1.4.5-2.85-2-2 2.8-.35L12 3.5z" fill="currentColor"/>
+          <path d="M8.5 13.5L7 21l5-2 5 2-1.5-7.5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2 data-i18n="card-boletim-h2">Gerador de Boletins</h2>
+      <p data-i18n="card-boletim-p">Monte boletins dos alunos rapidamente</p>
+    </a>
+
+
+    <!-- RAF temporário (29/09/2026): o código de 24 h para o aluno novo que ainda não tem RAF no card -->
+    <a class="card card-raftemp" href="raf-temporario.html">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 7.5A1.5 1.5 0 014.5 6h15A1.5 1.5 0 0121 7.5V10a2 2 0 000 4v2.5a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 16.5V14a2 2 0 000-4V7.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M15 6.5v11" stroke="currentColor" stroke-width="1.3" stroke-dasharray="1.6 1.6"/>
+          <circle cx="9" cy="12" r="2.2" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M9 10.9v1.1l.8.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2 data-i18n="card-raftemp-h2">RAF temporário</h2>
+      <p data-i18n="card-raftemp-p">Código de 24 horas para o aluno novo entrar no portal</p>
+    </a>
+      </div>
+    </section>
+    <section class="prat" id="prat-outras">
+      <h2 class="prat-t"><span aria-hidden="true">🧰</span> <span data-i18n="prat-outras">Outras ferramentas</span></h2>
+      <div class="prat-grid">
+
+    <!-- O corretor do simulado MET (19/09/2026): aberto para todos os professores (CORRETOR_ABERTO, no script);
+         nasce escondido e updateToolLinks decide, porque sem login não há o que corrigir -->
+    <a class="card card-met card-corretor" href="corretor-met.html" style="display:none">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="2.5" width="16" height="19" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="8.5" cy="7.5" r="1.4" fill="currentColor"/><circle cx="12" cy="7.5" r="1.4" stroke="currentColor" stroke-width="1.2"/><circle cx="15.5" cy="7.5" r="1.4" stroke="currentColor" stroke-width="1.2"/>
+          <circle cx="8.5" cy="12" r="1.4" stroke="currentColor" stroke-width="1.2"/><circle cx="12" cy="12" r="1.4" stroke="currentColor" stroke-width="1.2"/><circle cx="15.5" cy="12" r="1.4" fill="currentColor"/>
+          <path d="M8 17.5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2 data-i18n="card-corretor-h2">MET Practice Test Grader</h2>
+      <p data-i18n="card-corretor-p">Fotografe a folha de respostas e veja a nota</p>
+    </a>
+
 
     <!-- O Quick Practice SAIU daqui em 16/09/2026 (pedido do Pedro): as
          ferramentas que o professor projeta na TV moram dentro do Portal do
@@ -263,157 +386,6 @@
       <p data-i18n="card-answerkeys-p">Gabaritos das provas dos estágios, do Essentials ao In Focus e Espanhol</p>
     </a>
 
-    <!-- PILOTO (Pedro, 14/09/2026): a Turma de hoje aparece só para a direção e para o professor de teste
-         (TURMA_HOJE_PILOTO, no script); nasce escondida e updateToolLinks decide -->
-    <a class="card card-turmahoje" href="turma-de-hoje.html" style="display:none">
-      <div class="icon">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/>
-          <circle cx="16.5" cy="9.5" r="2.5" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M2.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          <path d="M14.5 18.5c.3-2.4 2-4 4.5-4 1.2 0 2.2.4 3 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          <path d="M17 3.5l1 1 2-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <h2 data-i18n="card-turmahoje-h2">Minha aula</h2>
-      <p data-i18n="card-turmahoje-p">Visão geral de todos os planners da turma</p>
-    </a>
-
-    <!-- O corretor do simulado MET (19/09/2026): aberto para todos os professores (CORRETOR_ABERTO, no script);
-         nasce escondido e updateToolLinks decide, porque sem login não há o que corrigir -->
-    <a class="card card-met card-corretor" href="corretor-met.html" style="display:none">
-      <div class="icon">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="4" y="2.5" width="16" height="19" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
-          <circle cx="8.5" cy="7.5" r="1.4" fill="currentColor"/><circle cx="12" cy="7.5" r="1.4" stroke="currentColor" stroke-width="1.2"/><circle cx="15.5" cy="7.5" r="1.4" stroke="currentColor" stroke-width="1.2"/>
-          <circle cx="8.5" cy="12" r="1.4" stroke="currentColor" stroke-width="1.2"/><circle cx="12" cy="12" r="1.4" stroke="currentColor" stroke-width="1.2"/><circle cx="15.5" cy="12" r="1.4" fill="currentColor"/>
-          <path d="M8 17.5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <h2 data-i18n="card-corretor-h2">MET Practice Test Grader</h2>
-      <p data-i18n="card-corretor-p">Fotografe a folha de respostas e veja a nota</p>
-    </a>
-
-    <!-- O PLANEJADOR ATÉ O LANÇAMENTO (16/09/2026): o roteiro agora é feito na Turma de hoje. O card fica só para quem
-         ainda não tem a Turma de hoje (updateToolLinks o esconde assim que ela abre para o professor) -->
-    <a class="card card-lessonplan" href="planejador.html">
-      <div class="icon">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="2.5" y="3.5" width="19" height="13" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M8 20.5h8M12 16.5v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          <path d="M6 8h7M6 11h9M6 13.5h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <h2 data-i18n="card-lessonplan-h2">Planejador da Próxima Aula</h2>
-      <p data-i18n="card-lessonplan-p">Ordem de prioridade de atendimento na próxima aula</p>
-    </a>
-
-    <a class="card card-termo" href="termo-atraso.html">
-      <div class="icon">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6 2.5h9l4 4v14.5a1 1 0 01-1 1H6a1 1 0 01-1-1v-17.5a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-          <path d="M15 2.5v4h4" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-          <circle cx="12" cy="14" r="3" stroke="currentColor" stroke-width="1.4"/>
-          <path d="M12 12.5v1.5l1 1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <h2 data-i18n="card-termo-h2">Gerador de Termo de Atraso</h2>
-      <p data-i18n="card-termo-p">Gere termos de atraso para alunos com poucos cliques</p>
-    </a>
-
-    <!-- E-counseling: o Google Doc que já existe na pasta do aluno, aberto e
-         escrito daqui. Era um card "em breve" desde 24/07/2026. -->
-    <a class="card card-ecounsel" href="counseling.html">
-      <div class="icon">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M4 5.5a1.5 1.5 0 011.5-1.5h13A1.5 1.5 0 0120 5.5v9a1.5 1.5 0 01-1.5 1.5H9l-5 4v-14.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-          <path d="M12 12.6c-1.6-1.2-3-2.1-3-3.4a1.6 1.6 0 013-.8 1.6 1.6 0 013 .8c0 1.3-1.4 2.2-3 3.4z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <h2 data-i18n="card-ecounsel-h2">E-counseling</h2>
-      <p data-i18n="card-ecounsel-p">Registre ocorrências e desenvolvimento do aluno</p>
-    </a>
-
-    <!-- Frequência à Tutoria (05/10/2026): o espelho do Diário de Bordo para o professor do aluno -->
-    <a class="card card-tutoria" href="tutoria.html">
-      <div class="icon">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="9" cy="8" r="3.2" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M3 19.5c0-3.2 2.7-5.5 6-5.5s6 2.3 6 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          <path d="M15.5 9.5l2 2 4-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <h2 data-i18n="card-tutoria-h2">Frequência à Tutoria</h2>
-      <p data-i18n="card-tutoria-p">Veja quais alunos seus foram ao plantão de dúvidas</p>
-    </a>
-
-    <!-- RAF temporário (29/09/2026): o código de 24 h para o aluno novo que ainda não tem RAF no card -->
-    <a class="card card-raftemp" href="raf-temporario.html">
-      <div class="icon">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M3 7.5A1.5 1.5 0 014.5 6h15A1.5 1.5 0 0121 7.5V10a2 2 0 000 4v2.5a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 16.5V14a2 2 0 000-4V7.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-          <path d="M15 6.5v11" stroke="currentColor" stroke-width="1.3" stroke-dasharray="1.6 1.6"/>
-          <circle cx="9" cy="12" r="2.2" stroke="currentColor" stroke-width="1.4"/>
-          <path d="M9 10.9v1.1l.8.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <h2 data-i18n="card-raftemp-h2">RAF temporário</h2>
-      <p data-i18n="card-raftemp-p">Código de 24 horas para o aluno novo entrar no portal</p>
-    </a>
-
-    <a class="card card-2ndchance" href="2nd-chance.html">
-      <div class="icon">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6 2.5h9l4 4v14.5a1 1 0 01-1 1H6a1 1 0 01-1-1v-17.5a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-          <path d="M15 2.5v4h4" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-          <path d="M9 15a3 3 0 104.24-2.74" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-          <polyline points="11.5,10.5 9.5,12.5 11.5,12.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <h2 data-i18n="card-2ndchance-h2">Gerador de Notificação 2nd Chance</h2>
-      <p data-i18n="card-2ndchance-p">Envie quando o aluno precisa refazer a prova</p>
-    </a>
-
-    <a class="card card-boletim" href="boletins.html">
-      <div class="icon">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="12" cy="8" r="6.25" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M12 3.5l1.2 2.6 2.8.35-2 2 .5 2.85L12 9.9l-2.5 1.4.5-2.85-2-2 2.8-.35L12 3.5z" fill="currentColor"/>
-          <path d="M8.5 13.5L7 21l5-2 5 2-1.5-7.5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <h2 data-i18n="card-boletim-h2">Gerador de Boletins</h2>
-      <p data-i18n="card-boletim-p">Monte boletins dos alunos rapidamente</p>
-    </a>
-
-    <a class="card card-overview" href="visao-geral.html">
-      <div class="icon">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M4 20h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          <rect x="5.5" y="11" width="3.4" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
-          <rect x="10.5" y="6.5" width="3.4" height="10.5" rx="1" stroke="currentColor" stroke-width="1.5"/>
-          <rect x="15.5" y="13" width="3.4" height="4" rx="1" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M6 8.5l4-3 4 1.5 4-3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/>
-        </svg>
-      </div>
-      <h2 data-i18n="card-overview-h2">Radar da Turma</h2>
-      <p data-i18n="card-overview-p">As cinco habilidades de cada aluno num relance, e onde focar com a turma</p>
-    </a>
-
-    <!-- ACOMPANHAMENTO DO ALUNO (19/09/2026): era a busca no topo da home; virou card quando a home ficou só com as
-         ferramentas. A página tem a busca própria (aluno.html). -->
-    <a class="card card-acomp" href="aluno.html">
-      <div class="icon">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="10" cy="8" r="3.5" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M3.5 20c0-3.6 2.9-6 6.5-6 1.4 0 2.7.4 3.7 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          <circle cx="17" cy="16.5" r="3" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M19.2 18.7l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <h2 data-i18n="card-acomp-h2">Radar do Aluno</h2>
-      <p data-i18n="card-acomp-p">Busque um aluno e veja o radar dele, onde focar e o que fez no portal</p>
-    </a>
 
     <!-- Os aplicativos que a franqueadora publica nas lojas: qual serve a qual
          estágio, e o link para baixar nas duas plataformas. Fica ANTES dos
@@ -433,6 +405,52 @@
       <h2 data-i18n="card-apps-h2">Aplicativos da Fisk</h2>
       <p data-i18n="card-apps-p">Qual app serve a qual estágio, e o link para baixar no Android e no iPhone</p>
     </a>
+
+
+    <a class="card card-overview" href="visao-geral.html">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 20h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <rect x="5.5" y="11" width="3.4" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="10.5" y="6.5" width="3.4" height="10.5" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="15.5" y="13" width="3.4" height="4" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M6 8.5l4-3 4 1.5 4-3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/>
+        </svg>
+      </div>
+      <h2 data-i18n="card-overview-h2">Radar da Turma</h2>
+      <p data-i18n="card-overview-p">As cinco habilidades de cada aluno num relance, e onde focar com a turma</p>
+    </a>
+
+
+    <!-- ACOMPANHAMENTO DO ALUNO (19/09/2026): era a busca no topo da home; virou card quando a home ficou só com as
+         ferramentas. A página tem a busca própria (aluno.html). -->
+    <a class="card card-acomp" href="aluno.html">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="10" cy="8" r="3.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M3.5 20c0-3.6 2.9-6 6.5-6 1.4 0 2.7.4 3.7 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="17" cy="16.5" r="3" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M19.2 18.7l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2 data-i18n="card-acomp-h2">Radar do Aluno</h2>
+      <p data-i18n="card-acomp-p">Busque um aluno e veja o radar dele, onde focar e o que fez no portal</p>
+    </a>
+
+
+    <!-- Frequência à Tutoria (05/10/2026): o espelho do Diário de Bordo para o professor do aluno -->
+    <a class="card card-tutoria" href="tutoria.html">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="9" cy="8" r="3.2" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M3 19.5c0-3.2 2.7-5.5 6-5.5s6 2.3 6 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M15.5 9.5l2 2 4-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2 data-i18n="card-tutoria-h2">Frequência à Tutoria</h2>
+      <p data-i18n="card-tutoria-p">Veja quais alunos seus foram ao plantão de dúvidas</p>
+    </a>
+
 
     <!-- ══ A CERIMÔNIA DE SELEÇÃO (campanha, 06/09 a 10/10/2026) ═══════════
          O mesmo quiz do Portal do Aluno, e a mesma casa guardada na mesma aba
@@ -456,7 +474,24 @@
       <p data-i18n="card-hw-p">Descubra a sua casa de Hogwarts, a mesma brincadeira que está na tela dos alunos</p>
     </a>
 
+
+    <!-- O PLANEJADOR ATÉ O LANÇAMENTO (16/09/2026): o roteiro agora é feito na Turma de hoje. O card fica só para quem
+         ainda não tem a Turma de hoje (updateToolLinks o esconde assim que ela abre para o professor) -->
+    <a class="card card-lessonplan" href="planejador.html">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2.5" y="3.5" width="19" height="13" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8 20.5h8M12 16.5v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M6 8h7M6 11h9M6 13.5h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2 data-i18n="card-lessonplan-h2">Planejador da Próxima Aula</h2>
+      <p data-i18n="card-lessonplan-p">Ordem de prioridade de atendimento na próxima aula</p>
+    </a>
+      </div>
+    </section>
   </main>
+  </div>
   <!-- O BUDDY DO PROFESSOR (06/10/2026): a coluna da direita. Em cima, a conversa do Buddy, com os informes da
        direção e da secretaria (Informes.js) e as novidades do Hub, cada um com a caixinha "Li e estou ciente".
        Embaixo, à parte, os alunos que foram à tutoria nas últimas 2 semanas (Tutoria.js). No celular a coluna
@@ -466,7 +501,8 @@
       <div class="bd-cab">
         <div class="bd-foto"><span class="rosto"><img alt="Buddy" src="https://portalfisk.com.br/assets/icons/buddy.png"></span></div>
         <div class="bd-nome"><b>Buddy</b><small id="bdSub">online</small></div>
-        <button type="button" class="av-fecha" id="avFecha" aria-label="Recolher o Buddy" title="Recolher">—</button>
+        <span class="bd-n" id="bdN" hidden></span>
+        <button type="button" class="av-fecha" id="avFecha" aria-label="Recolher ou abrir o Buddy" title="Recolher">—</button>
       </div>
       <div class="bd-chat" id="bdChat"></div>
     </div>
@@ -594,7 +630,8 @@
         'md-faltas':'Faltas médias','md-nota':'Média de notas','md-turmas':'turmas',
         'md-load':'analisando suas turmas…','md-falhou':'Não consegui ler {n} de {t} escolas suas: estes números estão incompletos. Recarregue para tentar de novo.','md-pick':'Escolha um professor no seletor do topo para ver o painel dele.',
         'md-busca-t':'🎓 Acompanhamento do Aluno','md-busca-ph':'🔎 Buscar aluno por nome ou RAF…','md-busca-nada':'Nenhum aluno com esse nome ou RAF.',
-        'card-planner-h2': 'Abridor de Planners',
+        'card-planner-h2': 'Abridor de Planners físicos',
+        'prat-aula': 'Em aula', 'prat-docs': 'Documentos', 'prat-outras': 'Outras ferramentas',
         'card-planner-p':  'Crie o PPT / Planner do aluno com as datas corretas',
         'card-conv-h2':    'Conversation Maker',
         'card-conv-p':     'Crie conversações completas em powerpoint, prontas para usar',
@@ -685,7 +722,8 @@
         'md-faltas':'Avg. absences','md-nota':'Avg. grade','md-turmas':'classes',
         'md-load':'analyzing your classes…','md-falhou':'Could not read {n} of your {t} schools: these numbers are incomplete. Reload to try again.','md-pick':'Pick a teacher in the selector above to see their panel.',
         'md-busca-t':'🎓 Student Follow-up','md-busca-ph':'🔎 Search student by name or RAF…','md-busca-nada':'No student with that name or RAF.',
-        'card-planner-h2': 'Planner Opener',
+        'card-planner-h2': 'Printed Planner Opener',
+        'prat-aula': 'In class', 'prat-docs': 'Documents', 'prat-outras': 'Other tools',
         'card-planner-p':  'Create student planners with the correct dates',
         'card-conv-h2':    'Conversation Maker',
         'card-conv-p':     'Generate full conversation PowerPoints, ready to use',
@@ -776,7 +814,8 @@
         'md-faltas':'Faltas medias','md-nota':'Nota media','md-turmas':'grupos',
         'md-load':'analizando tus grupos…','md-falhou':'No pude leer {n} de {t} escuelas tuyas: estos números están incompletos. Recarga para intentarlo de nuevo.','md-pick':'Elige un profesor en el selector de arriba para ver su panel.',
         'md-busca-t':'🎓 Seguimiento del Alumno','md-busca-ph':'🔎 Buscar alumno por nombre o RAF…','md-busca-nada':'Ningún alumno con ese nombre o RAF.',
-        'card-planner-h2': 'Abridor de Planners',
+        'card-planner-h2': 'Abridor de Planners físicos',
+        'prat-aula': 'En clase', 'prat-docs': 'Documentos', 'prat-outras': 'Otras herramientas',
         'card-planner-p':  'Crea planners del alumno con las fechas correctas',
         'card-conv-h2':    'Conversation Maker',
         'card-conv-p':     'Genera conversaciones completas en PowerPoint, listas para usar',
@@ -2305,6 +2344,7 @@
       /* o número do Buddy conta só o que pede ciência; a tutoria é informação, não pendência */
       var n = msgs.filter(function(m){ return !m.ciente; }).length;
       sinoN.hidden = !n; sinoN.textContent = n > 9 ? '9+' : String(n);
+      $$('bdN').hidden = !n; $$('bdN').textContent = sinoN.textContent;
       ttN.hidden = !tut.length; ttN.textContent = String(tut.length);
     }
     /* a conversa nasce uma vez: os já lidos recolhidos em cima, a saudação, e os novos chegando um a um */
@@ -2389,23 +2429,27 @@
       });
     }
 
-    /* A COLUNA RECOLHE (Pedro, 06/10/2026). No computador, o botão do cabeçalho guarda a coluna e o Buddy passa a
-       flutuar no canto, com o número de recados sem ler; clicar nele traz a coluna de volta. A escolha fica no
-       aparelho. No celular a coluna já nasce recolhida e o Buddy do canto abre o painel. */
+    /* A COLUNA RECOLHE NO LUGAR (Pedro, 06/10/2026). No computador a coluna do Buddy é FIXA: recolhida, sobra só o
+       cabeçalho dele, com o número de recados sem ler, no mesmo lugar; as ferramentas não se mexem. (A primeira
+       versão tirava a coluna e os cards corriam para a direita: bagunçava o olhar.) A escolha fica no aparelho.
+       No celular a coluna nasce fora da tela e o Buddy do canto abre o painel. */
     var LARGO = window.matchMedia ? window.matchMedia('(min-width: 1181px)') : { matches: true };
     try { if (localStorage.getItem('fisk_buddy_recolhido') === '1') document.body.classList.add('bd-recolhido'); } catch(e) {}
+    function botao(){ var r = document.body.classList.contains('bd-recolhido') && LARGO.matches; $$('avFecha').textContent = r ? '+' : (LARGO.matches ? '—' : '✕'); }
     function abre(sim){
       if (LARGO.matches) {
         document.body.classList.toggle('bd-recolhido', !sim);
         try { localStorage.setItem('fisk_buddy_recolhido', sim ? '0' : '1'); } catch(e) {}
-        return;
+        botao(); return;
       }
-      document.body.classList.toggle('av-aberto', !!sim); fundo.hidden = !sim;
+      document.body.classList.toggle('av-aberto', !!sim); fundo.hidden = !sim; botao();
     }
-    sino.addEventListener('click', function(){
-      abre(LARGO.matches ? document.body.classList.contains('bd-recolhido') : !document.body.classList.contains('av-aberto'));
+    sino.addEventListener('click', function(){ abre(!document.body.classList.contains('av-aberto')); });
+    /* o cabeçalho inteiro abre e recolhe no computador; no celular o botão fecha o painel */
+    cx.querySelector('.bd-cab').addEventListener('click', function(){
+      if (LARGO.matches) abre(document.body.classList.contains('bd-recolhido')); else abre(false);
     });
-    $$('avFecha').addEventListener('click', function(){ abre(false); });
+    botao();
     fundo.addEventListener('click', function(){ abre(false); });
     document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !LARGO.matches) abre(false); });
 
