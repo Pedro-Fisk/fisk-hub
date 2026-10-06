@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="assets/fisk-shared.css?v=2026-09-20a">
   <!-- a casa do professor veste a faixa do topo (campanha de 09/2026) -->
   <link rel="stylesheet" href="assets/casa-tema.css?v=9">
-<link rel="stylesheet" href="style.css?v=2026-10-06j">
+<link rel="stylesheet" href="style.css?v=2026-10-06k">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 </head>
@@ -475,21 +475,20 @@
        direção e da secretaria (Informes.js) e as novidades do Hub, cada um com a caixinha "Li e estou ciente".
        Os alunos que foram à tutoria (Tutoria.js) saíram daqui: viraram card na prateleira "Em aula". No celular a coluna
        vira painel, aberto pelo Buddy que flutua no canto. -->
-  <aside class="avisos" id="avisos" hidden aria-label="Buddy, recados e tutoria">
+  <aside class="avisos" id="avisos" hidden aria-label="Novidades da direção e da secretaria">
     <div class="bd-janela">
       <div class="bd-cab">
-        <div class="bd-foto"><span class="rosto"><img alt="Buddy" src="https://portalfisk.com.br/assets/icons/buddy.png"></span></div>
-        <div class="bd-nome"><b>Buddy</b><small id="bdSub">online</small></div>
+        <div class="bd-nome"><b id="bdNome">📣 Novidades</b><small id="bdSub">da direção e da secretaria</small></div>
         <span class="bd-n" id="bdN" hidden></span>
-        <button type="button" class="av-fecha" id="avFecha" aria-label="Minimizar ou abrir o Buddy" title="Minimizar">—</button>
-        <button type="button" class="av-fecha av-some" id="avSome" aria-label="Tirar o Buddy da tela" title="Tirar da tela">✕</button>
+        <button type="button" class="av-fecha" id="avFecha" aria-label="Minimizar as novidades" title="Minimizar">—</button>
+        <button type="button" class="av-fecha av-some" id="avSome" aria-label="Tirar as novidades da tela" title="Tirar da tela">✕</button>
       </div>
       <div class="bd-chat" id="bdChat"></div>
     </div>
   </aside>
   </div>
   <!-- o Buddy fica solto no canto, e não na barra do professor: ela é escondida para o professor comum -->
-  <button type="button" id="avSino" class="av-sino" hidden aria-label="Abrir os recados do Buddy"><span class="rosto"><img alt="" src="https://portalfisk.com.br/assets/icons/buddy.png"></span><span class="n" id="avSinoN" hidden></span></button>
+  <button type="button" id="avSino" class="av-sino" hidden aria-label="Abrir as novidades"><span class="ic" aria-hidden="true">📣</span><span class="n" id="avSinoN" hidden></span></button>
   <div class="av-fundo" id="avFundo" hidden></div>
 
   <!-- ═══════════════════════════════════════
@@ -1488,17 +1487,17 @@
         pt: { selo:'Novidade',
               t:'Agora dá para ver quem foi à tutoria 🙋',
               p1:'O Hub tem uma ferramenta nova, <b>Frequência à Tutoria</b>: os alunos seus que foram ao plantão de dúvidas nos últimos 14 dias, com o dia, o monitor e o que foi feito. É o espelho do Diário de Bordo, sem precisar abrir a planilha.',
-              p2:'Eles também aparecem aqui embaixo, em <b>Quem veio à tutoria</b>, com uma caixinha para você marcar quem já viu.',
+              p2:'Eles também aparecem na prateleira <b>Em aula</b>, no card <b>Quem veio à tutoria</b>, para você bater o olho.',
               btnLink:'Abrir a Frequência à Tutoria 🙋', btn:'Entendi 👍' },
         en: { selo:'What’s new',
               t:'Now you can see who came to tutoring 🙋',
               p1:'The Hub has a new tool, <b>Tutoring Attendance</b>: your students who came to the Learning Center in the last 14 days, with the day, the monitor and what was done. It mirrors the logbook, with no spreadsheet to open.',
-              p2:'They also show up right below, under <b>Who came to tutoring</b>, with a box to tick the ones you have seen.',
+              p2:'They also show up on the <b>In class</b> shelf, in the <b>Who came to tutoring</b> card, for a quick look.',
               btnLink:'Open Tutoring Attendance 🙋', btn:'Got it 👍' },
         es: { selo:'Novedad',
               t:'Ya puedes ver quién fue a la tutoría 🙋',
               p1:'El Hub tiene una herramienta nueva, <b>Asistencia a la Tutoría</b>: tus alumnos que fueron a la tutoría en los últimos 14 días, con el día, el monitor y lo que se hizo. Es el espejo del Diario de a Bordo, sin abrir la planilla.',
-              p2:'También aparecen aquí abajo, en <b>Quién fue a la tutoría</b>, con una casilla para marcar a quién ya viste.',
+              p2:'También aparecen en el estante <b>En clase</b>, en la tarjeta <b>Quién fue a la tutoría</b>, para verlo de un vistazo.',
               btnLink:'Abrir Asistencia a la Tutoría 🙋', btn:'Entendido 👍' }
       },
       {
@@ -2195,39 +2194,39 @@
     var CALMO = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
     var TX = {
-      pt: { sub:'seu auxiliar · online',
+      pt: { sub:'da direção e da secretaria',
             oi1:'Oi, {n}! Eu sou o Buddy 🐻',
             oi2:'Sou o seu auxiliar aqui no Hub. É por mim que chegam os recados da direção e da secretaria, e eu também conto quando tiver novidade nas ferramentas.',
             oi3:'Cada recado tem uma caixinha: marque quando tiver lido. E os alunos seus que forem à tutoria aparecem logo aqui embaixo.',
             ola:'Oi, {n}.', novo1:'Tem 1 recado novo para você.', novoN:'Tem {q} recados novos para você.',
-            nada:'Nenhum recado novo por aqui. Quando chegar, eu aviso.',
+            nada:'Nenhuma novidade sem ler.',
             antigos:'Ver os {q} já lidos', antigo1:'Ver o recado já lido', esconder:'Esconder os já lidos',
-            ciente:'Li e estou ciente', tDir:'Direção', tSec:'Secretaria', tNov:'Novidade',
+            ciente:'Li e estou ciente', tDir:'Direção', tSec:'Secretaria', tNov:'Novidade', nome:'Novidades',
             ttTit:'🙋 Quem veio à tutoria', ttSub:'nas últimas 2 semanas', ttVazio:'Nenhum aluno seu por enquanto.',
             ttLink:'Ver a frequência completa →', vi:'Vi', veio:' foi à tutoria',
-            falar:'Falar com o Buddy', saiu:'O Buddy saiu da tela. Para chamar de volta, clique no seu nome, lá em cima, e em "Falar com o Buddy".' },
-      en: { sub:'your assistant · online',
+            falar:'Ver as novidades', saiu:'As novidades saíram da tela. Para ver de novo, clique no seu nome, lá em cima, e em "Ver as novidades".' },
+      en: { sub:'from the direction and the office',
             oi1:'Hi, {n}! I’m Buddy 🐻',
             oi2:'I’m your assistant here in the Hub. Notices from the direction and the office reach you through me, and I’ll also tell you when a tool has something new.',
             oi3:'Each notice has a box: tick it once you’ve read it. And your students who come to tutoring show up right below.',
             ola:'Hi, {n}.', novo1:'You have 1 new notice.', novoN:'You have {q} new notices.',
-            nada:'No new notices here. I’ll let you know when one arrives.',
+            nada:'Nothing new to read.',
             antigos:'See the {q} already read', antigo1:'See the notice already read', esconder:'Hide the ones already read',
-            ciente:'Read and acknowledged', tDir:'Direction', tSec:'Office', tNov:'What’s new',
+            ciente:'Read and acknowledged', tDir:'Direction', tSec:'Office', tNov:'What’s new', nome:'What’s new',
             ttTit:'🙋 Who came to tutoring', ttSub:'in the last 2 weeks', ttVazio:'None of your students so far.',
             ttLink:'See the full attendance →', vi:'Seen', veio:' foi à tutoria',
-            falar:'Talk to Buddy', saiu:'Buddy left the screen. To bring him back, click your name at the top and choose "Talk to Buddy".' },
-      es: { sub:'tu auxiliar · en línea',
+            falar:'See what’s new', saiu:'The news panel left the screen. To see it again, click your name at the top and choose "See what’s new".' },
+      es: { sub:'de la dirección y la secretaría',
             oi1:'¡Hola, {n}! Soy Buddy 🐻',
             oi2:'Soy tu auxiliar aquí en el Hub. Por mí llegan los avisos de la dirección y de la secretaría, y también te cuento cuando haya novedad en las herramientas.',
             oi3:'Cada aviso tiene una casilla: márcala cuando lo hayas leído. Y tus alumnos que vayan a la tutoría aparecen aquí abajo.',
             ola:'Hola, {n}.', novo1:'Tienes 1 aviso nuevo.', novoN:'Tienes {q} avisos nuevos.',
-            nada:'Ningún aviso nuevo por aquí. Cuando llegue, te aviso.',
+            nada:'Ninguna novedad sin leer.',
             antigos:'Ver los {q} ya leídos', antigo1:'Ver el aviso ya leído', esconder:'Ocultar los ya leídos',
-            ciente:'Leído y enterado', tDir:'Dirección', tSec:'Secretaría', tNov:'Novedad',
+            ciente:'Leído y enterado', tDir:'Dirección', tSec:'Secretaría', tNov:'Novedad', nome:'Novedades',
             ttTit:'🙋 Quién fue a la tutoría', ttSub:'en las últimas 2 semanas', ttVazio:'Ningún alumno tuyo por ahora.',
             ttLink:'Ver la asistencia completa →', vi:'Visto', veio:' foi à tutoria',
-            falar:'Hablar con Buddy', saiu:'Buddy salió de la pantalla. Para llamarlo de vuelta, haz clic en tu nombre, arriba, y en "Hablar con Buddy".' }
+            falar:'Ver las novedades', saiu:'Las novedades salieron de la pantalla. Para verlas de nuevo, haz clic en tu nombre, arriba, y en "Ver las novedades".' }
     };
     function lang(){ return (typeof _lang !== 'undefined' && TX[_lang]) ? _lang : 'pt'; }
     function tx(k, v){ var t = TX[lang()][k] || TX.pt[k] || ''; if (v) Object.keys(v).forEach(function(x){ t = t.replace('{' + x + '}', v[x]); }); return t; }
@@ -2333,11 +2332,14 @@
       naoLidos = n; noNome();
       ttN.hidden = !tut.length; ttN.textContent = String(tut.length);
     }
-    /* a conversa nasce uma vez: os já lidos recolhidos em cima, a saudação, e os novos chegando um a um */
+    /* O MURAL (Pedro, 06/10/2026). A coluna deixou de ser o Buddy: é o radar de novidades da escola, uma circular.
+       Sem saudação e sem pontinhos; o que ainda não foi lido fica em cima, do mais novo para o mais antigo, e o
+       que já foi lido se recolhe embaixo. O urso ficou só para o auxiliar de IA (buddy.html). */
     function conversa(){
-      var minha = ++vez, s = sess() || {};
-      chat.innerHTML = '';
-      var lidos = msgs.filter(function(m){ return m.ciente; }), novos = msgs.filter(function(m){ return !m.ciente; });
+      ++vez; chat.innerHTML = '';
+      var lidos = msgs.filter(function(m){ return m.ciente; }).reverse(), novos = msgs.filter(function(m){ return !m.ciente; }).reverse();
+      if (!novos.length) { var v = document.createElement('p'); v.className = 'av-vazio'; v.textContent = tx('nada'); chat.appendChild(v); }
+      novos.forEach(function(m){ chat.appendChild(bolha(m)); });
       if (lidos.length) {
         var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'bd-antigos';
         var cxA = document.createElement('div'); cxA.className = 'bd-hist'; cxA.hidden = true;
@@ -2346,31 +2348,7 @@
         bt.addEventListener('click', function(){ cxA.hidden = !cxA.hidden; rot(); });
         rot(); chat.appendChild(bt); chat.appendChild(cxA);
       }
-      var kIntro = 'fisk_buddy_oi_' + (s.name || ''), jaViu = false;
-      try { jaViu = localStorage.getItem(kIntro) === '1'; } catch(e) { jaViu = true; }
-      var fila = [];
-      if (!jaViu && !como()) { fila.push({ t: tx('oi1', { n: esc(prim()) }) }, { t: tx('oi2') }, { t: tx('oi3') }); }
-      else fila.push({ t: tx('ola', { n: esc(prim()) }) + ' ' + (novos.length ? (novos.length === 1 ? tx('novo1') : tx('novoN', { q: novos.length })) : tx('nada')) });
-      if (!jaViu && !como() && novos.length) fila.push({ t: novos.length === 1 ? tx('novo1') : tx('novoN', { q: novos.length }) });
-      novos.forEach(function(m){ fila.push({ m: m }); });
-      try { if (!como()) localStorage.setItem(kIntro, '1'); } catch(e) {}
-      var comPontos = 0;
-      (function prox(i){
-        if (minha !== vez || i >= fila.length) return;
-        var it = fila[i], el = it.m ? bolha(it.m) : fala(it.t);
-        var espera = (comPontos < 5) ? digitando(it.m ? it.m.titulo : it.t) : 0;
-        if (!espera) { chat.appendChild(el); return prox(i + 1); }
-        comPontos++;
-        var dig = document.createElement('div'); dig.className = 'bd-dig'; dig.innerHTML = '<i></i><i></i><i></i>';
-        chat.appendChild(dig); chat.scrollTop = chat.scrollHeight;
-        setTimeout(function(){
-          if (minha !== vez) return;
-          dig.remove(); chat.appendChild(el);
-          /* o recado novo aparece pelo começo dele, e não pelo fim */
-          chat.scrollTop = Math.max(0, el.offsetTop - 10);
-          prox(i + 1);
-        }, espera);
-      })(0);
+      chat.scrollTop = 0;
     }
     function tutoria(){
       $$('ttTit').innerHTML = esc(tx('ttTit')) + '<small>' + esc(tx('ttSub')) + '</small>';
@@ -2390,7 +2368,7 @@
 
     function carrega(){
       var s = sess(); if (!s || !s.token) return;
-      $$('bdSub').textContent = tx('sub');
+      $$('bdSub').textContent = tx('sub'); $$('bdNome').textContent = '📣 ' + tx('nome');
       var pedido = ++leitura;   /* duas leituras no ar: só a mais nova desenha */
       var inf = post({ action: 'informesLer', como: como() }).catch(function(){ return null; });
       var avs = post({ action: 'avisosLer', como: como() }).catch(function(){ return null; });
@@ -2459,7 +2437,7 @@
         if (ref) menu.insertBefore(it, ref); else menu.appendChild(it);
         it.addEventListener('click', function(){ chama(); document.body.click(); });
       }
-      it.innerHTML = '<img alt="" src="https://portalfisk.com.br/assets/icons/buddy.png" style="width:20px;height:20px;border-radius:50%;vertical-align:-4px;margin-right:.35rem;object-fit:cover">' + esc(tx('falar')) + '<span class="fu-n fu-n2" hidden></span>';
+      it.innerHTML = '📣 ' + esc(tx('falar')) + '<span class="fu-n fu-n2" hidden></span>';
       noNome();
       return true;
     }
@@ -2479,7 +2457,7 @@
           clearInterval(t2);
           if (menu.querySelector('.fu-buddy-ia')) return;
           var a = document.createElement('a'); a.className = 'fu-item fu-buddy-ia'; a.href = 'buddy.html';
-          a.textContent = '🧪 Perguntar ao Buddy (piloto)';
+          a.innerHTML = '<img alt="" src="https://portalfisk.com.br/assets/icons/buddy.png" style="width:20px;height:20px;border-radius:50%;vertical-align:-4px;margin-right:.35rem;object-fit:cover">Perguntar ao Buddy (piloto)';
           var ref = menu.querySelector('.fu-csl'); if (ref) menu.insertBefore(a, ref); else menu.appendChild(a);
         }, 300);
       }).catch(function(){});

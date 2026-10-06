@@ -927,3 +927,19 @@ body.bd-fora .avisos, body.bd-fora .av-sino{ display:none !important; }
   .av-fundo:not([hidden]){ display:block; position:fixed; inset:0; z-index:59; background:rgba(15,23,42,.45); }
 }
 @media (prefers-reduced-motion: reduce){ .avisos{ transition:none; } .bd-msg{ animation:none; } .bd-dig i{ animation:none; } }
+
+/* ── A CENTRAL VIROU MURAL (Pedro, 06/10/2026): as novidades deixam de ter a cara do Buddy ──
+   O urso, o azul vivo, a textura escolar e os pontinhos ficaram só no auxiliar de IA (buddy.html). Aqui é uma
+   circular: o azul sóbrio do Hub no cabeçalho, fundo liso, um cartão por recado. As regras de cima continuam
+   valendo para a estrutura; estas só trocam a pele. */
+.bd-janela{ background:var(--white); box-shadow:var(--surface-shadow, 0 4px 14px rgba(15,31,78,.08)); border:2px solid var(--surface-border-color,#a8bfd2); }
+.bd-cab{ background:var(--ui-dark,#223e5a); padding:.7rem .95rem; }
+.bd-nome b{ font-size:1.05rem; }
+.bd-chat{ background:var(--ui-soft,#e9eff5); background-image:none; gap:.7rem; padding:.85rem .8rem 1rem; }
+body.theme-dark .bd-chat{ background:#17202e; background-image:none; }
+.bd-msg{ animation:none; border-radius:12px; box-shadow:0 1px 3px rgba(15,31,78,.08); }
+.bd-chat .av-vazio{ padding:.4rem .2rem; }
+.bd-antigos{ align-self:stretch; border-radius:10px; background:transparent; border-style:dashed; }
+.bd-ir{ background:var(--ui,#2b4d70); }
+.av-sino{ background:var(--ui-dark,#223e5a); box-shadow:0 8px 22px rgba(15,31,78,.3); width:56px; height:56px; }
+.av-sino .ic{ font-size:1.5rem; line-height:56px; display:block; text-align:center; }
