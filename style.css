@@ -772,10 +772,12 @@ body.theme-dark .md-achado .md-meu{background:#1d3a31;color:#7fd3b6}
 /* DISPOSIÇÃO FIXA (Pedro, 06/10/2026): as ferramentas à esquerda e a coluna do Buddy à direita, sempre nos mesmos
    lugares. O respiro sob a faixa do topo é do contêiner, e não de cada bloco, para o primeiro bloco (a faixa
    "Mais usadas", ou a primeira prateleira quando ela não existe) nascer sempre à mesma distância. */
-.home-cols{ flex:1; width:100%; max-width:1560px; margin:0 auto; padding:2rem 1.5rem 0; display:flex; align-items:flex-start; gap:1.75rem; }
+.home-cols{ flex:1; width:100%; max-width:1560px; margin:0 auto; padding:2rem 1.5rem 0; display:flex; align-items:flex-start; gap:1.5rem; }
 .home-esq{ flex:1 1 auto; min-width:0; }
 .home-esq .mais-usadas{ max-width:none; margin:0 0 1.4rem; padding:0; }
-.avisos{ flex:0 0 440px; width:440px; margin:0 0 2rem; position:sticky; top:1rem;
+/* AS FERRAMENTAS SÃO O PRINCIPAL (Pedro, 06/10/2026): a coluna do Buddy é estreita o bastante para sobrarem
+   quatro cards QUADRADOS por linha num monitor comum. Com 440px ela espremia os cards em retângulos em pé. */
+.avisos{ flex:0 0 350px; width:350px; margin:0 0 2rem; position:sticky; top:1rem;
   max-height:calc(100vh - 2rem); display:flex; flex-direction:column; gap:.9rem; }
 /* as prateleiras: a grade é de cada uma, e o card não estica quando a prateleira tem poucos */
 main.grid.prats{ display:block; max-width:none; margin:0; padding:0 0 3rem; }
@@ -783,13 +785,25 @@ main.grid.prats{ display:block; max-width:none; margin:0; padding:0 0 3rem; }
 .prat-t{ display:flex; align-items:center; gap:.5rem; margin:0 0 .9rem; padding-bottom:.45rem; border-bottom:2px solid var(--surface-border-color,#a8bfd2);
   font-family:var(--font-heading); font-size:1.15rem; font-weight:800; color:var(--ui-dark,#223e5a); }
 body.theme-dark .prat-t{ color:#e4e7ec; border-bottom-color:#344054; }
-.prat-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:1.25rem; }
+.prat-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(215px, 1fr)); gap:1.25rem; }
+/* o card é QUADRADO: o título e o texto encolhem um pouco para caber, e o card só cresce se o texto não couber */
+.prat-grid .card{ aspect-ratio:1 / 1; min-height:auto; padding:1.1rem 1.15rem; gap:.5rem; justify-content:flex-start; }
+.prat-grid .card .icon{ width:52px; height:52px; border-radius:12px; }
+.prat-grid .card .icon svg{ width:28px; height:28px; }
+.prat-grid .card h2{ font-size:1.16rem; line-height:1.18; }
+.prat-grid .card p{ font-size:.83rem; line-height:1.38; text-align:left; hyphens:none; }
 /* os links úteis começam na mesma linha vertical dos cards */
 .links-section{ max-width:1560px; padding-left:1.5rem; padding-right:1.5rem; }
 @media (max-width: 640px){
   .home-cols{ padding:1.3rem .9rem 0; }
   .prat-grid{ grid-template-columns:repeat(2, minmax(0, 1fr)); gap:.7rem; }
   .prat{ margin-bottom:1.6rem; } .prat-t{ font-size:1.02rem; }
+  /* no celular vale o quadrado pequeno de sempre (as regras de cima são do computador) */
+  .prat-grid .card{ padding:.95rem .85rem; gap:.5rem; justify-content:center; min-height:0; }
+  .prat-grid .card .icon{ width:42px; height:42px; border-radius:11px; }
+  .prat-grid .card .icon svg{ width:24px; height:24px; }
+  .prat-grid .card h2{ font-size:.95rem; line-height:1.22; }
+  .prat-grid .card p{ font-size:.72rem; line-height:1.32; }
   .links-section{ padding-left:.9rem; padding-right:.9rem; }
 }
 .avisos[hidden]{ display:none; }
@@ -878,6 +892,13 @@ body.theme-dark .tt-ok{ background:rgba(34,197,94,.2); color:#86efac; }
 .av-sino .n{ position:absolute; top:-4px; right:-4px; min-width:22px; height:22px; padding:0 5px; border-radius:99px; background:#16a34a; color:#fff;
   font-size:.74rem; font-weight:800; line-height:22px; text-align:center; font-family:var(--font-body); box-shadow:0 0 0 2px #fff; }
 .av-sino .n[hidden]{ display:none; }
+/* dois botões no cabeçalho: — minimiza, ✕ tira o Buddy da tela */
+.av-fecha.av-some{ margin-left:.1rem; font-size:1rem; }
+.av-fecha:hover{ background:rgba(255,255,255,.2); }
+/* o Buddy fora da tela: nem coluna, nem bolinha, e as ferramentas ocupam a largura toda */
+body.bd-fora .avisos, body.bd-fora .av-sino{ display:none !important; }
+.bd-toast{ position:fixed; left:50%; bottom:22px; transform:translateX(-50%); z-index:80; max-width:min(520px, 92vw); background:#1d3349; color:#fff;
+  font-size:.9rem; line-height:1.45; padding:.75rem 1rem; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.3); }
 .av-fundo{ display:none; }
 /* a coluna recolhida no computador: some, e o Buddy flutua no canto para chamá-la de volta */
 @media (min-width: 1181px){
