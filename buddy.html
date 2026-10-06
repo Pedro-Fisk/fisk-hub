@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="assets/casa-tema.css?v=9">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
-<script src="assets/fisk-shared.js?v=2026-09-20a"></script>
+<script src="assets/fisk-shared.js?v=2026-10-06a"></script>
 <script src="assets/buddy-conversas.js?v=2026-10-06f"></script>
 <style>
   [hidden]{ display:none !important; }
@@ -127,6 +127,23 @@
   .aviso h2{ margin:0 0 .4rem; font-family:var(--font-heading); font-size:1.05rem; color:var(--ui-dark,#223e5a); }
   .rodape{ font-size:.8rem; color:var(--gray); padding:.7rem .2rem 0; }
   .fundo{ display:none; }
+  .so-mini{ display:none !important; }
+  body.mini .so-mini{ display:inline-block !important; } body.mini .so-cheio, body.mini .hero, body.mini .hist, body.mini .arvore, body.mini .rodape,
+  body.mini .cab .selo, body.mini .cab .ideias-bt, body.mini .cab .hist-bt, body.mini #lembBt{ display:none !important; }
+  body.mini{ background:transparent; } body.mini main{ padding:0; max-width:none; } body.mini .palco{ display:block; }
+  body.mini .janela{ height:100vh; max-height:none; min-height:0; border-radius:0; position:static; box-shadow:none; }
+  body.mini .comeco{ grid-template-columns:1fr; } body.mini .msg, body.mini .prop{ max-width:96%; }
+  .sug{ align-self:stretch; background:#fff; border:2px solid #f59e0b; border-radius:14px; padding:.7rem .9rem; animation:entra .3s ease both; }
+  .sug-t{ font-family:var(--font-heading); font-weight:800; color:#92400e; font-size:.95rem; margin-bottom:.35rem; }
+  .sug-i{ display:flex; gap:.6rem; align-items:center; padding:.45rem 0; border-top:1px solid #f3e3c2; } .sug-i:first-of-type{ border-top:0; }
+  .sug-i .ic{ font-size:1.2rem; flex:none; } .sug-i > div{ flex:1; min-width:0; } .sug-i b{ font-size:.92rem; color:#1d2b3a; } .sug-i p{ margin:.1rem 0 0; font-size:.84rem; color:#44607c; } .sug-i small{ color:#6b7a8c; }
+  .sug-i button{ flex:none; background:#f59e0b; color:#fff; border:0; border-radius:10px; font-family:var(--font-body); font-weight:800; font-size:.84rem; padding:.5rem .8rem; cursor:pointer; }
+  .sug-i button:disabled{ opacity:.6; cursor:default; }
+  .lemb-i{ display:flex; gap:.5rem; align-items:flex-start; padding:.35rem 0; border-top:1px solid #e3eaf2; font-size:.92rem; } .lemb-i span{ flex:1; }
+  .lemb-i button{ background:transparent; border:0; cursor:pointer; color:#b91c1c; font-size:.95rem; }
+  body.theme-dark .sug{ background:#273449; border-color:#b45309; } body.theme-dark .sug-t{ color:#fcd34d; } body.theme-dark .sug-i{ border-top-color:#3a4a63; }
+  body.theme-dark .sug-i b{ color:#f1f5fb; } body.theme-dark .sug-i p{ color:#c2d0e0; } body.theme-dark .lemb-i{ border-top-color:#3a4a63; }
+  @media (max-width: 520px){ .sug-i{ flex-wrap:wrap; } .sug-i button{ width:100%; } }
   /* a espera da entrada: o servidor leva alguns segundos para dizer quem é o professor */
   .cortina{ position:fixed; inset:0; z-index:90; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.1rem; padding:1.5rem;
             background:linear-gradient(140deg,#1e3a8a,#2563eb 55%,#3b82f6); color:#fff; text-align:center; transition:opacity .35s ease; }
@@ -218,7 +235,9 @@
           <button type="button" class="hist-bt" id="histBt">💬 Conversas</button>
           <button type="button" class="ideias-bt" id="ideiasBt">💡 Ideias</button>
           <button type="button" id="nova">＋ Nova conversa</button>
-          <a class="bt" href="index.html">← Hub</a>
+          <a class="bt so-cheio" href="index.html">← Hub</a>
+          <a class="bt so-mini" href="buddy.html" target="_top" title="Abrir a página do Buddy, com o histórico das conversas">⤢ Página do Buddy</a>
+          <button type="button" class="so-mini" id="fechaMini" title="Fechar">✕</button>
         </div>
       </div>
       <div class="chat" id="chat" aria-live="polite"></div>
@@ -227,7 +246,7 @@
         <button type="button" id="mic" class="mic" hidden title="Falar a pergunta" aria-label="Falar a pergunta">🎙️</button>
         <button type="submit" id="enviar">Enviar</button>
       </form>
-      <div class="pe"><span id="restam"></span><span id="turnoTxt"></span><span>Enter envia · Shift+Enter quebra a linha</span><span class="cont" id="cont"></span></div>
+      <div class="pe"><span id="restam"></span><span id="turnoTxt"></span><a href="#" id="lembBt" style="color:inherit">📌 lembretes</a><span>Enter envia · Shift+Enter quebra a linha</span><span class="cont" id="cont"></span></div>
     </div>
 
     <nav class="arvore" id="arvore" aria-label="Perguntas prontas">
@@ -256,6 +275,8 @@
  *  · os passos visíveis ("olhando o resumo das turmas…"): espera sem sinal
  *    parece travamento.
  * ═══════════════════════════════════════════════════════════════════════════ */
+var MINI = /[?&]mini=1/.test(location.search);
+if (MINI) document.body.classList.add('mini');
 var EP = FISK_HUB_EP, conversa = '', ocupado = false, info = null, comoQuem = '', depoisDaVez = null;
 function $(id) { return document.getElementById(id); }
 function sess() { return fiskSessao() || {}; }
@@ -459,9 +480,9 @@ function cartaoAcao(pr, idConversa) {
   }
   if (DOCS[pr.acao]) return cartaoDoc(pr, idConversa);
   var d = document.createElement('div'); d.className = 'prop';
-  d.innerHTML = '<b>' + (pr.acao === 'card' ? '📝 Anotação na célula da aula' : '🗂️ Registro no counseling') + ' · ' + esc(pr.aluno) + '</b>' +
-    '<div class="onde">' + esc(pr.turma) + ' · ' + esc(pr.onde) + '</div><blockquote>' + esc(pr.texto) + '</blockquote>' +
-    '<div class="bts"><button type="button" class="sim">✓ Confirmar e gravar</button><button type="button" class="nao">Cancelar</button><span class="res"></span></div>';
+  d.innerHTML = '<b>' + (pr.acao === 'card' ? '📝 Anotação na célula da aula' : pr.acao === 'recado' ? '📨 Recado para a secretaria' : '🗂️ Registro no counseling') + ' · ' + esc(pr.aluno) + '</b>' +
+    '<div class="onde">' + esc(pr.turma ? pr.turma + ' · ' : '') + esc(pr.onde) + '</div><blockquote>' + esc(pr.texto) + '</blockquote>' +
+    '<div class="bts"><button type="button" class="sim">' + (pr.acao === 'recado' ? '✓ Confirmar e enviar' : '✓ Confirmar e gravar') + '</button><button type="button" class="nao">Cancelar</button><span class="res"></span></div>';
   var sim = d.querySelector('.sim'), nao = d.querySelector('.nao'), res = d.querySelector('.res');
   function manda(cancela) {
     sim.disabled = nao.disabled = true; res.className = 'res'; res.textContent = cancela ? '' : 'gravando…';
@@ -476,6 +497,26 @@ function cartaoAcao(pr, idConversa) {
   sim.addEventListener('click', function () { manda(false); });
   nao.addEventListener('click', function () { manda(true); });
   poe(d);
+}
+
+function mostraPropostas(props, idConv) {
+  var geradores = [];
+  (props || []).forEach(function (pr) { var g = cartaoAcao(pr, idConv); if (DOCS[pr.acao] && g) geradores.push(g); });
+  if (geradores.length > 1) {
+    /* vários termos de uma vez: um clique gera todos, um depois do outro (o Drive não gosta de dez envios juntos) */
+    var lote = document.createElement('div'); lote.className = 'prop';
+    lote.innerHTML = '<b>📚 ' + geradores.length + ' documentos propostos</b><div class="onde">Confira os cartões acima. Você pode gerar um por um, ou todos de uma vez.</div>' +
+      '<div class="bts"><button type="button" class="sim">✓ Gerar os ' + geradores.length + ' documentos</button><span class="res"></span></div>';
+    lote.querySelector('.sim').addEventListener('click', function () {
+      var bt = this, rs = lote.querySelector('.res'), i = 0; bt.disabled = true;
+      (function prox() {
+        if (i >= geradores.length) { bt.remove(); rs.className = 'res ok'; rs.textContent = 'Terminei. Veja o resultado em cada cartão.'; return; }
+        rs.textContent = 'gerando ' + (i + 1) + ' de ' + geradores.length + '…';
+        geradores[i++]().then(prox, prox);
+      })();
+    });
+    poe(lote);
+  }
 }
 
 function recebe(j) {
@@ -494,23 +535,7 @@ function recebe(j) {
       '<a href="' + esc(p.link) + '" target="_blank" rel="noopener">Abrir o Gerador de Termo, já na escola e no professor →</a>';
     poe(d);
   }
-  var geradores = [];
-  (j.propostas || []).forEach(function (pr) { var g = cartaoAcao(pr, conversa); if (DOCS[pr.acao] && g) geradores.push(g); });
-  if (geradores.length > 1) {
-    /* vários termos de uma vez: um clique gera todos, um depois do outro (o Drive não gosta de dez envios juntos) */
-    var lote = document.createElement('div'); lote.className = 'prop';
-    lote.innerHTML = '<b>📚 ' + geradores.length + ' documentos propostos</b><div class="onde">Confira os cartões acima. Você pode gerar um por um, ou todos de uma vez.</div>' +
-      '<div class="bts"><button type="button" class="sim">✓ Gerar os ' + geradores.length + ' documentos</button><span class="res"></span></div>';
-    lote.querySelector('.sim').addEventListener('click', function () {
-      var bt = this, rs = lote.querySelector('.res'), i = 0; bt.disabled = true;
-      (function prox() {
-        if (i >= geradores.length) { bt.remove(); rs.className = 'res ok'; rs.textContent = 'Terminei. Veja o resultado em cada cartão.'; return; }
-        rs.textContent = 'gerando ' + (i + 1) + ' de ' + geradores.length + '…';
-        geradores[i++]().then(prox, prox);
-      })();
-    });
-    poe(lote);
-  }
+  mostraPropostas(j.propostas, conversa);
   if (j.medicao) {
     var m = document.createElement('div'); m.className = 'med';
     m.textContent = 'medição · ' + j.medicao.modelo + ' · ' + j.passos + ' chamadas · ' + j.medicao.tokens.toLocaleString('pt-BR') + ' tokens na conversa · US$ ' +
@@ -581,6 +606,7 @@ $('ideiasBt').addEventListener('click', function () { document.body.classList.re
 $('histBt').addEventListener('click', function () { document.body.classList.remove('arv-aberta'); document.body.classList.toggle('hist-aberta'); });
 $('fundo').addEventListener('click', function () { document.body.classList.remove('arv-aberta', 'hist-aberta'); });
 $('nova').addEventListener('click', function () { if (!ocupado) abertura(); });
+$('lembBt').addEventListener('click', function (e) { e.preventDefault(); mostraLembretes(); });
 $('novaLado').addEventListener('click', function () { if (!ocupado) { document.body.classList.remove('hist-aberta'); abertura(); } });
 
 /* ── o histórico: reabrir uma conversa é ler texto guardado, não custa token ── */
@@ -594,6 +620,7 @@ function quandoFoi(ms) {
 }
 function marcaAtual() { [].forEach.call($('histLista').querySelectorAll('button'), function (b) { b.className = b.getAttribute('data-id') === conversa && conversa ? 'atual' : ''; }); }
 function carregaHist() {
+  if (MINI) return;   /* a janelinha do Hub é sempre conversa nova; o histórico mora na página do Buddy */
   post({ action: 'buddyHistorico' }).then(function (j) {
     var cs = (j && j.conversas) || [];
     $('histLista').innerHTML = cs.length ? cs.map(function (c) {
@@ -645,8 +672,54 @@ function abertura() {
       return '<button type="button" style="animation-delay:' + (350 + i * 110) + 'ms" data-rot="' + esc(r) + '"><span>' + ic + '</span><span>' + esc(r) + '</span></button>'; }).join('');
     d.addEventListener('click', function (e) { var b = e.target.closest ? e.target.closest('button') : null; if (b) escolhe(b.getAttribute('data-rot')); });
     poe(d);
+    mostraSugestoes(vez);
   }, 1100);
   $('txt').focus();
+}
+
+/* ── as sugestões: o que está pendente, sem o professor perguntar. É regra do servidor, não modelo: ver e clicar
+   não gasta pergunta nem token. O botão já traz os cartões de confirmação (buddyPropoe). ── */
+function mostraSugestoes(vez) {
+  if (info && info.direcao && !comoQuem) return;
+  post({ action: 'buddySugestoes' }).then(function (j) {
+    var ss = (j && j.sugestoes) || [];
+    if (vez !== aberturaN || !ss.length) return;
+    var d = document.createElement('div'); d.className = 'sug';
+    d.innerHTML = '<div class="sug-t">🔔 Para você olhar hoje</div>' + ss.map(function (g, i) {
+      var nomes = g.alunos.slice(0, 4).map(function (a) { return esc(a.nome.split(' ')[0]) + ' <small>(' + esc(a.detalhe) + ')</small>'; }).join(', ') + (g.alunos.length > 4 ? ' e mais ' + (g.alunos.length - 4) : '');
+      return '<div class="sug-i" data-i="' + i + '"><span class="ic">' + g.ic + '</span><div><b>' + esc(g.titulo) + '</b><p>' + nomes + '</p></div>' +
+             '<button type="button">' + esc(g.botao || 'Perguntar ao Buddy') + '</button></div>';
+    }).join('');
+    d.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('button') : null; if (!b || ocupado) return;
+      var g = ss[+b.parentNode.getAttribute('data-i')];
+      if (g.tipo === 'faltas') { pergunta('Quais alunos meus passaram de 25% de faltas? Liste por turma, com o número de faltas, e diga com quem eu falo primeiro.', 'Quem passou de 25% de faltas?'); return; }
+      aberturaN++; b.disabled = true; b.textContent = 'preparando…'; trava(true);
+      post({ action: 'buddyPropoe', tipo: g.tipo, rafs: g.alunos.slice(0, 12).map(function (a) { return a.raf; }), conversa: conversa }).then(function (r) {
+        if (!r || r.ok !== true) { nota((r && r.error) || 'Não consegui preparar agora.'); b.disabled = false; b.textContent = g.botao; return; }
+        conversa = r.conversa; b.parentNode.remove(); if (!d.querySelector('.sug-i')) d.remove();
+        var com = document.querySelector('.comeco'); if (com) com.remove();
+        nota(g.tipo === '2nd' ? 'Comunicados de 2nd chance preparados. Confira e confirme.' : 'Termos de atraso preparados. Confira e confirme.');
+        mostraPropostas(r.propostas, r.conversa);
+        if ((r.erros || []).length) nota('Ficaram de fora: ' + r.erros.length + ' (sem dado suficiente no card).');
+      }).catch(function () { nota('Sem conexão. Tente de novo.'); b.disabled = false; b.textContent = g.botao; })
+        .then(function () { trava(false); });
+    });
+    var com = document.querySelector('.comeco');
+    if (com && com.parentNode) com.parentNode.insertBefore(d, com); else poe(d);
+    $('chat').scrollTop = 0;
+  }).catch(function () {});
+}
+/* ── os lembretes que o Buddy guarda entre conversas: o professor vê e apaga ── */
+function mostraLembretes(apaga) {
+  post({ action: 'buddyLembretes', apaga: apaga || '' }).then(function (j) {
+    var ls = (j && j.lembretes) || [], velho = document.querySelector('.lemb'); if (velho) velho.remove();
+    var d = document.createElement('div'); d.className = 'prop lemb';
+    d.innerHTML = '<b>📌 O que eu guardo entre uma conversa e outra</b><div class="onde">' + (ls.length ? 'Entra no começo de cada conversa nova. No máximo ' + (j.max || 10) + '.' : 'Nada ainda. Peça "lembre de acompanhar o aluno tal" e eu guardo.') + '</div>' +
+      ls.map(function (m) { return '<div class="lemb-i"><span>' + esc(m.texto) + '</span><button type="button" data-id="' + esc(m.id) + '" title="Esquecer">✕</button></div>'; }).join('');
+    d.addEventListener('click', function (e) { var b = e.target.closest ? e.target.closest('button[data-id]') : null; if (b) mostraLembretes(b.getAttribute('data-id')); });
+    poe(d);
+  }).catch(function () {});
 }
 
 /* ── a direção escolhe "como quem" pergunta, aqui mesmo ── */
@@ -677,8 +750,14 @@ function fechaCortina() {
   var c = $('cortina'); if (!c) return;
   c.classList.add('some'); setTimeout(function () { if (c.parentNode) c.parentNode.removeChild(c); }, 400);
 }
+/* a janelinha do Hub (assets/fisk-shared.js): fechar avisa a página de fora; reabrir pede conversa nova */
+$('fechaMini').addEventListener('click', function () { try { window.parent.postMessage({ fiskBuddy: 'fecha' }, location.origin); } catch (e) {} });
+window.addEventListener('message', function (e) {
+  if (e.origin !== location.origin || !e.data || e.data.fiskBuddy !== 'nova') return;
+  if (!ocupado && info && !$('palco').hidden) abertura();
+});
 fiskInitThemeToggle('themeToggle');
-fiskInitUserMenu();
+if (!MINI) fiskInitUserMenu();
 desenhaArvore();
 function recusa(t, p) { fechaCortina(); $('fora').hidden = false; $('foraT').textContent = t; $('foraP').textContent = p; }
 (function () {

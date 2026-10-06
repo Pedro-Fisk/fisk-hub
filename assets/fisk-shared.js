@@ -1144,3 +1144,77 @@ function fiskBuscaMeusAlunos(q) {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', comeca);
   else comeca();
 })();
+
+/* ══ O BUDDY EM QUALQUER TELA (Pedro, 06/10/2026) ══════════════════════════
+ * A bolinha do urso no canto de baixo, à direita, em toda página do Hub que
+ * carrega este kit. Clicar abre uma janelinha com a conversa (buddy.html em
+ * modo `mini`, dentro de um iframe): é sempre CONVERSA NOVA, sem histórico. O
+ * histórico e as perguntas frequentes moram na página do Buddy, que a
+ * janelinha oferece em "⤢ Página do Buddy".
+ *
+ * Só aparece para quem o servidor diz que pode usar o Buddy (`buddyInfo`), e a
+ * resposta fica 30 minutos no aparelho para as outras páginas não perguntarem
+ * de novo. Não aparece na própria página do Buddy, dentro de iframe (gavetas),
+ * nem para quem não tem sessão.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+  if (window.parent !== window) return;
+  if (/buddy(-ajustes)?\.html/.test(location.pathname)) return;
+  var s = (typeof fiskSessao === 'function') ? fiskSessao() : null;
+  if (!s || !s.token) return;
+  var CHAVE = 'fisk_buddy_fab:' + String(s.token).slice(0, 12);
+  function pode() {
+    try {
+      var g = JSON.parse(sessionStorage.getItem(CHAVE) || 'null');
+      if (g && Date.now() - g.q < 30 * 60000) return Promise.resolve(!!g.ok);
+    } catch (e) {}
+    return fetch(FISK_HUB_EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'buddyInfo', token: s.token }) })
+      .then(fiskJson).then(function (j) {
+        var ok = !!(j && j.ok === true && j.piloto && j.chave);
+        try { sessionStorage.setItem(CHAVE, JSON.stringify({ ok: ok, q: Date.now() })); } catch (e) {}
+        return ok;
+      }).catch(function () { return false; });
+  }
+  function monta() {
+    if (document.getElementById('fkBuddyFab')) return;
+    var base = (typeof fiskHubBase === 'function') ? fiskHubBase() : '';
+    var st = document.createElement('style');
+    st.textContent =
+      '#fkBuddyFab{position:fixed;z-index:9990;right:16px;bottom:16px;width:60px;height:60px;border-radius:50%;border:0;padding:0;cursor:pointer;background:#fff;' +
+        'box-shadow:0 6px 20px rgba(37,99,235,.45),0 0 0 3px #2563eb;transition:transform .15s ease}' +
+      '#fkBuddyFab:hover{transform:scale(1.07)}#fkBuddyFab span{display:block;width:100%;height:100%;border-radius:50%;overflow:hidden}' +
+      '#fkBuddyFab img{display:block;width:100%;height:100%;transform:scale(1.35);transform-origin:50% 45%}' +
+      '#fkBuddyJan{position:fixed;z-index:9991;right:16px;bottom:88px;width:420px;height:min(640px,calc(100vh - 110px));border-radius:18px;overflow:hidden;background:#fff;' +
+        'box-shadow:0 18px 50px rgba(15,23,42,.38),0 0 0 1px rgba(37,99,235,.35);display:none}' +
+      '#fkBuddyJan iframe{width:100%;height:100%;border:0;display:block}' +
+      'body.fk-buddy-aberto #fkBuddyJan{display:block}' +
+      /* na home o mural minimizado também mora nesse canto: ele sobe um degrau */
+      'body.fk-buddy .av-sino{bottom:88px}' +
+      '@media (max-width:560px){#fkBuddyJan{right:0;bottom:0;left:0;top:0;width:auto;height:auto;border-radius:0}body.fk-buddy-aberto #fkBuddyFab{display:none}}' +
+      '@media print{#fkBuddyFab,#fkBuddyJan{display:none !important}}';
+    document.head.appendChild(st);
+    var bt = document.createElement('button');
+    bt.id = 'fkBuddyFab'; bt.type = 'button'; bt.title = 'Perguntar ao Buddy'; bt.setAttribute('aria-label', 'Perguntar ao Buddy');
+    bt.innerHTML = '<span><img alt="" src="https://portalfisk.com.br/assets/icons/buddy.png"></span>';
+    var jan = document.createElement('div'); jan.id = 'fkBuddyJan';
+    document.body.appendChild(jan); document.body.appendChild(bt);
+    document.body.classList.add('fk-buddy');
+    var fr = null;
+    function abre(sim) {
+      document.body.classList.toggle('fk-buddy-aberto', !!sim);
+      if (!sim) return;
+      if (!fr) {
+        fr = document.createElement('iframe'); fr.title = 'Buddy, auxiliar do professor'; fr.allow = 'microphone';
+        fr.src = base + 'buddy.html?mini=1'; jan.appendChild(fr);
+      } else {
+        /* reabrir é conversa nova */
+        try { fr.contentWindow.postMessage({ fiskBuddy: 'nova' }, new URL(fr.src, location.href).origin); } catch (e) {}
+      }
+    }
+    bt.addEventListener('click', function () { abre(!document.body.classList.contains('fk-buddy-aberto')); });
+    window.addEventListener('message', function (e) { if (e.data && e.data.fiskBuddy === 'fecha') abre(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && document.body.classList.contains('fk-buddy-aberto')) abre(false); });
+  }
+  function vai() { pode().then(function (ok) { if (ok) monta(); }); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', vai); else vai();
+})();
