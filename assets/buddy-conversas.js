@@ -99,6 +99,21 @@ window.BUDDY_ARVORE = [
         texto: 'Como está o uso do Portal do Aluno (entradas e atividades) na turma ' }
     ] },
 
+  { id: 'radar', ic: '🎯', tit: 'Habilidades (radar)', sub: 'o quanto cada um sabe, pelo que fez no portal',
+    perguntas: [
+      { rot: 'Em que habilidade uma turma está mais fraca…', falta: 'turma',
+        texto: 'Abra o radar e diga em qual dos cinco eixos (Listening, Reading, Speaking, Writing, gramática e vocabulário) a turma está mais fraca, com a média de cada eixo e os alunos que puxam para baixo. Turma: ',
+        depois: ['Quem caiu nos últimos 30 dias?', 'Quem não estuda em casa?'] },
+      { rot: 'Quem caiu nos últimos 30 dias…', falta: 'turma',
+        texto: 'Pelo radar, quais alunos caíram 5 pontos ou mais em algum eixo nos últimos 30 dias, e em qual eixo? Turma: ' },
+      { rot: 'Quem não estuda em casa…', falta: 'turma',
+        texto: 'Pelo radar, quais alunos têm menos de 4 dias de estudo no portal nos últimos 30 dias? Liste com a última atividade de cada um. Turma: ' },
+      { rot: 'Quem está sem dado no radar…', falta: 'turma',
+        texto: 'Quais alunos não têm nenhum eixo medido no radar (não fizeram atividade suficiente)? Turma: ' },
+      { rot: 'O radar de um aluno…', falta: 'aluno',
+        texto: 'Mostre o radar (os cinco eixos, com a variação em 30 dias), a constância e os últimos checkings do aluno ' }
+    ] },
+
   { id: 'notas', ic: '📝', tit: 'Notas e simulados', sub: 'avaliações e MET',
     perguntas: [
       { rot: 'Quem ainda está sem nota?',
@@ -118,12 +133,16 @@ window.BUDDY_ARVORE = [
   { id: 'aluno', ic: '👤', tit: 'Um aluno', sub: 'a ficha de uma pessoa',
     perguntas: [
       { rot: 'Ficha rápida de um aluno…', falta: 'aluno',
-        texto: 'Me dê a ficha rápida (turma, livro, atraso, faltas, notas, tutoria e uso do portal) do aluno ',
+        texto: 'Me dê a ficha rápida (turma, livro, atraso, faltas, notas, radar, checkings e tutoria) do aluno ',
         depois: ['Preparar a conversa com a família…', 'Preparar o termo de um aluno…'] },
       { rot: 'Como ele está comparado à turma…', falta: 'aluno',
         texto: 'Compare com a média da própria turma, em atraso e em faltas, o aluno ' },
       { rot: 'Preparar a conversa com a família…', falta: 'aluno',
-        texto: 'Vou conversar com a família. Monte um roteiro curto, só com dados (o que está bem, o que preocupa e um combinado possível), sobre o aluno ' }
+        texto: 'Vou conversar com a família. Monte um roteiro curto, só com dados (o que está bem, o que preocupa e um combinado possível), sobre o aluno ' },
+      { rot: 'O que já foi registrado no counseling…', falta: 'aluno',
+        texto: 'Abra o e-counseling e resuma o que já foi registrado (acompanhamento e termos, com as datas) do aluno ' },
+      { rot: 'Como ele estava no semestre passado…', falta: 'aluno',
+        texto: 'Olhe o card do semestre passado e compare com este (livro, turma, faltas) para o aluno ' }
     ] },
 
   { id: 'docs', ic: '📄', tit: 'Documentos', sub: 'o Buddy junta os dados, você confere e gera',
