@@ -94,6 +94,24 @@
   .aviso h2{ margin:0 0 .4rem; font-family:var(--font-heading); font-size:1.05rem; color:var(--ui-dark,#223e5a); }
   .rodape{ font-size:.8rem; color:var(--gray); padding:.7rem .2rem 0; }
   .fundo{ display:none; }
+  /* a espera da entrada: o servidor leva alguns segundos para dizer quem é o professor */
+  .cortina{ position:fixed; inset:0; z-index:90; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.1rem; padding:1.5rem;
+            background:linear-gradient(140deg,#1e3a8a,#2563eb 55%,#3b82f6); color:#fff; text-align:center; transition:opacity .35s ease; }
+  .cortina.some{ opacity:0; pointer-events:none; }
+  .cortina .urso{ width:112px; height:112px; border-radius:50%; background:#fff; overflow:hidden; box-shadow:0 0 0 6px rgba(255,255,255,.22), 0 14px 34px rgba(0,0,0,.28); animation:respira 2.4s ease-in-out infinite; }
+  .cortina .urso img{ display:block; width:100%; height:100%; transform:scale(1.35); transform-origin:50% 45%; }
+  .cortina b{ font-family:var(--font-heading); font-size:1.5rem; }
+  .cortina .frase{ font-size:1.02rem; min-height:1.6em; opacity:.95; transition:opacity .3s ease; }
+  .cortina .frase.troca{ opacity:0; }
+  .cortina .pts{ display:flex; gap:.4rem; } .cortina .pts i{ width:9px; height:9px; border-radius:50%; background:#fff; animation:pula 1s infinite; }
+  .cortina .pts i:nth-child(2){ animation-delay:.15s; } .cortina .pts i:nth-child(3){ animation-delay:.3s; }
+  @keyframes respira{ 0%,100%{ transform:none; } 50%{ transform:scale(1.05); } }
+  /* o Buddy "escrevendo" antes de se apresentar */
+  .msg.digita{ display:flex; gap:.3rem; align-items:center; padding:.85rem 1rem; }
+  .msg.digita i{ width:8px; height:8px; border-radius:50%; background:#8aa0b8; animation:pula 1s infinite; }
+  .msg.digita i:nth-child(2){ animation-delay:.15s; } .msg.digita i:nth-child(3){ animation-delay:.3s; }
+  .comeco button{ opacity:0; animation:surge .45s ease forwards; }
+  @keyframes surge{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:none; } }
   body.theme-dark .janela, body.theme-dark .entrada, body.theme-dark .pe{ background:#1f2937; border-color:#334155; }
   body.theme-dark .chat{ background:#17202e; }
   body.theme-dark .msg:not(.eu), body.theme-dark .prop{ background:#273449; border-color:#3a4a63; color:#e6edf6; }
@@ -116,10 +134,16 @@
     .msg, .prop{ max-width:94%; }
     .hero{ display:none; }   /* no celular a conversa precisa da tela inteira */
   }
-  @media (prefers-reduced-motion: reduce){ .msg{ animation:none; } .passos .p i{ animation:none; } .arvore{ transition:none; } }
+  @media (prefers-reduced-motion: reduce){ .comeco button{ animation:none; opacity:1; } .cortina .urso, .cortina .pts i, .msg.digita i{ animation:none; } .msg{ animation:none; } .passos .p i{ animation:none; } .arvore{ transition:none; } }
 </style>
 </head>
 <body>
+<div class="cortina" id="cortina" role="status" aria-live="polite">
+  <div class="urso"><img alt="" src="https://portalfisk.com.br/assets/icons/buddy.png"></div>
+  <b>Buddy</b>
+  <div class="frase" id="cortinaFrase">Acordando o seu auxiliar virtual…</div>
+  <div class="pts"><i></i><i></i><i></i></div>
+</div>
 
 <header class="hero">
   <a class="back-link" href="index.html">&larr; Voltar aos recursos</a>
@@ -138,7 +162,7 @@
 
   <div class="palco" id="palco" hidden>
     <nav class="arvore" id="arvore" aria-label="Perguntas prontas">
-      <div class="arv-cab"><b>💡 O que perguntar</b><small>toque numa pergunta, ou escreva a sua</small></div>
+      <div class="arv-cab"><b>💡 Perguntas frequentes</b><small>o que você pode perguntar ao Buddy, por tema</small></div>
       <div class="arv-lista" id="arvLista"></div>
     </nav>
 
@@ -237,7 +261,13 @@ function desenhaArvore() {
 }
 $('arvLista').addEventListener('click', function (e) {
   var b = e.target.closest ? e.target.closest('button') : null; if (!b) return;
-  if (b.parentNode.classList.contains('cat')) { var c = b.parentNode, ab = c.classList.toggle('aberta'); b.setAttribute('aria-expanded', ab ? 'true' : 'false'); return; }
+  if (b.parentNode.classList.contains('cat')) {
+    /* sanfona: abrir um tema fecha o que estava aberto */
+    var c = b.parentNode, ab = !c.classList.contains('aberta');
+    $('arvLista').querySelectorAll('.cat.aberta').forEach(function (x) { x.classList.remove('aberta'); x.firstElementChild.setAttribute('aria-expanded', 'false'); });
+    if (ab) { c.classList.add('aberta'); b.setAttribute('aria-expanded', 'true'); if (c.scrollIntoView) c.scrollIntoView({ block: 'nearest' }); }
+    return;
+  }
   escolhe(b.getAttribute('data-rot'));
 });
 /* uma pergunta pronta foi escolhida, na árvore ou num atalho */
@@ -314,6 +344,7 @@ function recebe(j) {
 }
 function pergunta(t, rotulo, depois) {
   t = String(t || '').trim(); if (!t || ocupado) return;
+  aberturaN++; var dgt = document.querySelector('.msg.digita'); if (dgt) dgt.remove();
   var com = document.querySelector('.comeco'); if (com) com.remove();
   document.querySelectorAll('.depois').forEach(function (x) { x.remove(); });
   if (depois) depoisDaVez = depois;
@@ -338,17 +369,27 @@ $('nova').addEventListener('click', function () { if (!ocupado) abertura(); });
 /* ── a abertura: o Buddy se apresenta e oferece por onde começar ── */
 var COMECO = ['Como está a saúde pedagógica das minhas turmas?', 'Quais alunos estão faltando mais?', 'Quem está em atraso crítico?',
               'Quem foi à tutoria?', 'Quem não está usando o portal?', 'Monte minhas prioridades da semana'];
+var aberturaN = 0;
 function abertura() {
   conversa = ''; depoisDaVez = null; $('chat').innerHTML = '';
   var quem = comoQuem || sess().name || '', prim = String(quem).trim().split(/\s+/)[0] || '';
   prim = prim.charAt(0).toUpperCase() + prim.slice(1).toLowerCase();
-  bolha('<p>Oi' + (info && info.direcao ? '! Estou respondendo como se <b>' + esc(quem) + '</b> estivesse perguntando.' : ', ' + esc(prim) + '!') +
-        ' Eu olho suas turmas com você: atraso, faltas, notas, tutoria e uso do portal.</p><p>Escolha por onde começar, ou escreva do seu jeito.</p>');
-  var d = document.createElement('div'); d.className = 'comeco';
-  d.innerHTML = COMECO.map(function (r) { var p = POR_ROTULO[r], ic = ''; (window.BUDDY_ARVORE || []).forEach(function (c) { if (c.perguntas.indexOf(p) > -1) ic = c.ic; });
-    return '<button type="button" data-rot="' + esc(r) + '"><span>' + ic + '</span><span>' + esc(r) + '</span></button>'; }).join('');
-  d.addEventListener('click', function (e) { var b = e.target.closest ? e.target.closest('button') : null; if (b) escolhe(b.getAttribute('data-rot')); });
-  poe(d); $('txt').focus();
+  /* um segundo de "escrevendo…" antes de ele se apresentar; a vez é numerada para um clique em
+     "Nova conversa" (ou uma pergunta) no meio da espera não deixar duas apresentações na tela */
+  var vez = ++aberturaN, dg = document.createElement('div');
+  dg.className = 'msg digita'; dg.innerHTML = '<i></i><i></i><i></i>'; poe(dg);
+  setTimeout(function () {
+    if (vez !== aberturaN || !dg.parentNode) return;
+    dg.remove();
+    bolha('<p>Oi' + (info && info.direcao ? '! Estou respondendo como se <b>' + esc(quem) + '</b> estivesse perguntando.' : ', ' + esc(prim) + '!') +
+          ' Eu olho suas turmas com você: atraso, faltas, notas, radar, tutoria e uso do portal.</p><p>Escolha por onde começar, ou escreva do seu jeito.</p>');
+    var d = document.createElement('div'); d.className = 'comeco';
+    d.innerHTML = COMECO.map(function (r, i) { var p = POR_ROTULO[r], ic = ''; (window.BUDDY_ARVORE || []).forEach(function (c) { if (c.perguntas.indexOf(p) > -1) ic = c.ic; });
+      return '<button type="button" style="animation-delay:' + (350 + i * 110) + 'ms" data-rot="' + esc(r) + '"><span>' + ic + '</span><span>' + esc(r) + '</span></button>'; }).join('');
+    d.addEventListener('click', function (e) { var b = e.target.closest ? e.target.closest('button') : null; if (b) escolhe(b.getAttribute('data-rot')); });
+    poe(d);
+  }, 1100);
+  $('txt').focus();
 }
 
 /* ── a direção escolhe "como quem" pergunta, aqui mesmo ── */
@@ -366,10 +407,23 @@ function montaVerComo() {
   });
 }
 
+/* ── a cortina de entrada ── */
+var CORTINA = ['Acordando o seu auxiliar virtual…', 'Conferindo quem é você…', 'Abrindo as suas turmas…', 'Olhando quem está em situação crítica…',
+               'Separando as perguntas mais úteis…', 'Quase pronto…'];
+var cortinaI = 0, cortinaT = setInterval(function () {
+  var f = $('cortinaFrase'); if (!f) return;
+  f.classList.add('troca');
+  setTimeout(function () { cortinaI = Math.min(cortinaI + 1, CORTINA.length - 1); f.textContent = CORTINA[cortinaI]; f.classList.remove('troca'); }, 300);
+}, 3000);
+function fechaCortina() {
+  clearInterval(cortinaT);
+  var c = $('cortina'); if (!c) return;
+  c.classList.add('some'); setTimeout(function () { if (c.parentNode) c.parentNode.removeChild(c); }, 400);
+}
 fiskInitThemeToggle('themeToggle');
 fiskInitUserMenu();
 desenhaArvore();
-function recusa(t, p) { $('fora').hidden = false; $('foraT').textContent = t; $('foraP').textContent = p; }
+function recusa(t, p) { fechaCortina(); $('fora').hidden = false; $('foraT').textContent = t; $('foraP').textContent = p; }
 (function () {
   var s = sess();
   if (!s.token) return recusa('🔒 Entre no Fisk Hub primeiro', 'Volte à página inicial do Hub, entre com seu usuário e abra o Buddy de novo.');
@@ -379,7 +433,7 @@ function recusa(t, p) { $('fora').hidden = false; $('foraT').textContent = t; $(
     info = j;
     if (!j.piloto) return recusa('🧪 O Buddy auxiliar está em piloto', 'Por enquanto ele está com poucos professores, para a gente medir como ele se sai. Em breve chega para todos.');
     if (!j.chave) return recusa('🔑 Falta a chave do Buddy', j.direcao ? 'Abra os Ajustes do Buddy e cole a chave do Claude Console.' : 'A direção ainda não ligou o Buddy. Avise o Pedro.');
-    rodapeConta();
+    fechaCortina(); rodapeConta();
     if (j.direcao) { $('ajustes').hidden = false; montaVerComo(); }
     $('palco').hidden = false; $('rodape').hidden = false;
     if (j.direcao && !comoQuem) {
