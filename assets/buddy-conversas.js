@@ -54,7 +54,7 @@ window.BUDDY_ARVORE = [
         texto: 'Quais alunos meus estão em dia com o conteúdo e com menos de 10% de faltas? Quero saber quem elogiar. Agrupe por turma.' },
       { rot: 'Quem precisa de termo de atraso?',
         texto: 'Quem dos meus alunos está em situação de termo de atraso (4 aulas ou mais)? Liste por turma, do mais atrasado para o menos, com as faltas de cada um.',
-        depois: ['Preparar o termo de um aluno…'] },
+        depois: ['Gerar o termo de atraso de um aluno…'] },
       { rot: 'Quem está atrasado e também falta muito?',
         texto: 'Cruze atraso e faltas: quais alunos meus têm 3 aulas ou mais de atraso E mais de 20% de faltas? São os de maior risco. Liste com a turma.',
         depois: ['Quem precisa de termo de atraso?', 'Preparar a conversa com a família…'] }
@@ -134,7 +134,7 @@ window.BUDDY_ARVORE = [
     perguntas: [
       { rot: 'Ficha rápida de um aluno…', falta: 'aluno',
         texto: 'Me dê a ficha rápida (turma, livro, atraso, faltas, notas, radar, checkings e tutoria) do aluno ',
-        depois: ['Preparar a conversa com a família…', 'Preparar o termo de um aluno…'] },
+        depois: ['Preparar a conversa com a família…', 'Gerar o termo de atraso de um aluno…'] },
       { rot: 'Como ele está comparado à turma…', falta: 'aluno',
         texto: 'Compare com a média da própria turma, em atraso e em faltas, o aluno ' },
       { rot: 'Preparar a conversa com a família…', falta: 'aluno',
@@ -145,24 +145,24 @@ window.BUDDY_ARVORE = [
         texto: 'Olhe o card do semestre passado e compare com este (livro, turma, faltas) para o aluno ' }
     ] },
 
-  { id: 'docs', ic: '📄', tit: 'Documentos', sub: 'o Buddy junta os dados, você confere e gera',
+  { id: 'docs', ic: '📄', tit: 'Documentos', sub: 'o Buddy prepara, você confirma e ele gera',
     perguntas: [
-      { rot: 'Preparar o termo de um aluno…', falta: 'aluno',
-        texto: 'Preciso de um termo de atraso para o aluno ' },
+      { rot: 'Gerar o termo de atraso de um aluno…', falta: 'aluno',
+        texto: 'Crie o termo de atraso do aluno ' },
+      { rot: 'Gerar os termos de uma turma…', falta: 'turma',
+        texto: 'Crie o termo de atraso de todos os alunos com 4 aulas ou mais de atraso que ainda não têm termo marcado no card, na turma ' },
       { rot: 'Lista para os termos de uma turma…', falta: 'turma',
         texto: 'Liste quem precisa de termo de atraso (4 aulas ou mais), com as faltas e as aulas atrasadas de cada um, na turma ' },
-      { rot: 'Gerar vários termos de uma vez', breve: true,
-        porque: 'A geração em lote ainda não existe. Por enquanto o Buddy lista quem precisa e abre o gerador de cada um.' },
       { rot: 'Gerar os boletins da turma', breve: true,
         porque: 'O Buddy ainda não gera boletim. Use o Gerador de Boletins.' }
     ] },
 
   { id: 'registrar', ic: '✍️', tit: 'Registrar', sub: 'o Buddy escreve, você confirma',
     perguntas: [
-      { rot: 'Anotar no card que o aluno vai faltar…', falta: 'aluno',
-        texto: 'Ponha uma nota na próxima aula do card avisando que vai faltar (ele me avisou) o aluno ' },
-      { rot: 'Pôr um recado na próxima aula de um aluno…', falta: 'aluno',
-        texto: 'Ponha uma nota na célula da próxima aula no card. Aluno e recado: ' },
+      { rot: 'Anotar na célula da aula que o aluno vai faltar…', falta: 'aluno',
+        texto: 'Ponha uma anotação na célula da próxima aula no card avisando que vai faltar (ele me avisou) o aluno ' },
+      { rot: 'Pôr uma anotação na célula da próxima aula…', falta: 'aluno',
+        texto: 'Ponha uma anotação na célula da próxima aula no card. Aluno e recado: ' },
       { rot: 'Registrar uma orientação no counseling…', falta: 'aluno',
         texto: 'Registre no counseling que hoje eu conversei e orientei o aluno. Aluno e o que foi combinado: ' },
       { rot: 'Quem precisa de termo e ainda não tem…', falta: 'turma',
