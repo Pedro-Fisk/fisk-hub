@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <script src="assets/fisk-shared.js?v=2026-09-20a"></script>
-<script src="assets/buddy-conversas.js?v=2026-10-06d"></script>
+<script src="assets/buddy-conversas.js?v=2026-10-06e"></script>
 <style>
   [hidden]{ display:none !important; }
   .hero{ padding-bottom:1.1rem; }
@@ -229,7 +229,7 @@
       <div class="arv-lista" id="arvLista"></div>
     </nav>
   </div>
-  <p class="rodape" id="rodape" hidden>O Buddy lê card, faltas, atraso, notas, radar, counseling, tutoria e uso do portal das suas turmas. Ele só grava depois de você confirmar no cartão: uma linha no counseling, uma anotação na célula da aula no card ou um termo de atraso. Confira os números antes de agir, e marque 👍 ou 👎 em cada resposta: é assim que a gente mede se ele está acertando.</p>
+  <p class="rodape" id="rodape" hidden>O Buddy lê card, faltas, atraso, notas, radar, counseling, tutoria e uso do portal das suas turmas. Ele só grava depois de você confirmar no cartão: uma linha no counseling, uma anotação na célula da aula no card, um termo de atraso ou um comunicado de 2nd chance. Confira os números antes de agir, e marque 👍 ou 👎 em cada resposta: é assim que a gente mede se ele está acertando.</p>
 </main>
 <div class="fundo" id="fundo"></div>
 
@@ -370,13 +370,27 @@ function nomeProprio(s) { return String(s || '').toLowerCase().replace(/(^|\s)(\
 /* O TERMO DE ATRASO PELO CHAT. O PDF é montado AQUI, com o mesmo motor do Gerador de Termo (assets/termo-pdf.js),
    e segue pelas mesmas três rotas: pasta do aluno no Drive, marca no card, linha no counseling. Sem o Drive, para:
    termo que não foi salvo não pode aparecer como gerado. Card e counseling são registro, e a falha deles é aviso. */
-function cartaoTermo(pr, idConversa) {
-  var x = pr.dados || {}, d = document.createElement('div'); d.className = 'prop';
+var DOCS = {
+  termo: { ic: '📄', nome: 'Termo de atraso', curto: 'Termo', motor: 'assets/termo-pdf.js?v=2026-10-06a',
+    pdf: function (x) { return fiskTermoPDF({ nome: x.nome, book: x.book, prof: nomeProprio(x.professor), horario: fiskTermoHorario(x.turmaCheia), atraso: x.atraso, faltas: x.faltas,
+                                             ultima: x.ultima, prevista: x.prevista, motivos: x.motivos, outros: x.outros, sugestoes: x.sugestoes, livres: x.livres }); },
+    counseling: function (x) { return { estagio: x.book || '', faltas: x.faltas, atrasadas: x.atraso, texto: 'Termo de atraso gerado pelo Fisk Hub (Buddy).' }; } },
+  '2nd': { ic: '🔁', nome: 'Comunicado de 2nd Chance', curto: 'Comunicado', motor: 'assets/segunda-chance-pdf.js?v=2026-10-06a',
+    pdf: function (x) { return fisk2ndPDF({ nome: x.nome, estagio: x.book, prof: nomeProprio(x.professor), turma: String(x.turmaCheia || '').split('\n')[0].trim(), escrita: x.escrita, auditiva: x.auditiva,
+                                           itens: fisk2ndItens({ licoes: x.licoes, marcadas: x.marcadas, livres: x.livres, escrita: x.escrita, auditiva: x.auditiva }) }); },
+    counseling: function (x) {
+      var ab = fisk2ndAbaixo(x);
+      return { estagio: x.book || '', prova: ab.join(' e '), motivo: ab.map(function (q) { return (q === 'escrita' ? 'Escrita' : 'Auditiva') + ': ' + x[q]; }).join(' · ') };
+    } }
+};
+function cartaoDoc(pr, idConversa) {
+  var x = pr.dados || {}, D = DOCS[pr.acao], d = document.createElement('div'); d.className = 'prop';
   var linhas = [];
+  (x.resumo || []).forEach(function (l) { linhas.push(esc(l)); });
   if ((x.motivos || []).length || x.outros) linhas.push('<b style="font-size:.82rem">Motivos:</b> ' + esc((x.motivos || []).concat(x.outros ? ['Outros: ' + x.outros] : []).join('; ')));
   if ((x.sugestoes || []).length || x.livres) linhas.push('<b style="font-size:.82rem">Sugestões:</b> ' + esc((x.sugestoes || []).concat(x.livres ? [x.livres] : []).join('; ')));
-  d.innerHTML = '<b>📄 Termo de atraso · ' + esc(pr.aluno) + '</b><div class="onde">' + esc(pr.turma) + ' · ' + esc(x.book || '') + '</div>' +
-    '<blockquote>' + esc(pr.texto) + (linhas.length ? '<br>' + linhas.join('<br>') : '<br><span style="color:#5b6b7c">Sem motivos nem sugestões marcados. Se quiser algum, peça ao Buddy antes de gerar.</span>') + '</blockquote>' +
+  d.innerHTML = '<b>' + D.ic + ' ' + D.nome + ' · ' + esc(pr.aluno) + '</b><div class="onde">' + esc(pr.turma) + ' · ' + esc(x.book || '') + '</div>' +
+    '<blockquote>' + esc(pr.texto) + (linhas.length ? '<br>' + linhas.join('<br>') : (pr.acao === 'termo' ? '<br><span style="color:#5b6b7c">Sem motivos nem sugestões marcados. Se quiser algum, peça ao Buddy antes de gerar.</span>' : '')) + '</blockquote>' +
     '<div class="onde">Ao confirmar: ' + esc(pr.onde) + '.</div>' +
     '<div class="bts"><button type="button" class="sim">✓ Confirmar e gerar</button><button type="button" class="nao">Cancelar</button><span class="res"></span></div>';
   var sim = d.querySelector('.sim'), nao = d.querySelector('.nao'), res = d.querySelector('.res'), feito = false;
@@ -385,11 +399,8 @@ function cartaoTermo(pr, idConversa) {
     if (feito || sim.disabled) return Promise.resolve();
     sim.disabled = nao.disabled = true; diz('montando o PDF…');
     var pdf = null, pasta = null, avisos = [];
-    return carrega('https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js').then(function () { return carrega('assets/termo-pdf.js?v=2026-10-06a'); })
-      .then(function () {
-        return fiskTermoPDF({ nome: x.nome, book: x.book, prof: nomeProprio(x.professor), horario: fiskTermoHorario(x.turmaCheia), atraso: x.atraso, faltas: x.faltas,
-                              ultima: x.ultima, prevista: x.prevista, motivos: x.motivos, outros: x.outros, sugestoes: x.sugestoes, livres: x.livres });
-      }).then(function (r) {
+    return carrega('https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js').then(function () { return carrega(D.motor); })
+      .then(function () { return D.pdf(x); }).then(function (r) {
         pdf = r; diz('salvando na pasta do aluno…');
         return fiskSalvarNoDrive({ token: sess().token || '', tipo: 'aluno', escola: x.escola, professor: x.professor,
                                    turma: String(x.turmaCheia || '').split('\n')[0].trim(), aluno: x.nome, filename: r.filename, bytes: r.bytes });
@@ -397,20 +408,19 @@ function cartaoTermo(pr, idConversa) {
         pasta = r || {}; if (pasta.aviso) avisos.push(pasta.aviso);
         diz('marcando no card…');
         if (x.linhaCard == null) { avisos.push('sem linha no card para marcar'); return null; }
-        var q = { action: 'card', token: sess().token || '', fn: 'registrarDoc', escola: x.escola, prof: x.professor, professor: x.professor, linhaCard: x.linhaCard, tipo: 'termo' };
+        var q = { action: 'card', token: sess().token || '', fn: 'registrarDoc', escola: x.escola, prof: x.professor, professor: x.professor, linhaCard: x.linhaCard, tipo: pr.acao };
         return fetch(EP + '?' + Object.keys(q).map(function (k) { return k + '=' + encodeURIComponent(q[k]); }).join('&')).then(fiskJson)
           .then(function (j) { if (!j || j.erro) avisos.push('a marca no card não entrou' + (j && j.erro ? ' (' + j.erro + ')' : '')); })
           .catch(function () { avisos.push('a marca no card não entrou'); });
       }).then(function () {
         diz('registrando no counseling…');
-        return fiskCounseling({ escola: x.escola, professor: x.professor, turma: x.turmaCheia, aluno: x.nome, origem: 'termo',
-                                campos: { estagio: x.book || '', faltas: x.faltas, atrasadas: x.atraso, texto: 'Termo de atraso gerado pelo Fisk Hub (Buddy).' } })
+        return fiskCounseling({ escola: x.escola, professor: x.professor, turma: x.turmaCheia, aluno: x.nome, origem: pr.acao, campos: D.counseling(x) })
           .then(function (j) { if (!j || j.ok !== true) avisos.push('a linha do counseling não entrou' + (j && j.erro ? ' (' + j.erro + ')' : '')); });
       }).then(function () {
         feito = true; sim.remove(); nao.remove(); d.classList.add('feita');
         var url = URL.createObjectURL(new Blob([pdf.bytes], { type: 'application/pdf' }));
         res.className = 'res ok';
-        res.innerHTML = '✓ Termo salvo' + (pasta.pasta ? ' em "' + esc(pasta.pasta) + '"' : ' na pasta do aluno') + '. ' +
+        res.innerHTML = '✓ ' + D.curto + ' salvo' + (pasta.pasta ? ' em "' + esc(pasta.pasta) + '"' : ' na pasta do aluno') + '. ' +
           (pasta.pastaUrl || pasta.url ? '<a class="lk" href="' + esc(pasta.pastaUrl || pasta.url) + '" target="_blank" rel="noopener">abrir a pasta</a> · ' : '') +
           '<a class="lk" href="' + url + '" target="_blank" rel="noopener">ver o PDF</a>' +
           (avisos.length ? '<br><span style="color:#b45309">Atenção: ' + esc(avisos.join('; ')) + '.</span>' : '');
@@ -432,7 +442,7 @@ function cartaoTermo(pr, idConversa) {
   return gera;
 }
 function cartaoAcao(pr, idConversa) {
-  if (pr.acao === 'termo') return cartaoTermo(pr, idConversa);
+  if (DOCS[pr.acao]) return cartaoDoc(pr, idConversa);
   var d = document.createElement('div'); d.className = 'prop';
   d.innerHTML = '<b>' + (pr.acao === 'card' ? '📝 Anotação na célula da aula' : '🗂️ Registro no counseling') + ' · ' + esc(pr.aluno) + '</b>' +
     '<div class="onde">' + esc(pr.turma) + ' · ' + esc(pr.onde) + '</div><blockquote>' + esc(pr.texto) + '</blockquote>' +
@@ -470,12 +480,12 @@ function recebe(j) {
     poe(d);
   }
   var geradores = [];
-  (j.propostas || []).forEach(function (pr) { var g = cartaoAcao(pr, conversa); if (pr.acao === 'termo' && g) geradores.push(g); });
+  (j.propostas || []).forEach(function (pr) { var g = cartaoAcao(pr, conversa); if (DOCS[pr.acao] && g) geradores.push(g); });
   if (geradores.length > 1) {
     /* vários termos de uma vez: um clique gera todos, um depois do outro (o Drive não gosta de dez envios juntos) */
     var lote = document.createElement('div'); lote.className = 'prop';
-    lote.innerHTML = '<b>📚 ' + geradores.length + ' termos propostos</b><div class="onde">Confira os cartões acima. Você pode gerar um por um, ou todos de uma vez.</div>' +
-      '<div class="bts"><button type="button" class="sim">✓ Gerar os ' + geradores.length + ' termos</button><span class="res"></span></div>';
+    lote.innerHTML = '<b>📚 ' + geradores.length + ' documentos propostos</b><div class="onde">Confira os cartões acima. Você pode gerar um por um, ou todos de uma vez.</div>' +
+      '<div class="bts"><button type="button" class="sim">✓ Gerar os ' + geradores.length + ' documentos</button><span class="res"></span></div>';
     lote.querySelector('.sim').addEventListener('click', function () {
       var bt = this, rs = lote.querySelector('.res'), i = 0; bt.disabled = true;
       (function prox() {

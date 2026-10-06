@@ -153,6 +153,10 @@ window.BUDDY_ARVORE = [
         texto: 'Crie o termo de atraso de todos os alunos com 4 aulas ou mais de atraso que ainda não têm termo marcado no card, na turma ' },
       { rot: 'Lista para os termos de uma turma…', falta: 'turma',
         texto: 'Liste quem precisa de termo de atraso (4 aulas ou mais), com as faltas e as aulas atrasadas de cada um, na turma ' },
+      { rot: 'Gerar o comunicado de 2nd chance de um aluno…', falta: 'aluno',
+        texto: 'Crie o comunicado de 2nd chance do aluno ' },
+      { rot: 'Gerar os comunicados de 2nd chance de uma turma…', falta: 'turma',
+        texto: 'Crie o comunicado de 2nd chance de todos os alunos com prova escrita ou auditiva abaixo de 6,0 na avaliação mais recente, na turma ' },
       { rot: 'Gerar os boletins da turma', breve: true,
         porque: 'O Buddy ainda não gera boletim. Use o Gerador de Boletins.' }
     ] },
