@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="assets/fisk-shared.css?v=2026-09-20a">
   <!-- a casa do professor veste a faixa do topo (campanha de 09/2026) -->
   <link rel="stylesheet" href="assets/casa-tema.css?v=9">
-<link rel="stylesheet" href="style.css?v=2026-10-06h">
+<link rel="stylesheet" href="style.css?v=2026-10-06i">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 </head>
@@ -228,7 +228,7 @@
           <path d="M8.6 13.8c.5-1.6 1.8-2.5 3.4-2.5s2.9.9 3.4 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
         </svg>
       </div>
-      <h2 data-i18n="card-portal-h2">Portal do Aluno (professor de inglês)</h2>
+      <h2 data-i18n="card-portal-h2">Portal do Aluno (inglês)</h2>
       <p data-i18n="card-portal-p">As ferramentas do aluno em inglês, com Teacher Mode para projetar na TV</p>
     </a>
 
@@ -242,7 +242,7 @@
           <path d="M8.6 13.8c.5-1.6 1.8-2.5 3.4-2.5s2.9.9 3.4 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
         </svg>
       </div>
-      <h2 data-i18n="card-portal-es-h2">Portal do Aluno (professor de espanhol)</h2>
+      <h2 data-i18n="card-portal-es-h2">Portal do Aluno (espanhol)</h2>
       <p data-i18n="card-portal-es-p">As ferramentas do aluno em espanhol, com Teacher Mode para projetar na TV</p>
     </a>
 
@@ -258,6 +258,15 @@
       <h2 data-i18n="card-tutoria-h2">Frequência à Tutoria</h2>
       <p data-i18n="card-tutoria-p">Veja quais alunos seus foram ao plantão de dúvidas</p>
     </a>
+
+    <!-- QUEM VEIO À TUTORIA (Pedro, 06/10/2026): a lista que ficava embaixo do Buddy virou card aqui, ao lado da
+         ferramenta completa, para o professor bater o olho. Ocupa duas casas da grade e rola por dentro. Não é
+         <a class="card">: não entra no "Mais usadas" nem nos atalhos. Quem preenche é o script do Buddy. -->
+    <div class="tt-card" id="ttCard" hidden>
+      <div class="tt-cab"><span id="ttTit">🙋 Quem veio à tutoria<small>nas últimas 2 semanas</small></span><b id="ttN" hidden></b></div>
+      <div class="tt-lista" id="ttLista"></div>
+      <a class="av-rodape" id="ttLink" href="tutoria.html">Ver a frequência completa →</a>
+    </div>
       </div>
     </section>
     <section class="prat" id="prat-documentos">
@@ -464,7 +473,7 @@
   </div>
   <!-- O BUDDY DO PROFESSOR (06/10/2026): a coluna da direita. Em cima, a conversa do Buddy, com os informes da
        direção e da secretaria (Informes.js) e as novidades do Hub, cada um com a caixinha "Li e estou ciente".
-       Embaixo, à parte, os alunos que foram à tutoria nas últimas 2 semanas (Tutoria.js). No celular a coluna
+       Os alunos que foram à tutoria (Tutoria.js) saíram daqui: viraram card na prateleira "Em aula". No celular a coluna
        vira painel, aberto pelo Buddy que flutua no canto. -->
   <aside class="avisos" id="avisos" hidden aria-label="Buddy, recados e tutoria">
     <div class="bd-janela">
@@ -476,11 +485,6 @@
         <button type="button" class="av-fecha av-some" id="avSome" aria-label="Tirar o Buddy da tela" title="Tirar da tela">✕</button>
       </div>
       <div class="bd-chat" id="bdChat"></div>
-    </div>
-    <div class="tt-card" id="ttCard" hidden>
-      <div class="tt-cab"><span id="ttTit">🙋 Quem veio à tutoria<small>nas últimas 2 semanas</small></span><b id="ttN" hidden></b></div>
-      <div class="tt-lista" id="ttLista"></div>
-      <a class="av-rodape" id="ttLink" href="tutoria.html">Ver a frequência completa →</a>
     </div>
   </aside>
   </div>
@@ -635,9 +639,9 @@
         'card-apps-p':      'Qual app serve a qual estágio, e o link para baixar no Android e no iPhone',
         'card-overview-h2': 'Radar da Turma',
         'card-overview-p':  'As cinco habilidades de cada aluno num relance, e onde focar com a turma',
-        'card-portal-h2':   'Portal do Aluno (professor de inglês)',
+        'card-portal-h2':   'Portal do Aluno (inglês)',
         'card-portal-p':    'As ferramentas do aluno em inglês, com Teacher Mode para projetar na TV',
-        'card-portal-es-h2':'Portal do Aluno (professor de espanhol)',
+        'card-portal-es-h2':'Portal do Aluno (espanhol)',
         'card-portal-es-p': 'As ferramentas do aluno em espanhol, com Teacher Mode para projetar na TV',
         'card-acessos-h2': 'Acessos dos Alunos',
         'card-acessos-p':  'Veja quem já entrou no Portal do Aluno e quem ainda não acessou',
@@ -727,9 +731,9 @@
         'card-apps-p':      'Which app belongs to which level, and where to download it on Android and iPhone',
         'card-overview-h2': 'Class Radar',
         'card-overview-p':  'Every student\'s five skills at a glance, and where to focus with the class',
-        'card-portal-h2':   'Student Portal (English teacher)',
+        'card-portal-h2':   'Student Portal (English)',
         'card-portal-p':    'The student tools in English, with Teacher Mode to project on the TV',
-        'card-portal-es-h2':'Student Portal (Spanish teacher)',
+        'card-portal-es-h2':'Student Portal (Spanish)',
         'card-portal-es-p': 'The student tools in Spanish, with Teacher Mode to project on the TV',
         'card-acessos-h2': 'Student Access',
         'card-acessos-p':  'See who has logged in to the Student Portal and who hasn’t yet',
@@ -819,9 +823,9 @@
         'card-apps-p':      'Qué app sirve a cada nivel, y el enlace para descargar en Android y iPhone',
         'card-overview-h2': 'Radar del Grupo',
         'card-overview-p':  'Las cinco habilidades de cada alumno de un vistazo, y dónde enfocarse con el grupo',
-        'card-portal-h2':   'Portal del Alumno (profesor de inglés)',
+        'card-portal-h2':   'Portal del Alumno (inglés)',
         'card-portal-p':    'Las herramientas del alumno en inglés, con Modo Profesor para proyectar en la TV',
-        'card-portal-es-h2':'Portal del Alumno (profesor de español)',
+        'card-portal-es-h2':'Portal del Alumno (español)',
         'card-portal-es-p': 'Las herramientas del alumno en español, con Modo Profesor para proyectar en la TV',
         'card-acessos-h2': 'Accesos de los Alumnos',
         'card-acessos-p':  'Mira quién ya entró al Portal del Alumno y quién todavía no',
@@ -2311,12 +2315,22 @@
       return Math.max(900, Math.min(2600, Math.round((800 + n * 14) * sorte)));
     }
 
-    var msgs = [], tut = [], vez = 0, assinatura = '', leitura = 0;
+    var msgs = [], tut = [], vez = 0, assinatura = '', leitura = 0, naoLidos = 0;
+    /* O NÚMERO AO LADO DO NOME (Pedro, 06/10/2026): quem tirou o Buddy da tela não tinha mais sinal nenhum de
+       recado novo. O número fica no botão do nome do professor, lá em cima, e no item "Falar com o Buddy". */
+    function noNome(){
+      var bt = document.querySelector('.fisk-user-btn'); if (!bt) return;
+      var b = bt.querySelector('.fu-n');
+      if (!b) { b = document.createElement('span'); b.className = 'fu-n'; bt.insertBefore(b, bt.querySelector('.fu-seta')); }
+      b.hidden = !naoLidos; b.textContent = naoLidos > 9 ? '9+' : String(naoLidos);
+      var it = document.querySelector('.fu-buddy .fu-n2'); if (it) { it.hidden = !naoLidos; it.textContent = b.textContent; }
+    }
     function conta(){
       /* o número do Buddy conta só o que pede ciência; a tutoria é informação, não pendência */
       var n = msgs.filter(function(m){ return !m.ciente; }).length;
       sinoN.hidden = !n; sinoN.textContent = n > 9 ? '9+' : String(n);
       $$('bdN').hidden = !n; $$('bdN').textContent = sinoN.textContent;
+      naoLidos = n; noNome();
       ttN.hidden = !tut.length; ttN.textContent = String(tut.length);
     }
     /* a conversa nasce uma vez: os já lidos recolhidos em cima, a saudação, e os novos chegando um a um */
@@ -2442,7 +2456,8 @@
         if (ref) menu.insertBefore(it, ref); else menu.appendChild(it);
         it.addEventListener('click', function(){ chama(); document.body.click(); });
       }
-      it.innerHTML = '<img alt="" src="https://portalfisk.com.br/assets/icons/buddy.png" style="width:20px;height:20px;border-radius:50%;vertical-align:-4px;margin-right:.35rem;object-fit:cover">' + esc(tx('falar'));
+      it.innerHTML = '<img alt="" src="https://portalfisk.com.br/assets/icons/buddy.png" style="width:20px;height:20px;border-radius:50%;vertical-align:-4px;margin-right:.35rem;object-fit:cover">' + esc(tx('falar')) + '<span class="fu-n fu-n2" hidden></span>';
+      noNome();
       return true;
     }
     /* o cabeçalho inteiro abre e recolhe no computador; no celular o botão fecha o painel */

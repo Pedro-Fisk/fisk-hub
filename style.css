@@ -867,7 +867,13 @@ body.theme-dark .bd-t{ color:#f1f5fb; } body.theme-dark .bd-ck{ color:#dbe6f3; b
 body.theme-dark .bd-arq{ background:#222d3f; border-color:#3a4a63; color:#dbe6f3; }
 body.theme-dark .bd-senha{ background:#222d3f; } body.theme-dark .bd-senha span, body.theme-dark .bd-senha b{ color:#cfe0f3; }
 body.theme-dark .bd-cuidado{ background:#3a2f14; color:#f5d78e; }
-/* quem veio à tutoria: à parte da conversa */
+/* o número de recados sem ler, ao lado do nome do professor e no item do menu */
+.fu-n{ display:inline-block; min-width:18px; height:18px; padding:0 5px; margin-left:.35rem; border-radius:99px; background:#22c55e; color:#fff;
+  font-size:.68rem; font-weight:800; line-height:18px; text-align:center; vertical-align:1px; }
+.fu-n[hidden]{ display:none; }
+/* quem veio à tutoria: card da prateleira "Em aula", duas casas de largura e a altura da linha (rola por dentro) */
+.prat-grid .tt-card{ grid-column:span 2; max-height:none; height:0; min-height:100%; }
+@media (max-width: 640px){ .prat-grid .tt-card{ height:auto; min-height:0; max-height:270px; } }
 .tt-card{ flex:0 1 auto; min-height:0; display:flex; flex-direction:column; background:var(--white); border:2px solid var(--surface-border-color,#a8bfd2);
   border-radius:16px; overflow:hidden; box-shadow:var(--surface-shadow, 0 4px 14px rgba(15,31,78,.08)); max-height:38vh; }
 .tt-card[hidden]{ display:none; }
