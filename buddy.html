@@ -140,6 +140,13 @@
   .sug-i .ic{ font-size:1.2rem; flex:none; } .sug-i > div{ flex:1; min-width:0; } .sug-i b{ font-size:.92rem; color:#1d2b3a; } .sug-i p{ margin:.1rem 0 0; font-size:.84rem; color:#44607c; } .sug-i small{ color:#6b7a8c; }
   .sug-i button{ flex:none; background:#f59e0b; color:#fff; border:0; border-radius:10px; font-family:var(--font-body); font-weight:800; font-size:.84rem; padding:.5rem .8rem; cursor:pointer; }
   .sug-i button:disabled{ opacity:.6; cursor:default; }
+  .aula{ align-self:stretch; background:#fff; border:2px solid #2563eb; border-radius:14px; padding:.7rem .9rem; animation:entra .3s ease both; }
+  .aula-t{ font-family:var(--font-heading); font-weight:800; color:#1e3a8a; font-size:.95rem; margin-bottom:.3rem; } .aula-t small{ font-family:var(--font-body); font-weight:600; color:#6b7a8c; font-size:.74rem; }
+  .aula-i{ display:grid; grid-template-columns:minmax(0,1fr) auto; gap:.1rem .6rem; padding:.4rem 0; border-top:1px solid #e3eaf2; } .aula-i:first-of-type{ border-top:0; }
+  .aula-i b{ font-size:.92rem; color:#1d2b3a; } .aula-i .lic{ font-size:.8rem; color:#44607c; font-weight:700; white-space:nowrap; }
+  .aula-i p{ grid-column:1 / -1; margin:0; font-size:.84rem; color:#92400e; } .aula-i.ok p{ color:#166534; }
+  body.theme-dark .aula{ background:#273449; } body.theme-dark .aula-t{ color:#bfdbfe; } body.theme-dark .aula-i{ border-top-color:#3a4a63; }
+  body.theme-dark .aula-i b{ color:#f1f5fb; } body.theme-dark .aula-i .lic{ color:#c2d0e0; } body.theme-dark .aula-i p{ color:#fcd34d; } body.theme-dark .aula-i.ok p{ color:#86efac; }
   .lemb-i{ display:flex; gap:.5rem; align-items:flex-start; padding:.35rem 0; border-top:1px solid #e3eaf2; font-size:.92rem; } .lemb-i span{ flex:1; }
   .lemb-i button{ background:transparent; border:0; cursor:pointer; color:#b91c1c; font-size:.95rem; }
   body.theme-dark .sug{ background:#273449; border-color:#b45309; } body.theme-dark .sug-t{ color:#fcd34d; } body.theme-dark .sug-i{ border-top-color:#3a4a63; }
@@ -694,8 +701,12 @@ function abertura() {
 function mostraSugestoes(vez) {
   if (info && info.direcao && !comoQuem) return;
   post({ action: 'buddySugestoes' }).then(function (j) {
-    var ss = (j && j.sugestoes) || [];
-    if (vez !== aberturaN || !ss.length) return;
+    if (vez !== aberturaN || !j) return;
+    var ss = j.sugestoes || [];
+    /* EM AULA (Pedro, 06/10/2026): se ele abriu o Buddy no horário de uma turma dele, o começo é sobre ela: uma linha
+       por aluno com o que importa hoje, as pendências só dessa turma, e perguntas prontas que já dizem a turma. */
+    if (j.aula) { ss = j.aula.sugestoes || []; mostraAula(j.aula); }
+    if (!ss.length) return;
     var d = document.createElement('div'); d.className = 'sug';
     d.innerHTML = '<div class="sug-t">🔔 Para você olhar hoje</div>' + ss.map(function (g, i) {
       /* a sugestão traz ou uma lista de alunos (termo, 2nd chance, faltas) ou linhas prontas (semana, aluno novo, pastas) */
@@ -721,8 +732,29 @@ function mostraSugestoes(vez) {
     });
     var com = document.querySelector('.comeco');
     if (com && com.parentNode) com.parentNode.insertBefore(d, com); else poe(d);
-    $('chat').scrollTop = 0;
+    if (!j.aula) $('chat').scrollTop = 0;
   }).catch(function () {});
+}
+function mostraAula(au) {
+  var com = document.querySelector('.comeco'); if (com) com.remove();
+  bolha('<p>Você está em aula com <b>' + esc(au.turma) + '</b> (' + esc(au.horario) + '). Separei o que importa de cada aluno hoje.</p>');
+  var d = document.createElement('div'); d.className = 'aula';
+  d.innerHTML = '<div class="aula-t">🎓 A turma de agora' + (au.radarDe ? ' <small>· radar da ' + esc(au.radarDe) + '</small>' : '') + '</div>' +
+    (au.alunos || []).map(function (a) {
+      return '<div class="aula-i' + (a.pontos.length ? '' : ' ok') + '"><b>' + esc(a.nome.split(' ').slice(0, 2).join(' ')) + '</b><span class="lic">' + esc(a.licao) + '</span>' +
+             '<p>' + (a.pontos.length ? a.pontos.map(esc).join(' · ') : 'em dia') + '</p></div>';
+    }).join('');
+  poe(d);
+  var T = au.turma, perguntas = [
+    ['🗣️', 'Com quem eu falo primeiro nesta aula?', 'Estou em aula agora com a turma "' + T + '". Com quem eu falo primeiro, e sobre o quê? No máximo quatro alunos, uma linha cada.'],
+    ['🎯', 'Em que habilidade esta turma está mais fraca?', 'Estou em aula agora com a turma "' + T + '". Pelo radar, em que habilidade a turma está mais fraca e quais alunos puxam para baixo? Resposta curta.'],
+    ['🙋', 'Quem desta turma foi à tutoria?', 'Da turma "' + T + '", quem foi à tutoria nas últimas duas semanas e o que foi feito? E quem está atrasado e não foi?'],
+    ['📚', 'O que cada um pode praticar no portal?', 'Para cada aluno da turma "' + T + '" com algum eixo do radar abaixo de 70, diga qual eixo e o que ele mais errou. Uma linha por aluno.']];
+  var c = document.createElement('div'); c.className = 'comeco';
+  c.innerHTML = perguntas.map(function (p, i) { return '<button type="button" style="animation-delay:' + (150 + i * 110) + 'ms" data-i="' + i + '"><span>' + p[0] + '</span><span>' + esc(p[1]) + '</span></button>'; }).join('');
+  c.addEventListener('click', function (e) { var b = e.target.closest ? e.target.closest('button') : null; if (b) { var p = perguntas[+b.getAttribute('data-i')]; pergunta(p[2], p[1]); } });
+  poe(c);
+  $('chat').scrollTop = 0;
 }
 /* ── os lembretes que o Buddy guarda entre conversas: o professor vê e apaga ── */
 function mostraLembretes(apaga) {
