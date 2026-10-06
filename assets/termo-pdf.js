@@ -22,6 +22,16 @@ function fiskTermoHorario(titulo) {
   var m = l.match(/(2ª|3ª|4ª|5ª|6ª|s[áa]b\.?|dom\.?).*$/i);
   return m ? m[0].trim() : '';
 }
+/* a mensagem de WhatsApp que acompanha o termo (06/10/2026): no molde da do 2nd chance, sem números e sem gênero
+   (o termo vale para aluno e aluna). O professor copia e envia; ninguém envia por ele. */
+function fiskTermoMensagem(nome, prof) {
+  nome = String(nome || '').trim(); prof = String(prof || '').trim();
+  var pr = nome.split(/\s+/)[0] || 'seu/sua filho(a)', assina = prof ? ('Prof. ' + prof) : 'a professora / o professor';
+  return 'Olá, família! Tudo bem? 😊\n\n' +
+    'Aqui é ' + assina + ', da Fisk. Estou enviando em anexo um comunicado sobre o andamento de ' + (nome || 'seu/sua filho(a)') + ' no curso.\n\n' +
+    'Notamos que o plano de curso de ' + pr + ' está com algumas aulas de atraso, e queremos ajudar a retomar o ritmo com tranquilidade. Para isso, a escola oferece as tutorias, que são aulas extras sem nenhum custo.\n\n' +
+    'No comunicado explico a situação e o que podemos fazer juntos. Qualquer dúvida, estou à disposição. Conte comigo e com a escola! 🧡';
+}
 async function fiskTermoPDF(d) {
   d = d || {};
   d.nome = String(d.nome || '').trim();

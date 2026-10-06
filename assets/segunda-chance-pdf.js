@@ -69,6 +69,17 @@ function fisk2ndItens(o) {
   String(o.livres || '').split('\n').forEach(function (l) { l = fisk2ndPolir(l); if (l) itens.push(l); });
   return itens;
 }
+/* a mensagem de WhatsApp que acompanha o comunicado: leve, SEM notas (texto do Pedro, à risca). Mora aqui para o
+   gerador e o Buddy mandarem a MESMA mensagem. */
+function fisk2ndMensagem(nome, prof) {
+  nome = String(nome || '').trim(); prof = String(prof || '').trim();
+  var pr = fisk2ndPrimeiroNome(nome), assina = prof ? ('Prof. ' + prof) : 'a professora / o professor';
+  return 'Olá, família! Tudo bem? 😊\n\n' +
+    'Aqui é ' + assina + ', da Fisk. Estou enviando em anexo um comunicado sobre as avaliações linguísticas de ' + (nome || 'seu/sua filho(a)') + '.\n\n' +
+    'Infelizmente, a ' + pr + ' não obteve a pontuação necessária na avaliação e, por isso, precisaremos realizar algumas revisões e prepará-la para prestar a prova novamente. Este tipo de desafio faz parte do processo de aprendizagem, e a escola vai apoiar em cada passo.\n\n' +
+    'Em virtude dessa revisão e recuperação de conteúdos para a segunda chance (Second Chance Test), o plano de curso dela se atrasará um pouco.\n\n' +
+    'No comunicado explico os detalhes e como podemos ajudar. Qualquer dúvida, estou à disposição. Conte comigo e com a escola! 🧡';
+}
 async function fisk2ndPDF(d) {
   d = d || {};
   d.nome = String(d.nome || '').trim();

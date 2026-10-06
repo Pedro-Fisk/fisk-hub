@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <script src="assets/fisk-shared.js?v=2026-10-06a"></script>
-<script src="assets/buddy-conversas.js?v=2026-10-06g"></script>
+<script src="assets/buddy-conversas.js?v=2026-10-06h"></script>
 <style>
   [hidden]{ display:none !important; }
   .hero{ padding-bottom:1.1rem; }
@@ -100,6 +100,11 @@
   .prop .bts button:disabled{ opacity:.55; cursor:default; }
   .prop .res{ font-size:.9rem; font-weight:700; } .prop .res.ok{ color:#166534; } .prop .res.err{ color:#b91c1c; }
   .prop .bts a.abre{ display:inline-block; background:#2563eb; color:#fff; font-weight:800; text-decoration:none; border-radius:10px; padding:.55rem 1rem; font-size:.92rem; }
+  .zap{ margin-top:.6rem; padding-top:.55rem; border-top:1px dashed #c5d3e3; } .zap-t{ font-weight:800; font-size:.88rem; color:#16243a; } .zap-t small{ font-weight:600; color:#6b7a8c; }
+  .zap pre{ margin:.4rem 0 .5rem; padding:.6rem .75rem; background:#ecfdf5; border-radius:10px; font-family:var(--font-body); font-size:.88rem; line-height:1.45; white-space:pre-wrap; color:#1d2b3a; max-height:190px; overflow:auto; }
+  body.theme-dark .zap-t{ color:#f1f5fb; } body.theme-dark .zap pre{ background:#1f2937; color:#e6edf6; } body.theme-dark .zap{ border-top-color:#3a4a63; }
+  .msg a{ color:#2563eb; font-weight:700; word-break:break-all; } body.theme-dark .msg:not(.eu) a{ color:#93c5fd; }
+  .aula-i a.pst{ text-decoration:none; font-size:.95rem; margin-left:.35rem; }
   .prop a.lk{ display:inline; background:none; color:#2563eb; padding:0; font-weight:800; text-decoration:underline; font-size:inherit; }
   .prop.feita{ border-color:#16a34a; } .prop.cancelada{ border-color:#c5d3e3; opacity:.75; }
   body.theme-dark .prop .res.ok{ color:#86efac; } body.theme-dark .prop .res.err{ color:#fca5a5; } body.theme-dark .prop .bts .nao{ background:#3a4a63; color:#e6edf6; }
@@ -306,7 +311,11 @@ function formata(t) {
     });
     if (dentro) h += '</ul>';
   });
-  return h.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+  h = h.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+  /* link clicável só para endereço do Drive, dos Documentos Google e das nossas páginas: o texto vem do modelo */
+  return h.replace(/https:\/\/(?:drive\.google\.com|docs\.google\.com|pedro-fisk\.github\.io|portalfisk\.com\.br)\/[^\s<]*[^\s<.,;:!?)]/g, function (u) {
+    return '<a href="' + u + '" target="_blank" rel="noopener">' + (/drive\.google\.com\/drive\/folders/.test(u) ? '📁 abrir a pasta no Drive' : u) + '</a>';
+  });
 }
 function poe(el) { var c = $('chat'); c.appendChild(el); c.scrollTop = c.scrollHeight; return el; }
 function bolhaEu(t) { var d = document.createElement('div'); d.className = 'msg eu'; d.textContent = t; return poe(d); }
@@ -407,13 +416,15 @@ function nomeProprio(s) { return String(s || '').toLowerCase().replace(/(^|\s)(\
    e segue pelas mesmas três rotas: pasta do aluno no Drive, marca no card, linha no counseling. Sem o Drive, para:
    termo que não foi salvo não pode aparecer como gerado. Card e counseling são registro, e a falha deles é aviso. */
 var DOCS = {
-  termo: { ic: '📄', nome: 'Termo de atraso', curto: 'Termo', motor: 'assets/termo-pdf.js?v=2026-10-06a',
+  termo: { ic: '📄', nome: 'Termo de atraso', curto: 'Termo', motor: 'assets/termo-pdf.js?v=2026-10-06b',
     pdf: function (x) { return fiskTermoPDF({ nome: x.nome, book: x.book, prof: nomeProprio(x.professor), horario: fiskTermoHorario(x.turmaCheia), atraso: x.atraso, faltas: x.faltas,
                                              ultima: x.ultima, prevista: x.prevista, motivos: x.motivos, outros: x.outros, sugestoes: x.sugestoes, livres: x.livres }); },
+    mensagem: function (x) { return fiskTermoMensagem(x.nome, nomeProprio(x.professor).split(' ')[0]); },
     counseling: function (x) { return { estagio: x.book || '', faltas: x.faltas, atrasadas: x.atraso, texto: 'Termo de atraso gerado pelo Fisk Hub (Buddy).' }; } },
-  '2nd': { ic: '🔁', nome: 'Comunicado de 2nd Chance', curto: 'Comunicado', motor: 'assets/segunda-chance-pdf.js?v=2026-10-06a',
+  '2nd': { ic: '🔁', nome: 'Comunicado de 2nd Chance', curto: 'Comunicado', motor: 'assets/segunda-chance-pdf.js?v=2026-10-06b',
     pdf: function (x) { return fisk2ndPDF({ nome: x.nome, estagio: x.book, prof: nomeProprio(x.professor), turma: String(x.turmaCheia || '').split('\n')[0].trim(), escrita: x.escrita, auditiva: x.auditiva,
                                            itens: fisk2ndItens({ licoes: x.licoes, marcadas: x.marcadas, livres: x.livres, escrita: x.escrita, auditiva: x.auditiva }) }); },
+    mensagem: function (x) { return fisk2ndMensagem(x.nome, nomeProprio(x.professor).split(' ')[0]); },
     counseling: function (x) {
       var ab = fisk2ndAbaixo(x);
       return { estagio: x.book || '', prova: ab.join(' e '), motivo: ab.map(function (q) { return (q === 'escrita' ? 'Escrita' : 'Auditiva') + ': ' + x[q]; }).join(' · ') };
@@ -460,6 +471,20 @@ function cartaoDoc(pr, idConversa) {
           (pasta.pastaUrl || pasta.url ? '<a class="lk" href="' + esc(pasta.pastaUrl || pasta.url) + '" target="_blank" rel="noopener">abrir a pasta</a> · ' : '') +
           '<a class="lk" href="' + url + '" target="_blank" rel="noopener">ver o PDF</a>' +
           (avisos.length ? '<br><span style="color:#b45309">Atenção: ' + esc(avisos.join('; ')) + '.</span>' : '');
+        /* a mensagem para a família: o professor copia e manda pelo WhatsApp dele, com o PDF anexado */
+        var msgF = D.mensagem ? D.mensagem(x) : '';
+        if (msgF) {
+          var cx = document.createElement('div'); cx.className = 'zap';
+          cx.innerHTML = '<div class="zap-t">💬 Mensagem para a família <small>(você envia pelo seu WhatsApp, com o PDF)</small></div><pre></pre>' +
+                         '<div class="bts"><button type="button" class="nao">📋 Copiar a mensagem</button><span class="res"></span></div>';
+          cx.querySelector('pre').textContent = msgF;
+          cx.querySelector('button').addEventListener('click', function () {
+            var r2 = cx.querySelector('.res'), ok = function () { r2.className = 'res ok'; r2.textContent = 'copiada'; setTimeout(function () { r2.textContent = ''; }, 2000); };
+            if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(msgF).then(ok, function () { r2.textContent = 'selecione o texto e copie'; });
+            else r2.textContent = 'selecione o texto e copie';
+          });
+          d.appendChild(cx);
+        }
         post({ action: 'buddyConfirma', conversa: idConversa, id: pr.id, resultado: 'drive ok' + (avisos.length ? '; ' + avisos.join('; ') : '; card e counseling ok') }).catch(function () {});
       }).catch(function (e) {
         /* parou antes de salvar: nada foi registrado. O PDF, se chegou a ser montado, fica para baixar à mão */
@@ -741,7 +766,7 @@ function mostraAula(au) {
   var d = document.createElement('div'); d.className = 'aula';
   d.innerHTML = '<div class="aula-t">🎓 A turma de agora' + (au.radarDe ? ' <small>· radar da ' + esc(au.radarDe) + '</small>' : '') + '</div>' +
     (au.alunos || []).map(function (a) {
-      return '<div class="aula-i' + (a.pontos.length ? '' : ' ok') + '"><b>' + esc(a.nome.split(' ').slice(0, 2).join(' ')) + '</b><span class="lic">' + esc(a.licao) + '</span>' +
+      return '<div class="aula-i' + (a.pontos.length ? '' : ' ok') + '"><b>' + esc(a.nome.split(' ').slice(0, 2).join(' ')) + (a.pasta ? '<a class="pst" href="' + esc(a.pasta) + '" target="_blank" rel="noopener" title="Abrir a pasta do aluno no Drive">📁</a>' : '') + '</b><span class="lic">' + esc(a.licao) + '</span>' +
              '<p>' + (a.pontos.length ? a.pontos.map(esc).join(' · ') : 'em dia') + '</p></div>';
     }).join('');
   poe(d);

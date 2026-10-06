@@ -11,7 +11,7 @@
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-<script src="assets/segunda-chance-pdf.js?v=2026-10-06a"></script>
+<script src="assets/segunda-chance-pdf.js?v=2026-10-06b"></script>
 <style>
   /* Acentos na tela ecoam a paleta AZUL do boletim de jovens e adultos
      (sheet-adults): o PDF gerado usa exatamente esses azuis. */
@@ -648,15 +648,8 @@ function itensRecuperacao() {
 
 /* ---- mensagem de WhatsApp: leve, SEM notas (texto do Pedro, à risca) ---- */
 function montarMensagem() {
-  var nome = (alunoSel.nome || '').trim();
-  var pr = primeiroNome(nome);
-  var prof = ($('fProf').value || '').trim();
-  var assina = prof ? ('Prof. ' + prof) : 'a professora / o professor';
-  return 'Olá, família! Tudo bem? 😊\n\n' +
-    'Aqui é ' + assina + ', da Fisk. Estou enviando em anexo um comunicado sobre as avaliações linguísticas de ' + (nome || 'seu/sua filho(a)') + '.\n\n' +
-    'Infelizmente, a ' + pr + ' não obteve a pontuação necessária na avaliação e, por isso, precisaremos realizar algumas revisões e prepará-la para prestar a prova novamente. Este tipo de desafio faz parte do processo de aprendizagem, e a escola vai apoiar em cada passo.\n\n' +
-    'Em virtude dessa revisão e recuperação de conteúdos para a segunda chance (Second Chance Test), o plano de curso dela se atrasará um pouco.\n\n' +
-    'No comunicado explico os detalhes e como podemos ajudar. Qualquer dúvida, estou à disposição. Conte comigo e com a escola! 🧡';
+  /* o texto mora em assets/segunda-chance-pdf.js (fisk2ndMensagem), o mesmo que o Buddy oferece */
+  return fisk2ndMensagem(alunoSel.nome, $('fProf').value);
 }
 $('btnCopiar').addEventListener('click', function () {
   var t = $('msg').value;

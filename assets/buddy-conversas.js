@@ -181,6 +181,13 @@ window.BUDDY_ARVORE = [
 
   { id: 'semana', ic: '🗓️', tit: 'Minha semana', sub: 'o que fazer com tudo isso',
     perguntas: [
+      { rot: 'Monte o roteiro da aula de uma turma…', falta: 'turma',
+        texto: 'Monte o roteiro da aula: uma linha por aluno, começando por quem mais precisa, com uma ação concreta para hoje. Turma: ',
+        depois: ['Em que habilidade uma turma está mais fraca…', 'Quem precisa de termo de atraso?'] },
+      { rot: 'Escrever uma mensagem para a família…', falta: 'aluno',
+        texto: 'Escreva uma mensagem de WhatsApp para a família, pronta para eu copiar e enviar. Aluno e assunto: ' },
+      { rot: 'Elogiar um aluno para a família…', falta: 'aluno',
+        texto: 'Olhe os dados e escreva uma mensagem curta de WhatsApp para a família contando o que está indo bem (presença, progresso no livro, estudo no portal). Só o que os dados mostram. Aluno: ' },
       { rot: 'Monte minhas prioridades da semana',
         texto: 'Monte minha lista de prioridades da semana: no máximo sete itens, do mais urgente para o menos, cada um com o aluno ou a turma e o motivo em números.',
         depois: ['Quem precisa de termo de atraso?', 'Com quem eu falo antes da próxima aula?'] },
