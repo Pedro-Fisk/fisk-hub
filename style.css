@@ -816,7 +816,7 @@ body.theme-dark .prat-t{ color:#e4e7ec; border-bottom-color:#344054; }
 .bd-n{ margin-left:auto; min-width:24px; height:24px; padding:0 7px; border-radius:99px; background:#22c55e; color:#fff; font-size:.8rem; font-weight:800;
   line-height:24px; text-align:center; } .bd-n[hidden]{ display:none; }
 .bd-n + .av-fecha{ margin-left:.5rem; }
-.bd-cab{ cursor:pointer; }
+
 .bd-foto{ position:relative; width:44px; height:44px; border-radius:50%; background:#fff; flex:none; box-shadow:0 0 0 3px rgba(255,255,255,.4); }
 .bd-foto .rosto, .av-sino .rosto{ display:block; width:100%; height:100%; border-radius:50%; overflow:hidden; }
 .bd-foto img, .av-sino img{ display:block; width:100%; height:100%; transform:scale(1.35); transform-origin:50% 45%; }
@@ -872,7 +872,9 @@ body.theme-dark .bd-cuidado{ background:#3a2f14; color:#f5d78e; }
   font-size:.68rem; font-weight:800; line-height:18px; text-align:center; vertical-align:1px; }
 .fu-n[hidden]{ display:none; }
 /* quem veio à tutoria: card da prateleira "Em aula", duas casas de largura e a altura da linha (rola por dentro) */
-.prat-grid .tt-card{ grid-column:span 2; max-height:none; height:0; min-height:100%; }
+/* sozinho na linha (com o Buddy fora da tela as ferramentas se rearrumam) ele não tinha de quem herdar a altura e
+   sumia: 100% de uma linha vazia é zero. Por isso o piso. */
+.prat-grid .tt-card{ grid-column:span 2; max-height:none; height:0; min-height:max(100%, 232px); }
 @media (max-width: 640px){ .prat-grid .tt-card{ height:auto; min-height:0; max-height:270px; } }
 .tt-card{ flex:0 1 auto; min-height:0; display:flex; flex-direction:column; background:var(--white); border:2px solid var(--surface-border-color,#a8bfd2);
   border-radius:16px; overflow:hidden; box-shadow:var(--surface-shadow, 0 4px 14px rgba(15,31,78,.08)); max-height:38vh; }
@@ -908,9 +910,10 @@ body.bd-fora .avisos, body.bd-fora .av-sino{ display:none !important; }
 .av-fundo{ display:none; }
 /* a coluna recolhida no computador: some, e o Buddy flutua no canto para chamá-la de volta */
 @media (min-width: 1181px){
-  /* recolhida, a coluna continua ocupando o lugar dela: sobra o cabeçalho do Buddy, e nada mais se mexe */
-  body.bd-recolhido .bd-chat, body.bd-recolhido .tt-card{ display:none; }
-  body.bd-recolhido .bd-janela{ flex:0 0 auto; }
+  /* minimizado: a janela some e o Buddy vira a bolinha do canto; o lugar da coluna continua reservado, e as
+     ferramentas não se mexem */
+  body.bd-recolhido .bd-janela{ display:none; }
+  body.bd-recolhido .av-sino:not([hidden]){ display:block; }
 }
 @media (max-width: 1180px){
   .home-cols{ display:block; }
