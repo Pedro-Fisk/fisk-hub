@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="assets/fisk-shared.css?v=2026-09-20a">
   <!-- a casa do professor veste a faixa do topo (campanha de 09/2026) -->
   <link rel="stylesheet" href="assets/casa-tema.css?v=9">
-<link rel="stylesheet" href="style.css?v=2026-10-05a">
+<link rel="stylesheet" href="style.css?v=2026-10-06b">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 </head>
@@ -167,6 +167,7 @@
   <!-- MAIS USADAS (19/09/2026): a home tem muita ferramenta e o professor usa quatro ou cinco por dia. A faixa é
        montada pelo próprio aparelho, contando os cliques nos cards; nada sai daqui e nada é escondido da grade. -->
   <nav id="maisUsadas" class="mais-usadas" hidden aria-label="Suas ferramentas mais usadas"></nav>
+  <div class="home-cols">
   <main class="grid">
     <!-- POLÍTICA DE ABAS (31/07/2026): ferramenta do ecossistema abre na MESMA
          aba, para o botão de voltar dela funcionar como navegação de verdade;
@@ -456,6 +457,29 @@
     </a>
 
   </main>
+  <!-- O BUDDY DO PROFESSOR (06/10/2026): a coluna da direita. Em cima, a conversa do Buddy, com os informes da
+       direção e da secretaria (Informes.js) e as novidades do Hub, cada um com a caixinha "Li e estou ciente".
+       Embaixo, à parte, os alunos que foram à tutoria nas últimas 2 semanas (Tutoria.js). No celular a coluna
+       vira painel, aberto pelo Buddy que flutua no canto. -->
+  <aside class="avisos" id="avisos" hidden aria-label="Buddy, recados e tutoria">
+    <div class="bd-janela">
+      <div class="bd-cab">
+        <div class="bd-foto"><span class="rosto"><img alt="Buddy" src="https://portalfisk.com.br/assets/icons/buddy.png"></span></div>
+        <div class="bd-nome"><b>Buddy</b><small id="bdSub">online</small></div>
+        <button type="button" class="av-fecha" id="avFecha" aria-label="Recolher o Buddy" title="Recolher">—</button>
+      </div>
+      <div class="bd-chat" id="bdChat"></div>
+    </div>
+    <div class="tt-card" id="ttCard" hidden>
+      <div class="tt-cab"><span id="ttTit">🙋 Quem veio à tutoria<small>nas últimas 2 semanas</small></span><b id="ttN" hidden></b></div>
+      <div class="tt-lista" id="ttLista"></div>
+      <a class="av-rodape" id="ttLink" href="tutoria.html">Ver a frequência completa →</a>
+    </div>
+  </aside>
+  </div>
+  <!-- o Buddy fica solto no canto, e não na barra do professor: ela é escondida para o professor comum -->
+  <button type="button" id="avSino" class="av-sino" hidden aria-label="Abrir os recados do Buddy"><span class="rosto"><img alt="" src="https://portalfisk.com.br/assets/icons/buddy.png"></span><span class="n" id="avSinoN" hidden></span></button>
+  <div class="av-fundo" id="avFundo" hidden></div>
 
   <!-- ═══════════════════════════════════════
        Calendário Institucional — FORA DO AR desde 03/08/2026
@@ -1361,7 +1385,7 @@
       function enter(prof){
         try{ localStorage.setItem('fisk_prof', JSON.stringify(prof)); }catch(e){}
         document.body.classList.remove('prof-out');
-        document.body.classList.add('prof-in');
+        document.body.classList.add('prof-in'); if (window._avisosLiga) window._avisosLiga();
         fillBar(prof);
         /* mesmo menu das ferramentas, no mesmo canto. ⚠️ SEM `onIdioma` desde
            23/09/2026: sem ele o kit não desenha o seletor de idioma, e é assim
@@ -1445,14 +1469,82 @@
          desenho só escreve o que o aviso trouxer. */
       var AVISOS = [
       {
+        /* A FREQUÊNCIA À TUTORIA (06/10/2026): a ferramenta nova, contada pelo Buddy */
+        id: 'tutoria-frequencia-2026-10',
+        desde: '2026-10-06', ate: '2026-12-15',
+        link: { href: 'tutoria.html' },
+        pt: { selo:'Novidade',
+              t:'Agora dá para ver quem foi à tutoria 🙋',
+              p1:'O Hub tem uma ferramenta nova, <b>Frequência à Tutoria</b>: os alunos seus que foram ao plantão de dúvidas nos últimos 14 dias, com o dia, o monitor e o que foi feito. É o espelho do Diário de Bordo, sem precisar abrir a planilha.',
+              p2:'Eles também aparecem aqui embaixo, em <b>Quem veio à tutoria</b>, com uma caixinha para você marcar quem já viu.',
+              btnLink:'Abrir a Frequência à Tutoria 🙋', btn:'Entendi 👍' },
+        en: { selo:'What’s new',
+              t:'Now you can see who came to tutoring 🙋',
+              p1:'The Hub has a new tool, <b>Tutoring Attendance</b>: your students who came to the Learning Center in the last 14 days, with the day, the monitor and what was done. It mirrors the logbook, with no spreadsheet to open.',
+              p2:'They also show up right below, under <b>Who came to tutoring</b>, with a box to tick the ones you have seen.',
+              btnLink:'Open Tutoring Attendance 🙋', btn:'Got it 👍' },
+        es: { selo:'Novedad',
+              t:'Ya puedes ver quién fue a la tutoría 🙋',
+              p1:'El Hub tiene una herramienta nueva, <b>Asistencia a la Tutoría</b>: tus alumnos que fueron a la tutoría en los últimos 14 días, con el día, el monitor y lo que se hizo. Es el espejo del Diario de a Bordo, sin abrir la planilla.',
+              p2:'También aparecen aquí abajo, en <b>Quién fue a la tutoría</b>, con una casilla para marcar a quién ya viste.',
+              btnLink:'Abrir Asistencia a la Tutoría 🙋', btn:'Entendido 👍' }
+      },
+      {
+        /* A CERIMÔNIA DE SELEÇÃO: a campanha de setembro, até 10/10/2026 */
+        id: 'cerimonia-selecao-2026-09',
+        desde: '2026-09-06', ate: '2026-10-10',
+        link: { href: 'hogwarts.html' },
+        pt: { selo:'Campanha',
+              t:'A Cerimônia de Seleção vai até 10/10 🎩',
+              p1:'O Chapéu Seletor está no Portal do Aluno e aqui no Hub: cada aluno responde às perguntas <b>uma vez só</b> e descobre a casa dele, e o portal passa a vestir as cores dela.',
+              p2:'Você também pode fazer a sua. A casa aparece na faixa do topo do Hub, e os pontos das casas somam o que os alunos praticam no portal.',
+              btnLink:'Fazer a minha Cerimônia 🎩', btn:'Entendi 👍' },
+        en: { selo:'Campaign',
+              t:'The Sorting Ceremony runs until October 10 🎩',
+              p1:'The Sorting Hat is in the Student Portal and here in the Hub: each student answers the questions <b>only once</b> and finds out their house, and the portal starts wearing its colours.',
+              p2:'You can do yours too. Your house shows on the Hub’s top banner, and house points add up what students practise in the portal.',
+              btnLink:'Take my Sorting Ceremony 🎩', btn:'Got it 👍' },
+        es: { selo:'Campaña',
+              t:'La Ceremonia de Selección va hasta el 10/10 🎩',
+              p1:'El Sombrero Seleccionador está en el Portal del Alumno y aquí en el Hub: cada alumno responde las preguntas <b>una sola vez</b> y descubre su casa, y el portal pasa a vestir sus colores.',
+              p2:'Tú también puedes hacer la tuya. La casa aparece en la franja de arriba del Hub, y los puntos de las casas suman lo que los alumnos practican en el portal.',
+              btnLink:'Hacer mi Ceremonia 🎩', btn:'Entendido 👍' }
+      },
+      {
+        /* O ACESSO KIDS do Portal do Aluno: a chave de sala do plantão das crianças. Mesma ofuscação da senha
+           das provas (a página é pública): atrito, não cofre. */
+        id: 'acesso-kids-2026-09',
+        desde: '2026-09-05', ate: '2026-12-15',
+        senha: String.fromCharCode(75,73,68,83),
+        pt: { selo:'Turmas Kids',
+              t:'O Portal do Aluno tem um acesso para as turmas Kids 🧒',
+              p1:'A criança das turmas infantis quase nunca sabe o RAF. Para ela ouvir os áudios e ver os vídeos do livro no computador da escola, entre no <b>Portal do Aluno</b> com o acesso abaixo, no lugar do RAF.',
+              rot:'No lugar do RAF, digite',
+              cuidado:'É uma chave de sala, sua: não passe para o aluno. Ela abre só os áudios, os vídeos e os aplicativos dos livros Kids, e nada do que for feito ali vira Fisk Dólar ou histórico.',
+              btn:'Entendi 👍' },
+        en: { selo:'Kids classes',
+              t:'The Student Portal has a login for Kids classes 🧒',
+              p1:'Young children hardly ever know their RAF. So they can listen to the book audio and watch the videos on the school computer, log in to the <b>Student Portal</b> with the access below, in place of the RAF.',
+              rot:'In place of the RAF, type',
+              cuidado:'It is a classroom key, yours: do not pass it on to students. It opens only the audio, videos and apps of the Kids books, and nothing done there earns Fisk Dollars or history.',
+              btn:'Got it 👍' },
+        es: { selo:'Grupos Kids',
+              t:'El Portal del Alumno tiene un acceso para los grupos Kids 🧒',
+              p1:'El niño de los grupos infantiles casi nunca sabe su RAF. Para que escuche los audios y vea los videos del libro en la computadora de la escuela, entra al <b>Portal del Alumno</b> con el acceso de abajo, en lugar del RAF.',
+              rot:'En lugar del RAF, escribe',
+              cuidado:'Es una llave de sala, tuya: no se la pases al alumno. Abre solo los audios, los videos y las aplicaciones de los libros Kids, y nada de lo que se haga ahí suma Fisk Dólares ni historial.',
+              btn:'Entendido 👍' }
+      },
+      {
         /* SÓ PARA QUEM TEM ALUNO DE SIMULADO (pedido do Pedro, 29/09/2026): professor que só dá aula para
            criança não precisa saber disso. `publico:'met'` = tem aluno ativo de In Focus ou Fluency 2 no card
            (ver `publicoMet`). */
         id: 'fpa-e-simulados-2026-09',
+        desde: '2026-09-29',
         ate: '2026-11-15',
         publico: 'met',
         link: { href: 'corretor-met.html' },
-        pt: { selo:'Novidade para o professor',
+        pt: { selo:'Novidade',
               t:'As notas do Fisk Portas Abertas e dos simulados já chegam sozinhas ao aluno 🎓',
               p1:'Os alunos que já apresentaram no <b>Fisk Portas Abertas</b> agora veem a avaliação deles no <b>Portal do Aluno</b>: um card novo, uma cortina de parabéns e o <b>Evaluation Report</b> que você preencheu, em tela e em PDF. O aluno recebe só o relatório dele, nunca um link do Drive da escola.',
               p2:'E o simulado presencial corrigido pela <b>ferramenta do professor</b> (a foto da folha de respostas) segue sozinho para três lugares:',
@@ -1461,7 +1553,7 @@
               li3:'a <b>tabela de acompanhamento</b> da secretaria, com o detalhamento das seções como anotação na célula.',
               cuidado:'Para o relatório do FPA aparecer, salve o PDF com <b>"Evaluation Report"</b> e o <b>nome completo do aluno</b> no título, como vocês já fazem. Ele chega ao portal no dia seguinte.',
               btnLink:'Abrir o corretor de simulados 📷', btn:'Entendi 👍' },
-        en: { selo:'New for teachers',
+        en: { selo:'What\u2019s new',
               t:'Fisk Portas Abertas and mock test grades now reach students automatically 🎓',
               p1:'Students who have already presented at <b>Fisk Portas Abertas</b> can now see their evaluation in the <b>Student Portal</b>: a new card, a congratulations screen and the <b>Evaluation Report</b> you filled in, on screen and as a PDF. Each student gets only their own report, never a link to the school Drive.',
               p2:'And a mock test graded with the <b>teacher tool</b> (the photo of the answer sheet) now goes by itself to three places:',
@@ -1470,7 +1562,7 @@
               li3:'the office\'s <b>tracking sheet</b>, with the section breakdown as a note on the cell.',
               cuidado:'For the FPA report to show up, save the PDF with <b>"Evaluation Report"</b> and the student\'s <b>full name</b> in the title, as you already do. It reaches the portal the next day.',
               btnLink:'Open the mock test grader 📷', btn:'Got it 👍' },
-        es: { selo:'Novedad para el profesor',
+        es: { selo:'Novedad',
               t:'Las notas del Fisk Portas Abertas y de los simulacros ya llegan solas al alumno 🎓',
               p1:'Los alumnos que ya presentaron en el <b>Fisk Portas Abertas</b> ahora ven su evaluación en el <b>Portal del Alumno</b>: una tarjeta nueva, una pantalla de felicitación y el <b>Evaluation Report</b> que llenaste, en pantalla y en PDF. Cada alumno recibe solo su informe, nunca un enlace al Drive de la escuela.',
               p2:'Y el simulacro presencial corregido con la <b>herramienta del profesor</b> (la foto de la hoja de respuestas) va solo a tres lugares:',
@@ -1482,9 +1574,10 @@
       },
       {
         id: 'apps-da-fisk-2026-09',
+        desde: '2026-09-10',
         ate: '2026-11-30',
         link: { href: 'apps.html' },
-        pt: { selo:'Novidade para o professor',
+        pt: { selo:'Novidade',
               t:'Já dá para saber, na hora, qual app a sua turma precisa baixar 📱',
               p1:'O Hub tem uma área nova, <b>Aplicativos da Fisk</b>: os 34 aplicativos que a franqueadora publica nas lojas, com <b>qual deles serve a qual estágio</b> e o link para baixar no Android e no iPhone. A régua é a Circular 29/25 da Fundação — não é o que dá para deduzir pelo nome.',
               p2:'Ela existe para você orientar o aluno, e o mesmo card está em mais dois lugares:',
@@ -1493,7 +1586,7 @@
               cuidado:'Confira a plataforma antes de indicar: três Cyber Fun só existem para iPhone, e o Fisk Helper e o New Fisk Player só para Android. O card avisa quando falta.',
               p3:'O <b>Fisk Helper</b> e o <b>New Fisk Player</b> aparecem só para você: são de uso interno da escola e nunca chegam à tela do aluno.',
               btnLink:'Ver os aplicativos 📱', btn:'Entendi 👍' },
-        en: { selo:'New for teachers',
+        en: { selo:'What\u2019s new',
               t:'Now you can tell, on the spot, which app your class needs 📱',
               p1:'The Hub has a new area, <b>Fisk apps</b>: the 34 apps the franchisor publishes in the stores, with <b>which one belongs to which level</b> and the link to download on Android and iPhone. The rule is the Foundation\u2019s Circular 29/25 — not what the name suggests.',
               p2:'It is there so you can guide your students, and the same card lives in two more places:',
@@ -1502,7 +1595,7 @@
               cuidado:'Check the platform before recommending: three Cyber Fun apps exist only for iPhone, and Fisk Helper and New Fisk Player only for Android. The card says so when one is missing.',
               p3:'<b>Fisk Helper</b> and <b>New Fisk Player</b> show up for you only: they are for school use and never reach a student\u2019s screen.',
               btnLink:'See the apps 📱', btn:'Got it 👍' },
-        es: { selo:'Novedad para el profesor',
+        es: { selo:'Novedad',
               t:'Ya puedes saber, al instante, qué app necesita tu grupo 📱',
               p1:'El Hub tiene un área nueva, <b>Aplicaciones de Fisk</b>: las 34 aplicaciones que la franquicia publica en las tiendas, con <b>cuál sirve a cada nivel</b> y el enlace para descargar en Android y iPhone. La regla es la Circular 29/25 de la Fundación — no lo que sugiere el nombre.',
               p2:'Existe para que orientes al alumno, y la misma tarjeta está en dos lugares más:',
@@ -1514,6 +1607,7 @@
       },
       {
         id: 'provas-audio-2026-09',
+        desde: '2026-09-05',
         ate: '2026-10-15',                       // AAAA-MM-DD, some sozinha depois
         /* ⚠️ A SENHA APARECE AQUI, e por isso ela não está escrita em texto no
            fonte: o Hub é servido pelo GitHub Pages e a página é pública, então
@@ -1522,7 +1616,7 @@
            o mesmo nível de proteção da própria trava (ver o comentário do
            `prova` no config.js do Portal do Aluno): atrito, não cofre. */
         senha: String.fromCharCode(107,115,105,102),
-        pt: { selo:'Novidade para o professor',
+        pt: { selo:'Novidade',
               t:'Os áudios das provas agora estão no Portal do Aluno 🎧',
               p1:'Os áudios das provas auditivas saíram do computador da escola e estão no Portal do Aluno, em <b>Áudios do livro</b>, numa seção separada chamada <b>TESTS</b> (no espanhol, <b>TEST DE ESCUCHA</b>).',
               p2:'<b>Ela nasce trancada.</b> Para abrir, na hora da prova:',
@@ -1533,7 +1627,7 @@
               cuidado:'O campo esconde o que você digita, em bolinhas. A ideia é que você digite de frente para o teclado, sem ditar em voz alta — assim o aluno não ouve a prova antes.',
               p3:'Se a prova for no fone de cada aluno, digite a senha no aparelho de cada um. Ouvir esses áudios <b>não dá Fisk Dólares</b> e não fecha lição nenhuma.',
               btn:'Entendi 👍' },
-        en: { selo:'New for teachers',
+        en: { selo:'What\u2019s new',
               t:'The test audio is now in the Student Portal 🎧',
               p1:'The listening test audio has moved off the school computer and into the Student Portal, under <b>Book audio</b>, in a separate section called <b>TESTS</b> (in Spanish, <b>TEST DE ESCUCHA</b>).',
               p2:'<b>It starts locked.</b> To open it at test time:',
@@ -1544,7 +1638,7 @@
               cuidado:'The field hides what you type, as dots. The idea is that you type facing the keyboard, without saying it out loud — so students do not hear the test beforehand.',
               p3:'If students take the test on their own headphones, type the code on each device. Listening to this audio <b>earns no Fisk Dollars</b> and does not complete any lesson.',
               btn:'Got it 👍' },
-        es: { selo:'Novedad para el profesor',
+        es: { selo:'Novedad',
               t:'Los audios de las pruebas ya están en el Portal del Alumno 🎧',
               p1:'Los audios de las pruebas auditivas salieron de la computadora de la escuela y están en el Portal del Alumno, en <b>Audios del libro</b>, en una sección aparte llamada <b>TEST DE ESCUCHA</b> (en inglés, <b>TESTS</b>).',
               p2:'<b>Nace bloqueada.</b> Para abrirla, a la hora de la prueba:',
@@ -1562,7 +1656,12 @@
         try { return localStorage.getItem('fisk_aviso_' + id + '_' + nome) === '1'; }
         catch(e) { return true; }                // sem localStorage: não insista
       }
+      /* AS NOVIDADES VIRARAM RECADO DO BUDDY (Pedro, 06/10/2026): a lista acima não abre mais em cortina. Quem a
+         desenha agora é a conversa do Buddy, na coluna da direita da home, com a caixinha "Li e estou ciente".
+         O que o professor já tinha confirmado na cortina continua confirmado (a mesma chave do aparelho). */
+      window._hubNoticias = { lista: AVISOS, visto: avisoVisto, publicoMet: publicoMet };
       function avisoNovidade(){
+        return;   /* a cortina saiu; ver o comentário acima */
         try{
           var s = saved(); if (!s || !s.name) return;
           if (document.getElementById('av-mask')) return;   // já está na tela
@@ -2059,6 +2158,267 @@
          e o addEventListener estourava. */
       if (document.body.classList.contains('prof-in')) load();
     })();
+  </script>
+  <script>
+  /* ══ O BUDDY DO PROFESSOR (06/10/2026) ════════════════════════════════════
+     O mesmo Buddy do Portal do Aluno, agora auxiliar do professor. A coluna tem
+     duas partes, e é de propósito que sejam duas:
+
+     · A CONVERSA: os informes da direção e da secretaria (rota `informesLer`)
+       e as novidades do Hub (a lista `AVISOS`, que antes abria em cortina).
+       Cada recado tem a caixinha "Li e estou ciente", um por um; a ciência vai
+       para o servidor (`informeCiente`), e quem publicou vê quem marcou.
+     · QUEM VEIO À TUTORIA: os alunos do professor nas últimas 2 semanas
+       (`avisosLer`), cada um com o seu "Vi". Fica fora da conversa porque é
+       muita linha pequena, e afogaria o recado que precisa de ciência.
+
+     Os três pontinhos têm o tempo do Buddy do aluno (ver `digitando` no
+     radar.js do portal). Nos três idiomas do Hub. Falha de rede deixa a coluna
+     como estava, calada: recado nunca pode segurar a home. */
+  (function buddyDoProfessor(){
+    var $$ = function(id){ return document.getElementById(id); };
+    var cx = $$('avisos'), chat = $$('bdChat'), sino = $$('avSino'), sinoN = $$('avSinoN'), fundo = $$('avFundo');
+    var ttCard = $$('ttCard'), ttLista = $$('ttLista'), ttN = $$('ttN');
+    if (!cx || !chat || typeof FISK_HUB_EP === 'undefined') return;
+    var CALMO = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+    var TX = {
+      pt: { sub:'seu auxiliar no Hub · online',
+            oi1:'Oi, {n}! Eu sou o Buddy 🐻',
+            oi2:'Sou o seu auxiliar aqui no Hub. É por mim que chegam os recados da direção e da secretaria, e eu também conto quando tiver novidade nas ferramentas.',
+            oi3:'Cada recado tem uma caixinha: marque quando tiver lido. E os alunos seus que forem à tutoria aparecem logo aqui embaixo.',
+            ola:'Oi, {n}.', novo1:'Tem 1 recado novo para você.', novoN:'Tem {q} recados novos para você.',
+            nada:'Nenhum recado novo por aqui. Quando chegar, eu aviso.',
+            antigos:'Ver os {q} já lidos', antigo1:'Ver o recado já lido', esconder:'Esconder os já lidos',
+            ciente:'Li e estou ciente', tDir:'Direção', tSec:'Secretaria', tNov:'Novidade',
+            ttTit:'🙋 Quem veio à tutoria', ttSub:'nas últimas 2 semanas', ttVazio:'Nenhum aluno seu por enquanto.',
+            ttLink:'Ver a frequência completa →', vi:'Vi', veio:' foi à tutoria' },
+      en: { sub:'your Hub assistant · online',
+            oi1:'Hi, {n}! I’m Buddy 🐻',
+            oi2:'I’m your assistant here in the Hub. Notices from the direction and the office reach you through me, and I’ll also tell you when a tool has something new.',
+            oi3:'Each notice has a box: tick it once you’ve read it. And your students who come to tutoring show up right below.',
+            ola:'Hi, {n}.', novo1:'You have 1 new notice.', novoN:'You have {q} new notices.',
+            nada:'No new notices here. I’ll let you know when one arrives.',
+            antigos:'See the {q} already read', antigo1:'See the notice already read', esconder:'Hide the ones already read',
+            ciente:'Read and acknowledged', tDir:'Direction', tSec:'Office', tNov:'What’s new',
+            ttTit:'🙋 Who came to tutoring', ttSub:'in the last 2 weeks', ttVazio:'None of your students so far.',
+            ttLink:'See the full attendance →', vi:'Seen', veio:' foi à tutoria' },
+      es: { sub:'tu auxiliar en el Hub · en línea',
+            oi1:'¡Hola, {n}! Soy Buddy 🐻',
+            oi2:'Soy tu auxiliar aquí en el Hub. Por mí llegan los avisos de la dirección y de la secretaría, y también te cuento cuando haya novedad en las herramientas.',
+            oi3:'Cada aviso tiene una casilla: márcala cuando lo hayas leído. Y tus alumnos que vayan a la tutoría aparecen aquí abajo.',
+            ola:'Hola, {n}.', novo1:'Tienes 1 aviso nuevo.', novoN:'Tienes {q} avisos nuevos.',
+            nada:'Ningún aviso nuevo por aquí. Cuando llegue, te aviso.',
+            antigos:'Ver los {q} ya leídos', antigo1:'Ver el aviso ya leído', esconder:'Ocultar los ya leídos',
+            ciente:'Leído y enterado', tDir:'Dirección', tSec:'Secretaría', tNov:'Novedad',
+            ttTit:'🙋 Quién fue a la tutoría', ttSub:'en las últimas 2 semanas', ttVazio:'Ningún alumno tuyo por ahora.',
+            ttLink:'Ver la asistencia completa →', vi:'Visto', veio:' foi à tutoria' }
+    };
+    function lang(){ return (typeof _lang !== 'undefined' && TX[_lang]) ? _lang : 'pt'; }
+    function tx(k, v){ var t = TX[lang()][k] || TX.pt[k] || ''; if (v) Object.keys(v).forEach(function(x){ t = t.replace('{' + x + '}', v[x]); }); return t; }
+
+    function sess(){ try{ return JSON.parse(localStorage.getItem('fisk_prof')||'null'); }catch(e){ return null; } }
+    function como(){ var s = sess(); if (!s || !s.master) return ''; try{ return (JSON.parse(localStorage.getItem('fisk_actas')||'null')||{}).name||''; }catch(e){ return ''; } }
+    function eu(){ var s = sess() || {}; return como() || s.name || ''; }
+    function prim(){ var p = String(eu()).trim().split(/\s+/)[0] || ''; return p.charAt(0).toUpperCase() + p.slice(1).toLowerCase(); }
+    function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+    /* o texto de quem publica é texto puro: escapa, quebra a linha e liga só o que é endereço http(s) */
+    function texto(t){
+      return esc(t).replace(/(https?:\/\/[^\s<]+[^\s<.,;:!?)])/g, '<a href="$1" target="_blank" rel="noopener">$1</a>').replace(/\n/g, '<br>');
+    }
+    function post(body){
+      var s = sess(); if (!s || !s.token) return Promise.reject(new Error('sem sessão'));
+      body.token = s.token;
+      return fetch(FISK_HUB_EP, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(body) }).then(function(r){ return r.json(); });
+    }
+    function hojeIso(){ var d = new Date(); return d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2); }
+    function ddmm(ms){ var d = new Date(ms); return ('0'+d.getDate()).slice(-2) + '/' + ('0'+(d.getMonth()+1)).slice(-2); }
+
+    /* ── as novidades do Hub viram recado ── */
+    function daNoticia(a, cientes){
+      var t = a[lang()] || a.pt, s = sess() || {};
+      var lista = [t.li1, t.li2, t.li3].filter(Boolean);
+      var visto = false;
+      try { visto = !!(window._hubNoticias && window._hubNoticias.visto(a.id, s.name)); } catch(e) {}
+      return { id: 'fixo:' + a.id, quando: new Date((a.desde || '2026-09-01') + 'T12:00:00').getTime(), tag: 'nov', selo: t.selo,
+               titulo: t.t, html: '<p>' + t.p1 + '</p>' + (t.p2 ? '<p>' + t.p2 + '</p>' : '') +
+                 (lista.length ? '<ol>' + lista.map(function(x){ return '<li>' + x + '</li>'; }).join('') + '</ol>' : '') +
+                 (a.senha ? '<div class="bd-senha"><span>' + t.rot + '</span><b>' + a.senha + '</b></div>' : '') +
+                 (t.cuidado ? '<div class="bd-cuidado">' + t.cuidado + '</div>' : '') + (t.p3 ? '<p>' + t.p3 + '</p>' : ''),
+               link: a.link ? { href: a.link.href, rot: t.btnLink } : null, anexos: [],
+               ciente: visto || !!cientes['fixo:' + a.id] };
+    }
+    function noticias(cientes, cb){
+      var N = window._hubNoticias, s = sess() || {}, hoje = hojeIso(), out = [], espera = 0, fim = false;
+      if (!N || !N.lista) return cb([]);
+      function pronto(){ if (fim && !espera) cb(out); }
+      N.lista.forEach(function(a){
+        if (!a || !a.id || !a.ate || hoje > a.ate || (a.desde && hoje < a.desde)) return;
+        if (a.publico === 'met') {
+          espera++;
+          try { N.publicoMet(s, function(ok){ if (ok) out.push(daNoticia(a, cientes)); espera--; pronto(); }); }
+          catch(e) { espera--; }
+          return;
+        }
+        out.push(daNoticia(a, cientes));
+      });
+      fim = true; pronto();
+    }
+    function doInforme(i){
+      return { id: i.id, quando: i.quando, tag: i.origem === 'direcao' ? 'dir' : 'sec', titulo: esc(i.titulo), html: i.texto ? '<p>' + texto(i.texto) + '</p>' : '',
+               anexos: i.anexos || [], link: null, ciente: !!i.ciente, autor: i.autor };
+    }
+
+    /* ── a bolha de um recado ── */
+    var ROT = { dir: 'tDir', sec: 'tSec', nov: 'tNov' };
+    function bolha(m){
+      var d = document.createElement('div');
+      d.className = 'bd-msg bd-rec' + (m.ciente ? ' lido' : '');
+      d.setAttribute('data-id', m.id);
+      var anexos = (m.anexos || []).map(function(a){
+        return a.imagem
+          ? '<a class="bd-img" href="' + esc(a.url) + '" target="_blank" rel="noopener"><img alt="' + esc(a.nome) + '" loading="lazy" src="' + esc(a.mini) + '"></a>'
+          : '<a class="bd-arq" href="' + esc(a.url) + '" target="_blank" rel="noopener">📎 ' + esc(a.nome) + '</a>';
+      }).join('');
+      d.innerHTML =
+        '<div class="bd-topo"><span class="bd-tag t-' + m.tag + '">' + esc(m.tag === 'nov' && m.selo ? m.selo : tx(ROT[m.tag])) + '</span><small>' + ddmm(m.quando) + '</small></div>' +
+        (m.titulo ? '<b class="bd-t">' + m.titulo + '</b>' : '') +
+        '<div class="bd-tx">' + m.html + '</div>' + anexos +
+        (m.link ? '<a class="bd-ir" href="' + esc(m.link.href) + '">' + m.link.rot + '</a>' : '') +
+        '<label class="bd-ck"><input type="checkbox"' + (m.ciente ? ' checked' : '') + (como() ? ' disabled' : '') + '> ' + esc(tx('ciente')) + '</label>';
+      d.querySelector('input').addEventListener('change', function(ev){
+        var marcou = ev.target.checked;
+        m.ciente = marcou; d.classList.toggle('lido', marcou); conta();
+        post({ action: 'informeCiente', id: m.id, desfaz: marcou ? 0 : 1 }).catch(function(){});
+      });
+      return d;
+    }
+    function fala(t){ var d = document.createElement('div'); d.className = 'bd-msg'; d.innerHTML = t; return d; }
+    function digitando(t){
+      if (CALMO) return 0;
+      var n = String(t || '').replace(/<[^>]*>/g, '').length, sorte = 0.75 + Math.random() * 0.6;
+      return Math.max(900, Math.min(2600, Math.round((800 + n * 14) * sorte)));
+    }
+
+    var msgs = [], tut = [], vez = 0, assinatura = '', leitura = 0;
+    function conta(){
+      /* o número do Buddy conta só o que pede ciência; a tutoria é informação, não pendência */
+      var n = msgs.filter(function(m){ return !m.ciente; }).length;
+      sinoN.hidden = !n; sinoN.textContent = n > 9 ? '9+' : String(n);
+      ttN.hidden = !tut.length; ttN.textContent = String(tut.length);
+    }
+    /* a conversa nasce uma vez: os já lidos recolhidos em cima, a saudação, e os novos chegando um a um */
+    function conversa(){
+      var minha = ++vez, s = sess() || {};
+      chat.innerHTML = '';
+      var lidos = msgs.filter(function(m){ return m.ciente; }), novos = msgs.filter(function(m){ return !m.ciente; });
+      if (lidos.length) {
+        var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'bd-antigos';
+        var cxA = document.createElement('div'); cxA.className = 'bd-hist'; cxA.hidden = true;
+        var rot = function(){ bt.textContent = cxA.hidden ? (lidos.length === 1 ? tx('antigo1') : tx('antigos', { q: lidos.length })) + ' ▾' : tx('esconder') + ' ▴'; };
+        lidos.forEach(function(m){ cxA.appendChild(bolha(m)); });
+        bt.addEventListener('click', function(){ cxA.hidden = !cxA.hidden; rot(); });
+        rot(); chat.appendChild(bt); chat.appendChild(cxA);
+      }
+      var kIntro = 'fisk_buddy_oi_' + (s.name || ''), jaViu = false;
+      try { jaViu = localStorage.getItem(kIntro) === '1'; } catch(e) { jaViu = true; }
+      var fila = [];
+      if (!jaViu && !como()) { fila.push({ t: tx('oi1', { n: esc(prim()) }) }, { t: tx('oi2') }, { t: tx('oi3') }); }
+      else fila.push({ t: tx('ola', { n: esc(prim()) }) + ' ' + (novos.length ? (novos.length === 1 ? tx('novo1') : tx('novoN', { q: novos.length })) : tx('nada')) });
+      if (!jaViu && !como() && novos.length) fila.push({ t: novos.length === 1 ? tx('novo1') : tx('novoN', { q: novos.length }) });
+      novos.forEach(function(m){ fila.push({ m: m }); });
+      try { if (!como()) localStorage.setItem(kIntro, '1'); } catch(e) {}
+      var comPontos = 0;
+      (function prox(i){
+        if (minha !== vez || i >= fila.length) return;
+        var it = fila[i], el = it.m ? bolha(it.m) : fala(it.t);
+        var espera = (comPontos < 5) ? digitando(it.m ? it.m.titulo : it.t) : 0;
+        if (!espera) { chat.appendChild(el); return prox(i + 1); }
+        comPontos++;
+        var dig = document.createElement('div'); dig.className = 'bd-dig'; dig.innerHTML = '<i></i><i></i><i></i>';
+        chat.appendChild(dig); chat.scrollTop = chat.scrollHeight;
+        setTimeout(function(){
+          if (minha !== vez) return;
+          dig.remove(); chat.appendChild(el);
+          /* o recado novo aparece pelo começo dele, e não pelo fim */
+          chat.scrollTop = Math.max(0, el.offsetTop - 10);
+          prox(i + 1);
+        }, espera);
+      })(0);
+    }
+    function tutoria(){
+      $$('ttTit').innerHTML = esc(tx('ttTit')) + '<small>' + esc(tx('ttSub')) + '</small>';
+      $$('ttLink').textContent = tx('ttLink');
+      ttCard.hidden = false;
+      if (!tut.length) { ttLista.innerHTML = '<p class="av-vazio">' + esc(tx('ttVazio')) + '</p>'; return; }
+      ttLista.innerHTML = '';
+      /* SEM CAIXINHA (Pedro, 06/10/2026): é só para o professor saber quem veio. Um quadrado para clicar dava a
+         entender que havia algo a fazer com a informação. O ✓ é desenho, não botão. */
+      tut.forEach(function(a){
+        var l = document.createElement('div'); l.className = 'tt-it';
+        var nome = String(a.titulo || '').replace(/ foi à tutoria$/, '');
+        l.innerHTML = '<i class="tt-ok" aria-hidden="true">✓</i><span><b>' + esc(nome) + '</b><small>' + esc(a.texto) + '</small></span>';
+        ttLista.appendChild(l);
+      });
+    }
+
+    function carrega(){
+      var s = sess(); if (!s || !s.token) return;
+      $$('bdSub').textContent = tx('sub');
+      var pedido = ++leitura;   /* duas leituras no ar: só a mais nova desenha */
+      var inf = post({ action: 'informesLer', como: como() }).catch(function(){ return null; });
+      var avs = post({ action: 'avisosLer', como: como() }).catch(function(){ return null; });
+      Promise.all([inf, avs]).then(function(r){
+        if (pedido !== leitura) return;
+        var ji = r[0], ja = r[1], cientes = {};
+        ((ji && ji.cientes) || []).forEach(function(id){ cientes[id] = true; });
+        var corte = Date.now() - 14 * 86400000;
+        if (ja && ja.ok) tut = (ja.avisos || []).filter(function(a){ return a.tipo === 'tutoria' && a.quando >= corte; });
+        tutoria();
+        /* os informes não vieram (rede, sessão) e a conversa já está na tela: fica como estava */
+        if ((!ji || ji.ok !== true) && assinatura) { conta(); return; }
+        noticias(cientes, function(fixas){
+          if (pedido !== leitura) return;
+          var todas = fixas.concat(((ji && ji.informes) || []).map(doInforme));
+          todas.sort(function(a, b){ return a.quando - b.quando; });
+          /* só refaz a conversa quando chegou ou saiu recado: reler a cada 3 minutos não pode redigitar tudo */
+          var ass = lang() + '|' + eu() + '|' + todas.map(function(m){ return m.id; }).join(',');
+          if (ass === assinatura) { conta(); return; }
+          assinatura = ass; msgs = todas; conta(); conversa();
+        });
+      });
+    }
+
+    /* A COLUNA RECOLHE (Pedro, 06/10/2026). No computador, o botão do cabeçalho guarda a coluna e o Buddy passa a
+       flutuar no canto, com o número de recados sem ler; clicar nele traz a coluna de volta. A escolha fica no
+       aparelho. No celular a coluna já nasce recolhida e o Buddy do canto abre o painel. */
+    var LARGO = window.matchMedia ? window.matchMedia('(min-width: 1181px)') : { matches: true };
+    try { if (localStorage.getItem('fisk_buddy_recolhido') === '1') document.body.classList.add('bd-recolhido'); } catch(e) {}
+    function abre(sim){
+      if (LARGO.matches) {
+        document.body.classList.toggle('bd-recolhido', !sim);
+        try { localStorage.setItem('fisk_buddy_recolhido', sim ? '0' : '1'); } catch(e) {}
+        return;
+      }
+      document.body.classList.toggle('av-aberto', !!sim); fundo.hidden = !sim;
+    }
+    sino.addEventListener('click', function(){
+      abre(LARGO.matches ? document.body.classList.contains('bd-recolhido') : !document.body.classList.contains('av-aberto'));
+    });
+    $$('avFecha').addEventListener('click', function(){ abre(false); });
+    fundo.addEventListener('click', function(){ abre(false); });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !LARGO.matches) abre(false); });
+
+    function liga(){
+      var s = sess(); if (!s || !s.token) { cx.hidden = true; sino.hidden = true; return; }
+      cx.hidden = false; sino.hidden = false; carrega();
+    }
+    window._avisosLiga = liga;
+    if (document.body.classList.contains('prof-in')) liga();
+    setInterval(function(){ if (!document.hidden && document.body.classList.contains('prof-in')) carrega(); }, 180000);
+    var sel = $$('profActAs');
+    if (sel) sel.addEventListener('change', function(){ setTimeout(carrega, 50); });
+  })();
   </script>
   <script>
   /* ══ O PAINEL "A SUA CASA" ═══════════════════════════════════════════════
