@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <script src="assets/fisk-shared.js?v=2026-10-06a"></script>
-<script src="assets/buddy-conversas.js?v=2026-10-06f"></script>
+<script src="assets/buddy-conversas.js?v=2026-10-06g"></script>
 <style>
   [hidden]{ display:none !important; }
   .hero{ padding-bottom:1.1rem; }
@@ -118,6 +118,7 @@
   .entrada button{ background:#2563eb; color:#fff; border:0; border-radius:14px; font-weight:800; font-size:1rem; padding:.75rem 1.2rem; cursor:pointer; }
   .entrada button:disabled{ opacity:.5; cursor:default; }
   .entrada button.mic{ background:#e9eff5; color:#1d3349; padding:.75rem .85rem; font-size:1.1rem; line-height:1; }
+  .entrada button.mic.ligado{ background:#f59e0b; color:#fff; }
   .entrada button.mic.ouvindo{ background:#dc2626; color:#fff; animation:pisca 1.2s ease-in-out infinite; }
   @keyframes pisca{ 0%,100%{ box-shadow:0 0 0 0 rgba(220,38,38,.5); } 50%{ box-shadow:0 0 0 8px rgba(220,38,38,0); } }
   body.theme-dark .entrada button.mic{ background:#273449; color:#e6edf6; } body.theme-dark .entrada button.mic.ouvindo{ background:#dc2626; color:#fff; }
@@ -243,6 +244,7 @@
       <div class="chat" id="chat" aria-live="polite"></div>
       <form class="entrada" id="form">
         <textarea id="txt" rows="1" maxlength="2000" placeholder="Pergunte sobre suas turmas e alunos…" aria-label="Sua pergunta"></textarea>
+        <button type="button" id="anota" class="mic" title="Anotação rápida: dite ou escreva o que aconteceu com um aluno e eu registro (você confirma)" aria-label="Anotação rápida" aria-pressed="false">📝</button>
         <button type="button" id="mic" class="mic" hidden title="Falar a pergunta" aria-label="Falar a pergunta">🎙️</button>
         <button type="submit" id="enviar">Enviar</button>
       </form>
@@ -554,6 +556,7 @@ function recebe(j) {
 }
 function pergunta(t, rotulo, depois) {
   t = String(t || '').trim(); if (!t || ocupado) return;
+  if (modoAnota && !rotulo) { rotulo = '📝 ' + t; t = 'Anotação rápida: ' + t; anotacao(false); }
   aberturaN++; var dgt = document.querySelector('.msg.digita'); if (dgt) dgt.remove();
   var com = document.querySelector('.comeco'); if (com) com.remove();
   document.querySelectorAll('.depois').forEach(function (x) { x.remove(); });
@@ -585,7 +588,7 @@ function rodapeConta() { $('restam').textContent = info ? 'restam ' + info.resta
     try { rec.start(); } catch (e) {}
   });
   rec.onstart = function () { ouvindo = true; bt.classList.add('ouvindo'); bt.title = 'Clique para parar de ouvir'; $('txt').placeholder = 'Estou ouvindo… fale e clique no microfone para parar'; };
-  rec.onend = function () { ouvindo = false; bt.classList.remove('ouvindo'); bt.title = 'Falar a pergunta'; $('txt').placeholder = 'Pergunte sobre suas turmas e alunos…'; $('txt').focus(); };
+  rec.onend = function () { ouvindo = false; bt.classList.remove('ouvindo'); bt.title = 'Falar a pergunta'; $('txt').placeholder = modoAnota ? PH_ANOTA : PH; $('txt').focus(); };
   rec.onerror = function (e) {
     ouvindo = false; bt.classList.remove('ouvindo');
     if (e.error === 'not-allowed' || e.error === 'service-not-allowed') nota('O navegador bloqueou o microfone. Libere o microfone para este site (cadeado ao lado do endereço) e tente de novo.');
@@ -599,6 +602,15 @@ function rodapeConta() { $('restam').textContent = info ? 'restam ' + info.resta
   /* enviar para de ouvir: senão o que ele falar depois cairia na pergunta seguinte */
   $('form').addEventListener('submit', function () { if (ouvindo) rec.stop(); });
 })();
+/* ── anotação rápida (Pedro, 06/10/2026): no meio da aula o professor não quer formular pedido. Ele liga o 📝, dita
+   ou escreve "a Bia terminou a lição 5 e errou os verbos irregulares" e envia. A mensagem vai marcada como anotação,
+   e o Buddy acha a aluna e propõe direto o registro (célula da aula ou counseling), que ele confirma no cartão. ── */
+var modoAnota = false, PH = 'Pergunte sobre suas turmas e alunos…', PH_ANOTA = 'Anotação: diga o aluno e o que aconteceu (ex.: a Bia terminou a lição 5 e errou os verbos irregulares)';
+function anotacao(liga) {
+  modoAnota = !!liga; $('anota').classList.toggle('ligado', modoAnota); $('anota').setAttribute('aria-pressed', modoAnota ? 'true' : 'false');
+  $('txt').placeholder = modoAnota ? PH_ANOTA : PH; if (modoAnota) $('txt').focus();
+}
+$('anota').addEventListener('click', function () { if (!$('txt').disabled) anotacao(!modoAnota); });
 $('txt').addEventListener('input', ajusta);
 $('txt').addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); pergunta($('txt').value); } });
 $('form').addEventListener('submit', function (e) { e.preventDefault(); pergunta($('txt').value); });
@@ -686,14 +698,16 @@ function mostraSugestoes(vez) {
     if (vez !== aberturaN || !ss.length) return;
     var d = document.createElement('div'); d.className = 'sug';
     d.innerHTML = '<div class="sug-t">🔔 Para você olhar hoje</div>' + ss.map(function (g, i) {
-      var nomes = g.alunos.slice(0, 4).map(function (a) { return esc(a.nome.split(' ')[0]) + ' <small>(' + esc(a.detalhe) + ')</small>'; }).join(', ') + (g.alunos.length > 4 ? ' e mais ' + (g.alunos.length - 4) : '');
-      return '<div class="sug-i" data-i="' + i + '"><span class="ic">' + g.ic + '</span><div><b>' + esc(g.titulo) + '</b><p>' + nomes + '</p></div>' +
-             '<button type="button">' + esc(g.botao || 'Perguntar ao Buddy') + '</button></div>';
+      /* a sugestão traz ou uma lista de alunos (termo, 2nd chance, faltas) ou linhas prontas (semana, aluno novo, pastas) */
+      var corpo = g.linhas ? g.linhas.map(esc).join('<br>')
+        : (g.alunos || []).slice(0, 4).map(function (a) { return esc(a.nome.split(' ')[0]) + ' <small>(' + esc(a.detalhe) + ')</small>'; }).join(', ') + ((g.alunos || []).length > 4 ? ' e mais ' + (g.alunos.length - 4) : '');
+      return '<div class="sug-i" data-i="' + i + '"><span class="ic">' + g.ic + '</span><div><b>' + esc(g.titulo) + '</b><p>' + corpo + '</p></div>' +
+             (g.botao ? '<button type="button">' + esc(g.botao) + '</button>' : '') + '</div>';
     }).join('');
     d.addEventListener('click', function (e) {
       var b = e.target.closest ? e.target.closest('button') : null; if (!b || ocupado) return;
       var g = ss[+b.parentNode.getAttribute('data-i')];
-      if (g.tipo === 'faltas') { pergunta('Quais alunos meus passaram de 25% de faltas? Liste por turma, com o número de faltas, e diga com quem eu falo primeiro.', 'Quem passou de 25% de faltas?'); return; }
+      if (g.pergunta) { pergunta(g.pergunta, g.rotulo || g.titulo); return; }   /* esta vai ao Buddy, e conta como pergunta */
       aberturaN++; b.disabled = true; b.textContent = 'preparando…'; trava(true);
       post({ action: 'buddyPropoe', tipo: g.tipo, rafs: g.alunos.slice(0, 12).map(function (a) { return a.raf; }), conversa: conversa }).then(function (r) {
         if (!r || r.ok !== true) { nota((r && r.error) || 'Não consegui preparar agora.'); b.disabled = false; b.textContent = g.botao; return; }
