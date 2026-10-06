@@ -70,6 +70,7 @@
 .card-overview     { --accent: #7C3AED; } /* roxo do panorama estatístico */
 .card-acomp        { --accent: #0E7490; } /* ciano do Acompanhamento do Aluno */
 .card-ecounsel     { --accent: #9D174D; } /* vinho do E-counseling: é conversa com o aluno, não documento */
+.card-tutoria      { --accent: #15803D; } /* verde de presença: a Frequência à Tutoria */
 .card-raftemp      { --accent: #0F766E; } /* verde-petróleo do RAF temporário: porta provisória */
 #miniDash, #hwProf { display: none !important; } /* a home ficou só com as ferramentas (19/09/2026) */
 .card-portal       { --accent: #d81f26; } /* vermelho Fisk (pedido do Pedro, 16/09/2026) */

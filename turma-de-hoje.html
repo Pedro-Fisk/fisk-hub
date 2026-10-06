@@ -921,7 +921,28 @@ document.addEventListener('visibilitychange', function () {
 function atender(a) {
   if (estado.atendidos[a.raf]) delete estado.atendidos[a.raf]; else estado.atendidos[a.raf] = Date.now();
   guardaAtendidos();
+  if (estado.atendidos[a.raf]) tutRegistra(a, 'atendido');
   reordenaComAnimacao(a, true);
+}
+/* TUTORIA → DIÁRIO DE BORDO (Pedro, 05/10/2026). No plantão, o aluno atendido entra sozinho no Diário de Bordo
+   da escola (a planilha do Drive), na sessão do horário, com o que foi marcado no planner dele. O card NÃO muda:
+   tutoria não é aula. A linha nasce na primeira bolinha marcada e é completada no "Aluno atendido", que também
+   manda uma linha ao E-counseling do aluno, uma vez por dia. Tudo calado: falha aqui não atrapalha o atendimento. */
+var tutLancado = {};
+function tutRegistra(a, motivo) {
+  if (!estado.plantao || !a || !a.raf) return;
+  var desfaz = motivo === 'desfaz';
+  if (desfaz && !tutLancado[a.raf]) return;
+  tutLancado[a.raf] = !desfaz;
+  post({ action: 'tutoriaRegistrar', raf: a.raf, book: a.book || '', escola: estado.escola, desfaz: desfaz ? 1 : 0 }).then(function (r) {
+    if (desfaz || !r || !r.aluno) return;
+    if (r.novo) toast('📒 ' + String(r.aluno.nome).split(' ')[0] + ' entrou no Diário de Bordo (' + r.hora + ')');
+    if (motivo !== 'atendido') return;
+    var d = new Date(), k = 'th:tutcsl:' + a.raf + ':' + d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+    try { if (localStorage.getItem(k)) return; localStorage.setItem(k, '1'); } catch (e) {}
+    fiskCounseling({ escola: r.aluno.escola, professor: r.aluno.prof, turma: r.aluno.turma, aluno: r.aluno.nome, origem: 'tutoria',
+                     campos: { estagio: r.aluno.book || '', hora: r.hora, atividades: r.atividades || '' } });
+  }).catch(function () { if (!desfaz) tutLancado[a.raf] = false; });
 }
 function reordenaComAnimacao(a, foiAtender) {
   var antes = {};
@@ -969,7 +990,15 @@ function post(body) {
   if ((body.action === 'plannerProf' || body.action === 'plannerFalta') && estado.ontem && !estado.plantao) body.data = ontemIsoTH();
   if (body.action === 'plannerFalta' && !body.quem) body.quem = (sessao() || {}).name || estado.prof || '';   /* plantão não é aula: o card não muda (Pedro, 16/09/2026) */
   return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
-    .then(fiskJson).then(function (j) { if (!j || j.ok === false) throw new Error((j && (j.erro || j.error)) || 'Não consegui.'); return j; });
+    .then(fiskJson).then(function (j) { if (!j || j.ok === false) throw new Error((j && (j.erro || j.error)) || 'Não consegui.'); return j; })
+    .then(function (j) {
+      /* a primeira marca do monitor no planner do aluno já é a presença dele na tutoria */
+      if (body.action === 'plannerProf' && estado.plantao && body.raf && !tutLancado[body.raf]) {
+        var al = estado.alunos.filter(function (x) { return x.raf === body.raf; })[0];
+        if (al) tutRegistra(al, 'marca');
+      }
+      return j;
+    });
 }
 /* o "?" e o texto que ele abre: o texto nasce escondido e aparece só quando alguém pergunta */
 function poeDica(onde, texto) {
@@ -1262,6 +1291,7 @@ function trazerAluno(al) {
   }).catch(function (e) { status(''); toast('⚠️ Não consegui abrir o planner de ' + al.name + ' (' + e.message + ').'); });
 }
 function tirarVisitante(raf) {
+  tutRegistra({ raf: raf }, 'desfaz');   /* puxou o aluno errado: a linha que o Portal lançou no Diário sai */
   estado.visitantes = estado.visitantes.filter(function (v) { return v.raf !== raf; });
   estado.alunos = estado.alunos.filter(function (a) { return !(a.visitante && a.raf === raf); });
   desenharTurma();

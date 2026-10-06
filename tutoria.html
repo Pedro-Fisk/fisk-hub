@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frequência à Tutoria, FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-09-20a">
+<link rel="stylesheet" href="assets/casa-tema.css?v=9">
+<meta name="theme-color" content="#161414">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+<script src="assets/fisk-shared.js?v=2026-09-20a"></script>
+<style>
+  :root{ --blue:var(--ui,#2b4d70); --blue-mid:var(--ui-mid,#3d6b93); --blue-pill:var(--ui-pill,#1d3349);
+         --blue-soft:var(--ui-soft,#e9eff5); --blue-ink:var(--ui-ink,#1d3349); --blue-bd:var(--ui-bd,#9db6cb); }
+  [hidden]{ display:none !important; }
+  main{max-width:860px;margin:0 auto;padding:1.2rem;width:100%}
+  .painel{background:var(--white);border:2px solid var(--surface-border-color);
+          border-radius:var(--surface-radius);box-shadow:var(--surface-shadow);
+          padding:1.15rem 1.25rem;margin-bottom:1.1rem}
+  .painel h2{margin:0 0 .4rem;font-family:var(--font-heading);font-weight:700;
+             font-size:1.05rem;color:var(--ui-dark,#223e5a)}
+  .aviso{font-size:.85rem;color:var(--gray);margin:0 0 .6rem}
+  .status{font-size:.85rem;font-weight:700;margin:.5rem 0 0}
+  .status.erro{color:var(--red)}
+
+  /* os filtros: de quem e de qual escola */
+  .filtros{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:.2rem 0 .1rem}
+  .seg{display:inline-flex;border:1px solid var(--blue-bd);border-radius:99px;overflow:hidden;background:var(--white)}
+  .seg button{border:0;background:transparent;font-family:var(--font-body);font-weight:700;font-size:.82rem;
+              padding:.4rem .85rem;cursor:pointer;color:var(--blue-ink)}
+  .seg button[aria-pressed=true]{background:var(--blue);color:#fff}
+  .btn-leve{margin-left:auto;background:transparent;border:1px solid var(--blue-bd);border-radius:99px;
+            font-weight:700;font-size:.8rem;padding:.4rem .8rem;cursor:pointer;color:var(--blue-ink);font-family:var(--font-body)}
+  .btn-leve:disabled{opacity:.5;cursor:default}
+
+  .resumo{display:flex;flex-wrap:wrap;gap:.6rem;margin:.8rem 0 0}
+  .num{flex:1 1 130px;background:var(--blue-soft);border-radius:12px;padding:.6rem .8rem}
+  .num b{display:block;font-family:var(--font-heading);font-size:1.5rem;color:var(--blue-ink);line-height:1.1}
+  .num span{font-size:.76rem;color:var(--gray);font-weight:700}
+
+  /* um cartão por aluno, uma linha por visita */
+  .lista{display:flex;flex-direction:column;gap:.55rem}
+  .al{border:1px solid var(--gray-light);border-radius:12px;padding:.65rem .8rem;background:var(--white)}
+  .al-cab{display:flex;align-items:baseline;gap:.5rem;flex-wrap:wrap}
+  .al-cab b{font-size:.98rem;color:var(--blue-ink)}
+  .al-cab small{color:var(--gray);font-size:.78rem}
+  .vezes{margin-left:auto;font-size:.72rem;font-weight:800;padding:.15rem .55rem;border-radius:99px;
+         background:#dcfce7;color:#166534;white-space:nowrap}
+  .vis{display:flex;gap:.6rem;align-items:baseline;font-size:.86rem;padding:.3rem 0 0;flex-wrap:wrap}
+  .vis .qd{font-weight:800;color:var(--blue-ink);min-width:8.6em;white-space:nowrap}
+  .vis .mon{color:var(--gray);white-space:nowrap}
+  .vis .fez{flex:1 1 200px}
+  .vis .obs{flex-basis:100%;color:var(--gray);font-size:.8rem;padding-left:9.2em}
+  .selo{font-size:.66rem;font-weight:800;padding:.1rem .4rem;border-radius:99px;white-space:nowrap;
+        background:var(--blue-soft);color:var(--blue-ink)}
+  .selo.hoje{background:#fef3c7;color:#92400e}
+  .dia-tit{font-family:var(--font-heading);font-weight:700;font-size:.9rem;color:var(--ui-dark,#223e5a);margin:.7rem 0 .2rem}
+  .vazio{font-size:.88rem;color:var(--gray);font-style:italic;padding:.3rem 0}
+  .ni{border-style:dashed}
+  .pend{font-size:.84rem;background:#fff7ed;border:1px solid #fdba74;color:#9a3412;border-radius:10px;padding:.5rem .7rem;margin:.6rem 0 0}
+  .links{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.3rem}
+  .links a{font-size:.82rem;font-weight:700;color:var(--blue);text-decoration:none;border:1px solid var(--blue-bd);
+           border-radius:99px;padding:.3rem .75rem}
+  @media (max-width:520px){ .vis .obs{padding-left:0} .vis .qd{min-width:0} }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <a class="back-link" href="index.html">&larr; Voltar aos recursos</a>
+  <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
+  <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+  <h1>Frequência à Tutoria</h1>
+  <p>Quem foi ao plantão de dúvidas nos últimos 14 dias</p>
+</header>
+
+<main>
+
+  <section class="painel" id="semSessao" hidden>
+    <h2>🔒 Entre no Fisk Hub primeiro</h2>
+    <p class="aviso">Volte à página inicial do Hub, entre com seu usuário e abra esta ferramenta de novo.</p>
+  </section>
+
+  <section class="painel" id="painelTopo">
+    <h2 id="titulo">🙋 Seus alunos na tutoria</h2>
+    <p class="aviso">É o espelho do Diário de Bordo das duas escolas. O que o monitor lança pela Turma de hoje e o que é digitado na planilha aparecem aqui do mesmo jeito.</p>
+    <div class="filtros">
+      <div class="seg" role="group" aria-label="De quem">
+        <button type="button" data-quem="meus" aria-pressed="true">Meus alunos</button>
+        <button type="button" data-quem="todos" aria-pressed="false">Todos</button>
+      </div>
+      <div class="seg" role="group" aria-label="Como ver">
+        <button type="button" data-ver="aluno" aria-pressed="true">Por aluno</button>
+        <button type="button" data-ver="dia" aria-pressed="false">Por dia</button>
+      </div>
+      <button type="button" class="btn-leve" id="btnAtualizar">↻ Atualizar</button>
+    </div>
+    <div class="resumo" id="resumo" hidden></div>
+    <div id="pend"></div>
+    <p class="status" id="status"></p>
+  </section>
+
+  <section class="painel" id="painelLista" hidden>
+    <div class="lista" id="lista"></div>
+  </section>
+
+  <section class="painel" id="painelNI" hidden>
+    <h2>❓ Nomes que não consegui ligar a um aluno</h2>
+    <p class="aviso">Foram digitados no Diário de um jeito que não bate com um aluno só do card (um nome só, apelido, homônimo). Se for seu aluno, vale completar o nome na planilha: na próxima leitura ele entra na lista de cima.</p>
+    <div class="lista" id="listaNI"></div>
+  </section>
+
+  <section class="painel" id="painelLinks" hidden>
+    <h2>📒 O Diário de Bordo</h2>
+    <p class="aviso">A planilha continua sendo o registro oficial. Esta tela só lê.</p>
+    <div class="links" id="links"></div>
+  </section>
+
+</main>
+
+<script>
+/* ══ FREQUÊNCIA À TUTORIA (05/10/2026) ═════════════════════════════════════
+ * O professor do aluno abria o Diário de Bordo e caçava o nome. Aqui ele vê os
+ * últimos 14 dias de uma vez. Quem lê as planilhas, casa o nome com o RAF e
+ * descobre de quem é o aluno é o backend (Tutoria.js); esta página só filtra
+ * e desenha. O filtro "Meus alunos" nunca trava: substituição é frequente e
+ * todo professor pode ver todos.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+var EP = FISK_HUB_EP;
+var dados = null, quem = 'meus', ver = 'aluno';
+function $(id) { return document.getElementById(id); }
+function esc(s) { return fiskEsc(String(s == null ? '' : s)); }
+function sessao() { return fiskSessao() || {}; }
+function norm(v) { return String(v || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
+/* a direção "vendo como" um professor enxerga a lista dele */
+function euSou() {
+  var s = sessao(), como = '';
+  if (s.master) { try { como = (JSON.parse(localStorage.getItem('fisk_actas') || 'null') || {}).name || ''; } catch (e) {} }
+  return como || s.name || '';
+}
+function post(body) {
+  body.token = sessao().token || '';
+  return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) }).then(fiskJson);
+}
+var DIA = { DOM: 'dom', SEG: 'seg', TER: 'ter', QUA: 'qua', QUI: 'qui', SEX: 'sex', SAB: 'sáb' };
+function hojeIso() { var d = new Date(), p = function (n) { return (n < 10 ? '0' : '') + n; }; return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
+function quando(it) { var p = it.data.split('-'); return (DIA[it.dia] || '') + ' ' + p[2] + '/' + p[1] + ' · ' + it.hora; }
+function ehMeu(it) { var eu = norm(euSou()); return !!eu && (it.profs || []).some(function (p) { return norm(p) === eu; }); }
+function primeiro(n) { var p = String(n || '').trim().split(/\s+/)[0] || ''; return p.charAt(0).toUpperCase() + p.slice(1).toLowerCase(); }
+
+function linhaVisita(it, comNome) {
+  var h = '<div class="vis"><span class="qd">' + esc(quando(it)) + '</span>';
+  if (comNome) h += '<b>' + esc(it.aluno) + '</b>';
+  h += '<span class="mon">com ' + esc(it.monitor || '?') + (dados && it.escola ? ' · ' + esc(it.escola) : '') + '</span>';
+  h += '<span class="fez">' + esc([it.livro, it.ativ].filter(Boolean).join(' · ') || 'sem anotação do que foi feito') + '</span>';
+  if (it.data === hojeIso()) h += '<span class="selo hoje">hoje</span>';
+  if (it.obs) h += '<span class="obs">' + esc(it.obs) + '</span>';
+  return h + '</div>';
+}
+function desenhar() {
+  if (!dados) return;
+  var meus = quem === 'meus';
+  var bons = dados.itens.filter(function (it) { return it.ok && (!meus || ehMeu(it)); });
+  var ni = dados.itens.filter(function (it) { return !it.ok; });
+  var alunos = {}, ordem = [];
+  bons.forEach(function (it) { if (!alunos[it.raf]) { alunos[it.raf] = []; ordem.push(it.raf); } alunos[it.raf].push(it); });
+
+  $('titulo').textContent = meus ? '🙋 Alunos de ' + primeiro(euSou()) + ' na tutoria' : '🙋 Todos os alunos na tutoria';
+  $('resumo').hidden = false;
+  $('resumo').innerHTML =
+    '<div class="num"><b>' + ordem.length + '</b><span>' + (ordem.length === 1 ? 'aluno veio' : 'alunos vieram') + '</span></div>' +
+    '<div class="num"><b>' + bons.length + '</b><span>' + (bons.length === 1 ? 'visita' : 'visitas') + ' em ' + dados.dias + ' dias</span></div>' +
+    '<div class="num"><b>' + bons.filter(function (it) { return it.data === hojeIso(); }).length + '</b><span>hoje</span></div>';
+
+  var h = '';
+  if (!bons.length) {
+    h = '<p class="vazio">' + (meus ? 'Nenhum aluno seu aparece no Diário de Bordo nos últimos ' + dados.dias + ' dias. Em "Todos" dá para conferir a escola inteira.'
+                                    : 'Nenhuma visita registrada nos últimos ' + dados.dias + ' dias.') + '</p>';
+  } else if (ver === 'aluno') {
+    ordem.forEach(function (raf) {
+      var v = alunos[raf], a = v[0];
+      h += '<div class="al"><div class="al-cab"><b>' + esc(a.aluno) + '</b><small>' +
+           esc([a.turma, meus ? '' : (a.profs || []).map(primeiro).join(' e ')].filter(Boolean).join(' · ')) + '</small>' +
+           '<span class="vezes">' + v.length + (v.length === 1 ? ' vez' : ' vezes') + '</span></div>' +
+           v.map(function (it) { return linhaVisita(it, false); }).join('') + '</div>';
+    });
+  } else {
+    var dia = '';
+    bons.forEach(function (it) {
+      if (it.data !== dia) { dia = it.data; var p = dia.split('-'); h += '<div class="dia-tit">' + esc((DIA[it.dia] || '') + ' ' + p[2] + '/' + p[1]) + '</div>'; }
+      h += '<div class="al">' + linhaVisita(it, true) + '</div>';
+    });
+  }
+  $('lista').innerHTML = h; $('painelLista').hidden = false;
+
+  $('painelNI').hidden = !ni.length;
+  $('listaNI').innerHTML = ni.map(function (it) {
+    return '<div class="al ni"><div class="vis"><span class="qd">' + esc(quando(it)) + '</span><b>' + esc(it.digitado) + '</b>' +
+           '<span class="mon">com ' + esc(it.monitor || '?') + ' · ' + esc(it.escola) + '</span>' +
+           '<span class="fez">' + esc([it.profDigitado ? 'prof. ' + it.profDigitado : '', it.livro, it.ativ].filter(Boolean).join(' · ')) + '</span></div></div>';
+  }).join('');
+
+  $('pend').innerHTML = (dados.pendencias || []).map(function (p) { return '<div class="pend">⚠️ ' + esc(p) + '</div>'; }).join('');
+  $('painelLinks').hidden = false;
+  $('links').innerHTML = Object.keys(dados.diarios || {}).map(function (e) {
+    return '<a href="' + esc(dados.diarios[e]) + '" target="_blank" rel="noopener">Abrir o Diário de ' + esc(e) + ' ↗</a>';
+  }).join('');
+}
+function carregar(fresco) {
+  var st = $('status'), bt = $('btnAtualizar');
+  st.className = 'status'; bt.disabled = true;
+  var para = fiskEsperando(function (t) { st.textContent = t; },
+    ['Lendo o Diário de Bordo das duas escolas…', 'Ligando cada nome ao aluno do card…', 'Quase lá…']);
+  post({ action: 'tutoriaFrequencia', fresco: fresco ? 1 : 0 }).then(function (j) {
+    if (typeof para === 'function') para();
+    bt.disabled = false;
+    if (!j || j.ok !== true) throw new Error((j && (j.error || j.erro)) || 'não consegui ler');
+    dados = j;
+    var d = new Date(j.lido), p = function (n) { return (n < 10 ? '0' : '') + n; };
+    st.textContent = 'Lido às ' + p(d.getHours()) + 'h' + p(d.getMinutes()) + '.';
+    desenhar();
+  }).catch(function (e) {
+    if (typeof para === 'function') para();
+    bt.disabled = false;
+    var msg = String((e && e.message) || e);
+    st.className = 'status erro'; st.textContent = (/sess/i.test(msg) ? '🔒 ' : '⚠️ ') + msg;
+  });
+}
+document.querySelectorAll('[data-quem]').forEach(function (b) {
+  b.addEventListener('click', function () {
+    quem = b.dataset.quem;
+    document.querySelectorAll('[data-quem]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+    desenhar();
+  });
+});
+document.querySelectorAll('[data-ver]').forEach(function (b) {
+  b.addEventListener('click', function () {
+    ver = b.dataset.ver;
+    document.querySelectorAll('[data-ver]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+    desenhar();
+  });
+});
+$('btnAtualizar').addEventListener('click', function () { carregar(true); });
+
+fiskInitThemeToggle('themeToggle');
+fiskInitUserMenu();
+if (!sessao().token) {
+  $('semSessao').hidden = false; $('painelTopo').hidden = true;
+} else {
+  carregar(false);
+  fiskRegistrarUso('Frequência à Tutoria');
+}
+</script>
+</body>
+</html>
