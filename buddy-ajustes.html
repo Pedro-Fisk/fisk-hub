@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ajustes do Buddy · FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-09-20a">
+<link rel="stylesheet" href="assets/casa-tema.css?v=9">
+<meta name="theme-color" content="#161414">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+<script src="assets/fisk-shared.js?v=2026-09-20a"></script>
+<style>
+  [hidden]{ display:none !important; }
+  main{ max-width:900px; margin:0 auto; padding:1.2rem; width:100%; }
+  .painel{ background:var(--white); border:2px solid var(--surface-border-color); border-radius:var(--surface-radius); box-shadow:var(--surface-shadow); padding:1.1rem 1.25rem; margin-bottom:1.1rem; }
+  .painel h2{ margin:0 0 .35rem; font-family:var(--font-heading); font-weight:700; font-size:1.05rem; color:var(--ui-dark,#223e5a); }
+  .leg{ font-size:.86rem; color:var(--gray); margin:0 0 .7rem; line-height:1.5; }
+  .linha{ display:flex; gap:.6rem; flex-wrap:wrap; align-items:center; margin-bottom:.6rem; }
+  input[type=text], input[type=password], input[type=number], select{ border:1.5px solid var(--gray-light); border-radius:10px; padding:.5rem .7rem; font-family:var(--font-body); font-size:.92rem; }
+  .bt{ background:var(--ui,#2b4d70); color:#fff; border:0; border-radius:10px; font-weight:800; padding:.55rem 1rem; cursor:pointer; font-size:.88rem; font-family:var(--font-body); }
+  .bt.sec{ background:transparent; color:var(--ui,#2b4d70); border:1.5px solid var(--ui-bd,#9db6cb); }
+  .selo{ display:inline-block; font-size:.74rem; font-weight:800; padding:.2rem .6rem; border-radius:99px; }
+  .selo.ok{ background:#dcfce7; color:#166534; } .selo.at{ background:#fef3c7; color:#92400e; } .selo.no{ background:#fee2e2; color:#991b1b; }
+  .nums{ display:flex; gap:.6rem; flex-wrap:wrap; margin:.2rem 0 .8rem; }
+  .num{ flex:1 1 150px; background:var(--ui-soft,#e9eff5); border-radius:12px; padding:.6rem .8rem; }
+  .num b{ display:block; font-family:var(--font-heading); font-size:1.4rem; color:var(--ui-ink,#1d3349); } .num span{ font-size:.76rem; color:var(--gray); font-weight:700; }
+  .barra{ height:10px; border-radius:99px; background:var(--gray-light); overflow:hidden; margin:.2rem 0 .8rem; } .barra i{ display:block; height:100%; background:#16a34a; }
+  table{ width:100%; border-collapse:collapse; font-size:.86rem; } th, td{ text-align:left; padding:.4rem .5rem; border-bottom:1px solid var(--gray-light); vertical-align:top; }
+  th{ font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(--gray); }
+  td.n{ text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .chips{ display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:.6rem; }
+  .chip{ border:1.5px solid var(--ui-bd,#9db6cb); border-radius:99px; padding:.3rem .75rem; font-size:.84rem; font-weight:700; cursor:pointer; background:transparent; font-family:var(--font-body); color:var(--ui-ink,#1d3349); }
+  .chip.on{ background:var(--ui,#2b4d70); color:#fff; border-color:var(--ui,#2b4d70); } .chip.fixo{ opacity:.6; cursor:default; }
+  .msg{ font-size:.86rem; font-weight:700; margin:.3rem 0 0; } .msg.erro{ color:var(--red); } .msg.ok{ color:#166534; }
+  ol.passos{ margin:.2rem 0 .8rem 1.2rem; padding:0; font-size:.9rem; line-height:1.6; }
+</style>
+</head>
+<body>
+<header class="hero">
+  <a class="back-link" href="buddy.html">&larr; Voltar ao Buddy</a>
+  <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
+  <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+  <h1>Ajustes do Buddy</h1>
+  <p>A chave, quem usa, quanto pode gastar e o que o piloto já mediu</p>
+</header>
+
+<main>
+  <section class="painel" id="fora" hidden><h2>🔒 Só a direção</h2><p class="leg" id="foraP">Esta tela é da direção. Entre pelo Painel da Direção e abra o Fisk Hub por lá.</p></section>
+
+  <div id="tudo" hidden>
+    <section class="painel">
+      <h2>🔑 A chave do Claude Console</h2>
+      <p class="leg">É a chave que paga as respostas do Buddy. Ela fica guardada no servidor e <b>nunca volta para esta tela</b>: depois de salva, só aparecem os quatro últimos caracteres.</p>
+      <div class="linha"><span id="chaveSelo" class="selo"></span><span id="chaveTxt" style="font-size:.9rem"></span></div>
+      <ol class="passos">
+        <li>Abra <b>console.anthropic.com</b> e entre na conta da escola.</li>
+        <li>Crie um <b>workspace</b> só para o Buddy (por exemplo "Buddy Fisk") e, nele, defina o <b>limite de gasto mensal</b>. É a trava que vale mesmo se algo aqui falhar.</li>
+        <li>Nesse workspace, crie uma <b>chave de API</b> comum (não a de administração) e copie.</li>
+        <li>Cole aqui embaixo e salve. A tela confere a chave com o Console antes de guardar.</li>
+      </ol>
+      <div class="linha">
+        <input type="password" id="chave" placeholder="sk-ant-…" autocomplete="off" style="flex:1 1 320px">
+        <button class="bt" id="chaveSalvar">Conferir e salvar</button>
+        <button class="bt sec" id="chaveTirar">Voltar à chave compartilhada</button>
+      </div>
+      <p class="msg" id="chaveMsg"></p>
+    </section>
+
+    <section class="painel">
+      <h2>💵 Gasto e limites</h2>
+      <div class="nums" id="nums"></div>
+      <div class="barra"><i id="barra"></i></div>
+      <div class="linha">
+        <label style="font-size:.88rem;font-weight:700">Teto do mês (US$) <input type="number" id="teto" min="1" max="2000" step="1" style="width:110px"></label>
+        <button class="bt" id="tetoSalvar">Salvar teto</button>
+        <label style="font-size:.88rem;font-weight:700;margin-left:auto">Modelo
+          <select id="modelo"><option value="">alternar os dois (piloto)</option></select></label>
+        <button class="bt sec" id="modeloSalvar">Salvar modelo</button>
+      </div>
+      <p class="leg" id="limites"></p>
+      <p class="msg" id="gastoMsg"></p>
+    </section>
+
+    <section class="painel">
+      <h2>👥 Quem usa o Buddy</h2>
+      <p class="leg">A direção sempre entra. Marque os professores do piloto, ou abra para todos quando o piloto terminar.</p>
+      <div class="chips" id="profs"></div>
+      <div class="linha">
+        <button class="bt" id="pilotoSalvar">Salvar a lista</button>
+        <label style="font-size:.9rem;font-weight:700"><input type="checkbox" id="aberto"> Aberto para todos os professores</label>
+      </div>
+      <p class="msg" id="pilotoMsg"></p>
+    </section>
+
+    <section class="painel">
+      <h2>📊 O que o piloto mediu <small style="font-weight:600;color:var(--gray)">· últimos 30 dias</small></h2>
+      <p class="leg">Cada conversa usa um modelo só, e a seguinte usa o outro. O 👍 e o 👎 são os que os professores marcaram em cada resposta.</p>
+      <table><thead><tr><th>Modelo</th><th class="n">Perguntas</th><th class="n">Chamadas</th><th class="n">Tokens</th><th class="n">Custo</th><th class="n">Por pergunta</th><th class="n">👍</th><th class="n">👎</th></tr></thead><tbody id="tModelo"></tbody></table>
+      <h2 style="margin-top:1rem">Por professor</h2>
+      <table><thead><tr><th>Professor</th><th class="n">Perguntas</th><th class="n">Chamadas</th><th class="n">Custo</th></tr></thead><tbody id="tProf"></tbody></table>
+    </section>
+
+    <section class="painel">
+      <h2>💬 O que estão perguntando</h2>
+      <table><thead><tr><th>Quando</th><th>Professor</th><th>Modelo</th><th>Pergunta</th></tr></thead><tbody id="tPerg"></tbody></table>
+      <h2 style="margin-top:1rem">👎 e comentários</h2>
+      <table><thead><tr><th>Quando</th><th>Professor</th><th>Modelo</th><th>Voto</th><th>Comentário</th><th>Pergunta</th></tr></thead><tbody id="tCom"></tbody></table>
+    </section>
+  </div>
+</main>
+
+<script>
+/* ══ AJUSTES DO BUDDY (06/10/2026) ═════════════════════════════════════════
+ * A tela da direção para o que muda sem publicar código: a chave do Console,
+ * quem está no piloto, o teto do mês e o modelo. E o painel da medição. Tudo
+ * passa pela rota `buddyAdmin`, que só responde à direção. A chave é enviada
+ * uma vez, conferida no servidor e nunca devolvida.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+var EP = FISK_HUB_EP, dados = null, marcados = {};
+function $(id) { return document.getElementById(id); }
+function esc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+function norm(v) { return String(v || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
+function post(body) {
+  body.action = 'buddyAdmin'; body.token = (fiskSessao() || {}).token || '';
+  return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) }).then(fiskJson);
+}
+function usd(v) { return 'US$ ' + Number(v || 0).toFixed(v < 1 ? 4 : 2); }
+function dia(ms) { var d = new Date(ms), p = function (n) { return (n < 10 ? '0' : '') + n; }; return p(d.getDate()) + '/' + p(d.getMonth() + 1) + ' ' + p(d.getHours()) + 'h' + p(d.getMinutes()); }
+function msg(id, t, ok) { var e = $(id); e.textContent = t || ''; e.className = 'msg ' + (ok ? 'ok' : 'erro'); }
+
+function pinta(j) {
+  dados = j;
+  var c = j.chave, selo = $('chaveSelo');
+  if (c.origem === 'propria') { selo.className = 'selo ok'; selo.textContent = 'chave própria do Buddy'; $('chaveTxt').textContent = 'termina em …' + c.final; }
+  else if (c.origem === 'compartilhada') { selo.className = 'selo at'; selo.textContent = 'usando a chave compartilhada'; $('chaveTxt').textContent = 'a mesma do Writing Lab (termina em …' + c.final + '). Funciona, mas o gasto do Buddy fica misturado com o da correção de escrita.'; }
+  else { selo.className = 'selo no'; selo.textContent = 'sem chave'; $('chaveTxt').textContent = 'o Buddy não responde enquanto não houver uma.'; }
+  $('chaveTirar').hidden = c.origem !== 'propria';
+
+  var pct = Math.min(100, Math.round(j.gastoDoMes / j.teto * 100));
+  $('nums').innerHTML = '<div class="num"><b>' + usd(j.gastoDoMes) + '</b><span>gasto neste mês</span></div>' +
+    '<div class="num"><b>' + usd(j.teto) + '</b><span>teto do mês</span></div><div class="num"><b>' + pct + '%</b><span>do teto usado</span></div>';
+  $('barra').style.width = pct + '%'; $('barra').style.background = pct > 85 ? '#dc2626' : (pct > 60 ? '#d97706' : '#16a34a');
+  $('teto').value = j.teto;
+  var sel = $('modelo'); sel.innerHTML = '<option value="">alternar os dois (piloto)</option>' + j.modelos.map(function (m) {
+    var p = j.precos[m]; return '<option value="' + m + '"' + (m === j.modeloFixo ? ' selected' : '') + '>' + m + ' · US$ ' + p.e + ' / ' + p.s + ' por milhão</option>'; }).join('');
+  $('limites').textContent = 'Travas fixas no código: ' + j.limites.perguntasPorDia + ' perguntas por professor por dia, ' + j.limites.passosPorPergunta +
+    ' chamadas ao modelo por pergunta e ' + j.limites.caracteres + ' caracteres por pergunta. Batido o teto do mês, o Buddy para até o mês virar.';
+
+  $('aberto').checked = j.piloto.aberto;
+  marcados = {}; j.piloto.daDirecao.forEach(function (n) { marcados[norm(n)] = n; });
+  desenhaProfs();
+
+  $('tModelo').innerHTML = j.porModelo.length ? j.porModelo.map(function (m) {
+    return '<tr><td>' + esc(m.modelo) + '</td><td class="n">' + m.perguntas + '</td><td class="n">' + m.chamadas + '</td><td class="n">' + m.tokens.toLocaleString('pt-BR') +
+      '</td><td class="n">' + usd(m.custo) + '</td><td class="n">' + (m.perguntas ? usd(m.custo / m.perguntas) : '') + '</td><td class="n">' + m.bom + '</td><td class="n">' + m.ruim + '</td></tr>'; }).join('')
+    : '<tr><td colspan="8" class="leg">Ninguém perguntou ainda.</td></tr>';
+  $('tProf').innerHTML = j.porProfessor.length ? j.porProfessor.sort(function (a, b) { return b.custo - a.custo; }).map(function (p) {
+    return '<tr><td>' + esc(p.professor) + '</td><td class="n">' + p.perguntas + '</td><td class="n">' + p.chamadas + '</td><td class="n">' + usd(p.custo) + '</td></tr>'; }).join('')
+    : '<tr><td colspan="4" class="leg">Ninguém perguntou ainda.</td></tr>';
+  $('tPerg').innerHTML = j.ultimas.length ? j.ultimas.map(function (u) {
+    return '<tr><td>' + dia(u.quando) + '</td><td>' + esc(u.professor) + '</td><td>' + esc(u.modelo.replace('claude-', '')) + '</td><td>' + esc(u.pergunta) + '</td></tr>'; }).join('')
+    : '<tr><td colspan="4" class="leg">Nada ainda.</td></tr>';
+  $('tCom').innerHTML = j.comentarios.length ? j.comentarios.map(function (u) {
+    return '<tr><td>' + dia(u.quando) + '</td><td>' + esc(u.professor) + '</td><td>' + esc(u.modelo.replace('claude-', '')) + '</td><td>' + (u.voto === 'bom' ? '👍' : '👎') + '</td><td>' + esc(u.comentario) + '</td><td>' + esc(u.pergunta) + '</td></tr>'; }).join('')
+    : '<tr><td colspan="6" class="leg">Nenhum 👎 nem comentário.</td></tr>';
+}
+var PROFS = [];
+function desenhaProfs() {
+  var fixos = {}; ((dados && dados.piloto.doCodigo) || []).forEach(function (n) { fixos[norm(n)] = true; });
+  $('profs').innerHTML = PROFS.map(function (n) {
+    var k = norm(n);
+    return fixos[k] ? '<button type="button" class="chip on fixo" title="está no código do piloto" disabled>' + esc(n) + '</button>'
+                    : '<button type="button" class="chip' + (marcados[k] ? ' on' : '') + '" data-n="' + esc(n) + '">' + esc(n) + '</button>';
+  }).join('') || '<span class="leg">Carregando os professores…</span>';
+}
+$('profs').addEventListener('click', function (e) {
+  var b = e.target.closest ? e.target.closest('[data-n]') : null; if (!b) return;
+  var n = b.getAttribute('data-n'), k = norm(n);
+  if (marcados[k]) delete marcados[k]; else marcados[k] = n;
+  b.classList.toggle('on');
+});
+function manda(body, idMsg, okTxt) {
+  msg(idMsg, 'Salvando…', true);
+  return post(body).then(function (j) {
+    if (!j || j.ok !== true) { msg(idMsg, (j && j.error) || 'Não consegui salvar.'); return; }
+    pinta(j); msg(idMsg, okTxt, true);
+  }).catch(function () { msg(idMsg, 'Erro de conexão.'); });
+}
+$('chaveSalvar').addEventListener('click', function () {
+  var k = $('chave').value.trim(); if (!k) return msg('chaveMsg', 'Cole a chave primeiro.');
+  manda({ acao: 'chave', chave: k }, 'chaveMsg', 'Chave conferida e guardada.').then(function () { $('chave').value = ''; });
+});
+$('chaveTirar').addEventListener('click', function () { manda({ acao: 'chave', chave: '' }, 'chaveMsg', 'O Buddy voltou a usar a chave compartilhada.'); });
+$('tetoSalvar').addEventListener('click', function () { manda({ acao: 'teto', valor: Number($('teto').value) }, 'gastoMsg', 'Teto salvo.'); });
+$('modeloSalvar').addEventListener('click', function () { manda({ acao: 'modelo', modelo: $('modelo').value }, 'gastoMsg', 'Modelo salvo.'); });
+$('pilotoSalvar').addEventListener('click', function () {
+  manda({ acao: 'piloto', nomes: Object.keys(marcados).map(function (k) { return marcados[k]; }).join(',') }, 'pilotoMsg', 'Lista salva.');
+});
+$('aberto').addEventListener('change', function () { manda({ acao: 'aberto', aberto: $('aberto').checked ? 1 : 0 }, 'pilotoMsg', $('aberto').checked ? 'Aberto para todos.' : 'Fechado: só o piloto.'); });
+
+fiskInitThemeToggle('themeToggle');
+fiskInitUserMenu();
+if (!(fiskSessao() || {}).token) { $('fora').hidden = false; }
+else post({ acao: 'ler' }).then(function (j) {
+  if (!j || j.ok !== true) { $('fora').hidden = false; $('foraP').textContent = (j && j.error) || 'Sessão expirada. Entre de novo.'; return; }
+  $('tudo').hidden = false; pinta(j);
+  fetch(EP + '?action=profList').then(fiskJson).then(function (p) {
+    PROFS = ((p && p.profs) || []).filter(function (x) { return !x.director; }).map(function (x) { return x.name || x.nome; }).filter(Boolean);
+    desenhaProfs();
+  }).catch(function () {});
+}).catch(function () { $('fora').hidden = false; $('foraP').textContent = 'Sem conexão com o servidor.'; });
+</script>
+</body>
+</html>

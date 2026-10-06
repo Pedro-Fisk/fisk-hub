@@ -2470,6 +2470,19 @@
       var s = sess(); if (!s || !s.token) { cx.hidden = true; sino.hidden = true; return; }
       cx.hidden = false; sino.hidden = false; carrega();
       var n = 0, t = setInterval(function(){ if (noMenu() || ++n > 20) clearInterval(t); }, 300);
+      /* O BUDDY AUXILIAR, em piloto (06/10/2026): só quem está no piloto ganha o atalho no menu do nome */
+      post({ action: 'buddyInfo' }).then(function(j){
+        if (!j || !j.piloto) return;
+        var k = 0, t2 = setInterval(function(){
+          var menu = document.querySelector('.fisk-user-menu');
+          if (!menu) { if (++k > 20) clearInterval(t2); return; }
+          clearInterval(t2);
+          if (menu.querySelector('.fu-buddy-ia')) return;
+          var a = document.createElement('a'); a.className = 'fu-item fu-buddy-ia'; a.href = 'buddy.html';
+          a.textContent = '🧪 Perguntar ao Buddy (piloto)';
+          var ref = menu.querySelector('.fu-csl'); if (ref) menu.insertBefore(a, ref); else menu.appendChild(a);
+        }, 300);
+      }).catch(function(){});
     }
     window._avisosLiga = liga;
     if (document.body.classList.contains('prof-in')) liga();

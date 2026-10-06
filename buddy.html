@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buddy, auxiliar do professor · FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-09-20a">
+<link rel="stylesheet" href="assets/casa-tema.css?v=9">
+<meta name="theme-color" content="#161414">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+<script src="assets/fisk-shared.js?v=2026-09-20a"></script>
+<script src="assets/buddy-conversas.js?v=2026-10-06a"></script>
+<style>
+  [hidden]{ display:none !important; }
+  .hero{ padding-bottom:1.1rem; }
+  main{ max-width:1180px; margin:0 auto; padding:1.2rem; width:100%; }
+  .palco{ display:grid; grid-template-columns:300px minmax(0,1fr); gap:1.1rem; align-items:start; }
+
+  /* ── a árvore de conversas, à esquerda ── */
+  .arvore{ background:var(--white); border:2px solid var(--surface-border-color); border-radius:18px; box-shadow:var(--surface-shadow);
+           overflow:hidden; position:sticky; top:1rem; max-height:calc(100vh - 2rem); display:flex; flex-direction:column; }
+  .arv-cab{ padding:.8rem 1rem .6rem; border-bottom:1px solid var(--gray-light); }
+  .arv-cab b{ font-family:var(--font-heading); font-size:1rem; color:var(--ui-dark,#223e5a); display:block; }
+  .arv-cab small{ font-size:.78rem; color:var(--gray); }
+  .arv-lista{ overflow-y:auto; overscroll-behavior:contain; padding:.3rem 0 .5rem; }
+  .cat > button{ width:100%; display:flex; align-items:center; gap:.55rem; background:transparent; border:0; cursor:pointer; padding:.55rem 1rem;
+                 font-family:var(--font-body); text-align:left; color:var(--ui-ink,#1d3349); }
+  .cat > button:hover{ background:var(--ui-soft,#e9eff5); }
+  .cat .ic{ font-size:1.1rem; width:1.5rem; text-align:center; flex:none; }
+  .cat .tt{ flex:1; min-width:0; } .cat .tt b{ display:block; font-size:.92rem; } .cat .tt small{ display:block; font-size:.72rem; color:var(--gray); }
+  .cat .seta{ font-size:.7rem; color:var(--gray); transition:transform .15s; }
+  .cat.aberta .seta{ transform:rotate(90deg); }
+  .cat ul{ list-style:none; margin:0; padding:0 .7rem .45rem 2.6rem; display:none; }
+  .cat.aberta ul{ display:block; }
+  .cat li button{ width:100%; text-align:left; background:transparent; border:0; border-radius:8px; padding:.36rem .5rem; cursor:pointer;
+                  font-family:var(--font-body); font-size:.86rem; line-height:1.3; color:var(--ui,#2b4d70); }
+  .cat li button:hover{ background:var(--ui-soft,#e9eff5); }
+  .cat li button.breve{ color:var(--gray); cursor:help; font-style:italic; }
+  .cat li button.breve::after{ content:' · em breve'; font-size:.7rem; }
+
+  /* ── a conversa ── */
+  .janela{ border-radius:20px; overflow:hidden; background:#fff; box-shadow:0 10px 30px rgba(37,99,235,.18), 0 0 0 1px rgba(37,99,235,.18);
+           display:flex; flex-direction:column; height:calc(100vh - 2rem); min-height:520px; max-height:900px; position:sticky; top:1rem; }
+  .cab{ display:flex; align-items:center; gap:.8rem; padding:.8rem 1rem; color:#fff; background:linear-gradient(120deg,#1e40af,#2563eb 55%,#3b82f6); flex-wrap:wrap; }
+  .cab .nome b{ font-family:var(--font-heading); font-size:1.15rem; display:block; line-height:1.2; }
+  .cab .nome small{ opacity:.9; font-size:.82rem; }
+  .cab .dir{ margin-left:auto; display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; justify-content:flex-end; }
+  .cab .selo{ font-size:.68rem; font-weight:800; letter-spacing:.05em; text-transform:uppercase; background:rgba(255,255,255,.2); padding:.2rem .6rem; border-radius:99px; }
+  .cab button, .cab select, .cab a.bt{ background:rgba(255,255,255,.16); color:#fff; border:1px solid rgba(255,255,255,.35); border-radius:99px; font-family:var(--font-body);
+               font-weight:700; font-size:.8rem; padding:.3rem .75rem; cursor:pointer; text-decoration:none; }
+  .cab select option{ color:#1d2b3a; }
+  .cab button:hover, .cab a.bt:hover{ background:rgba(255,255,255,.28); }
+  .cab .ideias-bt{ display:none; }
+  .foto{ position:relative; width:48px; height:48px; border-radius:50%; background:#fff; flex:none; box-shadow:0 0 0 3px rgba(255,255,255,.4); }
+  .foto span{ display:block; width:100%; height:100%; border-radius:50%; overflow:hidden; }
+  .foto img{ display:block; width:100%; height:100%; transform:scale(1.35); transform-origin:50% 45%; }
+  .foto::after{ content:""; position:absolute; right:0; bottom:1px; width:12px; height:12px; border-radius:50%; background:#22c55e; border:2px solid #2563eb; }
+  .chat{ flex:1 1 auto; display:flex; flex-direction:column; gap:.65rem; padding:1.1rem; overflow-y:auto; overscroll-behavior:contain; background:#d3e2f2; }
+  .msg{ max-width:86%; align-self:flex-start; background:#fff; border:1px solid #dbe4ef; border-radius:16px; padding:.7rem .95rem; font-size:1rem; line-height:1.55;
+        color:#1d2b3a; box-shadow:0 2px 6px rgba(0,0,0,.05); animation:entra .3s cubic-bezier(.2,1.2,.4,1) both; }
+  .msg.eu{ align-self:flex-end; background:#2563eb; border-color:#2563eb; color:#fff; white-space:pre-wrap; }
+  .msg ul{ margin:.3rem 0 .4rem 1.15rem; padding:0; } .msg li{ margin-bottom:.2rem; } .msg p{ margin:0 0 .5rem; } .msg p:last-child, .msg ul:last-child{ margin-bottom:0; }
+  .acoes{ display:flex; gap:.35rem; margin-top:.5rem; padding-top:.45rem; border-top:1px solid #e3eaf2; align-items:center; flex-wrap:wrap; }
+  .acoes button{ background:transparent; border:1px solid #d5dfea; border-radius:99px; font-size:.78rem; font-family:var(--font-body); font-weight:700; color:#44607c; padding:.2rem .6rem; cursor:pointer; }
+  .acoes button:hover{ border-color:#2563eb; color:#2563eb; }
+  .acoes button.on{ background:#dcfce7; border-color:#86efac; color:#166534; } .acoes button.on.ruim{ background:#fee2e2; border-color:#fca5a5; color:#991b1b; }
+  .acoes .dito{ font-size:.76rem; color:#5b6b7c; }
+  .passos{ align-self:flex-start; display:flex; flex-direction:column; gap:.2rem; font-size:.84rem; color:#33506e; background:rgba(255,255,255,.72); border-radius:14px; padding:.45rem .8rem; }
+  .passos .p{ display:flex; gap:.45rem; align-items:center; } .passos .p.feito{ opacity:.6; }
+  .passos .p i{ width:6px; height:6px; border-radius:50%; background:#33506e; animation:pula 1s infinite; display:inline-block; }
+  .passos .p i:nth-child(3){ animation-delay:.15s; } .passos .p i:nth-child(4){ animation-delay:.3s; }
+  @keyframes pula{ 0%,60%,100%{ transform:none; opacity:.5; } 30%{ transform:translateY(-4px); opacity:1; } }
+  @keyframes entra{ from{ opacity:0; transform:translateY(8px) scale(.98); } to{ opacity:1; transform:none; } }
+  .prop{ align-self:stretch; max-width:86%; background:#fff; border:2px solid #2563eb; border-radius:14px; padding:.8rem 1rem; }
+  .prop b{ font-family:var(--font-heading); color:#16243a; } .prop p{ margin:.25rem 0 .6rem; font-size:.92rem; color:#33506e; }
+  .prop a{ display:inline-block; background:#2563eb; color:#fff; font-weight:800; text-decoration:none; border-radius:10px; padding:.55rem 1rem; font-size:.92rem; }
+  .depois{ align-self:flex-start; display:flex; flex-wrap:wrap; gap:.4rem; max-width:92%; }
+  .depois button, .comeco button{ border:1.5px solid #b9cbe0; background:rgba(255,255,255,.85); color:#1d3349; border-radius:99px; padding:.36rem .85rem; font-family:var(--font-body);
+               font-weight:700; font-size:.84rem; cursor:pointer; text-align:left; }
+  .depois button:hover, .comeco button:hover{ border-color:#2563eb; background:#fff; }
+  .comeco{ display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:.5rem; align-self:stretch; }
+  .comeco button{ border-radius:14px; padding:.6rem .8rem; display:flex; gap:.5rem; align-items:flex-start; line-height:1.3; }
+  .med{ align-self:flex-start; font-size:.74rem; color:#5b6b7c; font-family:ui-monospace,Menlo,monospace; }
+  .entrada{ display:flex; gap:.6rem; padding:.8rem 1rem .4rem; background:#fff; align-items:flex-end; border-top:1px solid #e3eaf2; }
+  .entrada textarea{ flex:1; resize:none; border:1.5px solid #c5d3e3; border-radius:14px; padding:.65rem .8rem; font-family:var(--font-body); font-size:1rem; line-height:1.4;
+                     min-height:48px; max-height:160px; outline:none; color:#1d2b3a; background:#fff; }
+  .entrada textarea:focus{ border-color:#2563eb; }
+  .entrada button{ background:#2563eb; color:#fff; border:0; border-radius:14px; font-weight:800; font-size:1rem; padding:.75rem 1.2rem; cursor:pointer; }
+  .entrada button:disabled{ opacity:.5; cursor:default; }
+  .pe{ display:flex; gap:.8rem; padding:0 1rem .6rem; background:#fff; font-size:.74rem; color:#6b7a8c; }
+  .pe .cont{ margin-left:auto; } .pe .cont.perto{ color:#b45309; font-weight:800; }
+  .aviso{ background:var(--white); border:2px solid var(--surface-border-color); border-radius:16px; padding:1.1rem 1.25rem; max-width:640px; margin:0 auto; }
+  .aviso h2{ margin:0 0 .4rem; font-family:var(--font-heading); font-size:1.05rem; color:var(--ui-dark,#223e5a); }
+  .rodape{ font-size:.8rem; color:var(--gray); padding:.7rem .2rem 0; }
+  .fundo{ display:none; }
+  body.theme-dark .janela, body.theme-dark .entrada, body.theme-dark .pe{ background:#1f2937; border-color:#334155; }
+  body.theme-dark .chat{ background:#17202e; }
+  body.theme-dark .msg:not(.eu), body.theme-dark .prop{ background:#273449; border-color:#3a4a63; color:#e6edf6; }
+  body.theme-dark .prop b{ color:#f1f5fb; } body.theme-dark .prop p{ color:#c2d0e0; }
+  body.theme-dark .entrada textarea{ background:#273449; border-color:#3a4a63; color:#e6edf6; }
+  body.theme-dark .depois button, body.theme-dark .comeco button{ background:#273449; border-color:#3a4a63; color:#dbe6f3; }
+  body.theme-dark .passos{ background:rgba(39,52,73,.85); color:#c2d0e0; } body.theme-dark .passos .p i{ background:#c2d0e0; }
+  body.theme-dark .acoes{ border-top-color:#3a4a63; } body.theme-dark .acoes button{ border-color:#3a4a63; color:#c2d0e0; }
+
+  /* tela estreita: a árvore vira gaveta, aberta pelo botão "Ideias" */
+  @media (max-width: 900px){
+    main{ padding:.6rem; }
+    .palco{ display:block; }
+    .janela{ height:calc(100vh - 1.2rem); position:static; border-radius:16px; }
+    .cab .ideias-bt{ display:inline-block; }
+    .arvore{ position:fixed; z-index:70; left:0; top:0; bottom:0; width:min(330px, 90vw); max-height:none; border-radius:0 18px 18px 0;
+             transform:translateX(-105%); transition:transform .22s ease; }
+    body.arv-aberta .arvore{ transform:none; }
+    body.arv-aberta .fundo{ display:block; position:fixed; inset:0; z-index:69; background:rgba(15,23,42,.45); }
+    .msg, .prop{ max-width:94%; }
+    .hero{ display:none; }   /* no celular a conversa precisa da tela inteira */
+  }
+  @media (prefers-reduced-motion: reduce){ .msg{ animation:none; } .passos .p i{ animation:none; } .arvore{ transition:none; } }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <a class="back-link" href="index.html">&larr; Voltar aos recursos</a>
+  <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
+  <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+  <h1>Buddy</h1>
+  <p>O auxiliar do professor</p>
+</header>
+
+<main>
+  <section class="aviso" id="fora" hidden>
+    <h2 id="foraT">🔒 Entre no Fisk Hub primeiro</h2>
+    <p id="foraP" style="margin:0;color:var(--gray);font-size:.92rem">Volte à página inicial do Hub, entre com seu usuário e abra o Buddy de novo.</p>
+    <p style="margin:.7rem 0 0"><a href="index.html" style="font-weight:800;color:var(--ui,#2b4d70)">← Voltar ao Fisk Hub</a></p>
+  </section>
+
+  <div class="palco" id="palco" hidden>
+    <nav class="arvore" id="arvore" aria-label="Perguntas prontas">
+      <div class="arv-cab"><b>💡 O que perguntar</b><small>toque numa pergunta, ou escreva a sua</small></div>
+      <div class="arv-lista" id="arvLista"></div>
+    </nav>
+
+    <div class="janela">
+      <div class="cab">
+        <div class="foto"><span><img alt="Buddy" src="https://portalfisk.com.br/assets/icons/buddy.png"></span></div>
+        <div class="nome"><b>Buddy</b><small id="sub">seu auxiliar · online</small></div>
+        <div class="dir">
+          <span class="selo">piloto</span>
+          <select id="verComo" hidden aria-label="Responder como qual professor"></select>
+          <a class="bt" id="ajustes" href="buddy-ajustes.html" hidden>⚙️ Ajustes</a>
+          <button type="button" class="ideias-bt" id="ideiasBt">💡 Ideias</button>
+          <button type="button" id="nova">＋ Nova conversa</button>
+          <a class="bt" href="index.html">← Hub</a>
+        </div>
+      </div>
+      <div class="chat" id="chat" aria-live="polite"></div>
+      <form class="entrada" id="form">
+        <textarea id="txt" rows="1" maxlength="2000" placeholder="Pergunte sobre suas turmas e alunos…" aria-label="Sua pergunta"></textarea>
+        <button type="submit" id="enviar">Enviar</button>
+      </form>
+      <div class="pe"><span id="restam"></span><span>Enter envia · Shift+Enter quebra a linha</span><span class="cont" id="cont"></span></div>
+    </div>
+  </div>
+  <p class="rodape" id="rodape" hidden>O Buddy só lê: card, faltas, atraso, notas, tutoria e uso do portal das suas turmas. Ele não grava nem envia nada. Confira os números antes de agir, e marque 👍 ou 👎 em cada resposta: é assim que a gente mede se ele está acertando.</p>
+</main>
+<div class="fundo" id="fundo"></div>
+
+<script>
+/* ══ O BUDDY AUXILIAR, PILOTO (06/10/2026) ═════════════════════════════════
+ * A conversa com o modelo mora no backend (Buddy.js). Esta página manda a
+ * pergunta e fica chamando `buddyPasso` até vir a resposta: cada chamada é um
+ * passo (o modelo pensando, ou o servidor lendo o card), e o que ele está
+ * fazendo aparece na tela. Nenhuma chave e nenhum dado de aluno ficam aqui.
+ *
+ * O que a tela cuida, e por quê:
+ *  · a ÁRVORE de perguntas prontas (assets/buddy-conversas.js): o professor não
+ *    precisa adivinhar o que dá para perguntar, e a pergunta pronta já pede a
+ *    resposta no formato certo, o que economiza passos;
+ *  · os ATALHOS embaixo de cada resposta, para a conversa seguir sem digitar;
+ *  · 👍 / 👎 em cada resposta: tokens a API conta sozinha, acerto só o professor
+ *    sabe. É o dado que o piloto mais precisa;
+ *  · os passos visíveis ("olhando o resumo das turmas…"): espera sem sinal
+ *    parece travamento.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+var EP = FISK_HUB_EP, conversa = '', ocupado = false, info = null, comoQuem = '', depoisDaVez = null;
+function $(id) { return document.getElementById(id); }
+function sess() { return fiskSessao() || {}; }
+function esc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+function post(body) {
+  body.token = sess().token || ''; body.como = comoQuem;
+  return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) }).then(fiskJson);
+}
+/* a resposta do modelo é texto: escapa tudo, e só então aceita **negrito**, listas e parágrafos */
+function formata(t) {
+  var h = '';
+  esc(t).split(/\n{2,}/).forEach(function (b) {
+    var ls = b.split('\n'), dentro = false;
+    ls.forEach(function (l) {
+      var m = /^\s*(?:[-•*]|\d+[.)])\s+(.*)$/.exec(l);
+      if (m) { if (!dentro) { h += '<ul>'; dentro = true; } h += '<li>' + m[1] + '</li>'; }
+      else { if (dentro) { h += '</ul>'; dentro = false; } if (l.trim()) h += '<p>' + l.replace(/^#+\s*/, '') + '</p>'; }
+    });
+    if (dentro) h += '</ul>';
+  });
+  return h.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+}
+function poe(el) { var c = $('chat'); c.appendChild(el); c.scrollTop = c.scrollHeight; return el; }
+function bolhaEu(t) { var d = document.createElement('div'); d.className = 'msg eu'; d.textContent = t; return poe(d); }
+function bolha(html) { var d = document.createElement('div'); d.className = 'msg'; d.innerHTML = html; return poe(d); }
+
+/* ── os passos à vista ── */
+var passosEl = null;
+function passo(t) {
+  if (!passosEl) { passosEl = document.createElement('div'); passosEl.className = 'passos'; poe(passosEl); }
+  var ult = passosEl.lastElementChild;
+  if (ult) { ult.classList.add('feito'); ult.innerHTML = '<span>✓</span><span>' + ult.dataset.t + '</span>'; }
+  var p = document.createElement('div'); p.className = 'p'; p.dataset.t = esc(t);
+  p.innerHTML = '<span>' + esc(t) + '</span><i></i><i></i><i></i>';
+  passosEl.appendChild(p); $('chat').scrollTop = $('chat').scrollHeight;
+}
+function fimPassos() { if (passosEl) { passosEl.remove(); passosEl = null; } }
+function trava(sim) { ocupado = sim; $('enviar').disabled = sim; $('txt').disabled = sim; $('nova').disabled = sim; if (!sim) $('txt').focus(); }
+
+/* ── a árvore ── */
+var POR_ROTULO = {};
+(window.BUDDY_ARVORE || []).forEach(function (c) { c.perguntas.forEach(function (p) { POR_ROTULO[p.rot] = p; }); });
+function desenhaArvore() {
+  $('arvLista').innerHTML = (window.BUDDY_ARVORE || []).map(function (c, i) {
+    return '<div class="cat' + (i === 0 ? ' aberta' : '') + '"><button type="button" aria-expanded="' + (i === 0) + '"><span class="ic">' + c.ic + '</span>' +
+      '<span class="tt"><b>' + esc(c.tit) + '</b><small>' + esc(c.sub) + '</small></span><span class="seta">▶</span></button><ul>' +
+      c.perguntas.map(function (p) {
+        return '<li><button type="button" data-rot="' + esc(p.rot) + '"' + (p.breve ? ' class="breve" title="' + esc(p.porque || '') + '"' : '') + '>' + esc(p.rot) + '</button></li>';
+      }).join('') + '</ul></div>';
+  }).join('');
+}
+$('arvLista').addEventListener('click', function (e) {
+  var b = e.target.closest ? e.target.closest('button') : null; if (!b) return;
+  if (b.parentNode.classList.contains('cat')) { var c = b.parentNode, ab = c.classList.toggle('aberta'); b.setAttribute('aria-expanded', ab ? 'true' : 'false'); return; }
+  escolhe(b.getAttribute('data-rot'));
+});
+/* uma pergunta pronta foi escolhida, na árvore ou num atalho */
+function escolhe(rot) {
+  var p = POR_ROTULO[rot];
+  document.body.classList.remove('arv-aberta');
+  if (p && p.breve) { bolha('<p>Isso eu ainda não sei fazer. ' + esc(p.porque || '') + '</p>'); return; }
+  if (p && p.falta) {
+    /* falta um nome que só o professor sabe: o começo vai para a caixa e ele completa */
+    $('txt').value = p.texto; ajusta(); $('txt').focus();
+    $('txt').placeholder = p.falta === 'turma' ? 'complete com a turma (ex.: 3ª e 5ª 19h) e envie' : 'complete com o nome do aluno e envie';
+    depoisDaVez = p.depois || null;
+    return;
+  }
+  pergunta(p ? p.texto : rot, p ? p.rot : null, p ? p.depois : null);
+}
+
+/* ── o que vem depois da resposta: nota, copiar e atalhos ── */
+function acoesDe(el, texto) {
+  var a = document.createElement('div'); a.className = 'acoes';
+  a.innerHTML = '<button type="button" data-v="bom" title="A resposta estava certa">👍 Acertou</button>' +
+                '<button type="button" data-v="ruim" title="A resposta estava errada ou não ajudou">👎 Errou</button>' +
+                '<button type="button" data-c="1">📋 Copiar</button><span class="dito"></span>';
+  var id = conversa, dito = a.querySelector('.dito');
+  a.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('button') : null; if (!b) return;
+    if (b.dataset.c) {
+      var ok = function () { dito.textContent = 'copiado'; setTimeout(function () { dito.textContent = ''; }, 1800); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(texto).then(ok, function () {});
+      return;
+    }
+    var voto = b.dataset.v, coment = '';
+    if (voto === 'ruim') { coment = window.prompt('O que estava errado? (opcional, ajuda muito)') || ''; }
+    a.querySelectorAll('[data-v]').forEach(function (x) { x.className = ''; });
+    b.className = 'on' + (voto === 'ruim' ? ' ruim' : '');
+    dito.textContent = 'anotado, obrigado';
+    post({ action: 'buddyNota', conversa: id, voto: voto, comentario: coment }).catch(function () {});
+  });
+  el.appendChild(a);
+}
+function atalhos(lista) {
+  if (!lista || !lista.length) return;
+  var d = document.createElement('div'); d.className = 'depois';
+  d.innerHTML = lista.map(function (r) { return '<button type="button">' + esc(r) + '</button>'; }).join('');
+  d.addEventListener('click', function (e) { var b = e.target.closest ? e.target.closest('button') : null; if (b && !ocupado) { d.remove(); escolhe(b.textContent); } });
+  poe(d);
+}
+
+function recebe(j) {
+  if (!j) throw new Error('sem resposta');
+  if (j.conversa) conversa = j.conversa;
+  if (j.estado === 'andando') { passo(j.rotulo || 'pensando'); return post({ action: 'buddyPasso', conversa: conversa }).then(recebe); }
+  fimPassos();
+  if (j.ok === false) { bolha('<p>⚠️ ' + esc(j.error || 'Não consegui agora.') + '</p>'); return; }
+  if (j.resposta) acoesDe(bolha(formata(j.resposta)), j.resposta);
+  if (j.proposta && j.proposta.tipo === 'termo') {
+    var p = j.proposta, d = document.createElement('div'); d.className = 'prop';
+    d.innerHTML = '<b>📄 Termo de atraso · ' + esc(p.aluno) + '</b><p>' + esc(p.turma) + ' · ' + esc(p.escola) + '<br>' +
+      esc(String(p.atraso_aulas)) + ' aulas de atraso · ' + esc(String(p.faltas == null ? '?' : p.faltas)) + ' faltas' +
+      (p.faltas_pct !== '' && p.faltas_pct != null ? ' (' + esc(String(p.faltas_pct)) + '%)' : '') +
+      '<br>Confira os números. O documento é gerado, salvo na pasta do aluno e registrado no counseling pelo gerador.</p>' +
+      '<a href="' + esc(p.link) + '" target="_blank" rel="noopener">Abrir o Gerador de Termo, já na escola e no professor →</a>';
+    poe(d);
+  }
+  if (j.medicao) {
+    var m = document.createElement('div'); m.className = 'med';
+    m.textContent = 'medição · ' + j.medicao.modelo + ' · ' + j.passos + ' chamadas · ' + j.medicao.tokens.toLocaleString('pt-BR') + ' tokens na conversa · US$ ' +
+      j.medicao.custoUSD.toFixed(4) + ' na conversa · US$ ' + j.medicao.gastoDoMesUSD.toFixed(2) + ' no mês';
+    poe(m);
+  }
+  atalhos(depoisDaVez || window.BUDDY_DEPOIS_PADRAO);
+  depoisDaVez = null;
+  if (info && info.restamHoje > 0) { info.restamHoje--; rodapeConta(); }
+}
+function pergunta(t, rotulo, depois) {
+  t = String(t || '').trim(); if (!t || ocupado) return;
+  var com = document.querySelector('.comeco'); if (com) com.remove();
+  document.querySelectorAll('.depois').forEach(function (x) { x.remove(); });
+  if (depois) depoisDaVez = depois;
+  bolhaEu(rotulo || t); $('txt').value = ''; ajusta(); $('txt').placeholder = 'Pergunte sobre suas turmas e alunos…';
+  trava(true); passo('pensando');
+  post({ action: 'buddyPergunta', texto: t, conversa: conversa }).then(recebe)
+    .catch(function (e) { fimPassos(); bolha('<p>⚠️ ' + esc(String((e && e.message) || e)) + '</p>'); })
+    .then(function () { trava(false); });
+}
+function ajusta() {
+  var a = $('txt'); a.style.height = 'auto'; a.style.height = Math.min(160, a.scrollHeight + 2) + 'px';
+  var n = a.value.length, c = $('cont'); c.textContent = n > 1500 ? n + ' / 2000' : ''; c.className = 'cont' + (n > 1800 ? ' perto' : '');
+}
+function rodapeConta() { $('restam').textContent = info ? 'restam ' + info.restamHoje + ' perguntas hoje' : ''; }
+$('txt').addEventListener('input', ajusta);
+$('txt').addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); pergunta($('txt').value); } });
+$('form').addEventListener('submit', function (e) { e.preventDefault(); pergunta($('txt').value); });
+$('ideiasBt').addEventListener('click', function () { document.body.classList.toggle('arv-aberta'); });
+$('fundo').addEventListener('click', function () { document.body.classList.remove('arv-aberta'); });
+$('nova').addEventListener('click', function () { if (!ocupado) abertura(); });
+
+/* ── a abertura: o Buddy se apresenta e oferece por onde começar ── */
+var COMECO = ['Como está a saúde pedagógica das minhas turmas?', 'Quais alunos estão faltando mais?', 'Quem está em atraso crítico?',
+              'Quem foi à tutoria?', 'Quem não está usando o portal?', 'Monte minhas prioridades da semana'];
+function abertura() {
+  conversa = ''; depoisDaVez = null; $('chat').innerHTML = '';
+  var quem = comoQuem || sess().name || '', prim = String(quem).trim().split(/\s+/)[0] || '';
+  prim = prim.charAt(0).toUpperCase() + prim.slice(1).toLowerCase();
+  bolha('<p>Oi' + (info && info.direcao ? '! Estou respondendo como se <b>' + esc(quem) + '</b> estivesse perguntando.' : ', ' + esc(prim) + '!') +
+        ' Eu olho suas turmas com você: atraso, faltas, notas, tutoria e uso do portal.</p><p>Escolha por onde começar, ou escreva do seu jeito.</p>');
+  var d = document.createElement('div'); d.className = 'comeco';
+  d.innerHTML = COMECO.map(function (r) { var p = POR_ROTULO[r], ic = ''; (window.BUDDY_ARVORE || []).forEach(function (c) { if (c.perguntas.indexOf(p) > -1) ic = c.ic; });
+    return '<button type="button" data-rot="' + esc(r) + '"><span>' + ic + '</span><span>' + esc(r) + '</span></button>'; }).join('');
+  d.addEventListener('click', function (e) { var b = e.target.closest ? e.target.closest('button') : null; if (b) escolhe(b.getAttribute('data-rot')); });
+  poe(d); $('txt').focus();
+}
+
+/* ── a direção escolhe "como quem" pergunta, aqui mesmo ── */
+function montaVerComo() {
+  var sel = $('verComo');
+  fetch(EP + '?action=profList').then(fiskJson).then(function (j) {
+    var ps = ((j && (j.profs || j.professores || j.lista)) || []).filter(function (p) { return !p.director; });
+    sel.innerHTML = '<option value="">responder como…</option>' + ps.map(function (p) { var n = p.name || p.nome || p; return '<option' + (n === comoQuem ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('');
+    sel.hidden = false;
+  }).catch(function () {});
+  sel.addEventListener('change', function () {
+    comoQuem = sel.value;
+    try { if (comoQuem) localStorage.setItem('fisk_actas', JSON.stringify({ name: comoQuem, escolas: '' })); } catch (e) {}
+    if (comoQuem) { $('fora').hidden = true; $('palco').hidden = false; $('rodape').hidden = false; abertura(); }
+  });
+}
+
+fiskInitThemeToggle('themeToggle');
+fiskInitUserMenu();
+desenhaArvore();
+function recusa(t, p) { $('fora').hidden = false; $('foraT').textContent = t; $('foraP').textContent = p; }
+(function () {
+  var s = sess();
+  if (!s.token) return recusa('🔒 Entre no Fisk Hub primeiro', 'Volte à página inicial do Hub, entre com seu usuário e abra o Buddy de novo.');
+  if (s.master) { try { comoQuem = (JSON.parse(localStorage.getItem('fisk_actas') || 'null') || {}).name || ''; } catch (e) {} }
+  post({ action: 'buddyInfo' }).then(function (j) {
+    if (!j || j.ok !== true) return recusa('🔒 Sessão expirada', 'Entre de novo pelo Fisk Hub.');
+    info = j;
+    if (!j.piloto) return recusa('🧪 O Buddy auxiliar está em piloto', 'Por enquanto ele está com poucos professores, para a gente medir como ele se sai. Em breve chega para todos.');
+    if (!j.chave) return recusa('🔑 Falta a chave do Buddy', j.direcao ? 'Abra os Ajustes do Buddy e cole a chave do Claude Console.' : 'A direção ainda não ligou o Buddy. Avise o Pedro.');
+    rodapeConta();
+    if (j.direcao) { $('ajustes').hidden = false; montaVerComo(); }
+    $('palco').hidden = false; $('rodape').hidden = false;
+    if (j.direcao && !comoQuem) {
+      $('chat').innerHTML = '';
+      bolha('<p>A direção não tem turmas. Escolha lá em cima, em <b>responder como…</b>, o professor por quem você quer perguntar. Eu respondo com as turmas dele, e a medição de custo aparece embaixo de cada resposta.</p>');
+      return;
+    }
+    abertura();
+    fiskRegistrarUso('Buddy auxiliar');
+  }).catch(function () { recusa('⚠️ Sem conexão', 'Não consegui falar com o servidor. Tente de novo em instantes.'); });
+})();
+</script>
+</body>
+</html>
