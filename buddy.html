@@ -542,7 +542,101 @@ function cartaoDoc(pr, idConversa) {
   poe(d);
   return gera;
 }
+/* O CONVERSATION MAKER PELO CHAT (Pedro, 08/10/2026). O cartão é a tabelinha de níveis e faixas da ferramenta, já
+   marcada com o que o Buddy propôs. Ao confirmar, este navegador chama as MESMAS rotas do Conversation Maker, com a
+   sessão do professor: uma escreve a aula (e cobra 1 crédito), a outra monta o .pptx e faz o backup no Drive. Uma
+   aula por vez; a primeira serve de guia para as seguintes, como no lote da ferramenta. Sem revisão aqui: para
+   ajustar, o professor abre o Conversation Maker. Teto de aulas por pedido vem do servidor (4). */
+var CM_BASE = 'https://conversation-maker.vercel.app';
+function cartaoConversation(pr, idConversa) {
+  var x = pr.dados || {}, max = x.max || 4, d = document.createElement('div'); d.className = 'prop';
+  var marcadas = (x.combos || []).map(function (c) { return c.level + '|' + c.age; });
+  var cab = '<tr><th></th>' + (x.faixas || []).map(function (f) { return '<th style="font-size:.74rem;font-weight:800;color:#5b6b7c;padding:.2rem .35rem">' + esc(f[1]) + '</th>'; }).join('') + '</tr>';
+  var linhas = (x.niveis || []).map(function (n) {
+    return '<tr><td style="font-weight:800;font-size:.86rem;color:#16243a;padding:.2rem .5rem .2rem 0;white-space:nowrap">' + esc(n[1]) + '</td>' + (x.faixas || []).map(function (f) {
+      var existe = !(n[0] === 'teens' && f[0] !== 'preteens');   /* o nível Teens só existe para pré-adolescentes */
+      return '<td style="text-align:center;padding:.15rem">' + (existe ? '<button type="button" class="cmc" data-k="' + n[0] + '|' + f[0] + '" style="width:2.3rem;height:2rem;border-radius:8px;border:2px solid #c7d3e3;background:#fff;cursor:pointer;font-weight:900"></button>' : '<span style="color:#c7d3e3">·</span>') + '</td>';
+    }).join('') + '</tr>';
+  }).join('');
+  d.innerHTML = '<b>💬 Aula de conversação · ' + (x.idioma === 'spanish' ? 'Espanhol' : 'Inglês') + '</b>' +
+    (x.perfil ? '<div class="onde">' + esc(x.perfil) + '</div>' : '') +
+    '<div style="margin:.4rem 0"><label style="font-size:.8rem;font-weight:800;color:#5b6b7c">Tema</label><br><input type="text" class="cmt" maxlength="140" style="width:100%;box-sizing:border-box;border:2px solid #c7d3e3;border-radius:8px;padding:.45rem .6rem;font:inherit"></div>' +
+    '<table style="border-collapse:collapse;margin:.2rem 0 .5rem">' + cab + linhas + '</table>' +
+    '<div class="onde cmn"></div>' +
+    '<div class="bts"><button type="button" class="sim">✓ Gerar</button><button type="button" class="nao">Cancelar</button><span class="res"></span></div>' +
+    '<div class="cml" style="margin-top:.5rem;font-size:.9rem;line-height:1.55"></div>';
+  var tema = d.querySelector('.cmt'), sim = d.querySelector('.sim'), nao = d.querySelector('.nao'), res = d.querySelector('.res'), cont = d.querySelector('.cmn'), lista = d.querySelector('.cml'), rodando = false;
+  tema.value = x.tema || '';
+  function rotulo(k) { var p = k.split('|'), n = (x.niveis || []).filter(function (y) { return y[0] === p[0]; })[0], f = (x.faixas || []).filter(function (y) { return y[0] === p[1]; })[0]; return (n ? n[1] : p[0]) + ' · ' + (f ? f[1] : p[1]); }
+  function pinta() {
+    d.querySelectorAll('.cmc').forEach(function (b) {
+      var on = marcadas.indexOf(b.dataset.k) > -1;
+      b.textContent = on ? '✓' : ''; b.style.background = on ? '#2563eb' : '#fff'; b.style.color = '#fff'; b.style.borderColor = on ? '#2563eb' : '#c7d3e3';
+    });
+    cont.textContent = marcadas.length + ' de ' + max + ' aulas por pedido · cada aula gasta 1 crédito do Conversation Maker e leva alguns minutos. Sem revisão no chat.';
+    sim.textContent = marcadas.length ? '✓ Gerar ' + marcadas.length + (marcadas.length === 1 ? ' aula' : ' aulas') : '✓ Gerar'; sim.disabled = rodando || !marcadas.length;
+  }
+  d.querySelectorAll('.cmc').forEach(function (b) { b.addEventListener('click', function () {
+    if (rodando) return;
+    var i = marcadas.indexOf(b.dataset.k);
+    if (i > -1) marcadas.splice(i, 1);
+    else if (marcadas.length >= max) { res.className = 'res err'; res.textContent = 'No máximo ' + max + ' por pedido.'; return; }
+    else marcadas.push(b.dataset.k);
+    res.textContent = ''; pinta();
+  }); });
+  function chama(caminho, corpo) {
+    return fetch(CM_BASE + caminho, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(corpo) });
+  }
+  function uma(k, guia) {
+    var p = k.split('|'), li = document.createElement('div'); li.textContent = '⏳ ' + rotulo(k) + ': escrevendo a aula…'; lista.appendChild(li);
+    var prof = nomeProprio(comoQuem || (sess().name || '')), aula = null;
+    return chama('/api/generate-lesson', { profToken: sess().token || '', language: x.idioma, topic: tema.value.trim(), levelChoice: p[0], ageGroup: p[1], useWebSearch: false, teacherName: prof, referenceLesson: guia || null })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) {
+        if (!r.ok) { var e = new Error(j.error || ('o Conversation Maker respondeu ' + r.status)); e.status = r.status; e.creditos = j.creditos; throw e; }
+        return j;
+      }); })
+      .then(function (j) {
+        aula = (j.lessons || [])[0]; if (!aula) throw new Error('a aula voltou vazia');
+        li.textContent = '⏳ ' + rotulo(k) + ': montando os slides…';
+        return chama('/api/export-pptx', { lesson: aula, meta: { teacherName: prof, profToken: sess().token || '', event: 'download', versionInfo: 'gerada pelo Buddy' } })
+          .then(function (r2) {
+            if (!r2.ok) throw new Error('não consegui montar o .pptx (' + r2.status + ')');
+            var cd = r2.headers.get('Content-Disposition') || '', m = /filename\*=UTF-8''([^;]+)/.exec(cd), nome = m ? decodeURIComponent(m[1]) : ('Ac - ' + (aula.coverTitle || tema.value.trim()) + ' - ' + rotulo(k).replace(' · ', ' - ') + '.pptx');
+            return r2.blob().then(function (b) {
+              li.innerHTML = '✓ <b>' + esc(rotulo(k)) + '</b>: <a class="lk" href="' + URL.createObjectURL(b) + '" download="' + esc(nome) + '">baixar o .pptx</a>' + (typeof j.creditos === 'number' ? ' <span style="color:#5b6b7c">· ' + j.creditos + ' crédito(s) restantes</span>' : '');
+              return aula;
+            });
+          });
+      })
+      .catch(function (e) {
+        /* a aula já escrita não se perde: se só a montagem falhou, o crédito foi gasto e o professor acha a aula refazendo no Conversation Maker */
+        li.innerHTML = '⚠️ <b>' + esc(rotulo(k)) + '</b>: ' + esc(e.status === 402 ? 'sem créditos no Conversation Maker' + (typeof e.creditos === 'number' ? ' (saldo ' + e.creditos + ')' : '') : e.status === 401 ? 'a sessão não foi aceita pelo Conversation Maker: saia e entre de novo no Hub' : String(e.message || e)) + (aula ? ' (a aula foi escrita e o crédito, gasto)' : '');
+        e.parar = e.status === 402 || e.status === 401; throw e;
+      });
+  }
+  sim.addEventListener('click', function () {
+    if (rodando || !marcadas.length) return;
+    if (tema.value.trim().length < 3) { res.className = 'res err'; res.textContent = 'Escreva o tema.'; return; }
+    rodando = true; tema.disabled = true; nao.disabled = true; pinta(); res.className = 'res'; res.textContent = 'gerando, pode levar alguns minutos…';
+    var fila = marcadas.slice(), feitas = 0, guia = null;
+    (function proxima() {
+      if (!fila.length) return fim();
+      uma(fila.shift(), guia).then(function (a) { feitas++; if (!guia) guia = a; proxima(); }, function (e) { if (e && e.parar) { fila.forEach(function (k) { var li = document.createElement('div'); li.textContent = '— ' + rotulo(k) + ': não gerada'; lista.appendChild(li); }); fim(); } else proxima(); });
+    })();
+    function fim() {
+      sim.remove(); nao.remove(); d.classList.add(feitas ? 'feita' : 'cancelada');
+      res.className = 'res ' + (feitas === marcadas.length ? 'ok' : 'err');
+      res.innerHTML = (feitas ? '✓ ' + feitas + (feitas === 1 ? ' aula gerada' : ' aulas geradas') + '. Elas também ficam em <a class="lk" href="' + CM_BASE + '/historico.html#proftok=' + encodeURIComponent(sess().token || '') + '" target="_blank" rel="noopener">Minhas aulas</a>.' : 'Nenhuma aula foi gerada.') +
+                      ' Para revisar ou ajustar, use o <a class="lk" href="' + CM_BASE + '/#proftok=' + encodeURIComponent(sess().token || '') + '" target="_blank" rel="noopener">Conversation Maker</a>.';
+      memFecha(idConversa, pr.id, feitas ? '✓ ' + feitas + ' aula(s) de conversação gerada(s) sobre "' + tema.value.trim() + '".' : 'nenhuma aula foi gerada.');
+    }
+  });
+  nao.addEventListener('click', function () { sim.remove(); nao.remove(); d.classList.add('cancelada'); res.className = 'res'; res.textContent = 'Cancelado. Nada foi gerado e nenhum crédito foi gasto.'; memFecha(idConversa, pr.id, 'cancelado, nada foi gerado.'); });
+  pinta(); poe(d);
+  return null;
+}
 function cartaoAcao(pr, idConversa) {
+  if (pr.acao === 'conversation') return cartaoConversation(pr, idConversa);
   if (pr.acao === 'boletim') {
     /* boletim: o Buddy só organizou as notas. Quem lança é o gerador, com o boletim montado na frente do professor */
     var xb = pr.dados || {}, db = document.createElement('div'); db.className = 'prop';
@@ -552,6 +646,31 @@ function cartaoAcao(pr, idConversa) {
                                      : 'Nada foi lançado. O gerador abre já neste aluno e com estas notas; você confere o boletim. Ao baixar o PDF, ele vai sozinho para a pasta do aluno, o card, o counseling e o planner.') + '</div>' +
       '<div class="bts"><a class="abre" href="' + esc(xb.link || '#') + '" target="_blank" rel="noopener">' + (xb.kids ? 'Abrir o boletim deste aluno →' : 'Abrir o boletim preenchido →') + '</a></div>';
     poe(db); return null;
+  }
+  if (pr.acao === 'recadoAluno') {
+    /* RECADO PARA O ALUNO (Pedro, 08/10/2026): o professor vê o que disse e a versão que o aluno vai ler, pode
+       editar essa versão, e só então envia. É a única proposta em que o texto final sai desta tela. */
+    var xr = pr.dados || {}, dr = document.createElement('div'); dr.className = 'prop';
+    dr.innerHTML = '<b>✉️ Recado para o aluno · ' + esc(pr.aluno) + '</b><div class="onde">' + esc(pr.turma ? pr.turma + ' · ' : '') + 'ele lê no Buddy da home do Portal</div>' +
+      (xr.original ? '<div class="onde" style="margin-bottom:.15rem"><b style="font-size:.78rem">Você disse:</b></div><blockquote style="border-left-color:#c7d3e3;background:#f6f8fb;color:#5b6b7c;font-size:.88rem">' + esc(xr.original) + '</blockquote>' : '') +
+      '<div class="onde" style="margin-bottom:.15rem"><b style="font-size:.78rem">O aluno vai ler (você pode editar):</b></div>' +
+      '<textarea class="rat" maxlength="' + (xr.max || 400) + '" rows="4" style="width:100%;box-sizing:border-box;border:2px solid #2563eb;border-radius:8px;padding:.55rem .7rem;font:inherit;font-size:.95rem;margin-bottom:.6rem;resize:vertical"></textarea>' +
+      '<div class="bts"><button type="button" class="sim">✓ Confirmar e enviar</button><button type="button" class="nao">Cancelar</button><span class="res"></span></div>';
+    var ta = dr.querySelector('.rat'), simR = dr.querySelector('.sim'), naoR = dr.querySelector('.nao'), resR = dr.querySelector('.res');
+    ta.value = pr.texto || '';
+    var mandaR = function (cancela) {
+      if (!cancela && ta.value.trim().length < 12) { resR.className = 'res err'; resR.textContent = 'O recado ficou vazio.'; return; }
+      simR.disabled = naoR.disabled = ta.disabled = true; resR.className = 'res'; resR.textContent = cancela ? '' : 'enviando…';
+      post({ action: 'buddyConfirma', conversa: idConversa, id: pr.id, cancela: cancela ? 1 : '', texto: cancela ? '' : ta.value.trim() }).then(function (r) {
+        if (!r || r.ok !== true) { resR.className = 'res err'; resR.textContent = (r && r.error) || 'Não consegui enviar.'; simR.disabled = naoR.disabled = ta.disabled = false; return; }
+        simR.remove(); naoR.remove();
+        if (r.cancelada) { dr.classList.add('cancelada'); resR.textContent = 'Cancelado. Nada foi enviado.'; memFecha(idConversa, pr.id, 'cancelado, nada foi enviado.'); return; }
+        dr.classList.add('feita'); resR.className = 'res ok'; resR.textContent = '✓ ' + (r.feito || 'Recado enviado.'); memFecha(idConversa, pr.id, '✓ recado enviado ao aluno.');
+      }).catch(function () { resR.className = 'res err'; resR.textContent = 'Sem conexão. Tente de novo.'; simR.disabled = naoR.disabled = ta.disabled = false; });
+    };
+    simR.addEventListener('click', function () { mandaR(false); });
+    naoR.addEventListener('click', function () { mandaR(true); });
+    poe(dr); return null;
   }
   if (DOCS[pr.acao]) return cartaoDoc(pr, idConversa);
   var d = document.createElement('div'); d.className = 'prop';
