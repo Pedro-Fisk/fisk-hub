@@ -162,7 +162,8 @@ else Promise.all([
       return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plannerProf', token: token(), raf: raf, book: book, patch: patch, semCard: q.get('plantao') === '1' }) }).then(function (r) { return r.json(); });
     }).then(function (r) {
       if (!r || r.ok === false) throw new Error((r && (r.erro || r.error)) || 'não salvou');
-      if (r.card && r.card.escreveu) status('📇 Card: ' + r.card.escreveu + ' na aula de hoje.');
+      if (r.card && r.card.escreveu) status('📇 Card: ' + r.card.escreveu + ' na aula de hoje.' + (r.card.fora === 'anterior' ? ' É a lição em que o aluno está (você marcou algo da ' + (r.card.marcou || 'lição anterior') + ').' : ''));
+      else if (r.card && !r.card.jaEstava && r.card.motivo) status(/sem aula hoje/.test(r.card.motivo) ? '📇 Você está preenchendo o planner fora do dia de aula deste aluno: nada foi lançado no card. Se ele veio, lance a aula direto no card.' : '📇 A presença de hoje NÃO foi para o card (' + r.card.motivo + '). Lance direto no card.', true);
     }).catch(function (e) {
       var v = JSON.parse(antes); if (v) itens[it.id] = v; else delete itens[it.id];
       desenha(); status('⚠️ Não salvou (' + (e && e.message || e) + '). A marca voltou.', true);

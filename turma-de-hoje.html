@@ -286,7 +286,7 @@
   .fila-off[hidden]{ display: none; }   /* o display:flex abaixo ganharia do hidden */
   .fila-off{ max-width: 1500px; margin: 0 auto .6rem; background: #fff4d6; border: 1.5px solid #e5b62b; color: #4a3a10; border-radius: 12px; padding: .6rem .9rem; font-weight: 800; display: flex; gap: .8rem; align-items: center; flex-wrap: wrap; }
   .fila-off button{ border: 1.5px solid #b8890f; background: #fff; color: #6b4d0f; border-radius: 999px; padding: .35rem .9rem; font: inherit; font-size: .85rem; cursor: pointer; }
-  .toast{ position: fixed; left: 50%; bottom: 1.4rem; transform: translateX(-50%); background: #1d3685; color: #fff; padding: .7rem 1.1rem; border-radius: 999px; font-weight: 800; font-size: .9rem; box-shadow: 0 8px 24px rgba(0,0,0,.25); z-index: 150; }
+  .toast{ position: fixed; left: 50%; bottom: 1.4rem; transform: translateX(-50%); max-width: min(92vw, 46rem); text-align: center; line-height: 1.3; background: #1d3685; color: #fff; padding: .7rem 1.1rem; border-radius: 1.3rem; font-weight: 800; font-size: .9rem; box-shadow: 0 8px 24px rgba(0,0,0,.25); z-index: 150; }
   /* o planner completo abre POR CIMA da turma, com os dados que ela já tem
      (Pedro, 14/09/2026): acima do menu do professor (60), abaixo do aviso
      (150), para o "📇 Card: L3" e o "não salvou" aparecerem sobre ele */
@@ -918,7 +918,21 @@ document.addEventListener('visibilitychange', function () {
    a lista é redesenhada na ordem nova, e todos deslizam da posição antiga
    para a nova (FLIP): o atendido desce por cima, com sombra, e os outros
    sobem. Quem pediu menos movimento no sistema vê a troca direta. */
+/* SEM BOLINHA NÃO HÁ ATENDIMENTO (Pedro, 08/10/2026): o professor não pode dar por atendido o aluno em quem não
+   registrou nada hoje. Vale a marca dele (a metade do professor, ou a do aluno fechada por ele) e o Checking, com o
+   carimbo de hoje; a marca que o aluno fez sozinho no portal não conta. Desfazer o atendido continua livre. */
+function profMarcouHoje(a) {
+  var pl = ((estado.dados[a.raf] || {}).planner) || {}, ini = new Date(); ini.setHours(0, 0, 0, 0); ini = ini.getTime();
+  var it = pl.itens || {}, ck = pl.checking || {};
+  return Object.keys(it).some(function (k) { var v = it[k] || {}; return (v.p && Number(v.pt) >= ini) || (v.a && v.aq && Number(v.at) >= ini); }) ||
+         Object.keys(ck).some(function (k) { var c = ck[k] || {}; return c.feito && Number(c.quando) >= ini; });
+}
 function atender(a) {
+  /* livro sem gabarito transcrito não tem bolinha para marcar: ali a trava não entra */
+  if (!estado.atendidos[a.raf] && planoDe(a.book) && !profMarcouHoje(a)) {
+    toast('Marque antes o que ' + (String(a.nome || '').trim().split(/\s+/)[0] || 'o aluno') + ' fez hoje: sem nenhuma bolinha ou Checking não dá para dar o aluno como atendido.', 6000);
+    return;
+  }
   if (estado.atendidos[a.raf]) delete estado.atendidos[a.raf]; else estado.atendidos[a.raf] = Date.now();
   guardaAtendidos();
   if (estado.atendidos[a.raf]) tutRegistra(a, 'atendido');
@@ -1009,7 +1023,40 @@ function poeDica(onde, texto) {
   onde.appendChild(b);
   return tx;
 }
-function toast(msg) { var t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 3200); }
+function toast(msg, ms) { var t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(function () { t.remove(); }, ms || 3200); }
+/* A BOLINHA QUE NÃO FOI PARA O CARD (08/10/2026). A marca acende na tela mesmo quando o card não muda, e o professor
+   saía achando que a presença estava lançada: a secretaria de Taubaté achou as aulas só com o previsto. O caso
+   principal é o planner preenchido FORA DO DIA DE AULA do aluno (o card só recebe a aula de hoje, decisão de
+   18/09): esse abre um pop-up, uma vez por turma, e depois vira aviso curto por aluno. "Já estava" não avisa: é a
+   segunda bolinha do mesmo dia. */
+var avisouCardTH = {};
+function popupForaDoDiaTH() {
+  var ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:200;background:rgba(15,23,60,.55);display:flex;align-items:center;justify-content:center;padding:1rem';
+  var cx = document.createElement('div');
+  cx.style.cssText = 'background:#fff;border-radius:1.2rem;max-width:30rem;padding:1.4rem 1.5rem;box-shadow:0 18px 50px rgba(0,0,0,.35);text-align:center';
+  var h = document.createElement('div'); h.style.cssText = 'font-weight:900;font-size:1.1rem;color:#1d3685;margin-bottom:.6rem';
+  h.textContent = '📇 Nada foi lançado no card';
+  var p = document.createElement('p'); p.style.cssText = 'margin:0 0 1.1rem;line-height:1.45;color:#2b3350';
+  p.textContent = 'Você está preenchendo o planner fora do dia de aula deste aluno. As marcas ficam salvas no planner, mas a presença só vai para o card no próprio dia da aula. Se o aluno veio, lance a aula direto no card.';
+  var b = document.createElement('button'); b.type = 'button'; b.className = 'btn'; b.textContent = 'Entendi';
+  b.addEventListener('click', function () { ov.remove(); });
+  cx.appendChild(h); cx.appendChild(p); cx.appendChild(b); ov.appendChild(cx); document.body.appendChild(ov); b.focus();
+}
+function avisoCardTH(a, c) {
+  if (!c || c.escreveu != null || c.jaEstava || !c.motivo) return;
+  var m = String(c.motivo), pri = String(a.nome || '').trim().split(/\s+/)[0] || 'este aluno';
+  var foraDoDia = /sem aula (hoje|ontem)|só dá para lançar/.test(m);
+  var k = a.raf + '|' + m + '|' + (estado.ontem ? 'o' : 'h');
+  if (avisouCardTH[k]) return; avisouCardTH[k] = 1;
+  if (foraDoDia) {
+    var kt = 'popup|' + estado.turma + '|' + (estado.ontem ? 'o' : 'h');
+    if (!avisouCardTH[kt]) { avisouCardTH[kt] = 1; popupForaDoDiaTH(); return; }
+    toast('📇 ' + pri + ': fora do dia de aula, nada foi para o card.', 4500);
+    return;
+  }
+  toast('📇 ' + pri + ': a presença NÃO foi para o card (' + (/não encontrado/.test(m) ? 'não achei o aluno no card' : m) + '). Lance direto no card.', 7000);
+}
 function esc(s) { return fiskEsc(String(s == null ? '' : s)); }
 function planoDe(book) { return window[planoGlobal(book)] || null; }
 
@@ -1883,8 +1930,11 @@ function confirmar(a, id, marca) {
     console.log('plannerProf', id, marca, r);
     if (pendentes[a.raf] && pendentes[a.raf][id] === marca) delete pendentes[a.raf][id];
     if (r.planner) { estado.dados[a.raf].planner = aplicaNotasPendentes(a.raf, aplicaPendentes(a.raf, r.planner)); redesenhar(a); }
-    if (r.card && r.card.escreveu) toast('📇 Card: ' + r.card.escreveu + ' na aula ' + rotDiaTH() + '.');
-    else if (estado.ontem && r.card && r.card.motivo) toast('📇 Card não alterado: ' + r.card.motivo + '.');
+    /* bolinha de lição anterior (Pedro, 08/10/2026): o card recebe de novo a lição em que o aluno está, e o professor
+       fica sabendo que não foi a da bolinha */
+    if (r.card && r.card.escreveu && r.card.fora === 'anterior') toast('📇 Card: ' + r.card.escreveu + ' na aula ' + rotDiaTH() + ', a lição em que o aluno está (você marcou algo da ' + (r.card.marcou || 'lição anterior') + ').', 6000);
+    else if (r.card && r.card.escreveu) toast('📇 Card: ' + r.card.escreveu + ' na aula ' + rotDiaTH() + '.');
+    else avisoCardTH(a, r.card);
   }).catch(function (e) {
     if (pendentes[a.raf] && pendentes[a.raf][id] === marca) delete pendentes[a.raf][id];
     console.error('plannerProf falhou', id, e);
