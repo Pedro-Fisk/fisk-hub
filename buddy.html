@@ -971,6 +971,7 @@ function montaVerComo() {
   }).catch(function () {});
   sel.addEventListener('change', function () {
     comoQuem = sel.value;
+    if (comoQuem) post({ action: 'buddyAquece' }).catch(function () {});
     try { if (comoQuem) localStorage.setItem('fisk_actas', JSON.stringify({ name: comoQuem, escolas: '' })); } catch (e) {}
     if (comoQuem) { $('fora').hidden = true; $('palco').hidden = false; $('rodape').hidden = false; abertura(); carregaHist(); }
   });
@@ -1009,6 +1010,8 @@ function recusa(t, p) { fechaCortina(); $('fora').hidden = false; $('foraT').tex
     if (!j.piloto) return recusa('🧪 O Buddy auxiliar está em piloto', 'Por enquanto ele está com poucos professores, para a gente medir como ele se sai. Em breve chega para todos.');
     if (!j.chave) return recusa('🔑 Falta a chave do Buddy', j.direcao ? 'Abra os Ajustes do Buddy e cole a chave do Claude Console.' : 'A direção ainda não ligou o Buddy. Avise o Pedro.');
     fechaCortina(); rodapeConta();
+    /* aquece: o servidor lê as turmas agora, enquanto o professor ainda está digitando (08/10/2026) */
+    if (!j.direcao || comoQuem) post({ action: 'buddyAquece' }).catch(function () {});
     if (j.direcao) { $('ajustes').hidden = false; montaVerComo(); }
     $('palco').hidden = false; $('rodape').hidden = false;
     if (j.direcao && !comoQuem) {
