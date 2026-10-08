@@ -546,10 +546,11 @@ function cartaoAcao(pr, idConversa) {
   if (pr.acao === 'boletim') {
     /* boletim: o Buddy só organizou as notas. Quem lança é o gerador, com o boletim montado na frente do professor */
     var xb = pr.dados || {}, db = document.createElement('div'); db.className = 'prop';
-    db.innerHTML = '<b>📊 Boletim · ' + esc(pr.aluno) + '</b><div class="onde">' + esc(pr.turma) + ' · ' + esc(xb.book || '') + (xb.jaTemPrimeira ? ' · 2ª avaliação (o card já tem a 1ª)' : ' · 1ª avaliação') + '</div>' +
+    db.innerHTML = '<b>📊 Boletim · ' + esc(pr.aluno) + '</b><div class="onde">' + esc(pr.turma) + ' · ' + esc(xb.book || '') + (xb.kids ? '' : xb.jaTemPrimeira ? ' · 2ª avaliação (o card já tem a 1ª)' : ' · 1ª avaliação') + '</div>' +
       '<blockquote>' + esc(pr.texto) + ((xb.faltam || []).length ? '<br><span style="color:#b45309">Sem nota: ' + esc(xb.faltam.join(', ')) + '. Dá para completar lá no boletim.</span>' : '') + '</blockquote>' +
-      '<div class="onde">Nada foi lançado. O gerador abre já neste aluno e com estas notas; você confere o boletim e finaliza lá.</div>' +
-      '<div class="bts"><a class="abre" href="' + esc(xb.link || '#') + '" target="_blank" rel="noopener">Abrir o boletim preenchido →</a></div>';
+      '<div class="onde">' + (xb.kids ? 'Nada foi gerado. O gerador abre já neste aluno; você marca as medalhas e a frase. Ao baixar o PDF, ele vai sozinho para a pasta do aluno, a coluna de notas do card e o counseling.'
+                                     : 'Nada foi lançado. O gerador abre já neste aluno e com estas notas; você confere o boletim. Ao baixar o PDF, ele vai sozinho para a pasta do aluno, o card, o counseling e o planner.') + '</div>' +
+      '<div class="bts"><a class="abre" href="' + esc(xb.link || '#') + '" target="_blank" rel="noopener">' + (xb.kids ? 'Abrir o boletim deste aluno →' : 'Abrir o boletim preenchido →') + '</a></div>';
     poe(db); return null;
   }
   if (DOCS[pr.acao]) return cartaoDoc(pr, idConversa);
