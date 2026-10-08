@@ -656,9 +656,9 @@ function msgRegistro() {
    Vai depois do registro no card e não fala nada na tela: o documento é
    registro secundário, e uma falha aqui não pode parecer falha do termo. */
 function registrarNoCounseling() {
-  if (modoLivre || !alunoSel || typeof fiskCounseling !== 'function') return;
+  if (modoLivre || !alunoSel || typeof fiskCounseling !== 'function') return Promise.resolve(null);
   var fProf = document.getElementById('fProf');
-  fiskCounseling({
+  return fiskCounseling({
     escola: payload.escola,
     professor: ((fProf && fProf.value) || payload.professor || payload.aba || '').trim(),
     turma: payload.turma || '',
@@ -672,6 +672,49 @@ function registrarNoCounseling() {
     }
   });
 }
+/* UM CLIQUE, TRÊS LUGARES (Pedro, 08/10/2026). Gerar o PDF já salva na pasta do aluno, anota no card e registra no
+   E-counseling, e a tela mostra uma linha de resultado por destino. Antes a pasta era um botão à parte, o
+   counseling só saía quando alguém refazia o "Lançar no card", e a falha dele não aparecia em lugar nenhum.
+   Os botões continuam ali para REFAZER o que falhou. */
+var REG = {};
+function regMostra() {
+  var txt = ['pasta', 'card', 'counseling'].map(function (k) { return REG[k]; }).filter(Boolean).join('   ·   ');
+  statusDoc(txt, REG.falhou ? '#b8860b' : '#1e8f4e');
+}
+function regCounselingTxt(j) {
+  if (!j) return '⚠️ não registrou (sem resposta do servidor ou sem login no Hub)';
+  if (j.ok) return j.jaExistia ? '✓ já estava registrado' : '✓ registrado';
+  if (j.code === 'sem_documento') return '⚠️ o aluno não tem documento de counseling na pasta';
+  if (j.code === 'pasta_nao_encontrada') return '⚠️ pasta do aluno não encontrada';
+  return '⚠️ ' + (j.erro || j.error || 'não registrou');
+}
+function registrarTudo() {
+  if (modoLivre || !alunoSel || alunoSel.linhaCard == null || !ultimoPDF) return;
+  var fProf = document.getElementById('fProf');
+  REG = { pasta: '📁 Pasta: ⏳', card: '📇 Card: ⏳', counseling: '💬 Counseling: ⏳' }; regMostra();
+  var btn = pares('btnDrive')[0];
+  if (btn && typeof fiskEnviarParaPasta === 'function') {
+    fiskEnviarParaPasta(btn, {
+      token: tokenSessao(), tipo: 'aluno',
+      escola: (payload && payload.escola) || '',
+      professor: ((fProf && fProf.value) || (payload && (payload.professor || payload.aba)) || '').trim(),
+      turma: (payload && payload.turma ? String(payload.turma).split('\n')[0] : '').trim(),
+      aluno: ultimoPDF.aluno, filename: ultimoPDF.filename, bytes: ultimoPDF.bytes
+    }).then(function (r) { REG.pasta = '📁 Pasta: ✓ "' + ((r && r.pasta) || ultimoPDF.aluno) + '"'; mostrarVerPasta(r); })
+      .catch(function () { REG.pasta = '📁 Pasta: ⚠️ não salvou'; REG.falhou = 1; })
+      .then(regMostra);
+  } else { REG.pasta = '📁 Pasta: ⚠️ não salvou (recarregue a página)'; REG.falhou = 1; }
+  api({ fn: 'registrarDoc', escola: payload.escola, prof: payload.aba, professor: payload.aba,
+        linhaCard: alunoSel.linhaCard, idx: alunoSel.ultimaPresencaIdx, tipo: 'termo' })
+    .then(function () { REG.card = '📇 Card: ✓ anotado na aula mais próxima de hoje'; })
+    .catch(function (e) { REG.card = '📇 Card: ⚠️ ' + (e && e.message || 'não anotou'); REG.falhou = 1; })
+    .then(regMostra);
+  registrarNoCounseling().then(function (j) {
+    REG.counseling = '💬 Counseling: ' + regCounselingTxt(j);
+    if (!j || !j.ok) REG.falhou = 1;
+    regMostra();
+  });
+}
 function lancarNoCard() {
   if (modoLivre || !alunoSel || alunoSel.linhaCard == null) {
     statusDoc('Termo livre não tem aluno no card para marcar.', '#b8860b'); return;
@@ -683,7 +726,7 @@ function lancarNoCard() {
   statusDoc('⏳ Registrando no card…');
   api({ fn: 'registrarDoc', escola: payload.escola, prof: payload.aba, professor: payload.aba,
         linhaCard: alunoSel.linhaCard, idx: alunoSel.ultimaPresencaIdx, tipo: 'termo' })
-    .then(function () { statusDoc(msgRegistro(), '#1e8f4e'); registrarNoCounseling(); })
+    .then(function () { statusDoc(msgRegistro(), '#1e8f4e'); registrarNoCounseling().then(function (j) { statusDoc(msgRegistro() + '   ·   💬 Counseling: ' + regCounselingTxt(j), j && j.ok ? '#1e8f4e' : '#b8860b'); }); })
     .catch(function (e) { statusDoc('⚠️ ' + e.message, '#c0392b'); });
 }
 pares('btnDrive').forEach(function (btn) { btn.addEventListener('click', function () {
@@ -740,11 +783,7 @@ async function gerarPDF() {
     // termo livre: nada a registrar no card, mas a secretaria é avisada
     avisarForaDoCard('termo de atraso');
   } else if (API_URL && payload && payload.escola) {
-    api({ fn: 'registrarTermo', escola: payload.escola, prof: payload.aba,
-          linhaCard: alunoSel.linhaCard, idx: alunoSel.ultimaPresencaIdx })
-      .then(function () {
-        statusDoc(msgRegistro(), '#1e8f4e');
-      }).catch(mostrarErroApi);
+    registrarTudo();
   } else if (!standalone) {
     window.parent.postMessage({ tipo: 'fisk-termo-gerado', nomeAluno: alunoSel.nome }, '*');
   }

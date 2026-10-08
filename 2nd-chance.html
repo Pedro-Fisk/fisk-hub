@@ -773,12 +773,12 @@ function salvarNaPasta(btn) {
    explica a linha um semestre depois. Silencioso, e o servidor recusa
    repetido: reemitir o mesmo comunicado não vira duas linhas. */
 function registrarNoCounseling() {
-  if (!alunoSel || typeof fiskCounseling !== 'function') return;
+  if (!alunoSel || typeof fiskCounseling !== 'function') return Promise.resolve(null);
   var abaixo = provasAbaixo(alunoSel);
   var notas = abaixo.map(function (q) {
     return (q === 'escrita' ? 'Escrita' : 'Auditiva') + ': ' + alunoSel[q];
   }).join(' · ');
-  fiskCounseling({
+  return fiskCounseling({
     escola: turma.escola,
     professor: ($('fProf').value || turma.professor || turma.aba || '').trim(),
     turma: turma.turma || turma.titulo || '',
@@ -788,6 +788,46 @@ function registrarNoCounseling() {
   });
 }
 
+/* UM CLIQUE, TRÊS LUGARES (Pedro, 08/10/2026). Gerar o PDF já salva na pasta do aluno, anota no card e registra no
+   E-counseling, com uma linha de resultado por destino. Antes eram dois botões depois do PDF (pasta e card), e a
+   falha do counseling não aparecia. Os botões continuam para REFAZER o que falhou. */
+var REG = {};
+function regMostra() {
+  var txt = ['pasta', 'card', 'counseling'].map(function (k) { return REG[k]; }).filter(Boolean).join('   ·   ');
+  statusDoc(txt, REG.falhou ? 'err' : 'ok');
+}
+function regCounselingTxt(j) {
+  if (!j) return '⚠️ não registrou (sem resposta do servidor ou sem login no Hub)';
+  if (j.ok) return j.jaExistia ? '✓ já estava registrado' : '✓ registrado';
+  if (j.code === 'sem_documento') return '⚠️ o aluno não tem documento de counseling na pasta';
+  if (j.code === 'pasta_nao_encontrada') return '⚠️ pasta do aluno não encontrada';
+  return '⚠️ ' + (j.erro || j.error || 'não registrou');
+}
+function registrarTudo() {
+  if (!ultimoPDF || !alunoSel || alunoSel.linhaCard == null || !turma || !turma.escola) return;
+  var prof = ($('fProf').value || turma.professor || turma.aba || '').trim();
+  REG = { pasta: '📁 Pasta: ⏳', card: '📇 Card: ⏳', counseling: '💬 Counseling: ⏳' }; regMostra();
+  var btn = pares('btnDrive')[0];
+  if (btn && typeof fiskEnviarParaPasta === 'function') {
+    fiskEnviarParaPasta(btn, {
+      token: tokenSessao(), tipo: 'aluno', escola: turma.escola, professor: prof,
+      turma: ($('fTurma').value || turma.turma || '').trim(),
+      aluno: ultimoPDF.aluno, filename: ultimoPDF.filename, bytes: ultimoPDF.bytes
+    }).then(function (r) { REG.pasta = '📁 Pasta: ✓ "' + ((r && r.pasta) || ultimoPDF.aluno) + '"'; mostrarVerPasta(r); })
+      .catch(function () { REG.pasta = '📁 Pasta: ⚠️ não salvou'; REG.falhou = 1; })
+      .then(regMostra);
+  } else { REG.pasta = '📁 Pasta: ⚠️ não salvou (recarregue a página)'; REG.falhou = 1; }
+  api({ fn: 'registrarDoc', escola: turma.escola, prof: turma.aba || turma.professor || '',
+        linhaCard: alunoSel.linhaCard, idx: alunoSel.idx, tipo: '2nd', professor: prof })
+    .then(function () { REG.card = '📇 Card: ✓ anotado na aula mais próxima de hoje'; })
+    .catch(function (e) { REG.card = '📇 Card: ⚠️ ' + (e && e.message || 'não anotou'); REG.falhou = 1; })
+    .then(regMostra);
+  registrarNoCounseling().then(function (j) {
+    REG.counseling = '💬 Counseling: ' + regCounselingTxt(j);
+    if (!j || !j.ok) REG.falhou = 1;
+    regMostra();
+  });
+}
 /* ---- 📤 lançar no card (nota na célula da última aula do aluno) ---- */
 function lancarNoCard() {
   if (!alunoSel || alunoSel.linhaCard == null || !turma || !turma.escola) {
@@ -806,8 +846,8 @@ function lancarNoCard() {
     linhaCard: alunoSel.linhaCard, idx: alunoSel.idx, tipo: '2nd',
     professor: ($('fProf').value || turma.professor || turma.aba || '').trim()
   }).then(function () {
-    statusDoc('✓ Lançado no card, na célula da última aula de ' + primeiroNome(alunoSel.nome) + '.', 'ok');
-    registrarNoCounseling();
+    statusDoc('✓ Lançado no card.', 'ok');
+    registrarNoCounseling().then(function (j) { statusDoc('✓ Lançado no card.   ·   💬 Counseling: ' + regCounselingTxt(j), j && j.ok ? 'ok' : 'err'); });
   }).catch(function (e) {
     statusDoc('⚠️ ' + e.message, 'err');
   }).finally(function () { btns.forEach(function (b) { b.disabled = false; }); });
@@ -842,6 +882,7 @@ async function gerarPDF() {
     mostrarPreview(url);
     syncAcoes();
     statusDoc('✓ PDF gerado e baixado, confira na pré-visualização abaixo.', 'ok');
+    registrarTudo();   /* pasta, card e counseling de uma vez; sem vínculo com o card, não faz nada */
     avisarForaDoCard('2nd chance');
   } catch (e) {
     alert('Não consegui gerar o PDF: ' + e.message);
