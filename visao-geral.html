@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Radar da Turma, FISK</title>
-<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-10-09a">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-10-09b">
   <!-- a casa do professor veste a faixa do topo (campanha de 09/2026) -->
   <link rel="stylesheet" href="assets/casa-tema.css?v=9">
 <meta name="theme-color" content="#161414">
@@ -219,7 +219,7 @@
 <script>try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
 
 <header class="hero">
-  <a class="back-link" href="index.html">&larr; Voltar ao Hub</a>
+  <a class="back-link" href="index.html" title="Voltar ao Fisk Hub">&larr; Hub</a>
   <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
   <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
   <h1>Radar da Turma</h1>
@@ -282,7 +282,7 @@
   Ferramenta interna das escolas Fisk Taubaté · Caçapava.
 </footer>
 
-<script src="assets/fisk-shared.js?v=2026-10-09a"></script>
+<script src="assets/fisk-shared.js?v=2026-10-09b"></script>
 <script>
 /* ============================================================
    RADAR DA TURMA (22/09/2026). Substitui a Visão Geral das Turmas,
@@ -642,7 +642,7 @@ function pinta(prof){
       (a.cons != null ? '<span title="constância" class="pill ' + (a.cons >= 70 ? 'emdia' : a.cons >= 50 ? 'media' : 'alta') + '">🧭 ' + a.cons + '%</span>' : '') +
       (ck ? '<span class="pill ' + (ck.resultado === 'estudar' ? 'media' : 'emdia') + '">' + esc(ck.licao) + (ck.resultado === 'estudar' ? ' 📚' : ' ✓') + '</span>' : '');
     if (!a.raf) return '<div class="rt-al sem"><div class="nm">' + esc(a.nome) + '</div><div class="sb">sem RAF no card</div></div>';
-    return '<a class="rt-al ac-link" href="aluno.html?raf=' + encodeURIComponent(a.raf) + '" data-raf="' + esc(a.raf) + '" data-nome="' + esc(a.nome).replace(/"/g, '&quot;') + '" data-turma="' + esc(a.turma).replace(/"/g, '&quot;') + '">' +
+    return '<a class="rt-al ac-link" href="aluno.html?raf=' + encodeURIComponent(a.raf) + '&de=radar" data-raf="' + esc(a.raf) + '" data-nome="' + esc(a.nome).replace(/"/g, '&quot;') + '" data-turma="' + esc(a.turma).replace(/"/g, '&quot;') + '">' +
       '<div class="mini">' + radarSVG(a.eixos, { R: 44 }) + '</div>' +
       '<div class="nm">' + esc(a.nome) + '</div><div class="sb">' + esc(a.book || '') + (r && r.ultima ? ' · ' + haQuanto(r.ultima) : '') + '</div>' +
       '<div class="pills">' + (pills || '<span class="pill cinza">sem evidência ainda</span>') + '</div></a>';
@@ -681,7 +681,7 @@ function tabela(){
   }).join('') + '</tr></thead><tbody>' + ls.map(function(a){
     return '<tr>' + cols.map(function(k){
       var v = k.v(a);
-      if (k.id === 'nome') return '<td>' + (a.raf ? '<a class="ac-link" href="aluno.html?raf=' + encodeURIComponent(a.raf) + '" data-raf="' + esc(a.raf) + '" data-nome="' + esc(a.nome).replace(/"/g, '&quot;') + '">' + esc(a.nome) + '</a>' : esc(a.nome)) + '</td>';
+      if (k.id === 'nome') return '<td>' + (a.raf ? '<a class="ac-link" href="aluno.html?raf=' + encodeURIComponent(a.raf) + '&de=radar" data-raf="' + esc(a.raf) + '" data-nome="' + esc(a.nome).replace(/"/g, '&quot;') + '">' + esc(a.nome) + '</a>' : esc(a.nome)) + '</td>';
       if (k.id === 'turma') return '<td>' + esc(v) + '</td>';
       if (k.num) {
         var pouca = EIXOS.some(function(e){ return e.id === k.id; }) && a.eixos[k.id] && a.eixos[k.id].pouca;

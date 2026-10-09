@@ -5,12 +5,12 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Radar do Aluno, FISK</title>
-<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-10-09a">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-10-09b">
   <!-- a casa do professor veste a faixa do topo (campanha de 09/2026) -->
   <link rel="stylesheet" href="assets/casa-tema.css?v=9">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
-<script src="assets/fisk-shared.js?v=2026-10-09a"></script>
+<script src="assets/fisk-shared.js?v=2026-10-09b"></script>
 <!-- activityId → nome legível ("mp:essentials-1:frozen-1" → "Frozen · Part I").
      Gerado por scripts/build-atividades-index.js no portal-aluno-fisk. -->
 <script src="assets/atividades-index.js"></script>
@@ -254,7 +254,7 @@
 <script>try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
 
 <header class="hero">
-  <a class="back-link" href="index.html">&larr; Voltar ao Hub</a>
+  <a class="back-link" href="index.html" title="Voltar ao Fisk Hub">&larr; Hub</a>
   <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
   <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
   <h1>Radar do Aluno</h1>
@@ -399,11 +399,52 @@ function sess(){ try{ return JSON.parse(localStorage.getItem('fisk_prof')||'null
 var TOK_URL = (function(){
   var m = /[#&](?:dirtok|proftok)=([^&]+)/.exec(location.hash || '');
   if (!m) return '';
+  window.__alunoDir = /[#&]dirtok=/.test(location.hash);   /* veio do Painel da Direção */
   var t = decodeURIComponent(m[1]);
   try { history.replaceState(null, '', location.pathname + location.search); } catch(e) { location.hash = ''; }
   return t;
 })();
 function token(){ if (TOK_URL) return TOK_URL; var s = sess(); return (s && s.token) || ''; }
+
+/* ── PARA ONDE O VOLTAR LEVA (09/10/2026) ─────────────────────────────────
+   O canto esquerdo volta UM nível, e diz o nome do destino. Esta página tem
+   três portas de entrada, e o "← Hub" só é certo para uma delas:
+   1. a DIREÇÃO, pelo Painel (`#dirtok=`): ela não tem sessão de professor
+      aqui, então o Hub mostraria a porteira de login. Volta ao Painel, e o
+      logo também. A marca fica na sessionStorage (só a marca, nunca o token)
+      para o rótulo sobreviver a um recarregar da página;
+   2. o RADAR DA TURMA, quando o aluno foi aberto em aba nova: volta ao Radar;
+   3. a home do Hub: fica como está. */
+var PAINEL_DIRECAO = 'https://portalfisk.com.br/diretor.html';
+var VEIO_DA_DIRECAO = (function(){
+  /* `__alunoDir` é posto pelo TOK_URL, logo acima, antes de apagar o hash */
+  try {
+    if (window.__alunoDir) { sessionStorage.setItem('aluno:dir', '1'); return true; }
+    /* recarregou: a marca vale enquanto não houver sessão de professor */
+    return sessionStorage.getItem('aluno:dir') === '1' && !sess();
+  } catch (e) { return !!window.__alunoDir; }
+})();
+var VEIO_DO_RADAR = !VEIO_DA_DIRECAO && (/[?&]de=radar(&|$)/.test(location.search) ||
+  /\/visao-geral\.html(\?|#|$)/.test(document.referrer || ''));
+(function(){
+  if (EMBED) return;
+  var v = document.querySelector('.hero .back-link');
+  if (v && VEIO_DA_DIRECAO) {
+    v.href = PAINEL_DIRECAO; v.innerHTML = '&larr; Painel da Direção'; v.title = 'Voltar ao Painel da Direção';
+  } else if (v && VEIO_DO_RADAR) {
+    v.href = 'visao-geral.html'; v.innerHTML = '&larr; Radar da Turma'; v.title = 'Voltar ao Radar da Turma';
+  }
+  /* o link do logo nasce no kit, no DOMContentLoaded; este ouvinte é
+     registrado depois do dele, então já encontra o link pronto */
+  function logo(){
+    var a = document.querySelector('.hero .hero-home');
+    if (a && VEIO_DA_DIRECAO) { a.href = PAINEL_DIRECAO; a.title = 'Painel da Direção'; a.setAttribute('aria-label', 'Voltar ao Painel da Direção'); }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', logo); else logo();
+  /* o menu do professor, que esta página não tinha. Sem sessão (a direção
+     pelo Painel) o kit não monta nada, e está certo. */
+  if (typeof fiskInitUserMenu === 'function') fiskInitUserMenu();
+})();
 function post(body){
   return fetch(EP, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
                      body: JSON.stringify(body) }).then(fiskJson);
