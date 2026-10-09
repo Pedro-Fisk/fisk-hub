@@ -15,7 +15,11 @@
   [hidden]{ display:none !important; }
   .hero{ padding-bottom:1.1rem; }
   main{ max-width:1500px; margin:0 auto; padding:1.2rem; width:100%; }
-  .palco{ display:grid; grid-template-columns:240px minmax(0,1fr) 290px; gap:1rem; align-items:start; }
+  .palco{ display:grid; grid-template-columns:240px minmax(0,1fr); gap:1rem; align-items:start; }
+  /* a coluna de perguntas frequentes saiu da tela em 09/10/2026 (Pedro: era informação demais). As perguntas viraram
+     tópicos no guia em PDF. A árvore (assets/buddy-conversas.js) continua carregada: os botões do começo da conversa
+     e os atalhos embaixo das respostas saem dela. */
+  .palco .arvore, .cab .ideias-bt{ display:none !important; }
 
   /* ── o histórico das conversas, à esquerda ── */
   .hist{ background:var(--white); border:2px solid var(--surface-border-color); border-radius:18px; box-shadow:var(--surface-shadow); overflow:hidden;
