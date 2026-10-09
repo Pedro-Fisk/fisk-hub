@@ -333,6 +333,32 @@ function fiskHubBase() {
   return externo ? 'https://pedro-fisk.github.io/fisk-hub/' : '';
 }
 
+/* ---------- O logo do cabeçalho leva à home do Hub ----------
+ * Um ponto só para todas as páginas que usam o kit: o `.hero-logo` ganha um
+ * link em volta. Na própria home ele fica como está (não há para onde ir).
+ * As páginas de fora (boletim, planner, conversation maker) recebem a URL de
+ * produção pelo fiskHubBase(). */
+(function () {
+  function liga() {
+    var base = fiskHubBase();
+    if (!base && /(^|\/)(index\.html)?$/.test(location.pathname)) return;
+    var logos = document.querySelectorAll('.hero .hero-logo');
+    for (var i = 0; i < logos.length; i++) {
+      var img = logos[i];
+      if (img.closest('a')) continue;
+      var a = document.createElement('a');
+      a.className = 'hero-home';
+      a.href = base + 'index.html';
+      a.title = 'Fisk Hub';
+      a.setAttribute('aria-label', 'Voltar ao Fisk Hub');
+      img.parentNode.insertBefore(a, img);
+      a.appendChild(img);
+    }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', liga);
+  else liga();
+})();
+
 var FISK_IDIOMAS = [
   { id: 'pt', rot: 'PT' },
   { id: 'en', rot: 'EN' },

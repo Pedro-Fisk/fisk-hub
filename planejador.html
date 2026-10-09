@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Planejador da Próxima Aula, FISK</title>
-<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-09-20a">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-10-09a">
   <!-- a casa do professor veste a faixa do topo (campanha de 09/2026) -->
   <link rel="stylesheet" href="assets/casa-tema.css?v=9">
 <meta name="theme-color" content="#161414">
@@ -314,7 +314,7 @@
   Ferramenta interna das escolas Fisk Taubaté · Caçapava.
 </footer>
 
-<script src="assets/fisk-shared.js?v=2026-10-06b"></script>
+<script src="assets/fisk-shared.js?v=2026-10-09a"></script>
 <script>
 /* ============================================================
    Planejador de Aula Personalizada — lê fn=turma do card (mesma
@@ -1319,9 +1319,10 @@ ligarAcao('.js-drive', function (ev) {
 
 /* ---- confirmação ao voltar ao Hub (não perder a fila reordenada) ---- */
 (function () {
-  var voltar = document.querySelector('.back-link');
-  if (!voltar) return;
-  voltar.addEventListener('click', function (e) {
+  /* delegado: o link do logo (.hero-home) nasce depois, no fisk-shared.js */
+  document.addEventListener('click', function (e) {
+    var voltar = e.target.closest ? e.target.closest('.back-link, .hero-home') : null;
+    if (!voltar) return;
     if (turma && estado.manual) {
       if (!window.confirm('Voltar ao Hub? A ordem da fila que você ajustou vai se perder. (As anotações ficam salvas neste navegador.)')) {
         e.preventDefault();

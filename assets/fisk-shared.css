@@ -100,6 +100,12 @@ h1, h2, h3, .btn, .btn-generate, .modal-title{ font-family: var(--font-heading);
   margin-bottom: 1.1rem;
 }
 
+/* o logo é o caminho de volta à home (o link nasce no fisk-shared.js) */
+.hero-home{ display: inline-block; line-height: 0; border-radius: 8px; }
+.hero-home:focus-visible{ outline: 2px solid var(--white); outline-offset: 4px; }
+.hero-home .hero-logo{ transition: opacity .15s; }
+.hero-home:hover .hero-logo{ opacity: .85; }
+
 .hero h1{
   margin: 0;
   font-size: clamp(2rem, 5vw, 3rem);
