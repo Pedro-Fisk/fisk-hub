@@ -900,6 +900,21 @@ function mostraSugestoes(vez) {
     /* EM AULA (Pedro, 06/10/2026): se ele abriu o Buddy no horário de uma turma dele, o começo é sobre ela: uma linha
        por aluno com o que importa hoje, as pendências só dessa turma, e perguntas prontas que já dizem a turma. */
     if (j.aula) { ss = j.aula.sugestoes || []; mostraAula(j.aula); }
+    /* O BUDDY PUXA A CONVERSA (Pedro, 08/10/2026): aluno transferido ou novo não fica como linha do quadro. Vira
+       uma fala dele, com o botão de resposta embaixo ("Sim, faça o resumo"). */
+    var falas = (j.sugestoes || []).filter(function (g) { return g.fala; });
+    ss = ss.filter(function (g) { return !g.fala; });
+    falas.forEach(function (g) {
+      bolha('<p>' + esc(g.fala) + '</p>');
+      var dv = document.createElement('div'); dv.className = 'depois';
+      dv.innerHTML = '<button type="button">' + esc(g.botao || 'Sim') + '</button><button type="button">Agora não</button>';
+      dv.addEventListener('click', function (e) {
+        var b = e.target.closest ? e.target.closest('button') : null; if (!b || ocupado) return;
+        var sim = b === dv.firstChild; dv.remove();
+        if (sim) pergunta(g.pergunta, g.rotulo || g.titulo);
+      });
+      poe(dv);
+    });
     if (!ss.length) return;
     var d = document.createElement('div'); d.className = 'sug';
     d.innerHTML = '<div class="sug-t">🔔 Para você olhar hoje</div>' + ss.map(function (g, i) {
