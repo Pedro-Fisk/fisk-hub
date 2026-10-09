@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Plano de curso · Fisk</title>
-<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-10-09a">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-10-09b">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <style>
   /* A VISÃO DE ÁGUIA (Pedro, 13/09/2026): o plano de curso inteiro de UM
@@ -20,12 +20,17 @@
   /* voltar à esquerda, onde o olho procura; imprimir à direita (Pedro, 14/09/2026) */
   .topo a.voltar { background: #fff; color: #1d3685; font-weight: 900; font-size: 13.5px; padding: 7px 14px; }
   .topo button { margin-left: auto; }
+  /* o logo da Fisk leva à home do Hub, como em todas as telas (09/10/2026).
+     Vai numa plaquinha branca: o logo é vermelho e a barra é azul. */
+  .topo a.inicio { background: #fff; padding: 4px 9px; border-radius: 9px; line-height: 0; flex: none; }
+  .topo a.inicio img { height: 22px; width: auto; display: block; }
+  .topo a.inicio:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
   .status { padding: 12px 16px; color: #54648d; font-weight: 700; } .status.err { color: #b91c1c; }
   @media print { .topo { display: none; } body { background: #fff; } }
 </style>
 </head>
 <body>
-<div class="topo"><a class="voltar" href="turma-de-hoje.html" id="voltar">← Minha aula</a><h1>🦅 Plano de curso</h1><span class="sub" id="quem"></span></div>
+<div class="topo"><a class="voltar" href="turma-de-hoje.html" id="voltar">← Minha aula</a><a class="inicio" href="index.html" title="Fisk Hub" aria-label="Voltar ao Fisk Hub"><img src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava"></a><h1>🦅 Plano de curso</h1><span class="sub" id="quem"></span></div>
 <div class="status" id="status">Lendo o planner…</div>
 <div id="corpo"></div>
 <script src="https://portalfisk.com.br/assets/planner-v2.js?v=4af46d8a83"></script>
