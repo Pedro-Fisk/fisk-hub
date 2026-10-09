@@ -736,8 +736,8 @@ function recebe(j) {
   mostraPropostas(j.propostas, conversa);
   if (j.medicao) {
     var m = document.createElement('div'); m.className = 'med';
-    m.textContent = 'medição · ' + j.medicao.modelo + ' · ' + j.passos + ' chamadas · ' + j.medicao.tokens.toLocaleString('pt-BR') + ' tokens na conversa · US$ ' +
-      j.medicao.custoUSD.toFixed(4) + ' na conversa · US$ ' + j.medicao.gastoDoMesUSD.toFixed(2) + ' no mês';
+    /* sem valor em dinheiro na tela (Pedro, 08/10/2026): o custo fica nos Ajustes do Buddy, que só a direção abre */
+    m.textContent = 'medição · ' + j.medicao.modelo + ' · ' + j.passos + ' chamadas · ' + j.medicao.tokens.toLocaleString('pt-BR') + ' tokens na conversa';
     poe(m);
   }
   atalhos(depoisDaVez || window.BUDDY_DEPOIS_PADRAO);
@@ -1016,7 +1016,7 @@ function recusa(t, p) { fechaCortina(); $('fora').hidden = false; $('foraT').tex
     $('palco').hidden = false; $('rodape').hidden = false;
     if (j.direcao && !comoQuem) {
       $('chat').innerHTML = '';
-      bolha('<p>A direção não tem turmas. Escolha lá em cima, em <b>responder como…</b>, o professor por quem você quer perguntar. Eu respondo com as turmas dele, e a medição de custo aparece embaixo de cada resposta.</p>');
+      bolha('<p>A direção não tem turmas. Escolha lá em cima, em <b>responder como…</b>, o professor por quem você quer perguntar. Eu respondo com as turmas dele, e a medição (modelo e tokens) aparece embaixo de cada resposta.</p>');
       return;
     }
     if (!memRestaura()) abertura();
