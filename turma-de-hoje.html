@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Minha aula, FISK</title>
-<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-10-09a">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-10-09b">
 <link rel="stylesheet" href="assets/casa-tema.css?v=9">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <!-- ═══════════════════════════════════════════════════════════════════════
@@ -450,7 +450,7 @@ body.theme-dark .pl-salvar{ background: #10261f; }
 <script>try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
 
 <header class="hero">
-  <a class="back-link" href="index.html">&larr; Voltar ao Hub</a>
+  <a class="back-link" href="index.html" title="Voltar ao Fisk Hub">&larr; Hub</a>
   <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
   <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
   <h1>Minha aula</h1>
@@ -500,7 +500,7 @@ body.theme-dark .pl-salvar{ background: #10261f; }
 <script src="https://portalfisk.com.br/assets/checking/guia-i2.js?v=56bd0516a9"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-i3.js?v=e326479afd"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-<script src="assets/fisk-shared.js?v=2026-10-09a"></script>
+<script src="assets/fisk-shared.js?v=2026-10-09b"></script>
 <script>
 fiskInitThemeToggle('themeToggle');
 fiskInitUserMenu();
@@ -2297,9 +2297,12 @@ function abrirChecking(card, a, plano, pos) {
   pinta();
   b.addEventListener('click', function () { document.body.classList.toggle('sem-obs'); try { localStorage.setItem('th:obs', document.body.classList.contains('sem-obs') ? 'off' : 'on'); } catch (e) {} pinta(); });
 })();
-/* a tela grande salvou o feedback: atualiza o aluno aqui sem recarregar */
-window.addEventListener('message', function (ev) {
-  var d = ev.data || {};
+/* a tela grande salvou o feedback: atualiza o aluno aqui sem recarregar.
+   ⚠️ O aviso chega pelo BroadcastChannel (09/10/2026): a tela grande é aberta com `rel="noopener"`, então ela não
+   tem `window.opener` e o postMessage antigo nunca chegava. O canal só alcança abas desta MESMA origem. O ouvinte
+   de `message` fica para uma tela grande antiga em cache, e agora confere a origem de quem falou. */
+function checkingDaTelaGrande(d) {
+  d = d || {};
   if (d.tipo !== 'checking' || !d.raf || !d.planner) return;
   var a = estado.alunos.find(function (x) { return x.raf === d.raf; });
   if (!a) return;
@@ -2307,6 +2310,11 @@ window.addEventListener('message', function (ev) {
   estado.aberto = '';
   redesenhar(a);
   toast('✓ Checking de ' + a.nome.split(' ')[0] + ' registrado pela tela grande.');
+}
+try { new BroadcastChannel('fisk-checking').onmessage = function (ev) { checkingDaTelaGrande(ev.data); }; } catch (e) {}
+window.addEventListener('message', function (ev) {
+  if (ev.origin !== location.origin) return;
+  checkingDaTelaGrande(ev.data);
 });
 
 (function () {

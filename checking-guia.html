@@ -30,6 +30,11 @@
   header .passos button.on{ background:var(--lima); color:var(--limai); border-color:var(--lima); }
   header .passos button.ok{ background:rgba(255,255,255,.85); color:var(--mar); border-color:transparent; }
   header .fechar{ color:#fff; text-decoration:none; font-weight:800; opacity:.85; margin-left:8px; }
+  /* o logo da Fisk leva à home do Hub, como em todas as telas (09/10/2026).
+     Plaquinha branca: o logo é vermelho e a barra é azul. */
+  header .inicio{ background:#fff; padding:4px 9px; border-radius:9px; line-height:0; flex:none; }
+  header .inicio img{ height:24px; width:auto; display:block; }
+  header .inicio:focus-visible{ outline:2px solid #fff; outline-offset:2px; }
   main{ flex:1; padding:26px 22px 140px; display:flex; flex-direction:column; gap:26px; max-width:1500px; width:100%; margin:0 auto; }
   .bloco-cab{ display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
   .bloco-cab h1{ margin:0; font-family:'Poppins',sans-serif; font-weight:800; font-size:clamp(28px,4vw,44px); color:var(--mar); }
@@ -110,6 +115,7 @@
 </head>
 <body>
 <header>
+  <a class="inicio" href="index.html" title="Fisk Hub" aria-label="Fisk Hub"><img src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava"></a>
   <span class="rot" id="rot">Checking</span>
   <span class="aluno" id="aluno"></span>
   <nav class="passos" id="passos" aria-label="Blocos"></nav>
@@ -293,7 +299,11 @@ function pintaFeedback(main) {
         var okEl = box.querySelector('[data-ok]'); okEl.hidden = false; okEl.textContent = fb.resultado === 'estudar'
           ? T2('✓ Checking saved. Study more: the next lesson stays closed until a new Checking is approved.', '✓ Verificación guardada. Estudia más: la lección siguiente queda cerrada hasta una nueva verificación aprobada.')
           : T2('✓ Checking saved. Approved: the next lesson is open for the student.', '✓ Verificación guardada. Aprobado: la lección siguiente ya está abierta para el alumno.');
-        try { if (window.opener) window.opener.postMessage({ tipo: 'checking', raf: raf, planner: r.planner }, '*'); } catch (e) {}
+        /* AVISA A MINHA AULA, na aba de trás. Ela abre esta tela com `rel="noopener"`, então `window.opener` é
+           sempre nulo e o aviso antigo nunca chegava (09/10/2026). O BroadcastChannel fala com as abas da MESMA
+           origem sem precisar do opener, e o noopener continua lá. O postMessage fica para a aba antiga em cache. */
+        try { var canal = new BroadcastChannel('fisk-checking'); canal.postMessage({ tipo: 'checking', raf: raf, planner: r.planner }); canal.close(); } catch (e) {}
+        try { if (window.opener) window.opener.postMessage({ tipo: 'checking', raf: raf, planner: r.planner }, location.origin); } catch (e) {}
         salvar.textContent = T2('✓ Saved · close', '✓ Guardado · cerrar'); salvar.disabled = false; salvar.onclick = function () { window.close(); };
       }).catch(function (e) { salvar.disabled = false; salvar.textContent = '⚠️ ' + e.message + T2(' · try again', ' · intentar de nuevo'); });
   });
