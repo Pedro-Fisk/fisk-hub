@@ -35,6 +35,15 @@
   :root{--font-h:'Poppins',system-ui,sans-serif;--font-b:'Nunito',system-ui,sans-serif}
   body{font-family:var(--font-b);background:#080b1c;min-height:100vh;display:flex;flex-direction:column}
   .screen{display:flex;flex-direction:column;flex:1;min-height:100vh}
+  /* O LOGO DA FISK LEVA À HOME DO HUB (09/10/2026), como em todas as telas.
+     É um link puro, escrito aqui: não depende do hogwarts.js nem do
+     hogwarts.css do Portal. Mesmo lugar e mesma altura do logo que o Portal
+     põe na tela dele (centro da barra, 24px). */
+  .hw-top{position:relative}
+  .hub-home{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:block;line-height:0;border-radius:6px}
+  .hub-home img{height:24px;width:auto;display:block}
+  .hub-home:hover img{opacity:.85}
+  .hub-home:focus-visible{outline:2px solid #f4ecd8;outline-offset:3px}
 </style>
 </head>
 <body>
@@ -42,14 +51,15 @@
 <div class="screen" id="screen-hogwarts">
   <div class="hw-sky" id="hw-sky" aria-hidden="true"></div>
   <div class="hw-top">
-    <button class="hw-btn-ghost" id="hw-back">← Fisk Hub</button>
+    <button class="hw-btn-ghost" id="hw-back" type="button">← Hub</button>
+    <a class="hub-home" href="index.html" title="Fisk Hub" aria-label="Voltar ao Fisk Hub"><img src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava"></a>
     <div class="hero-actions"></div>
     <button class="hw-btn-ghost hw-music" id="hw-music" type="button" aria-pressed="true"></button>
   </div>
   <div class="hw-stage" id="hw-stage"></div>
 </div>
 
-<script src="assets/fisk-shared.js"></script>
+<script src="assets/fisk-shared.js?v=2026-10-09b"></script>
 <script>
   /* A APP_KEY é pública por desenho: ela está em toda página de aluno e em
      todas as ferramentas. Só autoriza gravar; não lê dado de ninguém. */
@@ -77,6 +87,12 @@
      professor termina; no Portal isso é voltar para a home, e aqui é voltar
      para o Hub. */
   function show(id){ if (id !== 'screen-hogwarts') location.href = 'index.html'; }
+
+  /* O VOLTAR É LIGADO AQUI (09/10/2026), antes do teste abaixo: o ouvinte
+     dele vivia só no hogwarts.js do Portal, e quando o quiz não carregava o
+     botão ficava na tela sem fazer nada. Quando o script carrega, o ouvinte
+     dele faz a mesma coisa (show → index.html). */
+  $('hw-back').addEventListener('click', function(){ location.href = 'index.html'; });
 
   if (!window.FiskHogwarts) {
     $('hw-stage').innerHTML = '<p style="color:#f4ecd8;text-align:center;padding:3rem 1rem">' +

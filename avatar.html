@@ -34,6 +34,14 @@
   [hidden]{display:none !important}
   .av-sem{max-width:420px;margin:18vh auto 0;padding:1.4rem;border-radius:16px;background:#1a1f3f;color:#eef1ff;text-align:center;font:600 1rem var(--font-b)}
   .av-sem a{color:#f6c343}
+  /* O LOGO DA FISK LEVA À HOME DO HUB (09/10/2026), como em todas as telas.
+     É um link puro, escrito aqui: não depende do avatar.js nem do avatar.css
+     do Portal. Mesmo lugar e mesma altura do logo que o Portal põe na tela
+     dele (depois do voltar, 24px), para as duas ficarem iguais. */
+  .hub-home{flex:none;display:block;line-height:0;border-radius:6px}
+  .hub-home img{height:24px;width:auto;display:block}
+  .hub-home:hover img{opacity:.85}
+  .hub-home:focus-visible{outline:2px solid #fff;outline-offset:3px}
 </style>
 </head>
 <body>
@@ -58,7 +66,8 @@
 
 <div class="screen av active" id="screen-avatar">
   <header class="av-top">
-    <button class="av-back" id="av-back" type="button">← Fisk Hub</button>
+    <button class="av-back" id="av-back" type="button">← Hub</button>
+    <a class="hub-home" href="index.html" title="Fisk Hub" aria-label="Voltar ao Fisk Hub"><img src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava"></a>
     <div class="av-brand">
       <svg viewBox="0 0 26 26" aria-hidden="true"><path d="M13 2l10 5.5v11L13 24 3 18.5v-11z" fill="#f6c343"/><path d="M13 13l10-5.5v11L13 24z" fill="#c9922e"/><path d="M13 13L3 7.5v11L13 24z" fill="#e0a93a"/><path d="M13 2l10 5.5L13 13 3 7.5z" fill="#ffe08a"/></svg>
       <span>MY AVATAR</span>
@@ -69,7 +78,7 @@
   <div class="av-body" id="av-body"></div>
 </div>
 
-<script src="assets/fisk-shared.js"></script>
+<script src="assets/fisk-shared.js?v=2026-10-09b"></script>
 <script>
   /* A APP_KEY é pública por desenho (ver hogwarts.html). */
   window.PORTAL_CONFIG = {
@@ -98,6 +107,10 @@
   function esc(s){ var d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; }
   /* uma tela só: o "voltar" do avatar é voltar para o Hub */
   function show(id){ if (id !== 'screen-avatar') location.href = 'index.html'; }
+  /* O voltar é ligado AQUI, antes de depender do avatar.js do Portal: se o
+     script de lá não carregar, o botão continua levando ao Hub. Quando ele
+     carrega, o ouvinte dele faz a mesma coisa (show → index.html). */
+  document.getElementById('av-back').addEventListener('click', function(){ location.href = 'index.html'; });
 
   if (!window.FiskAvatar || !window.FiskAvatarEngine || !window.FISK_AVATAR_CATALOGO) {
     document.getElementById('av-body').innerHTML = '<p class="av-sem">My Avatar is not answering right now. Please try again in a moment, or go back to the <a href="index.html">Fisk Hub</a>.</p>';
