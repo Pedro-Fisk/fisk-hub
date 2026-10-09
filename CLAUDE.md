@@ -140,3 +140,21 @@ as cores, o padrão e o brasão da casa dele, nas dezessete páginas.
   professor comum.
 - ⚠️ **Mexeu no `fisk-shared.js`? Suba o `?v=` nas dezessete páginas**, senão
   o navegador do professor segue com a versão antiga por tempo indeterminado.
+
+## O cabeçalho das páginas (09/10/2026)
+
+- **Canto esquerdo = UM voltar, com o nome do destino** (`← Hub`, `← Answer Keys`,
+  `← Buddy`). **O logo da Fisk é a home**, em toda tela: nas páginas com
+  `.hero` o link nasce no `fisk-shared.js`; nas de cabeçalho próprio
+  (`treinamentos`, `plano-curso`, `checking-guia`, `avatar`, `hogwarts`) ele
+  está escrito no HTML.
+- **No celular (até 640px) o `.hero` é uma grade**, e a regra mora no
+  `assets/fisk-shared.css`: linha 1 = voltar, menu (só 👤▾) e tema; o logo
+  desce. Não volte a pôr `position:absolute` ali, nem regra de cabeçalho no
+  `style.css` (só nove páginas o carregam).
+- **Idioma: uma chave só, `fisk_lang`**, lida e gravada por `fiskIdioma()` e
+  `fiskDefinirIdioma()`. O padrão é `en`. O seletor fica no menu do professor
+  em todas as páginas; só a home traduz na hora (`onIdioma`). O Portal na
+  visão do professor abre na língua do CARD (`curso=`), não na do Hub.
+- `avatar.html` e `hogwarts.html` ligam o próprio `#av-back`/`#hw-back` à
+  home: não dependa do script do Portal para um link funcionar.
