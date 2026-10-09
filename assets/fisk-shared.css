@@ -238,9 +238,48 @@ h1, h2, h3, .btn, .btn-generate, .modal-title{ font-family: var(--font-heading);
   cursor: pointer;
 }
 .fu-lang.is-on{ border-color: var(--ui); background: var(--ui-soft); color: var(--ui-dark); }
+.fisk-user-menu{ max-width: calc(100vw - 1.5rem); }
+.fu-lang-rot{ padding: 0.1rem 0.7rem 0.3rem; font-size: 0.72rem; font-weight: 800; color: var(--gray); letter-spacing: 0.04em; text-transform: uppercase; }
+
+/* ---------- Cabeçalho no celular (09/10/2026) ----------
+   No computador o voltar, o menu e o tema são três absolutos nos cantos e
+   sobra espaço. No celular eles se cruzavam (voltar por baixo do nome, logo
+   por baixo do menu e do tema). Aqui o .hero vira GRADE: a primeira linha é
+   [ voltar | menu | tema ], e tudo o mais (logo, título, subtítulo) ocupa a
+   largura inteira nas linhas de baixo. Nada é absoluto, então nada se cruza,
+   seja qual for o tamanho do nome ou do rótulo.
+   A regra mora AQUI e não no style.css, que só nove páginas carregam. */
 @media (max-width: 640px){
-  .fisk-user{ right: 4.6rem; top: 1rem; }
-  .fisk-user-btn{ max-width: 8.5rem; height: 2.3rem; font-size: 0.78rem; padding: 0 0.7rem; }
+  .hero{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    column-gap: 0.5rem;
+    align-items: center;
+    padding: 0.9rem 1rem 1.75rem;
+  }
+  .hero > *{ grid-column: 1 / -1; min-width: 0; }
+  .hero > .back-link{
+    position: static;
+    grid-column: 1; grid-row: 1;
+    justify-self: start;
+    max-width: 100%;
+    padding: 0.5rem 0.2rem;
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hero > .fisk-user{ position: relative; top: auto; right: auto; grid-column: 2; grid-row: 1; }
+  .hero > .theme-toggle{ position: static; grid-column: 3; grid-row: 1; width: 2.3rem; height: 2.3rem; font-size: 1.05rem; }
+  .hero > .hero-home, .hero > .hero-logo{ justify-self: center; margin-top: 0.9rem; }
+  .hero > .hero-home .hero-logo{ margin-bottom: 0; }
+  .hero > .hero-home{ margin-bottom: 1.1rem; }
+  /* o menu encolhe para 👤▾: o nome completo está dentro do menu aberto */
+  .fisk-user-btn{ height: 2.3rem; font-size: 0.85rem; padding: 0 0.7rem; }
+  .fisk-user-btn .fu-nome{ display: none; }
+  .fisk-user-btn .fu-seta{ font-size: 0.8rem; opacity: 1; }
 }
 
 /* ---------- Badge ("Em breve" etc) ---------- */

@@ -10,10 +10,10 @@
      regra nova de estilo simplesmente não aparece na tela dele — foi o que
      aconteceu no teste da busca de aluno, com o campo saindo sem formatação.
      MEXEU no style.css ou no kit? Suba a data aqui. -->
-<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-10-09a">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-10-09b">
   <!-- a casa do professor veste a faixa do topo (campanha de 09/2026) -->
   <link rel="stylesheet" href="assets/casa-tema.css?v=9">
-<link rel="stylesheet" href="style.css?v=2026-10-06k">
+<link rel="stylesheet" href="style.css?v=2026-10-09b">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 </head>
@@ -64,6 +64,15 @@
     body.theme-dark .prof-bar button{color:#6ea8ff;}
     body.prof-out .prof-bar{display:none;}
     .prof-bar.is-oculta{display:none;}
+    /* NO CELULAR A BARRA ENTRA NO FLUXO (09/10/2026): fixa, ela ia de x12 a
+       x320 e cobria o nome, o tema e o topo do logo da direção e da visita.
+       Vira uma faixa acima do cabeçalho, que quebra linha se precisar. */
+    @media (max-width:640px){
+      .prof-bar{position:static;flex-wrap:wrap;justify-content:center;border-radius:0;border-width:0 0 1px;
+        padding:8px 12px;box-shadow:none;backdrop-filter:none;}
+      .prof-bar #profBarName{min-width:0;overflow-wrap:anywhere;text-align:center;}
+      .prof-actas{max-width:100%;}
+    }
     /* visão da direção "como professor": barra âmbar para não confundir com a sessão real */
     .prof-bar.is-visita{background:#fff7e6;border-color:#f0c477;color:#7a5300;}
     .prof-bar.is-visita button{color:#a05a00;}
@@ -573,7 +582,7 @@
        de lá em vez de repetir o número. Se não carregar, o painel da casa
        mostra os Fisk Dólares e nada quebra. -->
   <script src="https://portalfisk.com.br/assets/mana.js"></script>
-  <script src="assets/fisk-shared.js?v=2026-10-09a"></script>
+  <script src="assets/fisk-shared.js?v=2026-10-09b"></script>
   <script>
     fiskInitThemeToggle('themeToggle');
 

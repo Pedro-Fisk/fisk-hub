@@ -626,16 +626,8 @@ body.theme-dark .cal-event-item{ background: rgba(255,255,255,.04); }
 }
 
 @media (max-width: 640px){
-  .hero{
-    padding: 2.25rem 1.25rem 1.75rem;
-  }
-
-  .back-link{
-    position: static;
-    display: inline-block;
-    margin-bottom: 0.9rem;
-    padding: 0.4rem 0.1rem;
-  }
+  /* o cabeçalho do celular (voltar, menu, tema, logo) mora no
+     assets/fisk-shared.css desde 09/10/2026: vale para todas as páginas */
 
   /* No celular os cards viram QUADRADOS em duas colunas: cabe o dobro de
      ferramentas na primeira tela, que é o que o professor quer ver ao abrir.

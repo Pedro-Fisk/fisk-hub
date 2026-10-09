@@ -396,7 +396,10 @@ function fiskInitUserMenu(opts) {
   btn.className = 'fisk-user-btn';
   btn.setAttribute('aria-haspopup', 'true');
   btn.setAttribute('aria-expanded', 'false');
-  btn.innerHTML = '<span>👤 ' + fiskEsc(primeiro) + '</span><span class="fu-seta">▾</span>';
+  btn.setAttribute('aria-label', 'Menu de ' + primeiro);
+  /* o nome vai num span próprio: no celular ele some e fica só 👤▾ */
+  btn.innerHTML = '<span class="fu-ico">👤</span><span class="fu-nome">' + fiskEsc(primeiro) +
+    '</span><span class="fu-seta">▾</span>';
 
   var menu = document.createElement('div');
   menu.className = 'fisk-user-menu';
