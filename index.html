@@ -90,11 +90,15 @@
 </style>
 
   <div id="profGate">
-    <!-- ⚠️ O SELETOR DE IDIOMA SAIU DAQUI EM 23/09/2026 (pedido do Pedro).
-         O Hub é a casa do professor e fala INGLÊS por padrão (`fisk-lang` ||
-         'en', logo abaixo); o Portal do Aluno na visão dele abre na língua do
-         card por onde ele entrou (ver docs/teacher-mode.md, no repositório do
-         portal). O bloco `applyLang` continua: é ele que traduz o Hub. -->
+    <!-- ⚠️ O SELETOR DE IDIOMA SAIU DESTA TELA DE LOGIN EM 23/09/2026 (pedido
+         do Pedro) e continua fora dela. Em 09/10/2026 ele VOLTOU, mas só ao
+         menu do professor (o 👤 do topo, depois do login), em todas as páginas.
+         O Hub fala INGLÊS por padrão (`fiskIdioma()`, no fisk-shared.js); o
+         Portal do Aluno na visão dele abre na língua do CARD por onde ele
+         entrou (`curso=en` ou `curso=es`), e não na língua do Hub: os dois
+         perfis, professor de inglês e de espanhol, continuam separados (ver
+         docs/teacher-mode.md, no repositório do portal). O bloco `applyLang`
+         é quem traduz o Hub. -->
     <div class="pg-top"></div>
     <div class="pg-card">
       <img class="pg-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
@@ -589,9 +593,10 @@
     /* ════════════════════════════════════════════════
        INTERNACIONALIZAÇÃO (PT / EN / ES)
     ════════════════════════════════════════════════ */
-    let _lang = (function(){
-      try { return localStorage.getItem('fisk-lang') || 'en'; } catch(e) { return 'en'; }
-    })();
+    /* UMA chave só desde 09/10/2026: `fisk_lang`, lida e gravada pelo kit
+       (fiskIdioma / fiskDefinirIdioma). A antiga `fisk-lang` desta página é
+       migrada lá dentro. O padrão continua inglês. */
+    let _lang = (typeof fiskIdioma === 'function') ? fiskIdioma() : 'en';
 
     const T = {
       pt: {
@@ -876,7 +881,7 @@
 
     function applyLang(lang) {
       _lang = lang;
-      try { localStorage.setItem('fisk-lang', lang); } catch(e) {}
+      if (typeof fiskDefinirIdioma === 'function') fiskDefinirIdioma(lang);
       document.getElementById('htmlRoot').lang = lang === 'pt' ? 'pt-BR' : lang;
       document.querySelectorAll('[data-i18n]').forEach(function(el) {
         var val = tr(el.dataset.i18n);
@@ -1302,6 +1307,13 @@
         if (first && first.disabled) first.textContent = tr('pg-name-ph');
       }
 
+      /* o professor trocou de idioma no menu: a home inteira acompanha, e a
+         barra da direção/visita também (o "Sair" dela vem do dicionário) */
+      function trocaIdioma(lang){
+        applyLang(lang);
+        fillBar(saved());
+      }
+
       function fillBar(prof){
         if (!prof) return;
         var esc = String(prof.escolas || prof.escola || '').replace(/,/g, ' + ');
@@ -1403,12 +1415,13 @@
         document.body.classList.remove('prof-out');
         document.body.classList.add('prof-in'); if (window._avisosLiga) window._avisosLiga();
         fillBar(prof);
-        /* mesmo menu das ferramentas, no mesmo canto. ⚠️ SEM `onIdioma` desde
-           23/09/2026: sem ele o kit não desenha o seletor de idioma, e é assim
-           que o menu de idioma sai do Hub. Respeita o "sair da visão" da
-           direção. */
+        /* mesmo menu das ferramentas, no mesmo canto. O idioma voltou ao
+           menu em 09/10/2026 (saíra em 23/09): o kit desenha o seletor em
+           toda página, e só aqui ele troca na hora, pelo `onIdioma`.
+           Respeita o "sair da visão" da direção. */
         if (typeof fiskInitUserMenu === 'function') {
           fiskInitUserMenu({
+            onIdioma: trocaIdioma,
             onSair: function(){ $('profLogout').click(); }
           });
         }
@@ -1463,7 +1476,7 @@
          meio da aula é pior do que aviso não lido.
 
          NOS TRÊS IDIOMAS do Hub, e não só em português: o padrão da casa é
-         INGLÊS (`localStorage 'fisk-lang' || 'en'`), então um aviso só em
+         INGLÊS (`fiskIdioma()`, padrão 'en'), então um aviso só em
          português apareceria em outra língua que não a da tela para a maior
          parte dos professores. Segue o `_lang` do momento em que abre.
 
@@ -1931,9 +1944,10 @@
         fillBar(s); if (s.master) setupActAs(); updateToolLinks();  // já logado (prof-in veio do pre-paint)
         registrarHome();
         // quem já estava logado não passa pelo enter(): o menu é montado aqui
-        // (sem `onIdioma`, como no enter: o seletor de idioma saiu do Hub)
+        // (com `onIdioma`, como no enter: o idioma voltou ao menu em 09/10/2026)
         if (typeof fiskInitUserMenu === 'function') {
           fiskInitUserMenu({
+            onIdioma: trocaIdioma,
             onSair: function(){ $('profLogout').click(); }
           });
         }

@@ -365,16 +365,46 @@ var FISK_IDIOMAS = [
   { id: 'es', rot: 'ES' }
 ];
 
-/** Idioma escolhido no Hub — vale para todas as páginas. */
+/* ---------- Idioma do professor: UMA chave só (09/10/2026) ----------
+ * Havia duas: `fisk-lang` (a home, padrão `en`) e `fisk_lang` (este kit,
+ * padrão `pt`). Ficou `fisk_lang`, e todo mundo lê e grava por aqui.
+ *
+ * MIGRAÇÃO: quem tem a chave antiga `fisk-lang` tem o valor dela copiado e a
+ * antiga apagada. Ela ganha da nova de propósito: era a da home, ou seja, a
+ * língua que o professor de fato via na tela.
+ *
+ * O PADRÃO É `en`: é a língua em que o Hub abre para todo professor desde
+ * 23/09/2026 (decisão do Pedro). Com padrão `pt`, a home mudaria de língua
+ * sozinha para quem nunca escolheu nada. */
+var FISK_LANG_PADRAO = 'en';
+function fiskIdiomaValido(l) { return l === 'pt' || l === 'en' || l === 'es'; }
+
+/** Idioma escolhido pelo professor: vale para todas as páginas. */
 function fiskIdioma() {
-  try { return localStorage.getItem('fisk_lang') || 'pt'; } catch (e) { return 'pt'; }
+  try {
+    var antiga = localStorage.getItem('fisk-lang');
+    if (antiga !== null) {
+      if (fiskIdiomaValido(antiga)) localStorage.setItem('fisk_lang', antiga);
+      localStorage.removeItem('fisk-lang');
+    }
+    var l = localStorage.getItem('fisk_lang');
+    return fiskIdiomaValido(l) ? l : FISK_LANG_PADRAO;
+  } catch (e) { return FISK_LANG_PADRAO; }
+}
+
+/** Guarda o idioma escolhido. Devolve o que ficou valendo. */
+function fiskDefinirIdioma(lang) {
+  if (!fiskIdiomaValido(lang)) return fiskIdioma();
+  try { localStorage.setItem('fisk_lang', lang); localStorage.removeItem('fisk-lang'); } catch (e) {}
+  return lang;
 }
 
 /**
  * Monta o menu do professor no cabeçalho.
  * opts.onIdioma(lang) — chamado quando o professor troca de idioma; se a
  * página não passa nada, a escolha é só guardada e vale na próxima que souber
- * traduzir (o idioma é do PROFESSOR, não da página).
+ * traduzir (o idioma é do PROFESSOR, não da página). O seletor aparece em
+ * TODA página desde 09/10/2026 (pedido do Pedro: o idioma volta ao menu).
  * opts.onSair() — substitui o "sair" padrão. O Hub usa para tratar o modo
  * visita da direção, que volta ao painel do diretor em vez do login.
  */
@@ -415,13 +445,13 @@ function fiskInitUserMenu(opts) {
        porque o menu é a única coisa que existe nas vinte telas. */
     '<button type="button" class="fu-item fu-csl">💬 E-counseling de um aluno</button>' +
     '<a class="fu-item" href="' + base + 'treinamentos.html">🎓 Treinamentos</a>' +
-    /* o seletor de idioma só aparece onde a página SABE traduzir: um botão
-       que não muda nada na tela é pior do que não ter botão */
-    (typeof opts.onIdioma === 'function'
-      ? '<div class="fu-sep"></div><div class="fu-langs">' + FISK_IDIOMAS.map(function (l) {
-          return '<button type="button" class="fu-lang" data-lang="' + l.id + '">' + l.rot + '</button>';
-        }).join('') + '</div>'
-      : '') +
+    /* O IDIOMA VOLTOU AO MENU (Pedro, 09/10/2026), em toda página. Onde a
+       página sabe traduzir (a home), troca na hora; nas outras a escolha
+       fica guardada e vale quando ele voltar à home. */
+    '<div class="fu-sep"></div><div class="fu-lang-rot">🌐 Idioma</div>' +
+    '<div class="fu-langs" role="group" aria-label="Idioma">' + FISK_IDIOMAS.map(function (l) {
+      return '<button type="button" class="fu-lang" data-lang="' + l.id + '">' + l.rot + '</button>';
+    }).join('') + '</div>' +
     '<div class="fu-sep"></div>' +
     '<button type="button" class="fu-item fu-sair">🚪 Sair desta conta</button>';
 
@@ -449,7 +479,7 @@ function fiskInitUserMenu(opts) {
   menu.querySelectorAll('.fu-lang').forEach(function (b) {
     b.addEventListener('click', function () {
       var lang = b.getAttribute('data-lang');
-      try { localStorage.setItem('fisk_lang', lang); } catch (x) {}
+      fiskDefinirIdioma(lang);
       marcarIdioma();
       if (typeof opts.onIdioma === 'function') opts.onIdioma(lang);
       fechar();
