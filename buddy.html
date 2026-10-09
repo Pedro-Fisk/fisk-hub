@@ -5,11 +5,11 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Buddy, auxiliar do professor · FISK</title>
-<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-10-09a">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-10-09b">
 <link rel="stylesheet" href="assets/casa-tema.css?v=9">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
-<script src="assets/fisk-shared.js?v=2026-10-09a"></script>
+<script src="assets/fisk-shared.js?v=2026-10-09b"></script>
 <script src="assets/buddy-conversas.js?v=2026-10-06i"></script>
 <style>
   [hidden]{ display:none !important; }
@@ -207,7 +207,22 @@
            transform:translateX(-105%); transition:transform .22s ease; }
     body.hist-aberta .hist{ transform:none; }
     .msg, .prop{ max-width:94%; }
-    .hero{ display:none; }   /* no celular a conversa precisa da tela inteira */
+    /* No celular a conversa precisa da tela inteira, e por isso o cabeçalho sumia. Mas com ele sumiam o menu do
+       professor, o tema e o logo (09/10/2026). Agora ele vira uma BARRA FINA de uma linha: voltar, logo, menu e tema.
+       O título e o subtítulo saem; a janela da conversa desconta a altura da barra. */
+    .hero{ display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); align-items:center; column-gap:.5rem;
+           padding:.45rem .7rem; border-bottom-width:3px; }
+    .hero > *{ grid-row:1; min-width:0; }
+    .hero > h1, .hero > p{ display:none; }
+    .hero > .back-link{ position:static; grid-column:1; justify-self:start; margin:0; padding:.4rem .2rem; font-size:.9rem; font-weight:700; white-space:nowrap; }
+    .hero > .hero-home, .hero > .hero-logo{ grid-column:2; justify-self:center; margin:0; }
+    .hero .hero-logo{ height:28px; margin:0; }
+    .hero > .theme-toggle{ position:static; grid-column:3; justify-self:end; width:2.2rem; height:2.2rem; font-size:1rem; }
+    .hero > .fisk-user{ position:relative; top:auto; right:auto; grid-column:3; justify-self:end; margin-right:2.7rem; }
+    .fisk-user-btn{ height:2.2rem; padding:0 .65rem; }
+    .fisk-user-btn .fu-nome{ display:none; }
+    .janela{ height:calc(100vh - 1.2rem - 3.3rem); }
+    a.bt.so-cheio{ display:none; }   /* o "← Hub" agora está na barra de cima */
   }
   @media (prefers-reduced-motion: reduce){ .comeco button{ animation:none; opacity:1; } .cortina .urso, .cortina .pts i, .msg.digita i{ animation:none; } .msg{ animation:none; } .passos .p i{ animation:none; } .arvore{ transition:none; } }
 </style>
@@ -221,7 +236,7 @@
 </div>
 
 <header class="hero">
-  <a class="back-link" href="index.html">&larr; Voltar aos recursos</a>
+  <a class="back-link" href="index.html" title="Voltar ao Fisk Hub">&larr; Hub</a>
   <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
   <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
   <h1>Buddy</h1>
