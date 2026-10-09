@@ -256,7 +256,8 @@
       <div class="chat" id="chat" aria-live="polite"></div>
       <form class="entrada" id="form">
         <textarea id="txt" rows="1" maxlength="2000" placeholder="Pergunte sobre suas turmas e alunos…" aria-label="Sua pergunta"></textarea>
-        <button type="button" id="anota" class="mic" title="Anotação rápida: dite ou escreva o que aconteceu com um aluno e eu registro (você confirma)" aria-label="Anotação rápida" aria-pressed="false">📝</button>
+        <!-- o botão da anotação rápida saiu da tela em 08/10/2026 (Pedro): o professor pede a anotação na própria caixa de texto, e ela vai para o campo Anotações da Minha aula. O elemento fica, escondido, porque o código abaixo ainda o procura. -->
+        <button type="button" id="anota" class="mic" style="display:none" tabindex="-1" title="Anotação rápida: dite ou escreva o que aconteceu com um aluno e eu registro (você confirma)" aria-label="Anotação rápida" aria-pressed="false">📝</button>
         <button type="button" id="mic" class="mic" hidden title="Falar a pergunta" aria-label="Falar a pergunta">🎙️</button>
         <button type="submit" id="enviar">Enviar</button>
       </form>
@@ -626,7 +627,7 @@ function cartaoConversation(pr, idConversa) {
     function fim() {
       sim.remove(); nao.remove(); d.classList.add(feitas ? 'feita' : 'cancelada');
       res.className = 'res ' + (feitas === marcadas.length ? 'ok' : 'err');
-      res.innerHTML = (feitas ? '✓ ' + feitas + (feitas === 1 ? ' aula gerada' : ' aulas geradas') + '. Elas também ficam em <a class="lk" href="' + CM_BASE + '/historico.html#proftok=' + encodeURIComponent(sess().token || '') + '" target="_blank" rel="noopener">Minhas aulas</a>.' : 'Nenhuma aula foi gerada.') +
+      res.innerHTML = (feitas ? '✓ ' + feitas + (feitas === 1 ? ' aula gerada' : ' aulas geradas') + '. Elas também ficam em <a class="lk" href="' + CM_BASE + '/historico.html#proftok=' + encodeURIComponent(sess().token || '') + '" target="_blank" rel="noopener">Minhas Conversações Criadas</a>.' : 'Nenhuma aula foi gerada.') +
                       ' Para revisar ou ajustar, use o <a class="lk" href="' + CM_BASE + '/#proftok=' + encodeURIComponent(sess().token || '') + '" target="_blank" rel="noopener">Conversation Maker</a>.';
       memFecha(idConversa, pr.id, feitas ? '✓ ' + feitas + ' aula(s) de conversação gerada(s) sobre "' + tema.value.trim() + '".' : 'nenhuma aula foi gerada.');
     }
