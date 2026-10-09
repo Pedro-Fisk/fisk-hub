@@ -95,9 +95,9 @@ h1, h2, h3, .btn, .btn-generate, .modal-title{ font-family: var(--font-heading);
 
 .hero-logo{
   display: inline-block;
-  height: 52px;
+  height: 40px;   /* a mesma medida do Portal do Aluno (portal.css) */
   width: auto;
-  margin-bottom: 1.1rem;
+  margin-bottom: 0.7rem;
 }
 
 /* o logo é o caminho de volta à home (o link nasce no fisk-shared.js) */
