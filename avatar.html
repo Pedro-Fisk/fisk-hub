@@ -130,6 +130,10 @@
     /* a vitrine dos professores (18/09/2026): enquanto não entram três, a
        direção vê uma prévia com colegas inventados (avisada na tela) */
     vitrineDeMentira: !!sessao.master,
+    /* (15/10/2026) A LÍNGUA DO PROFESSOR: a do menu do Hub (fiskIdioma). O professor de espanhol que usa o Hub em
+       espanhol vê a tela e as palavras do desafio em espanhol; antes a tela abria sempre em inglês */
+    idioma: function(){ try { return fiskIdioma(); } catch (e) { return 'en'; } },
+    idiomaAlvo: function(){ try { return fiskIdioma() === 'es' ? 'es' : 'en'; } catch (e) { return 'en'; } },
     get student(){ return { raf: 'PROF:' + nome, name: nome, book: '', master: false, prof: true, profToken: sessao.token }; }
   });
   av.openAvatar();

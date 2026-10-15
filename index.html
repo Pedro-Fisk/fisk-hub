@@ -1451,6 +1451,7 @@
         levaIdentidadeAoPortal();
         if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Fisk Hub (início)');
         avisoNovidade();
+        cortinaDoAvatar();
         // campanha da direção, se houver alguma no ar para a equipe
         if (typeof fiskCampanha === 'function') fiskCampanha();
       }
@@ -1486,7 +1487,32 @@
 
          Os campos `lista`, `senha`, `cuidado`, `p3` e `link` são OPCIONAIS: o
          desenho só escreve o que o aviso trouxer. */
+      /* O MY AVATAR DO PROFESSOR (15/10/2026, pedido do Pedro: "faz uma cortina para os professores também"). Esta abre
+         em CORTINA de verdade (as outras desta lista viraram recado do Buddy em 06/10), só para quem já tem o avatar
+         aberto (avatarProfAberto: Caçapava já, Taubaté às 17h40) e uma vez por professor. Ela também entra na lista, e o
+         Buddy mostra o mesmo aviso: confirmar num lugar confirma no outro (a mesma chave do aparelho). */
+      var AVISO_AVATAR = {
+        id: 'my-avatar-prof-2026-10',
+        desde: '2026-10-15', ate: '2026-11-15',
+        link: { href: 'avatar.html' },
+        pt: { selo:'Novidade ✨',
+              t:'O My Avatar chegou para você e para os seus alunos 🧸',
+              p1:'Monte o <b>seu avatar</b> aqui no Hub: escolha o personagem (Buddy, Angel, Jinny ou Jolly) e vista com as roupas, os acessórios e as skins da loja. O professor tem um orçamento próprio de Fisk Dólares, que não sai de nenhum aluno.',
+              p2:'Os seus alunos também ganharam o My Avatar no Portal do Aluno: compram itens com os Fisk Dólares das atividades, e as atividades de filme dão itens especiais daquele filme. Na aba <b>Turma</b> do avatar deles aparece o <b>seu</b> avatar, com o seu nome, no destaque "Seu professor". Capriche! 😉',
+              btnLink:'Montar o meu avatar 🧸', btn:'Entendi 👍' },
+        en: { selo:'What’s new ✨',
+              t:'My Avatar is here, for you and for your students 🧸',
+              p1:'Build <b>your avatar</b> here in the Hub: pick a character (Buddy, Angel, Jinny or Jolly) and dress it with clothes, accessories and skins from the shop. Teachers get their own Fisk Dollar budget, which never comes from a student.',
+              p2:'Your students got My Avatar in the Student Portal too: they buy items with the Fisk Dollars from their activities, and movie activities give special items from that movie. In the <b>Class</b> tab of their avatar, <b>your</b> avatar shows up with your name, under "Your teacher". Make it a good one! 😉',
+              btnLink:'Build my avatar 🧸', btn:'Got it 👍' },
+        es: { selo:'Novedad ✨',
+              t:'Mi Avatar llegó para ti y para tus alumnos 🧸',
+              p1:'Arma <b>tu avatar</b> aquí en el Hub: elige el personaje (Buddy, Angel, Jinny o Jolly) y vístelo con la ropa, los accesorios y las apariencias de la tienda. El profesor tiene su propio presupuesto de Fisk Dólares, que no sale de ningún alumno.',
+              p2:'Tus alumnos también recibieron Mi Avatar en el Portal del Alumno: compran ítems con los Fisk Dólares de las actividades, y las actividades de video regalan ítems especiales de ese video. En la pestaña <b>Clase</b> de su avatar aparece <b>tu</b> avatar, con tu nombre, en el destacado "Tu profesor". ¡Esmérate! 😉',
+              btnLink:'Armar mi avatar 🧸', btn:'Entendido 👍' }
+      };
       var AVISOS = [
+      AVISO_AVATAR,
       {
         /* A FREQUÊNCIA À TUTORIA (06/10/2026): a ferramenta nova, contada pelo Buddy */
         id: 'tutoria-frequencia-2026-10',
@@ -1679,6 +1705,16 @@
          desenha agora é a conversa do Buddy, na coluna da direita da home, com a caixinha "Li e estou ciente".
          O que o professor já tinha confirmado na cortina continua confirmado (a mesma chave do aparelho). */
       window._hubNoticias = { lista: AVISOS, visto: avisoVisto, publicoMet: publicoMet };
+      /* a cortina do My Avatar (falha fechada, como a antiga): só com o avatar aberto para este professor */
+      function cortinaDoAvatar(){
+        try{
+          var s = saved(); if (!s || !s.name || document.getElementById('av-mask')) return;
+          var d = new Date(), hoje = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+          if (hoje < AVISO_AVATAR.desde || hoje > AVISO_AVATAR.ate || avisoVisto(AVISO_AVATAR.id, s.name)) return;
+          if (!(s.master || avatarProfAberto(s))) return;
+          avisoMostra(AVISO_AVATAR, s);
+        }catch(e){ /* aviso nunca pode segurar o Hub */ }
+      }
       function avisoNovidade(){
         return;   /* a cortina saiu; ver o comentário acima */
         try{
