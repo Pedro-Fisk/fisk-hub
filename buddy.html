@@ -315,9 +315,26 @@ var EP = FISK_HUB_EP, conversa = '', ocupado = false, info = null, comoQuem = ''
 function $(id) { return document.getElementById(id); }
 function sess() { return fiskSessao() || {}; }
 function esc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-function post(body) {
+function post(body, ms) {
   body.token = sess().token || ''; body.como = comoQuem;
-  return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) }).then(fiskJson);
+  /* A TELA PRESA (Pedro, 15/10/2026): o Google às vezes não entrega a volta de um pedido longo, e sem prazo a tela
+     esperava para sempre. Com prazo, a pergunta é buscada de novo no servidor (ver `busca`). */
+  var ac = (ms && window.AbortController) ? new AbortController() : null, t = ac ? setTimeout(function () { ac.abort(); }, ms) : 0;
+  return fetch(EP, { method: 'POST', signal: ac ? ac.signal : undefined, headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
+    .then(fiskJson).then(function (j) { clearTimeout(t); return j; }, function (e) { clearTimeout(t); throw e; });
+}
+/* a vez em andamento: com o id da pergunta, a tela que perdeu a volta pergunta ao servidor por ela, sem repetir nada */
+var VEZ = null, PRAZO_MS = 45000;
+function idAleatorio(n) { var a = 'abcdefghijklmnopqrstuvwxyz0123456789', x = ''; for (var i = 0; i < n; i++) x += a.charAt(Math.floor(Math.random() * a.length)); return x; }
+function espera(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+/** Pede o passo seguinte. Volta perdida ou rede caída: tenta de novo algumas vezes, com calma, antes de desistir. */
+function busca(onde) {
+  return post({ action: 'buddyPasso', conversa: onde || conversa || (VEZ && VEZ.novaId) || '', turnoId: VEZ ? VEZ.turnoId : '' }, PRAZO_MS)
+    .then(function (j) { if (VEZ) VEZ.falhas = 0; return recebe(j); }, function (e) {
+      if (!VEZ || ++VEZ.falhas > 4) throw new Error('Perdi a ligação com o servidor. Tente perguntar de novo.');
+      passo('a ligação oscilou, buscando a resposta');
+      return espera(2500).then(function () { return busca(onde); });
+    });
 }
 /* a resposta do modelo é texto: escapa tudo, e só então aceita **negrito**, listas e parágrafos */
 function formata(t) {
@@ -740,7 +757,15 @@ function recebe(j) {
   /* o servidor abriu outra conversa (limite de perguntas ou validade): a janelinha passa a guardar só a nova */
   if (j.conversa && conversa && j.conversa !== conversa) { var ult = -1; MEM.forEach(function (it, i) { if (it.t === 'eu') ult = i; }); MEM = ult >= 0 ? MEM.slice(ult) : []; }
   if (j.conversa) conversa = j.conversa;
-  if (j.estado === 'andando') { passo(j.rotulo || 'pensando'); return post({ action: 'buddyPasso', conversa: conversa }).then(recebe); }
+  if (j.estado === 'naoChegou') {
+    /* a pergunta não chegou ao servidor: manda de novo, uma vez */
+    if (!VEZ) throw new Error('A pergunta não chegou ao servidor. Tente de novo.');
+    /* o servidor pode ter aberto a conversa nova com o id que a tela propôs (limite de perguntas da anterior) */
+    if (!VEZ.olhouNova && conversa && conversa !== VEZ.novaId) { VEZ.olhouNova = true; return busca(VEZ.novaId); }
+    if (VEZ.reenvios++ > 0) throw new Error('A pergunta não chegou ao servidor. Tente de novo.');
+    return manda();
+  }
+  if (j.estado === 'andando') { passo(j.rotulo || 'pensando'); return espera(j.espera || 0).then(busca); }
   fimPassos();
   if (j.ok === false) { bolha('<p>⚠️ ' + esc(j.error || 'Não consegui agora.') + '</p>'); return; }
   if (j.resposta) { acoesDe(bolha(formata(j.resposta)), j.resposta); memPoe({ t: 'bd', x: j.resposta }); }
@@ -780,9 +805,14 @@ function pergunta(t, rotulo, depois) {
   if (depois) depoisDaVez = depois;
   bolhaEu(rotulo || t); memPoe({ t: 'eu', x: rotulo || t }); $('txt').value = ''; ajusta(); $('txt').placeholder = PH;
   trava(true); passo('pensando');
-  post({ action: 'buddyPergunta', texto: t, conversa: conversa, rotulo: String(rotulo || t).slice(0, 160) }).then(recebe)
+  VEZ = { texto: t, rotulo: String(rotulo || t).slice(0, 160), turnoId: idAleatorio(16), novaId: idAleatorio(12), falhas: 0, reenvios: 0 };
+  manda()
     .catch(function (e) { fimPassos(); bolha('<p>⚠️ ' + esc(String((e && e.message) || e)) + '</p>'); })
-    .then(function () { trava(false); });
+    .then(function () { VEZ = null; trava(false); });
+}
+function manda() {
+  return post({ action: 'buddyPergunta', texto: VEZ.texto, conversa: conversa, novaId: VEZ.novaId, turnoId: VEZ.turnoId, rotulo: VEZ.rotulo }, PRAZO_MS)
+    .then(recebe, function () { passo('a ligação oscilou, buscando a resposta'); return espera(2500).then(busca); });
 }
 function ajusta() {
   var a = $('txt'); a.style.height = 'auto'; a.style.height = Math.min(160, a.scrollHeight + 2) + 'px';
