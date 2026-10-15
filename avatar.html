@@ -102,7 +102,13 @@
      da home está cinza com "Em breve", e o endereço direto também não abre.
      Só a direção (master) entra. Abrir = `true` aqui e no index.html. */
   var AVATAR_PROFS_ABERTO = false;
-  if (!AVATAR_PROFS_ABERTO && !sessao.master) { location.replace('index.html'); return; }
+  /* (15/10/2026) aberto por escola, no horário dos alunos: Caçapava já, Taubaté às 17h40 (a mesma regra do index.html) */
+  var AVATAR_ABRE_EM = { 'CACAPAVA': Date.parse('2026-10-15T00:00:00-03:00'), 'TAUBATE': Date.parse('2026-10-15T17:40:00-03:00') };
+  var escolaAberta = String(sessao.escolas || sessao.escola || '').split(',').some(function (e) {
+    var k = String(e || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z]/g, '');
+    return Date.now() >= (AVATAR_ABRE_EM[k] || Infinity);
+  });
+  if (!AVATAR_PROFS_ABERTO && !sessao.master && !escolaAberta) { location.replace('index.html'); return; }
 
   function esc(s){ var d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; }
   /* uma tela só: o "voltar" do avatar é voltar para o Hub */
