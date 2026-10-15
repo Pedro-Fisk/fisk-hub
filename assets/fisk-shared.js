@@ -1227,7 +1227,8 @@ function fiskBuscaMeusAlunos(q) {
   function pode() {
     try {
       var g = JSON.parse(sessionStorage.getItem(CHAVE) || 'null');
-      if (g && Date.now() - g.q < 30 * 60000) return Promise.resolve(!!g.ok);
+      /* o "pode" vale 30 min; o "não pode" só 5, para a abertura com hora marcada chegar logo a quem já estava no Hub */
+      if (g && Date.now() - g.q < (g.ok ? 30 : 5) * 60000) return Promise.resolve(!!g.ok);
     } catch (e) {}
     return fetch(FISK_HUB_EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'buddyInfo', token: s.token }) })
       .then(fiskJson).then(function (j) {
