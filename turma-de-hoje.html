@@ -2019,6 +2019,10 @@ function notasDaCelula(txt) {
   if (mE) { o.l = num(mE[1]); o.cardCrit.l = 1; }
   if (mW) { o.w = num(mW[1]); o.cardCrit.w = 1; }
   if (mM) { o.media = num(mM[1]); o.cardCrit.media = 1; }
+  /* oral e participação: o Gerador grava as duas desde 16/10/2026 (antes a 1ª coluna delas ficava vazia) */
+  var mO = t.match(/^\s*oral:\s*([0-9]+(?:[.,][0-9]+)?)/im), mP = t.match(/^\s*participa[çc][ãa]o:\s*([0-9]+(?:[.,][0-9]+)?)/im);
+  if (mO) { o.o = num(mO[1]); o.cardCrit.o = 1; }
+  if (mP) { o.p = num(mP[1]); o.cardCrit.p = 1; }
   /* a data do lançamento: "Lançamento de nota - dd/mm/aaaa" (a linha "Report Card N · created on" do planner) */
   var mD = t.match(/(\d{2})\/(\d{2})\/\d{4}/); if (mD) o.data = mD[1] + '/' + mD[2];
   if (!mE && !mW) {
