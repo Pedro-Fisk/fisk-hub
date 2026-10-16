@@ -190,32 +190,6 @@
   .ck .aviso{ font-size: .8rem; color: var(--gray); }
   .ck .ok{ color: #155a48; font-weight: 800; }
   .ck .registrado{ font-size: .84rem; color: #155a48; font-weight: 700; margin-bottom: .5rem; }
-  /* o guia do Checking: o roteiro da mesa, bloco a bloco */
-  .guia{ margin: 0 0 .9rem; border: 1px solid #cfe6e1; background: #f2faf8; border-radius: 14px; overflow: hidden; }
-  .guia summary{ cursor: pointer; padding: .7rem .9rem; font-family: var(--font-heading); font-weight: 700; font-size: .95rem; list-style: none; display: flex; align-items: center; gap: .6rem; }
-  .guia summary::-webkit-details-marker{ display: none; }
-  .guia summary .tempo{ margin-left: auto; font-size: .76rem; color: var(--gray); font-weight: 600; }
-  .guia .bl{ border-top: 1px solid #cfe6e1; padding: .7rem .9rem .8rem; }
-  .guia .bl h5{ margin: 0 0 .2rem; font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: #155a48; display: flex; align-items: center; gap: .5rem; }
-  .guia .bl h5 .min{ font-weight: 600; color: var(--gray); text-transform: none; letter-spacing: 0; }
-  .guia .bl .o{ font-size: .78rem; color: var(--gray); margin: 0 0 .5rem; }
-  .guia table{ width: 100%; border-collapse: collapse; }
-  .guia td{ vertical-align: top; padding: .35rem .4rem .35rem 0; border-top: 1px dashed #cfe6e1; }
-  .guia tr:first-child td{ border-top: 0; }
-  /* as duas vozes do guia, com as cores do planner: verde-oliva o professor, azul-marinho o aluno */
-  .guia td.diz{ width: 55%; font-family: var(--font-body); font-weight: 500; font-size: 1.02rem; line-height: 1.3; }
-  .guia td.nota{ font-size: .8rem; color: var(--gray); line-height: 1.35; }
-  .guia tr.prof td.diz{ color: #4b5503; border-left: 4px solid #a8b907; padding-left: .55rem; }
-  .guia tr.aluno td.diz{ color: #1d3685; border-left: 4px solid #1d3685; padding-left: 1.4rem; }
-  .guia .vozes{ display: flex; gap: .9rem; font-size: .74rem; font-weight: 700; color: var(--gray); margin: 0 .9rem .5rem; }
-  .guia .vozes i{ display: inline-block; width: .7rem; height: .7rem; border-radius: 3px; margin-right: .3rem; vertical-align: -1px; }
-  .guia .feito-btn{ display: block; width: 100%; margin-top: .6rem; border: 0; border-radius: 14px; padding: .8rem 1rem; font-family: var(--font-body); font-weight: 900; font-size: 1.05rem; background: #d4e909; color: #3f4703; box-shadow: 0 4px 0 #a8b907; cursor: pointer; }
-  .guia .bl.feito{ opacity: .55; }
-  .guia .bl.feito .feito-btn{ background: #e4f3f1; color: #155a48; box-shadow: none; }
-  .guia .tela-grande{ display: block; margin: .6rem .9rem .8rem; text-align: center; border-radius: 14px; padding: .8rem 1rem; font-weight: 900; font-size: 1rem; background: #1d3685; color: #fff; text-decoration: none; box-shadow: 0 4px 0 #0f2260; }
-  body.theme-dark .guia td.diz{ color: #dbe6f3; }
-  body.theme-dark .guia{ background: #172232; border-color: #2e4560; }
-  body.theme-dark .guia .en{ color: #dbe6f3; }
   /* a fila do Planejador e o atendimento */
   .fila-info{ max-width: 1500px; margin: 0 auto .8rem; display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; font-size: .84rem; color: var(--gray); background: #e4f3f1; border: 1px solid #cfe6e1; border-radius: 12px; padding: .55rem .9rem; }
   .fila-info b{ color: #155a48; }
@@ -1616,7 +1590,8 @@ function gradeDaLicao(a, plano, etapaId, ctx, reg, ehAtual) {
         lista.appendChild(feitoBox);
       }
       var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'btn ' + (ckFeito ? 'btn-ck-editar' : 'btn-ck'); bt.dataset.ck = etapaId;
-      bt.textContent = ckFeito ? 'Editar Checking' : 'Registrar Checking';
+      bt.textContent = ckFeito ? (estudar ? 'Refazer Checking' : 'Editar Checking') : 'Registrar Checking';
+      if (ckFeito && estudar) bt.className = 'btn btn-ck';   /* o Estude mais pede um Checking NOVO, na tela grande */
       lista.appendChild(bt);
       if (ehAtual) lista.appendChild(poeDica(lista, 'O Checking é a conversa do fim da lição, toda falada: o aluno ouve e responde. No fim você escolhe Aprovado ou Estude mais, e nos dois pode marcar o que ele precisa melhorar e deixar pedidos. Aprovado libera a próxima lição e paga F$ 250.'));
       var prox = plano.etapas[plano.etapas.indexOf(plano.etapas.find(function (e) { return e.id === etapaId; })) + 1];
@@ -1709,7 +1684,7 @@ function cartaoAluno(a) {
   }
   if (estado.atendidos[a.raf]) { var q = document.createElement('span'); q.className = 'quando'; var dt = new Date(estado.atendidos[a.raf]); q.textContent = 'Atendido às ' + ('0' + dt.getHours()).slice(-2) + ':' + ('0' + dt.getMinutes()).slice(-2); at.appendChild(q); }
   card.appendChild(at);
-  cardReal.querySelectorAll('[data-ck]').forEach(function (b) { b.addEventListener('click', function () { var e = plano && plano.etapas.find(function (x) { return x.id === b.dataset.ck; }); abrirChecking(cardReal, a, plano, e ? { id: e.id, rot: e.rot, tema: e.tema } : pos); }); });
+  cardReal.querySelectorAll('[data-ck]').forEach(function (b) { b.addEventListener('click', function () { var e = plano && plano.etapas.find(function (x) { return x.id === b.dataset.ck; }); iniciarChecking(cardReal, a, plano, e ? { id: e.id, rot: e.rot, tema: e.tema } : pos); }); });
   if (estado.aberto === a.raf) abrirChecking(cardReal, a, plano, pos);
   return cardReal;
 }
@@ -2130,27 +2105,35 @@ function guiaDe(book) {
   if (mEs) return window['GUIA_CHECKING_I' + mEs[1]] || null;
   return (m && window['GUIA_CHECKING_' + m[1].charAt(0).toUpperCase() + m[2]]) || null;
 }
-function guiaHTML(book, licaoId, nome, raf) {
-  var g = guiaDe(book); if (!g) return '';
-  var l = g.licoes.find(function (x) { return x.id === licaoId; }); if (!l) return '';
-  var primeiro = String(nome || '').split(' ')[0];
-  function bloco(k) {
-    var r = g.ROTEIRO.find(function (x) { return x.k === k; }) || {};
-    var linhas = g.linhasDe ? g.linhasDe(l, k) : [];
-    var corpo = '<table>' + linhas.map(function (ln) {
-      return '<tr class="' + (ln.quem === 'A' ? 'aluno' : 'prof') + '"><td class="diz">' + esc(ln.diz) + '</td><td class="nota">' + esc(ln.nota) + '</td></tr>';
-    }).join('') + '</table>';
-    return '<div class="bl"><h5>' + (r.ic ? r.ic + ' ' : '') + esc(r.t || k) + '</h5><p class="o">' + esc(r.o || '') + '</p>' + corpo +
-      '<button type="button" class="feito-btn">' + (g.idioma === 'es' ? '✓ Hecho' : '✓ Done') + '</button></div>';
-  }
-  var grande = 'checking-guia.html?book=' + encodeURIComponent(book) + '&licao=' + encodeURIComponent(licaoId) + '&aluno=' + encodeURIComponent(nome || '') + '&raf=' + encodeURIComponent(raf || '');
-  return '<details class="guia" open><summary>📋 Guia do Checking · ' + esc(l.rot) + ' · ' + esc(l.tema) + '<span class="tempo">com ' + esc(primeiro) + '</span></summary>' +
-    '<div class="vozes"><span><i style="background:#a8b907"></i>' + (g.idioma === 'es' ? 'Dice el profesor' : 'Teacher says') + '</span><span><i style="background:#1d3685"></i>' + (g.idioma === 'es' ? 'Dice el alumno' : 'Student says') + '</span></div>' +
-    '<a class="tela-grande" href="' + grande + '" target="_blank" rel="noopener">🖥️ Abrir em tela grande, para fazer junto com ' + esc(primeiro) + '</a>' +
-    g.ROTEIRO.map(function (r) { return bloco(r.k); }).join('') + '</details>';
-}
-
 /* ── o Checking ── */
+/* REGISTRAR = TELA GRANDE (Pedro, 15/10/2026): os professores fazem o Checking virando a tela para o aluno, então o
+   Registrar já abre a tela grande numa aba nova, sem passar pelo guia em letra normal. O feedback é salvo lá; esta
+   aba fica sabendo pelo canal 'fisk-checking' e, se o aviso se perder (aba congelada, outra janela), pergunta ao
+   servidor quando o professor volta para cá. O formulário daqui ficou para EDITAR um Checking aprovado e para o
+   livro que ainda não tem guia. O Estude mais pede um Checking novo: volta para a tela grande. */
+function iniciarChecking(card, a, plano, pos) {
+  var r = ((((estado.dados[a.raf] || {}).planner || {}).checking || {})[pos.id]) || {};
+  var g = guiaDe(a.book), temGuia = !!(g && g.licoes.some(function (x) { return x.id === pos.id; }));
+  if (!temGuia || (r.feito && r.resultado !== 'estudar')) { abrirChecking(card, a, plano, pos); return; }
+  var url = 'checking-guia.html?book=' + encodeURIComponent(a.book || '') + '&licao=' + encodeURIComponent(pos.id) + '&aluno=' + encodeURIComponent(a.nome || '') + '&raf=' + encodeURIComponent(a.raf || '');
+  window.open(url, '_blank', 'noopener');
+  estado.ckFora = { raf: a.raf, book: a.book, turma: a.turma || estado.turma, licao: pos.id, desde: Date.now(), antes: Number(r.quando) || 0 };
+  toast('🖥️ Checking de ' + String(a.nome || '').split(' ')[0] + ' aberto na tela grande, numa aba nova. Ao salvar, volte para cá.', 5000);
+}
+/* a volta da tela grande: se o canal não trouxe o Checking, o servidor diz se ele foi salvo */
+function conferirCheckingFora() {
+  var p = estado.ckFora; if (!p || estado.ckConferindo) return;
+  if (Date.now() - p.desde > 3 * 3600 * 1000) { estado.ckFora = null; return; }
+  estado.ckConferindo = true;
+  post({ action: 'plannerTurma', alunos: [{ raf: p.raf, book: p.book, turma: p.turma }] }).then(function (r) {
+    var d = (r.alunos || {})[p.raf]; if (!d || !d.planner || estado.ckFora !== p) return;
+    var c = (d.planner.checking || {})[p.licao] || {};
+    if (!(c.feito && Number(c.quando) > p.antes)) return;   /* ainda não salvou: a aba pode estar aberta */
+    checkingDaTelaGrande({ tipo: 'checking', raf: p.raf, planner: d.planner });
+  }).catch(function () {}).then(function () { estado.ckConferindo = false; });
+}
+document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') conferirCheckingFora(); });
+window.addEventListener('focus', conferirCheckingFora);
 function abrirChecking(card, a, plano, pos) {
   var jaAberto = card.querySelector('.ck');
   if (jaAberto) { jaAberto.remove(); estado.aberto = ''; return; }
@@ -2162,7 +2145,6 @@ function abrirChecking(card, a, plano, pos) {
   var ck = document.createElement('div'); ck.className = 'ck';
   ck.innerHTML =
     '<h4>Checking de ' + esc(a.nome) + '</h4>' +
-    '<div data-guia></div>' +
     '<div class="registrado" data-reg hidden></div>' +
     '<div class="lin"><label class="rot">Lição</label><select data-licao>' + licoes.map(function (l) { return '<option value="' + esc(l.v) + '"' + (l.v === licao ? ' selected' : '') + '>' + esc(l.t) + '</option>'; }).join('') + '</select></div>' +
     /* O RESULTADO (Pedro, 21/09/2026). Os elogios, o que melhorar e os pedidos
@@ -2229,8 +2211,8 @@ function abrirChecking(card, a, plano, pos) {
   }
   function carregaLicao() {
     var r = reg[f.licao.value] || {};
-    ck.querySelector('[data-guia]').innerHTML = guiaHTML(a.book, f.licao.value, a.nome, a.raf);
-    ck.querySelectorAll('[data-guia] .feito-btn').forEach(function (bt) { bt.addEventListener('click', function () { var bl = bt.closest('.bl'); bl.classList.toggle('feito'); var esG = (guiaDe(a.book) || {}).idioma === 'es'; bt.textContent = bl.classList.contains('feito') ? (esG ? '✓ Hecho · deshacer' : '✓ Done · undo') : (esG ? '✓ Hecho' : '✓ Done'); }); });
+    /* O GUIA EM LETRA NORMAL SAIU (Pedro, 15/10/2026): os professores fazem o Checking na tela grande, que abre
+       sozinha no Registrar. Este formulário ficou para editar um Checking aprovado, e para o livro sem guia. */
     pintaProntos();
     /* VÁRIOS ELOGIOS (Pedro, 19/09/2026): era um critério só; `melhores` é a lista e `melhor` continua com o primeiro, para os registros antigos e para quem lê o campo velho */
     var jaBons = (r.melhores && r.melhores.length ? r.melhores : (r.melhor ? [r.melhor] : []));
@@ -2306,6 +2288,7 @@ function checkingDaTelaGrande(d) {
   if (d.tipo !== 'checking' || !d.raf || !d.planner) return;
   var a = estado.alunos.find(function (x) { return x.raf === d.raf; });
   if (!a) return;
+  if (estado.ckFora && estado.ckFora.raf === d.raf) estado.ckFora = null;
   estado.dados[a.raf] = Object.assign(estado.dados[a.raf] || {}, { planner: d.planner });
   estado.aberto = '';
   redesenhar(a);

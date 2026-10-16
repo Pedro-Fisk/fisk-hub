@@ -296,22 +296,41 @@ function pintaFeedback(main) {
       .then(function (r) { return r.json(); })
       .then(function (r) {
         if (!r || !r.ok) throw new Error((r && (r.error || r.erro)) || 'not saved');
-        var okEl = box.querySelector('[data-ok]'); okEl.hidden = false; okEl.textContent = fb.resultado === 'estudar'
-          ? T2('✓ Checking saved. Study more: the next lesson stays closed until a new Checking is approved.', '✓ Verificación guardada. Estudia más: la lección siguiente queda cerrada hasta una nueva verificación aprobada.')
-          : T2('✓ Checking saved. Approved: the next lesson is open for the student.', '✓ Verificación guardada. Aprobado: la lección siguiente ya está abierta para el alumno.');
         /* AVISA A MINHA AULA, na aba de trás. Ela abre esta tela com `rel="noopener"`, então `window.opener` é
            sempre nulo e o aviso antigo nunca chegava (09/10/2026). O BroadcastChannel fala com as abas da MESMA
            origem sem precisar do opener, e o noopener continua lá. O postMessage fica para a aba antiga em cache. */
         try { var canal = new BroadcastChannel('fisk-checking'); canal.postMessage({ tipo: 'checking', raf: raf, planner: r.planner }); canal.close(); } catch (e) {}
         try { if (window.opener) window.opener.postMessage({ tipo: 'checking', raf: raf, planner: r.planner }, location.origin); } catch (e) {}
-        salvar.textContent = T2('✓ Saved · close', '✓ Guardado · cerrar'); salvar.disabled = false; salvar.onclick = function () { window.close(); };
+        telaDoFim(fb.resultado);
       }).catch(function (e) { salvar.disabled = false; salvar.textContent = '⚠️ ' + e.message + T2(' · try again', ' · intentar de nuevo'); });
   });
   acoes.appendChild(volta); acoes.appendChild(salvar);
   main.appendChild(acoes);
 }
+/* O FIM (Pedro, 15/10/2026): salvo o Checking, a tela inteira diz que acabou e manda o professor de volta ao
+   planner, onde o aluno já aparece com o Checking feito. A aba foi aberta pelo Registrar, então o botão consegue
+   fechá-la; se o navegador não deixar, o texto já diz o que fazer. */
+var acabou = false;
+function telaDoFim(resultado) {
+  acabou = true;
+  var estudar = resultado === 'estudar';
+  $('passos').innerHTML = '';
+  $('main').innerHTML = '<div class="fim">' +
+    '<h1>' + (estudar ? '📚 ' : '✅ ') + T2('Checking saved', 'Verificación guardada') + '</h1>' +
+    '<p>' + (estudar
+      ? T2('Study more: the next lesson stays closed until a new Checking is approved.', 'Estudia más: la lección siguiente queda cerrada hasta una nueva verificación aprobada.')
+      : T2('Approved: the next lesson is open for the student.', 'Aprobado: la lección siguiente ya está abierta para el alumno.')) + '</p>' +
+    '<p><b>' + T2('You can close this window and go back to the planner.', 'Puedes cerrar esta ventana y volver al planner.') + '</b></p>' +
+    '<button type="button" class="btn btn-feito" id="fimFechar">' + T2('✕ Close this window', '✕ Cerrar esta ventana') + '</button></div>';
+  $('fimFechar').addEventListener('click', function () {
+    window.close();
+    /* o navegador não fechou (a aba não foi aberta pelo Hub): o próprio professor fecha */
+    setTimeout(function () { var b = $('fimFechar'); if (b) b.textContent = T2('Close this tab yourself (Ctrl+W)', 'Cierra esta pestaña tú mismo (Ctrl+W)'); }, 400);
+  });
+  window.scrollTo(0, 0);
+}
 document.addEventListener('keydown', function (ev) {
-  if (!L) return;
+  if (!L || acabou) return;
   if (ev.target && /TEXTAREA|INPUT/.test(ev.target.tagName)) return;
   if (ev.key === 'ArrowRight' || ev.key === 'Enter') { estado.feitas[(R[estado.i] || {}).k] = 1; estado.i = Math.min(R.length, estado.i + 1); pinta(); }
   if (ev.key === 'ArrowLeft') { estado.i = Math.max(0, estado.i - 1); pinta(); }
