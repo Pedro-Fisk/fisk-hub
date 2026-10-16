@@ -70,7 +70,7 @@
     <a class="hub-home" href="index.html" title="Fisk Hub" aria-label="Voltar ao Fisk Hub"><img src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava"></a>
     <div class="av-brand">
       <svg viewBox="0 0 26 26" aria-hidden="true"><path d="M13 2l10 5.5v11L13 24 3 18.5v-11z" fill="#f6c343"/><path d="M13 13l10-5.5v11L13 24z" fill="#c9922e"/><path d="M13 13L3 7.5v11L13 24z" fill="#e0a93a"/><path d="M13 2l10 5.5L13 13 3 7.5z" fill="#ffe08a"/></svg>
-      <span>MY AVATAR</span>
+      <span id="av-nome-topo">MY AVATAR</span>
     </div>
     <div class="av-wallet" id="av-wallet"></div>
     <div class="hero-actions"></div>
@@ -88,6 +88,8 @@
 </script>
 <script src="https://portalfisk.com.br/assets/mana.js"></script>
 <script src="https://portalfisk.com.br/assets/avatar-engine.js"></script>
+<!-- (15/10/2026) os nomes das peças em espanhol, ANTES do catálogo (é ele que os lê): o professor de espanhol vê a loja em espanhol -->
+<script src="https://portalfisk.com.br/assets/avatar-nomes-es.js"></script>
 <script src="https://portalfisk.com.br/assets/avatar-catalogo.js"></script>
 <script src="https://portalfisk.com.br/assets/avatar-i18n.js"></script>
 <script src="https://portalfisk.com.br/assets/avatar.js"></script>
@@ -122,6 +124,8 @@
     document.getElementById('av-body').innerHTML = '<p class="av-sem">My Avatar is not answering right now. Please try again in a moment, or go back to the <a href="index.html">Fisk Hub</a>.</p>';
     return;
   }
+  /* (15/10/2026) o nome no cabeçalho e na aba segue a língua do Hub: "Mi Avatar" em espanhol */
+  try { if (fiskIdioma() === 'es') { document.getElementById('av-nome-topo').textContent = 'MI AVATAR'; document.title = 'Mi Avatar · Fisk Hub'; } } catch (e) {}
   var av = window.FiskAvatar({
     esc: esc, show: show,
     ehFamilia: function(){ return false; },
