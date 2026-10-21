@@ -712,9 +712,9 @@ function cartaoAcao(pr, idConversa) {
   if (DOCS[pr.acao]) return cartaoDoc(pr, idConversa);
   var d = document.createElement('div'); d.className = 'prop';
   /* a presença na tutoria (15/10/2026): um cartão para vários alunos, um por linha, e o Diário de Bordo como destino */
-  d.innerHTML = '<b>' + (pr.acao === 'card' ? '📝 Anotação na célula da aula' : pr.acao === 'recado' ? '📨 Recado para a secretaria' : pr.acao === 'tutoria' ? '🎓 Presença na tutoria' : '🗂️ Registro no counseling') + ' · ' + esc(pr.aluno) + '</b>' +
+  d.innerHTML = '<b>' + (pr.acao === 'card' ? '📝 Anotação na célula da aula' : pr.acao === 'recado' ? '📨 Recado para a secretaria' : pr.acao === 'impressao' ? '🖨️ Pedido de impressão à secretaria' : pr.acao === 'tutoria' ? '🎓 Presença na tutoria' : '🗂️ Registro no counseling') + ' · ' + esc(pr.aluno) + '</b>' +
     '<div class="onde">' + esc(pr.turma ? pr.turma + ' · ' : '') + esc(pr.onde) + '</div><blockquote>' + esc(pr.texto).replace(/\n/g, '<br>') + '</blockquote>' +
-    '<div class="bts"><button type="button" class="sim">' + (pr.acao === 'recado' ? '✓ Confirmar e enviar' : pr.acao === 'tutoria' ? '✓ Confirmar e lançar' : '✓ Confirmar e gravar') + '</button><button type="button" class="nao">Cancelar</button><span class="res"></span></div>';
+    '<div class="bts"><button type="button" class="sim">' + (pr.acao === 'recado' || pr.acao === 'impressao' ? '✓ Confirmar e enviar' : pr.acao === 'tutoria' ? '✓ Confirmar e lançar' : '✓ Confirmar e gravar') + '</button><button type="button" class="nao">Cancelar</button><span class="res"></span></div>';
   var sim = d.querySelector('.sim'), nao = d.querySelector('.nao'), res = d.querySelector('.res');
   function manda(cancela) {
     sim.disabled = nao.disabled = true; res.className = 'res'; res.textContent = cancela ? '' : (pr.acao === 'tutoria' ? 'lançando no Diário de Bordo…' : 'gravando…');
