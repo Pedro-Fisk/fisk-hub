@@ -552,7 +552,7 @@ function cartaoDoc(pr, idConversa) {
         var msgF = D.mensagem ? D.mensagem(x) : '';
         if (msgF) {
           var cx = document.createElement('div'); cx.className = 'zap';
-          cx.innerHTML = '<div class="zap-t">💬 Mensagem para a família <small>(você envia pelo seu WhatsApp, com o PDF)</small></div><pre></pre>' +
+          cx.innerHTML = '<div class="zap-t">💬 Mensagem para a família <small>(' + (x.enviarFamilia ? 'só se você mesmo quiser enviar; a secretaria já vai mandar' : 'se preferir enviar você mesmo, pelo seu WhatsApp, com o PDF') + ')</small></div><pre></pre>' +
                          '<div class="bts"><button type="button" class="nao">📋 Copiar a mensagem</button><span class="res"></span></div>';
           cx.querySelector('pre').textContent = msgF;
           cx.querySelector('button').addEventListener('click', function () {
@@ -561,6 +561,30 @@ function cartaoDoc(pr, idConversa) {
             else r2.textContent = 'selecione o texto e copie';
           });
           d.appendChild(cx);
+        }
+        /* ENVIO À FAMÍLIA PELA SECRETARIA (Central de Pedidos, 21/10/2026): pedido junto, se o professor pediu ao Buddy;
+           senão, um botão para pedir depois. O PDF é o mesmo que acabou de ir para a pasta. */
+        var env = document.createElement('div'); env.className = 'zap';
+        function pedeEnvio() {
+          var rE = env.querySelector('.res'), bE = env.querySelector('button');
+          if (bE) bE.disabled = true; rE.className = 'res'; rE.textContent = 'mandando o pedido à secretaria…';
+          return post({ action: 'impPedir', acao: 'enviar', origem: pr.acao, titulo: D.nome + ' · ' + x.nome, mime: 'application/pdf',
+                        dados: fiskBytesToBase64(pdf.bytes), aluno: x.nome, raf: x.raf || '', turma: String(x.turmaCheia || '').split('\n')[0].trim(),
+                        escola: x.escola, professor: x.professor, linha: x.linhaCard == null ? '' : x.linhaCard, recado: x.recadoFamilia || '' })
+            .then(function (j) {
+              if (!j || !j.ok) { if (bE) bE.disabled = false; rE.className = 'res err'; rE.textContent = (j && j.error) || 'não consegui mandar o pedido'; return; }
+              if (bE) bE.remove();
+              rE.className = 'res ok'; rE.textContent = '✓ Pedido de envio à família na fila da secretaria de ' + j.escola + '. Você recebe o aviso no Hub quando ela enviar.';
+            }).catch(function () { if (bE) bE.disabled = false; rE.className = 'res err'; rE.textContent = 'sem conexão; tente de novo'; });
+        }
+        if (x.enviarFamilia) {
+          env.innerHTML = '<div class="zap-t">💬 Envio à família pela secretaria</div><div class="bts"><span class="res"></span></div>';
+          d.appendChild(env); pedeEnvio();
+        } else {
+          env.innerHTML = '<div class="zap-t">💬 Quer que a secretaria envie à família pelo WhatsApp?</div>' +
+                          '<div class="bts"><button type="button" class="sim">Pedir à secretaria para enviar</button><span class="res"></span></div>';
+          env.querySelector('button').addEventListener('click', pedeEnvio);
+          d.appendChild(env);
         }
         post({ action: 'buddyConfirma', conversa: idConversa, id: pr.id, resultado: 'drive ok' + (avisos.length ? '; ' + avisos.join('; ') : '; card e counseling ok') }).catch(function () {});
       }).catch(function (e) {
@@ -712,9 +736,9 @@ function cartaoAcao(pr, idConversa) {
   if (DOCS[pr.acao]) return cartaoDoc(pr, idConversa);
   var d = document.createElement('div'); d.className = 'prop';
   /* a presença na tutoria (15/10/2026): um cartão para vários alunos, um por linha, e o Diário de Bordo como destino */
-  d.innerHTML = '<b>' + (pr.acao === 'card' ? '📝 Anotação na célula da aula' : pr.acao === 'recado' ? '📨 Recado para a secretaria' : pr.acao === 'impressao' ? '🖨️ Pedido de impressão à secretaria' : pr.acao === 'tutoria' ? '🎓 Presença na tutoria' : '🗂️ Registro no counseling') + ' · ' + esc(pr.aluno) + '</b>' +
+  d.innerHTML = '<b>' + (pr.acao === 'card' ? '📝 Anotação na célula da aula' : pr.acao === 'recado' ? '📨 Recado para a secretaria' : pr.acao === 'impressao' ? '🖨️ Pedido de impressão à secretaria' : pr.acao === 'envioFamilia' ? '💬 Envio à família pela secretaria' : pr.acao === 'tutoria' ? '🎓 Presença na tutoria' : '🗂️ Registro no counseling') + ' · ' + esc(pr.aluno) + '</b>' +
     '<div class="onde">' + esc(pr.turma ? pr.turma + ' · ' : '') + esc(pr.onde) + '</div><blockquote>' + esc(pr.texto).replace(/\n/g, '<br>') + '</blockquote>' +
-    '<div class="bts"><button type="button" class="sim">' + (pr.acao === 'recado' || pr.acao === 'impressao' ? '✓ Confirmar e enviar' : pr.acao === 'tutoria' ? '✓ Confirmar e lançar' : '✓ Confirmar e gravar') + '</button><button type="button" class="nao">Cancelar</button><span class="res"></span></div>';
+    '<div class="bts"><button type="button" class="sim">' + (pr.acao === 'recado' || pr.acao === 'impressao' || pr.acao === 'envioFamilia' ? '✓ Confirmar e enviar' : pr.acao === 'tutoria' ? '✓ Confirmar e lançar' : '✓ Confirmar e gravar') + '</button><button type="button" class="nao">Cancelar</button><span class="res"></span></div>';
   var sim = d.querySelector('.sim'), nao = d.querySelector('.nao'), res = d.querySelector('.res');
   function manda(cancela) {
     sim.disabled = nao.disabled = true; res.className = 'res'; res.textContent = cancela ? '' : (pr.acao === 'tutoria' ? 'lançando no Diário de Bordo…' : 'gravando…');
