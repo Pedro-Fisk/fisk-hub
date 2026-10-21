@@ -96,7 +96,10 @@
         '<div class="fimp-campo"><label for="fimpAte">Preciso até (opcional)</label><input id="fimpAte" type="date"></div>' +
         (escolas.length > 1 ? '<div class="fimp-campo fimp-largo"><label for="fimpEsc">Escola</label><select id="fimpEsc">' +
           escolas.map(function (e) { return '<option' + (e === escola ? ' selected' : '') + '>' + esc(e) + '</option>'; }).join('') + '</select></div>' : '') +
-        '<div class="fimp-campo fimp-largo"><label for="fimpObs">Observação para a secretária (opcional)</label><textarea id="fimpObs" rows="2" maxlength="500" placeholder="Ex.: frente e verso"></textarea></div>' +
+        (envio ? '<div class="fimp-campo fimp-largo"><label for="fimpRec">Recado para a família (opcional)</label>' +
+          '<textarea id="fimpRec" rows="3" maxlength="500" placeholder="Ex.: Vamos combinar a reposição das aulas na tutoria de sábado."></textarea>' +
+          '<div style="font-size:11.5px;color:#6f6a6a;margin-top:3px">Entra na mensagem que a secretaria manda pelo WhatsApp, como recado seu.</div></div>' : '') +
+        '<div class="fimp-campo fimp-largo"><label for="fimpObs">Observação para a secretária (opcional)</label><textarea id="fimpObs" rows="2" maxlength="500" placeholder="' + (envio ? 'Ex.: mandar também para a mãe' : 'Ex.: frente e verso') + '"></textarea></div>' +
       '</div>') +
       '<p class="fimp-msg" id="fimpMsg" role="status"></p>' +
       '<div class="fimp-acoes"><button type="button" class="fimp-ghost" id="fimpFechar">Fechar</button>' +
@@ -117,7 +120,8 @@
         acao: envio ? 'enviar' : 'imprimir', professor: vinc.professor || '', linha: vinc.linha || '',
         dados: b64(bytes), paginas: paginas(bytes), aluno: aluno, raf: window.RAF_DO_CARD || vinc.raf || '', turma: vinc.turma || '',
         copias: (fundo.querySelector('#fimpCop') || {}).value || 1, precisaAte: fundo.querySelector('#fimpAte').value,
-        escola: (fundo.querySelector('#fimpEsc') || {}).value || escola, obs: fundo.querySelector('#fimpObs').value.trim() };
+        escola: (fundo.querySelector('#fimpEsc') || {}).value || escola, obs: fundo.querySelector('#fimpObs').value.trim(),
+        recado: envio ? (fundo.querySelector('#fimpRec') || {}).value.trim() : '' };
       fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(corpo) })
         .then(function (r) { return r.json(); })
         .then(function (j) {
