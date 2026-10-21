@@ -43,11 +43,11 @@
   .ped:first-child{border-top:0}
   .tp{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;
       font-family:var(--font-heading);font-weight:700;font-size:.68rem}
-  .tp.boletim{background:var(--red)} .tp.planner{background:var(--blue)} .tp.avulso{background:var(--gray)}
+  .tp.boletim{background:var(--red)} .tp.planner{background:var(--blue)} .tp.avulso{background:var(--gray)} .tp.termo{background:#0B5394} .tp[class~="2nd"]{background:#7C3AED}
   .ped b{font-size:.92rem} .ped .sub{font-size:.8rem;color:var(--gray);line-height:1.45}
   .ped .acoes{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;justify-content:flex-end}
   .selo{display:inline-block;border-radius:99px;font-size:.72rem;font-weight:800;padding:.15rem .6rem;white-space:nowrap}
-  .selo.pendente{background:#fdf1df;color:#a15c00} .selo.impresso{background:#e3f3ea;color:#1d7a46} .selo.cancelado{background:#eef1f5;color:#5a6474}
+  .selo.pendente{background:#fdf1df;color:#a15c00} .selo.impresso,.selo.enviado{background:#e3f3ea;color:#1d7a46} .selo.cancelado{background:#eef1f5;color:#5a6474}
   body.theme-dark .selo.pendente{background:#382a14;color:#f2b45c} body.theme-dark .selo.impresso{background:#173225;color:#6fd39a} body.theme-dark .selo.cancelado{background:#222a35;color:#9aa5b5}
   .vazio{color:var(--gray);font-size:.88rem;padding:.4rem 0}
   @media (max-width:560px){ .ped{grid-template-columns:auto minmax(0,1fr)} .ped .acoes{grid-column:1 / -1;justify-content:flex-start} }
@@ -112,7 +112,8 @@
 <script>
 var EP = FISK_HUB_EP, MAX = 15 * 1024 * 1024;
 var TIPOS = { 'application/pdf': 1, 'image/jpeg': 1, 'image/png': 1 };
-var ROT = { boletim: 'BOL', planner: 'PLA', avulso: 'ARQ' }, NOME = { boletim: 'Boletim', planner: 'Planner físico', avulso: '' };
+var ROT = { boletim: 'BOL', planner: 'PLA', avulso: 'ARQ', termo: 'TER', '2nd': '2ND' },
+    NOME = { boletim: 'Boletim', planner: 'Planner físico', avulso: '', termo: 'Termo de atraso', '2nd': '2nd Chance' };
 var arquivo = null;
 function $(id) { return document.getElementById(id); }
 function esc(s) { return fiskEsc(String(s == null ? '' : s)); }
@@ -187,9 +188,11 @@ function carregar() {
     if (!L.length) { $('lista').innerHTML = '<p class="vazio">Nenhum pedido ainda.</p>'; return; }
     $('lista').innerHTML = L.map(function (it) {
       var sub = it.copias + (it.copias > 1 ? ' cópias' : ' cópia') + ' · ' + esc(it.escola) + ' · pedido em ' + quando(it.quando);
+      if (it.acao === 'enviar') sub = '💬 Para enviar à família · ' + sub.replace(/^\d+ cópias? · /, '');
       if (it.status === 'impresso') sub = 'Impresso por ' + esc(String(it.feitoPor).split(' ')[0]) + ' em ' + quando(it.feitoEm) + ' · ' + sub;
+      if (it.status === 'enviado') sub = 'Enviado à família por ' + esc(String(it.feitoPor).split(' ')[0]) + ' em ' + quando(it.feitoEm) + ' · ' + sub;
       if (it.status === 'cancelado' && it.motivo) sub = 'Motivo: ' + esc(it.motivo) + ' · ' + sub;
-      var rot = { pendente: 'Aguardando', impresso: 'Impresso', cancelado: 'Cancelado' }[it.status] || it.status;
+      var rot = { pendente: 'Aguardando', impresso: 'Impresso', enviado: 'Enviado', cancelado: 'Cancelado' }[it.status] || it.status;
       return '<div class="ped"><div class="tp ' + esc(it.origem) + '">' + (ROT[it.origem] || 'ARQ') + '</div>' +
         '<div style="min-width:0"><b>' + esc((NOME[it.origem] ? NOME[it.origem] + ' · ' : '') + it.titulo) + '</b><div class="sub">' + sub + '</div></div>' +
         '<div class="acoes"><span class="selo ' + esc(it.status) + '">' + rot + '</span>' +

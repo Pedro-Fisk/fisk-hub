@@ -878,6 +878,15 @@ async function gerarPDF() {
     a.href = url; a.download = feito.filename; a.click();
     // guarda o PDF gerado para poder enviá-lo à pasta do aluno no Drive
     ultimoPDF = { bytes: bytes, filename: a.download, aluno: (nome || '').trim() };
+    /* para o botão "Enviar à família pela secretaria" (assets/fisk-imprimir.js): é com escola, professor e linha do card
+       que a secretaria acha o responsável e o WhatsApp. Termo livre (sem card) vai sem: ela procura o contato à mão. */
+    try {
+      var _sT = document.getElementById('selTurma');
+      window.FISK_VINCULO = (!modoLivre && alunoSel && alunoSel.linhaCard != null)
+        ? { escola: document.getElementById('selEscola').value, professor: document.getElementById('selProf').value,
+            turma: _sT && _sT.selectedOptions && _sT.selectedOptions[0] ? _sT.selectedOptions[0].text : '',
+            linha: alunoSel.linhaCard, nome: alunoSel.nome } : null;
+    } catch (e) { window.FISK_VINCULO = null; }
     esconderVerPasta();          // a pasta ainda não recebeu ESTE arquivo
     mostrarPreview(url);
     syncAcoes();
@@ -935,5 +944,8 @@ fiskRegistrarUso("2nd Chance");
 if (typeof fiskLigarAcompanhamento === 'function') fiskLigarAcompanhamento(document, 'a.dossie-link');
 })();
 </script>
+<!-- Central de Pedidos (21/10/2026): o botão "Enviar à família pela secretaria" aparece quando o PDF é gerado -->
+<script src="assets/fisk-imprimir.js?v=2026-10-21b"></script>
+<script>if (window.fiskImpressao) fiskImpressao.ligar({ depoisDe: 'btnPDF', origem: '2nd', rotulo: '2nd Chance', acao: 'enviar', margem: '0 0 0 8px' });</script>
 </body>
 </html>

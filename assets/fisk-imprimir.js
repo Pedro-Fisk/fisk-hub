@@ -8,6 +8,8 @@
    Uso, depois de carregar este arquivo:
      fiskImpressao.ligar({ depoisDe: 'pdfBtn', origem: 'boletim', rotulo: 'Boletim', classe: 'btn btn-generate btn-sm' });
    `classe` (opcional) veste o botão com as classes da própria página, para ele ficar igual ao vizinho.
+   `acao: 'enviar'` (21/10/2026, Central de Pedidos) faz o botão "Enviar à família pela secretaria":
+   a secretária manda o PDF ao responsável pelo WhatsApp (sem cópias; com prazo e observação).
 
    O botão (verde) aparece sozinho quando a página guarda um PDF novo em
    window.ultimoPDF ({ bytes, filename, aluno }) e some quando ele é limpo.
@@ -55,8 +57,10 @@
       var st = document.createElement('style'); st.id = 'fimp-css'; st.textContent = CSS; document.head.appendChild(st);
     }
     var btn = document.createElement('button');
-    btn.type = 'button'; btn.className = opts.classe || 'fimp-btn'; btn.hidden = true; btn.textContent = '🖨️ Solicitar impressão';
-    btn.title = 'Mandar este PDF para a secretaria imprimir';
+    var envio = opts.acao === 'enviar';
+    var rotulo = envio ? '💬 Enviar à família pela secretaria' : '🖨️ Solicitar impressão';
+    btn.type = 'button'; btn.className = opts.classe || 'fimp-btn'; btn.hidden = true; btn.textContent = rotulo;
+    btn.title = envio ? 'A secretaria manda este PDF ao responsável pelo WhatsApp' : 'Mandar este PDF para a secretaria imprimir';
     if (opts.margem) btn.style.margin = opts.margem;
     if (opts.classe) btn.style.background = '#32a889';   /* verde de ação, mesmo que a classe da página seja de outra cor */
     ancora.parentNode.insertBefore(btn, ancora.nextSibling);
@@ -65,7 +69,7 @@
     setInterval(function () {
       var pdf = window.ultimoPDF;
       if (!pdf || !pdf.bytes) { btn.hidden = true; visto = null; return; }
-      if (pdf !== visto) { visto = pdf; btn.hidden = false; btn.disabled = false; btn.textContent = '🖨️ Solicitar impressão'; }
+      if (pdf !== visto) { visto = pdf; btn.hidden = false; btn.disabled = false; btn.textContent = rotulo; }
     }, 700);
     btn.addEventListener('click', function () { abrir(opts, btn); });
   }
@@ -79,14 +83,16 @@
     var escolas = String(s.escolas || s.escola || '').split(',').map(function (x) { return x.trim(); }).filter(String);
     var escola = vinc.escola && (!escolas.length || escolas.indexOf(vinc.escola) >= 0) ? vinc.escola : (escolas[0] || '');
     var bytes = pdf.bytes instanceof Uint8Array ? pdf.bytes : new Uint8Array(pdf.bytes);
+    var envio = opts.acao === 'enviar';
     var fundo = document.createElement('div');
     fundo.className = 'fimp-fundo';
     fundo.innerHTML = '<div class="fimp-caixa" role="dialog" aria-modal="true" aria-labelledby="fimpTit">' +
-      '<h3 id="fimpTit">Solicitar impressão à secretaria</h3>' +
+      '<h3 id="fimpTit">' + (envio ? 'Enviar à família pela secretaria' : 'Solicitar impressão à secretaria') + '</h3>' +
+      (envio ? '<p class="fimp-sub">A secretaria manda este PDF ao responsável pelo WhatsApp e você recebe o aviso no Fisk Hub quando for enviado.</p>' : '') +
       '<p class="fimp-sub">' + esc(titulo) + (vinc.turma ? ' · ' + esc(vinc.turma) : '') + (paginas(bytes) ? ' · ' + paginas(bytes) + ' página(s)' : '') + '</p>' +
       (!s.token ? '<p class="fimp-msg erro">Entre no Fisk Hub primeiro (na página inicial do Hub) e gere o PDF de novo.</p>' :
       '<div class="fimp-grade">' +
-        '<div class="fimp-campo"><label for="fimpCop">Cópias</label><input id="fimpCop" type="number" min="1" max="200" value="1"></div>' +
+        (envio ? '' : '<div class="fimp-campo"><label for="fimpCop">Cópias</label><input id="fimpCop" type="number" min="1" max="200" value="1"></div>') +
         '<div class="fimp-campo"><label for="fimpAte">Preciso até (opcional)</label><input id="fimpAte" type="date"></div>' +
         (escolas.length > 1 ? '<div class="fimp-campo fimp-largo"><label for="fimpEsc">Escola</label><select id="fimpEsc">' +
           escolas.map(function (e) { return '<option' + (e === escola ? ' selected' : '') + '>' + esc(e) + '</option>'; }).join('') + '</select></div>' : '') +
@@ -108,17 +114,18 @@
     enviar.addEventListener('click', function () {
       enviar.disabled = true; msg.className = 'fimp-msg'; msg.textContent = 'Enviando…';
       var corpo = { action: 'impPedir', token: s.token, origem: opts.origem || 'avulso', titulo: titulo, mime: 'application/pdf',
-        dados: b64(bytes), paginas: paginas(bytes), aluno: aluno, raf: window.RAF_DO_CARD || '', turma: vinc.turma || '',
-        copias: fundo.querySelector('#fimpCop').value, precisaAte: fundo.querySelector('#fimpAte').value,
+        acao: envio ? 'enviar' : 'imprimir', professor: vinc.professor || '', linha: vinc.linha || '',
+        dados: b64(bytes), paginas: paginas(bytes), aluno: aluno, raf: window.RAF_DO_CARD || vinc.raf || '', turma: vinc.turma || '',
+        copias: (fundo.querySelector('#fimpCop') || {}).value || 1, precisaAte: fundo.querySelector('#fimpAte').value,
         escola: (fundo.querySelector('#fimpEsc') || {}).value || escola, obs: fundo.querySelector('#fimpObs').value.trim() };
       fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(corpo) })
         .then(function (r) { return r.json(); })
         .then(function (j) {
           if (!j || !j.ok) { enviar.disabled = false; msg.className = 'fimp-msg erro'; msg.textContent = (j && j.error) || 'Não consegui enviar.'; return; }
           msg.className = 'fimp-msg ok';
-          msg.textContent = 'Pedido enviado à secretaria de ' + j.escola + '. Você recebe o aviso no Fisk Hub quando for impresso.';
+          msg.textContent = 'Pedido enviado à secretaria de ' + j.escola + '. Você recebe o aviso no Fisk Hub quando for ' + (envio ? 'enviado à família.' : 'impresso.');
           enviar.remove();
-          btn.disabled = true; btn.textContent = '✅ Impressão solicitada';
+          btn.disabled = true; btn.textContent = envio ? '✅ Envio à família solicitado' : '✅ Impressão solicitada';
         })
         .catch(function () { enviar.disabled = false; msg.className = 'fimp-msg erro'; msg.textContent = 'Erro de conexão. O pedido não foi enviado; tente de novo.'; });
     });
