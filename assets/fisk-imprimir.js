@@ -6,7 +6,8 @@
    então a sessão do professor (localStorage fisk_prof) é a mesma.
 
    Uso, depois de carregar este arquivo:
-     fiskImpressao.ligar({ depoisDe: 'btnDrive', origem: 'boletim', rotulo: 'Boletim' });
+     fiskImpressao.ligar({ depoisDe: 'pdfBtn', origem: 'boletim', rotulo: 'Boletim', classe: 'btn btn-generate btn-sm' });
+   `classe` (opcional) veste o botão com as classes da própria página, para ele ficar igual ao vizinho.
 
    O botão (verde) aparece sozinho quando a página guarda um PDF novo em
    window.ultimoPDF ({ bytes, filename, aluno }) e some quando ele é limpo.
@@ -54,9 +55,10 @@
       var st = document.createElement('style'); st.id = 'fimp-css'; st.textContent = CSS; document.head.appendChild(st);
     }
     var btn = document.createElement('button');
-    btn.type = 'button'; btn.className = 'fimp-btn'; btn.hidden = true; btn.textContent = '🖨️ Solicitar impressão';
+    btn.type = 'button'; btn.className = opts.classe || 'fimp-btn'; btn.hidden = true; btn.textContent = '🖨️ Solicitar impressão';
     btn.title = 'Mandar este PDF para a secretaria imprimir';
     if (opts.margem) btn.style.margin = opts.margem;
+    if (opts.classe) btn.style.background = '#32a889';   /* verde de ação, mesmo que a classe da página seja de outra cor */
     ancora.parentNode.insertBefore(btn, ancora.nextSibling);
 
     var visto = null;
