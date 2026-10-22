@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Answer Keys dos Reviews, FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-10-09c">
+  <!-- a casa do professor veste a faixa do topo (campanha de 09/2026) -->
+  <link rel="stylesheet" href="assets/casa-tema.css?v=9">
+<link rel="stylesheet" href="style.css?v=2026-10-17a">
+<link rel="stylesheet" href="assets/fisk-ak.css?v=2026-08-04">
+<meta name="theme-color" content="#161414">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+<script>/* aplica o tema salvo antes da primeira pintura, para o modo escuro persistir entre as páginas sem piscar */try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
+
+  <header class="hero">
+    <a class="back-link" href="answer-keys.html" title="Voltar aos Answer Keys">&larr; Answer Keys</a>
+    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
+    <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+    <h1>Answer Keys dos Reviews</h1>
+    <p>Gabarito do Review 2026 de cada estágio</p>
+  </header>
+
+  <section class="ak-secao">
+    <h2>Inglês, Jovens e Adultos</h2>
+    <p class="ak-sub">Do Essentials ao Fluency</p>
+  </section>
+
+  <main class="grid boletins-grid ak-grid" id="gradeIngles"></main>
+
+  <section class="ak-secao">
+    <h2>Espanhol</h2>
+    <p class="ak-sub">Clave de respuestas, Repaso</p>
+  </section>
+
+  <main class="grid boletins-grid ak-grid" id="gradeEspanhol"></main>
+
+  <footer>
+    <p>Ferramenta desenvolvida exclusivamente para uso interno das escolas Fisk. A utilização deste sistema e de seu conteúdo por pessoas ou instituições não autorizadas, incluindo professores particulares, é proibida. Desenvolvido por @fiskcacapava e @taubatefisk</p>
+  </footer>
+
+  <script src="assets/fisk-shared.js?v=2026-10-09b"></script>
+  <script src="assets/fisk-ak.js?v=2026-08-04"></script>
+  <script>
+fiskInitThemeToggle('themeToggle');
+fiskInitUserMenu();
+fiskRegistrarUso("Answer Keys");
+
+/* Gabaritos dos REVIEWS 2026 (22/10/2026) — pasta "05 - Arquivos pedagógicos para impressão 2026 /
+   02 - Review PDFs 2026 / Answer Keys 2026" do drive pedagógico. Um PDF por estágio. O aluno vê estes
+   mesmos arquivos no Portal, mas só na hora da aula (Answer-keys-aluno.js no backend); aqui é livre. */
+var AK_LIVRO = [
+  {id:'ess1', grade:'gradeIngles',   nome:'Essentials 1',  arq:'01 - Answer Key Essentials 1 2026',  cor:'#15803D', drive:'1GbEwUnO3_D7Ius_qNWIt_x9AlcaL2yR5'},
+  {id:'ess2', grade:'gradeIngles',   nome:'Essentials 2',  arq:'02 - Answer Key Essentials 2 2026',  cor:'#15803D', drive:'184O1eDPB22ifC9JxPDyNs6abRSEdwmlQ'},
+  {id:'tra1', grade:'gradeIngles',   nome:'Transitions 1', arq:'03 - Answer Key Transitions 1 2026', cor:'#B45309', drive:'1to5BEJnHlDAxq05ldT0vJEhU8cGx3LB4'},
+  {id:'tra2', grade:'gradeIngles',   nome:'Transitions 2', arq:'04 - Answer Key Transitions 2 2026', cor:'#B45309', drive:'1iumNvKxOVB9a8IbpsciWEJGMYfbnYp-I'},
+  {id:'flu1', grade:'gradeIngles',   nome:'Fluency 1',     arq:'05 - Answer Key Fluency 1 2026',     cor:'#4338CA', drive:'1lusuPJLf_mf3XeXJ-1Igc-M7g5eroXbm'},
+  {id:'flu2', grade:'gradeIngles',   nome:'Fluency 2',     arq:'06 - Answer Key Fluency 2 2026',     cor:'#4338CA', drive:'1mFq2M9yiU4UlruCSLXP67qs5WcPz-q31'},
+  {id:'inm1', grade:'gradeEspanhol', nome:'Inmediato 1',   arq:'07 - Clave de Respuestas Repaso Inmediato 1 2026', cor:'#CC7C08', drive:'1vIozxO9XXMy0p9yhHW03PjcLF1V9COvv'}
+];
+
+(function () {
+  var html = {gradeIngles: '', gradeEspanhol: ''};
+  for (var i = 0; i < AK_LIVRO.length; i++) {
+    var e = AK_LIVRO[i];
+    html[e.grade] +=
+      '<a class="ak-card card" id="' + e.id + '" style="--accent:' + e.cor + '" ' +
+      'target="_blank" rel="noopener" data-ak="' + e.drive + '" ' +
+      'data-titulo="' + akEsc(e.nome + ', Answer Key do Review') + '" ' +
+      'href="https://drive.google.com/file/d/' + e.drive + '/view">' +
+      akIconeDoc() +
+      '<h2>' + akEsc(e.nome) + '</h2>' +
+      '<p class="ak-arquivo">' + akEsc(e.arq) + '</p>' +
+      '</a>';
+  }
+  document.getElementById('gradeIngles').innerHTML = html.gradeIngles;
+  document.getElementById('gradeEspanhol').innerHTML = html.gradeEspanhol;
+
+  /* Liga os cliques ANTES do akViewerInit para poder cuidar do hash da URL:
+     answer-keys-review.html#tra2 abre direto o gabarito do Review de Transitions 2, então o
+     professor consegue mandar o link de um estágio específico. */
+  var cards = document.querySelectorAll('.ak-card');
+  for (var j = 0; j < cards.length; j++) {
+    cards[j].setAttribute('data-ak-ligado', '1');
+    cards[j].addEventListener('click', function (ev) {
+      if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button !== 0) return;
+      ev.preventDefault();
+      abrirEstagio(this);
+    });
+  }
+
+  function abrirEstagio(card) {
+    if (location.hash !== '#' + card.id) history.replaceState(null, '', '#' + card.id);
+    akAbrir(card.getAttribute('data-ak'), card.getAttribute('data-titulo'), function () {
+      history.replaceState(null, '', location.pathname + location.search);
+      card.focus();
+    });
+  }
+
+  akViewerInit();
+
+  if (location.hash.length > 1) {
+    var alvo = document.getElementById(location.hash.slice(1));
+    if (alvo && alvo.classList.contains('ak-card')) abrirEstagio(alvo);
+  }
+})();
+  </script>
+</body>
+</html>
