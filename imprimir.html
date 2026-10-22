@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Solicitar impressão, FISK</title>
+<title>Central de Pedidos, FISK</title>
 <link rel="stylesheet" href="assets/fisk-shared.css?v=2026-10-09c">
 <link rel="stylesheet" href="assets/casa-tema.css?v=9">
 <meta name="theme-color" content="#161414">
@@ -51,6 +51,23 @@
   body.theme-dark .selo.pendente{background:#382a14;color:#f2b45c} body.theme-dark .selo.impresso{background:#173225;color:#6fd39a} body.theme-dark .selo.cancelado{background:#222a35;color:#9aa5b5}
   .vazio{color:var(--gray);font-size:.88rem;padding:.4rem 0}
   @media (max-width:560px){ .ped{grid-template-columns:auto minmax(0,1fr)} .ped .acoes{grid-column:1 / -1;justify-content:flex-start} }
+  /* Meus documentos (22/10/2026, Documentos.js) */
+  .abas{display:flex;gap:.45rem;flex-wrap:wrap;margin:0 0 1rem}
+  .abas button{border:2px solid var(--surface-border-color);background:var(--white);color:inherit;border-radius:12px;font-family:var(--font-heading);
+               font-weight:700;font-size:.9rem;padding:.55rem 1rem;cursor:pointer}
+  .abas button.on{border-color:var(--green,#32a889);background:rgba(50,168,137,.1)}
+  .busca{width:100%;box-sizing:border-box;border:1.5px solid var(--blue-bd);border-radius:10px;padding:.55rem .7rem;font-family:var(--font-body);font-size:.9rem;
+         background:var(--white);color:inherit;margin:.2rem 0 .6rem}
+  .doc .chips{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.35rem}
+  .chip{display:inline-block;border-radius:99px;font-size:.7rem;font-weight:800;padding:.12rem .55rem;background:#eef1f5;color:#4b5563}
+  .chip.ok{background:#e3f3ea;color:#1d7a46} .chip.fam{background:#e9f0ff;color:#1d4ed8} .chip.esp{background:#fdf1df;color:#a15c00} .chip.nao{background:#fde8e8;color:#9b1218}
+  body.theme-dark .chip{background:#222a35;color:#c5ccd6} body.theme-dark .chip.ok{background:#173225;color:#6fd39a} body.theme-dark .chip.fam{background:#1b2a4a;color:#8fb2ff}
+  body.theme-dark .chip.esp{background:#382a14;color:#f2b45c} body.theme-dark .chip.nao{background:#3a1717;color:#ff9a9a}
+  .btn-cor{background:var(--green,#32a889);color:#fff;border:0;border-radius:99px;font-weight:700;font-size:.78rem;padding:.36rem .8rem;cursor:pointer;font-family:var(--font-body)}
+  .btn-zap{background:#25D366}
+  .form-ped{grid-column:1 / -1;background:var(--blue-soft);border-radius:12px;padding:.7rem .8rem;margin-top:.3rem}
+  .form-ped .campos{margin-top:0}
+  .form-ped .linha{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-top:.6rem}
 </style>
 </head>
 <body>
@@ -60,8 +77,8 @@
   <a class="back-link" href="index.html" title="Voltar ao Fisk Hub">&larr; Hub</a>
   <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
   <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
-  <h1>Solicitar impressão</h1>
-  <p>Mande o arquivo para a secretaria imprimir. Você recebe o aviso aqui no Hub quando estiver no seu armário.</p>
+  <h1>Central de Pedidos</h1>
+  <p>Os documentos que você gerou, os pedidos à secretaria e a resposta dela, num lugar só.</p>
 </header>
 
 <main>
@@ -70,7 +87,26 @@
     <p class="aviso">Volte à página inicial do Hub, entre com seu usuário e abra esta ferramenta de novo.</p>
   </section>
 
-  <section class="painel" id="painelPedido">
+  <div class="abas" id="abas" hidden>
+    <button type="button" class="on" data-aba="docs">📄 Meus documentos</button>
+    <button type="button" data-aba="meus">📋 Meus pedidos</button>
+    <button type="button" data-aba="avulso">🖨️ Pedido avulso</button>
+  </div>
+
+  <section class="painel" id="painelDocs" hidden>
+    <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap">
+      <h2 style="margin:0">📄 Meus documentos</h2>
+      <button type="button" class="btn-leve" id="docsAtualizar" style="margin-left:auto">Atualizar</button>
+    </div>
+    <p class="aviso" style="margin-top:.4rem">Boletins, termos de atraso e comunicados de 2nd Chance salvos na pasta do aluno, e os planners físicos que você gerou
+      (a cópia do planner fica guardada por 30 dias). Daqui você abre o PDF de novo e pede impressão ou envio à família sem gerar outra vez.
+      O histórico começa em 22/10/2026.</p>
+    <input class="busca" id="docsBusca" type="search" placeholder="🔎 Buscar por aluno ou documento">
+    <div id="docsLista"><p class="vazio">Carregando…</p></div>
+    <p class="status" id="docsStatus" role="status"></p>
+  </section>
+
+  <section class="painel" id="painelPedido" hidden>
     <h2>🖨️ Novo pedido</h2>
     <p class="aviso">Desenho para colorir, atividade extra, prova avulsa: qualquer material que precise sair no papel.
       Boletim e planner físico têm o botão verde <b>Solicitar impressão</b> dentro da própria ferramenta, logo depois de gerar o PDF.</p>
@@ -95,7 +131,7 @@
     <p class="status" id="status" role="status"></p>
   </section>
 
-  <section class="painel" id="painelMeus">
+  <section class="painel" id="painelMeus" hidden>
     <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap">
       <h2 style="margin:0">📋 Meus pedidos</h2>
       <button type="button" class="btn-leve" id="atualizar" style="margin-left:auto">Atualizar</button>
@@ -211,13 +247,109 @@ $('lista').addEventListener('click', function (e) {
 });
 $('atualizar').addEventListener('click', carregar);
 
+/* ── abas ── */
+var ABA = 'docs';
+function mostraAba(a) {
+  ABA = a;
+  [].forEach.call(document.querySelectorAll('#abas button'), function (b) { b.classList.toggle('on', b.getAttribute('data-aba') === a); });
+  $('painelDocs').hidden = a !== 'docs'; $('painelMeus').hidden = a !== 'meus'; $('painelPedido').hidden = a !== 'avulso';
+  try { history.replaceState(null, '', '#' + a); } catch (e) {}
+}
+$('abas').addEventListener('click', function (e) { var b = e.target.closest('[data-aba]'); if (b) mostraAba(b.getAttribute('data-aba')); });
+
+/* ── MEUS DOCUMENTOS (22/10/2026, backend Documentos.js) ── */
+var DOCS = [];
+var ROTP = { pendente: 'aguardando', impresso: 'impresso', enviado: 'enviado', cancelado: 'cancelado' };
+function dia(ms) { return new Date(ms).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }); }
+function norm(s) { return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
+function docsCarregar() {
+  $('docsLista').innerHTML = '<p class="vazio">Carregando…</p>';
+  post({ action: 'docsMeus' }).then(function (j) {
+    if (!j || !j.ok) { $('docsLista').innerHTML = '<p class="vazio">' + esc((j && j.error) || 'Não consegui ler seus documentos.') + '</p>'; return; }
+    DOCS = j.docs || []; docsDesenhar();
+  }).catch(function () { $('docsLista').innerHTML = '<p class="vazio">Erro de conexão. Tente Atualizar.</p>'; });
+}
+function docsDesenhar() {
+  var q = norm($('docsBusca').value), L = DOCS.filter(function (d) { return !q || norm(d.aluno + ' ' + d.rotulo + ' ' + d.turma).indexOf(q) > -1; });
+  if (!DOCS.length) { $('docsLista').innerHTML = '<p class="vazio">Nenhum documento ainda. Os boletins, termos e comunicados que você salvar na pasta do aluno a partir de hoje aparecem aqui.</p>'; return; }
+  if (!L.length) { $('docsLista').innerHTML = '<p class="vazio">Nada com essa busca.</p>'; return; }
+  $('docsLista').innerHTML = L.map(function (d) {
+    var chips = '';
+    if (d.apagado) chips += '<span class="chip nao">cópia apagada (passou dos 30 dias)</span>';
+    else if (d.naPasta) chips += '<span class="chip ok">📁 na pasta do aluno</span>';
+    else if (d.tipo === 'planner') chips += '<span class="chip">guardado até ' + dia(d.guardarAte) + '</span>';
+    if (d.familia) chips += '<span class="chip fam">👨‍👩‍👧 ' + (d.tipo === 'boletim' ? 'no Canto da Família (o mais recente)' : 'no Canto da Família') + '</span>';
+    (d.pedidos || []).slice().reverse().forEach(function (p) {
+      var env = p.acao === 'enviar', cls = p.status === 'pendente' ? 'esp' : p.status === 'cancelado' ? '' : 'ok';
+      var txt = (env ? '💬 envio: ' : '🖨️ impressão: ') + (ROTP[p.status] || p.status) + (p.feitoEm && p.status !== 'pendente' ? ' em ' + dia(p.feitoEm) : '');
+      chips += '<span class="chip ' + cls + '" title="' + esc(p.motivo || ('pedido em ' + quando(p.quando))) + '">' + txt + '</span>';
+    });
+    var vivo = !d.apagado, id = esc(d.id);
+    return '<div class="ped doc" data-doc="' + id + '"><div class="tp ' + esc(d.tipo) + '">' + (ROT[d.tipo] || 'DOC') + '</div>' +
+      '<div style="min-width:0"><b>' + esc(d.rotulo + ' · ' + d.aluno) + '</b><div class="sub">' + (d.turma ? esc(d.turma) + ' · ' : '') + 'gerado em ' + quando(d.quando) + '</div>' +
+      '<div class="chips">' + chips + '</div></div>' +
+      '<div class="acoes">' + (vivo ? '<button type="button" class="btn-leve" data-d="abrir" data-id="' + id + '">Abrir PDF</button>' +
+        '<button type="button" class="btn-cor" data-d="imprimir" data-id="' + id + '">🖨️ Imprimir</button>' +
+        (d.tipo !== 'planner' ? '<button type="button" class="btn-cor btn-zap" data-d="enviar" data-id="' + id + '">💬 Enviar à família</button>' : '') : '') + '</div></div>';
+  }).join('');
+}
+function docAcha(id) { return DOCS.filter(function (d) { return d.id === id; })[0]; }
+function docsStatus(t, tipo) { $('docsStatus').textContent = t || ''; $('docsStatus').className = 'status' + (tipo ? ' ' + tipo : ''); }
+$('docsBusca').addEventListener('input', docsDesenhar);
+$('docsAtualizar').addEventListener('click', docsCarregar);
+$('docsLista').addEventListener('click', function (e) {
+  var b = e.target.closest('[data-d]'); if (!b) return;
+  var id = b.getAttribute('data-id'), d = docAcha(id), k = b.getAttribute('data-d'), linha = b.closest('.doc');
+  if (k === 'abrir') {
+    /* abre a janela JÁ no clique (o navegador bloqueia janela aberta depois de esperar o servidor) */
+    var jan = window.open('', '_blank'); if (jan) jan.document.write('<p style="font-family:sans-serif">Abrindo o PDF…</p>');
+    b.disabled = true;
+    post({ action: 'docArquivo', id: id }).then(function (j) {
+      b.disabled = false;
+      if (!j || !j.ok) { if (jan) jan.close(); docsStatus((j && j.error) || 'Não consegui abrir.', 'erro'); return; }
+      var bytes = Uint8Array.from(atob(j.dados), function (c) { return c.charCodeAt(0); });
+      var url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
+      if (jan) jan.location.href = url; else window.open(url, '_blank');
+    }).catch(function () { b.disabled = false; if (jan) jan.close(); docsStatus('Erro de conexão.', 'erro'); });
+    return;
+  }
+  if (k === 'imprimir' || k === 'enviar') {
+    var velho = linha.querySelector('.form-ped'); if (velho) { velho.remove(); if (velho.getAttribute('data-k') === k) return; }
+    var f = document.createElement('div'); f.className = 'form-ped'; f.setAttribute('data-k', k);
+    f.innerHTML = (k === 'imprimir'
+      ? '<div class="campos"><div class="campo"><label>Cópias</label><input type="number" min="1" max="200" value="1" data-f="copias"></div>' +
+        '<div class="campo"><label>Preciso até (opcional)</label><input type="date" data-f="precisaAte"></div>' +
+        '<div class="campo largo"><label>Observação para a secretária (opcional)</label><input maxlength="500" data-f="obs" placeholder="Ex.: frente e verso"></div></div>'
+      : '<div class="campos"><div class="campo largo"><label>Recado para a família (opcional, entra na mensagem do WhatsApp)</label>' +
+        '<textarea rows="2" maxlength="500" data-f="recado" placeholder="Ex.: Qualquer dúvida, estou à disposição."></textarea></div>' +
+        '<div class="campo largo"><label>Observação para a secretária (opcional)</label><input maxlength="500" data-f="obs"></div></div>') +
+      '<div class="linha"><button type="button" class="btn-cor' + (k === 'enviar' ? ' btn-zap' : '') + '" data-d="pedir" data-k="' + k + '" data-id="' + esc(id) + '">' +
+      (k === 'imprimir' ? 'Mandar para a secretaria imprimir' : 'Pedir à secretaria para enviar') + '</button></div>';
+    linha.appendChild(f);
+    return;
+  }
+  if (k === 'pedir') {
+    var fp = b.closest('.form-ped'), val = function (n) { var x = fp.querySelector('[data-f="' + n + '"]'); return x ? x.value : ''; };
+    b.disabled = true; b.textContent = 'Enviando…';
+    post({ action: 'docPedir', id: id, acao: b.getAttribute('data-k') === 'enviar' ? 'enviar' : 'imprimir',
+           copias: val('copias'), precisaAte: val('precisaAte'), obs: val('obs').trim(), recado: val('recado').trim() }).then(function (j) {
+      if (!j || !j.ok) { b.disabled = false; b.textContent = 'Tentar de novo'; docsStatus((j && j.error) || 'Não consegui pedir.', 'erro'); return; }
+      docsStatus('Pedido enviado para a secretaria de ' + j.escola + '. A resposta dela aparece aqui e no mural do Hub.', 'ok');
+      docsCarregar(); carregar();
+    }).catch(function () { b.disabled = false; b.textContent = 'Tentar de novo'; docsStatus('Erro de conexão. O pedido não foi enviado.', 'erro'); });
+  }
+});
+
 fiskInitThemeToggle('themeToggle');
 fiskInitUserMenu();
 if (!sessao().token) {
-  $('semSessao').hidden = false; $('painelPedido').hidden = true; $('painelMeus').hidden = true;
+  $('semSessao').hidden = false;
 } else {
-  carregar();
-  fiskRegistrarUso('Solicitar impressão');
+  $('abas').hidden = false;
+  var h = String(location.hash || '').replace('#', '');
+  mostraAba({ docs: 1, meus: 1, avulso: 1 }[h] ? h : 'docs');
+  docsCarregar(); carregar();
+  fiskRegistrarUso('Central de Pedidos');
 }
 </script>
 </body>

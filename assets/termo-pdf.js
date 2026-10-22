@@ -213,5 +213,10 @@ async function fiskTermoPDF(d) {
   });
 
   var bytes = await doc.save();
-  return { bytes: bytes, filename: 'Termo de Atraso - ' + d.nome + '.pdf' };
+  /* COM A DATA NO NOME (Pedro, 22/10/2026): o aluno pode atrasar mais de uma vez no curso, e cada termo tem de ficar
+     guardado (a família vê todos no Canto da Família). Sem a data, o termo novo mandava o anterior para a lixeira.
+     Dois termos no MESMO dia continuam se substituindo: é a correção de um termo, não um atraso novo. */
+  var hj = new Date(), dataFile = ('0' + hj.getDate()).slice(-2) + '-' + ('0' + (hj.getMonth() + 1)).slice(-2) + '-' + hj.getFullYear();
+  var nomeArq = String(d.nome || 'aluno').replace(/[\\/:*?"<>|]+/g, '').trim();
+  return { bytes: bytes, filename: 'Termo de Atraso - ' + nomeArq + ' - ' + dataFile + '.pdf' };
 }

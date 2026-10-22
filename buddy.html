@@ -492,7 +492,7 @@ function nomeProprio(s) { return String(s || '').toLowerCase().replace(/(^|\s)(\
    e segue pelas mesmas três rotas: pasta do aluno no Drive, marca no card, linha no counseling. Sem o Drive, para:
    termo que não foi salvo não pode aparecer como gerado. Card e counseling são registro, e a falha deles é aviso. */
 var DOCS = {
-  termo: { ic: '📄', nome: 'Termo de atraso', curto: 'Termo', motor: 'assets/termo-pdf.js?v=2026-10-06b',
+  termo: { ic: '📄', nome: 'Termo de atraso', curto: 'Termo', motor: 'assets/termo-pdf.js?v=2026-10-22a',
     pdf: function (x) { return fiskTermoPDF({ nome: x.nome, book: x.book, prof: nomeProprio(x.professor), horario: fiskTermoHorario(x.turmaCheia), atraso: x.atraso, faltas: x.faltas,
                                              ultima: x.ultima, prevista: x.prevista, motivos: x.motivos, outros: x.outros, sugestoes: x.sugestoes, livres: x.livres }); },
     mensagem: function (x) { return fiskTermoMensagem(x.nome, nomeProprio(x.professor).split(' ')[0]); },

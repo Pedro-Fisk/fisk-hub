@@ -383,8 +383,8 @@
           <circle cx="17" cy="11" r=".9" fill="currentColor"/>
         </svg>
       </div>
-      <h2 data-i18n="card-imprimir-h2">Solicitar impressão</h2>
-      <p data-i18n="card-imprimir-p">Mande um arquivo para a secretaria imprimir</p>
+      <h2 data-i18n="card-imprimir-h2">Central de Pedidos</h2>
+      <p data-i18n="card-imprimir-p">Seus documentos gerados, os pedidos à secretaria e a resposta dela</p>
     </a>
 
     <!-- RAF temporário: saiu do Hub em 13/10/2026 (só a secretaria gerava) e VOLTOU em 21/10/2026, a pedido do Pedro,
@@ -666,8 +666,8 @@
         'card-2ndchance-p':  'Envie quando o aluno precisa refazer a prova',
         'card-boletim-h2': 'Gerador de Boletins',
         'card-boletim-p':  'Monte boletins dos alunos rapidamente',
-        'card-imprimir-h2': 'Solicitar impressão',
-        'card-imprimir-p':  'Mande um arquivo para a secretaria imprimir',
+        'card-imprimir-h2': 'Central de Pedidos',
+        'card-imprimir-p':  'Seus documentos gerados, os pedidos à secretaria e a resposta dela',
         'card-met-h2':     'Treino MET',
         'card-met-p':      'Pratique para o exame MET com simulados interativos',
         'card-siele-h2':   'Treino SIELE',
@@ -761,8 +761,8 @@
         'card-2ndchance-p':  'Send it when the student needs to take the test again',
         'card-boletim-h2': 'Report Card Generator',
         'card-boletim-p':  'Build student report cards quickly',
-        'card-imprimir-h2': 'Print request',
-        'card-imprimir-p':  'Send a file for the front desk to print',
+        'card-imprimir-h2': 'Requests center',
+        'card-imprimir-p':  'Your generated documents, front desk requests and their replies',
         'card-met-h2':     'MET Drills',
         'card-met-p':      'Practice for the MET exam with interactive simulations',
         'card-siele-h2':   'SIELE Drills',
@@ -856,8 +856,8 @@
         'card-2ndchance-p':  'Envíalo cuando el alumno necesita repetir el examen',
         'card-boletim-h2': 'Generador de Boletines',
         'card-boletim-p':  'Genera boletines de alumnos rápidamente',
-        'card-imprimir-h2': 'Solicitar impresión',
-        'card-imprimir-p':  'Envía un archivo para que la secretaría lo imprima',
+        'card-imprimir-h2': 'Central de Pedidos',
+        'card-imprimir-p':  'Tus documentos generados, los pedidos a la secretaría y su respuesta',
         'card-met-h2':     'Entrenamiento MET',
         'card-met-p':      'Practica para el examen MET con simulacros interactivos',
         'card-siele-h2':   'Entrenamiento SIELE',
@@ -2491,7 +2491,7 @@
            marcando o aviso como lido e o link para os pedidos. */
         var pedidos = (ja && ja.ok ? ja.avisos || [] : []).filter(function(a){ return a.tipo === 'impressao' && a.quando >= corte; }).map(function(a){
           return { id: 'av|' + a.id, avId: a.id, aviso: true, quando: a.quando, tag: 'sec', titulo: esc(a.titulo),
-                   html: a.texto ? '<p>' + texto(a.texto) + '</p>' : '', anexos: [], link: { href: 'imprimir.html', rot: '📬 Ver meus pedidos' }, ciente: !!a.lido };
+                   html: a.texto ? '<p>' + texto(a.texto) + '</p>' : '', anexos: [], link: { href: 'imprimir.html#meus', rot: '📬 Ver meus pedidos' }, ciente: !!a.lido };
         });
         tutoria();
         /* os informes não vieram (rede, sessão) e a conversa já está na tela: fica como estava */
