@@ -2405,7 +2405,8 @@
       d.querySelector('input').addEventListener('change', function(ev){
         var marcou = ev.target.checked;
         m.ciente = marcou; d.classList.toggle('lido', marcou); conta();
-        post({ action: 'informeCiente', id: m.id, desfaz: marcou ? 0 : 1 }).catch(function(){});
+        if (m.aviso) post({ action: 'avisosLido', ids: [m.avId], desfaz: marcou ? 0 : 1 }).catch(function(){});
+        else post({ action: 'informeCiente', id: m.id, desfaz: marcou ? 0 : 1 }).catch(function(){});
       });
       return d;
     }
@@ -2485,12 +2486,19 @@
         ((ji && ji.cientes) || []).forEach(function(id){ cientes[id] = true; });
         var corte = Date.now() - 14 * 86400000;
         if (ja && ja.ok) tut = (ja.avisos || []).filter(function(a){ return a.tipo === 'tutoria' && a.quando >= corte; });
+        /* O RETORNO DA SECRETARIA (22/10/2026): "foi impresso", "foi enviado à família", "não será impresso". O servidor
+           gravava esses avisos desde 20/10 e o mural não os mostrava (só a tutoria). Entram como recado, com o "Ciente"
+           marcando o aviso como lido e o link para os pedidos. */
+        var pedidos = (ja && ja.ok ? ja.avisos || [] : []).filter(function(a){ return a.tipo === 'impressao' && a.quando >= corte; }).map(function(a){
+          return { id: 'av|' + a.id, avId: a.id, aviso: true, quando: a.quando, tag: 'sec', titulo: esc(a.titulo),
+                   html: a.texto ? '<p>' + texto(a.texto) + '</p>' : '', anexos: [], link: { href: 'imprimir.html', rot: '📬 Ver meus pedidos' }, ciente: !!a.lido };
+        });
         tutoria();
         /* os informes não vieram (rede, sessão) e a conversa já está na tela: fica como estava */
         if ((!ji || ji.ok !== true) && assinatura) { conta(); return; }
         noticias(cientes, function(fixas){
           if (pedido !== leitura) return;
-          var todas = fixas.concat(((ji && ji.informes) || []).map(doInforme));
+          var todas = fixas.concat(((ji && ji.informes) || []).map(doInforme), pedidos);
           todas.sort(function(a, b){ return a.quando - b.quando; });
           /* só refaz a conversa quando chegou ou saiu recado: reler a cada 3 minutos não pode redigitar tudo */
           var ass = lang() + '|' + eu() + '|' + todas.map(function(m){ return m.id; }).join(',');
