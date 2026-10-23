@@ -169,6 +169,56 @@ var AK_PROVAS = [
         {tipo:'escrita', drive:'1hdQTuIwi_MsGxG_Pgs8N9VTL7gJ5ZUj-'},
         {tipo:'script',  drive:'1DF7bLn4F-G996vzcCn_TrxoHyXP8qMu7'}]}]}]},
 
+  /* Teens Connect: pasta " Teens Connect " dentro de "06 - Testes online e Keys"
+     (subida pela secretaria em 10/10/2026). São as Teacher's Copy: a prova de
+     escuta e a escrita já trazem as respostas, e não há transcrição à parte.
+     Falta no Drive: Teens Connect 3, Listening, Lições 6–10 (formas A e B). */
+  {id:'tc1', nome:'Teens Connect 1', sub:'Teens', cor:'#0F766E', idioma:'ing', testes:[
+    {id:'t1', nome:'Teste 1', licoes:'Lições 1–5', formas:[
+      {id:'a', nome:'Form A', docs:[
+        {tipo:'escuta',  drive:'1WuvcuOv6HQnaE2dyzL8okzxCd3TLxaMD'},
+        {tipo:'escrita', drive:'1oncm1r0uOg_lmt5aWOIoPZUCWX-6Ebli'}]},
+      {id:'b', nome:'Form B', docs:[
+        {tipo:'escuta',  drive:'1LpFvjSYvufdws9GxHJwNaZySJXvbOlZX'},
+        {tipo:'escrita', drive:'1tL8oRqH_Kgig9ylmYT7P2L9hmPUefOPs'}]}]},
+    {id:'t2', nome:'Teste 2', licoes:'Lições 6–10', formas:[
+      {id:'a', nome:'Form A', docs:[
+        {tipo:'escuta',  drive:'1A7fBGJrLddO-CFHHJACsZCUmbohtdqZ7'},
+        {tipo:'escrita', drive:'1eBTAXT_ScqRGxoM_aNMeGrw5XKPaO6zN'}]},
+      {id:'b', nome:'Form B', docs:[
+        {tipo:'escuta',  drive:'1i7BG27HkoGW1dzgp7ndce_k9z9pFufOH'},
+        {tipo:'escrita', drive:'11Gb9tBwf7uGIhb76-aTyRA-WtpInEsP_'}]}]}]},
+
+  {id:'tc2', nome:'Teens Connect 2', sub:'Teens', cor:'#0F766E', idioma:'ing', testes:[
+    {id:'t1', nome:'Teste 1', licoes:'Lições 1–5', formas:[
+      {id:'a', nome:'Form A', docs:[
+        {tipo:'escuta',  drive:'1vJOMOZyx44QPzAwzPnFb1JzNXtr06fZz'},
+        {tipo:'escrita', drive:'1WETIGqks5gwYTUKqsmMM7yizBKD_gNaR'}]},
+      {id:'b', nome:'Form B', docs:[
+        {tipo:'escuta',  drive:'1AUJ1J_bvLJb_jOEkZFcOECjtWvRyU-Gc'},
+        {tipo:'escrita', drive:'1OFXyrOBoeLrt6Z1Tasu4BqNLDOM4JIcn'}]}]},
+    {id:'t2', nome:'Teste 2', licoes:'Lições 6–10', formas:[
+      {id:'a', nome:'Form A', docs:[
+        {tipo:'escuta',  drive:'1w6KqiutX3I2INaI9EwfutxJSK4h8xEXG'},
+        {tipo:'escrita', drive:'1d66I8RIA0JHR7ooFh8qilpr9DAAbrsik'}]},
+      {id:'b', nome:'Form B', docs:[
+        {tipo:'escuta',  drive:'1P4CB3g-clNE_YyT4Rr2-5aV8Uqim4hZe'},
+        {tipo:'escrita', drive:'1gelynhwfVE0KTyfL0A0AZV-whfTYA_lW'}]}]}]},
+
+  {id:'tc3', nome:'Teens Connect 3', sub:'Teens', cor:'#0F766E', idioma:'ing', testes:[
+    {id:'t1', nome:'Teste 1', licoes:'Lições 1–5', formas:[
+      {id:'a', nome:'Form A', docs:[
+        {tipo:'escuta',  drive:'1wL2Ef3cUqk_VkPlNAt-kWOjyWAolZQRa'},
+        {tipo:'escrita', drive:'1CtWiJKd4o_55QAl0ttZGyf0iE80RK_jM'}]},
+      {id:'b', nome:'Form B', docs:[
+        {tipo:'escuta',  drive:'1gBYHCzprhsL-CBSnS40RtHQQ_lDwqIzz'},
+        {tipo:'escrita', drive:'1_8z3FSBjZFVS_Wy0LWFCswZict0QLiPP'}]}]},
+    {id:'t2', nome:'Teste 2', licoes:'Lições 6–10', formas:[
+      {id:'a', nome:'Form A', docs:[
+        {tipo:'escrita', drive:'1jD4cGo-51EnduJIbBeiqRA5fP3boVtus'}]},
+      {id:'b', nome:'Form B', docs:[
+        {tipo:'escrita', drive:'17w41mfm4hCmJzKATUf1UmaoL_Xb4Xabg'}]}]}]},
+
   /* In Focus não entra: a única pasta de provas dele no Drive é a do
      "Wings of Freedom", livro fora de uso há muito tempo. O gabarito do LIVRO
      de In Focus continua em answer-keys-livro.html. */
@@ -289,7 +339,7 @@ var AK_ORDEM = ['escuta', 'script', 'escrita'];
     subHero.textContent = 'Escolha o estágio para chegar ao gabarito da prova';
     montarTrilha([{texto:'Estágios'}]);
     cabec.innerHTML = '<h2>Escolha o estágio</h2>' +
-      '<p class="ak-sub">Inglês de jovens e adultos e Espanhol</p>';
+      '<p class="ak-sub">Inglês de jovens e adultos, Teens Connect e Espanhol</p>';
     var h = '';
     for (var i = 0; i < AK_PROVAS.length; i++) {
       var e = AK_PROVAS[i];
