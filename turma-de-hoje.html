@@ -453,6 +453,9 @@ body.theme-dark .pl-salvar{ background: #10261f; }
   .pt-nota label small{ font-family: var(--font-body); font-weight: 800; font-size: .84rem; color: #b45309; }
   .pt-nota textarea{ width: 100%; min-height: 84px; box-sizing: border-box; border: 1.5px solid #f3d27a; border-radius: 12px; padding: .6rem .7rem; font-family: var(--font-body); font-size: 1rem; line-height: 1.45; resize: vertical; background: #fff; }
   .pt-nota .st{ font-size: .82rem; font-weight: 800; color: #047857; min-height: 1.1em; margin-top: .3rem; }
+  .pt-nota-livro{ margin-top: .8rem; padding: .7rem .8rem; border-radius: 14px; }
+  .pt-nota-livro label{ font-size: .95rem; }
+  .pt-nota-livro textarea{ min-height: 64px; font-size: .95rem; }
   body.theme-dark .pt-nota{ background: #2b2513; border-color: #6d5a23; }
   body.theme-dark .pt-nota textarea{ background: #0f1825; color: #e2e8f0; border-color: #6d5a23; }
   .pt-mom{ position: relative; border-radius: 20px; padding: 1rem 1rem .95rem; background: var(--mc-bg); border: 2px solid var(--mc-bd); }
@@ -2567,6 +2570,8 @@ function planoTurmaMonta(escola, turma) {
       if (!ptEstado || ptEstado.turma !== turma) return;
       ptEstado.marcas = r.marcas || {}; ptEstado.nota = r.nota || null; ptEstado.carregou = true;
       if (ptEstado.notaEl) { var ta = ptEstado.notaEl.querySelector('textarea'); if (ta && !ta.value) ta.value = (ptEstado.nota && ptEstado.nota.texto) || ''; ta.disabled = false; }
+      ptEstado.notasLivro = r.notasLivro || {};
+      Object.keys(ptEstado.notaLivroEl || {}).forEach(function (lv) { var tl = ptEstado.notaLivroEl[lv].querySelector('textarea'); if (tl && !tl.value) tl.value = (ptEstado.notasLivro[ptNotaLivroChave(lv)] || {}).texto || ''; if (tl) tl.disabled = false; });
       ptDesenha();
     }).catch(function (e) { toast('⚠️ Não li as marcas do plano (' + e.message + ').'); if (ptEstado) { ptEstado.carregou = true; ptDesenha(); } });
   });
@@ -2700,6 +2705,7 @@ function ptDesenha() {
   if (!ptEstado.carregou) html += '<div class="pt-nada" style="text-align:center">🔄 Lendo o que já foi feito…</div>';
   cx.innerHTML = html; cx.hidden = false;
   var cab = cx.querySelector('.pt-cab'); if (cab) cab.parentNode.insertBefore(ptNotaTurma(), cab.nextSibling);
+  cx.querySelectorAll('.pt-livro').forEach(function (el) { var c = el.querySelector('.corpo'); if (c) c.appendChild(ptNotaLivro(el.dataset.ptlivro)); });
   cx.querySelectorAll('[data-ptoff]').forEach(function (bt) { bt.addEventListener('click', function () { var v = Number(bt.dataset.ptoff); ptEstado.off = v === 0 ? 0 : ptEstado.off + v; ptDesenha(); }); });
   cx.querySelectorAll('.pt-tick').forEach(function (bt) { bt.addEventListener('click', function () { ptAlterna(bt.dataset.ptl, bt.dataset.ptk, bt.dataset.pts); }); });
   cx.querySelectorAll('[data-ptmv]').forEach(function (bt) { bt.addEventListener('click', function () { ptMoveLivro(bt.dataset.ptlv, Number(bt.dataset.ptmv)); }); });
@@ -2746,6 +2752,35 @@ function ptNotaTurma() {
   ta.addEventListener('input', function () { st.textContent = ''; clearTimeout(timer); timer = setTimeout(salvar, 1200); });
   ta.addEventListener('blur', function () { clearTimeout(timer); salvar(); });
   ptEstado.notaEl = box;
+  return box;
+}
+/* A ANOTAÇÃO DO LIVRO (Pedro, 23/10/2026): o mesmo campo da turma, embaixo do cartão de cada livro, para o que vale só
+   para aquele livro ou aquele grupo de alunos. Também atravessa as semanas e salva sozinho (planoTurmaMarca com
+   `notaLivro`). Um nó por livro, reaproveitado a cada redesenho, para não perder o que está sendo digitado. */
+function ptNotaLivroChave(livro) { return String(livro || '').trim().slice(0, 40); }
+function ptNotaLivro(livro) {
+  ptEstado.notaLivroEl = ptEstado.notaLivroEl || {};
+  if (ptEstado.notaLivroEl[livro]) return ptEstado.notaLivroEl[livro];
+  var box = document.createElement('div'); box.className = 'pt-nota pt-nota-livro';
+  box.innerHTML = '<label>📝 Anotações deste livro <small>valem para ' + esc(livro) + ', em todas as semanas</small></label>' +
+    '<textarea maxlength="4000" placeholder="Ex.: o grupo deste livro precisa revisar a Lesson 3, quem está atrasado, o que ficou para a próxima…"></textarea><div class="st"></div>';
+  var ta = box.querySelector('textarea'), st = box.querySelector('.st'), timer = null;
+  var salvo = ((ptEstado.notasLivro || {})[ptNotaLivroChave(livro)] || {}).texto || '';
+  ta.value = salvo; ta.disabled = !ptEstado.carregou;
+  var turma = ptEstado.turma, escola = ptEstado.escola;
+  function salvar() {
+    var v = ta.value.trim();
+    if (v === salvo.trim()) return;
+    st.textContent = 'Salvando…';
+    post({ action: 'planoTurmaMarca', escola: escola, turma: turma, nota: v, notaLivro: ptNotaLivroChave(livro) }).then(function () { salvo = v; st.textContent = '✓ Salvo'; })
+      .catch(function (e) { st.textContent = '⚠️ Não salvou: ' + e.message; });
+  }
+  ta.addEventListener('input', function () { st.textContent = ''; clearTimeout(timer); timer = setTimeout(salvar, 1200); });
+  ta.addEventListener('blur', function () { clearTimeout(timer); salvar(); });
+  /* o cartão é arrastável: arrastar a partir do campo selecionaria o cartão em vez do texto */
+  ta.addEventListener('mousedown', function () { var c = box.closest('.pt-livro'); if (c) c.setAttribute('draggable', 'false'); });
+  ta.addEventListener('mouseup', function () { var c = box.closest('.pt-livro'); if (c && ptEstado.livros.length > 1) c.setAttribute('draggable', 'true'); });
+  ptEstado.notaLivroEl[livro] = box;
   return box;
 }
 /* A ORDEM DOS LIVROS (Pedro, 23/10/2026): começa na ordem da Tabela de Progresso Acadêmico, do livro dos menores para
