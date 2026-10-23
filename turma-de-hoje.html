@@ -419,6 +419,18 @@ body.theme-dark .pl-salvar{ background: #10261f; }
 .aula .btn-ck, .aula .ck-feito{ padding-top: .4rem; padding-bottom: .4rem; }
 .aula .it + .btn-ck, .aula .it + .ck-feito{ margin-top: .4rem; }
 
+
+  .al.al-kids{ padding: 0; }
+  .ak-lin{ display: flex; align-items: center; gap: .6rem; padding: .45rem .9rem; flex-wrap: wrap; }
+  .ak-lin .nome{ font-family: var(--font-heading); font-weight: 700; font-size: .98rem; }
+  .ak-bts{ margin-left: auto; display: flex; gap: .35rem; }
+  .ak-bts button{ border: 1.5px solid var(--ui-bd, #c9d4e6); background: #fff; color: #1d3685; border-radius: 9px; padding: .28rem .7rem; font-weight: 800; font-size: .82rem; cursor: pointer; font-family: inherit; }
+  .ak-bts .ak-veio.on{ background: #1f9d55; border-color: #1f9d55; color: #fff; }
+  .ak-bts .ak-falta.on{ background: #c62828; border-color: #c62828; color: #fff; }
+  .ak-bts .ak-nota.tem{ border-color: #c9922e; background: #fff8e6; }
+  .ak-obs{ padding: 0 .9rem .7rem; }
+  .al.al-kids.faltou{ opacity: .75; }
+  body.theme-dark .ak-bts button{ background: #0f1825; color: #dbe6f3; border-color: #2e4560; }
   /* ── O PLANO DA TURMA (kids e teens, 23/10/2026) ── */
   .pt{ max-width: 1500px; margin: 0 auto 1rem; display: grid; gap: .8rem; }
   .pt-topo{ display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; background: var(--white); border: 1.5px solid var(--ui-line, #d6deea); border-radius: 14px; padding: .7rem 1rem; }
@@ -763,6 +775,7 @@ function aplicarFila() {
    ordem simples e grava o PDF na pasta da turma. A "atividade do dia" saiu: o planner já diz onde o aluno está. */
 function dataRoteiroPadrao() { var p = estado.plano; if (p && p.data && p.data >= hojeIsoTH()) return p.data; return hojeIsoTH(); }
 function pintaFila() {
+  if (ptEstado) { var fx = $('fila'); if (fx) { fx.hidden = true; fx.innerHTML = ''; } return; }   /* sem roteiro nem prioridade nas turmas do plano */
   var f = $('fila'); var plano = estado.plano;
   var nAt = Object.keys(estado.atendidos).length;
   f.className = 'fila-info roteiro' + (plano && plano.ordem && plano.ordem.length ? '' : ' sem');
@@ -970,6 +983,7 @@ function tutRegistra(a, motivo) {
   }).catch(function () { if (!desfaz) tutLancado[a.raf] = false; });
 }
 function reordenaComAnimacao(a, foiAtender) {
+  if (ptEstado) { desenharTurma(); return; }   /* turma do plano: todos ao mesmo tempo, ninguém muda de lugar */
   var antes = {};
   document.querySelectorAll('#alunos .al').forEach(function (el) { antes[el.dataset.raf] = el.getBoundingClientRect().top; });
   if (estado.prioridade) ordenarPorPrioridade(); else aplicarFila(); desenharTurma(); pintaFila();
@@ -1411,6 +1425,7 @@ function licoesDoLivro(plano) {
 
 function desenharTurma() {
   var caixa = $('alunos'); caixa.innerHTML = '';
+  if (ptEstado) { desenharChamadaKids(caixa); return; }
   var nCk = 0;
   estado.alunos.forEach(function (a) { var cc = cartaoAluno(a); cc.dataset.raf = cc.dataset.raf || a.raf; caixa.appendChild(cc); var ck = (estado.dados[a.raf] || {}).planner; if (ck && ck.checking && Object.keys(ck.checking).some(function (k) { return ck.checking[k].feito; })) nCk++; });
   $('resumo').hidden = false;
@@ -2350,6 +2365,32 @@ window.addEventListener('message', function (ev) {
   initCascata();
 })();
 
+/* A CHAMADA DAS TURMAS DO PLANO (Pedro, 23/10/2026): uma linha fina por aluno, para bater o olho na turma inteira.
+   "Veio" é o "Aluno atendido" de sempre com outro nome (aqui todos são atendidos juntos); "Faltou" lança o "a" no
+   card como antes; a anotação fica recolhida no 📝 e é a mesma das outras turmas. */
+function desenharChamadaKids(caixa) {
+  var lista = estado.alunos.slice().sort(function (x, y) { return normNome(x.nome) < normNome(y.nome) ? -1 : 1; });
+  var nVeio = 0, nFalta = 0;
+  lista.forEach(function (a) {
+    var veio = !!estado.atendidos[a.raf], faltou = faltouHoje(a);
+    if (veio) nVeio++; if (faltou) nFalta++;
+    var obs = ((estado.dados[a.raf] || {}).planner || {}).obs || '';
+    var el = document.createElement('section'); el.className = 'al al-kids' + (veio ? ' veio' : '') + (faltou ? ' faltou' : ''); el.dataset.raf = a.raf;
+    el.innerHTML = '<div class="ak-lin"><span class="nome">' + esc(tituloNomeTH(String(a.nome || '').replace(/\([^)]*\)/g, ''))) + '</span>' +
+      '<span class="pill">' + esc(a.book || '') + '</span>' +
+      '<span class="ak-bts"><button type="button" class="ak-veio' + (veio ? ' on' : '') + '">' + (veio ? '✓ Veio' : 'Veio') + '</button>' +
+      '<button type="button" class="ak-falta' + (faltou ? ' on' : '') + '">' + (faltou ? '✗ Faltou' : 'Faltou') + '</button>' +
+      '<button type="button" class="ak-nota' + (obs ? ' tem' : '') + '" title="Anotações · só professores" aria-label="Anotações de ' + esc(a.nome) + '">📝</button></span></div>';
+    var nota = document.createElement('div'); nota.className = 'ak-obs'; nota.hidden = true;
+    el.appendChild(nota);
+    el.querySelector('.ak-veio').addEventListener('click', function () { if (faltouHoje(a)) { toast('Desfaça a falta antes de marcar que veio.'); return; } atender(a); });
+    el.querySelector('.ak-falta').addEventListener('click', function () { if (estado.atendidos[a.raf]) { delete estado.atendidos[a.raf]; guardaAtendidos(); } marcarFalta(a); });
+    el.querySelector('.ak-nota').addEventListener('click', function () { if (!nota.firstChild) nota.appendChild(caixaObs(a)); nota.hidden = !nota.hidden; if (!nota.hidden) { var ta = nota.querySelector('textarea'); if (ta) ta.focus(); } });
+    caixa.appendChild(el);
+  });
+  $('resumo').hidden = false;
+  $('resumo').innerHTML = '<b>' + lista.length + '</b> alunos · <b>' + nVeio + '</b> vieram · <b>' + nFalta + '</b> faltaram';
+}
 /* ══ O PLANO DA TURMA (kids e teens, 23/10/2026) ══════════════════════════════
    As turmas infantis e teens não usam o planner do aluno: seguem o plano de aula
    semanal da coordenação (o .pptx do semestre, convertido por
@@ -2361,7 +2402,7 @@ window.addEventListener('message', function (ev) {
    _planoTurma). PILOTO: só as turmas abaixo, e a direção (master) em qualquer
    turma que tenha livro no plano. */
 var PLANO_TURMA_SEM = '2026-2';
-var PLANO_TURMA_V = '20261023a';
+var PLANO_TURMA_V = '20261023b';
 var PLANO_TURMA_PILOTO = [
   { escola: 'Caçapava', turma: /kids\s*multilevel\s*\(at[eé]\s*2º\s*ano\)\s*-\s*3ª\s*8h30/i },
   { escola: 'Taubaté', turma: /^teens\s*connect\s*2\s*-\s*3ª\s*15h/i }
@@ -2399,7 +2440,8 @@ function planoTurmaMonta(escola, turma) {
     if (!livros.length) return;   /* turma sem livro no plano (adultos, personalizado): a tela segue a de sempre */
     ptEstado = { P: P, escola: escola, turma: turma, porLivro: porLivro, livros: livros, off: 0, marcas: {}, carregou: false };
     document.body.classList.add('pt-ativo');
-    ptDesenha();
+    $('legenda').hidden = true;
+    ptDesenha(); pintaFila(); desenharTurma();
     post({ action: 'planoTurmaLe', escola: escola, turma: turma }).then(function (r) {
       if (!ptEstado || ptEstado.turma !== turma) return;
       ptEstado.marcas = r.marcas || {}; ptEstado.carregou = true; ptDesenha();
@@ -2497,15 +2539,33 @@ function ptDesenha() {
       corpo += '<details class="pt-pend"><summary>⏳ ' + pend.length + ' atividade' + (pend.length > 1 ? 's' : '') + ' de semanas anteriores sem tique</summary>' +
         pend.slice(-40).map(function (p) { return '<div class="pt-lin">' + ptTick(nome, p.it.k, p.s.de) + '<span class="rot">' + esc(ptDataBr(p.s.de)) + '</span><span class="txt">' + (PT_TIPO[p.it.tipo] ? '<span class="pt-tipo ' + esc(p.it.tipo) + '">' + PT_TIPO[p.it.tipo] + '</span>' : '') + esc(p.it.t) + '</span></div>'; }).join('') + '</details>';
     }
-    var mat = P.materiais && P.materiais[nome];
     html += '<div class="pt-cx"><h3>📗 ' + esc(livro) + (L && L.licao ? ' <span class="lic">' + esc(L.licao) + '</span>' : '') + '</h3>' +
       '<div class="pt-alunos">' + ptEstado.porLivro[livro].length + ' aluno' + (ptEstado.porLivro[livro].length > 1 ? 's' : '') + ': ' + esc(alunos) + '</div>' + corpo +
-      (mat ? '<div class="pt-botoes">' + ptLink(ptPasta(mat), '🎧 Áudios e vídeos do livro') + '</div>' : '') + '</div>';
+      ptBotoesMaterial(livro, ptLicaoVigente(b, nome, sw.i)) + '</div>';
   });
   if (!ptEstado.carregou) html += '<div class="pt-nada">🔄 Lendo o que já foi feito…</div>';
   cx.innerHTML = html; cx.hidden = false;
   cx.querySelectorAll('[data-ptoff]').forEach(function (bt) { bt.addEventListener('click', function () { var v = Number(bt.dataset.ptoff); ptEstado.off = v === 0 ? 0 : ptEstado.off + v; ptDesenha(); }); });
   cx.querySelectorAll('.pt-tick').forEach(function (bt) { bt.addEventListener('click', function () { ptAlterna(bt.dataset.ptl, bt.dataset.ptk, bt.dataset.pts); }); });
+}
+/* Os botões do material abrem o PORTAL (Modo Kids para os livros infantis, a chave do professor para os Teens, que
+   ficam fora do Modo Kids) já no livro, nos áudios com a lição da semana aberta, ou nos vídeos com os dela em
+   destaque (materialIrConsome no portal-app.js). Sem lição no plano, abre o livro inteiro. */
+var PT_SEM_VIDEO = /fun\s*at\s*(home|school)|merry/i;
+function ptSlugLivro(livro) { return String(livro || '').toLowerCase().replace(/\s*book\s*$/, '').trim().replace(/\s+/g, '-'); }
+function ptUrlMaterial(livro, ir, licao) {
+  var kids = !/teens/i.test(livro);
+  return 'https://portalfisk.com.br/#raf=' + (kids ? 'KIDS' : '0000-000&curso=en') + '&matlivro=' + encodeURIComponent(ptSlugLivro(livro)) + '&matir=' + ir + (licao ? '&matlicao=' + licao : '');
+}
+/* a lição da semana; se a semana não disser (só páginas), a última que o plano deu para o livro */
+function ptLicaoVigente(b, nome, ate) {
+  for (var i = ate; i >= 0; i--) { var Lx = ((b.semanas[i] || {}).livros || {})[nome]; var m = Lx && String(Lx.licao || '').match(/L\s*(\d+)(?!.*L\s*\d)/i); if (m) return m[1]; }
+  return '';
+}
+function ptBotoesMaterial(livro, licao) {
+  var rot = licao ? ' · Lesson ' + licao : '';
+  return '<div class="pt-botoes">' + ptLink(ptUrlMaterial(livro, 'audios', licao), '🎧 Áudios' + rot) +
+    (PT_SEM_VIDEO.test(livro) ? '' : ptLink(ptUrlMaterial(livro, 'videos', licao), '📺 Vídeos' + rot)) + '</div>';
 }
 function ptAlterna(livro, k, semana) {
   if (!ptEstado) return;

@@ -134,6 +134,8 @@ def itensDe(linhas):
         if m and not licao: licao = re.sub(r'\s+', ' ', m.group(1)).strip(); l = l[m.end():]
         # HW e HWC sempre viram bolinha própria; vírgula, | e " + " separam atividades
         l = re.sub(r'\s*[-–]?\s*(?=\bHWC?\b)', '\n', l)
+        # TE e SB na mesma linha ("TE p.150 to 160/SB p. 54 to 57", "SB Pg 12 - ST: Pg 21"): cada livro na sua bolinha
+        l = re.sub(r'\s*(?:/|\s[-–])\s*(?=(?:SB|BS|TE|TM|ST|AC|WB|MD|TRM)\b)', '\n', l)
         for p in re.split(r'\n|,|\s\|\s|\|\s|\s\+\s', l):
             p = p.strip(' -–;.')
             if not p or re.fullmatch(r'(and|e)', p, re.I): continue

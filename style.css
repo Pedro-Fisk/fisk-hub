@@ -78,6 +78,7 @@
 /* o card do professor de espanhol: laranja, a mesma cor que o quadro do
    plantão usa para espanhol, para a cor dizer o curso antes do texto */
 .card-portal-es    { --accent: #EA580C; }
+.card-portal-kids  { --accent: #0F766E; }
 .card-answerkeys   { --accent: #0F766E; } /* verde-petróleo dos gabaritos */
 .card-ak-provas    { --accent: #0F766E; }
 .card-ak-livro     { --accent: #B45309; }

@@ -222,8 +222,13 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "8f7cb9aa",
-         "t": "SB Pg: 12-15 - ST: Pg 21 - Jolly’s B:",
+         "k": "84051b59",
+         "t": "SB Pg: 12-15",
+         "tipo": "sb"
+        },
+        {
+         "k": "a286a4c6",
+         "t": "ST: Pg 21 - Jolly’s B:",
          "tipo": "sb"
         },
         {
@@ -338,8 +343,13 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "6dbf5188",
-         "t": "SB Pg:  16-23 - ST: 29 - Jolly´s B:",
+         "k": "20fef5ad",
+         "t": "SB Pg:  16-23",
+         "tipo": "sb"
+        },
+        {
+         "k": "0a77391a",
+         "t": "ST: 29 - Jolly´s B:",
          "tipo": "sb"
         },
         {
@@ -418,9 +428,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "471699a4",
-         "t": "TE p. 46-54 / SB p.17-20",
+         "k": "734b2db2",
+         "t": "TE p. 46-54",
          "tipo": "te"
+        },
+        {
+         "k": "ef44778e",
+         "t": "SB p.17-20",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -518,9 +533,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "4eb50ce2",
-         "t": "TE p.56-62 / SB p. 21-22",
+         "k": "39e6aad9",
+         "t": "TE p.56-62",
          "tipo": "te"
+        },
+        {
+         "k": "fb7e8e7c",
+         "t": "SB p. 21-22",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -637,9 +657,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "a95adb84",
-         "t": "TE p.64-74 / SB p. 23-26",
+         "k": "c5980368",
+         "t": "TE p.64-74",
          "tipo": "te"
+        },
+        {
+         "k": "1e3afa64",
+         "t": "SB p. 23-26",
+         "tipo": "sb"
         }
        ]
       },
@@ -737,9 +762,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "ab159a9a",
-         "t": "TE p. 74-84 / SB p. 27/28",
+         "k": "b26d6df0",
+         "t": "TE p. 74-84",
          "tipo": "te"
+        },
+        {
+         "k": "5d578c56",
+         "t": "SB p. 27/28",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -832,9 +862,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "38f6c0e1",
-         "t": "TE p. 86-94 / SB p. 29-32",
+         "k": "ca9e554f",
+         "t": "TE p. 86-94",
          "tipo": "te"
+        },
+        {
+         "k": "2e8f5b6f",
+         "t": "SB p. 29-32",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -926,9 +961,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "54cb3feb",
-         "t": "TE p. 94-104 / SB p. 33",
+         "k": "2671afc8",
+         "t": "TE p. 94-104",
          "tipo": "te"
+        },
+        {
+         "k": "0faf9daa",
+         "t": "SB p. 33",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -1024,9 +1064,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "50f1462d",
-         "t": "TE p. 106-114 / SB p. 34-37",
+         "k": "e636b16e",
+         "t": "TE p. 106-114",
          "tipo": "te"
+        },
+        {
+         "k": "e21112d8",
+         "t": "SB p. 34-37",
+         "tipo": "sb"
         }
        ]
       },
@@ -1034,9 +1079,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "L6",
        "itens": [
         {
-         "k": "1235c26f",
-         "t": "TE p.126 to 136./ SB p. 46 to 49",
+         "k": "2ca33c5d",
+         "t": "TE p.126 to 136",
          "tipo": "te"
+        },
+        {
+         "k": "8a1be30a",
+         "t": "SB p. 46 to 49",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -1106,9 +1156,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "383c6089",
-         "t": "TE p. 116-124 / SB p. 38-39",
+         "k": "4e96b3fa",
+         "t": "TE p. 116-124",
          "tipo": "te"
+        },
+        {
+         "k": "1c34f604",
+         "t": "SB p. 38-39",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -1119,9 +1174,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "L6",
        "itens": [
         {
-         "k": "16683a3d",
-         "t": "TE p. 138 to 148./SB p. 50 to 53",
+         "k": "b620f7e2",
+         "t": "TE p. 138 to 148",
          "tipo": "te"
+        },
+        {
+         "k": "1f4f3337",
+         "t": "SB p. 50 to 53",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -1204,9 +1264,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "99a65886",
-         "t": "TE p. 126-136 / SB p. 40-43",
+         "k": "7aff7514",
+         "t": "TE p. 126-136",
          "tipo": "te"
+        },
+        {
+         "k": "3846b9df",
+         "t": "SB p. 40-43",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -1217,9 +1282,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "L7",
        "itens": [
         {
-         "k": "efebc927",
-         "t": "TE p.150 to 160/SB p. 54 to 57",
+         "k": "e7c2cefc",
+         "t": "TE p.150 to 160",
          "tipo": "te"
+        },
+        {
+         "k": "045d714f",
+         "t": "SB p. 54 to 57",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -1293,9 +1363,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "04a1f675",
-         "t": "TE p. 136-144 / SB p. 44-45",
+         "k": "eeb8682f",
+         "t": "TE p. 136-144",
          "tipo": "te"
+        },
+        {
+         "k": "db326b31",
+         "t": "SB p. 44-45",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -1388,9 +1463,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "411e8f3a",
-         "t": "TE P. 162-172 / SB p. 51-54",
+         "k": "a8c7aed1",
+         "t": "TE P. 162-172",
          "tipo": "te"
+        },
+        {
+         "k": "f65ad14a",
+         "t": "SB p. 51-54",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -1401,9 +1481,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "L9",
        "itens": [
         {
-         "k": "110e564c",
-         "t": "TE p. 198 to 208/ SB p. 70 to 73",
+         "k": "cc905f94",
+         "t": "TE p. 198 to 208",
          "tipo": "te"
+        },
+        {
+         "k": "e21a858d",
+         "t": "SB p. 70 to 73",
+         "tipo": "sb"
         }
        ]
       },
@@ -1474,9 +1559,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "130d448c",
-         "t": "TE p. 172-180 / SB p. 55-56",
+         "k": "3dc7cb18",
+         "t": "TE p. 172-180",
          "tipo": "te"
+        },
+        {
+         "k": "f055a839",
+         "t": "SB p. 55-56",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -1487,9 +1577,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "L9",
        "itens": [
         {
-         "k": "8c659dd7",
-         "t": "TE p. 210 to 220/ SB p.74 to 77",
+         "k": "068eff5e",
+         "t": "TE p. 210 to 220",
          "tipo": "te"
+        },
+        {
+         "k": "05b1b78c",
+         "t": "SB p.74 to 77",
+         "tipo": "sb"
         }
        ]
       },
@@ -1554,9 +1649,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "2a1019b2",
-         "t": "TE p. 146-150 / SB p. 46-48",
+         "k": "a76c026e",
+         "t": "TE p. 146-150",
          "tipo": "te"
+        },
+        {
+         "k": "f38c17be",
+         "t": "SB p. 46-48",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -1567,9 +1667,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "L8",
        "itens": [
         {
-         "k": "8fdeacb1",
-         "t": "TE p.174 to 184/ SB p. 62 to 65",
+         "k": "7a955cbb",
+         "t": "TE p.174 to 184",
          "tipo": "te"
+        },
+        {
+         "k": "b216a746",
+         "t": "SB p. 62 to 65",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -1646,9 +1751,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "4db6e061",
-         "t": "TE p. 152-160 / SB p. 49-50",
+         "k": "b7a2c4c1",
+         "t": "TE p. 152-160",
          "tipo": "te"
+        },
+        {
+         "k": "708dd00c",
+         "t": "SB p. 49-50",
+         "tipo": "sb"
         }
        ]
       },
@@ -1656,9 +1766,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "L8",
        "itens": [
         {
-         "k": "c7bd7328",
-         "t": "TE p. 186 to 196/ SB p. 66 to 69",
+         "k": "4815b098",
+         "t": "TE p. 186 to 196",
          "tipo": "te"
+        },
+        {
+         "k": "0b26d155",
+         "t": "SB p. 66 to 69",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -1728,9 +1843,19 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "bff526a1",
-         "t": "TE p. 182-190 / SB p. 57-60 (LC - SB p. 61-62)",
+         "k": "fdb57651",
+         "t": "TE p. 182-190",
          "tipo": "te"
+        },
+        {
+         "k": "a7e85c90",
+         "t": "SB p. 57-60 (LC",
+         "tipo": "sb"
+        },
+        {
+         "k": "53c71b5d",
+         "t": "SB p. 61-62)",
+         "tipo": "sb"
         }
        ]
       },
@@ -1738,9 +1863,19 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "L10",
        "itens": [
         {
-         "k": "c724bedd",
-         "t": "TE p.222 to 232/SB p. 78 to 81 (LC - SB p. 82 to 85)",
+         "k": "1a0a86a0",
+         "t": "TE p.222 to 232",
          "tipo": "te"
+        },
+        {
+         "k": "74d35106",
+         "t": "SB p. 78 to 81 (LC",
+         "tipo": "sb"
+        },
+        {
+         "k": "f425d2ef",
+         "t": "SB p. 82 to 85)",
+         "tipo": "sb"
         }
        ]
       },
@@ -1940,9 +2075,14 @@ window.PLANO_TURMA["2026-2"] = {
          "tipo": "outro"
         },
         {
-         "k": "c786a045",
-         "t": "HW - WB p. 7",
+         "k": "f0e68e18",
+         "t": "HW",
          "tipo": "hw"
+        },
+        {
+         "k": "2333ad2b",
+         "t": "WB p. 7",
+         "tipo": "outro"
         },
         {
          "k": "499f677e",
@@ -2045,9 +2185,14 @@ window.PLANO_TURMA["2026-2"] = {
          "tipo": "hwc"
         },
         {
-         "k": "84f588d8",
-         "t": "TE p. 24 to 31 / MD",
+         "k": "58fbba49",
+         "t": "TE p. 24 to 31",
          "tipo": "te"
+        },
+        {
+         "k": "29b960ef",
+         "t": "MD",
+         "tipo": "md"
         },
         {
          "k": "b352f65f",
@@ -2068,9 +2213,14 @@ window.PLANO_TURMA["2026-2"] = {
          "tipo": "sb"
         },
         {
-         "k": "d7fbec00",
-         "t": "HW - WB  p.11",
+         "k": "1269d03d",
+         "t": "HW",
          "tipo": "hw"
+        },
+        {
+         "k": "e3b06901",
+         "t": "WB  p.11",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -2107,9 +2257,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "35096e7c",
-         "t": "TE p. 32 to 38 / SB p. 21 to  25",
+         "k": "deadc67b",
+         "t": "TE p. 32 to 38",
          "tipo": "te"
+        },
+        {
+         "k": "2453099b",
+         "t": "SB p. 21 to  25",
+         "tipo": "sb"
         },
         {
          "k": "3f40f15e",
@@ -2173,9 +2328,14 @@ window.PLANO_TURMA["2026-2"] = {
          "tipo": "hwc"
         },
         {
-         "k": "4c62a2bc",
-         "t": "TE p. 40 to 46 / SB p. 26 to 29",
+         "k": "fbd4d1da",
+         "t": "TE p. 40 to 46",
          "tipo": "te"
+        },
+        {
+         "k": "ef9dbb0f",
+         "t": "SB p. 26 to 29",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -2237,9 +2397,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "95632b4e",
-         "t": "TE p.48 to 53 / SB p. 30 to 33",
+         "k": "e5aad5d6",
+         "t": "TE p.48 to 53",
          "tipo": "te"
+        },
+        {
+         "k": "0c1cd947",
+         "t": "SB p. 30 to 33",
+         "tipo": "sb"
         },
         {
          "k": "0b85b8c0",
@@ -2306,9 +2471,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "4032b620",
-         "t": "TE p 54 to 61 /  SB p. 34 to 37",
+         "k": "cd27860a",
+         "t": "TE p 54 to 61",
          "tipo": "te"
+        },
+        {
+         "k": "2d903cf6",
+         "t": "SB p. 34 to 37",
+         "tipo": "sb"
         },
         {
          "k": "3522a567",
@@ -2360,9 +2530,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "7e5187a8",
-         "t": "TE p.62 to 67 / SB p.38 to 41",
+         "k": "b7420206",
+         "t": "TE p.62 to 67",
          "tipo": "te"
+        },
+        {
+         "k": "f31a836a",
+         "t": "SB p.38 to 41",
+         "tipo": "sb"
         },
         {
          "k": "662caba0",
@@ -2383,9 +2558,14 @@ window.PLANO_TURMA["2026-2"] = {
          "tipo": "sb"
         },
         {
-         "k": "0c11f64c",
-         "t": "HW - WB-p.17",
+         "k": "fe44d80b",
+         "t": "HW",
          "tipo": "hw"
+        },
+        {
+         "k": "b6ed515b",
+         "t": "WB-p.17",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -2423,9 +2603,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "9f281466",
-         "t": "TE p.68 to 75 / SB p. 42 to 45",
+         "k": "07753f4c",
+         "t": "TE p.68 to 75",
          "tipo": "te"
+        },
+        {
+         "k": "29c811c4",
+         "t": "SB p. 42 to 45",
+         "tipo": "sb"
         },
         {
          "k": "d2ff06d0",
@@ -2451,9 +2636,14 @@ window.PLANO_TURMA["2026-2"] = {
          "tipo": "sb"
         },
         {
-         "k": "3e0a5a11",
-         "t": "HW - WB p. 19",
+         "k": "eac73885",
+         "t": "HW",
          "tipo": "hw"
+        },
+        {
+         "k": "e413faa7",
+         "t": "WB p. 19",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -2514,9 +2704,14 @@ window.PLANO_TURMA["2026-2"] = {
          "tipo": "outro"
         },
         {
-         "k": "b747ec8c",
-         "t": "HW - WB p.21",
+         "k": "a2e7e1de",
+         "t": "HW",
          "tipo": "hw"
+        },
+        {
+         "k": "110384a5",
+         "t": "WB p.21",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -2545,9 +2740,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "bfd79bb8",
-         "t": "TE p.82 to 88/ SB p. 50 to 53",
+         "k": "e9cf38fc",
+         "t": "TE p.82 to 88",
          "tipo": "te"
+        },
+        {
+         "k": "7f94e2a1",
+         "t": "SB p. 50 to 53",
+         "tipo": "sb"
         },
         {
          "k": "bc91a203",
@@ -2568,9 +2768,14 @@ window.PLANO_TURMA["2026-2"] = {
          "tipo": "outro"
         },
         {
-         "k": "34ff92da",
-         "t": "HW - WB p.22",
+         "k": "5a46cdc6",
+         "t": "HW",
          "tipo": "hw"
+        },
+        {
+         "k": "4631148a",
+         "t": "WB p.22",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -2604,9 +2809,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "2dc30dd6",
-         "t": "TE p. 90 to 97/  SB p. 54 to 58",
+         "k": "830211ce",
+         "t": "TE p. 90 to 97",
          "tipo": "te"
+        },
+        {
+         "k": "d4eb670a",
+         "t": "SB p. 54 to 58",
+         "tipo": "sb"
         },
         {
          "k": "e35d483b",
@@ -2632,9 +2842,14 @@ window.PLANO_TURMA["2026-2"] = {
          "tipo": "outro"
         },
         {
-         "k": "9fda3ea5",
-         "t": "HW - WB p.23",
+         "k": "d6dff974",
+         "t": "HW",
          "tipo": "hw"
+        },
+        {
+         "k": "463db4d8",
+         "t": "WB p.23",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -2672,9 +2887,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "478db833",
-         "t": "TE p. 98 to 105/ SB p. 59 to 63",
+         "k": "6d8edfed",
+         "t": "TE p. 98 to 105",
          "tipo": "te"
+        },
+        {
+         "k": "329c8f14",
+         "t": "SB p. 59 to 63",
+         "tipo": "sb"
         },
         {
          "k": "02b6dc5c",
@@ -2695,9 +2915,14 @@ window.PLANO_TURMA["2026-2"] = {
          "tipo": "outro"
         },
         {
-         "k": "ec1f4505",
-         "t": "HW - WB p.24",
+         "k": "a14dcae6",
+         "t": "HW",
          "tipo": "hw"
+        },
+        {
+         "k": "dd37eab6",
+         "t": "WB p.24",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -2760,9 +2985,14 @@ window.PLANO_TURMA["2026-2"] = {
          "tipo": "outro"
         },
         {
-         "k": "e9b70662",
-         "t": "HW - WB p.25",
+         "k": "6b004c01",
+         "t": "HW",
          "tipo": "hw"
+        },
+        {
+         "k": "e7e22306",
+         "t": "WB p.25",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -2792,9 +3022,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "51dcb1c1",
-         "t": "TE p. 116 to 122 / SB p. 69 to 73",
+         "k": "11af6596",
+         "t": "TE p. 116 to 122",
          "tipo": "te"
+        },
+        {
+         "k": "aced7df7",
+         "t": "SB p. 69 to 73",
+         "tipo": "sb"
         },
         {
          "k": "57483c1b",
@@ -2815,9 +3050,14 @@ window.PLANO_TURMA["2026-2"] = {
          "tipo": "outro"
         },
         {
-         "k": "7add4c9e",
-         "t": "HW - WB p. 26",
+         "k": "7924af69",
+         "t": "HW",
          "tipo": "hw"
+        },
+        {
+         "k": "c59a1103",
+         "t": "WB p. 26",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -2846,9 +3086,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "1dd5f99e",
-         "t": "TE p. 124 to 131 / SB p. 74 to 77",
+         "k": "eb9ed1e4",
+         "t": "TE p. 124 to 131",
          "tipo": "te"
+        },
+        {
+         "k": "df153252",
+         "t": "SB p. 74 to 77",
+         "tipo": "sb"
         },
         {
          "k": "89d855e2",
@@ -2869,9 +3114,14 @@ window.PLANO_TURMA["2026-2"] = {
          "tipo": "outro"
         },
         {
-         "k": "93ffa730",
-         "t": "HW - WB p. 27",
+         "k": "be07bf30",
+         "t": "HW",
          "tipo": "hw"
+        },
+        {
+         "k": "4ff0b85b",
+         "t": "WB p. 27",
+         "tipo": "outro"
         }
        ]
       }
@@ -2897,9 +3147,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "aa2cd937",
-         "t": "TE p. 132 to 137 / SB p",
+         "k": "8b9edbfe",
+         "t": "TE p. 132 to 137",
          "tipo": "te"
+        },
+        {
+         "k": "2f4aa679",
+         "t": "SB p",
+         "tipo": "sb"
         },
         {
          "k": "84559491",
@@ -2951,9 +3206,14 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "",
        "itens": [
         {
-         "k": "99b5a691",
-         "t": "TE p.138 to 145 /  SB p. 82 to 85",
+         "k": "da0e3110",
+         "t": "TE p.138 to 145",
          "tipo": "te"
+        },
+        {
+         "k": "0957fd68",
+         "t": "SB p. 82 to 85",
+         "tipo": "sb"
         },
         {
          "k": "33b29243",
