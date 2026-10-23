@@ -18,6 +18,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 </head>
 <body>
+  <div id="hubEntrando" hidden><div class="cx"><span class="hub-roda"></span><p data-i18n="pg-entering">Preparando o seu Hub…</p></div></div>
 <script>/* aplica o tema salvo antes da primeira pintura, para o modo escuro persistir entre as páginas sem piscar */try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
 <script>/* porteira do professor: decide antes da 1ª pintura se mostra o login ou o hub (sem flash) */try{document.body.classList.add(localStorage.getItem("fisk_prof")?"prof-in":"prof-out");}catch(e){document.body.classList.add("prof-out");}</script>
 
@@ -87,6 +88,18 @@
   .mais-usadas .mu-rot{ font-weight:800; font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ui, #1d3685); opacity:.75; }
   .mais-usadas .mu-chip{ border:1.5px solid var(--ui-bd, #d6deea); background:var(--white, #fff); color:var(--ui, #1d3685); border-radius:999px; padding:.4rem .9rem; font-weight:800; font-size:.86rem; text-decoration:none; }
   .mais-usadas .mu-chip:hover{ border-color:var(--ui, #1d3685); }
+  /* carregando: os nomes do login e a entrada no Hub (Pedro, 23/10/2026: "não tem nenhuma evidência visual") */
+  @keyframes hubGiro{to{transform:rotate(360deg)}}
+  @keyframes hubBrilho{0%{background-position:-200px 0}100%{background-position:calc(200px + 100%) 0}}
+  .hub-roda{display:inline-block;width:16px;height:16px;border:2.5px solid rgba(37,99,235,.25);border-top-color:#2563eb;border-radius:50%;animation:hubGiro .8s linear infinite;vertical-align:-3px}
+  .pg-input.carregando{background-image:linear-gradient(90deg,transparent 0,rgba(37,99,235,.12) 50%,transparent 100%);background-repeat:no-repeat;background-size:200px 100%;animation:hubBrilho 1.2s ease-in-out infinite}
+  .pg-carrega{display:flex;align-items:center;gap:.5rem;font-size:.85rem;opacity:.75;margin:.35rem 0 .2rem}
+  .pg-carrega[hidden]{display:none}
+  #hubEntrando{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:var(--bg,#f4f6fb)}
+  #hubEntrando[hidden]{display:none}
+  #hubEntrando .cx{text-align:center}
+  #hubEntrando .hub-roda{width:42px;height:42px;border-width:4px;margin-bottom:1rem}
+  #hubEntrando p{font-weight:700;margin:0}
 </style>
 
   <div id="profGate">
@@ -106,6 +119,7 @@
       <p class="pg-sub" data-i18n="pg-sub">Acesse o Fisk Hub com seu nome e senha</p>
       <label class="pg-label" data-i18n="pg-name">Seu nome</label>
       <select id="pgNome" class="pg-input"></select>
+      <div class="pg-carrega" id="pgCarrega" hidden><span class="hub-roda"></span> <span data-i18n="pg-loading-names">Buscando os professores no servidor…</span></div>
       <div id="pgFullWrap" hidden>
         <label class="pg-label" data-i18n="pg-fullname">Nome completo (opcional)</label>
         <input id="pgFull" class="pg-input" type="text">
@@ -660,7 +674,7 @@
         'pg-tab-login':'Entrar','pg-tab-register':'Criar conta','pg-name':'Seu nome',
         'pg-name-ph':'Selecione seu nome…','pg-fullname':'Nome completo (opcional)',
         'pg-fullname-ph':'Ex.: Maria Fernanda Silva','pg-pass':'Senha','pg-pass2':'Confirmar senha',
-        'pg-help':'Sem usuário ou esqueceu a senha? Fale com a direção.','pg-logout':'Sair','pg-loading':'Carregando…',
+        'pg-help':'Sem usuário ou esqueceu a senha? Fale com a direção.','pg-logout':'Sair','pg-loading':'Carregando…','pg-loading-names':'Buscando os professores no servidor…','pg-entering':'Preparando o seu Hub…',
         'pg-pick-name':'Selecione seu nome.','pg-need-pass':'Digite sua senha.','pg-wait':'Aguarde…',
         'pg-short':'Senha muito curta (mínimo 4).','pg-nomatch':'As senhas não conferem.',
         'pg-err':'Erro de conexão. Tente de novo.','pg-hello':'Olá',
@@ -757,7 +771,7 @@
         'pg-tab-login':'Sign in','pg-tab-register':'Create account','pg-name':'Your name',
         'pg-name-ph':'Select your name…','pg-fullname':'Full name (optional)',
         'pg-fullname-ph':'e.g., Maria Fernanda Silva','pg-pass':'Password','pg-pass2':'Confirm password',
-        'pg-help':"No account or forgot your password? Talk to the office.",'pg-logout':'Log out','pg-loading':'Loading…',
+        'pg-help':"No account or forgot your password? Talk to the office.",'pg-logout':'Log out','pg-loading':'Loading…','pg-loading-names':'Fetching the teachers from the server…','pg-entering':'Getting your Hub ready…',
         'pg-pick-name':'Select your name.','pg-need-pass':'Enter your password.','pg-wait':'Please wait…',
         'pg-short':'Password too short (min. 4).','pg-nomatch':"Passwords don't match.",
         'pg-err':'Connection error. Try again.','pg-hello':'Hi',
@@ -854,7 +868,7 @@
         'pg-tab-login':'Entrar','pg-tab-register':'Crear cuenta','pg-name':'Tu nombre',
         'pg-name-ph':'Selecciona tu nombre…','pg-fullname':'Nombre completo (opcional)',
         'pg-fullname-ph':'Ej.: María Fernanda Silva','pg-pass':'Contraseña','pg-pass2':'Confirmar contraseña',
-        'pg-help':'¿Sin usuario u olvidaste tu contraseña? Habla con la dirección.','pg-logout':'Salir','pg-loading':'Cargando…',
+        'pg-help':'¿Sin usuario u olvidaste tu contraseña? Habla con la dirección.','pg-logout':'Salir','pg-loading':'Cargando…','pg-loading-names':'Buscando a los profesores en el servidor…','pg-entering':'Preparando tu Hub…',
         'pg-pick-name':'Selecciona tu nombre.','pg-need-pass':'Escribe tu contraseña.','pg-wait':'Espera…',
         'pg-short':'Contraseña muy corta (mín. 4).','pg-nomatch':'Las contraseñas no coinciden.',
         'pg-err':'Error de conexión. Inténtalo de nuevo.','pg-hello':'Hola',
@@ -1937,7 +1951,10 @@
       }
       function loadProfs(){
         sel.innerHTML = '<option value="" disabled selected>' + tr('pg-loading') + '</option>';
+        sel.disabled = true; sel.classList.add('carregando'); $('pgCarrega').hidden = false;
+        var pronto = function(){ sel.disabled = false; sel.classList.remove('carregando'); $('pgCarrega').hidden = true; };
         fetch(EP + '?action=profList').then(fiskJson).then(function(res){
+          pronto();
           var ps = ((res && res.profs) || []).filter(ehProfessor);
           ps.sort(function(a, b){ return String(a.name).localeCompare(String(b.name), 'pt-BR'); });
           sel.innerHTML = '<option value="" disabled selected>' + tr('pg-name-ph') + '</option>' +
@@ -1946,7 +1963,7 @@
               var esc = String(p.escolas || '').replace(/,/g, ' + ');
               return '<option value="' + nm + '">' + nm + (esc ? ' · ' + esc : '') + (p.registered ? '  ✓' : '') + '</option>';
             }).join('');
-        }).catch(function(){ sel.innerHTML = '<option value="" disabled selected></option>'; });
+        }).catch(function(){ pronto(); sel.innerHTML = '<option value="" disabled selected></option>'; });
       }
 
       // Só login: o cadastro/senha agora é feito e entregue pela direção.
@@ -2559,6 +2576,7 @@
                    html: a.texto ? '<p>' + texto(a.texto) + '</p>' : '', anexos: [], link: a.tipo === 'impressao' ? { href: 'imprimir.html#meus', rot: '📬 Ver meus pedidos' } : null, ciente: !!a.lido };
         });
         tutoria(); aniversarios();
+        try { document.dispatchEvent(new Event('hub-mural-pronto')); } catch (e) {}
         /* os informes não vieram (rede, sessão) e a conversa já está na tela: fica como estava */
         if ((!ji || ji.ok !== true) && assinatura) { conta(); return; }
         noticias(cientes, function(fixas){
@@ -2626,7 +2644,17 @@
 
     function liga(){
       var s = sess(); if (!s || !s.token) { cx.hidden = true; sino.hidden = true; return; }
-      cx.hidden = false; sino.hidden = false; carrega();
+      cx.hidden = false; sino.hidden = false;
+      /* entra de uma vez (Pedro, 23/10/2026): a home espera o mural (recados, quem veio à tutoria, aniversariantes)
+         antes de aparecer, em vez de ir montando os cards na frente do professor. Teto de 12 s. */
+      var ov = $$('hubEntrando');
+      if (ov) {
+        ov.hidden = false;
+        var some = function(){ ov.hidden = true; document.removeEventListener('hub-mural-pronto', some); };
+        document.addEventListener('hub-mural-pronto', some);
+        setTimeout(some, 12000);
+      }
+      carrega();
       var n = 0, t = setInterval(function(){ if (noMenu() || ++n > 20) clearInterval(t); }, 300);
       /* O BUDDY AUXILIAR, em piloto (06/10/2026): só quem está no piloto ganha o atalho no menu do nome */
       post({ action: 'buddyInfo' }).then(function(j){
