@@ -515,6 +515,9 @@ body.theme-dark .pl-salvar{ background: #10261f; }
   .ak-cab .cont.f{ background: #fee2e2; color: #b91c1c; }
   .al.al-kids{ padding: 0; border-radius: 18px; border: 2px solid #e8ecf4; box-shadow: none; margin-bottom: .55rem; background: #fff; overflow: hidden; }
   .al.al-kids.veio{ border-color: #a7f3d0; background: #f6fffb; }
+  .al.al-kids.aniv{ border-color: #f5c542; background: linear-gradient(90deg, #fff8db 0%, #ffffff 60%); box-shadow: 0 0 0 3px rgba(245,197,66,.25); }
+  .al.al-kids.aniv .ak-id .nome{ color: #92400e; font-size: 1.16rem; }
+  .ak-aniv{ display: inline-block; margin-left: .35rem; font-size: .82rem; font-weight: 900; color: #fff; background: linear-gradient(90deg, #f59e0b, #ec4899); border-radius: 99px; padding: .14rem .6rem; vertical-align: 2px; }
   .al.al-kids.faltou{ border-color: #fecaca; background: #fff8f8; opacity: 1; filter: none; }
   .al.al-kids.faltou .ak-id .nome{ color: #991b1b; }
   .ak-lin{ display: flex; align-items: center; gap: .8rem; padding: .7rem 1rem; flex-wrap: wrap; }
@@ -2470,20 +2473,72 @@ function desenharChamadaKids(caixa) {
     var veio = !!estado.atendidos[a.raf], faltou = faltouHoje(a);
     var obs = ((estado.dados[a.raf] || {}).planner || {}).obs || '';
     var nome = tituloNomeTH(String(a.nome || '').replace(/\([^)]*\)/g, ''));
-    var el = document.createElement('section'); el.className = 'al al-kids' + (veio ? ' veio' : '') + (faltou ? ' faltou' : ''); el.dataset.raf = a.raf;
+    var aniv = anivDaSemana(a);
+    var el = document.createElement('section'); el.className = 'al al-kids' + (veio ? ' veio' : '') + (faltou ? ' faltou' : '') + (aniv ? ' aniv' : ''); el.dataset.raf = a.raf;
     el.setAttribute('style', ptCorVars(ptCor(a.book)));
     el.innerHTML = '<div class="ak-lin"><span class="ak-av" aria-hidden="true">' + esc(nome.charAt(0)) + '</span>' +
-      '<span class="ak-id"><span class="nome">' + esc(nome) + '</span><br><span class="livro">' + esc(a.book || '') + '</span></span>' +
+      '<span class="ak-id"><span class="nome">' + (aniv ? '🎂 ' : '') + esc(nome) + '</span>' + (aniv ? ' <span class="ak-aniv">🎉 Aniversário ' + esc(aniv) + '</span>' : '') + '<br><span class="livro">' + esc(a.book || '') + '</span></span>' +
       '<span class="ak-bts"><button type="button" class="ak-veio' + (veio ? ' on' : '') + '"><span class="bx">' + (veio ? '✓' : '') + '</span>Veio</button>' +
       '<button type="button" class="ak-falta' + (faltou ? ' on' : '') + '">✗ Faltou</button></span></div>' +
       '<button type="button" class="ak-nota' + (obs ? ' tem' : '') + '">📝 Anotações sobre o aluno' + (obs ? ' · tem anotação' : '') + '</button>';
     var nota = document.createElement('div'); nota.className = 'ak-obs'; nota.hidden = true;
     el.appendChild(nota);
-    el.querySelector('.ak-veio').addEventListener('click', function () { if (faltouHoje(a)) { toast('Desfaça a falta antes de marcar que veio.'); return; } atender(a); });
-    el.querySelector('.ak-falta').addEventListener('click', function () { if (estado.atendidos[a.raf]) { delete estado.atendidos[a.raf]; guardaAtendidos(); } marcarFalta(a); });
+    el.querySelector('.ak-veio').addEventListener('click', function () { if (faltouHoje(a)) { toast('Desfaça a falta antes de marcar que veio.'); return; } presencaKids(a); });
+    el.querySelector('.ak-falta').addEventListener('click', function () {
+      if (!estado.atendidos[a.raf]) { marcarFalta(a); return; }
+      presencaKids(a).then(function () { marcarFalta(a); });   /* veio e depois faltou: devolve o placeholder antes do "a" */
+    });
     el.querySelector('.ak-nota').addEventListener('click', function () { if (!nota.firstChild) montaNotaKids(nota, a); nota.hidden = !nota.hidden; if (!nota.hidden) { var ta = nota.querySelector('textarea'); if (ta) ta.focus(); } });
     caixa.appendChild(el);
   });
+}
+/* O "VEIO" ESCREVE NO CARD (Pedro, 23/10/2026, pedido das secretárias): as turmas kids e teens deixaram o "p" e o "."
+   e têm placeholder (".L7") nas aulas futuras. Marcar que o aluno veio tira o ponto do placeholder de hoje ("L7");
+   célula vazia recebe a lição da semana do plano. Desmarcar devolve o que estava (plannerPresenca no backend). */
+function licaoDeHoje(a) {
+  if (!ptEstado) return '';
+  var b = ptBlocoDe(ptEstado.P, a.book); if (!b) return '';
+  var nome = ptLivroNoPlano(b, a.book), i = ptIndiceSemana(b, diaAlvoTH());
+  var L = ((b.semanas[i] || {}).livros || {})[nome] || {};
+  var adv = String(L.licao || '').match(/^\s*Adv\s*(\d)/i); if (adv) return 'Adv' + adv[1];
+  var n = ptLicaoVigente(b, nome, i); return n ? 'L' + n : '';
+}
+function presencaKids(a) {
+  var desfazer = !!estado.atendidos[a.raf];
+  if (desfazer) delete estado.atendidos[a.raf]; else estado.atendidos[a.raf] = Date.now();
+  guardaAtendidos(); desenharTurma();
+  return post({ action: 'plannerPresenca', raf: a.raf, book: a.book, lic: licaoDeHoje(a), desfazer: desfazer }).then(function (r) {
+    var c = r.card || {};
+    if (c.escreveu) toast('📇 Card: "' + c.escreveu + '" na aula ' + rotDiaTH() + '.');
+    else if (c.desfez) toast('📇 Card: presença ' + rotDiaTH() + ' desfeita.');
+    else if (c.jaEstava) toast('📇 O card já tinha "' + c.jaEstava + '" na aula ' + rotDiaTH() + ' e não foi alterado.');
+    else if (c.motivo) toast('📇 Card não alterado: ' + c.motivo + '.');
+  }).catch(function (e) {
+    if (desfazer) estado.atendidos[a.raf] = Date.now(); else delete estado.atendidos[a.raf];
+    guardaAtendidos(); desenharTurma(); toast('⚠️ Não salvou a presença (' + e.message + '). Tente de novo.');
+  });
+}
+/* o dia e o mês do aniversário: a célula de DATA chega do backend em ISO (aaaa-mm-dd, sem ambiguidade); a de TEXTO
+   segue o cabeçalho dos dois cards, "Data de Nascimento (MM/DD/AAAA)", e só vira dia/mês quando o primeiro número
+   passa de 12. Devolve 'mm-dd' ou ''. */
+function nascMesDia(a) {
+  var pes = pessoaisDe(a) || {}, iso = String(pes.nascimento || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return iso[2] + '-' + iso[3];
+  var m = String(pes.nascimentoTxt || pes.nascimento || '').match(/(\d{1,2})\/(\d{1,2})/); if (!m) return '';
+  var x = Number(m[1]), y = Number(m[2]), mes = x, dia = y;
+  if (x > 12 && y <= 12) { mes = y; dia = x; }
+  if (mes < 1 || mes > 12 || dia < 1 || dia > 31) return '';
+  return ('0' + mes).slice(-2) + '-' + ('0' + dia).slice(-2);
+}
+function mdBr(md) { return md ? md.slice(3) + '/' + md.slice(0, 2) : ''; }
+/* o aniversariante da semana na chamada (Pedro, 23/10/2026: "com o nome bem destacado"): a semana do plano do livro
+   dele, pela data de nascimento do card */
+function anivDaSemana(a) {
+  if (!ptEstado) return '';
+  var b = ptBlocoDe(ptEstado.P, a.book); if (!b) return '';
+  var s = (b.semanas || [])[ptIndiceSemana(b, diaAlvoTH())]; if (!s) return '';
+  var mmdd = nascMesDia(a); if (!mmdd) return '';
+  return (s.de.slice(5) <= mmdd && mmdd <= s.ate.slice(5)) ? mdBr(mmdd) : '';
 }
 function montaNotaKids(box, a) {
   var atual = ((estado.dados[a.raf] || {}).planner || {}).obs || '';
@@ -2604,10 +2659,8 @@ function ptPrimeiro(nome) { var n = String(nome || '').replace(/\([^)]*\)/g, '')
 function ptAniversarios(s) {
   var out = [];
   (estado.alunos || []).forEach(function (a) {
-    var pes = pessoaisDe(a) || {}, t = String(pes.nascimentoTxt || pes.nascimento || '');
-    var m = t.match(/(\d{1,2})\/(\d{1,2})/); if (!m) return;
-    var mmdd = ('0' + m[2]).slice(-2) + '-' + ('0' + m[1]).slice(-2);
-    if (s.de.slice(5) <= mmdd && mmdd <= s.ate.slice(5)) out.push(ptPrimeiro(a.nome) + ' (' + ('0' + m[1]).slice(-2) + '/' + ('0' + m[2]).slice(-2) + ')');
+    var mmdd = nascMesDia(a); if (!mmdd) return;
+    if (s.de.slice(5) <= mmdd && mmdd <= s.ate.slice(5)) out.push(ptPrimeiro(a.nome) + ' (' + mdBr(mmdd) + ')');
   });
   return out;
 }
