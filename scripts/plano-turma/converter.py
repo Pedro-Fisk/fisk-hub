@@ -218,6 +218,26 @@ def materiais():
             if m: out['Teens Connect ' + m.group(1)] = drvId(os.path.join(tc, d))
     return out
 
+def transicoes(txt):
+    """As músicas de transição das ORIENTAÇÕES GERAIS: "Hello song - 1 (AGO), 2 (set), 3 (out), 1 (nov), 2 (dez)",
+    "Snack - 4", "Clean up - 5", "Bye - 6 (ago e set), 7 (out e nov), 6 e 7 (dez)". Mês → números da pasta de músicas."""
+    out = {}
+    for rot, k in (('hello', 'hello'), ('snack', 'snack'), ('clean', 'clean'), ('bye', 'bye')):
+        m = re.search(r'\b%s[^\n-]*-\s*([^\n]+)' % rot, txt, re.I)
+        if not m: continue
+        spec = m.group(1)
+        partes = re.findall(r'([\d\s,e]+?)\s*\(([^)]*)\)', spec)
+        if partes:
+            meses = {}
+            for nums, ms in partes:
+                ns = [int(x) for x in re.findall(r'\d+', nums)]
+                for mm in re.findall(r'[a-z]{3,}', norm(ms)):
+                    if mm[:3] in MESES: meses[str(MESES[mm[:3]])] = ns
+            out[k] = {'meses': meses}
+        else:
+            out[k] = {'todos': [int(x) for x in re.findall(r'\d+', spec)][:3]}
+    return out
+
 # ── a leitura ───────────────────────────────────────────────────────────────
 pres = Presentation(PPTX)
 meio = Emu(pres.slide_width).cm / 2 - 1.5
@@ -230,6 +250,8 @@ for s in pres.slides:
         bloco = {'titulo': titulo, 'teens': 'TEENS' in titulo.upper(), 'semanas': []}
         blocos.append(bloco); continue
     if bloco is None: continue
+    if re.search(r'TRANSITION SONGS', tudo, re.I):
+        bloco['transicao'] = transicoes(tudo); continue
     lados = {}
     for x, y, t in bx: lados.setdefault('d' if x > meio else 'e', []).append((y, t))
     for lado in ('e', 'd'):

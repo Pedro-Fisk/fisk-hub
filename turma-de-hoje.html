@@ -420,52 +420,122 @@ body.theme-dark .pl-salvar{ background: #10261f; }
 .aula .it + .btn-ck, .aula .it + .ck-feito{ margin-top: .4rem; }
 
 
-  .al.al-kids{ padding: 0; }
-  .ak-lin{ display: flex; align-items: center; gap: .6rem; padding: .45rem .9rem; flex-wrap: wrap; }
-  .ak-lin .nome{ font-family: var(--font-heading); font-weight: 700; font-size: .98rem; }
-  .ak-bts{ margin-left: auto; display: flex; gap: .35rem; }
-  .ak-bts button{ border: 1.5px solid var(--ui-bd, #c9d4e6); background: #fff; color: #1d3685; border-radius: 9px; padding: .28rem .7rem; font-weight: 800; font-size: .82rem; cursor: pointer; font-family: inherit; }
-  .ak-bts .ak-veio.on{ background: #1f9d55; border-color: #1f9d55; color: #fff; }
-  .ak-bts .ak-falta.on{ background: #c62828; border-color: #c62828; color: #fff; }
-  .ak-bts .ak-nota.tem{ border-color: #c9922e; background: #fff8e6; }
-  .ak-obs{ padding: 0 .9rem .7rem; }
-  .al.al-kids.faltou{ opacity: .75; }
-  body.theme-dark .ak-bts button{ background: #0f1825; color: #dbe6f3; border-color: #2e4560; }
-  /* ── O PLANO DA TURMA (kids e teens, 23/10/2026) ── */
-  .pt{ max-width: 1500px; margin: 0 auto 1rem; display: grid; gap: .8rem; }
-  .pt-topo{ display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; background: var(--white); border: 1.5px solid var(--ui-line, #d6deea); border-radius: 14px; padding: .7rem 1rem; }
-  .pt-topo h2{ font-family: var(--font-heading); font-size: 1.05rem; margin: 0; color: var(--ui-ink, #1d3685); }
-  .pt-topo .sem{ font-weight: 800; }
-  .pt-topo .nav{ margin-left: auto; display: flex; gap: .35rem; }
-  .pt-topo .nav button{ border: 1.5px solid var(--ui-bd, #c9d4e6); background: #fff; color: #1d3685; border-radius: 9px; padding: .3rem .7rem; font-weight: 800; cursor: pointer; font-family: inherit; }
-  .pt-cx{ background: var(--white); border: 1.5px solid var(--ui-line, #d6deea); border-radius: 14px; padding: .8rem 1rem; }
-  .pt-cx h3{ font-family: var(--font-heading); font-size: .98rem; margin: 0 0 .5rem; display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
-  .pt-cx h3 .lic{ font-size: .78rem; background: var(--ui-soft, #eef3fb); color: var(--ui-ink, #1d3685); padding: .15rem .55rem; border-radius: 99px; }
-  .pt-alunos{ font-size: .8rem; color: var(--gray); margin: -.2rem 0 .55rem; }
-  .pt-lin{ display: flex; align-items: flex-start; gap: .55rem; padding: .32rem 0; border-top: 1px dashed #e3e9f2; }
-  .pt-lin:first-of-type{ border-top: 0; }
-  .pt-lin .rot{ font-size: .7rem; font-weight: 900; letter-spacing: .03em; text-transform: uppercase; color: #6b7a90; min-width: 6.2rem; padding-top: .18rem; }
-  .pt-lin .txt{ flex: 1; font-size: .9rem; line-height: 1.4; white-space: pre-line; }
-  .pt-lin .txt a{ color: #1d3685; font-weight: 700; }
-  .pt-tick{ width: 26px; height: 26px; flex: 0 0 26px; border-radius: 50%; border: 2px solid #9fb0c8; background: #fff; cursor: pointer; display: grid; place-items: center; font-weight: 900; color: #fff; font-size: .85rem; padding: 0; }
-  .pt-tick.on{ background: #1f9d55; border-color: #1f9d55; }
-  .pt-tick:disabled{ opacity: .5; cursor: wait; }
-  .pt-quando{ font-size: .72rem; color: #1f9d55; font-weight: 800; margin-left: .3rem; white-space: nowrap; }
-  .pt-tipo{ display: inline-block; font-size: .66rem; font-weight: 900; padding: .05rem .4rem; border-radius: 6px; background: #eef3fb; color: #1d3685; margin-right: .35rem; vertical-align: 1px; }
-  .pt-tipo.hw, .pt-tipo.hwc{ background: #fff4e0; color: #9a5b00; }
-  .pt-tipo.video{ background: #fde8ef; color: #a1123f; }
-  .pt-botoes{ display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .55rem; }
-  .pt-botoes a{ font-size: .82rem; font-weight: 800; text-decoration: none; border: 1.5px solid var(--ui-bd, #c9d4e6); border-radius: 9px; padding: .3rem .7rem; color: #1d3685; background: #fff; }
-  .pt-pend{ margin-top: .5rem; font-size: .82rem; }
-  .pt-pend summary{ cursor: pointer; color: #9a5b00; font-weight: 800; }
-  .pt-aniv{ background: #fff8e6; border-color: #f2d48a; }
-  .pt-nada{ color: var(--gray); font-size: .88rem; }
-  body.pt-ativo .sem-plano, body.pt-ativo .btn-ck, body.pt-ativo .btn-atend, body.pt-ativo .al-cab .pill.pos{ display: none; }
-  body.theme-dark .pt-topo, body.theme-dark .pt-cx{ background: #172232; border-color: #2e4560; color: #dbe6f3; }
+  /* ══ A MINHA AULA DAS TURMAS KIDS E TEENS (23/10/2026, redesenho a pedido do Pedro) ══════════════════════
+     Mais leve e colorida: cada livro com a cor dele (a mesma do Modo Kids do portal), fonte maior, a aula em
+     MOMENTOS e as presenças num bloco próprio. Coluna mais estreita no computador e respiro de 14px no celular. */
+  body.pt-ativo main{ max-width: 1060px; margin-left: auto; margin-right: auto; }
+  body.pt-ativo .painel, body.pt-ativo #alunos, body.pt-ativo .pt{ max-width: 1060px; margin-left: auto; margin-right: auto; }
+  body.pt-ativo #resumo{ display: none !important; }
+  @media (max-width: 720px){ body.pt-ativo main{ padding-left: 14px; padding-right: 14px; } }
+  .pt{ display: grid; gap: 1.1rem; margin: 0 auto 1.4rem; font-size: 1.04rem; }
+  .pt-cab{ text-align: center; padding: 1.3rem 1rem 1.1rem; border-radius: 22px; color: #fff; position: relative; overflow: hidden;
+    background: linear-gradient(120deg, #7C3AED 0%, #2563EB 45%, #0EA5A0 100%); box-shadow: 0 10px 28px rgba(37,99,235,.22); }
+  .pt-cab::before, .pt-cab::after{ content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,.12); }
+  .pt-cab::before{ width: 160px; height: 160px; left: -40px; top: -60px; }
+  .pt-cab::after{ width: 110px; height: 110px; right: -24px; bottom: -44px; }
+  .pt-cab h2{ font-family: var(--font-heading); font-size: 1.55rem; margin: 0; letter-spacing: -.01em; position: relative; }
+  .pt-cab .sub{ margin-top: .25rem; font-size: 1.02rem; opacity: .95; position: relative; }
+  .pt-cab .nav{ margin-top: .8rem; display: inline-flex; gap: .4rem; position: relative; }
+  .pt-cab .nav button{ border: 0; background: rgba(255,255,255,.2); color: #fff; border-radius: 99px; padding: .38rem .95rem; font-weight: 800; font-size: .92rem; cursor: pointer; font-family: inherit; }
+  .pt-cab .nav button{ white-space: nowrap; }
+  .pt-cab .nav button:hover{ background: rgba(255,255,255,.32); }
+  .pt-titulo{ display: flex; align-items: center; justify-content: center; gap: .55rem; margin: .5rem 0 -.2rem; font-family: var(--font-heading); font-size: 1.18rem; color: #1d2b53; }
+  .pt-titulo .cont{ font-family: var(--font-body); font-size: .9rem; font-weight: 800; color: #5b6b85; }
+  .pt-trans{ display: flex; flex-wrap: wrap; justify-content: center; gap: .45rem; }
+  .pt-trans a, .pt-trans span{ display: inline-flex; align-items: center; gap: .35rem; text-decoration: none; font-weight: 800; font-size: .9rem; padding: .42rem .85rem; border-radius: 99px; background: #fff; border: 2px solid #e6e9f5; color: #3b3f73; }
+  .pt-trans a:hover{ border-color: #c7b8f5; background: #faf7ff; }
+  .pt-momentos{ display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: .8rem; }
+  .pt-mom{ position: relative; border-radius: 20px; padding: 1rem 1rem .95rem; background: var(--mc-bg); border: 2px solid var(--mc-bd); }
+  .pt-mom .ic{ width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; font-size: 1.4rem; background: #fff; box-shadow: 0 3px 10px rgba(0,0,0,.06); }
+  .pt-mom h4{ margin: .6rem 0 .25rem; font-family: var(--font-heading); font-size: 1.05rem; color: var(--mc-tx); }
+  .pt-mom .txt{ font-size: 1rem; line-height: 1.45; color: #2b3044; white-space: pre-line; }
+  .pt-mom .txt a{ color: var(--mc-tx); font-weight: 800; }
+  .pt-mom .pt-tick{ position: absolute; top: .9rem; right: .9rem; }
+  .pt-mom.m-warm{ --mc-bg: #fff4e8; --mc-bd: #ffd9b0; --mc-tx: #b45309; }
+  .pt-mom.m-story{ --mc-bg: #f2f0ff; --mc-bd: #d9d2ff; --mc-tx: #5b21b6; }
+  .pt-mom.m-com{ --mc-bg: #e9f8f5; --mc-bd: #bfeade; --mc-tx: #0f766e; }
+  .pt-mom.m-mat{ --mc-bg: #f4f6fa; --mc-bd: #e1e6ef; --mc-tx: #334155; }
+  .pt-mom.m-aniv{ --mc-bg: #fff8db; --mc-bd: #fbe08a; --mc-tx: #a16207; }
+  .pt-mom.m-geral{ --mc-bg: #eef6ff; --mc-bd: #cfe3ff; --mc-tx: #1d4ed8; }
+  .pt-livros{ display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 1rem; }
+  @media (max-width: 720px){ .pt-livros{ grid-template-columns: 1fr; } .pt-momentos{ grid-template-columns: 1fr; } }
+  .pt-livro{ border-radius: 22px; overflow: hidden; background: #fff; border: 2px solid var(--lc-soft); box-shadow: 0 6px 18px rgba(20,30,60,.06); }
+  .pt-livro .topo{ background: var(--lc); color: #fff; padding: .85rem 1.1rem; display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+  .pt-livro .topo h3{ margin: 0; font-family: var(--font-heading); font-size: 1.15rem; }
+  .pt-livro .topo .lic{ background: rgba(255,255,255,.25); border-radius: 99px; padding: .15rem .65rem; font-weight: 900; font-size: .88rem; }
+  .pt-livro .quem{ display: flex; flex-wrap: wrap; gap: .3rem; padding: .7rem 1.1rem 0; }
+  .pt-livro .quem span{ font-size: .86rem; font-weight: 800; background: var(--lc-bg); color: var(--lc-tx); border-radius: 99px; padding: .2rem .6rem; }
+  .pt-livro .corpo{ padding: .55rem 1.1rem 1rem; }
+  .pt-it{ display: flex; align-items: flex-start; gap: .65rem; padding: .5rem 0; border-top: 1px dashed #e7eaf3; font-size: 1.02rem; line-height: 1.4; }
+  .pt-it:first-child{ border-top: 0; }
+  .pt-it .t{ flex: 1; padding-top: .12rem; }
+  .pt-tipo{ display: inline-block; font-size: .72rem; font-weight: 900; padding: .1rem .45rem; border-radius: 7px; background: var(--lc-bg, #eef3fb); color: var(--lc-tx, #1d3685); margin-right: .4rem; vertical-align: 2px; letter-spacing: .02em; }
+  .pt-tipo.hw, .pt-tipo.hwc{ background: #fff1d6; color: #9a5b00; }
+  .pt-tipo.video{ background: #ffe4ec; color: #be123c; }
+  .pt-games{ margin-top: .6rem; background: var(--lc-bg); border-radius: 16px; padding: .7rem .8rem; display: flex; gap: .65rem; align-items: flex-start; }
+  .pt-games .t{ flex: 1; font-size: .98rem; line-height: 1.45; white-space: pre-line; }
+  .pt-games b{ color: var(--lc-tx); display: block; margin-bottom: .15rem; }
+  .pt-tick{ width: 30px; height: 30px; flex: 0 0 30px; border-radius: 50%; border: 2.5px solid var(--lc, #9fb0c8); background: #fff; cursor: pointer; display: grid; place-items: center; font-weight: 900; color: #fff; font-size: .95rem; padding: 0; transition: transform .12s ease, background .15s ease; }
+  .pt-tick:hover{ transform: scale(1.08); }
+  .pt-tick.on{ background: var(--lc, #10b981); border-color: var(--lc, #10b981); }
+  .pt-mom .pt-tick{ --lc: var(--mc-tx); }
+  .pt-tick:disabled{ opacity: .45; cursor: wait; }
+  .pt-quando{ font-size: .78rem; color: #059669; font-weight: 900; margin-left: .35rem; white-space: nowrap; }
+  .pt-botoes{ display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .85rem; }
+  .pt-botoes a{ flex: 1 1 160px; text-align: center; font-size: .95rem; font-weight: 900; text-decoration: none; border-radius: 14px; padding: .6rem .8rem; color: var(--lc-tx); background: var(--lc-bg); border: 2px solid var(--lc-soft); }
+  .pt-botoes a:hover{ background: var(--lc); color: #fff; border-color: var(--lc); }
+  .pt-pend{ margin-top: .7rem; font-size: .95rem; }
+  .pt-pend summary{ cursor: pointer; color: #b45309; font-weight: 900; }
+  .pt-nada{ color: #64748b; font-size: .98rem; padding: .4rem 0; }
+  /* presenças */
+  .ak-cab{ display: flex; align-items: center; justify-content: center; gap: .55rem; flex-wrap: wrap; margin: .6rem 0 .8rem; font-family: var(--font-heading); font-size: 1.18rem; color: #1d2b53; }
+  .ak-cab .cont{ font-family: var(--font-body); font-size: .9rem; font-weight: 900; padding: .2rem .65rem; border-radius: 99px; background: #eef2f8; color: #475569; }
+  .ak-cab .cont.v{ background: #d1fae5; color: #047857; }
+  .ak-cab .cont.f{ background: #fee2e2; color: #b91c1c; }
+  .al.al-kids{ padding: 0; border-radius: 18px; border: 2px solid #e8ecf4; box-shadow: none; margin-bottom: .55rem; background: #fff; overflow: hidden; }
+  .al.al-kids.veio{ border-color: #a7f3d0; background: #f6fffb; }
+  .al.al-kids.faltou{ border-color: #fecaca; background: #fff8f8; opacity: 1; filter: none; }
+  .al.al-kids.faltou .ak-id .nome{ color: #991b1b; }
+  .ak-lin{ display: flex; align-items: center; gap: .8rem; padding: .7rem 1rem; flex-wrap: wrap; }
+  .ak-av{ width: 40px; height: 40px; flex: 0 0 40px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-heading); font-weight: 700; color: #fff; background: var(--lc, #64748b); font-size: 1rem; }
+  .ak-id{ flex: 1 1 180px; min-width: 0; }
+  .ak-id .nome{ font-family: var(--font-heading); font-weight: 700; font-size: 1.08rem; color: #1e293b; line-height: 1.2; }
+  .ak-id .livro{ font-size: .86rem; font-weight: 800; color: var(--lc-tx, #475569); }
+  .ak-bts{ display: flex; gap: .9rem; align-items: center; margin-left: auto; }
+  .ak-bts button{ display: inline-flex; align-items: center; gap: .4rem; border-radius: 12px; padding: .5rem .95rem; font-weight: 900; font-size: .98rem; cursor: pointer; font-family: inherit; border: 2px solid; background: #fff; }
+  .ak-veio{ border-color: #6ee7b7 !important; color: #047857; }
+  .ak-veio .bx{ width: 18px; height: 18px; border-radius: 5px; border: 2.5px solid #10b981; display: inline-grid; place-items: center; font-size: .8rem; line-height: 1; }
+  .ak-veio.on{ background: #10b981 !important; border-color: #10b981 !important; color: #fff; }
+  .ak-veio.on .bx{ background: #fff; color: #10b981; border-color: #fff; }
+  .ak-falta{ border-color: #fca5a5 !important; color: #b91c1c; }
+  .ak-falta.on{ background: #dc2626 !important; border-color: #dc2626 !important; color: #fff; }
+  .ak-nota{ display: flex; align-items: center; gap: .4rem; margin: 0 1rem .7rem 3.75rem; background: none; border: 0; padding: 0; color: #64748b; font-weight: 800; font-size: .92rem; cursor: pointer; font-family: inherit; }
+  .ak-nota.tem{ color: #b45309; }
+  .ak-nota:hover{ color: #1d4ed8; }
+  .ak-obs{ margin: 0 1rem .9rem 3.75rem; background: #fffbea; border: 2px solid #fde68a; border-radius: 14px; padding: .7rem; }
+  .ak-obs textarea{ width: 100%; min-height: 76px; border: 1.5px solid #f3d27a; border-radius: 10px; padding: .55rem .65rem; font-family: var(--font-body); font-size: 1rem; resize: vertical; background: #fff; box-sizing: border-box; }
+  .ak-obs .st{ font-size: .82rem; font-weight: 800; color: #047857; min-height: 1.1em; margin: .3rem 0; }
+  .ak-obs .acoes{ display: flex; gap: .5rem; flex-wrap: wrap; }
+  .ak-obs .acoes button{ border: 2px solid #e2d3a0; background: #fff; color: #7c5a00; border-radius: 10px; padding: .42rem .8rem; font-weight: 900; font-size: .9rem; cursor: pointer; font-family: inherit; }
+  .ak-obs .acoes button:hover{ border-color: #b45309; }
+  @media (max-width: 720px){
+    .ak-lin{ gap: .6rem; padding: .7rem .8rem; }
+    .ak-bts{ width: 100%; margin-left: 0; gap: .6rem; }
+    .ak-bts button{ flex: 1; justify-content: center; }
+    .ak-nota, .ak-obs{ margin-left: .8rem; margin-right: .8rem; }
+    .pt-cab h2{ font-size: 1.35rem; }
+    .pt-cab .nav button{ padding: .36rem .7rem; font-size: .85rem; }
+  }
+  body.theme-dark .pt-livro, body.theme-dark .al.al-kids{ background: #172232; border-color: #2e4560; }
+  body.theme-dark .ak-id .nome, body.theme-dark .pt-titulo, body.theme-dark .ak-cab{ color: #e2e8f0; }
+  body.theme-dark .pt-mom .txt, body.theme-dark .pt-it, body.theme-dark .pt-games .t{ color: #dbe6f3; }
+  body.theme-dark .pt-mom{ background: #1b273a; }
+  body.theme-dark .pt-trans a, body.theme-dark .pt-trans span{ background: #172232; border-color: #2e4560; color: #dbe6f3; }
+  body.theme-dark .ak-bts button{ background: #0f1825; }
   body.theme-dark .pt-tick{ background: #0f1825; }
-  body.theme-dark .pt-tick.on{ background: #1f9d55; }
-  body.theme-dark .pt-botoes a, body.theme-dark .pt-topo .nav button{ background: #0f1825; color: #dbe6f3; border-color: #2e4560; }
-  body.theme-dark .pt-aniv{ background: #2b2513; border-color: #6d5a23; }
+  body.theme-dark .ak-obs{ background: #2b2513; border-color: #6d5a23; }
+  body.theme-dark .ak-obs textarea{ background: #0f1825; color: #e2e8f0; border-color: #6d5a23; }
+  body.pt-ativo .sem-plano, body.pt-ativo .btn-ck, body.pt-ativo .btn-atend, body.pt-ativo .al-cab .pill.pos{ display: none; }
 </style>
 </head>
 <body>
@@ -2365,31 +2435,64 @@ window.addEventListener('message', function (ev) {
   initCascata();
 })();
 
-/* A CHAMADA DAS TURMAS DO PLANO (Pedro, 23/10/2026): uma linha fina por aluno, para bater o olho na turma inteira.
-   "Veio" é o "Aluno atendido" de sempre com outro nome (aqui todos são atendidos juntos); "Faltou" lança o "a" no
-   card como antes; a anotação fica recolhida no 📝 e é a mesma das outras turmas. */
+/* A CHAMADA DAS TURMAS DO PLANO (Pedro, 23/10/2026): "Presenças dos alunos", uma linha por aluno com a cor do livro
+   dele. "Veio" é o "Aluno atendido" de sempre com outro nome (aqui todos são atendidos juntos); "Faltou" lança o "a"
+   no card como antes. As anotações ficam recolhidas e, abertas, podem ir ao counseling ou à célula da aula de hoje
+   no card (como nota da célula: plannerNotaCard no backend). */
 function desenharChamadaKids(caixa) {
   var lista = estado.alunos.slice().sort(function (x, y) { return normNome(x.nome) < normNome(y.nome) ? -1 : 1; });
-  var nVeio = 0, nFalta = 0;
+  var nVeio = lista.filter(function (a) { return estado.atendidos[a.raf]; }).length, nFalta = lista.filter(faltouHoje).length;
+  var cab = document.createElement('div'); cab.className = 'ak-cab';
+  cab.innerHTML = '🙋 Presenças dos alunos <span class="cont">' + lista.length + ' alunos</span><span class="cont v">✓ ' + nVeio + ' vieram</span><span class="cont f">✗ ' + nFalta + ' faltaram</span>';
+  caixa.appendChild(cab);
   lista.forEach(function (a) {
     var veio = !!estado.atendidos[a.raf], faltou = faltouHoje(a);
-    if (veio) nVeio++; if (faltou) nFalta++;
     var obs = ((estado.dados[a.raf] || {}).planner || {}).obs || '';
+    var nome = tituloNomeTH(String(a.nome || '').replace(/\([^)]*\)/g, ''));
     var el = document.createElement('section'); el.className = 'al al-kids' + (veio ? ' veio' : '') + (faltou ? ' faltou' : ''); el.dataset.raf = a.raf;
-    el.innerHTML = '<div class="ak-lin"><span class="nome">' + esc(tituloNomeTH(String(a.nome || '').replace(/\([^)]*\)/g, ''))) + '</span>' +
-      '<span class="pill">' + esc(a.book || '') + '</span>' +
-      '<span class="ak-bts"><button type="button" class="ak-veio' + (veio ? ' on' : '') + '">' + (veio ? '✓ Veio' : 'Veio') + '</button>' +
-      '<button type="button" class="ak-falta' + (faltou ? ' on' : '') + '">' + (faltou ? '✗ Faltou' : 'Faltou') + '</button>' +
-      '<button type="button" class="ak-nota' + (obs ? ' tem' : '') + '" title="Anotações · só professores" aria-label="Anotações de ' + esc(a.nome) + '">📝</button></span></div>';
+    el.setAttribute('style', ptCorVars(ptCor(a.book)));
+    el.innerHTML = '<div class="ak-lin"><span class="ak-av" aria-hidden="true">' + esc(nome.charAt(0)) + '</span>' +
+      '<span class="ak-id"><span class="nome">' + esc(nome) + '</span><br><span class="livro">' + esc(a.book || '') + '</span></span>' +
+      '<span class="ak-bts"><button type="button" class="ak-veio' + (veio ? ' on' : '') + '"><span class="bx">' + (veio ? '✓' : '') + '</span>Veio</button>' +
+      '<button type="button" class="ak-falta' + (faltou ? ' on' : '') + '">✗ Faltou</button></span></div>' +
+      '<button type="button" class="ak-nota' + (obs ? ' tem' : '') + '">📝 Anotações sobre o aluno' + (obs ? ' · tem anotação' : '') + '</button>';
     var nota = document.createElement('div'); nota.className = 'ak-obs'; nota.hidden = true;
     el.appendChild(nota);
     el.querySelector('.ak-veio').addEventListener('click', function () { if (faltouHoje(a)) { toast('Desfaça a falta antes de marcar que veio.'); return; } atender(a); });
     el.querySelector('.ak-falta').addEventListener('click', function () { if (estado.atendidos[a.raf]) { delete estado.atendidos[a.raf]; guardaAtendidos(); } marcarFalta(a); });
-    el.querySelector('.ak-nota').addEventListener('click', function () { if (!nota.firstChild) nota.appendChild(caixaObs(a)); nota.hidden = !nota.hidden; if (!nota.hidden) { var ta = nota.querySelector('textarea'); if (ta) ta.focus(); } });
+    el.querySelector('.ak-nota').addEventListener('click', function () { if (!nota.firstChild) montaNotaKids(nota, a); nota.hidden = !nota.hidden; if (!nota.hidden) { var ta = nota.querySelector('textarea'); if (ta) ta.focus(); } });
     caixa.appendChild(el);
   });
-  $('resumo').hidden = false;
-  $('resumo').innerHTML = '<b>' + lista.length + '</b> alunos · <b>' + nVeio + '</b> vieram · <b>' + nFalta + '</b> faltaram';
+}
+function montaNotaKids(box, a) {
+  var atual = ((estado.dados[a.raf] || {}).planner || {}).obs || '';
+  box.innerHTML = '<textarea maxlength="600" placeholder="Ex.: participou muito no storytelling; esqueceu o livro; conversar com a família…"></textarea>' +
+    '<div class="st"></div><div class="acoes"><button type="button" data-ak="ec">💬 Enviar anotação para o counseling</button><button type="button" data-ak="card">📇 Enviar anotação para o card</button></div>';
+  var ta = box.querySelector('textarea'), st = box.querySelector('.st');
+  ta.value = atual;
+  function salvar() {
+    var v = ta.value.trim();
+    if (v === atual) return;
+    st.textContent = 'Salvando…';
+    post({ action: 'plannerProf', raf: a.raf, book: a.book, patch: { obs: v } }).then(function (r) {
+      if (r.planner) estado.dados[a.raf] = Object.assign(estado.dados[a.raf] || {}, { planner: r.planner });
+      atual = v; st.textContent = v ? '✓ Anotação salva' : '✓ Anotação apagada';
+    }).catch(function (e) { st.textContent = '⚠️ Não salvou: ' + e.message; });
+  }
+  ta.addEventListener('input', function () { st.textContent = ''; clearTimeout(obsTimer[a.raf]); obsTimer[a.raf] = setTimeout(salvar, 1200); });
+  ta.addEventListener('blur', function () { clearTimeout(obsTimer[a.raf]); salvar(); });
+  box.querySelector('[data-ak=ec]').addEventListener('click', function () {
+    fiskCounselingGaveta({ escola: estado.escola, professor: estado.prof, turma: estado.turma, aluno: a.nome, estagio: a.book || '', texto: ta.value.trim() });
+  });
+  box.querySelector('[data-ak=card]').addEventListener('click', function () {
+    var v = ta.value.trim(), bt = this;
+    if (!v) { toast('Escreva a anotação antes de mandar para o card.'); return; }
+    bt.disabled = true; st.textContent = 'Mandando para o card…';
+    post({ action: 'plannerNotaCard', raf: a.raf, book: a.book, nota: v, quem: (sessao() || {}).name || estado.prof || '' }).then(function (r) {
+      var c = r.card || {};
+      st.textContent = c.nota ? '📇 Anotação na célula da aula de hoje, no card (como nota da célula).' : '📇 Card não alterado: ' + (c.motivo || 'não achei a aula de hoje') + '.';
+    }).catch(function (e) { st.textContent = '⚠️ Não mandou: ' + e.message; }).then(function () { bt.disabled = false; });
+  });
 }
 /* ══ O PLANO DA TURMA (kids e teens, 23/10/2026) ══════════════════════════════
    As turmas infantis e teens não usam o planner do aluno: seguem o plano de aula
@@ -2402,7 +2505,7 @@ function desenharChamadaKids(caixa) {
    _planoTurma). PILOTO: só as turmas abaixo, e a direção (master) em qualquer
    turma que tenha livro no plano. */
 var PLANO_TURMA_SEM = '2026-2';
-var PLANO_TURMA_V = '20261023b';
+var PLANO_TURMA_V = '20261023c';
 var PLANO_TURMA_PILOTO = [
   { escola: 'Caçapava', turma: /kids\s*multilevel\s*\(at[eé]\s*2º\s*ano\)\s*-\s*3ª\s*8h30/i },
   { escola: 'Taubaté', turma: /^teens\s*connect\s*2\s*-\s*3ª\s*15h/i }
@@ -2491,59 +2594,86 @@ function ptTick(livro, k, semana) {
 }
 function ptQuando(livro, k) { var m = ptMarca(livro, k); return m && m.d ? '<span class="pt-quando">' + (m.d === diaAlvoTH() ? 'hoje' : ptDataBr(m.d)) + '</span>' : ''; }
 var PT_TIPO = { te: 'TE', sb: 'SB', md: 'MD', video: 'VÍDEO', hw: 'HW', hwc: 'HWC', app: 'APP', outro: '' };
+/* a cor de cada livro: a mesma do card do estágio no Modo Kids do portal (KIDS.livros); teens com as deles */
+var PT_CORES = [[/magic\s*way\s*yellow/i, '#EAB308'], [/magic\s*way\s*blue/i, '#2563EB'], [/magic\s*way\s*red/i, '#DC2626'], [/magic\s*way\s*green/i, '#16A34A'],
+  [/hello\s*a\b/i, '#EC4899'], [/hello\s*b\b/i, '#A855F7'], [/slide/i, '#F97316'], [/see.?saw/i, '#0EA5A0'], [/merry/i, '#E11D48'], [/maze/i, '#6366F1'],
+  [/fun\s*at\s*home/i, '#B45309'], [/fun\s*at\s*school/i, '#0284C7'], [/teens\s*connect/i, '#7C3AED'], [/teens\s*elem/i, '#EA580C']];
+function ptCor(livro) { var c = PT_CORES.find(function (p) { return p[0].test(String(livro || '')); }); return c ? c[1] : '#475569'; }
+function ptCorVars(hex) {
+  var n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  var lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255, k = lum > 0.55 ? 0.5 : 0.72;
+  var esc2 = function (v) { return Math.round(v * k); };
+  return '--lc:' + hex + ';--lc-bg:rgba(' + r + ',' + g + ',' + b + ',.10);--lc-soft:rgba(' + r + ',' + g + ',' + b + ',.28);--lc-tx:rgb(' + esc2(r) + ',' + esc2(g) + ',' + esc2(b) + ')';
+}
+/* as músicas de transição do mês (Hello, Snack, Clean up, Bye), das ORIENTAÇÕES GERAIS do plano */
+var PT_TRANS = [['hello', '👋', 'Hello'], ['snack', '🍎', 'Snack'], ['clean', '🧹', 'Clean up'], ['bye', '🌈', 'Bye']];
+function ptTransicoes(b, s, mus) {
+  var tr = b.transicao; if (!tr) return '';
+  var mes = String(Number(s.de.slice(5, 7)));
+  return PT_TRANS.map(function (p) {
+    var t = tr[p[0]]; if (!t) return '';
+    var ns = t.meses ? (t.meses[mes] || []) : (t.todos || []);
+    return ns.map(function (n) {
+      var m = mus[n], rot = p[1] + ' ' + p[2];
+      return m && m.id ? '<a href="' + esc(ptDrive(m.id)) + '" target="_blank" rel="noopener" title="' + esc(n + ' · ' + m.nome) + '">' + rot + ' ▶</a>' : '<span title="música ' + n + '">' + rot + '</span>';
+    }).join('');
+  }).join('');
+}
+function ptMomento(cls, ic, titulo, txt, tick) {
+  return '<div class="pt-mom ' + cls + '">' + (tick || '') + '<div class="ic" aria-hidden="true">' + ic + '</div><h4>' + titulo + '</h4><div class="txt">' + txt + '</div></div>';
+}
 function ptDesenha() {
   var cx = $('plano-turma'); if (!cx || !ptEstado) return;
-  var P = ptEstado.P, html = '';
+  var P = ptEstado.P, html = '', off = ptEstado.off;
   var blocos = []; ptEstado.livros.forEach(function (l) { var b = ptBlocoDe(P, l); if (blocos.indexOf(b) < 0) blocos.push(b); });
   var s0 = ptSemana(blocos[0]).s;
-  html += '<div class="pt-topo"><h2>📘 Plano da turma</h2><span class="sem">Semana de ' + ptDataBr(s0.de) + ' a ' + ptDataBr(s0.ate) + '</span>' +
-    (ptEstado.off ? ' <span class="pill">' + (ptEstado.off > 0 ? '+' : '') + ptEstado.off + ' semana' + (Math.abs(ptEstado.off) > 1 ? 's' : '') + '</span>' : '') +
-    '<span class="nav"><button type="button" data-ptoff="-1" title="Semana anterior">‹</button><button type="button" data-ptoff="0" title="Semana desta aula">Hoje</button><button type="button" data-ptoff="1" title="Próxima semana">›</button></span></div>';
+  html += '<div class="pt-cab"><h2>📘 Plano da turma</h2><div class="sub">Semana de ' + ptDataBr(s0.de) + ' a ' + ptDataBr(s0.ate) +
+    (off ? ' · ' + (off > 0 ? off + ' semana' + (off > 1 ? 's' : '') + ' à frente' : (-off) + ' semana' + (off < -1 ? 's' : '') + ' atrás') : ' · a semana desta aula') + '</div>' +
+    '<div class="nav"><button type="button" data-ptoff="-1">‹ Anterior</button><button type="button" data-ptoff="0">Esta semana</button><button type="button" data-ptoff="1">Próxima ›</button></div></div>';
   blocos.forEach(function (b) {
-    var sw = ptSemana(b), s = sw.s, mus = (P.musicas && P.musicas[Object.keys(P.musicas)[0]]) || {};
-    var linhas = '';
-    var musTxt = (s.musicas || []).map(function (n) { var m = mus[n]; return m && m.id ? ptLink(ptDrive(m.id), '▶ ' + n + ' · ' + m.nome) : esc(n + (m ? ' · ' + m.nome : '')); }).join('  ');
-    var links = (s.links || []).map(function (u) { return ptLink(u, '▶ vídeo'); }).join('  ');
-    if (s.warmup || musTxt) linhas += '<div class="pt-lin">' + ptTick('*', 'warmup:' + s.de, s.de) + '<span class="rot">Warm-up</span><span class="txt">' + (musTxt || esc(s.warmup.replace(/https?:\/\/\S+/g, '').trim())) + (links ? '  ' + links : '') + ptQuando('*', 'warmup:' + s.de) + '</span></div>';
-    if (s.storytelling) linhas += '<div class="pt-lin">' + ptTick('*', 'story:' + s.de, s.de) + '<span class="rot">Storytelling</span><span class="txt">' + esc(s.storytelling) + (s.storytellingArq && s.storytellingArq.id ? '  ' + ptLink(ptDrive(s.storytellingArq.id), '📄 Reading Activity') : '') + ptQuando('*', 'story:' + s.de) + '</span></div>';
-    var com = s.comunicativa || '';
-    var comPasta = s.comunicativaPasta && s.comunicativaPasta.id && (s.comunicativaPasta.arquivos || []).length ? ptLink(ptPasta(s.comunicativaPasta.id), '📁 atividades comunicativas da semana') : '';
-    if (com || comPasta) linhas += '<div class="pt-lin">' + ptTick('*', 'com:' + s.de, s.de) + '<span class="rot">Comunicativa</span><span class="txt">' + esc(com) + (com && comPasta ? '  ' : '') + comPasta + ptQuando('*', 'com:' + s.de) + '</span></div>';
-    if (s.material) linhas += '<div class="pt-lin"><span class="rot" style="min-width:calc(6.2rem + 34px)">Material</span><span class="txt">' + esc(s.material) + '</span></div>';
-    if (s.geral) linhas += '<div class="pt-lin"><span class="rot" style="min-width:calc(6.2rem + 34px)">Livro</span><span class="txt">' + esc(s.geral) + '</span></div>';
-    if (s.gamesGeral) linhas += '<div class="pt-lin"><span class="rot" style="min-width:calc(6.2rem + 34px)">Games</span><span class="txt">' + esc(s.gamesGeral) + '</span></div>';
-    html += '<div class="pt-cx"><h3>🎵 Toda a turma' + (blocos.length > 1 ? ' · ' + esc(ptLivrosDoBloco(b)) : '') + '</h3>' + (linhas || '<div class="pt-nada">Nada além do livro nesta semana.</div>') + '</div>';
+    var s = ptSemana(b).s, mus = (P.musicas && P.musicas[Object.keys(P.musicas)[0]]) || {};
+    html += '<div class="pt-titulo">🎶 Momentos da aula' + (blocos.length > 1 ? ' <span class="cont">' + esc(ptLivrosDoBloco(b)) + '</span>' : '') + '</div>';
+    var trans = ptTransicoes(b, s, mus);
+    if (trans) html += '<div class="pt-trans">' + trans + '</div>';
+    var moms = '';
+    var musTxt = (s.musicas || []).map(function (n) { var m = mus[n]; return m && m.id ? ptLink(ptDrive(m.id), '▶ ' + m.nome) : esc(n + (m ? ' · ' + m.nome : '')); }).join('\n');
+    var links = (s.links || []).map(function (u) { return ptLink(u, '▶ abrir o vídeo'); }).join('\n');
+    if (s.warmup || musTxt) moms += ptMomento('m-warm', '🎵', 'Warm-up', (musTxt || esc(String(s.warmup || '').replace(/https?:\/\/\S+/g, '').trim())) + (links ? '\n' + links : '') + ptQuando('*', 'warmup:' + s.de), ptTick('*', 'warmup:' + s.de, s.de));
+    if (s.storytelling) moms += ptMomento('m-story', '📖', 'Storytelling', esc(s.storytelling) + (s.storytellingArq && s.storytellingArq.id ? '\n' + ptLink(ptDrive(s.storytellingArq.id), '📄 Reading Activity') : '') + ptQuando('*', 'story:' + s.de), ptTick('*', 'story:' + s.de, s.de));
+    var comPasta = s.comunicativaPasta && s.comunicativaPasta.id && (s.comunicativaPasta.arquivos || []).length ? ptLink(ptPasta(s.comunicativaPasta.id), '📁 atividades da semana') : '';
+    if (s.comunicativa || comPasta) moms += ptMomento('m-com', '💬', 'Atividade comunicativa', esc(s.comunicativa || '') + (s.comunicativa && comPasta ? '\n' : '') + comPasta + ptQuando('*', 'com:' + s.de), ptTick('*', 'com:' + s.de, s.de));
     var aniv = ptAniversarios(s);
-    if (aniv.length) html += '<div class="pt-cx pt-aniv"><h3>🎂 Aniversário nesta semana</h3><div class="txt">' + esc(aniv.join(', ')) + '. Hora de cantar parabéns!</div></div>';
+    if (aniv.length) moms += ptMomento('m-aniv', '🎂', 'Aniversário!', esc(aniv.join(', ')) + '\nHora de cantar parabéns 🎉');
+    if (s.geral) moms += ptMomento('m-geral', '📚', 'Livro nesta semana', esc(s.geral));
+    if (s.material) moms += ptMomento('m-mat', '🧺', 'Material da semana', esc(s.material));
+    html += moms ? '<div class="pt-momentos">' + moms + '</div>' : '<div class="pt-nada" style="text-align:center">Nada além do livro nesta semana.</div>';
   });
+  html += '<div class="pt-titulo">📚 Livros da turma</div><div class="pt-livros">';
   ptEstado.livros.forEach(function (livro) {
     var b = ptBlocoDe(P, livro), nome = ptLivroNoPlano(b, livro), sw = ptSemana(b), s = sw.s;
-    var L = (s.livros || {})[nome] || null;
-    var alunos = ptEstado.porLivro[livro].map(function (a) { return ptPrimeiro(a.nome); }).join(', ');
-    var corpo = '';
+    var L = (s.livros || {})[nome] || null, corpo = '';
     if (!L || (!L.itens.length && !(L.games || []).length)) corpo = '<div class="pt-nada">' + (s.geral ? esc(s.geral) : 'Sem atividade de livro nesta semana.') + '</div>';
     else {
       L.itens.forEach(function (it) {
-        corpo += '<div class="pt-lin">' + ptTick(nome, it.k, s.de) + '<span class="txt">' + (PT_TIPO[it.tipo] ? '<span class="pt-tipo ' + esc(it.tipo) + '">' + PT_TIPO[it.tipo] + '</span>' : '') + esc(it.t) + ptQuando(nome, it.k) + '</span></div>';
+        corpo += '<div class="pt-it">' + ptTick(nome, it.k, s.de) + '<span class="t">' + (PT_TIPO[it.tipo] ? '<span class="pt-tipo ' + esc(it.tipo) + '">' + PT_TIPO[it.tipo] + '</span>' : '') + esc(it.t) + ptQuando(nome, it.k) + '</span></div>';
       });
-      if ((L.games || []).length) corpo += '<div class="pt-lin">' + ptTick(nome, 'games:' + s.de, s.de) + '<span class="rot">Games</span><span class="txt">' + esc(L.games.join('\n')) + ptQuando(nome, 'games:' + s.de) + '</span></div>';
+      if ((L.games || []).length) corpo += '<div class="pt-games">' + ptTick(nome, 'games:' + s.de, s.de) + '<span class="t"><b>🎲 Games e extras</b>' + esc(L.games.join('\n')) + ptQuando(nome, 'games:' + s.de) + '</span></div>';
     }
-    /* o que ficou para trás: atividades de semanas anteriores deste livro ainda sem tique */
-    /* só a partir do primeiro tique deste livro: antes disso a turma não usava o plano aqui, e acusar o semestre
-       inteiro como pendente no primeiro dia seria só ruído */
+    /* o que ficou para trás: atividades de semanas anteriores deste livro ainda sem tique, só a partir do primeiro
+       tique dele (antes disso a turma não usava o plano aqui, e acusar o semestre inteiro seria só ruído) */
     var desde = '';
     Object.keys(ptEstado.marcas).forEach(function (ch) { var m = ptEstado.marcas[ch]; if (ch.indexOf(nome + '|') === 0 && m.s && (!desde || m.s < desde)) desde = m.s; });
     var pend = [];
     if (desde) (b.semanas || []).slice(0, sw.i).forEach(function (sp) { if (sp.de < desde) return; var Lp = (sp.livros || {})[nome]; if (!Lp) return; Lp.itens.forEach(function (it) { if (!ptMarca(nome, it.k)) pend.push({ s: sp, it: it }); }); });
-    if (ptEstado.carregou && pend.length) {
-      corpo += '<details class="pt-pend"><summary>⏳ ' + pend.length + ' atividade' + (pend.length > 1 ? 's' : '') + ' de semanas anteriores sem tique</summary>' +
-        pend.slice(-40).map(function (p) { return '<div class="pt-lin">' + ptTick(nome, p.it.k, p.s.de) + '<span class="rot">' + esc(ptDataBr(p.s.de)) + '</span><span class="txt">' + (PT_TIPO[p.it.tipo] ? '<span class="pt-tipo ' + esc(p.it.tipo) + '">' + PT_TIPO[p.it.tipo] + '</span>' : '') + esc(p.it.t) + '</span></div>'; }).join('') + '</details>';
-    }
-    html += '<div class="pt-cx"><h3>📗 ' + esc(livro) + (L && L.licao ? ' <span class="lic">' + esc(L.licao) + '</span>' : '') + '</h3>' +
-      '<div class="pt-alunos">' + ptEstado.porLivro[livro].length + ' aluno' + (ptEstado.porLivro[livro].length > 1 ? 's' : '') + ': ' + esc(alunos) + '</div>' + corpo +
-      ptBotoesMaterial(livro, ptLicaoVigente(b, nome, sw.i)) + '</div>';
+    if (ptEstado.carregou && pend.length) corpo += '<details class="pt-pend"><summary>⏳ ' + pend.length + ' atividade' + (pend.length > 1 ? 's' : '') + ' de semanas anteriores sem tique</summary>' +
+      pend.slice(-40).map(function (p) { return '<div class="pt-it">' + ptTick(nome, p.it.k, p.s.de) + '<span class="t"><span class="pt-tipo">' + esc(ptDataBr(p.s.de)) + '</span>' + esc(p.it.t) + '</span></div>'; }).join('') + '</details>';
+    var cor = ptCor(livro), claro = parseInt(cor.slice(1), 16), lum = (0.299 * (claro >> 16) + 0.587 * ((claro >> 8) & 255) + 0.114 * (claro & 255)) / 255;
+    html += '<div class="pt-livro" style="' + ptCorVars(cor) + '"><div class="topo"' + (lum > 0.6 ? ' style="color:#3a2e00"' : '') + '><h3>' + esc(livro) + '</h3>' + (L && L.licao ? '<span class="lic">' + esc(L.licao) + '</span>' : '') + '</div>' +
+      '<div class="quem">' + ptEstado.porLivro[livro].map(function (a) { return '<span>' + esc(ptPrimeiro(a.nome)) + '</span>'; }).join('') + '</div>' +
+      '<div class="corpo">' + corpo + ptBotoesMaterial(livro, ptLicaoVigente(b, nome, sw.i)) + '</div></div>';
   });
-  if (!ptEstado.carregou) html += '<div class="pt-nada">🔄 Lendo o que já foi feito…</div>';
+  html += '</div>';
+  if (!ptEstado.carregou) html += '<div class="pt-nada" style="text-align:center">🔄 Lendo o que já foi feito…</div>';
   cx.innerHTML = html; cx.hidden = false;
   cx.querySelectorAll('[data-ptoff]').forEach(function (bt) { bt.addEventListener('click', function () { var v = Number(bt.dataset.ptoff); ptEstado.off = v === 0 ? 0 : ptEstado.off + v; ptDesenha(); }); });
   cx.querySelectorAll('.pt-tick').forEach(function (bt) { bt.addEventListener('click', function () { ptAlterna(bt.dataset.ptl, bt.dataset.ptk, bt.dataset.pts); }); });
@@ -2563,7 +2693,7 @@ function ptLicaoVigente(b, nome, ate) {
   return '';
 }
 function ptBotoesMaterial(livro, licao) {
-  var rot = licao ? ' · Lesson ' + licao : '';
+  var rot = licao ? ' da Lesson ' + licao : ' do livro';
   return '<div class="pt-botoes">' + ptLink(ptUrlMaterial(livro, 'audios', licao), '🎧 Áudios' + rot) +
     (PT_SEM_VIDEO.test(livro) ? '' : ptLink(ptUrlMaterial(livro, 'videos', licao), '📺 Vídeos' + rot)) + '</div>';
 }
