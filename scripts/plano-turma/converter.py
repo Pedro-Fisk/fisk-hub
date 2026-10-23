@@ -309,6 +309,87 @@ for b in blocos:
     b['semanas'].sort(key=lambda s: (s['de'], s['ate']))
     b['livros'] = sorted({n for s in b['semanas'] for n in s['livros']})
 
+# ── CORREÇÕES DO DOCUMENTO (por semestre) ──────────────────────────────────
+# 2026-2 (Pedro, 23/10/2026): no bloco dos menores (Blue, Green, Hello B, See-Saw), as semanas de 02/11 e 09/11 trazem
+# as lições de 16/11 e 23/11 e vice-versa (L9/L10 antes da L8), nos QUATRO livros: um bloco copiado e colado no
+# lugar errado. Aqui os livros dessas semanas trocam de lugar; o resto da semana (músicas, storytelling) fica.
+# No Fun at School, a mesma coisa em 23/11 e 30/11 (p. 92-99 antes das p. 88-91): troca só esse livro.
+TROCAS = {'2026-2': [('MW BLUE', None, ('2026-11-02', '2026-11-16')), ('MW BLUE', None, ('2026-11-09', '2026-11-23')),
+                     ('PLAY MAZE', 'Fun At School', ('2026-11-23', '2026-11-30'))]}
+for marca, so, (d1, d2) in TROCAS.get(SEM, []):
+    for b in blocos:
+        if marca.lower() not in b['titulo'].lower(): continue
+        s1 = next((x for x in b['semanas'] if x['de'] == d1), None); s2 = next((x for x in b['semanas'] if x['de'] == d2), None)
+        if not (s1 and s2): continue
+        if so is None: s1['livros'], s2['livros'] = s2['livros'], s1['livros']
+        else:
+            a1, a2 = s1['livros'].pop(so, None), s2['livros'].pop(so, None)
+            if a2 is not None: s1['livros'][so] = a2
+            if a1 is not None: s2['livros'][so] = a1
+        s1['corrigida'] = s2['corrigida'] = True
+
+# ── A LIÇÃO QUE O PLANO NÃO DIZ ──────────────────────────────────────────────
+# Hello B, Maze, Fun at School e Magic Way Blue trazem só páginas. A lição sai da página do SB: o catálogo de áudios
+# do portal (assets/audios-data.js) guarda a página de cada faixa, então se sabe onde cada lição começa; a semana
+# fica com a lição em que cai o MEIO das páginas do SB. Conferido em 23/10/2026 nos livros que dizem a lição:
+# See-Saw 18/18, Green 16/18 (os 2 erros eram de leitura do texto). O Blue não tem página no catálogo: os inícios
+# abaixo são ESTIMADOS pelas páginas do TE, que andam no ritmo do Green (duas semanas por lição).
+INICIO_TE_BLUE = [(1, 6), (2, 26), (3, 46), (4, 64), (5, 86), (6, 106), (7, 126), (8, 146), (9, 162), (10, 182)]
+CAT_ID = {'Playground Hello B': 'playground-hello-b', 'Playground Hello A': 'playground-hello-a', 'Playground Maze': 'playground-maze',
+          'Playground Slide': 'playground-slide', 'Playground Merry-Go-Round': 'playground-merry-go-round', 'Playground See-Saw': 'playground-see-saw',
+          'Fun At School': 'fun-at-school', 'Fun At Home': 'fun-at-home', 'Magic Way Green Book': 'magic-way-green', 'Magic Way Red Book': 'magic-way-red'}
+def iniciosDoCatalogo():
+    caminho = os.path.join(AQUI, '..', '..', '..', 'portal-aluno-fisk', 'assets', 'audios-data.js')
+    if '--portal' in sys.argv: caminho = os.path.join(sys.argv[sys.argv.index('--portal') + 1], 'assets', 'audios-data.js')
+    try:
+        js = subprocess.run(['node', '-e', 'global.window={};require(process.argv[1]);const A=Object.values(window).find(v=>v&&v.books);'
+                             'const o={};A.books.forEach(b=>{o[b.id]=b.sections.map(s=>{const m=String(s.title).match(/^Lesson (\\d+)/);const ps=s.tracks.map(t=>t.p).filter(Number.isFinite);'
+                             'return m&&ps.length?[+m[1],Math.min(...ps)]:null}).filter(Boolean)});console.log(JSON.stringify(o))', os.path.abspath(caminho)],
+                            capture_output=True, text=True).stdout
+        return json.loads(js or '{}')
+    except Exception: return {}
+INICIOS = iniciosDoCatalogo()
+def paginas(itens, prefixo):
+    if prefixo == 'SB':
+        tudo = ' '.join(i['t'] for i in itens)
+        tudo = re.sub(r'p\.?\s*\d+\s*\(WB\)\s*\+?', ' ', tudo, flags=re.I)
+        m = re.search(r'\b(?:SB|BS)\s*[-:]?\s*p(?:g|\.)?\s*:?\s*\.?\s*(\d+)(?:\s*(?:-|to|a)\s*(\d+))?', tudo, re.I)
+        if m: return (int(m.group(1)), int(m.group(2) or m.group(1)))
+    for it in itens:
+        t = it['t']
+        if prefixo == 'SB' and (re.match(r'^\s*(TE|TM|HW|HWC|MD)\b', t, re.I) or re.search(r'\bWB\b', t)): continue
+        if prefixo == 'TE' and not re.match(r'^\s*(TE|TM)\b', t, re.I): continue
+        m = re.search(r'p(?:g|\.)?\s*:?\s*\.?\s*(\d+)\s*(?:-|to|a)\s*(\d+)', t, re.I) or re.search(r'p(?:g|\.)?\s*:?\s*\.?\s*(\d+)', t, re.I)
+        if m: return (int(m.group(1)), int(m.group(2) if m.lastindex and m.lastindex > 1 else m.group(1)))
+    return None
+def licaoPorInicio(inicios, pg):
+    meio = (pg[0] + pg[1]) / 2; l = None
+    for n, ini in sorted(inicios, key=lambda x: x[1]):
+        if ini <= meio + 0.5: l = n
+    return l
+for b in blocos:
+    for s in b['semanas']:
+        for nome, L in s['livros'].items():
+            if L.get('licao') or not L['itens']: continue
+            txt = ' '.join(i['t'] for i in L['itens'])
+            adv = re.search(r'adventure\s*(\d)', txt, re.I)
+            if adv: L['licao'] = 'Adv' + adv.group(1); L['licaoInferida'] = True; continue
+            if nome == 'Magic Way Blue Book':
+                pg = paginas(L['itens'], 'TE'); n = licaoPorInicio(INICIO_TE_BLUE, pg) if pg else None
+            else:
+                ini = INICIOS.get(CAT_ID.get(nome, ''), [])
+                pg = paginas(L['itens'], 'SB'); n = licaoPorInicio(ini, pg) if (pg and ini) else None
+            if n: L['licao'] = 'L%d' % n; L['licaoInferida'] = True
+
+# as chaves das atividades seguem a semana em que a atividade ESTÁ (depois das trocas)
+for b in blocos:
+    for s in b['semanas']:
+        for nome, L in s['livros'].items():
+            vistos = {}
+            for it in L['itens']:
+                k = chave(s['de'], nome, it['t']); vistos[k] = vistos.get(k, 0) + 1
+                it['k'] = k + (str(vistos[k]) if vistos[k] > 1 else '')
+
 # ── as ligações com o Drive ────────────────────────────────────────────────
 MUS, RA, COM, MAT = musicas(), readingActivities(), comunicativas(), materiais()
 def raDe(titulo):

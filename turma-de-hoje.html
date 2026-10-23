@@ -2523,7 +2523,7 @@ function montaNotaKids(box, a) {
    _planoTurma). PILOTO: só as turmas abaixo, e a direção (master) em qualquer
    turma que tenha livro no plano. */
 var PLANO_TURMA_SEM = '2026-2';
-var PLANO_TURMA_V = '20261023d';
+var PLANO_TURMA_V = '20261023e';
 var PLANO_TURMA_PILOTO = [
   { escola: 'Caçapava', turma: /kids\s*multilevel\s*\(at[eé]\s*2º\s*ano\)\s*-\s*3ª\s*8h30/i },
   { escola: 'Taubaté', turma: /^teens\s*connect\s*2\s*-\s*3ª\s*15h/i }
@@ -2692,7 +2692,7 @@ function ptDesenha() {
     var mover = nL > 1 ? '<span class="mover"><button type="button" data-ptmv="-1" data-ptlv="' + esc(livro) + '"' + (iL === 0 ? ' disabled' : '') + ' aria-label="Subir ' + esc(livro) + '" title="Fazer antes">↑</button>' +
       '<button type="button" data-ptmv="1" data-ptlv="' + esc(livro) + '"' + (iL === nL - 1 ? ' disabled' : '') + ' aria-label="Descer ' + esc(livro) + '" title="Fazer depois">↓</button>' +
       '<span class="alca" title="Segure e arraste para mudar a ordem" aria-hidden="true">⠿</span></span>' : '';
-    html += '<div class="pt-livro" draggable="' + (nL > 1) + '" data-ptlivro="' + esc(livro) + '" style="' + ptCorVars(cor) + '"><div class="topo"' + (lum > 0.6 ? ' style="color:#3a2e00"' : '') + '><h3>' + esc(livro) + '</h3>' + (L && L.licao ? '<span class="lic">' + esc(L.licao) + '</span>' : '') + mover + '</div>' +
+    html += '<div class="pt-livro" draggable="' + (nL > 1) + '" data-ptlivro="' + esc(livro) + '" style="' + ptCorVars(cor) + '"><div class="topo"' + (lum > 0.6 ? ' style="color:#3a2e00"' : '') + '><h3>' + esc(livro) + '</h3>' + (L && L.licao ? '<span class="lic"' + (L.licaoInferida ? ' title="Lição deduzida pelas páginas do livro (o plano traz só as páginas)"' : '') + '>' + esc(L.licao) + '</span>' : '') + mover + '</div>' +
       '<div class="quem">' + ptEstado.porLivro[livro].map(function (a) { return '<span>' + esc(ptPrimeiro(a.nome)) + '</span>'; }).join('') + '</div>' +
       '<div class="corpo">' + corpo + ptBotoesMaterial(livro, ptLicaoVigente(b, nome, sw.i)) + '</div></div>';
   });

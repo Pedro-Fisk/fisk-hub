@@ -95,7 +95,7 @@ window.PLANO_TURMA["2026-2"] = {
        ]
       },
       "Playground Hello B": {
-       "licao": "",
+       "licao": "L1",
        "itens": [
         {
          "k": "fb7dbfd3",
@@ -120,7 +120,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "L1 TE p.7,9, 11 - optional activities - MD"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Playground See-Saw": {
        "licao": "L1",
@@ -219,7 +220,7 @@ window.PLANO_TURMA["2026-2"] = {
        ]
       },
       "Playground Hello B": {
-       "licao": "",
+       "licao": "L1",
        "itens": [
         {
          "k": "84051b59",
@@ -239,7 +240,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Play time and Appendix pg: 89 pg: 22 Rocket with shapes/ pg: 23."
-       ]
+       ],
+       "licaoInferida": true
       },
       "Playground See-Saw": {
        "licao": "L1",
@@ -340,7 +342,7 @@ window.PLANO_TURMA["2026-2"] = {
        ]
       },
       "Playground Hello B": {
-       "licao": "",
+       "licao": "L2",
        "itens": [
         {
          "k": "20fef5ad",
@@ -360,7 +362,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Play time pg: 30 (Buddy´s family Tree), pg: 31 (Ballon people)"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Playground See-Saw": {
        "licao": "L2",
@@ -425,7 +428,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "MGB - 4 sheets of paper, scotch tape, colored pencils or crayons.\nHello B - Appendix Pages, colored pencil, glue.",
      "livros": {
       "Magic Way Blue Book": {
-       "licao": "",
+       "licao": "L3",
        "itens": [
         {
          "k": "734b2db2",
@@ -440,7 +443,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Game: what is the monster wearing - TE. p50."
-       ]
+       ],
+       "licaoInferida": true
       },
       "Magic Way Green Book": {
        "licao": "L3",
@@ -466,7 +470,7 @@ window.PLANO_TURMA["2026-2"] = {
        ]
       },
       "Playground Hello B": {
-       "licao": "",
+       "licao": "L3",
        "itens": [
         {
          "k": "54767480",
@@ -481,7 +485,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "PT pg 38/39 (Appendix pg 99), Appendix pg 91 to 98."
-       ]
+       ],
+       "licaoInferida": true
       },
       "Playground See-Saw": {
        "licao": "L2",
@@ -530,7 +535,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "MWG - paper plates (2 for each child), pieces of candy (small size, individually wrapped), double-sided Scotch tape. Masking tape.\nMGB- six A4 sheets of paper or similar, markers or crayons. Colored balloons.",
      "livros": {
       "Magic Way Blue Book": {
-       "licao": "",
+       "licao": "L3",
        "itens": [
         {
          "k": "39e6aad9",
@@ -545,7 +550,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Game : find the color - TE. p60. Extra activity: give the balloon - TE. p62."
-       ]
+       ],
+       "licaoInferida": true
       },
       "Magic Way Green Book": {
        "licao": "L3",
@@ -571,7 +577,7 @@ window.PLANO_TURMA["2026-2"] = {
        ]
       },
       "Playground Hello B": {
-       "licao": "",
+       "licao": "L4",
        "itens": [
         {
          "k": "8ef1f851",
@@ -606,7 +612,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "PT pg 46/ 47, Appendix pg 101 to 103."
-       ]
+       ],
+       "licaoInferida": true
       },
       "Playground See-Saw": {
        "licao": "L3",
@@ -654,7 +661,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Hello B: colored Pencil\nSee-Saw: (p.31) paper towels, colored markers + container with water | (p.33) plastic bottles + small ball | (p.34) cardboard boxes + decorations",
      "livros": {
       "Magic Way Blue Book": {
-       "licao": "",
+       "licao": "L4",
        "itens": [
         {
          "k": "c5980368",
@@ -666,7 +673,8 @@ window.PLANO_TURMA["2026-2"] = {
          "t": "SB p. 23-26",
          "tipo": "sb"
         }
-       ]
+       ],
+       "licaoInferida": true
       },
       "Magic Way Green Book": {
        "licao": "L4",
@@ -687,7 +695,7 @@ window.PLANO_TURMA["2026-2"] = {
        ]
       },
       "Playground Hello B": {
-       "licao": "",
+       "licao": "L5",
        "itens": [
         {
          "k": "65fe2662",
@@ -702,7 +710,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Appendix pg 105 to 108"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Playground See-Saw": {
        "licao": "L3",
@@ -759,7 +768,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "MGB: worksheet B, Worksheet D. Colored paper or old magazines, glue, colored pencils or crayons. Old newspaper, a bucket or a box, masking tape\nHello B: colored pencils,",
      "livros": {
       "Magic Way Blue Book": {
-       "licao": "",
+       "licao": "L4",
        "itens": [
         {
          "k": "b26d6df0",
@@ -774,7 +783,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Game: numbers cards - TE p76, Game: memory game - TE. p80. Extra activities - TE. p84."
-       ]
+       ],
+       "licaoInferida": true
       },
       "Magic Way Green Book": {
        "licao": "L4",
@@ -795,7 +805,7 @@ window.PLANO_TURMA["2026-2"] = {
        ]
       },
       "Playground Hello B": {
-       "licao": "",
+       "licao": "L6",
        "itens": [
         {
          "k": "16f33e30",
@@ -815,7 +825,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Móbile PT pg 54/55, Appendix 109 to 113."
-       ]
+       ],
+       "licaoInferida": true
       },
       "Playground See-Saw": {
        "licao": "L4",
@@ -859,7 +870,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "MGB - balloons TE p. 88\nHello B - Colored Pencils\nSee-Saw: paint (blue, green, purple, red, yellow and orange)",
      "livros": {
       "Magic Way Blue Book": {
-       "licao": "",
+       "licao": "L5",
        "itens": [
         {
          "k": "ca9e554f",
@@ -874,7 +885,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Game: throw the balloons - TE  p.88."
-       ]
+       ],
+       "licaoInferida": true
       },
       "Magic Way Green Book": {
        "licao": "L5",
@@ -895,7 +907,7 @@ window.PLANO_TURMA["2026-2"] = {
        ]
       },
       "Playground Hello B": {
-       "licao": "",
+       "licao": "L7",
        "itens": [
         {
          "k": "ff8e9bba",
@@ -910,7 +922,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Playtime pg.62"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Playground See-Saw": {
        "licao": "L4",
@@ -958,7 +971,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "MWG - a baking pan with a thin layer of flour covering the bottom. TE p. 120 - small plastic water bottles toilet paper rolls, dried  food, decorative materials. TE p.122 a rubber band.",
      "livros": {
       "Magic Way Blue Book": {
-       "licao": "",
+       "licao": "L5",
        "itens": [
         {
          "k": "2671afc8",
@@ -973,7 +986,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Game: carry the items TE p 96. Extra activities TE p.104"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Magic Way Green Book": {
        "licao": "L5",
@@ -994,7 +1008,7 @@ window.PLANO_TURMA["2026-2"] = {
        ]
       },
       "Playground Hello B": {
-       "licao": "",
+       "licao": "L7",
        "itens": [
         {
          "k": "584780bb",
@@ -1009,7 +1023,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Playtime pg. 63 (Extras pg. 115 to 119)"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Playground See-Saw": {
        "licao": "L5",
@@ -1061,7 +1076,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Hello B: Glue, scissors and paper + Extras pg. 131 to 137\nSee-Saw: cardboard boxes, scissors, glue",
      "livros": {
       "Magic Way Blue Book": {
-       "licao": "",
+       "licao": "L6",
        "itens": [
         {
          "k": "e636b16e",
@@ -1073,7 +1088,8 @@ window.PLANO_TURMA["2026-2"] = {
          "t": "SB p. 34-37",
          "tipo": "sb"
         }
-       ]
+       ],
+       "licaoInferida": true
       },
       "Magic Way Green Book": {
        "licao": "L6",
@@ -1094,7 +1110,7 @@ window.PLANO_TURMA["2026-2"] = {
        ]
       },
       "Playground Hello B": {
-       "licao": "",
+       "licao": "L8",
        "itens": [
         {
          "k": "7e216a8d",
@@ -1109,7 +1125,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Play Time pg. 70 (Extras pg. 131 to 137)"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Playground See-Saw": {
        "licao": "L5",
@@ -1153,7 +1170,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Play Time pg. 70 (Extras pg. 131 to 137)\nMWG _ TE. 138 - blank sheets of paper, glue, yarn, TE. 146 - cons, double-sided Scotch tape.",
      "livros": {
       "Magic Way Blue Book": {
-       "licao": "",
+       "licao": "L6",
        "itens": [
         {
          "k": "4e96b3fa",
@@ -1168,7 +1185,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Extras TE. 124."
-       ]
+       ],
+       "licaoInferida": true
       },
       "Magic Way Green Book": {
        "licao": "L6",
@@ -1189,7 +1207,7 @@ window.PLANO_TURMA["2026-2"] = {
        ]
       },
       "Playground Hello B": {
-       "licao": "",
+       "licao": "L8",
        "itens": [
         {
          "k": "c8bd9b92",
@@ -1204,7 +1222,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Play Time pg. 70 (Extras pg. 131 to 137)"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Playground See-Saw": {
        "licao": "L6",
@@ -1261,7 +1280,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Hello B: Glue, scissors and paper + Extras pg. 121 to 129.\nMWG: worksheet A",
      "livros": {
       "Magic Way Blue Book": {
-       "licao": "",
+       "licao": "L7",
        "itens": [
         {
          "k": "7aff7514",
@@ -1276,7 +1295,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Extras activities"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Magic Way Green Book": {
        "licao": "L7",
@@ -1297,7 +1317,7 @@ window.PLANO_TURMA["2026-2"] = {
        ]
       },
       "Playground Hello B": {
-       "licao": "",
+       "licao": "L8",
        "itens": [
         {
          "k": "7a58bc63",
@@ -1312,7 +1332,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Story Time (Extras pg. 121 to 129) + Play Time pg, 71"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Playground See-Saw": {
        "licao": "L6",
@@ -1360,7 +1381,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Hello B: Glue, scissors and pape, colored pencils r + Extras pg. 143/145)\nMWG - a baking pan with a thin layer of flour (sugar, rice or sand)\nSee-Saw: brown kraft paper, crayons | plastic cups, masking tape, thumbtack, water",
      "livros": {
       "Magic Way Blue Book": {
-       "licao": "",
+       "licao": "L7",
        "itens": [
         {
          "k": "eeb8682f",
@@ -1375,7 +1396,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Hands on: glitter germs activity TE. 136. Extras activities"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Magic Way Green Book": {
        "licao": "L7",
@@ -1391,7 +1413,7 @@ window.PLANO_TURMA["2026-2"] = {
        ]
       },
       "Playground Hello B": {
-       "licao": "",
+       "licao": "L9",
        "itens": [
         {
          "k": "2a52dda5",
@@ -1406,7 +1428,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Story Time pg. 77 (Extras pg. 143/145)"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Playground See-Saw": {
        "licao": "L7",
@@ -1460,67 +1483,72 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Hello B:Scissors+ Extras pg. 139\nSee-Saw: paper sheets and crayons",
      "livros": {
       "Magic Way Blue Book": {
-       "licao": "",
+       "licao": "L8",
        "itens": [
         {
-         "k": "a8c7aed1",
-         "t": "TE P. 162-172",
+         "k": "8f1ee49e",
+         "t": "TE p. 146-150",
          "tipo": "te"
         },
         {
-         "k": "f65ad14a",
-         "t": "SB p. 51-54",
+         "k": "e55d1211",
+         "t": "SB p. 46-48",
          "tipo": "sb"
         }
        ],
        "games": [
-        "videos activities."
-       ]
+        "Arts and crafts: right handed or left handed."
+       ],
+       "licaoInferida": true
       },
       "Magic Way Green Book": {
-       "licao": "L9",
+       "licao": "L8",
        "itens": [
         {
-         "k": "cc905f94",
-         "t": "TE p. 198 to 208",
+         "k": "f1bc3c0b",
+         "t": "TE p.174 to 184",
          "tipo": "te"
         },
         {
-         "k": "e21a858d",
-         "t": "SB p. 70 to 73",
+         "k": "c4b76e1b",
+         "t": "SB p. 62 to 65",
          "tipo": "sb"
         }
+       ],
+       "games": [
+        "Follow up practice TE. 186, warm up practice TE. 192. Abracadabra TE. 194."
        ]
       },
       "Playground Hello B": {
-       "licao": "",
+       "licao": "L9",
        "itens": [
         {
-         "k": "a0cd221e",
-         "t": "SB: pg. 80 to 81",
+         "k": "4d4a4930",
+         "t": "SB: pg. 75 to 76",
          "tipo": "sb"
         },
         {
-         "k": "4a4126d0",
-         "t": "HW Jolly´s Play Book pg. 33",
+         "k": "c833f238",
+         "t": "HW Jolly´s Play Book pg. 31",
          "tipo": "hw"
         }
        ],
        "games": [
-        ".Review Game (Can)"
-       ]
+        ": Story Time pg. 77 (Extras pg. 147/149/151)"
+       ],
+       "licaoInferida": true
       },
       "Playground See-Saw": {
-       "licao": "L9",
+       "licao": "L8",
        "itens": [
         {
-         "k": "531f5c96",
-         "t": "(full lesson – or half at Tutoria >vacation<) TE p. 150 to 167",
-         "tipo": "outro"
+         "k": "1534aa22",
+         "t": "TE p. 132 to 139",
+         "tipo": "te"
         },
         {
-         "k": "43bebbac",
-         "t": "SB p. 86 to 95",
+         "k": "5bcaf6be",
+         "t": "SB p. 76 to 80",
          "tipo": "sb"
         },
         {
@@ -1529,16 +1557,17 @@ window.PLANO_TURMA["2026-2"] = {
          "tipo": "hw"
         },
         {
-         "k": "8302174e",
-         "t": "Worksheet p.23 (to cut for next class)",
+         "k": "a700a8a5",
+         "t": "Worksheet p. 19",
          "tipo": "outro"
         }
        ],
        "games": [
-        "(optional) p.93 write a message with bubble letters | GAME: Simon Says p. 95"
+        "Worksheet p. 20"
        ]
       }
      },
+     "corrigida": true,
      "comunicativaPasta": {
       "id": "1m8-bNdvRSOi50aJ8Y3IvRIZQLaxDWud-",
       "arquivos": []
@@ -1556,80 +1585,83 @@ window.PLANO_TURMA["2026-2"] = {
      "storytelling": "ROCK-A-BABY",
      "livros": {
       "Magic Way Blue Book": {
-       "licao": "",
+       "licao": "L8",
        "itens": [
         {
-         "k": "3dc7cb18",
-         "t": "TE p. 172-180",
+         "k": "8fcc8191",
+         "t": "TE p. 152-160",
          "tipo": "te"
         },
         {
-         "k": "f055a839",
-         "t": "SB p. 55-56",
+         "k": "ba530d47",
+         "t": "SB p. 49-50",
+         "tipo": "sb"
+        }
+       ],
+       "licaoInferida": true
+      },
+      "Magic Way Green Book": {
+       "licao": "L8",
+       "itens": [
+        {
+         "k": "26f56568",
+         "t": "TE p. 186 to 196",
+         "tipo": "te"
+        },
+        {
+         "k": "c766685e",
+         "t": "SB p. 66 to 69",
          "tipo": "sb"
         }
        ],
        "games": [
-        "extra activity 2."
-       ]
-      },
-      "Magic Way Green Book": {
-       "licao": "L9",
-       "itens": [
-        {
-         "k": "068eff5e",
-         "t": "TE p. 210 to 220",
-         "tipo": "te"
-        },
-        {
-         "k": "05b1b78c",
-         "t": "SB p.74 to 77",
-         "tipo": "sb"
-        }
+        "Follow up practice TE. 210."
        ]
       },
       "Playground Hello B": {
-       "licao": "",
+       "licao": "L9",
        "itens": [
         {
-         "k": "39e603fb",
-         "t": "SB: pg. 82 to 83",
+         "k": "a7bb0f89",
+         "t": "SB  SB: pg. 77-79",
          "tipo": "sb"
         },
         {
-         "k": "40cb6b39",
-         "t": "HW Jolly´s Play Book pg. 34",
+         "k": "4b5e9f7b",
+         "t": "HW Jolly´s Play Book pg. 32",
          "tipo": "hw"
         }
        ],
        "games": [
-        "Head, shoulders, knees and Toe"
-       ]
+        "Play Time pg. 78 (Extras pg. 139)"
+       ],
+       "licaoInferida": true
       },
       "Playground See-Saw": {
-       "licao": "L10",
+       "licao": "L8",
        "itens": [
         {
-         "k": "39edfe30",
-         "t": "TE p. 168 to 175",
+         "k": "69c6196f",
+         "t": "TE p. 140 to 149",
          "tipo": "te"
         },
         {
-         "k": "79f81039",
-         "t": "SB p. 96 to 100",
+         "k": "0ac6710e",
+         "t": "SB p. 81 to 85",
          "tipo": "sb"
         },
         {
-         "k": "d47f71da",
-         "t": "HW: Cyber Missions",
+         "k": "d4b8580b",
+         "t": "HW: Worksheet p. 23",
          "tipo": "hw"
         }
        ],
        "games": [
-        "no extra – focus on the project rehearsal (longer)"
+        "Worksheet p. 21+22 | GAME: Hockey Pockey / Mime feelings (p.85) or TE p. 149 optional activity with the Ss photos"
        ]
       }
      },
+     "corrigida": true,
      "comunicativaPasta": {
       "id": "1n1IbH7D1zy6j6rVdO3lLPZ3azO590iRl",
       "arquivos": []
@@ -1646,70 +1678,69 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Hello B: Glue, scissors and pape, colored pencils r + Extras pg. 147/149/151)\nMWG - blank sheets of paper glue, dried spaghetti. Paperboard, small pieces of cloth. Extras page. 196.\nMWB:  A4 sheets of paper or similar, colored pencils or crayons, old magazines or other colored paper and glue.",
      "livros": {
       "Magic Way Blue Book": {
-       "licao": "",
+       "licao": "L9",
        "itens": [
         {
-         "k": "a76c026e",
-         "t": "TE p. 146-150",
+         "k": "68084d3a",
+         "t": "TE P. 162-172",
          "tipo": "te"
         },
         {
-         "k": "f38c17be",
-         "t": "SB p. 46-48",
+         "k": "13baf6e7",
+         "t": "SB p. 51-54",
          "tipo": "sb"
         }
        ],
        "games": [
-        "Arts and crafts: right handed or left handed."
-       ]
+        "videos activities."
+       ],
+       "licaoInferida": true
       },
       "Magic Way Green Book": {
-       "licao": "L8",
+       "licao": "L9",
        "itens": [
         {
-         "k": "7a955cbb",
-         "t": "TE p.174 to 184",
+         "k": "e12c9c45",
+         "t": "TE p. 198 to 208",
          "tipo": "te"
         },
         {
-         "k": "b216a746",
-         "t": "SB p. 62 to 65",
+         "k": "c5b4a32f",
+         "t": "SB p. 70 to 73",
          "tipo": "sb"
         }
-       ],
-       "games": [
-        "Follow up practice TE. 186, warm up practice TE. 192. Abracadabra TE. 194."
        ]
       },
       "Playground Hello B": {
-       "licao": "",
+       "licao": "L10",
        "itens": [
         {
-         "k": "34139de8",
-         "t": "SB: pg. 75 to 76",
+         "k": "ea1cdcb3",
+         "t": "SB: pg. 80 to 81",
          "tipo": "sb"
         },
         {
-         "k": "b2265cef",
-         "t": "HW Jolly´s Play Book pg. 31",
+         "k": "083248c8",
+         "t": "HW Jolly´s Play Book pg. 33",
          "tipo": "hw"
         }
        ],
        "games": [
-        ": Story Time pg. 77 (Extras pg. 147/149/151)"
-       ]
+        ".Review Game (Can)"
+       ],
+       "licaoInferida": true
       },
       "Playground See-Saw": {
-       "licao": "L8",
+       "licao": "L9",
        "itens": [
         {
-         "k": "14a11fe4",
-         "t": "TE p. 132 to 139",
-         "tipo": "te"
+         "k": "33b95b53",
+         "t": "(full lesson – or half at Tutoria >vacation<) TE p. 150 to 167",
+         "tipo": "outro"
         },
         {
-         "k": "f8532a4a",
-         "t": "SB p. 76 to 80",
+         "k": "6a782ce7",
+         "t": "SB p. 86 to 95",
          "tipo": "sb"
         },
         {
@@ -1718,16 +1749,17 @@ window.PLANO_TURMA["2026-2"] = {
          "tipo": "hw"
         },
         {
-         "k": "4b91c123",
-         "t": "Worksheet p. 19",
+         "k": "e1657d88",
+         "t": "Worksheet p.23 (to cut for next class)",
          "tipo": "outro"
         }
        ],
        "games": [
-        "Worksheet p. 20"
+        "(optional) p.93 write a message with bubble letters | GAME: Simon Says p. 95"
        ]
       }
      },
+     "corrigida": true,
      "storytellingArq": {
       "nome": "I - Reading Acitivy - No, David.doc",
       "id": "1oKL02hI_E1m2Buu9MaA68UqsWVbxuanG"
@@ -1748,80 +1780,83 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Hello B:  Glue, scissors and paper + Extras pg. 141\nMWG - colored Scotch tape, blank sheets of paper.",
      "livros": {
       "Magic Way Blue Book": {
-       "licao": "",
+       "licao": "L9",
        "itens": [
         {
-         "k": "b7a2c4c1",
-         "t": "TE p. 152-160",
+         "k": "84da0fda",
+         "t": "TE p. 172-180",
          "tipo": "te"
         },
         {
-         "k": "708dd00c",
-         "t": "SB p. 49-50",
-         "tipo": "sb"
-        }
-       ]
-      },
-      "Magic Way Green Book": {
-       "licao": "L8",
-       "itens": [
-        {
-         "k": "4815b098",
-         "t": "TE p. 186 to 196",
-         "tipo": "te"
-        },
-        {
-         "k": "0b26d155",
-         "t": "SB p. 66 to 69",
+         "k": "de2168e7",
+         "t": "SB p. 55-56",
          "tipo": "sb"
         }
        ],
        "games": [
-        "Follow up practice TE. 210."
+        "extra activity 2."
+       ],
+       "licaoInferida": true
+      },
+      "Magic Way Green Book": {
+       "licao": "L9",
+       "itens": [
+        {
+         "k": "2f35fc78",
+         "t": "TE p. 210 to 220",
+         "tipo": "te"
+        },
+        {
+         "k": "4560abfe",
+         "t": "SB p.74 to 77",
+         "tipo": "sb"
+        }
        ]
       },
       "Playground Hello B": {
-       "licao": "",
+       "licao": "L10",
        "itens": [
         {
-         "k": "efb44b3c",
-         "t": "SB  SB: pg. 77-79",
+         "k": "898d25fa",
+         "t": "SB: pg. 82 to 83",
          "tipo": "sb"
         },
         {
-         "k": "6bb042ac",
-         "t": "HW Jolly´s Play Book pg. 32",
+         "k": "be0a3d10",
+         "t": "HW Jolly´s Play Book pg. 34",
          "tipo": "hw"
         }
        ],
        "games": [
-        "Play Time pg. 78 (Extras pg. 139)"
-       ]
+        "Head, shoulders, knees and Toe"
+       ],
+       "licaoInferida": true
       },
       "Playground See-Saw": {
-       "licao": "L8",
+       "licao": "L10",
        "itens": [
         {
-         "k": "32d21d63",
-         "t": "TE p. 140 to 149",
+         "k": "470f6a8f",
+         "t": "TE p. 168 to 175",
          "tipo": "te"
         },
         {
-         "k": "49e03b40",
-         "t": "SB p. 81 to 85",
+         "k": "dd137775",
+         "t": "SB p. 96 to 100",
          "tipo": "sb"
         },
         {
-         "k": "638668a2",
-         "t": "HW: Worksheet p. 23",
+         "k": "5aa7093d",
+         "t": "HW: Cyber Missions",
          "tipo": "hw"
         }
        ],
        "games": [
-        "Worksheet p. 21+22 | GAME: Hockey Pockey / Mime feelings (p.85) or TE p. 149 optional activity with the Ss photos"
+        "no extra – focus on the project rehearsal (longer)"
        ]
       }
      },
+     "corrigida": true,
      "comunicativaPasta": {
       "id": "1jHZV7TaqGV-nsZ_NnF25z2C3lFWIuAd4",
       "arquivos": []
@@ -1840,7 +1875,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Hello B: Paper, glue, scissors and colored pencils",
      "livros": {
       "Magic Way Blue Book": {
-       "licao": "",
+       "licao": "L10",
        "itens": [
         {
          "k": "fdb57651",
@@ -1857,7 +1892,8 @@ window.PLANO_TURMA["2026-2"] = {
          "t": "SB p. 61-62)",
          "tipo": "sb"
         }
-       ]
+       ],
+       "licaoInferida": true
       },
       "Magic Way Green Book": {
        "licao": "L10",
@@ -1880,7 +1916,7 @@ window.PLANO_TURMA["2026-2"] = {
        ]
       },
       "Playground Hello B": {
-       "licao": "",
+       "licao": "L10",
        "itens": [
         {
          "k": "26d6e4b3",
@@ -1895,7 +1931,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Parts of the Body: Build a doll with various parts of the body, drawn on separate sheets of paper in a group."
-       ]
+       ],
+       "licaoInferida": true
       },
       "Playground See-Saw": {
        "licao": "L10",
@@ -2089,7 +2126,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Copo plástico ou de papel, Material digital/Flash cards/ 2 Dices",
      "livros": {
       "Playground Maze": {
-       "licao": "",
+       "licao": "L1",
        "itens": [
         {
          "k": "2aa4ecff",
@@ -2115,10 +2152,11 @@ window.PLANO_TURMA["2026-2"] = {
        "games": [
         "TE p. 9 - Lang and communication / p. 13 - Lucky game",
         "Memory game - flash cards L1"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Fun At School": {
-       "licao": "",
+       "licao": "L1",
        "itens": [
         {
          "k": "d761a50d",
@@ -2143,7 +2181,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "- TIC-TAC-TOE p.105"
-       ]
+       ],
+       "licaoInferida": true
       }
      },
      "storytellingArq": {
@@ -2173,7 +2212,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Digital Material/ Toy blocks/ tapa - olho ou algo para cobrir os olhos (game) / Flash cards",
      "livros": {
       "Playground Maze": {
-       "licao": "",
+       "licao": "L1",
        "itens": [
         {
          "k": "95499a98",
@@ -2183,10 +2222,11 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "YES OR NO - TE p. 25"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Fun At School": {
-       "licao": "",
+       "licao": "L2",
        "itens": [
         {
          "k": "1363c2c5",
@@ -2202,7 +2242,8 @@ window.PLANO_TURMA["2026-2"] = {
        "games": [
         "Appendix p.107A",
         "Appendix p. 109 TEp.27 C"
-       ]
+       ],
+       "licaoInferida": true
       }
      },
      "storytellingArq": {
@@ -2228,7 +2269,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Flash cards / Apple, cracker and container",
      "livros": {
       "Playground Maze": {
-       "licao": "",
+       "licao": "L2",
        "itens": [
         {
          "k": "fa1c3c00",
@@ -2253,10 +2294,11 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Language and communication / Math and science (+ worksheet p. 3)."
-       ]
+       ],
+       "licaoInferida": true
       },
       "Fun At School": {
-       "licao": "",
+       "licao": "L3",
        "itens": [
         {
          "k": "a5600921",
@@ -2277,7 +2319,8 @@ window.PLANO_TURMA["2026-2"] = {
        "games": [
         "TE p.37 D",
         "Experiment - TE-p. 35C"
-       ]
+       ],
+       "licaoInferida": true
       }
      },
      "comunicativaPasta": {
@@ -2305,7 +2348,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Board/ Flash cards",
      "livros": {
       "Playground Maze": {
-       "licao": "",
+       "licao": "L2",
        "itens": [
         {
          "k": "deadc67b",
@@ -2325,10 +2368,11 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Language and communication / Wrap-up"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Fun At School": {
-       "licao": "",
+       "licao": "L4",
        "itens": [
         {
          "k": "c8bf9106",
@@ -2345,7 +2389,8 @@ window.PLANO_TURMA["2026-2"] = {
         "Miming - TE p. 41 A",
         "Show me - TE p.43 B",
         "That or those - TE p.43 D"
-       ]
+       ],
+       "licaoInferida": true
       }
      },
      "comunicativaPasta": {
@@ -2371,7 +2416,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Student’s Worksheet p. 5/ Scissors/ glue/ Colored pencils/ Flash cards/ Digital material/ PAPER BAG/ Appendix.",
      "livros": {
       "Playground Maze": {
-       "licao": "",
+       "licao": "L3",
        "itens": [
         {
          "k": "2a4653b1",
@@ -2391,10 +2436,11 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Math and science + Worksheet p. 5/ Practical life + worksheet p. 6/7/Wrap game"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Fun At School": {
-       "licao": "",
+       "licao": "Adv1",
        "itens": [
         {
          "k": "55344d0c",
@@ -2420,7 +2466,8 @@ window.PLANO_TURMA["2026-2"] = {
        "games": [
         "Puppet - TE p.45 B",
         "Card - TE p.47 A"
-       ]
+       ],
+       "licaoInferida": true
       }
      },
      "comunicativaPasta": {
@@ -2445,7 +2492,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Digital Material, photos of famous people students can recognize",
      "livros": {
       "Playground Maze": {
-       "licao": "",
+       "licao": "L4",
        "itens": [
         {
          "k": "e5aad5d6",
@@ -2470,10 +2517,11 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Language and communication p. 33 + Worksheet A - p. 8"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Fun At School": {
-       "licao": "",
+       "licao": "L5",
        "itens": [
         {
          "k": "ec3e62e4",
@@ -2489,7 +2537,8 @@ window.PLANO_TURMA["2026-2"] = {
        "games": [
         "Vocabulary - TE p. 55",
         "Who - TE p. 57 C"
-       ]
+       ],
+       "licaoInferida": true
       }
      },
      "comunicativaPasta": {
@@ -2519,7 +2568,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Digital Material, Pieces of blank paper, Cards with the feeling words, dice, Question cards (Warp-up game), Scissors, glue",
      "livros": {
       "Playground Maze": {
-       "licao": "",
+       "licao": "L4",
        "itens": [
         {
          "k": "cd27860a",
@@ -2539,10 +2588,11 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Interaction B - p. 36/ Wrap-up p. 37"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Fun At School": {
-       "licao": "",
+       "licao": "L5",
        "itens": [
         {
          "k": "bad7a3ad",
@@ -2557,7 +2607,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Body games + reutilizar materiais das lições anteriores para revisar conteúdo (em especial, vocabulário)."
-       ]
+       ],
+       "licaoInferida": true
       }
      },
      "comunicativaPasta": {
@@ -2578,7 +2629,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Digital Material, Worksheet, Board, Mark.",
      "livros": {
       "Playground Maze": {
-       "licao": "",
+       "licao": "L5",
        "itens": [
         {
          "k": "b7420206",
@@ -2598,10 +2649,11 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Guessing game (Draw on the board and use the vocabulary word"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Fun At School": {
-       "licao": "",
+       "licao": "L6",
        "itens": [
         {
          "k": "4e2146d5",
@@ -2622,7 +2674,8 @@ window.PLANO_TURMA["2026-2"] = {
        "games": [
         "Vocabulary TE p.67",
         "Appendix p.115"
-       ]
+       ],
+       "licaoInferida": true
       }
      },
      "storytellingArq": {
@@ -2651,7 +2704,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Digital material, Worksheet, Sheet of paper, Measuring tape, Ruler, Masking tape, ball, empty waste basket.",
      "livros": {
       "Playground Maze": {
-       "licao": "",
+       "licao": "L5",
        "itens": [
         {
          "k": "07753f4c",
@@ -2671,10 +2724,11 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Math and Science + Woksheet p. 10 and 11 / Wrap-up game"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Fun At School": {
-       "licao": "",
+       "licao": "L7",
        "itens": [
         {
          "k": "0b7516a2",
@@ -2700,7 +2754,8 @@ window.PLANO_TURMA["2026-2"] = {
        "games": [
         "Vocabulary TE p.77",
         "Big Vampire"
-       ]
+       ],
+       "licaoInferida": true
       }
      },
      "comunicativaPasta": {
@@ -2724,7 +2779,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Digital Material, Scissors, Box cutter, Stickers",
      "livros": {
       "Playground Maze": {
-       "licao": "",
+       "licao": "L6",
        "itens": [
         {
          "k": "5b15669f",
@@ -2739,10 +2794,11 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Language and communication + Worksheet p.12"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Fun At School": {
-       "licao": "",
+       "licao": "L8",
        "itens": [
         {
          "k": "26b11c93",
@@ -2767,7 +2823,8 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Colorful elephant"
-       ]
+       ],
+       "licaoInferida": true
       }
      },
      "comunicativaPasta": {
@@ -2788,7 +2845,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Digital Material, Adults’ clothes (According to the book), Cell phone or tablet (QR code reader)",
      "livros": {
       "Playground Maze": {
-       "licao": "",
+       "licao": "L6",
        "itens": [
         {
          "k": "e9cf38fc",
@@ -2808,10 +2865,11 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Math and Science (Button up or Dress up)  / Take the right photo game(QR code)/ Wrap-up game"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Fun At School": {
-       "licao": "",
+       "licao": "L8",
        "itens": [
         {
          "k": "90950dd0",
@@ -2832,7 +2890,8 @@ window.PLANO_TURMA["2026-2"] = {
        "games": [
         "TE p.87 (Check this out A)",
         "Hidden Colours - TE p. 89"
-       ]
+       ],
+       "licaoInferida": true
       }
      },
      "comunicativaPasta": {
@@ -2857,7 +2916,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Digital material, Worksheet, Picture cards (TH and T)",
      "livros": {
       "Playground Maze": {
-       "licao": "",
+       "licao": "L7",
        "itens": [
         {
          "k": "830211ce",
@@ -2877,10 +2936,11 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Language and communication + Worksheet p. 13/14"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Fun At School": {
-       "licao": "",
+       "licao": "L9",
        "itens": [
         {
          "k": "a045978c",
@@ -2906,7 +2966,8 @@ window.PLANO_TURMA["2026-2"] = {
        "games": [
         "Adventure 2 - TE p.96,97.",
         "Class Rules TE p.105"
-       ]
+       ],
+       "licaoInferida": true
       }
      },
      "storytellingArq": {
@@ -2935,7 +2996,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Digital Material, Worksheet, Picture cards",
      "livros": {
       "Playground Maze": {
-       "licao": "",
+       "licao": "L7",
        "itens": [
         {
          "k": "6d8edfed",
@@ -2955,10 +3016,11 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Math and science + Worksheet p 15 (cards) / Wrap-up game"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Fun At School": {
-       "licao": "",
+       "licao": "L9",
        "itens": [
         {
          "k": "bfa8a6a0",
@@ -2979,7 +3041,8 @@ window.PLANO_TURMA["2026-2"] = {
        "games": [
         "Speeling Bee Contest TE p.107",
         "Fun Time TE p.109 C (Appendix 119)"
-       ]
+       ],
+       "licaoInferida": true
       }
      },
      "storytellingArq": {
@@ -3010,7 +3073,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Small pieces of pape, Pictures cards, Ordinal number cards, Masking  tape",
      "livros": {
       "Playground Maze": {
-       "licao": "",
+       "licao": "L8",
        "itens": [
         {
          "k": "df9649b3",
@@ -3025,10 +3088,11 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Language and Communication / Wrap up game."
-       ]
+       ],
+       "licaoInferida": true
       },
       "Fun At School": {
-       "licao": "",
+       "licao": "L10",
        "itens": [
         {
          "k": "1ca0a9cd",
@@ -3049,7 +3113,8 @@ window.PLANO_TURMA["2026-2"] = {
        "games": [
         "Visit a city TE p.113",
         "I’m from TE p.119"
-       ]
+       ],
+       "licaoInferida": true
       }
      },
      "comunicativaPasta": {
@@ -3070,7 +3135,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Worksheet, scissors, glue, Scrambled words",
      "livros": {
       "Playground Maze": {
-       "licao": "",
+       "licao": "L8",
        "itens": [
         {
          "k": "11af6596",
@@ -3090,10 +3155,11 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Language and communication + Worksheet p. 16 and 17"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Fun At School": {
-       "licao": "",
+       "licao": "L10",
        "itens": [
         {
          "k": "ee71fd7c",
@@ -3114,7 +3180,8 @@ window.PLANO_TURMA["2026-2"] = {
        "games": [
         "Fun Time TE p.120 (Appendix P.121)",
         "Duck Goose (seasons)"
-       ]
+       ],
+       "licaoInferida": true
       }
      },
      "comunicativaPasta": {
@@ -3134,7 +3201,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Pencils, erasers, a ruler, coins, Fisk dollars, pens and pencil sharpners",
      "livros": {
       "Playground Maze": {
-       "licao": "",
+       "licao": "L9",
        "itens": [
         {
          "k": "eb9ed1e4",
@@ -3154,10 +3221,11 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Math and Science/ Practical life + Worksheet p. 18 and 19 / Wrap-up  game."
-       ]
+       ],
+       "licaoInferida": true
       },
       "Fun At School": {
-       "licao": "",
+       "licao": "L11",
        "itens": [
         {
          "k": "544fb97e",
@@ -3174,7 +3242,8 @@ window.PLANO_TURMA["2026-2"] = {
          "t": "WB p. 27",
          "tipo": "outro"
         }
-       ]
+       ],
+       "licaoInferida": true
       }
      },
      "comunicativaPasta": {
@@ -3195,7 +3264,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "Worksheet, Picture cards",
      "livros": {
       "Playground Maze": {
-       "licao": "",
+       "licao": "L10",
        "itens": [
         {
          "k": "8b9edbfe",
@@ -3220,22 +3289,32 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Language and communication"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Fun At School": {
-       "licao": "",
+       "licao": "L11",
        "itens": [
         {
-         "k": "59eff56a",
-         "t": "p. 92- 99",
+         "k": "d0147048",
+         "t": "p. 88-91",
+         "tipo": "outro"
+        },
+        {
+         "k": "f500006d",
+         "t": "WB p. 28",
+         "tipo": "outro"
+        },
+        {
+         "k": "eebc1cc1",
+         "t": "30",
          "tipo": "outro"
         }
        ],
-       "games": [
-        "Appendix 1 pg. 149/150"
-       ]
+       "licaoInferida": true
       }
      },
+     "corrigida": true,
      "comunicativaPasta": {
       "id": "1jHZV7TaqGV-nsZ_NnF25z2C3lFWIuAd4",
       "arquivos": []
@@ -3254,7 +3333,7 @@ window.PLANO_TURMA["2026-2"] = {
      "material": "M&Ms or Jellybeans, a bowl, Worksheet",
      "livros": {
       "Playground Maze": {
-       "licao": "",
+       "licao": "L10",
        "itens": [
         {
          "k": "da0e3110",
@@ -3274,29 +3353,25 @@ window.PLANO_TURMA["2026-2"] = {
        ],
        "games": [
         "Math and Science + Worksheet p. 21 / Wrap-up game"
-       ]
+       ],
+       "licaoInferida": true
       },
       "Fun At School": {
-       "licao": "",
+       "licao": "L12",
        "itens": [
         {
-         "k": "4d64dcb7",
-         "t": "p. 88-91",
-         "tipo": "outro"
-        },
-        {
-         "k": "bd0b3e8f",
-         "t": "WB p. 28",
-         "tipo": "outro"
-        },
-        {
-         "k": "4bf9668f",
-         "t": "30",
+         "k": "e39c3e93",
+         "t": "p. 92- 99",
          "tipo": "outro"
         }
-       ]
+       ],
+       "games": [
+        "Appendix 1 pg. 149/150"
+       ],
+       "licaoInferida": true
       }
      },
+     "corrigida": true,
      "comunicativaPasta": {
       "id": "1jHZV7TaqGV-nsZ_NnF25z2C3lFWIuAd4",
       "arquivos": []
