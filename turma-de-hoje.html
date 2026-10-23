@@ -418,6 +418,42 @@ body.theme-dark .pl-salvar{ background: #10261f; }
 .aula .it .mk.tri{ height: 23px; }
 .aula .btn-ck, .aula .ck-feito{ padding-top: .4rem; padding-bottom: .4rem; }
 .aula .it + .btn-ck, .aula .it + .ck-feito{ margin-top: .4rem; }
+
+  /* ── O PLANO DA TURMA (kids e teens, 23/10/2026) ── */
+  .pt{ max-width: 1500px; margin: 0 auto 1rem; display: grid; gap: .8rem; }
+  .pt-topo{ display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; background: var(--white); border: 1.5px solid var(--ui-line, #d6deea); border-radius: 14px; padding: .7rem 1rem; }
+  .pt-topo h2{ font-family: var(--font-heading); font-size: 1.05rem; margin: 0; color: var(--ui-ink, #1d3685); }
+  .pt-topo .sem{ font-weight: 800; }
+  .pt-topo .nav{ margin-left: auto; display: flex; gap: .35rem; }
+  .pt-topo .nav button{ border: 1.5px solid var(--ui-bd, #c9d4e6); background: #fff; color: #1d3685; border-radius: 9px; padding: .3rem .7rem; font-weight: 800; cursor: pointer; font-family: inherit; }
+  .pt-cx{ background: var(--white); border: 1.5px solid var(--ui-line, #d6deea); border-radius: 14px; padding: .8rem 1rem; }
+  .pt-cx h3{ font-family: var(--font-heading); font-size: .98rem; margin: 0 0 .5rem; display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+  .pt-cx h3 .lic{ font-size: .78rem; background: var(--ui-soft, #eef3fb); color: var(--ui-ink, #1d3685); padding: .15rem .55rem; border-radius: 99px; }
+  .pt-alunos{ font-size: .8rem; color: var(--gray); margin: -.2rem 0 .55rem; }
+  .pt-lin{ display: flex; align-items: flex-start; gap: .55rem; padding: .32rem 0; border-top: 1px dashed #e3e9f2; }
+  .pt-lin:first-of-type{ border-top: 0; }
+  .pt-lin .rot{ font-size: .7rem; font-weight: 900; letter-spacing: .03em; text-transform: uppercase; color: #6b7a90; min-width: 6.2rem; padding-top: .18rem; }
+  .pt-lin .txt{ flex: 1; font-size: .9rem; line-height: 1.4; white-space: pre-line; }
+  .pt-lin .txt a{ color: #1d3685; font-weight: 700; }
+  .pt-tick{ width: 26px; height: 26px; flex: 0 0 26px; border-radius: 50%; border: 2px solid #9fb0c8; background: #fff; cursor: pointer; display: grid; place-items: center; font-weight: 900; color: #fff; font-size: .85rem; padding: 0; }
+  .pt-tick.on{ background: #1f9d55; border-color: #1f9d55; }
+  .pt-tick:disabled{ opacity: .5; cursor: wait; }
+  .pt-quando{ font-size: .72rem; color: #1f9d55; font-weight: 800; margin-left: .3rem; white-space: nowrap; }
+  .pt-tipo{ display: inline-block; font-size: .66rem; font-weight: 900; padding: .05rem .4rem; border-radius: 6px; background: #eef3fb; color: #1d3685; margin-right: .35rem; vertical-align: 1px; }
+  .pt-tipo.hw, .pt-tipo.hwc{ background: #fff4e0; color: #9a5b00; }
+  .pt-tipo.video{ background: #fde8ef; color: #a1123f; }
+  .pt-botoes{ display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .55rem; }
+  .pt-botoes a{ font-size: .82rem; font-weight: 800; text-decoration: none; border: 1.5px solid var(--ui-bd, #c9d4e6); border-radius: 9px; padding: .3rem .7rem; color: #1d3685; background: #fff; }
+  .pt-pend{ margin-top: .5rem; font-size: .82rem; }
+  .pt-pend summary{ cursor: pointer; color: #9a5b00; font-weight: 800; }
+  .pt-aniv{ background: #fff8e6; border-color: #f2d48a; }
+  .pt-nada{ color: var(--gray); font-size: .88rem; }
+  body.pt-ativo .sem-plano, body.pt-ativo .btn-ck, body.pt-ativo .btn-atend, body.pt-ativo .al-cab .pill.pos{ display: none; }
+  body.theme-dark .pt-topo, body.theme-dark .pt-cx{ background: #172232; border-color: #2e4560; color: #dbe6f3; }
+  body.theme-dark .pt-tick{ background: #0f1825; }
+  body.theme-dark .pt-tick.on{ background: #1f9d55; }
+  body.theme-dark .pt-botoes a, body.theme-dark .pt-topo .nav button{ background: #0f1825; color: #dbe6f3; border-color: #2e4560; }
+  body.theme-dark .pt-aniv{ background: #2b2513; border-color: #6d5a23; }
 </style>
 </head>
 <body>
@@ -456,6 +492,7 @@ body.theme-dark .pl-salvar{ background: #10261f; }
   <div id="fila-off" class="fila-off" hidden></div>
   <div id="resumo" class="resumo" style="max-width:1500px;margin:0 auto .6rem" hidden></div>
   <div id="fila" class="fila-info" hidden></div>
+  <div id="plano-turma" class="pt" hidden></div>
   <div id="alunos"></div>
 </main>
 
@@ -1182,6 +1219,7 @@ function erro(e) {
 
 /* ── a turma: os alunos do card (com RAF) e o planner de cada um ── */
 function carregarTurma(escola, prof, linha, titulo) {
+  planoTurmaDesmonta();
   estado.escola = escola; estado.prof = prof; estado.turma = titulo; estado.plantao = false; estado.prioridade = false; estado.ontem = false;
   $('alunos').innerHTML = ''; $('resumo').hidden = true; $('legenda').hidden = true;
   status('🔄 Lendo a turma no card…');
@@ -1224,6 +1262,7 @@ function carregarTurma(escola, prof, linha, titulo) {
         pintaFila();
         juntaVisitantes();
         desenharTurma();
+        planoTurmaMonta(escola, nomeTurma);
       });
   }).catch(erro);
 }
@@ -2310,6 +2349,176 @@ window.addEventListener('message', function (ev) {
   if (!window.PlannerV2) { status('⚠️ Não consegui carregar a régua do Planner (portalfisk.com.br). Recarregue a página.', true); return; }
   initCascata();
 })();
+
+/* ══ O PLANO DA TURMA (kids e teens, 23/10/2026) ══════════════════════════════
+   As turmas infantis e teens não usam o planner do aluno: seguem o plano de aula
+   semanal da coordenação (o .pptx do semestre, convertido por
+   scripts/plano-turma/converter.py em assets/plano-turma/<AAAA-S>.js). Aqui ele
+   vira a aula do professor: a parte comum da semana (músicas, storytelling,
+   atividade comunicativa, material, aniversariantes) e um cartão por LIVRO
+   presente na turma, com os alunos daquele bloco. O professor tica cada
+   atividade UMA vez para o bloco inteiro (PlanoTurma.js no backend, aba
+   _planoTurma). PILOTO: só as turmas abaixo, e a direção (master) em qualquer
+   turma que tenha livro no plano. */
+var PLANO_TURMA_SEM = '2026-2';
+var PLANO_TURMA_V = '20261023a';
+var PLANO_TURMA_PILOTO = [
+  { escola: 'Caçapava', turma: /kids\s*multilevel\s*\(at[eé]\s*2º\s*ano\)\s*-\s*3ª\s*8h30/i },
+  { escola: 'Taubaté', turma: /^teens\s*connect\s*2\s*-\s*3ª\s*15h/i }
+];
+var ptEstado = null;
+var ptCarregando = null;
+function ptCarregaDados() {
+  if (window.PLANO_TURMA && window.PLANO_TURMA[PLANO_TURMA_SEM]) return Promise.resolve(window.PLANO_TURMA[PLANO_TURMA_SEM]);
+  if (!ptCarregando) ptCarregando = new Promise(function (res) {
+    var sc = document.createElement('script');
+    sc.src = 'assets/plano-turma/' + PLANO_TURMA_SEM + '.js?v=' + PLANO_TURMA_V;
+    sc.onload = function () { res((window.PLANO_TURMA || {})[PLANO_TURMA_SEM] || null); };
+    sc.onerror = function () { ptCarregando = null; res(null); };
+    document.head.appendChild(sc);
+  });
+  return ptCarregando;
+}
+function ptNoPiloto(escola, turma) {
+  var s = sessao() || {};
+  if (s.master) return true;
+  return PLANO_TURMA_PILOTO.some(function (p) { return normNome(p.escola) === normNome(escola) && p.turma.test(String(turma || '').trim()); });
+}
+function planoTurmaDesmonta() {
+  ptEstado = null;
+  document.body.classList.remove('pt-ativo');
+  var cx = $('plano-turma'); if (cx) { cx.hidden = true; cx.innerHTML = ''; }
+}
+function planoTurmaMonta(escola, turma) {
+  if (!ptNoPiloto(escola, turma) || estado.plantao) return;
+  ptCarregaDados().then(function (P) {
+    if (!P || estado.escola !== escola || estado.turma !== turma) return;
+    var porLivro = {};
+    estado.alunos.forEach(function (a) { if (a.book) (porLivro[a.book] = porLivro[a.book] || []).push(a); });
+    var livros = Object.keys(porLivro).filter(function (b) { return ptBlocoDe(P, b); });
+    if (!livros.length) return;   /* turma sem livro no plano (adultos, personalizado): a tela segue a de sempre */
+    ptEstado = { P: P, escola: escola, turma: turma, porLivro: porLivro, livros: livros, off: 0, marcas: {}, carregou: false };
+    document.body.classList.add('pt-ativo');
+    ptDesenha();
+    post({ action: 'planoTurmaLe', escola: escola, turma: turma }).then(function (r) {
+      if (!ptEstado || ptEstado.turma !== turma) return;
+      ptEstado.marcas = r.marcas || {}; ptEstado.carregou = true; ptDesenha();
+    }).catch(function (e) { toast('⚠️ Não li as marcas do plano (' + e.message + ').'); if (ptEstado) { ptEstado.carregou = true; ptDesenha(); } });
+  });
+}
+function ptBlocoDe(P, livro) {
+  var n = normNome(livro);
+  return (P.blocos || []).find(function (b) { return (b.livros || []).some(function (x) { return normNome(x) === n; }); }) || null;
+}
+function ptLivrosDoBloco(b) { return ptEstado.livros.filter(function (l) { return ptBlocoDe(ptEstado.P, l) === b; }).join(', '); }
+function ptLivroNoPlano(bloco, livro) { var n = normNome(livro); return (bloco.livros || []).find(function (x) { return normNome(x) === n; }) || livro; }
+/* a semana da aula: a que contém o dia (a mais curta, se duas contiverem: o "SÁB 1 DE AGOSTO" dentro de "1 a 7"); fora
+   de qualquer semana (feriado, recesso), a última que já começou */
+function ptIndiceSemana(bloco, dia) {
+  var ss = bloco.semanas || [], best = -1, bestLen = 1e9;
+  ss.forEach(function (s, i) { if (s.de <= dia && dia <= s.ate) { var len = Date.parse(s.ate) - Date.parse(s.de); if (len < bestLen || (len === bestLen && i > best)) { best = i; bestLen = len; } } });
+  if (best < 0) ss.forEach(function (s, i) { if (s.de <= dia) best = i; });
+  return Math.max(0, best);
+}
+function ptSemana(bloco) {
+  var i = ptIndiceSemana(bloco, diaAlvoTH()) + (ptEstado ? ptEstado.off : 0);
+  i = Math.max(0, Math.min((bloco.semanas || []).length - 1, i));
+  return { i: i, s: bloco.semanas[i] };
+}
+function ptDataBr(iso) { var p = String(iso || '').split('-'); return p.length === 3 ? p[2] + '/' + p[1] : ''; }
+function ptDrive(id) { return id ? 'https://drive.google.com/file/d/' + id + '/view' : ''; }
+function ptPasta(id) { return id ? 'https://drive.google.com/drive/folders/' + id : ''; }
+function ptLink(url, txt) { return '<a href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(txt) + '</a>'; }
+function ptPrimeiro(nome) { var n = String(nome || '').replace(/\([^)]*\)/g, '').trim().split(/\s+/)[0] || ''; return n.charAt(0).toUpperCase() + n.slice(1).toLowerCase(); }
+/* aniversariantes da semana, pela data de nascimento do card (a mesma leitura da turma que traz o telefone) */
+function ptAniversarios(s) {
+  var out = [];
+  (estado.alunos || []).forEach(function (a) {
+    var pes = pessoaisDe(a) || {}, t = String(pes.nascimentoTxt || pes.nascimento || '');
+    var m = t.match(/(\d{1,2})\/(\d{1,2})/); if (!m) return;
+    var mmdd = ('0' + m[2]).slice(-2) + '-' + ('0' + m[1]).slice(-2);
+    if (s.de.slice(5) <= mmdd && mmdd <= s.ate.slice(5)) out.push(ptPrimeiro(a.nome) + ' (' + ('0' + m[1]).slice(-2) + '/' + ('0' + m[2]).slice(-2) + ')');
+  });
+  return out;
+}
+function ptMarca(livro, k) { return ptEstado && ptEstado.marcas[livro + '|' + k]; }
+function ptTick(livro, k, semana) {
+  var m = ptMarca(livro, k);
+  return '<button type="button" class="pt-tick' + (m ? ' on' : '') + '" data-ptl="' + esc(livro) + '" data-ptk="' + esc(k) + '" data-pts="' + esc(semana) + '"' +
+    (ptEstado.carregou ? '' : ' disabled') + ' aria-label="' + (m ? 'Desmarcar' : 'Marcar como feito') + '">' + (m ? '✓' : '') + '</button>';
+}
+function ptQuando(livro, k) { var m = ptMarca(livro, k); return m && m.d ? '<span class="pt-quando">' + (m.d === diaAlvoTH() ? 'hoje' : ptDataBr(m.d)) + '</span>' : ''; }
+var PT_TIPO = { te: 'TE', sb: 'SB', md: 'MD', video: 'VÍDEO', hw: 'HW', hwc: 'HWC', app: 'APP', outro: '' };
+function ptDesenha() {
+  var cx = $('plano-turma'); if (!cx || !ptEstado) return;
+  var P = ptEstado.P, html = '';
+  var blocos = []; ptEstado.livros.forEach(function (l) { var b = ptBlocoDe(P, l); if (blocos.indexOf(b) < 0) blocos.push(b); });
+  var s0 = ptSemana(blocos[0]).s;
+  html += '<div class="pt-topo"><h2>📘 Plano da turma</h2><span class="sem">Semana de ' + ptDataBr(s0.de) + ' a ' + ptDataBr(s0.ate) + '</span>' +
+    (ptEstado.off ? ' <span class="pill">' + (ptEstado.off > 0 ? '+' : '') + ptEstado.off + ' semana' + (Math.abs(ptEstado.off) > 1 ? 's' : '') + '</span>' : '') +
+    '<span class="nav"><button type="button" data-ptoff="-1" title="Semana anterior">‹</button><button type="button" data-ptoff="0" title="Semana desta aula">Hoje</button><button type="button" data-ptoff="1" title="Próxima semana">›</button></span></div>';
+  blocos.forEach(function (b) {
+    var sw = ptSemana(b), s = sw.s, mus = (P.musicas && P.musicas[Object.keys(P.musicas)[0]]) || {};
+    var linhas = '';
+    var musTxt = (s.musicas || []).map(function (n) { var m = mus[n]; return m && m.id ? ptLink(ptDrive(m.id), '▶ ' + n + ' · ' + m.nome) : esc(n + (m ? ' · ' + m.nome : '')); }).join('  ');
+    var links = (s.links || []).map(function (u) { return ptLink(u, '▶ vídeo'); }).join('  ');
+    if (s.warmup || musTxt) linhas += '<div class="pt-lin">' + ptTick('*', 'warmup:' + s.de, s.de) + '<span class="rot">Warm-up</span><span class="txt">' + (musTxt || esc(s.warmup.replace(/https?:\/\/\S+/g, '').trim())) + (links ? '  ' + links : '') + ptQuando('*', 'warmup:' + s.de) + '</span></div>';
+    if (s.storytelling) linhas += '<div class="pt-lin">' + ptTick('*', 'story:' + s.de, s.de) + '<span class="rot">Storytelling</span><span class="txt">' + esc(s.storytelling) + (s.storytellingArq && s.storytellingArq.id ? '  ' + ptLink(ptDrive(s.storytellingArq.id), '📄 Reading Activity') : '') + ptQuando('*', 'story:' + s.de) + '</span></div>';
+    var com = s.comunicativa || '';
+    var comPasta = s.comunicativaPasta && s.comunicativaPasta.id && (s.comunicativaPasta.arquivos || []).length ? ptLink(ptPasta(s.comunicativaPasta.id), '📁 atividades comunicativas da semana') : '';
+    if (com || comPasta) linhas += '<div class="pt-lin">' + ptTick('*', 'com:' + s.de, s.de) + '<span class="rot">Comunicativa</span><span class="txt">' + esc(com) + (com && comPasta ? '  ' : '') + comPasta + ptQuando('*', 'com:' + s.de) + '</span></div>';
+    if (s.material) linhas += '<div class="pt-lin"><span class="rot" style="min-width:calc(6.2rem + 34px)">Material</span><span class="txt">' + esc(s.material) + '</span></div>';
+    if (s.geral) linhas += '<div class="pt-lin"><span class="rot" style="min-width:calc(6.2rem + 34px)">Livro</span><span class="txt">' + esc(s.geral) + '</span></div>';
+    if (s.gamesGeral) linhas += '<div class="pt-lin"><span class="rot" style="min-width:calc(6.2rem + 34px)">Games</span><span class="txt">' + esc(s.gamesGeral) + '</span></div>';
+    html += '<div class="pt-cx"><h3>🎵 Toda a turma' + (blocos.length > 1 ? ' · ' + esc(ptLivrosDoBloco(b)) : '') + '</h3>' + (linhas || '<div class="pt-nada">Nada além do livro nesta semana.</div>') + '</div>';
+    var aniv = ptAniversarios(s);
+    if (aniv.length) html += '<div class="pt-cx pt-aniv"><h3>🎂 Aniversário nesta semana</h3><div class="txt">' + esc(aniv.join(', ')) + '. Hora de cantar parabéns!</div></div>';
+  });
+  ptEstado.livros.forEach(function (livro) {
+    var b = ptBlocoDe(P, livro), nome = ptLivroNoPlano(b, livro), sw = ptSemana(b), s = sw.s;
+    var L = (s.livros || {})[nome] || null;
+    var alunos = ptEstado.porLivro[livro].map(function (a) { return ptPrimeiro(a.nome); }).join(', ');
+    var corpo = '';
+    if (!L || (!L.itens.length && !(L.games || []).length)) corpo = '<div class="pt-nada">' + (s.geral ? esc(s.geral) : 'Sem atividade de livro nesta semana.') + '</div>';
+    else {
+      L.itens.forEach(function (it) {
+        corpo += '<div class="pt-lin">' + ptTick(nome, it.k, s.de) + '<span class="txt">' + (PT_TIPO[it.tipo] ? '<span class="pt-tipo ' + esc(it.tipo) + '">' + PT_TIPO[it.tipo] + '</span>' : '') + esc(it.t) + ptQuando(nome, it.k) + '</span></div>';
+      });
+      if ((L.games || []).length) corpo += '<div class="pt-lin">' + ptTick(nome, 'games:' + s.de, s.de) + '<span class="rot">Games</span><span class="txt">' + esc(L.games.join('\n')) + ptQuando(nome, 'games:' + s.de) + '</span></div>';
+    }
+    /* o que ficou para trás: atividades de semanas anteriores deste livro ainda sem tique */
+    /* só a partir do primeiro tique deste livro: antes disso a turma não usava o plano aqui, e acusar o semestre
+       inteiro como pendente no primeiro dia seria só ruído */
+    var desde = '';
+    Object.keys(ptEstado.marcas).forEach(function (ch) { var m = ptEstado.marcas[ch]; if (ch.indexOf(nome + '|') === 0 && m.s && (!desde || m.s < desde)) desde = m.s; });
+    var pend = [];
+    if (desde) (b.semanas || []).slice(0, sw.i).forEach(function (sp) { if (sp.de < desde) return; var Lp = (sp.livros || {})[nome]; if (!Lp) return; Lp.itens.forEach(function (it) { if (!ptMarca(nome, it.k)) pend.push({ s: sp, it: it }); }); });
+    if (ptEstado.carregou && pend.length) {
+      corpo += '<details class="pt-pend"><summary>⏳ ' + pend.length + ' atividade' + (pend.length > 1 ? 's' : '') + ' de semanas anteriores sem tique</summary>' +
+        pend.slice(-40).map(function (p) { return '<div class="pt-lin">' + ptTick(nome, p.it.k, p.s.de) + '<span class="rot">' + esc(ptDataBr(p.s.de)) + '</span><span class="txt">' + (PT_TIPO[p.it.tipo] ? '<span class="pt-tipo ' + esc(p.it.tipo) + '">' + PT_TIPO[p.it.tipo] + '</span>' : '') + esc(p.it.t) + '</span></div>'; }).join('') + '</details>';
+    }
+    var mat = P.materiais && P.materiais[nome];
+    html += '<div class="pt-cx"><h3>📗 ' + esc(livro) + (L && L.licao ? ' <span class="lic">' + esc(L.licao) + '</span>' : '') + '</h3>' +
+      '<div class="pt-alunos">' + ptEstado.porLivro[livro].length + ' aluno' + (ptEstado.porLivro[livro].length > 1 ? 's' : '') + ': ' + esc(alunos) + '</div>' + corpo +
+      (mat ? '<div class="pt-botoes">' + ptLink(ptPasta(mat), '🎧 Áudios e vídeos do livro') + '</div>' : '') + '</div>';
+  });
+  if (!ptEstado.carregou) html += '<div class="pt-nada">🔄 Lendo o que já foi feito…</div>';
+  cx.innerHTML = html; cx.hidden = false;
+  cx.querySelectorAll('[data-ptoff]').forEach(function (bt) { bt.addEventListener('click', function () { var v = Number(bt.dataset.ptoff); ptEstado.off = v === 0 ? 0 : ptEstado.off + v; ptDesenha(); }); });
+  cx.querySelectorAll('.pt-tick').forEach(function (bt) { bt.addEventListener('click', function () { ptAlterna(bt.dataset.ptl, bt.dataset.ptk, bt.dataset.pts); }); });
+}
+function ptAlterna(livro, k, semana) {
+  if (!ptEstado) return;
+  var chave = livro + '|' + k, antes = ptEstado.marcas[chave], feito = !antes;
+  if (feito) ptEstado.marcas[chave] = { d: diaAlvoTH(), q: (sessao() || {}).name || '', s: semana }; else delete ptEstado.marcas[chave];
+  ptDesenha();
+  post({ action: 'planoTurmaMarca', escola: ptEstado.escola, turma: ptEstado.turma, livro: livro, semana: semana, item: k, feito: feito, data: diaAlvoTH() })
+    .catch(function (e) {
+      if (!ptEstado) return;
+      if (antes) ptEstado.marcas[chave] = antes; else delete ptEstado.marcas[chave];
+      ptDesenha(); toast('⚠️ Não salvou (' + e.message + '). Tente de novo.');
+    });
+}
 </script>
 </body>
 </html>
