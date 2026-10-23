@@ -423,9 +423,10 @@ body.theme-dark .pl-salvar{ background: #10261f; }
   /* ══ A MINHA AULA DAS TURMAS KIDS E TEENS (23/10/2026, redesenho a pedido do Pedro) ══════════════════════
      Mais leve e colorida: cada livro com a cor dele (a mesma do Modo Kids do portal), fonte maior, a aula em
      MOMENTOS e as presenças num bloco próprio. Coluna mais estreita no computador e respiro de 14px no celular. */
-  body.pt-ativo main{ max-width: 1060px; margin-left: auto; margin-right: auto; }
-  body.pt-ativo .painel, body.pt-ativo #alunos, body.pt-ativo .pt{ max-width: 1060px; margin-left: auto; margin-right: auto; }
+  body.pt-ativo main{ max-width: 1180px; margin-left: auto; margin-right: auto; }
+  body.pt-ativo .painel, body.pt-ativo #alunos, body.pt-ativo .pt{ width: 100%; max-width: 1180px; margin-left: auto; margin-right: auto; box-sizing: border-box; }
   body.pt-ativo #resumo{ display: none !important; }
+  body.pt-ativo main{ padding-left: 24px; padding-right: 24px; box-sizing: border-box; }
   @media (max-width: 720px){ body.pt-ativo main{ padding-left: 14px; padding-right: 14px; } }
   .pt{ display: grid; gap: 1.1rem; margin: 0 auto 1.4rem; font-size: 1.04rem; }
   .pt-cab{ text-align: center; padding: 1.3rem 1rem 1.1rem; border-radius: 22px; color: #fff; position: relative; overflow: hidden;
@@ -444,7 +445,16 @@ body.theme-dark .pl-salvar{ background: #10261f; }
   .pt-trans{ display: flex; flex-wrap: wrap; justify-content: center; gap: .45rem; }
   .pt-trans a, .pt-trans span{ display: inline-flex; align-items: center; gap: .35rem; text-decoration: none; font-weight: 800; font-size: .9rem; padding: .42rem .85rem; border-radius: 99px; background: #fff; border: 2px solid #e6e9f5; color: #3b3f73; }
   .pt-trans a:hover{ border-color: #c7b8f5; background: #faf7ff; }
-  .pt-momentos{ display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: .8rem; }
+  /* colunas FIXAS (Pedro, 23/10/2026): com auto-fit a grade esticava os cartões conforme a quantidade da semana */
+  .pt-momentos{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; }
+  @media (max-width: 980px){ .pt-momentos{ grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .pt-nota{ background: #fffbea; border: 2px solid #fde68a; border-radius: 20px; padding: .9rem 1rem; }
+  .pt-nota label{ display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; font-family: var(--font-heading); font-weight: 700; font-size: 1.05rem; color: #92400e; margin-bottom: .5rem; }
+  .pt-nota label small{ font-family: var(--font-body); font-weight: 800; font-size: .84rem; color: #b45309; }
+  .pt-nota textarea{ width: 100%; min-height: 84px; box-sizing: border-box; border: 1.5px solid #f3d27a; border-radius: 12px; padding: .6rem .7rem; font-family: var(--font-body); font-size: 1rem; line-height: 1.45; resize: vertical; background: #fff; }
+  .pt-nota .st{ font-size: .82rem; font-weight: 800; color: #047857; min-height: 1.1em; margin-top: .3rem; }
+  body.theme-dark .pt-nota{ background: #2b2513; border-color: #6d5a23; }
+  body.theme-dark .pt-nota textarea{ background: #0f1825; color: #e2e8f0; border-color: #6d5a23; }
   .pt-mom{ position: relative; border-radius: 20px; padding: 1rem 1rem .95rem; background: var(--mc-bg); border: 2px solid var(--mc-bd); }
   .pt-mom .ic{ width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; font-size: 1.4rem; background: #fff; box-shadow: 0 3px 10px rgba(0,0,0,.06); }
   .pt-mom h4{ margin: .6rem 0 .25rem; font-family: var(--font-heading); font-size: 1.05rem; color: var(--mc-tx); }
@@ -457,14 +467,22 @@ body.theme-dark .pl-salvar{ background: #10261f; }
   .pt-mom.m-mat{ --mc-bg: #f4f6fa; --mc-bd: #e1e6ef; --mc-tx: #334155; }
   .pt-mom.m-aniv{ --mc-bg: #fff8db; --mc-bd: #fbe08a; --mc-tx: #a16207; }
   .pt-mom.m-geral{ --mc-bg: #eef6ff; --mc-bd: #cfe3ff; --mc-tx: #1d4ed8; }
-  .pt-livros{ display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 1rem; }
+  .pt-livros{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+  .pt-livros > .pt-livro:only-child{ grid-column: 1 / -1; }
   @media (max-width: 720px){ .pt-livros{ grid-template-columns: 1fr; } .pt-momentos{ grid-template-columns: 1fr; } }
   .pt-livro{ border-radius: 22px; overflow: hidden; background: #fff; border: 2px solid var(--lc-soft); box-shadow: 0 6px 18px rgba(20,30,60,.06); }
   .pt-livro .topo{ background: var(--lc); color: #fff; padding: .85rem 1.1rem; display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
   .pt-livro .topo h3{ margin: 0; font-family: var(--font-heading); font-size: 1.15rem; }
+  .pt-livro .topo .mover{ margin-left: auto; display: inline-flex; gap: .3rem; align-items: center; }
+  .pt-livro .topo .mover button{ width: 32px; height: 32px; border-radius: 10px; border: 0; background: rgba(255,255,255,.25); color: inherit; font-weight: 900; font-size: 1rem; cursor: pointer; font-family: inherit; }
+  .pt-livro .topo .mover button:hover{ background: rgba(255,255,255,.4); }
+  .pt-livro .topo .mover button:disabled{ opacity: .35; cursor: default; }
+  .pt-livro .topo .alca{ font-size: 1.25rem; cursor: grab; padding: 0 .2rem; opacity: .85; }
+  .pt-livro.arrastando{ opacity: .45; }
+  .pt-livro.alvo{ outline: 3px dashed var(--lc); outline-offset: 3px; }
   .pt-livro .topo .lic{ background: rgba(255,255,255,.25); border-radius: 99px; padding: .15rem .65rem; font-weight: 900; font-size: .88rem; }
   .pt-livro .quem{ display: flex; flex-wrap: wrap; gap: .3rem; padding: .7rem 1.1rem 0; }
-  .pt-livro .quem span{ font-size: .86rem; font-weight: 800; background: var(--lc-bg); color: var(--lc-tx); border-radius: 99px; padding: .2rem .6rem; }
+  .pt-livro .quem span{ font-size: 1rem; font-weight: 800; background: var(--lc-bg); color: var(--lc-tx); border-radius: 99px; padding: .2rem .6rem; }
   .pt-livro .corpo{ padding: .55rem 1.1rem 1rem; }
   .pt-it{ display: flex; align-items: flex-start; gap: .65rem; padding: .5rem 0; border-top: 1px dashed #e7eaf3; font-size: 1.02rem; line-height: 1.4; }
   .pt-it:first-child{ border-top: 0; }
@@ -2505,7 +2523,7 @@ function montaNotaKids(box, a) {
    _planoTurma). PILOTO: só as turmas abaixo, e a direção (master) em qualquer
    turma que tenha livro no plano. */
 var PLANO_TURMA_SEM = '2026-2';
-var PLANO_TURMA_V = '20261023c';
+var PLANO_TURMA_V = '20261023d';
 var PLANO_TURMA_PILOTO = [
   { escola: 'Caçapava', turma: /kids\s*multilevel\s*\(at[eé]\s*2º\s*ano\)\s*-\s*3ª\s*8h30/i },
   { escola: 'Taubaté', turma: /^teens\s*connect\s*2\s*-\s*3ª\s*15h/i }
@@ -2541,13 +2559,15 @@ function planoTurmaMonta(escola, turma) {
     estado.alunos.forEach(function (a) { if (a.book) (porLivro[a.book] = porLivro[a.book] || []).push(a); });
     var livros = Object.keys(porLivro).filter(function (b) { return ptBlocoDe(P, b); });
     if (!livros.length) return;   /* turma sem livro no plano (adultos, personalizado): a tela segue a de sempre */
-    ptEstado = { P: P, escola: escola, turma: turma, porLivro: porLivro, livros: livros, off: 0, marcas: {}, carregou: false };
+    ptEstado = { P: P, escola: escola, turma: turma, porLivro: porLivro, livros: ptOrdena(escola, turma, livros), off: 0, marcas: {}, carregou: false };
     document.body.classList.add('pt-ativo');
     $('legenda').hidden = true;
     ptDesenha(); pintaFila(); desenharTurma();
     post({ action: 'planoTurmaLe', escola: escola, turma: turma }).then(function (r) {
       if (!ptEstado || ptEstado.turma !== turma) return;
-      ptEstado.marcas = r.marcas || {}; ptEstado.carregou = true; ptDesenha();
+      ptEstado.marcas = r.marcas || {}; ptEstado.nota = r.nota || null; ptEstado.carregou = true;
+      if (ptEstado.notaEl) { var ta = ptEstado.notaEl.querySelector('textarea'); if (ta && !ta.value) ta.value = (ptEstado.nota && ptEstado.nota.texto) || ''; ta.disabled = false; }
+      ptDesenha();
     }).catch(function (e) { toast('⚠️ Não li as marcas do plano (' + e.message + ').'); if (ptEstado) { ptEstado.carregou = true; ptDesenha(); } });
   });
 }
@@ -2668,15 +2688,22 @@ function ptDesenha() {
     if (ptEstado.carregou && pend.length) corpo += '<details class="pt-pend"><summary>⏳ ' + pend.length + ' atividade' + (pend.length > 1 ? 's' : '') + ' de semanas anteriores sem tique</summary>' +
       pend.slice(-40).map(function (p) { return '<div class="pt-it">' + ptTick(nome, p.it.k, p.s.de) + '<span class="t"><span class="pt-tipo">' + esc(ptDataBr(p.s.de)) + '</span>' + esc(p.it.t) + '</span></div>'; }).join('') + '</details>';
     var cor = ptCor(livro), claro = parseInt(cor.slice(1), 16), lum = (0.299 * (claro >> 16) + 0.587 * ((claro >> 8) & 255) + 0.114 * (claro & 255)) / 255;
-    html += '<div class="pt-livro" style="' + ptCorVars(cor) + '"><div class="topo"' + (lum > 0.6 ? ' style="color:#3a2e00"' : '') + '><h3>' + esc(livro) + '</h3>' + (L && L.licao ? '<span class="lic">' + esc(L.licao) + '</span>' : '') + '</div>' +
+    var iL = ptEstado.livros.indexOf(livro), nL = ptEstado.livros.length;
+    var mover = nL > 1 ? '<span class="mover"><button type="button" data-ptmv="-1" data-ptlv="' + esc(livro) + '"' + (iL === 0 ? ' disabled' : '') + ' aria-label="Subir ' + esc(livro) + '" title="Fazer antes">↑</button>' +
+      '<button type="button" data-ptmv="1" data-ptlv="' + esc(livro) + '"' + (iL === nL - 1 ? ' disabled' : '') + ' aria-label="Descer ' + esc(livro) + '" title="Fazer depois">↓</button>' +
+      '<span class="alca" title="Segure e arraste para mudar a ordem" aria-hidden="true">⠿</span></span>' : '';
+    html += '<div class="pt-livro" draggable="' + (nL > 1) + '" data-ptlivro="' + esc(livro) + '" style="' + ptCorVars(cor) + '"><div class="topo"' + (lum > 0.6 ? ' style="color:#3a2e00"' : '') + '><h3>' + esc(livro) + '</h3>' + (L && L.licao ? '<span class="lic">' + esc(L.licao) + '</span>' : '') + mover + '</div>' +
       '<div class="quem">' + ptEstado.porLivro[livro].map(function (a) { return '<span>' + esc(ptPrimeiro(a.nome)) + '</span>'; }).join('') + '</div>' +
       '<div class="corpo">' + corpo + ptBotoesMaterial(livro, ptLicaoVigente(b, nome, sw.i)) + '</div></div>';
   });
   html += '</div>';
   if (!ptEstado.carregou) html += '<div class="pt-nada" style="text-align:center">🔄 Lendo o que já foi feito…</div>';
   cx.innerHTML = html; cx.hidden = false;
+  var cab = cx.querySelector('.pt-cab'); if (cab) cab.parentNode.insertBefore(ptNotaTurma(), cab.nextSibling);
   cx.querySelectorAll('[data-ptoff]').forEach(function (bt) { bt.addEventListener('click', function () { var v = Number(bt.dataset.ptoff); ptEstado.off = v === 0 ? 0 : ptEstado.off + v; ptDesenha(); }); });
   cx.querySelectorAll('.pt-tick').forEach(function (bt) { bt.addEventListener('click', function () { ptAlterna(bt.dataset.ptl, bt.dataset.ptk, bt.dataset.pts); }); });
+  cx.querySelectorAll('[data-ptmv]').forEach(function (bt) { bt.addEventListener('click', function () { ptMoveLivro(bt.dataset.ptlv, Number(bt.dataset.ptmv)); }); });
+  ptLigaArrastarLivros(cx);
 }
 /* Os botões do material abrem o PORTAL (Modo Kids para os livros infantis, a chave do professor para os Teens, que
    ficam fora do Modo Kids) já no livro, nos áudios com a lição da semana aberta, ou nos vídeos com os dela em
@@ -2696,6 +2723,67 @@ function ptBotoesMaterial(livro, licao) {
   var rot = licao ? ' da Lesson ' + licao : ' do livro';
   return '<div class="pt-botoes">' + ptLink(ptUrlMaterial(livro, 'audios', licao), '🎧 Áudios' + rot) +
     (PT_SEM_VIDEO.test(livro) ? '' : ptLink(ptUrlMaterial(livro, 'videos', licao), '📺 Vídeos' + rot)) + '</div>';
+}
+/* A ANOTAÇÃO DA TURMA (Pedro, 23/10/2026): um campo só, que atravessa todas as semanas, para o professor guardar o que
+   vale para a turma (combinados, quem precisa de atenção, o que ficou para depois). Salva sozinho, no servidor
+   (planoTurmaMarca com `nota`, a última vale). O nó é criado uma vez e reaproveitado a cada redesenho do plano. */
+function ptNotaTurma() {
+  if (ptEstado.notaEl) return ptEstado.notaEl;
+  var box = document.createElement('div'); box.className = 'pt-nota';
+  box.innerHTML = '<label for="pt-nota-ta">📝 Anotações da turma <small>ficam aqui em todas as semanas</small></label>' +
+    '<textarea id="pt-nota-ta" maxlength="4000" placeholder="Ex.: combinados da turma, quem precisa de mais atenção, o que ficou para a próxima aula…"></textarea><div class="st"></div>';
+  var ta = box.querySelector('textarea'), st = box.querySelector('.st'), timer = null;
+  var salvo = (ptEstado.nota && ptEstado.nota.texto) || '';
+  ta.value = salvo; ta.disabled = !ptEstado.carregou;
+  var turma = ptEstado.turma, escola = ptEstado.escola;
+  function salvar() {
+    var v = ta.value.trim();
+    if (v === salvo.trim()) return;
+    st.textContent = 'Salvando…';
+    post({ action: 'planoTurmaMarca', escola: escola, turma: turma, nota: v }).then(function () { salvo = v; st.textContent = '✓ Salvo'; })
+      .catch(function (e) { st.textContent = '⚠️ Não salvou: ' + e.message; });
+  }
+  ta.addEventListener('input', function () { st.textContent = ''; clearTimeout(timer); timer = setTimeout(salvar, 1200); });
+  ta.addEventListener('blur', function () { clearTimeout(timer); salvar(); });
+  ptEstado.notaEl = box;
+  return box;
+}
+/* A ORDEM DOS LIVROS (Pedro, 23/10/2026): começa na ordem da Tabela de Progresso Acadêmico, do livro dos menores para
+   o dos maiores (a ordem de PT_CORES), e o professor pode trocar pelas setas ou arrastando o cartão. A escolha fica
+   no aparelho, por turma. Não há prioridade aqui: a turma inteira é atendida ao mesmo tempo, o que muda é por qual
+   grupo começar. */
+function ptChaveOrdem(escola, turma) { return 'pt:ordem:' + normNome(escola) + '|' + normNome(turma); }
+function ptIndiceTabela(livro) { var i = PT_CORES.findIndex(function (p) { return p[0].test(String(livro || '')); }); return i < 0 ? 99 : i; }
+function ptOrdena(escola, turma, livros) {
+  var salvo = []; try { salvo = JSON.parse(localStorage.getItem(ptChaveOrdem(escola, turma)) || '[]') || []; } catch (e) {}
+  return livros.slice().sort(function (a, b) {
+    var sa = salvo.indexOf(a), sb = salvo.indexOf(b);
+    if (sa > -1 && sb > -1) return sa - sb;
+    if (sa > -1 || sb > -1) return sa > -1 ? -1 : 1;
+    return ptIndiceTabela(a) - ptIndiceTabela(b);
+  });
+}
+function ptGuardaOrdem() { try { localStorage.setItem(ptChaveOrdem(ptEstado.escola, ptEstado.turma), JSON.stringify(ptEstado.livros)); } catch (e) {} }
+function ptMoveLivro(livro, delta) {
+  var l = ptEstado.livros, i = l.indexOf(livro), j = i + delta;
+  if (i < 0 || j < 0 || j >= l.length) return;
+  l.splice(i, 1); l.splice(j, 0, livro); ptGuardaOrdem(); ptDesenha();
+  var el = document.querySelector('.pt-livro[data-ptlivro="' + livro.replace(/"/g, '') + '"]'); if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+function ptLigaArrastarLivros(cx) {
+  var arrastado = null;
+  cx.querySelectorAll('.pt-livro[draggable="true"]').forEach(function (el) {
+    el.addEventListener('dragstart', function (e) { arrastado = el.dataset.ptlivro; el.classList.add('arrastando'); try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', arrastado); } catch (x) {} });
+    el.addEventListener('dragend', function () { el.classList.remove('arrastando'); cx.querySelectorAll('.pt-livro.alvo').forEach(function (o) { o.classList.remove('alvo'); }); });
+    el.addEventListener('dragover', function (e) { if (!arrastado || arrastado === el.dataset.ptlivro) return; e.preventDefault(); el.classList.add('alvo'); });
+    el.addEventListener('dragleave', function () { el.classList.remove('alvo'); });
+    el.addEventListener('drop', function (e) {
+      e.preventDefault(); el.classList.remove('alvo');
+      var alvo = el.dataset.ptlivro; if (!arrastado || arrastado === alvo) return;
+      var l = ptEstado.livros, de = l.indexOf(arrastado); l.splice(de, 1); l.splice(l.indexOf(alvo) + (de <= l.indexOf(alvo) ? 1 : 0), 0, arrastado);
+      arrastado = null; ptGuardaOrdem(); ptDesenha();
+    });
+  });
 }
 function ptAlterna(livro, k, semana) {
   if (!ptEstado) return;
