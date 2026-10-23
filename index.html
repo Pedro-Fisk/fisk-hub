@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="assets/fisk-shared.css?v=2026-10-09c">
   <!-- a casa do professor veste a faixa do topo (campanha de 09/2026) -->
   <link rel="stylesheet" href="assets/casa-tema.css?v=9">
-<link rel="stylesheet" href="style.css?v=2026-10-23a">
+<link rel="stylesheet" href="style.css?v=2026-10-23b">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 </head>
@@ -311,6 +311,13 @@
       <div class="tt-cab"><span id="ttTit">🙋 Quem veio à tutoria<small>nas últimas 2 semanas</small></span><b id="ttN" hidden></b></div>
       <div class="tt-lista" id="ttLista"></div>
       <a class="av-rodape" id="ttLink" href="tutoria.html">Ver a frequência completa →</a>
+    </div>
+    <!-- ANIVERSARIANTES DA SEMANA (Pedro, 23/10/2026): ao lado de quem veio à tutoria, para todo professor. Os alunos
+         dele que fazem aniversário de segunda a domingo (rota aniversariantesProf, a mesma régua do Portal do Aluno).
+         Quem preenche é o script do mural, junto da tutoria. -->
+    <div class="tt-card an-card" id="anCard" hidden>
+      <div class="tt-cab"><span id="anTit">🎂 Aniversariantes da semana<small>de segunda a domingo</small></span><b id="anN" hidden></b></div>
+      <div class="tt-lista" id="anLista"></div>
     </div>
       </div>
     </section>
@@ -634,7 +641,7 @@
        de lá em vez de repetir o número. Se não carregar, o painel da casa
        mostra os Fisk Dólares e nada quebra. -->
   <script src="https://portalfisk.com.br/assets/mana.js"></script>
-  <script src="assets/fisk-shared.js?v=2026-10-09b"></script>
+  <script src="assets/fisk-shared.js?v=2026-10-23a"></script>
   <script>
     fiskInitThemeToggle('themeToggle');
 
@@ -2315,6 +2322,7 @@
     var $$ = function(id){ return document.getElementById(id); };
     var cx = $$('avisos'), chat = $$('bdChat'), sino = $$('avSino'), sinoN = $$('avSinoN'), fundo = $$('avFundo');
     var ttCard = $$('ttCard'), ttLista = $$('ttLista'), ttN = $$('ttN');
+    var anCard = $$('anCard'), anLista = $$('anLista'), anN = $$('anN'), aniv = [];
     if (!cx || !chat || typeof FISK_HUB_EP === 'undefined') return;
     var CALMO = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
@@ -2326,7 +2334,7 @@
             ola:'Oi, {n}.', novo1:'Tem 1 recado novo para você.', novoN:'Tem {q} recados novos para você.',
             nada:'Nenhuma novidade sem ler.',
             antigos:'Ver os {q} já lidos', antigo1:'Ver o recado já lido', esconder:'Esconder os já lidos',
-            ciente:'Li e estou ciente', tDir:'Direção', tSec:'Secretaria', tNov:'Novidade', nome:'Novidades',
+            ciente:'Li e estou ciente', tDir:'Direção', tSec:'Secretaria', tNov:'Novidade', nome:'Novidades', tAniv:'Aniversário', anTit:'🎂 Aniversariantes da semana', anSub:'de segunda a domingo', anVazio:'Nenhum aluno seu faz aniversário nesta semana.', anRec:'🎂 Aniversariantes desta semana', anHoje:'é hoje!',
             ttTit:'🙋 Quem veio à tutoria', ttSub:'nas últimas 2 semanas', ttVazio:'Nenhum aluno seu por enquanto.',
             ttLink:'Ver a frequência completa →', vi:'Vi', veio:' foi à tutoria',
             falar:'Ver as novidades', saiu:'As novidades saíram da tela. Para ver de novo, clique no seu nome, lá em cima, e em "Ver as novidades".' },
@@ -2337,7 +2345,7 @@
             ola:'Hi, {n}.', novo1:'You have 1 new notice.', novoN:'You have {q} new notices.',
             nada:'Nothing new to read.',
             antigos:'See the {q} already read', antigo1:'See the notice already read', esconder:'Hide the ones already read',
-            ciente:'Read and acknowledged', tDir:'Direction', tSec:'Office', tNov:'What’s new', nome:'What’s new',
+            ciente:'Read and acknowledged', tDir:'Direction', tSec:'Office', tNov:'What’s new', nome:'What’s new', tAniv:'Birthday', anTit:'🎂 Birthdays this week', anSub:'Monday to Sunday', anVazio:'None of your students has a birthday this week.', anRec:'🎂 Birthdays this week', anHoje:'today!',
             ttTit:'🙋 Who came to tutoring', ttSub:'in the last 2 weeks', ttVazio:'None of your students so far.',
             ttLink:'See the full attendance →', vi:'Seen', veio:' foi à tutoria',
             falar:'See what’s new', saiu:'The news panel left the screen. To see it again, click your name at the top and choose "See what’s new".' },
@@ -2348,7 +2356,7 @@
             ola:'Hola, {n}.', novo1:'Tienes 1 aviso nuevo.', novoN:'Tienes {q} avisos nuevos.',
             nada:'Ninguna novedad sin leer.',
             antigos:'Ver los {q} ya leídos', antigo1:'Ver el aviso ya leído', esconder:'Ocultar los ya leídos',
-            ciente:'Leído y enterado', tDir:'Dirección', tSec:'Secretaría', tNov:'Novedad', nome:'Novedades',
+            ciente:'Leído y enterado', tDir:'Dirección', tSec:'Secretaría', tNov:'Novedad', nome:'Novedades', tAniv:'Cumpleaños', anTit:'🎂 Cumpleaños de la semana', anSub:'de lunes a domingo', anVazio:'Ningún alumno tuyo cumple años esta semana.', anRec:'🎂 Cumpleaños de esta semana', anHoje:'¡es hoy!',
             ttTit:'🙋 Quién fue a la tutoría', ttSub:'en las últimas 2 semanas', ttVazio:'Ningún alumno tuyo por ahora.',
             ttLink:'Ver la asistencia completa →', vi:'Visto', veio:' foi à tutoria',
             falar:'Ver las novedades', saiu:'Las novedades salieron de la pantalla. Para verlas de nuevo, haz clic en tu nombre, arriba, y en "Ver las novedades".' }
@@ -2409,7 +2417,7 @@
     }
 
     /* ── a bolha de um recado ── */
-    var ROT = { dir: 'tDir', sec: 'tSec', nov: 'tNov' };
+    var ROT = { dir: 'tDir', sec: 'tSec', nov: 'tNov', aniv: 'tAniv' };
     function bolha(m){
       var d = document.createElement('div');
       d.className = 'bd-msg bd-rec' + (m.ciente ? ' lido' : '');
@@ -2428,6 +2436,7 @@
       d.querySelector('input').addEventListener('change', function(ev){
         var marcou = ev.target.checked;
         m.ciente = marcou; d.classList.toggle('lido', marcou); conta();
+        if (m.local) { try { if (marcou) localStorage.setItem(m.local, '1'); else localStorage.removeItem(m.local); } catch (e) {} return; }
         if (m.aviso) post({ action: 'avisosLido', ids: [m.avId], desfaz: marcou ? 0 : 1 }).catch(function(){});
         else post({ action: 'informeCiente', id: m.id, desfaz: marcou ? 0 : 1 }).catch(function(){});
       });
@@ -2481,6 +2490,36 @@
       }
       chat.scrollTop = 0;
     }
+    /* OS ANIVERSARIANTES (Pedro, 23/10/2026): o cartão da home e um recado no mural, uma vez por semana. O recado é
+       só informação, mas pede o "ciente" como os outros, para o professor não deixar passar; o ciente fica no
+       aparelho (não há o que registrar no servidor). */
+    var DOW = { pt: ['dom','seg','ter','qua','qui','sex','sáb'], en: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], es: ['dom','lun','mar','mié','jue','vie','sáb'] };
+    function diaAniv(a){
+      var h = new Date(), ano = h.getFullYear(), d = new Date(ano, a.mes - 1, a.dia);
+      if (h.getMonth() === 11 && a.mes === 1) d = new Date(ano + 1, a.mes - 1, a.dia);
+      if (h.getMonth() === 0 && a.mes === 12) d = new Date(ano - 1, a.mes - 1, a.dia);
+      return (DOW[lang()] || DOW.pt)[d.getDay()] + ' ' + ('0' + a.dia).slice(-2) + '/' + ('0' + a.mes).slice(-2);
+    }
+    function segundaISO(){ var h = new Date(); h.setDate(h.getDate() - ((h.getDay() + 6) % 7)); return h.getFullYear() + '-' + ('0' + (h.getMonth() + 1)).slice(-2) + '-' + ('0' + h.getDate()).slice(-2); }
+    function aniversarios(){
+      if (!anCard) return;
+      $$('anTit').innerHTML = esc(tx('anTit')) + '<small>' + esc(tx('anSub')) + '</small>';
+      anCard.hidden = false; anN.hidden = !aniv.length; anN.textContent = String(aniv.length);
+      if (!aniv.length) { anLista.innerHTML = '<p class="av-vazio">' + esc(tx('anVazio')) + '</p>'; return; }
+      anLista.innerHTML = aniv.map(function(a){
+        return '<div class="tt-it an-it' + (a.hoje ? ' hoje' : '') + '"><i class="an-bolo" aria-hidden="true">🎂</i><span><b>' + esc(a.nome) +
+          (a.hoje ? ' <em>' + esc(tx('anHoje')) + '</em>' : '') + '</b><small>' + esc(diaAniv(a)) + ' · ' + esc(a.turma) + '</small></span></div>';
+      }).join('');
+    }
+    function recadoAniv(){
+      if (!aniv.length) return [];
+      var chave = 'fisk_aniv_ciente:' + segundaISO() + ':' + (eu() || '');
+      var lido = false; try { lido = localStorage.getItem(chave) === '1'; } catch (e) {}
+      var h = new Date(); h.setDate(h.getDate() - ((h.getDay() + 6) % 7)); h.setHours(8, 0, 0, 0);
+      return [{ id: 'aniv|' + segundaISO(), local: chave, quando: h.getTime(), tag: 'aniv', titulo: esc(tx('anRec')),
+        html: '<ul class="an-rec">' + aniv.map(function(a){ return '<li><b>' + esc(a.nome) + '</b> · ' + esc(diaAniv(a)) + (a.hoje ? ' 🎉 ' + esc(tx('anHoje')) : '') + '<br><small>' + esc(a.turma) + '</small></li>'; }).join('') + '</ul>',
+        anexos: [], link: null, ciente: lido }];
+    }
     function tutoria(){
       $$('ttTit').innerHTML = esc(tx('ttTit')) + '<small>' + esc(tx('ttSub')) + '</small>';
       $$('ttLink').textContent = tx('ttLink');
@@ -2503,7 +2542,9 @@
       var pedido = ++leitura;   /* duas leituras no ar: só a mais nova desenha */
       var inf = post({ action: 'informesLer', como: como() }).catch(function(){ return null; });
       var avs = post({ action: 'avisosLer', como: como() }).catch(function(){ return null; });
-      Promise.all([inf, avs]).then(function(r){
+      var ans = post({ action: 'aniversariantesProf', como: como() }).catch(function(){ return null; });
+      Promise.all([inf, avs, ans]).then(function(r){
+        if (r[2] && r[2].ok) aniv = r[2].aniversariantes || [];
         if (pedido !== leitura) return;
         var ji = r[0], ja = r[1], cientes = {};
         ((ji && ji.cientes) || []).forEach(function(id){ cientes[id] = true; });
@@ -2517,12 +2558,12 @@
           return { id: 'av|' + a.id, avId: a.id, aviso: true, quando: a.quando, tag: 'sec', titulo: esc(a.titulo),
                    html: a.texto ? '<p>' + texto(a.texto) + '</p>' : '', anexos: [], link: a.tipo === 'impressao' ? { href: 'imprimir.html#meus', rot: '📬 Ver meus pedidos' } : null, ciente: !!a.lido };
         });
-        tutoria();
+        tutoria(); aniversarios();
         /* os informes não vieram (rede, sessão) e a conversa já está na tela: fica como estava */
         if ((!ji || ji.ok !== true) && assinatura) { conta(); return; }
         noticias(cientes, function(fixas){
           if (pedido !== leitura) return;
-          var todas = fixas.concat(((ji && ji.informes) || []).map(doInforme), pedidos);
+          var todas = fixas.concat(((ji && ji.informes) || []).map(doInforme), pedidos, recadoAniv());
           todas.sort(function(a, b){ return a.quando - b.quando; });
           /* só refaz a conversa quando chegou ou saiu recado: reler a cada 3 minutos não pode redigitar tudo */
           var ass = lang() + '|' + eu() + '|' + todas.map(function(m){ return m.id; }).join(',');

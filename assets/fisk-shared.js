@@ -1274,6 +1274,46 @@ function fiskBuscaMeusAlunos(q) {
     window.addEventListener('message', function (e) { if (e.data && e.data.fiskBuddy === 'fecha') abre(false); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && document.body.classList.contains('fk-buddy-aberto')) abre(false); });
     try { if (sessionStorage.getItem('fisk_buddy_aberto') === '1') abre(true); } catch (e) {}
+    balaoAniversario(bt, abre);
+  }
+  /* O URSO AVISA DOS ANIVERSÁRIOS (Pedro, 23/10/2026): um balão saindo da bolinha, uma vez por dia, com os alunos do
+     professor que fazem aniversário nesta semana (rota aniversariantesProf; a lista fica 30 min no aparelho). O ✕
+     guarda o dia; clicar no balão leva à home, onde o cartão "Aniversariantes da semana" tem a lista inteira. */
+  function balaoAniversario(bt) {
+    var hoje = new Date(), dia = hoje.getFullYear() + '-' + (hoje.getMonth() + 1) + '-' + hoje.getDate();
+    var CH = 'fisk_aniv_balao:' + dia + ':' + String(s.token).slice(0, 12);
+    try { if (localStorage.getItem(CH) === '1') return; } catch (e) {}
+    var CC = 'fisk_aniv_lista:' + String(s.token).slice(0, 12), lista = null;
+    try { var g = JSON.parse(sessionStorage.getItem(CC) || 'null'); if (g && Date.now() - g.q < 30 * 60000) lista = g.l; } catch (e) {}
+    var pega = lista ? Promise.resolve(lista) : fetch(FISK_HUB_EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'aniversariantesProf', token: s.token }) })
+      .then(fiskJson).then(function (j) { var l = (j && j.ok && j.aniversariantes) || []; try { sessionStorage.setItem(CC, JSON.stringify({ q: Date.now(), l: l })); } catch (e) {} return l; }).catch(function () { return []; });
+    pega.then(function (l) {
+      if (!l || !l.length || document.getElementById('fkAnivBalao')) return;
+      var dd = function (a) { return ('0' + a.dia).slice(-2) + '/' + ('0' + a.mes).slice(-2); };
+      var prim = function (n) { return String(n || '').trim().split(/\s+/)[0]; };
+      var hojeL = l.filter(function (a) { return a.hoje; });
+      var txt = hojeL.length
+        ? '🎂 Hoje é aniversário de <b>' + hojeL.map(function (a) { return fiskEsc(prim(a.nome)); }).join(', ') + '</b>!' + (l.length > hojeL.length ? ' E mais ' + (l.length - hojeL.length) + ' nesta semana.' : '')
+        : '🎂 Aniversário nesta semana: ' + l.slice(0, 3).map(function (a) { return '<b>' + fiskEsc(prim(a.nome)) + '</b> (' + dd(a) + ')'; }).join(', ') + (l.length > 3 ? ' e mais ' + (l.length - 3) : '') + '.';
+      var st = document.createElement('style');
+      st.textContent = '#fkAnivBalao{position:fixed;z-index:9989;right:16px;bottom:88px;max-width:290px;background:#fff;border:2px solid #f5c542;border-radius:16px 16px 4px 16px;' +
+        'padding:.7rem 2rem .7rem .85rem;font:inherit;font-size:.92rem;line-height:1.4;color:#3b2a00;box-shadow:0 10px 26px rgba(146,64,14,.22);cursor:pointer;animation:fkAniv .4s ease}' +
+        '#fkAnivBalao button{position:absolute;top:.35rem;right:.4rem;border:0;background:none;font-size:1rem;cursor:pointer;color:#92400e}' +
+        'body.fk-buddy-aberto #fkAnivBalao{display:none}@keyframes fkAniv{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}' +
+        'body.theme-dark #fkAnivBalao{background:#2b2513;color:#fde68a;border-color:#6d5a23}@media print{#fkAnivBalao{display:none}}';
+      document.head.appendChild(st);
+      var b = document.createElement('div'); b.id = 'fkAnivBalao'; b.setAttribute('role', 'status');
+      b.innerHTML = '<span>' + txt + '</span><button type="button" aria-label="Fechar">✕</button>';
+      document.body.appendChild(b);
+      var fecha = function () { b.remove(); try { localStorage.setItem(CH, '1'); } catch (e) {} };
+      b.querySelector('button').addEventListener('click', function (e) { e.stopPropagation(); fecha(); });
+      b.addEventListener('click', function () {
+        fecha();
+        var card = document.getElementById('anCard');
+        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        else location.href = ((typeof fiskHubBase === 'function') ? fiskHubBase() : '') + 'index.html';
+      });
+    });
   }
   function vai() { pode().then(function (ok) { if (ok) monta(); }); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', vai); else vai();
