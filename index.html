@@ -2489,8 +2489,8 @@
         /* O RETORNO DA SECRETARIA (22/10/2026): "foi impresso", "foi enviado à família", "não será impresso". O servidor
            gravava esses avisos desde 20/10 e o mural não os mostrava (só a tutoria). Entram como recado, com o "Ciente"
            marcando o aviso como lido e o link para os pedidos. */
-        var pedidos = (ja && ja.ok ? ja.avisos || [] : []).filter(function(a){ return (a.tipo === 'impressao' || a.tipo === 'transferencia') && a.quando >= corte; }).map(function(a){
-          /* transferência de aluno entre turmas (Portal da Secretaria, 23/10/2026): recado sem link */
+        var pedidos = (ja && ja.ok ? ja.avisos || [] : []).filter(function(a){ return (a.tipo === 'impressao' || a.tipo === 'transferencia' || a.tipo === 'matricula') && a.quando >= corte; }).map(function(a){
+          /* transferência de aluno entre turmas e aluno novo matriculado pelo portal (Portal da Secretaria, 23/10/2026): recado sem link */
           return { id: 'av|' + a.id, avId: a.id, aviso: true, quando: a.quando, tag: 'sec', titulo: esc(a.titulo),
                    html: a.texto ? '<p>' + texto(a.texto) + '</p>' : '', anexos: [], link: a.tipo === 'impressao' ? { href: 'imprimir.html#meus', rot: '📬 Ver meus pedidos' } : null, ciente: !!a.lido };
         });
