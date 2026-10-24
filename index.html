@@ -657,6 +657,7 @@
        de lá em vez de repetir o número. Se não carregar, o painel da casa
        mostra os Fisk Dólares e nada quebra. -->
   <script src="https://portalfisk.com.br/assets/mana.js"></script>
+  <script src="https://portalfisk.com.br/assets/equipe-cortina.js?v=2026-10-24a"></script>
   <script src="assets/fisk-shared.js?v=2026-10-23a"></script>
   <script>
     fiskInitThemeToggle('themeToggle');
@@ -2658,7 +2659,7 @@
       var ov = $$('hubEntrando');
       if (ov) {
         ov.hidden = false;
-        var some = function(){ ov.hidden = true; document.removeEventListener('hub-mural-pronto', some); };
+        var some = function(){ if (ov.hidden) return; ov.hidden = true; document.removeEventListener('hub-mural-pronto', some); eqCampanha(); };
         document.addEventListener('hub-mural-pronto', some);
         setTimeout(some, 12000);
       }
@@ -2678,6 +2679,21 @@
         }, 300);
       }).catch(function(){});
     }
+    /* OS DADOS DA EQUIPE (Pedro, 24/10/2026): a cortina mora no portal (assets/equipe-cortina.js), a mesma da secretaria.
+       É campanha: volta em toda entrada até o professor preencher. A direção vendo como alguém não é pesquisada. */
+    function eqOpt(){ var s = sess() || {}; return { post: post, ler: 'equipeDadosLer', salvar: 'equipeDadosSalvar', conta: s.name || '' }; }   /* sem `festa`: a cortina solta o confete dela */
+    function eqCampanha(){ var s = sess(); if (!s || !s.token || s.master || !window.FiskEquipe) return; FiskEquipe.inicia(eqOpt()); }
+    (function eqMenu(){
+      var k = 0, t = setInterval(function(){
+        var menu = document.querySelector('.fisk-user-menu');
+        if (!menu) { if (++k > 40) clearInterval(t); return; }
+        clearInterval(t);
+        if (menu.querySelector('.fu-eq')) return;
+        var it = document.createElement('button'); it.type = 'button'; it.className = 'fu-item fu-eq'; it.textContent = '🪪 Meus dados';
+        it.addEventListener('click', function(){ document.body.click(); if (window.FiskEquipe) FiskEquipe.abre(eqOpt()); });
+        var ref = menu.querySelector('.fu-csl'); if (ref) menu.insertBefore(it, ref); else menu.appendChild(it);
+      }, 300);
+    })();
     window._avisosLiga = liga;
     if (document.body.classList.contains('prof-in')) liga();
     setInterval(function(){ if (!document.hidden && document.body.classList.contains('prof-in')) carrega(); }, 180000);
