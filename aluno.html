@@ -858,7 +858,12 @@ function renderFala(f){
    está, em vez de sumir. */
 function nomePratica(id){
   var m = String(id||'').match(/^e(\d+)-l(\d+)$/);
-  return m ? ('Essentials ' + m[1] + ' · Lesson ' + m[2]) : id;
+  if (m) return 'Essentials ' + m[1] + ' · Lesson ' + m[2];
+  /* (23/10/2026, Fisk Worlds E4) a entrevista do Aeroporto: fwen-imig1-05 cai na prática fwen-imig1. Sem gravação para
+     ouvir (decisão D4 = B: o áudio do jogo não vai ao Drive), só a frase e a nota */
+  var w = String(id||'').match(/^fw(en|es)-(imig|emb)(\d)$/);
+  if (w) return 'Fisk Worlds · ' + (w[2] === 'imig' ? 'Imigração' : 'Avião') + ' (nível ' + w[3] + ')';
+  return id;
 }
 
 /* Ouvir a gravação. O áudio vem em base64 pela rota autenticada e vira um
