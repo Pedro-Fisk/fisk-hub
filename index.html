@@ -100,6 +100,8 @@
   #hubEntrando .cx{text-align:center}
   #hubEntrando .hub-roda{width:42px;height:42px;border-width:4px;margin-bottom:1rem}
   #hubEntrando p{font-weight:700;margin:0}
+  .an-prox{ margin:.7rem 0 .25rem; font-size:.78rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; opacity:.6; }
+  .an-it.prox{ opacity:.8; }
 </style>
 
   <div id="profGate">
@@ -2351,7 +2353,7 @@
             ola:'Oi, {n}.', novo1:'Tem 1 recado novo para você.', novoN:'Tem {q} recados novos para você.',
             nada:'Nenhuma novidade sem ler.',
             antigos:'Ver os {q} já lidos', antigo1:'Ver o recado já lido', esconder:'Esconder os já lidos',
-            ciente:'Li e estou ciente', tDir:'Direção', tSec:'Secretaria', tNov:'Novidade', nome:'Novidades', tAniv:'Aniversário', anTit:'🎂 Aniversariantes da semana', anSub:'de segunda a domingo', anVazio:'Nenhum aluno seu faz aniversário nesta semana.', anRec:'🎂 Aniversariantes desta semana', anHoje:'é hoje!',
+            ciente:'Li e estou ciente', tDir:'Direção', tSec:'Secretaria', tNov:'Novidade', nome:'Novidades', tAniv:'Aniversário', anTit:'🎂 Aniversariantes da semana', anSub:'de segunda a domingo', anVazio:'Nenhum aluno seu faz aniversário nesta semana.', anRec:'🎂 Aniversariantes desta semana', anHoje:'é hoje!', anProx:'Semana que vem', anProxVazio:'Ninguém na semana que vem.',
             ttTit:'🙋 Quem veio à tutoria', ttSub:'nas últimas 2 semanas', ttVazio:'Nenhum aluno seu por enquanto.',
             ttLink:'Ver a frequência completa →', vi:'Vi', veio:' foi à tutoria',
             falar:'Ver as novidades', saiu:'As novidades saíram da tela. Para ver de novo, clique no seu nome, lá em cima, e em "Ver as novidades".' },
@@ -2362,7 +2364,7 @@
             ola:'Hi, {n}.', novo1:'You have 1 new notice.', novoN:'You have {q} new notices.',
             nada:'Nothing new to read.',
             antigos:'See the {q} already read', antigo1:'See the notice already read', esconder:'Hide the ones already read',
-            ciente:'Read and acknowledged', tDir:'Direction', tSec:'Office', tNov:'What’s new', nome:'What’s new', tAniv:'Birthday', anTit:'🎂 Birthdays this week', anSub:'Monday to Sunday', anVazio:'None of your students has a birthday this week.', anRec:'🎂 Birthdays this week', anHoje:'today!',
+            ciente:'Read and acknowledged', tDir:'Direction', tSec:'Office', tNov:'What’s new', nome:'What’s new', tAniv:'Birthday', anTit:'🎂 Birthdays this week', anSub:'Monday to Sunday', anVazio:'None of your students has a birthday this week.', anRec:'🎂 Birthdays this week', anHoje:'today!', anProx:'Next week', anProxVazio:'No one next week.',
             ttTit:'🙋 Who came to tutoring', ttSub:'in the last 2 weeks', ttVazio:'None of your students so far.',
             ttLink:'See the full attendance →', vi:'Seen', veio:' foi à tutoria',
             falar:'See what’s new', saiu:'The news panel left the screen. To see it again, click your name at the top and choose "See what’s new".' },
@@ -2373,7 +2375,7 @@
             ola:'Hola, {n}.', novo1:'Tienes 1 aviso nuevo.', novoN:'Tienes {q} avisos nuevos.',
             nada:'Ninguna novedad sin leer.',
             antigos:'Ver los {q} ya leídos', antigo1:'Ver el aviso ya leído', esconder:'Ocultar los ya leídos',
-            ciente:'Leído y enterado', tDir:'Dirección', tSec:'Secretaría', tNov:'Novedad', nome:'Novedades', tAniv:'Cumpleaños', anTit:'🎂 Cumpleaños de la semana', anSub:'de lunes a domingo', anVazio:'Ningún alumno tuyo cumple años esta semana.', anRec:'🎂 Cumpleaños de esta semana', anHoje:'¡es hoy!',
+            ciente:'Leído y enterado', tDir:'Dirección', tSec:'Secretaría', tNov:'Novedad', nome:'Novedades', tAniv:'Cumpleaños', anTit:'🎂 Cumpleaños de la semana', anSub:'de lunes a domingo', anVazio:'Ningún alumno tuyo cumple años esta semana.', anRec:'🎂 Cumpleaños de esta semana', anHoje:'¡es hoy!', anProx:'La próxima semana', anProxVazio:'Nadie la próxima semana.',
             ttTit:'🙋 Quién fue a la tutoría', ttSub:'en las últimas 2 semanas', ttVazio:'Ningún alumno tuyo por ahora.',
             ttLink:'Ver la asistencia completa →', vi:'Visto', veio:' foi à tutoria',
             falar:'Ver las novedades', saiu:'Las novedades salieron de la pantalla. Para verlas de nuevo, haz clic en tu nombre, arriba, y en "Ver las novedades".' }
@@ -2518,17 +2520,23 @@
       return (DOW[lang()] || DOW.pt)[d.getDay()] + ' ' + ('0' + a.dia).slice(-2) + '/' + ('0' + a.mes).slice(-2);
     }
     function segundaISO(){ var h = new Date(); h.setDate(h.getDate() - ((h.getDay() + 6) % 7)); return h.getFullYear() + '-' + ('0' + (h.getMonth() + 1)).slice(-2) + '-' + ('0' + h.getDate()).slice(-2); }
+    /* a semana que vem vem junto, embaixo (Pedro, 24/10/2026: "para o professor se planejar"); o número e o recado
+       do mural contam só esta semana */
+    function anivDesta(){ return aniv.filter(function(a){ return !a.proxima; }); }
     function aniversarios(){
       if (!anCard) return;
       $$('anTit').innerHTML = esc(tx('anTit')) + '<small>' + esc(tx('anSub')) + '</small>';
-      anCard.hidden = false; anN.hidden = !aniv.length; anN.textContent = String(aniv.length);
-      if (!aniv.length) { anLista.innerHTML = '<p class="av-vazio">' + esc(tx('anVazio')) + '</p>'; return; }
-      anLista.innerHTML = aniv.map(function(a){
-        return '<div class="tt-it an-it' + (a.hoje ? ' hoje' : '') + '"><i class="an-bolo" aria-hidden="true">🎂</i><span><b>' + esc(a.nome) +
+      var esta = anivDesta(), prox = aniv.filter(function(a){ return a.proxima; });
+      var item = function(a){
+        return '<div class="tt-it an-it' + (a.hoje ? ' hoje' : '') + (a.proxima ? ' prox' : '') + '"><i class="an-bolo" aria-hidden="true">🎂</i><span><b>' + esc(a.nome) +
           (a.hoje ? ' <em>' + esc(tx('anHoje')) + '</em>' : '') + '</b><small>' + esc(diaAniv(a)) + ' · ' + esc(a.turma) + '</small></span></div>';
-      }).join('');
+      };
+      anCard.hidden = false; anN.hidden = !esta.length; anN.textContent = String(esta.length);
+      anLista.innerHTML = (esta.length ? esta.map(item).join('') : '<p class="av-vazio">' + esc(tx('anVazio')) + '</p>') +
+        '<p class="an-prox">' + esc(tx('anProx')) + '</p>' + (prox.length ? prox.map(item).join('') : '<p class="av-vazio">' + esc(tx('anProxVazio')) + '</p>');
     }
     function recadoAniv(){
+      var aniv = anivDesta();
       if (!aniv.length) return [];
       var chave = 'fisk_aniv_ciente:' + segundaISO() + ':' + (eu() || '');
       var lido = false; try { lido = localStorage.getItem(chave) === '1'; } catch (e) {}
