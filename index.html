@@ -170,6 +170,9 @@
     <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
     <h1>Fisk Hub</h1>
     <p data-i18n="subtitle">Ferramentas rápidas para o seu dia a dia em sala de aula</p>
+    <!-- A FRASE DO DIA (Pedro, 26/10/2026): o acervo mora no Portal (assets/frases-equipe.js), o mesmo do Portal da
+         Secretaria. Uma por visita, sem repetir a última; clicar troca. Sem o arquivo, o parágrafo fica escondido. -->
+    <p class="hero-frase" id="heroFrase" hidden title="Clique para outra frase" style="font-style:italic;opacity:.92;max-width:44rem;margin:.55rem auto 0;cursor:pointer;transition:opacity .3s"></p>
   </header>
 
   <!-- resumo instantâneo das turmas do professor logado (dados do card, cache 30 min) -->
@@ -714,6 +717,14 @@
        mostra os Fisk Dólares e nada quebra. -->
   <script src="https://portalfisk.com.br/assets/mana.js"></script>
   <script src="https://portalfisk.com.br/assets/equipe-cortina.js?v=2026-10-24a"></script>
+  <script src="https://portalfisk.com.br/assets/frases-equipe.js?v=2026-10-26a"></script>
+  <script>
+    (function () {
+      var el = document.getElementById('heroFrase'); if (!el || !window.FISK_FRASES) return;
+      el.textContent = '✨ ' + FISK_FRASES.sorteia('professor'); el.hidden = false;
+      el.addEventListener('click', function () { el.style.opacity = '0'; setTimeout(function () { el.textContent = '✨ ' + FISK_FRASES.sorteia('professor'); el.style.opacity = ''; }, 300); });
+    })();
+  </script>
   <script src="assets/fisk-shared.js?v=2026-10-26a"></script>
   <script>
     fiskInitThemeToggle('themeToggle');
