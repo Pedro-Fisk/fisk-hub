@@ -102,6 +102,20 @@
   #hubEntrando p{font-weight:700;margin:0}
   .an-prox{ margin:.7rem 0 .25rem; font-size:.78rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; opacity:.6; }
   .an-it.prox{ opacity:.8; }
+  /* ── FISK WORLDS / FISK MUNDO (26/10/2026) ── a mesma faixa da home do aluno no portal, uma por curso */
+  .fwh{max-width:1100px;width:100%;margin:1.4rem auto 0;padding:0 1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+  .fwh[hidden]{display:none}
+  .fwh-f{position:relative;display:flex;align-items:center;gap:.85rem;min-height:92px;padding:.8rem 1rem;border-radius:16px;color:#fff;text-decoration:none;overflow:hidden;
+    background:linear-gradient(90deg,#0d3a24 0%,rgba(13,58,36,.85) 32%,rgba(13,58,36,.2) 62%,rgba(13,58,36,0) 82%),
+      #1d5b3a url(https://portalfisk.com.br/worlds/img/carga-v2-paisagem-1280.webp) 70% 40%/cover no-repeat;
+    box-shadow:0 4px 0 #062014;transition:transform .14s ease, box-shadow .14s ease}
+  .fwh-f:hover{transform:translateY(-2px);box-shadow:0 6px 0 #062014}
+  .fwh-t{display:flex;flex-direction:column;gap:.1rem;min-width:0}
+  .fwh-tag{align-self:flex-start;font-size:.62rem;font-weight:800;letter-spacing:.1em;background:#f6c343;color:#1b1605;border-radius:6px;padding:.12rem .45rem;margin-bottom:.2rem}
+  .fwh-t b{font-size:1.3rem;font-weight:800;line-height:1.1;text-shadow:0 2px 0 rgba(0,0,0,.25)}
+  .fwh-t small{font-size:.86rem;font-weight:700;color:#d8f5df}
+  .fwh-go{margin-left:auto;flex:none;background:#fff;color:#14532d;border-radius:999px;padding:.5rem .95rem;font-weight:800;font-size:.9rem;white-space:nowrap;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+  @media (max-width:760px){ .fwh{grid-template-columns:1fr;padding:0 .9rem;margin-top:1rem;gap:.8rem} .fwh-go span{display:none} .fwh-go{padding:.5rem .75rem} .fwh-t b{font-size:1.15rem} }
 </style>
 
   <div id="profGate">
@@ -190,6 +204,21 @@
     <a class="hwp-ir" id="hwpIr" href="hogwarts.html"></a>
     <!-- o placar das quatro casas, o MESMO que o aluno vê na home dele -->
     <div class="hwp-taca" id="hwpTaca" hidden></div>
+  </section>
+
+  <!-- FISK WORLDS (26/10/2026, pedido do Pedro): o jogo do Portal do Aluno, para o professor jogar também. Uma
+       faixa por curso, como os dois cards do Portal: em inglês ele é Fisk Worlds e em espanhol, Fisk Mundo. Nasce
+       escondida; `levaIdentidadeAoPortal` acende com o link do portal (`ir=worlds` abre o jogo direto), porque é a
+       sessão do professor que dá nome ao jogo dele no servidor. -->
+  <section class="fwh" id="fwHub" hidden>
+    <a class="fwh-f" id="fw-hub-en" href="https://portalfisk.com.br/#raf=0000-000&curso=en&ir=worlds">
+      <span class="fwh-t"><span class="fwh-tag" data-i18n="fw-tag">JOGO 3D · INGLÊS</span><b>Fisk Worlds</b><small data-i18n="fw-d">Explore o bosque, ajude os moradores e ache segredos</small></span>
+      <span class="fwh-go"><span data-i18n="fw-jogar">Jogar</span> ▶</span>
+    </a>
+    <a class="fwh-f" id="fw-hub-es" href="https://portalfisk.com.br/#raf=0000-000&curso=es&ir=worlds">
+      <span class="fwh-t"><span class="fwh-tag" data-i18n="fw-tag-es">JOGO 3D · ESPANHOL</span><b>Fisk Mundo</b><small data-i18n="fw-d">Explore o bosque, ajude os moradores e ache segredos</small></span>
+      <span class="fwh-go"><span data-i18n="fw-jogar">Jogar</span> ▶</span>
+    </a>
   </section>
 
   <!-- MAIS USADAS (19/09/2026): a home tem muita ferramenta e o professor usa quatro ou cinco por dia. A faixa é
@@ -724,6 +753,7 @@
         'card-overview-h2': 'Radar da Turma',
         'card-overview-p':  'As cinco habilidades de cada aluno num relance, e onde focar com a turma',
         'card-portal-h2':   'Portal do Aluno (inglês)',
+        'fw-tag': 'JOGO 3D · INGLÊS', 'fw-tag-es': 'JOGO 3D · ESPANHOL', 'fw-d': 'Explore o bosque, ajude os moradores e ache segredos', 'fw-jogar': 'Jogar',
         'card-portal-p':    'As ferramentas do aluno em inglês, com Teacher Mode para projetar na TV',
         'card-portal-es-h2':'Portal do Aluno (espanhol)',
         'card-portal-es-p': 'As ferramentas do aluno em espanhol, com Teacher Mode para projetar na TV',
@@ -821,6 +851,7 @@
         'card-overview-h2': 'Class Radar',
         'card-overview-p':  'Every student\'s five skills at a glance, and where to focus with the class',
         'card-portal-h2':   'Student Portal (English)',
+        'fw-tag': '3D GAME · ENGLISH', 'fw-tag-es': '3D GAME · SPANISH', 'fw-d': 'Explore the woods, help the neighbors and find secrets', 'fw-jogar': 'Play',
         'card-portal-p':    'The student tools in English, with Teacher Mode to project on the TV',
         'card-portal-es-h2':'Student Portal (Spanish)',
         'card-portal-es-p': 'The student tools in Spanish, with Teacher Mode to project on the TV',
@@ -918,6 +949,7 @@
         'card-overview-h2': 'Radar del Grupo',
         'card-overview-p':  'Las cinco habilidades de cada alumno de un vistazo, y dónde enfocarse con el grupo',
         'card-portal-h2':   'Portal del Alumno (inglés)',
+        'fw-tag': 'JUEGO 3D · INGLÉS', 'fw-tag-es': 'JUEGO 3D · ESPAÑOL', 'fw-d': 'Explora el bosque, ayuda a los vecinos y encuentra secretos', 'fw-jogar': 'Jugar',
         'card-portal-p':    'Las herramientas del alumno en inglés, con Modo Profesor para proyectar en la TV',
         'card-portal-es-h2':'Portal del Alumno (español)',
         'card-portal-es-p': 'Las herramientas del alumno en español, con Modo Profesor para proyectar en la TV',
@@ -1549,6 +1581,13 @@
           card.href = 'https://portalfisk.com.br/#raf=0000-000&curso=' + par[1] +
                       '&pt=' + encodeURIComponent(s.token);
         });
+        /* a faixa do Fisk Worlds / Fisk Mundo: só com a sessão, que é o que guarda o jogo do professor */
+        [['fw-hub-en', 'en'], ['fw-hub-es', 'es']].forEach(function (par) {
+          var f = document.getElementById(par[0]);
+          if (f) f.href = 'https://portalfisk.com.br/#raf=0000-000&curso=' + par[1] + '&ir=worlds&pt=' + encodeURIComponent(s.token);
+        });
+        var fwHub = document.getElementById('fwHub');
+        if (fwHub) fwHub.hidden = false;
       }
 
       function registrarHome(){
