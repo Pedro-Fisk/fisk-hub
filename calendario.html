@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minha semana, FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-10-09c">
+<link rel="stylesheet" href="assets/casa-tema.css?v=9">
+<meta name="theme-color" content="#161414">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+<script src="assets/fisk-shared.js?v=2026-10-26a"></script>
+<style>
+  :root{ --hora: 52px; --cal-linha: var(--ui-line, #dfe6ef); --cal-fundo: var(--white, #fff); --cal-hoje: #fff7e6; --agora: #e11d48; }
+  body.theme-dark{ --cal-linha: #2f3a48; --cal-hoje: #2a2412; }
+  [hidden]{ display: none !important; }
+  main{ max-width: 1240px; margin: 0 auto; padding: 1rem; width: 100%; box-sizing: border-box; }
+  .painel{ background: var(--white); border: 2px solid var(--surface-border-color); border-radius: var(--surface-radius);
+           box-shadow: var(--surface-shadow); padding: 1rem 1.1rem; margin-bottom: 1rem; }
+  .painel h2{ margin: 0 0 .4rem; font-family: var(--font-heading); font-weight: 700; font-size: 1.05rem; color: var(--ui-dark, #223e5a); }
+  .aviso{ font-size: .85rem; color: var(--gray); margin: 0 0 .5rem; }
+
+  /* a barra: semana, hoje, ver como */
+  .barra{ display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .8rem; }
+  .barra .nav{ display: inline-flex; gap: .3rem; }
+  .barra button, .barra select{ font-family: inherit; font-weight: 800; font-size: .9rem; border: 1.5px solid var(--ui-bd, #9db6cb);
+    background: var(--white); color: var(--ui-dark, #223e5a); border-radius: 10px; padding: .45rem .8rem; cursor: pointer; min-height: 40px; }
+  .barra button:hover{ border-color: var(--ui, #3c6e98); }
+  .barra .semana{ font-family: var(--font-heading); font-weight: 800; font-size: 1.1rem; color: var(--ui-dark, #223e5a); }
+  .barra .quem{ margin-left: auto; font-size: .85rem; color: var(--gray); }
+  .st{ font-size: .82rem; color: var(--gray); margin: .5rem 0 0; min-height: 1em; }
+  .st.err{ color: var(--red); font-weight: 700; }
+
+  /* ── a grade da semana (computador) ── */
+  .grade{ display: grid; grid-template-columns: 52px repeat(var(--ndias), minmax(0, 1fr)); border: 1px solid var(--cal-linha); border-radius: 12px; overflow: hidden; background: var(--cal-fundo); }
+  .g-cab{ padding: .5rem .4rem; text-align: center; border-bottom: 1px solid var(--cal-linha); border-left: 1px solid var(--cal-linha); font-size: .8rem; color: var(--gray); }
+  .g-cab b{ display: block; font-family: var(--font-heading); font-size: 1.25rem; color: var(--ui-dark, #223e5a); }
+  .g-cab.hoje b{ display: grid; place-items: center; width: 2rem; height: 2rem; margin: .1rem auto 0; border-radius: 50%; background: var(--ui, #3c6e98); color: #fff; }
+  .g-dia-inteiro{ grid-column: 1 / -1; display: grid; grid-template-columns: inherit; }
+  .g-faixas{ border-left: 1px solid var(--cal-linha); border-bottom: 1px solid var(--cal-linha); padding: .25rem; min-height: 1.6rem; display: flex; flex-direction: column; gap: .2rem; }
+  .faixa{ font-size: .74rem; font-weight: 800; border-radius: 6px; padding: .15rem .4rem; color: #fff; background: #64748b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .faixa.feriado, .faixa.ferias{ background: #dc2626; }
+  .faixa.aniv{ background: linear-gradient(90deg, #f59e0b, #ec4899); }
+  .g-horas{ position: relative; }
+  .g-horas div{ height: var(--hora); font-size: .7rem; color: var(--gray); text-align: right; padding-right: .35rem; transform: translateY(-.45rem); }
+  .g-col{ position: relative; border-left: 1px solid var(--cal-linha);
+          background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--hora) - 1px), var(--cal-linha) calc(var(--hora) - 1px), var(--cal-linha) var(--hora)); }
+  .g-col.hoje{ background-color: var(--cal-hoje); }
+  .agora{ position: absolute; left: 0; right: 0; height: 2px; background: var(--agora); z-index: 3; }
+  .agora::before{ content: ''; position: absolute; left: -5px; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: var(--agora); }
+
+  /* o bloco de um compromisso (aula, plantão, experimental solta) */
+  .ev{ position: absolute; left: 3px; right: 3px; border-radius: 8px; padding: .3rem .4rem; font-size: .76rem; line-height: 1.25; overflow: hidden;
+       background: var(--ev-fundo, #e8f0fb); color: var(--ev-tx, #1e3a5f); border-left: 4px solid var(--ev-cor, #3c6e98); cursor: pointer; text-align: left;
+       font-family: inherit; border-top: 0; border-right: 0; border-bottom: 0; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .ev:hover{ filter: brightness(.97); z-index: 2; }
+  .ev .h{ font-weight: 800; display: block; }
+  .ev .t{ font-weight: 700; display: block; }
+  .ev .m{ display: block; opacity: .85; }
+  .ev.plantao{ background: repeating-linear-gradient(45deg, var(--ev-fundo), var(--ev-fundo) 6px, transparent 6px, transparent 12px); border-left-style: dashed; }
+  .ev.semaula{ text-decoration: line-through; opacity: .55; }
+  .ev.exp{ --ev-cor: #7c3aed; --ev-fundo: #f1e9ff; --ev-tx: #4c1d95; }
+  body.theme-dark .ev{ --ev-fundo: #1d2a3b; --ev-tx: #dbe6f3; }
+  body.theme-dark .ev.exp{ --ev-fundo: #2a1d44; --ev-tx: #e9d5ff; }
+
+  /* ── o dia (celular) ── */
+  .tira{ display: none; gap: .3rem; margin: .7rem 0 .4rem; }
+  .tira button{ flex: 1; border: 1.5px solid var(--cal-linha); background: var(--white); border-radius: 10px; padding: .35rem 0; font-family: inherit; cursor: pointer; color: var(--ui-dark, #223e5a); min-height: 52px; }
+  .tira button small{ display: block; font-size: .68rem; color: var(--gray); }
+  .tira button b{ font-size: 1.05rem; }
+  .tira button.sel{ background: var(--ui, #3c6e98); color: #fff; border-color: var(--ui, #3c6e98); }
+  .tira button.sel small{ color: #e8f0fb; }
+  .tira button i{ display: block; width: 6px; height: 6px; border-radius: 50%; margin: .15rem auto 0; background: transparent; }
+  .tira button.tem i{ background: currentColor; opacity: .6; }
+  .dia-lista{ display: none; }
+  .dia-lista .vazio{ color: var(--gray); font-size: .9rem; padding: 1rem 0; text-align: center; }
+  .cartao{ display: flex; gap: .7rem; width: 100%; text-align: left; font-family: inherit; border: 1px solid var(--cal-linha); border-left: 5px solid var(--ev-cor, #3c6e98);
+           background: var(--white); color: inherit; border-radius: 12px; padding: .7rem .8rem; margin-bottom: .55rem; cursor: pointer; }
+  .cartao .hh{ font-family: var(--font-heading); font-weight: 800; min-width: 3.4rem; color: var(--ui-dark, #223e5a); }
+  .cartao .hh small{ display: block; font-weight: 600; color: var(--gray); font-size: .75rem; }
+  .cartao .tt{ font-weight: 800; }
+  .cartao .mm{ font-size: .8rem; color: var(--gray); }
+  .cartao.semaula{ opacity: .55; text-decoration: line-through; }
+  .cartao.plantao{ border-left-style: dashed; }
+  .cartao.exp{ --ev-cor: #7c3aed; }
+  .selo{ display: inline-block; font-size: .72rem; font-weight: 900; border-radius: 99px; padding: .05rem .45rem; margin: .15rem .25rem 0 0; color: #fff; background: #64748b; }
+  .selo.aniv{ background: linear-gradient(90deg, #f59e0b, #ec4899); }
+  .selo.exp{ background: #7c3aed; }
+  .selo.fer{ background: #dc2626; }
+
+  @media (max-width: 640px){
+    .grade{ display: none; }
+    .tira{ display: flex; }
+    .dia-lista{ display: block; }
+    .barra .quem{ margin-left: 0; width: 100%; }
+  }
+
+  /* as turmas sem horário legível */
+  .sem-h li{ font-size: .85rem; margin: .2rem 0; }
+
+  /* a gaveta da aula */
+  .gav{ position: fixed; inset: 0; z-index: 9000; }
+  .gav .fundo{ position: absolute; inset: 0; background: rgba(12,12,14,.4); }
+  .gav .caixa{ position: absolute; top: 0; right: 0; height: 100%; width: min(460px, 100vw); background: var(--white); box-shadow: -14px 0 40px rgba(0,0,0,.2);
+               overflow-y: auto; padding: 1rem 1.1rem 2rem; box-sizing: border-box; }
+  .gav h3{ font-family: var(--font-heading); margin: .2rem 0 .2rem; color: var(--ui-dark, #223e5a); }
+  .gav .fecha{ float: right; border: 0; background: transparent; font-size: 1.4rem; cursor: pointer; color: var(--gray); min-width: 44px; min-height: 44px; }
+  .gav .sub{ color: var(--gray); font-size: .85rem; margin-bottom: .7rem; }
+  .gav .bloco{ border-top: 1px solid var(--cal-linha); padding: .7rem 0; }
+  .gav .bloco b.tit{ display: block; font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; color: var(--gray); margin-bottom: .35rem; }
+  .gav ul{ margin: 0; padding-left: 1.1rem; }
+  .gav li{ margin: .2rem 0; font-size: .9rem; }
+  .gav li a{ color: inherit; }
+  .abrir-aula{ display: block; text-align: center; margin-top: .6rem; padding: .75rem 1rem; border-radius: 12px; font-weight: 900; text-decoration: none;
+               background: var(--ui, #3c6e98); color: #fff; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <a class="back-link" href="index.html" title="Voltar ao Fisk Hub">&larr; Hub</a>
+  <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
+  <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+  <h1>Minha semana</h1>
+  <p>Suas aulas, plantões, experimentais, aniversários e os dias sem aula</p>
+</header>
+
+<main>
+  <section class="painel" id="semSessao" hidden>
+    <h2>🔒 Entre no Fisk Hub primeiro</h2>
+    <p class="aviso">Volte à página inicial do Hub, entre com seu usuário e abra esta ferramenta de novo.</p>
+  </section>
+
+  <section class="painel" id="painelCal" hidden>
+    <div class="barra">
+      <span class="nav">
+        <button type="button" id="ant" aria-label="Semana anterior">‹</button>
+        <button type="button" id="hoje">Hoje</button>
+        <button type="button" id="prox" aria-label="Próxima semana">›</button>
+      </span>
+      <span class="semana" id="rotSemana"></span>
+      <span class="quem" id="quem"></span>
+      <select id="verComo" hidden aria-label="Ver a semana de outro professor"></select>
+    </div>
+    <div class="tira" id="tira"></div>
+    <p class="st" id="st"></p>
+    <div class="grade" id="grade"></div>
+    <div class="dia-lista" id="diaLista"></div>
+  </section>
+
+  <section class="painel" id="painelSemH" hidden>
+    <h2>🕒 Turmas sem horário no card</h2>
+    <p class="aviso">O título destas turmas no card não diz o dia e a hora de um jeito que dê para ler (ex.: "ADVANCED - 2ª/4ª 17h30 às 18h45"). Elas não aparecem na semana: peça à secretaria para acertar o título.</p>
+    <ul class="sem-h" id="semH"></ul>
+  </section>
+</main>
+
+<div class="gav" id="gav" hidden>
+  <div class="fundo" data-fecha></div>
+  <div class="caixa" role="dialog" aria-modal="true" aria-labelledby="gavTit">
+    <button type="button" class="fecha" data-fecha aria-label="Fechar">×</button>
+    <div id="gavCorpo"></div>
+  </div>
+</div>
+
+<script>
+/* ══ MINHA SEMANA, o calendário do professor (26/10/2026) ═══════════════════════════════════════════════════════
+ * Pedido do Pedro (24/10, confirmado em 26/10 depois da auditoria das ferramentas): a semana do professor no estilo
+ * Google Calendar. Nada aqui é dado novo: cada pedaço já existia noutro lugar e esta tela só junta e desenha.
+ *   · aulas: as turmas do card (panoramaProf), com o dia e a hora lidos do TÍTULO por fiskHorarioDaTurma (o kit),
+ *     a mesma leitura da Turma de hoje e do backend (usopHorario_). Turma sem horário legível vai para uma lista
+ *     à parte: não se inventa horário;
+ *   · feriados, férias e eventos: o Calendário Institucional (calList), o mesmo que a home lê;
+ *   · plantão / Learning Center: a grade da escola (plantaoList), casada pelo nome como na Turma de hoje;
+ *   · experimentais: profExperimentais (Experimental.js), só nome, idade, data, hora e turma;
+ *   · aniversários: aniversariantesProf, que cobre a semana atual e a seguinte (as outras semanas ficam sem).
+ * No celular abre o DIA (decisão do Pedro); no computador, a semana em colunas. Cada fonte que falha some sozinha:
+ * só as aulas são obrigatórias.
+ * ════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
+var EP = FISK_HUB_EP;
+var INI_H = 7, FIM_H = 22;   /* a grade vai das 7h às 22h */
+var DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'], DIAS_LC = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
+var dados = { turmas: [], semHorario: [], cal: [], lc: [], exps: [], anivs: [] };
+var segunda = inicioDaSemana(new Date()), diaSel = new Date();
+function $(id) { return document.getElementById(id); }
+function esc(s) { return fiskEsc(String(s == null ? '' : s)); }
+function sessao() { return fiskSessao() || {}; }
+function token() { return sessao().token || ''; }
+function nP(v) { return String(v || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
+function como() { var s = sessao(); if (!s.master) return null; try { return JSON.parse(localStorage.getItem('fisk_actas') || 'null'); } catch (e) { return null; } }
+function eu() { var c = como(); return (c && c.name) || sessao().name || ''; }
+function minhasEscolas() {
+  var c = como(), e = (c && c.name) ? c.escolas : sessao().escolas;
+  return (Array.isArray(e) ? e : String(e || '').split(/[,;]/)).map(function (x) { return String(x).trim(); }).filter(Boolean);
+}
+function iso(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+function inicioDaSemana(d) { var x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; }
+function somaDias(d, n) { var x = new Date(d); x.setDate(x.getDate() + n); return x; }
+function hm(min) { return Math.floor(min / 60) + 'h' + (min % 60 ? ('0' + (min % 60)).slice(-2) : ''); }
+function minDe(txt) { var m = /^(\d{1,2})[:h](\d{2})?/.exec(String(txt || '').trim()); return m ? (+m[1]) * 60 + (+(m[2] || 0)) : null; }
+function mesmaPessoa(tabela, prof) {
+  var t = nP(tabela).replace(/^(PROF(A|ESSORA?)?\.?\s+|TEACHER\s+)/, ''), p = nP(prof);
+  if (!t || !p) return false;
+  if (t === p || p.indexOf(t + ' ') === 0 || t.indexOf(p + ' ') === 0) return true;
+  return t.indexOf(' ') < 0 && p.split(' ')[0] === t;
+}
+function ehPlantao(titulo) { return /\bLC\b|plant[aã]o|learning\s*center|centro de estudos/i.test(String(titulo || '')); }
+function linha1(t) { return String(t || '').split('\n')[0].trim(); }
+/* o nome da turma sem o dia e a hora, que o bloco já mostra: "ADVANCED - 2ª/4ª 17h30 às 18h45" vira "ADVANCED" */
+function nomeCurto(t) {
+  var partes = linha1(t).split(/\s+[-–]\s+|\s+[-–]|[-–]\s+/).filter(function (p) {
+    return p && !/\d{1,2}\s*[h:]\d{0,2}|\d[ªº°]|^\s*\d+\s*$|\b(seg|ter|qua|qui|sex|s[aá]b|dom)[a-z]*\b/i.test(p.replace(/\([^)]*\)/g, ''));
+  });
+  return partes.join(' - ') || linha1(t);
+}
+
+/* a cor de cada turma, pelo livro da maioria (a mesma família de cores dos estágios) */
+var CORES = [[/kids|playground|fun at school|tots/i, '#db2777'], [/teens/i, '#0d9488'], [/essentials/i, '#2563eb'], [/transitions/i, '#7c3aed'],
+             [/fluency/i, '#ea580c'], [/focus/i, '#16a34a'], [/pathways|advanced|avan/i, '#b45309'], [/inmediato|español|espanhol|nivel/i, '#dc2626']];
+function corDaTurma(t) {
+  var conta = {}; (t.alunos || []).forEach(function (a) { if (a.book) conta[a.book] = (conta[a.book] || 0) + 1; });
+  var livro = Object.keys(conta).sort(function (a, b) { return conta[b] - conta[a]; })[0] || t.titulo;
+  for (var i = 0; i < CORES.length; i++) if (CORES[i][0].test(livro)) return CORES[i][1];
+  return '#3c6e98';
+}
+
+/* ── chamadas ao servidor ── */
+function get(params) {
+  params.token = token();
+  var qs = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
+  return fetch(EP + '?' + qs).then(fiskJson).then(function (j) { if (j && (j.erro || j.error)) throw new Error(j.erro || j.error); return j; });
+}
+function post(body) {
+  body.token = token();
+  return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
+    .then(fiskJson).then(function (j) { if (!j || j.ok === false) throw new Error((j && (j.erro || j.error)) || 'Não consegui.'); return j; });
+}
+
+/* as turmas: para cada escola do professor, a aba dele no card (o nome da aba pode ser só o primeiro nome) */
+function carregaTurmas() {
+  var nome = eu();
+  return Promise.all(minhasEscolas().map(function (escola) {
+    return get({ action: 'card', fn: 'profs', escola: escola }).then(function (j) {
+      var profs = j.profs || [];
+      var aba = profs.find(function (p) { return nP(p) === nP(nome); }) ||
+                profs.find(function (p) { return nP(p).indexOf(nP(nome).split(' ')[0]) === 0; });
+      if (!aba) return [];
+      return get({ action: 'panoramaProf', escola: escola, prof: aba }).then(function (pj) {
+        var alunos = (pj.alunos || []).filter(function (a) { return a && a.nome && !a.saiu; });
+        return (pj.turmas || []).map(function (t) {
+          return { escola: escola, prof: aba, linha: t.linhaTitulo, titulo: linha1(t.turma), tituloInteiro: t.turma,
+                   alunos: alunos.filter(function (a) { return a.turma === t.turma; }), h: fiskHorarioDaTurma(t.turma) };
+        });
+      });
+    }).catch(function (e) {
+      if (/sess[ãa]o/i.test((e && e.message) || '')) throw e;   /* sessão vencida não é "sem turmas" */
+      console.warn('turmas de', escola, e); return [];
+    });
+  })).then(function (ls) {
+    var todas = [].concat.apply([], ls);
+    dados.turmas = todas.filter(function (t) { return t.h; });
+    dados.semHorario = todas.filter(function (t) { return !t.h; });
+    try { localStorage.setItem('cal:turmas:' + nP(nome), JSON.stringify({ t: dados.turmas, s: dados.semHorario })); } catch (e) {}
+  });
+}
+function carregaExtras() {
+  var ano = new Date().getFullYear(), c = como();
+  return Promise.all([
+    Promise.all([ano, ano + 1].map(function (a) { return post({ action: 'calList', publico: 'pedag', ano: String(a) }).then(function (j) { return j.itens || []; }).catch(function () { return []; }); }))
+      .then(function (ls) { dados.cal = [].concat.apply([], ls); }),
+    Promise.all(minhasEscolas().map(function (escola) {
+      return post({ action: 'plantaoList', unidade: escola }).then(function (j) { return (j.itens || []).map(function (it) { it.escola = escola; return it; }); }).catch(function () { return []; });
+    })).then(function (ls) { var nome = eu(); dados.lc = [].concat.apply([], ls).filter(function (it) { return mesmaPessoa(it.professor, nome); }); }),
+    post(c && c.name ? { action: 'profExperimentais', prof: c.name } : { action: 'profExperimentais' }).then(function (j) { dados.exps = j.itens || []; }).catch(function () { dados.exps = []; }),
+    post(c && c.name ? { action: 'aniversariantesProf', como: c.name } : { action: 'aniversariantesProf' }).then(function (j) { dados.anivs = j.aniversariantes || []; }).catch(function () { dados.anivs = []; })
+  ]);
+}
+
+/* ── o que acontece num dia ── */
+function diaInteiro(d) {
+  var dIso = iso(d), escolas = minhasEscolas();
+  return dados.cal.filter(function (it) {
+    var ini = String(it.inicio || ''), fim = String(it.fim || it.inicio || '');
+    if (!(ini <= dIso && dIso <= fim)) return false;
+    var un = Array.isArray(it.unidades) ? it.unidades : String(it.unidades || '').split(',').filter(Boolean);
+    return !un.length || un.some(function (u) { return escolas.indexOf(String(u).trim()) > -1; });
+  });
+}
+function semAula(d) { return diaInteiro(d).some(function (it) { return it.tipo === 'feriado' || it.tipo === 'ferias'; }); }
+function anivsDoDia(d) { return dados.anivs.filter(function (a) { return +a.dia === d.getDate() && +a.mes === d.getMonth() + 1; }); }
+function eventosDoDia(d) {
+  var wd = d.getDay(), dIso = iso(d), fer = semAula(d), evs = [], anivs = anivsDoDia(d);
+  var exps = dados.exps.filter(function (x) { return x.data === dIso; });
+  dados.turmas.forEach(function (t) {
+    if (t.h.dias.indexOf(wd) < 0) return;
+    var nt = nP(t.titulo);
+    evs.push({ tipo: ehPlantao(t.titulo) ? 'plantao' : 'aula', ini: t.h.ini, fim: t.h.fim, turma: t, titulo: nomeCurto(t.titulo), semaula: fer, cor: corDaTurma(t),
+               anivs: anivs.filter(function (a) { return nP(linha1(a.turma)) === nt; }),
+               exps: exps.filter(function (x) { return nP(linha1(x.turma)) === nt; }) });
+  });
+  dados.lc.forEach(function (it) {
+    if (it.dia !== DIAS_LC[wd]) return;
+    var ini = minDe(it.inicio), fim = minDe(it.fim); if (ini == null) return;
+    evs.push({ tipo: 'plantao', ini: ini, fim: fim || ini + 75, titulo: 'Plantão de dúvidas' + (it.modalidade ? ' · ' + it.modalidade : ''), lc: it, semaula: fer, cor: '#0891b2', anivs: [], exps: [] });
+  });
+  /* experimental sem turma reconhecida vira bloco próprio, na hora marcada */
+  exps.forEach(function (x) {
+    if (evs.some(function (e) { return e.exps && e.exps.indexOf(x) > -1; })) return;
+    var ini = minDe(x.hora); if (ini == null) ini = 8 * 60;
+    evs.push({ tipo: 'exp', ini: ini, fim: ini + 60, titulo: '🧪 Experimental: ' + x.nome, exps: [x], anivs: [], cor: '#7c3aed' });
+  });
+  evs.sort(function (a, b) { return a.ini - b.ini || a.fim - b.fim; });
+  /* lado a lado quando se sobrepõem */
+  var cols = [];
+  evs.forEach(function (e) {
+    var c = 0; while (cols[c] && cols[c] > e.ini) c++;
+    cols[c] = e.fim; e.col = c;
+  });
+  evs.forEach(function (e) { e.ncol = evs.filter(function (o) { return o.ini < e.fim && e.ini < o.fim; }).reduce(function (m, o) { return Math.max(m, o.col + 1); }, 1); });
+  return evs;
+}
+
+/* ── desenho ── */
+function rotSemana() {
+  var dom = somaDias(segunda, 6), mes = function (d) { return ('0' + (d.getMonth() + 1)).slice(-2); };
+  return ('0' + segunda.getDate()).slice(-2) + '/' + mes(segunda) + ' a ' + ('0' + dom.getDate()).slice(-2) + '/' + mes(dom);
+}
+function selos(e) {
+  return (e.semaula ? '<span class="selo fer">feriado: sem aula</span>' : '') +
+    (e.anivs && e.anivs.length ? '<span class="selo aniv">🎂 ' + e.anivs.map(function (a) { return esc(String(a.nome).split(' ')[0]); }).join(', ') + '</span>' : '') +
+    (e.exps && e.exps.length && e.tipo !== 'exp' ? '<span class="selo exp">🧪 ' + e.exps.length + ' experimental' + (e.exps.length > 1 ? 'is' : '') + '</span>' : '');
+}
+function rotMeta(e) {
+  if (e.tipo === 'aula') return e.turma.alunos.length + ' aluno' + (e.turma.alunos.length === 1 ? '' : 's') + (e.turma.escola && minhasEscolas().length > 1 ? ' · ' + esc(e.turma.escola) : '');
+  if (e.tipo === 'plantao') return 'Learning Center';
+  return '';
+}
+var EVS = [];
+function desenhar() {
+  $('rotSemana').textContent = rotSemana();
+  var hoje = iso(new Date()), dias = [];
+  for (var i = 0; i < 7; i++) dias.push(somaDias(segunda, i));
+  var porDia = dias.map(eventosDoDia);
+  /* domingo só aparece se tiver alguma coisa */
+  var mostra = dias.map(function (d, i) { return i < 6 || porDia[i].length || diaInteiro(d).length; });
+  var idx = dias.map(function (d, i) { return i; }).filter(function (i) { return mostra[i]; });
+  EVS = [];
+  /* computador */
+  var g = $('grade'); g.style.setProperty('--ndias', idx.length);
+  var h = '<div class="g-cab"></div>';
+  idx.forEach(function (i) { var d = dias[i]; h += '<div class="g-cab' + (iso(d) === hoje ? ' hoje' : '') + '">' + DIAS[d.getDay()] + '<b>' + d.getDate() + '</b></div>'; });
+  h += '<div class="g-faixas" style="border-left:0"></div>';
+  idx.forEach(function (i) {
+    var d = dias[i], fx = diaInteiro(d).map(function (it) { return '<span class="faixa ' + esc(it.tipo) + '" title="' + esc(it.titulo) + '">' + esc(it.titulo) + '</span>'; });
+    anivsDoDia(d).forEach(function (a) { fx.push('<span class="faixa aniv" title="' + esc(a.nome) + ' · ' + esc(linha1(a.turma)) + '">🎂 ' + esc(String(a.nome).split(' ')[0]) + '</span>'); });
+    h += '<div class="g-faixas">' + fx.join('') + '</div>';
+  });
+  h += '<div class="g-horas">'; for (var hh = INI_H; hh < FIM_H; hh++) h += '<div>' + hh + 'h</div>'; h += '</div>';
+  var alturaH = 52;
+  idx.forEach(function (i) {
+    var d = dias[i], ehHoje = iso(d) === hoje;
+    h += '<div class="g-col' + (ehHoje ? ' hoje' : '') + '" style="height:' + ((FIM_H - INI_H) * alturaH) + 'px">';
+    porDia[i].forEach(function (e) {
+      var k = EVS.push({ e: e, d: d }) - 1;
+      var top = Math.max(0, (e.ini - INI_H * 60) / 60 * alturaH), alt = Math.max(22, (e.fim - e.ini) / 60 * alturaH - 2);
+      var larg = 100 / e.ncol;
+      h += '<button type="button" class="ev ' + e.tipo + (e.semaula ? ' semaula' : '') + '" data-ev="' + k + '" style="--ev-cor:' + e.cor + ';top:' + top + 'px;height:' + alt + 'px;left:calc(' + (e.col * larg) + '% + 3px);right:auto;width:calc(' + larg + '% - 6px)">' +
+        '<span class="h">' + hm(e.ini) + '–' + hm(e.fim) + '</span><span class="t">' + esc(e.titulo) + '</span><span class="m">' + rotMeta(e) + '</span>' + selos(e) + '</button>';
+    });
+    if (ehHoje) { var n = new Date(), min = n.getHours() * 60 + n.getMinutes(); if (min >= INI_H * 60 && min <= FIM_H * 60) h += '<div class="agora" style="top:' + ((min - INI_H * 60) / 60 * alturaH) + 'px"></div>'; }
+    h += '</div>';
+  });
+  g.innerHTML = h;
+  /* celular: a tira dos dias e a lista do dia escolhido */
+  if (iso(diaSel) < iso(segunda) || iso(diaSel) > iso(somaDias(segunda, 6))) diaSel = dias[0];
+  $('tira').innerHTML = idx.map(function (i) {
+    var d = dias[i], tem = porDia[i].length || diaInteiro(d).length;
+    return '<button type="button" data-dia="' + i + '" class="' + (iso(d) === iso(diaSel) ? 'sel' : '') + (tem ? ' tem' : '') + '"><small>' + DIAS[d.getDay()] + '</small><b>' + d.getDate() + '</b><i></i></button>';
+  }).join('');
+  var iSel = dias.map(iso).indexOf(iso(diaSel)), lista = porDia[iSel] || [], dSel = dias[iSel];
+  var topo = diaInteiro(dSel).map(function (it) { return '<span class="selo ' + (it.tipo === 'feriado' || it.tipo === 'ferias' ? 'fer' : '') + '">' + esc(it.titulo) + '</span>'; })
+    .concat(anivsDoDia(dSel).map(function (a) { return '<span class="selo aniv">🎂 ' + esc(a.nome) + ' · ' + esc(linha1(a.turma)) + '</span>'; })).join('');
+  $('diaLista').innerHTML = (topo ? '<div style="margin:.2rem 0 .6rem">' + topo + '</div>' : '') + (lista.length ? lista.map(function (e) {
+    var k = EVS.push({ e: e, d: dSel }) - 1;
+    return '<button type="button" class="cartao ' + e.tipo + (e.semaula ? ' semaula' : '') + '" data-ev="' + k + '" style="--ev-cor:' + e.cor + '"><span class="hh">' + hm(e.ini) + '<small>até ' + hm(e.fim) + '</small></span>' +
+      '<span><span class="tt">' + esc(e.titulo) + '</span><br><span class="mm">' + rotMeta(e) + '</span><br>' + selos(e) + '</span></button>';
+  }).join('') : '<div class="vazio">Nenhuma aula neste dia.</div>');
+  /* turmas sem horário */
+  $('painelSemH').hidden = !dados.semHorario.length;
+  $('semH').innerHTML = dados.semHorario.map(function (t) { return '<li>' + esc(t.titulo) + (minhasEscolas().length > 1 ? ' <small>(' + esc(t.escola) + ')</small>' : '') + '</li>'; }).join('');
+}
+
+/* ── a gaveta da aula ── */
+function abreGaveta(k) {
+  var x = EVS[k]; if (!x) return;
+  var e = x.e, d = x.d, dataTxt = DIAS[d.getDay()] + ' ' + ('0' + d.getDate()).slice(-2) + '/' + ('0' + (d.getMonth() + 1)).slice(-2);
+  var h = '<h3 id="gavTit">' + esc(e.turma ? e.turma.titulo : e.titulo) + '</h3><div class="sub">' + dataTxt + ' · ' + hm(e.ini) + ' às ' + hm(e.fim) + (e.semaula ? ' · <b style="color:var(--red)">feriado: sem aula</b>' : '') + '</div>';
+  if (e.anivs && e.anivs.length) h += '<div class="bloco"><b class="tit">🎂 Aniversário neste dia</b><ul>' + e.anivs.map(function (a) { return '<li><b>' + esc(a.nome) + '</b></li>'; }).join('') + '</ul></div>';
+  if (e.exps && e.exps.length) h += '<div class="bloco"><b class="tit">🧪 Aula experimental</b><ul>' + e.exps.map(function (x2) {
+    return '<li><b>' + esc(x2.nome) + '</b>' + (x2.idade ? ', ' + esc(x2.idade) + ' anos' : '') + (x2.hora ? ' · ' + esc(x2.hora) : '') + (x2.curso ? ' · ' + esc(x2.curso) : '') + (x2.situacao && x2.situacao !== 'agendada' ? ' · ' + esc(x2.situacao.replace('_', ' ')) : '') + '</li>';
+  }).join('') + '</ul></div>';
+  if (e.turma) {
+    var t = e.turma;
+    h += '<div class="bloco"><b class="tit">👥 Alunos (' + t.alunos.length + ')</b><ul>' + t.alunos.map(function (a) {
+      var nome = esc(String(a.nome).replace(/\([^)]*\)/g, '').trim());
+      return '<li>' + (a.raf ? '<a class="dossie-link" href="aluno.html?raf=' + encodeURIComponent(a.raf) + '" data-raf="' + esc(a.raf) + '" data-nome="' + nome + '">' + nome + '</a>' : nome) +
+        (a.book ? ' <small style="color:var(--gray)">· ' + esc(a.book) + '</small>' : '') + (Number(a.aulasAtraso) >= 4 ? ' <small style="color:var(--red);font-weight:800">· ' + a.aulasAtraso + ' aulas atrás</small>' : '') + '</li>';
+    }).join('') + '</ul>';
+    h += '<a class="abrir-aula" href="turma-de-hoje.html#t=' + encodeURIComponent(t.escola + '|' + t.prof + '|' + t.linha) + '">Abrir na Minha aula →</a></div>';
+  } else if (e.lc) {
+    h += '<div class="bloco"><b class="tit">🙋 Plantão de dúvidas</b><p class="aviso">' + esc(e.lc.publico || '') + (e.lc.obs ? ' · ' + esc(e.lc.obs) : '') + '</p>' +
+      '<a class="abrir-aula" href="turma-de-hoje.html">Abrir a Minha aula →</a></div>';
+  }
+  $('gavCorpo').innerHTML = h; $('gav').hidden = false;
+}
+document.addEventListener('click', function (ev) {
+  var b = ev.target.closest('[data-ev]'); if (b) { abreGaveta(+b.dataset.ev); return; }
+  if (ev.target.closest('[data-fecha]')) { $('gav').hidden = true; return; }
+  var t = ev.target.closest('[data-dia]'); if (t) { diaSel = somaDias(segunda, +t.dataset.dia); desenhar(); }
+});
+document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') $('gav').hidden = true; });
+if (typeof fiskLigarAcompanhamento === 'function') fiskLigarAcompanhamento(document, 'a.dossie-link');
+$('ant').addEventListener('click', function () { segunda = somaDias(segunda, -7); diaSel = somaDias(diaSel, -7); desenhar(); });
+$('prox').addEventListener('click', function () { segunda = somaDias(segunda, 7); diaSel = somaDias(diaSel, 7); desenhar(); });
+$('hoje').addEventListener('click', function () { segunda = inicioDaSemana(new Date()); diaSel = new Date(); desenhar(); });
+/* o celular troca de dia com o dedo: arrastar para o lado */
+(function () {
+  var x0 = null; $('diaLista').addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+  $('diaLista').addEventListener('touchend', function (e) {
+    if (x0 == null) return; var dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) < 60) return;
+    diaSel = somaDias(diaSel, dx < 0 ? 1 : -1);
+    if (iso(diaSel) > iso(somaDias(segunda, 6))) segunda = somaDias(segunda, 7);
+    if (iso(diaSel) < iso(segunda)) segunda = somaDias(segunda, -7);
+    desenhar();
+  });
+})();
+
+/* a direção escolhe de quem é a semana (o mesmo fisk_actas do Hub e do Radar) */
+function montaVerComo() {
+  var sel = $('verComo');
+  fetch(EP + '?action=profList').then(fiskJson).then(function (j) {
+    var ps = ((j && j.profs) || []).filter(function (p) { return !p.director && String(p.cargo || '').toLowerCase().indexOf('secret') !== 0; })
+      .sort(function (a, b) { return String(a.name).localeCompare(String(b.name), 'pt-BR'); });
+    var c = como(), cur = (c && c.name) || '';
+    sel.innerHTML = '<option value="">👥 Ver a semana de…</option>' + ps.map(function (p) {
+      return '<option value="' + esc(p.name) + '" data-esc="' + esc(p.escolas || '') + '"' + (p.name === cur ? ' selected' : '') + '>' + esc(p.name) + '</option>';
+    }).join('');
+    sel.hidden = false;
+  }).catch(function () {});
+  sel.addEventListener('change', function () {
+    var o = sel.options[sel.selectedIndex];
+    try { if (sel.value) localStorage.setItem('fisk_actas', JSON.stringify({ name: sel.value, escolas: o.getAttribute('data-esc') || '' })); else localStorage.removeItem('fisk_actas'); } catch (e) {}
+    carregar();
+  });
+}
+
+var _pedido = 0;
+function carregar() {
+  var meu = ++_pedido, nome = eu();
+  $('quem').textContent = nome ? 'Semana de ' + nome : '';
+  if (!nome) { $('st').textContent = 'Escolha acima de quem é a semana.'; dados = { turmas: [], semHorario: [], cal: [], lc: [], exps: [], anivs: [] }; desenhar(); return; }
+  /* o que ficou guardado no aparelho desenha na hora; o servidor confirma por trás */
+  try { var g = JSON.parse(localStorage.getItem('cal:turmas:' + nP(nome)) || 'null'); if (g) { dados.turmas = g.t || []; dados.semHorario = g.s || []; desenhar(); } } catch (e) {}
+  var parar = fiskEsperando(function (t) { $('st').textContent = t; }, ['Lendo as suas turmas no card…', 'Ainda lendo, as duas escolas de uma vez…']);
+  $('st').className = 'st';
+  Promise.all([carregaTurmas(), carregaExtras()]).then(function () {
+    parar(); if (meu !== _pedido) return;
+    $('st').textContent = dados.turmas.length ? '' : 'Não achei turmas suas no card.';
+    desenhar();
+  }).catch(function (e) {
+    parar(); if (meu !== _pedido) return;
+    var msg = (e && e.message) || String(e);
+    $('st').className = 'st err';
+    if (/sess[ãa]o/i.test(msg)) {
+      $('st').innerHTML = '⚠️ ' + esc(msg) + ' <a href="index.html" style="font-weight:800">Entrar de novo →</a>';
+      try { localStorage.removeItem('fisk_prof'); sessionStorage.setItem('fisk_sessao_caiu', '1'); } catch (e2) {}
+    } else $('st').textContent = '⚠️ ' + msg;
+  });
+}
+
+fiskInitThemeToggle('themeToggle');
+fiskInitUserMenu();
+if (!token()) {
+  $('semSessao').hidden = false;
+} else {
+  $('painelCal').hidden = false;
+  if (sessao().master) montaVerComo();
+  carregar();
+  fiskRegistrarUso('Calendário');
+}
+</script>
+</body>
+</html>
