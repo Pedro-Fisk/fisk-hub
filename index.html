@@ -115,6 +115,13 @@
   .fwh-t b{font-size:1.3rem;font-weight:800;line-height:1.1;text-shadow:0 2px 0 rgba(0,0,0,.25)}
   .fwh-t small{font-size:.86rem;font-weight:700;color:#d8f5df}
   .fwh-go{margin-left:auto;flex:none;background:#fff;color:#14532d;border-radius:999px;padding:.5rem .95rem;font-weight:800;font-size:.9rem;white-space:nowrap;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+  /* o convite para montar o personagem (26/10/2026): roxo de mago, a largura das duas faixas */
+  .fwh-p{grid-column:1/-1;display:flex;align-items:center;gap:.9rem;padding:.75rem 1rem;border-radius:16px;color:#fff;text-decoration:none;
+    background:linear-gradient(110deg,#2d2466,#4b3d94 60%,#6453b5);box-shadow:0 4px 0 #1b1540;transition:transform .14s ease, box-shadow .14s ease}
+  .fwh-p:hover{transform:translateY(-2px);box-shadow:0 6px 0 #1b1540}
+  .fwh-p .ic{flex:none;font-size:2rem;line-height:1}
+  .fwh-p .fwh-t small{color:#ded8ff}
+  .fwh-p .fwh-go{color:#2d2466}
   @media (max-width:760px){ .fwh{grid-template-columns:1fr;padding:0 .9rem;margin-top:1rem;gap:.8rem} .fwh-go span{display:none} .fwh-go{padding:.5rem .75rem} .fwh-t b{font-size:1.15rem} }
 </style>
 
@@ -218,6 +225,12 @@
     <a class="fwh-f" id="fw-hub-es" href="https://portalfisk.com.br/#raf=0000-000&curso=es&ir=worlds">
       <span class="fwh-t"><span class="fwh-tag" data-i18n="fw-tag-es">JOGO 3D · ESPANHOL</span><b>Fisk Mundo</b><small data-i18n="fw-d">Explore o bosque, ajude os moradores e ache segredos</small></span>
       <span class="fwh-go"><span data-i18n="fw-jogar">Jogar</span> ▶</span>
+    </a>
+    <!-- MEU PERSONAGEM (26/10/2026): o professor monta o mago ou a bruxa com que entra no jogo em 2027 -->
+    <a class="fwh-p" href="meu-personagem.html">
+      <span class="ic" aria-hidden="true">🧙</span>
+      <span class="fwh-t"><span class="fwh-tag" data-i18n="fwp-tag">NOVO · PARA PROFESSORES</span><b data-i18n="fwp-t">Meu personagem do Fisk Worlds</b><small data-i18n="fwp-d">Monte o seu mago ou a sua bruxa para entrar no jogo em 2027</small></span>
+      <span class="fwh-go"><span data-i18n="fwp-go">Montar</span> ✨</span>
     </a>
   </section>
 
@@ -753,6 +766,7 @@
         'card-overview-h2': 'Radar da Turma',
         'card-overview-p':  'As cinco habilidades de cada aluno num relance, e onde focar com a turma',
         'card-portal-h2':   'Portal do Aluno (inglês)',
+        'fwp-tag': 'NOVO · PARA PROFESSORES', 'fwp-t': 'Meu personagem do Fisk Worlds', 'fwp-d': 'Monte o seu mago ou a sua bruxa para entrar no jogo em 2027', 'fwp-go': 'Montar',
         'fw-tag': 'JOGO 3D · INGLÊS', 'fw-tag-es': 'JOGO 3D · ESPANHOL', 'fw-d': 'Explore o bosque, ajude os moradores e ache segredos', 'fw-jogar': 'Jogar',
         'card-portal-p':    'As ferramentas do aluno em inglês, com Teacher Mode para projetar na TV',
         'card-portal-es-h2':'Portal do Aluno (espanhol)',
@@ -851,6 +865,7 @@
         'card-overview-h2': 'Class Radar',
         'card-overview-p':  'Every student\'s five skills at a glance, and where to focus with the class',
         'card-portal-h2':   'Student Portal (English)',
+        'fwp-tag': 'NEW · FOR TEACHERS', 'fwp-t': 'My Fisk Worlds character', 'fwp-d': 'Build your wizard or witch to join the game in 2027', 'fwp-go': 'Build',
         'fw-tag': '3D GAME · ENGLISH', 'fw-tag-es': '3D GAME · SPANISH', 'fw-d': 'Explore the woods, help the neighbors and find secrets', 'fw-jogar': 'Play',
         'card-portal-p':    'The student tools in English, with Teacher Mode to project on the TV',
         'card-portal-es-h2':'Student Portal (Spanish)',
@@ -949,6 +964,7 @@
         'card-overview-h2': 'Radar del Grupo',
         'card-overview-p':  'Las cinco habilidades de cada alumno de un vistazo, y dónde enfocarse con el grupo',
         'card-portal-h2':   'Portal del Alumno (inglés)',
+        'fwp-tag': 'NUEVO · PARA PROFESORES', 'fwp-t': 'Mi personaje de Fisk Mundo', 'fwp-d': 'Arma tu mago o tu bruja para entrar al juego en 2027', 'fwp-go': 'Armar',
         'fw-tag': 'JUEGO 3D · INGLÉS', 'fw-tag-es': 'JUEGO 3D · ESPAÑOL', 'fw-d': 'Explora el bosque, ayuda a los vecinos y encuentra secretos', 'fw-jogar': 'Jugar',
         'card-portal-p':    'Las herramientas del alumno en inglés, con Modo Profesor para proyectar en la TV',
         'card-portal-es-h2':'Portal del Alumno (español)',

@@ -138,6 +138,14 @@ var FW_BASE = /^(localhost|127\.)/.test(location.hostname) ? 'http://localhost:8
   var sessao = null;
   try { sessao = fiskSessao(); } catch (e) {}
   var nomeProf = sessao && (sessao.name || sessao.nome) ? String(sessao.name || sessao.nome) : '';
+  /* sem sessão não há de quem é o personagem: volta para o login do Hub (na máquina de desenvolvimento, segue em demonstração) */
+  var DEMO = !(sessao && sessao.token) && /^(localhost|127\.)/.test(location.hostname);
+  if (!(sessao && sessao.token) && !DEMO) { location.replace('index.html'); return; }
+  function post(corpo) {
+    corpo.token = sessao.token;
+    return fetch(FISK_HUB_EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(corpo) })
+      .then(function (r) { return r.json(); });
+  }
   var primeiro = nomeProf.split(/\s+/)[0] || '';
 
   /* ── a escolha (o que se guarda) e a conversão para os `tracos` do jogo ── */
@@ -225,12 +233,33 @@ var FW_BASE = /^(localhost|127\.)/.test(location.hostname) ? 'http://localhost:8
     E.corOculos = sorteia(OP.corOculos); E.chapeu = Math.random() < 0.3 ? '' : E.papel; E.cetro = sorteia(OP.cetro)[0];
     marca(); desenha();
   });
-  /* PROTÓTIPO: guarda neste aparelho. A versão final manda ao servidor, no nome que a sessão do Hub confirma. */
-  document.getElementById('salvar').addEventListener('click', function () {
+  /* SALVAR vai ao servidor (Personagem.js), no nome que a sessão do Hub confirma. O aparelho guarda uma cópia, só para
+     a tela abrir já com o boneco enquanto o servidor responde. */
+  var btSalvar = document.getElementById('salvar');
+  btSalvar.addEventListener('click', function () {
     var st = document.getElementById('estado');
-    try { localStorage.setItem(CHAVE, JSON.stringify(E)); st.textContent = T.salvo; st.className = 'estado ok'; }
-    catch (e) { st.textContent = T.falhou; st.className = 'estado'; }
+    try { localStorage.setItem(CHAVE, JSON.stringify(E)); } catch (e) {}
+    if (DEMO) { st.textContent = T.salvo; st.className = 'estado ok'; return; }
+    st.textContent = T.salvando; st.className = 'estado'; btSalvar.disabled = true;
+    var esc = {}; Object.keys(PADRAO).forEach(function (k) { esc[k] = E[k]; });
+    post({ action: 'personagemSalvar', escolhas: esc })
+      .then(function (r) {
+        if (r && r.ok) { st.textContent = T.salvo; st.className = 'estado ok'; try { if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Meu personagem (salvou)'); } catch (e) {} }
+        else { st.textContent = (r && r.error) || T.falhou; st.className = 'estado'; }
+      })
+      .catch(function () { st.textContent = T.falhou; st.className = 'estado'; })
+      .then(function () { btSalvar.disabled = false; });
   });
+  /* o que está no servidor manda: quem montou no computador e abre no celular vê o mesmo boneco */
+  if (!DEMO) {
+    try { if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Meu personagem'); } catch (e) {}
+    post({ action: 'personagemLer' }).then(function (r) {
+      if (!r || !r.ok || !r.escolhas) return;
+      Object.keys(PADRAO).forEach(function (k) { if (r.escolhas[k] != null) E[k] = r.escolhas[k]; });
+      try { localStorage.setItem(CHAVE, JSON.stringify(E)); } catch (e) {}
+      marca(); desenha();
+    }).catch(function () {});
+  }
 
   /* ── o palco 3D ── */
   var cv = document.getElementById('cena'), THREE, R, cena, cam, boneco = null, giro = 0.5, alvo = 0.5, arrasto = null;
