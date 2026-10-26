@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Meu personagem · Fisk Hub</title>
+<link rel="icon" href="assets/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+
+<!-- ══ MEU PERSONAGEM DO FISK WORLDS (26/10/2026) ════════════════════════════
+     Pedido do Pedro: cada professor monta, ao longo deste ano, o boneco com que
+     vai entrar no jogo em 2027. Mago ou bruxa, sempre de manto (a roupa é fixa);
+     o que muda é o rosto e o que ele segura.
+
+     ⚠️ O BONECO É O DO JOGO, carregado do Portal (worlds/js/fw-modelos.js,
+     `FW.modelos.professor`), e não uma cópia: é o mesmo desenho da Rita, a
+     guardiã dos calabouços. O que se guarda aqui são os TRAÇOS no formato que
+     o registro do guardião já lê (worlds/js/fw-guardiao.js, `tracos`), então
+     levar um professor para dentro do jogo é copiar o objeto.
+
+     O corpo é o mesmo para todos (regra do diretor: bonecos padronizados). -->
+
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  :root{--ui:#2b4d70;--ui-dark:#223e5a;--ui-soft:#e9eff5;--ui-line:#a8bfd2;--ink:#1d3349;--soft:#5b6b7b;
+    --bg:#f4f6fb;--card:#fff;--mago:#4b3d94;--ouro:#e9c046;--font-h:'Poppins',system-ui,sans-serif;--font-b:'Nunito',system-ui,sans-serif}
+  body{margin:0;font-family:var(--font-b);background:var(--bg);color:var(--ink)}
+  [hidden]{display:none !important}
+  .topo{background:var(--ui);color:#fff;display:flex;align-items:center;gap:.8rem;padding:.7rem 1rem}
+  .topo a.volta{color:#fff;text-decoration:none;font:700 .9rem var(--font-b);background:rgba(255,255,255,.14);border-radius:999px;padding:.35rem .8rem}
+  .topo img{height:24px;display:block}
+  .topo h1{font:800 1.05rem var(--font-h);margin:0}
+  main{max-width:1180px;margin:0 auto;padding:1.2rem 1rem 3rem}
+  .intro{background:linear-gradient(110deg,#2d2466,#4b3d94);color:#fff;border-radius:16px;padding:1rem 1.2rem;margin-bottom:1rem;box-shadow:0 4px 0 #1b1540}
+  .intro b{font:800 1.15rem var(--font-h);display:block}
+  .intro p{margin:.3rem 0 0;color:#ded8ff;font-weight:700;font-size:.92rem}
+  .grade{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:1rem;align-items:start}
+  .palco{position:sticky;top:1rem;border-radius:18px;overflow:hidden;border:2px solid var(--ui-line);
+    background:radial-gradient(ellipse at 50% 85%,#3d6b4c 0%,#1f3d2c 45%,#16261f 100%)}
+  .palco canvas{display:block;width:100%;height:520px;touch-action:none;cursor:grab}
+  .palco .nome{position:absolute;left:0;right:0;bottom:.8rem;text-align:center;color:#fff;font:800 1.15rem var(--font-h);text-shadow:0 2px 0 rgba(0,0,0,.35)}
+  .palco .dica{position:absolute;top:.7rem;left:0;right:0;text-align:center;color:#cfe8d6;font:700 .78rem var(--font-b)}
+  .painel{display:flex;flex-direction:column;gap:.8rem}
+  .bloco{background:var(--card);border:2px solid var(--ui-line);border-radius:16px;padding:.8rem .9rem}
+  .bloco h2{font:800 .95rem var(--font-h);margin:0 0 .55rem}
+  .linha{display:flex;flex-wrap:wrap;gap:.45rem}
+  .linha + .linha{margin-top:.55rem}
+  .cor{width:36px;height:36px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px var(--ui-line);cursor:pointer;padding:0}
+  .cor[aria-pressed="true"]{box-shadow:0 0 0 3px var(--ui)}
+  .op{border:2px solid var(--ui-line);background:#fff;color:var(--ink);border-radius:12px;padding:.42rem .7rem;font:700 .86rem var(--font-b);cursor:pointer}
+  .op[aria-pressed="true"]{background:var(--ui);border-color:var(--ui);color:#fff}
+  .op:focus-visible,.cor:focus-visible{outline:3px solid var(--ouro);outline-offset:2px}
+  .acoes{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+  .bt{border:0;border-radius:12px;padding:.7rem 1.1rem;font:800 .95rem var(--font-h);cursor:pointer}
+  .bt.salvar{background:var(--mago);color:#fff;box-shadow:0 3px 0 #2d2466}
+  .bt.sorte{background:var(--ui-soft);color:var(--ink)}
+  .estado{font-weight:700;font-size:.86rem;color:var(--soft)}
+  .estado.ok{color:#14794a}
+  @media (max-width:860px){
+    .grade{grid-template-columns:1fr}
+    /* no celular o palco fica preso no topo: quem rola pelas opções continua vendo o boneco mudar */
+    .palco{top:.4rem;z-index:5;box-shadow:0 6px 14px rgba(0,0,0,.25)}
+    .palco canvas{height:250px}
+  }
+</style>
+</head>
+<body>
+<header class="topo">
+  <a class="volta" href="index.html" data-t="voltar">← Hub</a>
+  <a href="index.html" style="line-height:0"><img src="https://portalfisk.com.br/worlds/img/fisk-logo-branco.png" alt="Fisk"></a>
+  <h1 data-t="titulo">Meu personagem do Fisk Worlds</h1>
+</header>
+<main>
+  <div class="intro">
+    <b data-t="intro_t">Em 2027, os professores entram no jogo 🧙</b>
+    <p data-t="intro_d">Monte o seu mago ou a sua bruxa com a sua carinha. Pode voltar e mudar quando quiser ao longo do ano.</p>
+  </div>
+  <div class="grade">
+    <div class="palco">
+      <canvas id="cena" aria-label="Prévia do personagem"></canvas>
+      <div class="dica" data-t="dica">Arraste para girar</div>
+      <div class="nome" id="nome"></div>
+    </div>
+    <div class="painel" id="painel"></div>
+  </div>
+</main>
+
+<script src="assets/fisk-shared.js?v=2026-10-23a"></script>
+<script>
+/* O boneco vem do Portal; na máquina de desenvolvimento, do portal local (a mesma regra do aluno.html) */
+var FW_BASE = /^(localhost|127\.)/.test(location.hostname) ? 'http://localhost:8811/' : 'https://portalfisk.com.br/';
+</script>
+<script>
+(function () {
+  'use strict';
+  /* ── as opções. Cores pensadas para o boneco de caixas: chapadas, sem neon ── */
+  var OP = {
+    papel: [['mago', 'Mago', 'Wizard', 'Mago'], ['bruxa', 'Bruxa', 'Witch', 'Bruja']],
+    pele: ['#fbe7d9', '#f3d3bd', '#e8bc98', '#d9a47a', '#c08a5e', '#a06c45', '#7d5233', '#5b3a25'],
+    olhos: [['#3b2f29', 'Castanho escuro', 'Dark brown', 'Café oscuro'], ['#6b4a2e', 'Castanho', 'Brown', 'Café'], ['#a87a3a', 'Mel', 'Hazel', 'Miel'],
+            ['#4d8a4a', 'Verde', 'Green', 'Verde'], ['#3d74b8', 'Azul', 'Blue', 'Azul'], ['#7d8a96', 'Cinza', 'Grey', 'Gris'], ['#1c1a1a', 'Preto', 'Black', 'Negro']],
+    cabelo: [['curto', 'Curto', 'Short', 'Corto'], ['topete', 'Topete', 'Quiff', 'Copete'], ['longo', 'Longo', 'Long', 'Largo'],
+             ['rabo', 'Rabo de cavalo', 'Ponytail', 'Coleta'], ['coque', 'Coque', 'Bun', 'Moño'], ['cacheado', 'Cacheado', 'Curly', 'Rizado'], ['careca', 'Careca', 'Bald', 'Calvo']],
+    corCabelo: ['#1c1714', '#3b2a20', '#5a3c26', '#8a5a33', '#b5452a', '#d6a75a', '#ecd28f', '#9a9a9e', '#d9d9dc', '#f4f2ec', '#6b4fb8', '#d16a9e'],
+    barba: [['', 'Sem barba', 'No beard', 'Sin barba'], ['cavanhaque', 'Cavanhaque', 'Goatee', 'Perilla'], ['cheia', 'Cheia', 'Full', 'Completa'], ['longa', 'Longa de mago', 'Long wizard', 'Larga de mago']],
+    oculos: [['', 'Sem óculos', 'No glasses', 'Sin gafas'], ['retangular', 'Retangular', 'Rectangular', 'Rectangular'], ['redondo', 'Redondo', 'Round', 'Redondas']],
+    corOculos: ['#2b2b33', '#6b4226', '#b8923e', '#c0392b', '#2e5c9a'],
+    sorriso: [['1', 'Sorrindo', 'Smiling', 'Sonriendo'], ['0', 'Sério', 'Serious', 'Serio']],
+    chapeu: [['', 'Sem chapéu', 'No hat', 'Sin sombrero'], ['mago', 'Chapéu de mago', 'Wizard hat', 'Sombrero de mago'], ['bruxa', 'Chapéu de bruxa', 'Witch hat', 'Sombrero de bruja']],
+    cetro: [['cristal', 'Cajado de cristal', 'Crystal staff', 'Bastón de cristal'], ['varinha', 'Varinha', 'Wand', 'Varita'], ['galho', 'Cajado de galho', 'Branch staff', 'Bastón de rama'],
+            ['estrela', 'Cetro de estrela', 'Star scepter', 'Cetro de estrella'], ['lua', 'Cetro da lua', 'Moon scepter', 'Cetro de luna'], ['orbe', 'Cajado de orbe', 'Orb staff', 'Bastón de orbe']]
+  };
+  var TX = {
+    pt: { voltar: '← Hub', titulo: 'Meu personagem do Fisk Worlds', intro_t: 'Em 2027, os professores entram no jogo 🧙',
+          intro_d: 'Monte o seu mago ou a sua bruxa com a sua carinha. Pode voltar e mudar quando quiser ao longo do ano.', dica: 'Arraste para girar',
+          papel: '🧙 Mago ou bruxa', pele: '🎨 Tom de pele', olhos: '👀 Cor dos olhos', cabelo: '💇 Cabelo', barba: '🧔 Barba', oculos: '👓 Óculos', sorriso: '🙂 Expressão',
+          chapeu: '🎩 Chapéu', cetro: '🪄 O que você segura', salvar: 'Salvar meu personagem', sorte: '🎲 Sortear', salvo: 'Salvo! ✔', salvando: 'Salvando…', falhou: 'Não salvou. Tente de novo.',
+          prof_mago: 'Professor', prof_bruxa: 'Professora' },
+    en: { voltar: '← Hub', titulo: 'My Fisk Worlds character', intro_t: 'In 2027, teachers join the game 🧙',
+          intro_d: 'Build your wizard or witch with your own face. Come back and change it any time this year.', dica: 'Drag to turn',
+          papel: '🧙 Wizard or witch', pele: '🎨 Skin tone', olhos: '👀 Eye colour', cabelo: '💇 Hair', barba: '🧔 Beard', oculos: '👓 Glasses', sorriso: '🙂 Expression',
+          chapeu: '🎩 Hat', cetro: '🪄 What you hold', salvar: 'Save my character', sorte: '🎲 Surprise me', salvo: 'Saved! ✔', salvando: 'Saving…', falhou: 'Not saved. Please try again.',
+          prof_mago: 'Teacher', prof_bruxa: 'Teacher' },
+    es: { voltar: '← Hub', titulo: 'Mi personaje de Fisk Mundo', intro_t: 'En 2027, los profesores entran al juego 🧙',
+          intro_d: 'Arma tu mago o tu bruja con tu carita. Puedes volver y cambiarlo cuando quieras durante el año.', dica: 'Arrastra para girar',
+          papel: '🧙 Mago o bruja', pele: '🎨 Tono de piel', olhos: '👀 Color de ojos', cabelo: '💇 Cabello', barba: '🧔 Barba', oculos: '👓 Gafas', sorriso: '🙂 Expresión',
+          chapeu: '🎩 Sombrero', cetro: '🪄 Lo que sostienes', salvar: 'Guardar mi personaje', sorte: '🎲 Sorpréndeme', salvo: '¡Guardado! ✔', salvando: 'Guardando…', falhou: 'No se guardó. Inténtalo de nuevo.',
+          prof_mago: 'Profesor', prof_bruxa: 'Profesora' }
+  };
+  var L = 'pt';
+  try { L = TX[fiskIdioma()] ? fiskIdioma() : 'pt'; } catch (e) {}
+  var T = TX[L], IL = { pt: 1, en: 2, es: 3 }[L];
+  function rot(par) { return par[IL]; }
+  document.querySelectorAll('[data-t]').forEach(function (el) { var k = el.getAttribute('data-t'); if (T[k]) el.textContent = T[k]; });
+  if (L !== 'pt') document.documentElement.lang = L;
+  document.title = T.titulo + ' · Fisk Hub';
+
+  var sessao = null;
+  try { sessao = fiskSessao(); } catch (e) {}
+  var nomeProf = sessao && (sessao.name || sessao.nome) ? String(sessao.name || sessao.nome) : '';
+  var primeiro = nomeProf.split(/\s+/)[0] || '';
+
+  /* ── a escolha (o que se guarda) e a conversão para os `tracos` do jogo ── */
+  var CHAVE = 'fisk_personagem_prof:' + (nomeProf || 'anon');
+  var PADRAO = { papel: 'mago', pele: '#e8bc98', olhos: '#6b4a2e', cabelo: 'curto', corCabelo: '#3b2a20', barba: '', oculos: '', corOculos: '#2b2b33', sorriso: '1', chapeu: 'mago', cetro: 'cristal' };
+  var E = {};
+  try { E = JSON.parse(localStorage.getItem(CHAVE) || 'null') || {}; } catch (e) { E = {}; }
+  Object.keys(PADRAO).forEach(function (k) { if (E[k] == null) E[k] = PADRAO[k]; });
+
+  function escurece(hex, f) {
+    var n = parseInt(hex.slice(1), 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    function c(v) { return Math.max(0, Math.min(255, Math.round(v * f))).toString(16).padStart(2, '0'); }
+    return '#' + c(r) + c(g) + c(b);
+  }
+  function tracos() {
+    return {
+      pele: E.pele, olhos: E.olhos,
+      cabelo: { forma: E.cabelo, cor: E.corCabelo },
+      barba: E.barba ? { forma: E.barba, cor: E.corCabelo } : null,
+      oculos: E.oculos ? { forma: E.oculos, cor: E.corOculos } : null,
+      sobrancelha: E.cabelo === 'careca' ? escurece(E.pele, 0.55) : escurece(E.corCabelo, 0.85),
+      sorriso: E.sorriso === '1',
+      chapeu: E.chapeu === '' ? false : (E.chapeu === 'bruxa' ? 'bruxa' : true),
+      cetro: E.cetro
+    };
+  }
+
+  /* ── o painel ── */
+  var painel = document.getElementById('painel');
+  function bloco(titulo) { var b = document.createElement('section'); b.className = 'bloco'; b.innerHTML = '<h2>' + titulo + '</h2>'; painel.appendChild(b); return b; }
+  function linha(b) { var l = document.createElement('div'); l.className = 'linha'; b.appendChild(l); return l; }
+  var botoes = [];
+  function opcoes(b, campo, lista) {
+    var l = linha(b);
+    lista.forEach(function (par) {
+      var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'op'; bt.textContent = rot(par);
+      bt.dataset.campo = campo; bt.dataset.valor = par[0];
+      bt.addEventListener('click', function () { escolhe(campo, par[0]); });
+      l.appendChild(bt); botoes.push(bt);
+    });
+  }
+  function cores(b, campo, lista, nomes) {
+    var l = linha(b);
+    lista.forEach(function (item) {
+      var hex = Array.isArray(item) ? item[0] : item;
+      var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'cor'; bt.style.background = hex;
+      bt.dataset.campo = campo; bt.dataset.valor = hex;
+      bt.setAttribute('aria-label', Array.isArray(item) ? rot(item) : hex);
+      if (Array.isArray(item)) bt.title = rot(item);
+      bt.addEventListener('click', function () { escolhe(campo, hex); });
+      l.appendChild(bt); botoes.push(bt);
+    });
+  }
+  opcoes(bloco(T.papel), 'papel', OP.papel);
+  cores(bloco(T.pele), 'pele', OP.pele);
+  cores(bloco(T.olhos), 'olhos', OP.olhos);
+  var bc = bloco(T.cabelo); opcoes(bc, 'cabelo', OP.cabelo); cores(bc, 'corCabelo', OP.corCabelo);
+  opcoes(bloco(T.barba), 'barba', OP.barba);
+  var bo = bloco(T.oculos); opcoes(bo, 'oculos', OP.oculos); cores(bo, 'corOculos', OP.corOculos);
+  opcoes(bloco(T.sorriso), 'sorriso', OP.sorriso);
+  opcoes(bloco(T.chapeu), 'chapeu', OP.chapeu);
+  opcoes(bloco(T.cetro), 'cetro', OP.cetro);
+  var ba = document.createElement('div'); ba.className = 'acoes';
+  ba.innerHTML = '<button type="button" class="bt salvar" id="salvar"></button><button type="button" class="bt sorte" id="sorte"></button><span class="estado" id="estado" aria-live="polite"></span>';
+  painel.appendChild(ba);
+  document.getElementById('salvar').textContent = T.salvar;
+  document.getElementById('sorte').textContent = T.sorte;
+
+  function marca() {
+    botoes.forEach(function (bt) { bt.setAttribute('aria-pressed', String(E[bt.dataset.campo] === bt.dataset.valor)); });
+    var titulo = E.papel === 'bruxa' ? T.prof_bruxa : T.prof_mago;
+    document.getElementById('nome').textContent = primeiro ? titulo + ' ' + primeiro : '';
+  }
+  function escolhe(campo, valor) {
+    E[campo] = valor;
+    /* quem escolhe bruxa e ainda está com o chapéu de mago ganha o de bruxa (e vice-versa); sem chapéu continua sem */
+    if (campo === 'papel' && E.chapeu) E.chapeu = valor;
+    document.getElementById('estado').textContent = ''; document.getElementById('estado').className = 'estado';
+    marca(); desenha();
+  }
+  function sorteia(l) { return l[Math.floor(Math.random() * l.length)]; }
+  document.getElementById('sorte').addEventListener('click', function () {
+    E.pele = sorteia(OP.pele); E.olhos = sorteia(OP.olhos)[0]; E.cabelo = sorteia(OP.cabelo)[0]; E.corCabelo = sorteia(OP.corCabelo);
+    E.barba = Math.random() < 0.6 ? '' : sorteia(OP.barba)[0]; E.oculos = Math.random() < 0.5 ? '' : sorteia(OP.oculos)[0];
+    E.corOculos = sorteia(OP.corOculos); E.chapeu = Math.random() < 0.3 ? '' : E.papel; E.cetro = sorteia(OP.cetro)[0];
+    marca(); desenha();
+  });
+  /* PROTÓTIPO: guarda neste aparelho. A versão final manda ao servidor, no nome que a sessão do Hub confirma. */
+  document.getElementById('salvar').addEventListener('click', function () {
+    var st = document.getElementById('estado');
+    try { localStorage.setItem(CHAVE, JSON.stringify(E)); st.textContent = T.salvo; st.className = 'estado ok'; }
+    catch (e) { st.textContent = T.falhou; st.className = 'estado'; }
+  });
+
+  /* ── o palco 3D ── */
+  var cv = document.getElementById('cena'), THREE, R, cena, cam, boneco = null, giro = 0.5, alvo = 0.5, arrasto = null;
+  function desenha() {
+    if (!THREE || !window.FW || !FW.modelos || !FW.geo) return;
+    if (boneco) { cena.remove(boneco); FW.geo.descarta(boneco); }
+    var m = FW.modelos.professor({ tracos: tracos(), traje: 'mago' }), todas = [];
+    Object.keys(m.partes).forEach(function (k) { todas = todas.concat(m.partes[k]); });
+    boneco = FW.geo.malha(todas);
+    boneco.matrixAutoUpdate = true;   // o FW.geo nasce parado (cenário); aqui ele gira
+    boneco.rotation.y = giro;
+    cena.add(boneco);
+  }
+  function tamanho() {
+    var w = cv.clientWidth, h = cv.clientHeight;
+    R.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix();
+  }
+  function quadro() {
+    giro += (alvo - giro) * 0.15;
+    if (!arrasto) alvo += 0.004;
+    if (boneco) boneco.rotation.y = giro;
+    R.render(cena, cam);
+    requestAnimationFrame(quadro);
+  }
+  function liga() {
+    THREE = window.THREE;
+    R = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true });
+    R.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    cena = new THREE.Scene();
+    cam = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
+    cam.position.set(0, 1.25, 5.2); cam.lookAt(0, 0.95, 0);
+    cena.add(new THREE.HemisphereLight(0xfff4e0, 0x5a6b48, 1.6));
+    var sol = new THREE.DirectionalLight(0xffffff, 1.6); sol.position.set(2.5, 4, 3); cena.add(sol);
+    /* o chão: um disco de grama, para o boneco não flutuar */
+    var chao = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.1, 0.08, 32), new THREE.MeshLambertMaterial({ color: 0x5d7f3f }));
+    chao.position.y = -0.04; cena.add(chao);
+    tamanho(); window.addEventListener('resize', tamanho);
+    cv.addEventListener('pointerdown', function (e) { arrasto = { x: e.clientX, a: alvo }; cv.setPointerCapture(e.pointerId); });
+    cv.addEventListener('pointermove', function (e) { if (arrasto) alvo = arrasto.a + (e.clientX - arrasto.x) * 0.012; });
+    cv.addEventListener('pointerup', function () { arrasto = null; });
+    cv.addEventListener('pointercancel', function () { arrasto = null; });
+    desenha(); quadro();
+  }
+  function carrega(src) {
+    return new Promise(function (ok, nao) { var s = document.createElement('script'); s.src = FW_BASE + src; s.onload = ok; s.onerror = nao; document.head.appendChild(s); });
+  }
+  marca();
+  carrega('worlds/vendor/three-0.183.2.fw.min.js')
+    .then(function () { return carrega('worlds/js/fw-geometria.js'); })
+    .then(function () { return carrega('worlds/js/fw-modelos.js'); })
+    .then(liga)
+    .catch(function () { document.querySelector('.palco .dica').textContent = '⚠️'; });
+})();
+</script>
+</body>
+</html>
