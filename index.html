@@ -2695,10 +2695,22 @@
       var s = sess(); if (!s || !s.token) return;
       $$('bdSub').textContent = tx('sub'); $$('bdNome').textContent = '📣 ' + tx('nome');
       var pedido = ++leitura;   /* duas leituras no ar: só a mais nova desenha */
+      /* A VOLTA À HOME SEM CORTINA (Pedro, 26/10/2026: "parece que ele tem que carregar tudo toda vez"). A última resposta
+         do mural fica guardada na aba (sessionStorage): na volta de uma ferramenta o mural se desenha na hora com ela e a
+         leitura nova corre por trás, redesenhando só se algo mudou (a assinatura agora inclui o "ciente"). */
+      var chaveMural = 'hub:mural:' + eu();
+      var guardado = null; try { guardado = JSON.parse(sessionStorage.getItem(chaveMural) || 'null'); } catch (e) {}
+      if (guardado) desenhaMural(guardado, pedido);
       var inf = post({ action: 'informesLer', como: como() }).catch(function(){ return null; });
       var avs = post({ action: 'avisosLer', como: como() }).catch(function(){ return null; });
       var ans = post({ action: 'aniversariantesProf', como: como() }).catch(function(){ return null; });
       Promise.all([inf, avs, ans]).then(function(r){
+        if (r[0] && r[0].ok === true) { try { sessionStorage.setItem(chaveMural, JSON.stringify(r)); } catch (e) {} }
+        desenhaMural(r, pedido);
+      });
+    }
+    function temMuralGuardado(){ try { return !!sessionStorage.getItem('hub:mural:' + eu()); } catch (e) { return false; } }
+    function desenhaMural(r, pedido){
         if (r[2] && r[2].ok) aniv = r[2].aniversariantes || [];
         if (pedido !== leitura) return;
         var ji = r[0], ja = r[1], cientes = {};
@@ -2722,11 +2734,10 @@
           var todas = fixas.concat(((ji && ji.informes) || []).map(doInforme), pedidos, recadoAniv());
           todas.sort(function(a, b){ return a.quando - b.quando; });
           /* só refaz a conversa quando chegou ou saiu recado: reler a cada 3 minutos não pode redigitar tudo */
-          var ass = lang() + '|' + eu() + '|' + todas.map(function(m){ return m.id; }).join(',');
+          var ass = lang() + '|' + eu() + '|' + todas.map(function(m){ return m.id + (m.ciente ? '+' : ''); }).join(',');
           if (ass === assinatura) { conta(); return; }
           assinatura = ass; msgs = todas; conta(); conversa();
         });
-      });
     }
 
     /* MINIMIZAR VIRA A BOLINHA (Pedro, 06/10/2026, terceira volta). O "—" guarda a janela e o Buddy passa a ser a
@@ -2786,7 +2797,8 @@
       /* entra de uma vez (Pedro, 23/10/2026): a home espera o mural (recados, quem veio à tutoria, aniversariantes)
          antes de aparecer, em vez de ir montando os cards na frente do professor. Teto de 12 s. */
       var ov = $$('hubEntrando');
-      if (ov) {
+      if (ov && temMuralGuardado()) eqCampanha();   /* volta de uma ferramenta: o mural guardado aparece na hora, sem cortina */
+      else if (ov) {
         ov.hidden = false;
         var some = function(){ if (ov.hidden) return; ov.hidden = true; document.removeEventListener('hub-mural-pronto', some); eqCampanha(); };
         document.addEventListener('hub-mural-pronto', some);
