@@ -517,6 +517,17 @@ body.theme-dark .pl-salvar{ background: #10261f; }
   .al.al-kids.veio{ border-color: #a7f3d0; background: #f6fffb; }
   .al.al-kids.aniv{ border-color: #f5c542; background: linear-gradient(90deg, #fff8db 0%, #ffffff 60%); box-shadow: 0 0 0 3px rgba(245,197,66,.25); }
   .al.al-kids.aniv .ak-id .nome{ color: #92400e; font-size: 1.16rem; }
+  /* o aniversariante da semana em TODOS os cartões (Pedro, 26/10/2026: "a ideia é esse aluno estar em destaque",
+     a semana inteira, adultos, teens e kids) */
+  .al.aniv{ border-color: #f5c542; box-shadow: 0 0 0 3px rgba(245,197,66,.3); }
+  .al.aniv .al-cab{ background: linear-gradient(90deg, #fff4c7 0%, rgba(255,244,199,0) 75%); }
+  .al.aniv .al-cab .nome{ color: #92400e; font-size: 1.12rem; }
+  .al.aniv .ak-aniv.hoje{ animation: anivPulsa 1.6s ease-in-out infinite; }
+  @keyframes anivPulsa{ 50%{ transform: scale(1.08); } }
+  @media (prefers-reduced-motion: reduce){ .al.aniv .ak-aniv.hoje{ animation: none; } }
+  body.theme-dark .al.aniv .al-cab{ background: linear-gradient(90deg, #3a2e12 0%, rgba(58,46,18,0) 75%); }
+  body.theme-dark .al.aniv .al-cab .nome, body.theme-dark .al.al-kids.aniv .ak-id .nome{ color: #fcd34d; }
+  body.theme-dark .al.al-kids.aniv{ background: linear-gradient(90deg, #3a2e12 0%, #1b273a 60%); }
   .ak-aniv{ display: inline-block; margin-left: .35rem; font-size: .82rem; font-weight: 900; color: #fff; background: linear-gradient(90deg, #f59e0b, #ec4899); border-radius: 99px; padding: .14rem .6rem; vertical-align: 2px; }
   .al.al-kids.faltou{ border-color: #fecaca; background: #fff8f8; opacity: 1; filter: none; }
   .al.al-kids.faltou .ak-id .nome{ color: #991b1b; }
@@ -1207,6 +1218,14 @@ function initCascata() {
   /* RÁPIDO (Pedro, 15/09/2026): as listas de escolas, professores e turmas ficam guardadas no aparelho e a cascata se
      monta na hora com elas; a leitura do card corre por trás e só troca as opções se algo mudou. A escola e o professor
      vêm de quem entrou; a turma, SÓ pelo horário: fora da aula nenhuma turma abre sozinha (a última vista não volta mais). */
+  /* A TURMA PEDIDA PELO LINK (26/10/2026): o Planejador foi aposentado e o endereço dele encaminha para cá com
+     #t=escola|professor|linha (o link da célula e da barra lateral do card). Vale uma vez, antes do horário. */
+  var pedida = null;
+  if (location.hash.indexOf('#t=') === 0) {
+    var pr = decodeURIComponent(location.hash.slice(3)).split('|');
+    if (pr[0] && pr[1] && pr[2]) pedida = { escola: pr[0], prof: pr[1], linha: String(pr[2]) };
+    history.replaceState(null, '', location.pathname + location.search);
+  }
   var LISTA_V = 'th:lista:';
   function lista(chave, params, campo, pinta) {
     var guardada = null;
@@ -1238,6 +1257,7 @@ function initCascata() {
       if (antes && profs.indexOf(antes) > -1) { selProf.value = antes; return; }
       var meu = profs.find(function (p) { return eu && p.toLowerCase() === eu.toLowerCase(); }) || profs.find(function (p) { return eu && p.toLowerCase().indexOf(eu.toLowerCase().split(' ')[0]) === 0; });
       var ult = fiskUltimaTurma();
+      if (pedida && pedida.escola === escola && escolhe(selProf, pedida.prof)) return;
       escolhe(selProf, meu || (ult && ult.escola === escola && ult.prof));
     });
   });
@@ -1250,6 +1270,10 @@ function initCascata() {
       var antes = selTurma.value;
       montarSelect(selTurma, 'Escolha a turma…', [{ v: PLANTAO, t: '🙋 Plantão de dúvidas (alunos da escola, pela busca)' }].concat(turmas.map(function (t) { return { v: t.linhaTitulo, t: t.titulo }; })));
       if (antes && (antes === PLANTAO || turmas.some(function (t) { return String(t.linhaTitulo) === antes; }))) { selTurma.value = antes; return; }
+      if (pedida && pedida.escola === escola && pedida.prof === prof) {
+        var linhaPedida = pedida.linha; pedida = null;
+        if (escolhe(selTurma, linhaPedida)) return;
+      }
       var agora = turmaDoHorario(turmas);
       /* o horário do plantão escrito no card ("LC FIXO - 5ª 15h às 17h30") abre o plantão, não a lista daquela linha */
       /* a tabela das Learning Center sessions diz quem é monitor e quando (Pedro, 16/09/2026) */
@@ -1275,6 +1299,7 @@ function initCascata() {
     var minha = escolas.find(function (e) { return minhas.some(function (m) { return m && e.toLowerCase().indexOf(m.toLowerCase()) > -1; }); }) || (escolas.length === 1 ? escolas[0] : '');
     if (antes && escolas.indexOf(antes) > -1) { selEscola.value = antes; return; }
     var ult = fiskUltimaTurma();
+    if (pedida && escolhe(selEscola, pedida.escola)) return;
     escolhe(selEscola, minha || (ult && ult.escola));
   });
 
@@ -1320,13 +1345,20 @@ function erro(e) {
   if (/sess[ãa]o/i.test(msg)) {
     $('status').className = 'status err'; $('status').hidden = false;
     $('status').innerHTML = '⚠️ ' + esc(msg) + ' <a href="index.html" style="font-weight:800">Entrar de novo →</a>';
+    /* a sessão vencida sai daqui mesmo: senão o link voltava à home logada e a Minha aula falhava de novo */
+    try { localStorage.removeItem('fisk_prof'); sessionStorage.setItem('fisk_sessao_caiu', '1'); } catch (e2) {}
     return;
   }
   status('⚠️ ' + msg, true);
 }
 
 /* ── a turma: os alunos do card (com RAF) e o planner de cada um ── */
+/* Cada leitura de turma ganha um número; a resposta que não é da leitura mais recente é jogada fora
+   (auditoria de 26/10/2026: trocar de turma no mesmo segundo em que a da hora abria deixava a resposta
+   atrasada da primeira vencer, e os cartões da turma B saíam com o planner e a ordem da A). */
+var _turmaPedido = 0;
 function carregarTurma(escola, prof, linha, titulo) {
+  var meu = ++_turmaPedido;
   planoTurmaDesmonta();
   estado.escola = escola; estado.prof = prof; estado.turma = titulo; estado.plantao = false; estado.prioridade = false; estado.ontem = false;
   $('alunos').innerHTML = ''; $('resumo').hidden = true; $('legenda').hidden = true;
@@ -1334,10 +1366,16 @@ function carregarTurma(escola, prof, linha, titulo) {
   /* o panorama é rota de GET no backend (doGet); por POST ele cai na guarda
      genérica de chave e volta "chave inválida" */
   get({ action: 'panoramaProf', escola: escola, prof: prof }).then(function (j) {
+    if (meu !== _turmaPedido) return;
     var turmaPan = (j.turmas || []).find(function (t) { return String(t.linhaTitulo) === String(linha); });
     var nomeTurma = turmaPan ? turmaPan.turma : titulo;
     var alunos = (j.alunos || []).filter(function (a) { return !a.saiu && (a.turma === nomeTurma || a.turma === titulo); });
-    if (!alunos.length) { status('Nenhum aluno ativo nesta turma no card.'); return; }
+    if (!alunos.length) {
+      /* turma vazia não pode deixar a anterior na tela: o "Salvar ordem" gravaria os alunos dela como roteiro desta */
+      estado.alunos = []; estado.dados = {}; estado.plano = null;
+      if ($('fila')) $('fila').hidden = true;
+      status('Nenhum aluno ativo nesta turma no card.'); return;
+    }
     var semRaf = alunos.filter(function (a) { return !a.raf; });
     estado.alunos = alunos.filter(function (a) { return a.raf; });
     status('🔄 ' + estado.alunos.length + ' alunos. Lendo o planner de cada um…');
@@ -1348,15 +1386,18 @@ function carregarTurma(escola, prof, linha, titulo) {
        por fora e só o planner completo espera por ela */
     estado.pessoais = null;
     get({ action: 'card', fn: 'turma', escola: escola, prof: prof, linha: linha }).then(function (j) {
-      if (estado.escola !== escola || estado.prof !== prof) return;
+      if (meu !== _turmaPedido) return;
       estado.pessoais = (j && j.alunos) || [];
       if (aguia.ov) desenhaAguia();
+      /* o aniversário mora nesta leitura: se os cartões já foram desenhados sem ela, redesenha uma vez */
+      if ($('alunos').children.length && estado.alunos.some(function (a) { return nascMesDia(a); })) desenharTurma();
     }).catch(function (e) { console.warn('card fn=turma', e); estado.pessoais = []; });
     return Promise.all([
       post({ action: 'plannerTurma', alunos: estado.alunos.map(function (a) { return { raf: a.raf, book: a.book, turma: nomeTurma }; }) }),
       post({ action: 'planejamentoLe', escola: escola, prof: prof, turma: nomeTurma }).catch(function () { return { plano: null }; }),
       Promise.all(Object.keys(livros).map(function (k) { return carregaPlano(livros[k]); }))
     ]).then(function (rs) {
+        if (meu !== _turmaPedido) return;
         /* o visitante fica na tela ao trocar de turma: o planner dele NÃO pode ser apagado pela leitura da turma nova
            (auditoria de 15/09/2026: o cartão voltava para a Introduction e a marca ia para a lição errada) */
         var antes = estado.dados || {};
@@ -1372,7 +1413,7 @@ function carregarTurma(escola, prof, linha, titulo) {
         desenharTurma();
         planoTurmaMonta(escola, nomeTurma);
       });
-  }).catch(erro);
+  }).catch(function (e) { if (meu === _turmaPedido) erro(e); });
 }
 
 /* ── OUTRO ALUNO NA TURMA (Pedro, 15/09/2026) ──
@@ -1775,7 +1816,10 @@ function cartaoAluno(a) {
   if (estado.atendidos[a.raf]) card.classList.add('atendido');
   if (faltouHoje(a)) card.classList.add('faltou');
   if (a.visitante) card.classList.add('visitante');
-  cab.innerHTML = '<span class="mover"><button type="button" class="arrasta" aria-label="Arrastar ' + esc(a.nome) + ' para outra posição" title="Segure e arraste para mudar a ordem">⠿</button><button type="button" class="sobe" aria-label="Subir ' + esc(a.nome) + '" title="Subir uma posição">↑</button><button type="button" class="desce" aria-label="Descer ' + esc(a.nome) + '" title="Descer uma posição">↓</button></span><span class="nome">' + esc(a.nome) + '</span>' + (a.visitante ? '<span class="visita" title="Aluno trazido pela busca">' + (estado.plantao ? 'plantão' : 'de outra turma') + (a.turma ? ' · ' + esc(String(a.turma).split('\n')[0]) : '') + '</span><button type="button" class="tirar" data-tirar="' + esc(a.raf) + '">Tirar da tela</button>' : '') + '<span class="livro' + (plano ? ' cor' : '') + '">' + esc(a.book || '') + '</span>' +
+  var aniv = anivSemanaCalendario(a), anivHoje = aniv && anivEhHoje(a);
+  if (aniv) card.classList.add('aniv');
+  cab.innerHTML = '<span class="mover"><button type="button" class="arrasta" aria-label="Arrastar ' + esc(a.nome) + ' para outra posição" title="Segure e arraste para mudar a ordem">⠿</button><button type="button" class="sobe" aria-label="Subir ' + esc(a.nome) + '" title="Subir uma posição">↑</button><button type="button" class="desce" aria-label="Descer ' + esc(a.nome) + '" title="Descer uma posição">↓</button></span><span class="nome">' + (aniv ? '🎂 ' : '') + esc(a.nome) + '</span>' +
+    (aniv ? '<span class="ak-aniv' + (anivHoje ? ' hoje' : '') + '">🎉 ' + (anivHoje ? 'Aniversário HOJE!' : 'Aniversário ' + esc(aniv)) + '</span>' : '') + (a.visitante ? '<span class="visita" title="Aluno trazido pela busca">' + (estado.plantao ? 'plantão' : 'de outra turma') + (a.turma ? ' · ' + esc(String(a.turma).split('\n')[0]) : '') + '</span><button type="button" class="tirar" data-tirar="' + esc(a.raf) + '">Tirar da tela</button>' : '') + '<span class="livro' + (plano ? ' cor' : '') + '">' + esc(a.book || '') + '</span>' +
     (estado.prioridade ? '' : plan ? '<span class="pill nv-' + esc(plan.nivel || 'emdia') + '">' + esc(nivelRot[plan.nivel] || plan.nivel || '') + '</span>' : (estado.plano ? '<span class="pill fora">fora do roteiro</span>' : '')) +
     (estado.prioridade && a._rank ? '<span class="pill prio nv-' + esc(a._prio.nivel) + '" title="' + esc(prioMotivo(a._prio)) + '">⚡ ' + a._rank + 'º · ' + esc(prioMotivo(a._prio)) + '</span>' : '') +
     avisoAtendimento(a) +
@@ -2002,10 +2046,25 @@ function ehDeRede(e) {
   var m = String((e && e.message) || e || '');
   return /failed to fetch|load failed|networkerror|network request|demorou demais|conexão|connection/i.test(m);
 }
-function filaEnfileira(item) { var f = filaLe(); f.push(item); filaGrava(f); }
+/* Auditoria de 26/10/2026, três regras novas:
+   · cada marca guardada leva a DATA da aula e o NOME de quem marcou. Sem a data, a marca de segunda enviada
+     na quarta caía na aula de quarta; com ela, o servidor grava no planner e recusa o card fora do dia;
+   · uma marca nova no mesmo item substitui a guardada (senão a antiga voltava depois de o professor desfazer);
+   · só sai com a sessão de quem marcou, e erro de sessão não descarta: espera a pessoa entrar de novo. */
+function filaChave(it) { return it.raf + '|' + Object.keys((it.patch && it.patch.itens) || {}).join(','); }
+function filaTira(raf, id) {
+  var f = filaLe(), g = f.filter(function (it) { return filaChave(it) !== raf + '|' + id; });
+  if (g.length !== f.length) filaGrava(g);
+}
+function filaEnfileira(item) {
+  item.data = item.data || hojeIsoTH(); item.quem = item.quem || (sessao() || {}).name || '';
+  var f = filaLe().filter(function (it) { return filaChave(it) !== filaChave(item); });
+  f.push(item); filaGrava(f);
+}
+function filaMinhas() { var eu = (sessao() || {}).name || ''; return filaLe().filter(function (it) { return !it.quem || it.quem === eu; }); }
 function pintaFilaOff() {
   var el = $('fila-off'); if (!el) return;
-  var f = filaLe();
+  var f = filaMinhas();
   if (!f.length) { el.hidden = true; el.innerHTML = ''; return; }
   el.hidden = false;
   el.innerHTML = '<span>⏳ ' + f.length + ' marca' + (f.length === 1 ? '' : 's') + ' esperando a internet. Elas estão guardadas neste aparelho e vão sozinhas quando a rede voltar.</span>' +
@@ -2015,21 +2074,24 @@ function pintaFilaOff() {
 var filaEnviando = false;
 function filaDrena(avisar) {
   if (filaEnviando) return;
-  var f = filaLe(); if (!f.length) return;
+  var f = filaMinhas(); if (!f.length) return;
   filaEnviando = true;
-  var item = f[0];
-  post({ action: 'plannerProf', raf: item.raf, book: item.book, patch: item.patch }).then(function () {
-    var g = filaLe(); g.shift(); filaGrava(g);
+  var item = f[0], chave = filaChave(item);
+  function tira() { filaGrava(filaLe().filter(function (it) { return !(filaChave(it) === chave && it.quando === item.quando); })); }
+  post({ action: 'plannerProf', raf: item.raf, book: item.book, patch: item.patch, data: item.data || '' }).then(function (r) {
+    tira();
     filaEnviando = false;
-    if (g.length) filaDrena(avisar); else toast('✓ Marcas guardadas enviadas.');
+    if (r && r.card && r.card.ok === false && /aula de hoje/.test(r.card.motivo || '')) toast('📇 Uma marca guardada de outro dia foi para o planner, mas não para o card: lance a presença no card à mão.', 7000);
+    if (filaMinhas().length) filaDrena(avisar); else toast('✓ Marcas guardadas enviadas.');
   }).catch(function (e) {
     filaEnviando = false;
-    if (!ehDeRede(e)) { var g = filaLe(); g.shift(); filaGrava(g); toast('⚠️ Uma marca guardada não foi aceita: ' + e.message); }
+    if (/sess[ãa]o/i.test(e.message || '')) { if (avisar) toast('⚠️ Sua sessão expirou. Entre de novo no Hub: as marcas guardadas continuam aqui e vão depois.', 7000); return; }
+    if (!ehDeRede(e)) { tira(); toast('⚠️ Uma marca guardada não foi aceita: ' + e.message); }
     else if (avisar) toast('⚠️ Ainda sem internet. As marcas continuam guardadas.');
   });
 }
 window.addEventListener('online', function () { filaDrena(false); });
-setInterval(function () { if (filaLe().length) filaDrena(false); }, 20000);
+setInterval(function () { if (filaMinhas().length) filaDrena(false); }, 20000);
 document.addEventListener('DOMContentLoaded', function () { pintaFilaOff(); setTimeout(function () { filaDrena(false); }, 1500); });
 
 function confirmar(a, id, marca) {
@@ -2041,6 +2103,7 @@ function confirmar(a, id, marca) {
   if ('a' in marca) { if (marca.a) { it.a = 1; it.aq = (sessao() || {}).name || 'você'; it.at = Date.now(); } else { delete it.a; delete it.at; delete it.aq; } }
   if (!it.p && !it.a) delete d.planner.itens[id];
   redesenhar(a);   /* já com a marca nova */
+  filaTira(a.raf, id);   /* o toque novo vale mais que uma marca guardada no mesmo item */
   var patch = { itens: {} }; patch.itens[id] = marca;
   pendentes[a.raf] = pendentes[a.raf] || {}; pendentes[a.raf][id] = marca;
   var k = a.raf + '|' + id;
@@ -2477,7 +2540,7 @@ function desenharChamadaKids(caixa) {
     var el = document.createElement('section'); el.className = 'al al-kids' + (veio ? ' veio' : '') + (faltou ? ' faltou' : '') + (aniv ? ' aniv' : ''); el.dataset.raf = a.raf;
     el.setAttribute('style', ptCorVars(ptCor(a.book)));
     el.innerHTML = '<div class="ak-lin"><span class="ak-av" aria-hidden="true">' + esc(nome.charAt(0)) + '</span>' +
-      '<span class="ak-id"><span class="nome">' + (aniv ? '🎂 ' : '') + esc(nome) + '</span>' + (aniv ? ' <span class="ak-aniv">🎉 Aniversário ' + esc(aniv) + '</span>' : '') + '<br><span class="livro">' + esc(a.book || '') + '</span></span>' +
+      '<span class="ak-id"><span class="nome">' + (aniv ? '🎂 ' : '') + esc(nome) + '</span>' + (aniv ? ' <span class="ak-aniv' + (anivEhHoje(a) ? ' hoje' : '') + '">🎉 ' + (anivEhHoje(a) ? 'Aniversário HOJE!' : 'Aniversário ' + esc(aniv)) + '</span>' : '') + '<br><span class="livro">' + esc(a.book || '') + '</span></span>' +
       '<span class="ak-bts"><button type="button" class="ak-veio' + (veio ? ' on' : '') + '"><span class="bx">' + (veio ? '✓' : '') + '</span>Veio</button>' +
       '<button type="button" class="ak-falta' + (faltou ? ' on' : '') + '">✗ Faltou</button></span></div>' +
       '<button type="button" class="ak-nota' + (obs ? ' tem' : '') + '">📝 Anotações sobre o aluno' + (obs ? ' · tem anotação' : '') + '</button>';
@@ -2533,10 +2596,23 @@ function nascMesDia(a) {
 function mdBr(md) { return md ? md.slice(3) + '/' + md.slice(0, 2) : ''; }
 /* o aniversariante da semana na chamada (Pedro, 23/10/2026: "com o nome bem destacado"): a semana do plano do livro
    dele, pela data de nascimento do card */
+/* A SEMANA DO CALENDÁRIO (segunda a domingo) que contém o dia da aula: vale para as turmas de adulto, que não têm
+   o plano por semana do livro. Atravessa a virada do ano (semana de 29/12 a 04/01). */
+function anivSemanaCalendario(a) {
+  var mmdd = nascMesDia(a); if (!mmdd) return '';
+  var p = diaAlvoTH().split('-'), d = new Date(+p[0], +p[1] - 1, +p[2]);
+  var seg = new Date(d); seg.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  for (var i = 0; i < 7; i++) {
+    var x = new Date(seg); x.setDate(seg.getDate() + i);
+    if (('0' + (x.getMonth() + 1)).slice(-2) + '-' + ('0' + x.getDate()).slice(-2) === mmdd) return mdBr(mmdd);
+  }
+  return '';
+}
+function anivEhHoje(a) { var md = nascMesDia(a); return !!md && diaAlvoTH().slice(5) === md; }
 function anivDaSemana(a) {
-  if (!ptEstado) return '';
-  var b = ptBlocoDe(ptEstado.P, a.book); if (!b) return '';
-  var s = (b.semanas || [])[ptIndiceSemana(b, diaAlvoTH())]; if (!s) return '';
+  if (!ptEstado) return anivSemanaCalendario(a);
+  var b = ptBlocoDe(ptEstado.P, a.book); if (!b) return anivSemanaCalendario(a);
+  var s = (b.semanas || [])[ptIndiceSemana(b, diaAlvoTH())]; if (!s) return anivSemanaCalendario(a);
   var mmdd = nascMesDia(a); if (!mmdd) return '';
   return (s.de.slice(5) <= mmdd && mmdd <= s.ate.slice(5)) ? mdBr(mmdd) : '';
 }

@@ -372,7 +372,7 @@ function contexto() {
 }
 
 function selecionar(a) {
-  alunoSel = a;
+  alunoSel = a; dadosDoc = null;
   $('fEstagio').value = a.book || '';
   $('fTexto').value = '';
   $('statusSalvar').textContent = '';
@@ -389,8 +389,12 @@ function selecionar(a) {
     ['Procurando o documento na pasta do aluno…',
      'Ainda procurando, a primeira busca do dia é a mais lenta…']);
 
+  /* só vale a resposta do aluno que está na tela (auditoria de 26/10/2026: o histórico do A aparecia sob o nome
+     do B, e o "Salvar" gravava no B) */
   post('counselingLer', contexto()).then(function (j) {
     pararEspera();
+    if (alunoSel !== a) return;
+    dadosDoc = null;
     if (!j || j.ok !== true) {
       st.className = 'status erro';
       st.textContent = '⚠️ ' + ((j && (j.erro || j.error)) || 'não consegui ler o documento');
@@ -413,6 +417,7 @@ function selecionar(a) {
     $('painelEscrever').hidden = false;
   }).catch(function (e) {
     pararEspera();
+    if (alunoSel !== a) return;
     st.className = 'status erro';
     st.textContent = '⚠️ ' + ((e && e.message) || e);
   });

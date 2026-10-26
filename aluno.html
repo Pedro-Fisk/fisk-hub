@@ -577,13 +577,19 @@ function abrir(raf, turma, nome){
   $('alCursos').hidden = true; $('alCursos').innerHTML = '';
   $('btnPasta').hidden = true; $('btnPasta').disabled = false; $('stPasta').textContent = '';
   $('pnAtiv').hidden = true;
+  /* os painéis do aluno anterior saem antes de o novo chegar (auditoria de 26/10/2026: com a consulta falhando,
+     o E-counseling e o relatório ficavam ligados ao aluno de antes) */
+  ['pnSim', 'pnPassivo', 'pnFala', 'btnCounseling', 'btnRelFam'].forEach(function (id) { if ($(id)) $(id).hidden = true; });
   radarAbrir(raf, nome);
   if (!EMBED) $('pnAluno').scrollIntoView({ behavior:'smooth', block:'start' });
 
+  /* só vale a resposta do aluno que está na tela: dois cliques seguidos faziam a resposta atrasada do primeiro
+     pintar o segundo */
   post({ action:'alunoDiagnostico', token: token(), raf: raf, turma: atualTurma }).then(function(res){
+    if (atual !== raf) return;
     if (!res.ok){ $('alNome').textContent = '⚠️ ' + (res.error || 'Não consegui abrir o aluno.'); return; }
     render(res);
-  }).catch(function(){ $('alNome').textContent = '⚠️ Erro de conexão.'; });
+  }).catch(function(){ if (atual === raf) $('alNome').textContent = '⚠️ Erro de conexão.'; });
 }
 
 /* O E-COUNSELING A PARTIR DO DOSSIÊ (20/09/2026).
@@ -864,7 +870,7 @@ document.addEventListener('click', function(ev){
   if (!b) return;
   if (_falaAudio){ _falaAudio.pause(); _falaAudio = null; }
   b.disabled = true; b.textContent = '⏳';
-  post({ action:'falaAudio', token: token(), raf: (atual && atual.raf) || '', fileId: b.dataset.arq })
+  post({ action:'falaAudio', token: token(), raf: atual || '', fileId: b.dataset.arq })
     .then(function(r){
       b.disabled = false; b.textContent = '▶';
       if (!r || !r.ok){ b.title = (r && r.error) || 'não deu para carregar'; b.textContent = '⚠'; return; }

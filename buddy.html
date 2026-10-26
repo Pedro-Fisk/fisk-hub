@@ -1052,17 +1052,21 @@ function mostraLembretes(apaga) {
 }
 
 /* ── a direção escolhe "como quem" pergunta, aqui mesmo ── */
+/* a escola de cada professor vai junto no fisk_actas: gravado sem ela, o Radar da Turma da direção parava em
+   "Escolha um professor" (auditoria de 26/10/2026) */
+var _escolasDe = {};
 function montaVerComo() {
   var sel = $('verComo');
   fetch(EP + '?action=profList').then(fiskJson).then(function (j) {
     var ps = ((j && (j.profs || j.professores || j.lista)) || []).filter(function (p) { return !p.director; });
+    ps.forEach(function (p) { _escolasDe[p.name || p.nome || p] = p.escolas || ''; });
     sel.innerHTML = '<option value="">responder como…</option>' + ps.map(function (p) { var n = p.name || p.nome || p; return '<option' + (n === comoQuem ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('');
     sel.hidden = false;
   }).catch(function () {});
   sel.addEventListener('change', function () {
     comoQuem = sel.value;
     if (comoQuem) post({ action: 'buddyAquece' }).catch(function () {});
-    try { if (comoQuem) localStorage.setItem('fisk_actas', JSON.stringify({ name: comoQuem, escolas: '' })); } catch (e) {}
+    try { if (comoQuem) localStorage.setItem('fisk_actas', JSON.stringify({ name: comoQuem, escolas: _escolasDe[comoQuem] || '' })); } catch (e) {}
     if (comoQuem) { $('fora').hidden = true; $('palco').hidden = false; $('rodape').hidden = false; abertura(); carregaHist(); }
   });
 }
@@ -1109,7 +1113,13 @@ function recusa(t, p) { fechaCortina(); $('fora').hidden = false; $('foraT').tex
       bolha('<p>A direção não tem turmas. Escolha lá em cima, em <b>responder como…</b>, o professor por quem você quer perguntar. Eu respondo com as turmas dele, e a medição (modelo e tokens) aparece embaixo de cada resposta.</p>');
       return;
     }
-    if (!memRestaura()) abertura();
+    /* PERGUNTA PRONTA (26/10/2026): outra tela abre o Buddy com #pergunta=… (o Radar da Turma, "perguntar ao Buddy
+       sobre esta turma"). Começa conversa nova e já pergunta; a pergunta sai do endereço para não repetir ao recarregar. */
+    var pUrl = (location.hash.match(/[#&]pergunta=([^&]+)/) || [])[1];
+    if (pUrl) {
+      history.replaceState(null, '', location.pathname + location.search);
+      abertura(); pergunta(decodeURIComponent(pUrl).slice(0, 400));
+    } else if (!memRestaura()) abertura();
     carregaHist();
     fiskRegistrarUso('Buddy auxiliar');
   }).catch(function () { recusa('⚠️ Sem conexão', 'Não consegui falar com o servidor. Tente de novo em instantes.'); });

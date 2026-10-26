@@ -441,6 +441,8 @@ function avisarForaDoCard(documento) {
     });
 }
 document.getElementById('btnLivre').addEventListener('click', function () {
+  /* o termo livre começa limpo: motivos, sugestões e o PDF do aluno anterior iam junto (auditoria de 26/10/2026) */
+  limparEscolhasDoAlunoAnterior();
   modoLivre = true;
   alunoSel = { nome: '', book: '', ultimaLicao: null, licaoPrevista: null,
                faltas: '', pctFaltas: '', aulasAtraso: null, linhaCard: null, ultimaPresencaIdx: null };
@@ -528,7 +530,7 @@ function montarLista() {
         (a.precisaTermo
           ? '<span class="badge atraso">' + a.aulasAtraso + ' aulas atrasado</span>'
           : '<span class="badge ok">' + (a.aulasAtraso == null ? 'sem placeholder' : 'em dia') + '</span>');
-      div.addEventListener('click', function () { selecionarAluno(a); });
+      div.addEventListener('click', function (ev) { if (ev.target.closest('a.dossie-link')) return; selecionarAluno(a); });
       div.dataset.nome = a.nome;
       ul.appendChild(div);
     });
@@ -546,11 +548,14 @@ function nomeComDossie(nome) {
   var url = (typeof fiskLinkDossie === 'function') ? fiskLinkDossie(IDX_ALUNOS, nome) : '';
   if (!url) return String(nome).replace(/</g, '&lt;');
   return '<a class="dossie-link" href="' + url + '" title="Ver o acompanhamento deste aluno" ' +
-         'onclick="event.stopPropagation()">' + String(nome).replace(/</g, '&lt;') + '</a>';
+         '>' + String(nome).replace(/</g, '&lt;') + '</a>';
 }
 /* repinta a lista quando o índice chega depois dela */
 function renderListaSeHouver() {
-  if (payload && payload.alunos) montarLista();
+  /* só os nomes: refazer a lista inteira fechava o aluno que o professor já tinha aberto (auditoria de 26/10/2026) */
+  document.querySelectorAll('#listaAlunos .aluno-item').forEach(function (div) {
+    var sp = div.querySelector('span'); if (sp && div.dataset.nome) sp.innerHTML = nomeComDossie(div.dataset.nome);
+  });
 }
 
 function selecionarAluno(a) {
@@ -775,11 +780,15 @@ async function gerarPDF() {
   /* para o botão "Enviar à família pela secretaria" (assets/fisk-imprimir.js): é com escola, professor e linha do card
      que a secretaria acha o responsável e o WhatsApp. Termo livre (sem card) vai sem: ela procura o contato à mão. */
   try {
+    /* o vínculo sai da turma CARREGADA (auditoria de 26/10/2026): no link da célula do card (#t=) os selects
+       ficam vazios, e o pedido chegava à secretaria sem escola, professor nem RAF */
     var _sT = document.getElementById('selTurma');
     window.FISK_VINCULO = (!modoLivre && alunoSel && alunoSel.linhaCard != null)
-      ? { escola: document.getElementById('selEscola').value, professor: document.getElementById('selProf').value,
-          turma: _sT && _sT.selectedOptions && _sT.selectedOptions[0] ? _sT.selectedOptions[0].text : '',
-          linha: alunoSel.linhaCard, nome: alunoSel.nome } : null;
+      ? { escola: (payload && payload.escola) || document.getElementById('selEscola').value,
+          professor: (payload && (payload.aba || payload.professor)) || document.getElementById('selProf').value,
+          turma: (payload && payload.turma) ? String(payload.turma).split('\n')[0]
+               : (_sT && _sT.selectedOptions && _sT.selectedOptions[0] ? _sT.selectedOptions[0].text : ''),
+          linha: alunoSel.linhaCard, nome: alunoSel.nome, raf: alunoSel.raf || '' } : null;
   } catch (e) { window.FISK_VINCULO = null; }
   pares('btnDrive').forEach(function (b) { b.disabled = false; b.title = 'Salvar este PDF na pasta do aluno'; });
   // "Lançar no card" só existe para aluno que veio do card (termo livre não tem célula)

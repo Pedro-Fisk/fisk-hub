@@ -2021,7 +2021,12 @@
               var esc = String(p.escolas || '').replace(/,/g, ' + ');
               return '<option value="' + nm + '">' + nm + (esc ? ' · ' + esc : '') + (p.registered ? '  ✓' : '') + '</option>';
             }).join('');
-        }).catch(function(){ pronto(); sel.innerHTML = '<option value="" disabled selected></option>'; });
+        }).catch(function(){
+          /* o servidor acordando devagar deixava a lista vazia e calada (auditoria de 26/10/2026): agora diz e oferece de novo */
+          pronto(); sel.innerHTML = '<option value="" disabled selected></option>';
+          msg.innerHTML = '⚠️ Não consegui carregar a lista de professores. <button type="button" id="pgDeNovo" style="font-weight:800;border:0;background:none;color:inherit;text-decoration:underline;cursor:pointer">Tentar de novo</button>';
+          var b = $('pgDeNovo'); if (b) b.onclick = function(){ msg.textContent = ''; loadProfs(); };
+        });
       }
 
       // Só login: o cadastro/senha agora é feito e entregue pela direção.
@@ -2038,6 +2043,7 @@
       }
 
       function submit(){
+        if (sub.disabled) return;   /* o Enter na senha mandava um segundo login, e cada login troca o token */
         var name = sel.value, pass = $('pgPass').value;
         if (!name){ msg.textContent = tr('pg-pick-name'); return; }
         if (!pass){ msg.textContent = tr('pg-need-pass'); return; }
@@ -2131,6 +2137,18 @@
       if (s){
         fillBar(s); if (s.master) setupActAs(); updateToolLinks();  // já logado (prof-in veio do pre-paint)
         registrarHome();
+        /* A SESSÃO GUARDADA AINDA VALE? (auditoria de 26/10/2026) A home só olhava se o fisk_prof existia. Com o token
+           vencido (o login em outro aparelho troca o token), a ferramenta dizia "Sessão expirada, entre de novo", o link
+           trazia de volta para cá, a home abria normal e a ferramenta falhava outra vez, sem saída. Agora a home pergunta
+           ao servidor por trás; só a recusa EXPLÍCITA da sessão desloga (erro de rede não tira ninguém). */
+        if (s.token && !s.master && !s.viewingAs) {
+          post({ action:'profCheck', token: s.token }).then(function(res){
+            if (res && res.ok === false && /sess[ãa]o/i.test(String(res.error || ''))) {
+              try { localStorage.removeItem('fisk_prof'); localStorage.removeItem('fisk_actas'); sessionStorage.setItem('fisk_sessao_caiu', '1'); } catch (e) {}
+              location.reload();
+            }
+          }).catch(function(){});
+        }
         // quem já estava logado não passa pelo enter(): o menu é montado aqui
         // (com `onIdioma`, como no enter: o idioma voltou ao menu em 09/10/2026)
         if (typeof fiskInitUserMenu === 'function') {
@@ -2140,7 +2158,10 @@
           });
         }
       }
-      else { loadProfs(); setMode('login'); setPlaceholders(); }
+      else {
+        loadProfs(); setMode('login'); setPlaceholders();
+        try { if (sessionStorage.getItem('fisk_sessao_caiu')) { sessionStorage.removeItem('fisk_sessao_caiu'); msg.textContent = 'Sua sessão expirou (talvez você tenha entrado em outro aparelho). Entre de novo.'; } } catch (e) {}
+      }
     })();
 
     /* ════════════════════════════════════════════════

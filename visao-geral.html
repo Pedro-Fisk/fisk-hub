@@ -213,6 +213,9 @@
   .rt-tab tr:hover td{background:var(--blue-soft)}
   .rt-tab a{color:inherit;font-weight:700;text-decoration:none} .rt-tab a:hover{text-decoration:underline}
   .rt-ok{color:var(--emdia)} .rt-mid{color:var(--media)} .rt-low{color:var(--alta)} .rt-x{color:var(--gray);font-weight:600!important}
+  .btn-buddy-radar{ display: inline-flex; align-items: center; gap: .35rem; padding: .5rem .9rem; border-radius: 10px; font-weight: 800; font-size: .9rem;
+    text-decoration: none; background: var(--ui-soft, #e9eff5); color: var(--ui-dark, #223e5a); border: 1.5px solid var(--ui-bd, #9db6cb); }
+  .btn-buddy-radar:hover{ border-color: var(--ui, #3c6e98); }
 </style>
 </head>
 <body>
@@ -412,7 +415,9 @@ function selecionarNaCascata(escola, prof, auto) {
   selEscola.value = escola; selEscola.dispatchEvent(new Event('change'));
   if (!prof) return;
   var t0 = Date.now();
-  var i2 = setInterval(function () {
+  /* trocar de professor no "Ver como" cria uma espera nova: a anterior morre, senão as duas disparavam análise */
+  clearInterval(window._vgEspera);
+  var i2 = window._vgEspera = setInterval(function () {
     if (Date.now() - t0 > 15000) { clearInterval(i2); return; }
     if (has(selProf, prof)) {
       clearInterval(i2);
@@ -556,7 +561,11 @@ function radarDaTurma(rafs){
   })).then(function(ls){ return [].concat.apply([], ls); });
 }
 
+/* só vale a análise mais recente (auditoria de 26/10/2026: a direção trocava de A para B e a resposta lenta de A
+   pintava os alunos de A com o nome de B) */
+var _vgPedido = 0;
 function analisar(escola, prof) {
+  var meu = ++_vgPedido;
   var btn = $('btnAnalisar'); btn.disabled = true;
   $('pnTurma').hidden = $('pnAlunos').hidden = $('pnTabela').hidden = true;
   var pararEspera = fiskEsperando(statusCard, [
@@ -566,12 +575,14 @@ function analisar(escola, prof) {
     'Está demorando mais que o normal. Se passar de um minuto, tente de novo.'
   ]);
   panorama(escola, prof).then(function (j) {
+    if (meu !== _vgPedido) { pararEspera(); return; }
     var turmas = (j.turmas || []).map(function(t){ return t.turma; });
     /* DESISTENTE FICA DE FORA: o card guarda a linha de quem saiu */
     var alunos = (j.alunos || []).filter(function(a){ return a && a.nome && !a.saiu && turmas.indexOf(a.turma) >= 0; });
     if (!alunos.length) { pararEspera(); statusCard('Nenhum aluno encontrado nas turmas de ' + prof + '.', 'err'); btn.disabled = false; return; }
     var rafs = alunos.map(function(a){ return a.raf; }).filter(Boolean);
     return radarDaTurma(rafs).then(function(rs){
+      if (meu !== _vgPedido) { pararEspera(); return; }
       var porRaf = {};
       rs.forEach(function(r){ porRaf[String(r.raf).toUpperCase().replace(/[^A-Z0-9]/g, '')] = r; });
       _alunos = alunos.map(function(a){
@@ -584,7 +595,7 @@ function analisar(escola, prof) {
       pararEspera(); statusCard(''); btn.disabled = false;
       pinta(prof);
     });
-  }).catch(function (e) { pararEspera(); statusCard('⚠️ ' + e.message, 'err'); btn.disabled = false; });
+  }).catch(function (e) { pararEspera(); if (meu !== _vgPedido) return; statusCard('⚠️ ' + e.message, 'err'); btn.disabled = false; });
 }
 
 function daVez(){ return _alunos.filter(function(a){ return !_turmaSel || a.turma === _turmaSel; }); }
@@ -625,8 +636,14 @@ function pinta(prof){
   if (pior && pior.ab.length) f.push('🎯 <b>' + rotEixo(pior.e, 'full') + '</b> é onde mais alunos estão abaixo de 70% (' + pior.ab.length + ' de ' + ls.length + '): ' +
     pior.ab.slice(0, 6).map(function(a){ return esc(a.nome.split(' ')[0]); }).join(', ') + (pior.ab.length > 6 ? '…' : '') + '.');
   if (baixaCons.length) f.push('🧭 <b>' + baixaCons.length + '</b> com constância abaixo de 50% (faltas ou pouco estudo em casa).');
-  if (semNada.length) f.push('⚪ <b>' + semNada.length + '</b> ainda sem nenhuma atividade no portal neste estágio.');
-  $('rtFoco').innerHTML = f.length ? f.join('<br>') : '👏 Nenhum eixo com alunos abaixo do domínio. Turma em dia!';
+  /* quem são, não só quantos (auditoria de 26/10/2026): é a lista que o professor leva para a sala */
+  if (semNada.length) f.push('⚪ <b>' + semNada.length + '</b> ainda sem nenhuma atividade no portal neste estágio: ' +
+    semNada.slice(0, 8).map(function(a){ return esc(String(a.nome).split(' ')[0]); }).join(', ') + (semNada.length > 8 ? '…' : '') + '.');
+  /* e a conversa com o Buddy já começa sobre esta turma */
+  var alvoBuddy = _turmaSel ? 'a turma ' + String(_turmaSel).split('\n')[0] : 'as minhas turmas';
+  var pergBuddy = 'Em que habilidade ' + alvoBuddy + ' está mais fraca, quem precisa de atenção primeiro e o que eu faço na próxima aula?';
+  $('rtFoco').innerHTML = (f.length ? f.join('<br>') : '👏 Nenhum eixo com alunos abaixo do domínio. Turma em dia!') +
+    '<div style="margin-top:.7rem"><a class="btn-buddy-radar" href="buddy.html#pergunta=' + encodeURIComponent(pergBuddy) + '">💬 Perguntar ao Buddy sobre ' + esc(_turmaSel ? 'esta turma' : 'as suas turmas') + '</a></div>';
 
   /* cada aluno em miniatura, o mais fraco em cima: é quem pede atenção primeiro */
   var ord = ls.slice().sort(function(a, b){

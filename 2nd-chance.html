@@ -505,7 +505,10 @@ function renderLista() {
   });
   $('lista').innerHTML = html || '<p class="sub">Ninguém precisa de 2nd chance nesta avaliação. Desmarque o filtro para ver todos.</p>';
   $('lista').querySelectorAll('.aluno').forEach(function (el) {
-    el.addEventListener('click', function () {
+    el.addEventListener('click', function (ev) {
+      /* o nome é link do dossiê: abre a gaveta (fiskLigarAcompanhamento) e não escolhe o aluno. Antes o link
+         tinha stopPropagation, que barrava a gaveta: a página saía para o dossiê e o formulário se perdia. */
+      if (ev.target.closest('a.dossie-link')) return;
       $('lista').querySelectorAll('.aluno').forEach(function (x) { x.classList.remove('sel'); });
       el.classList.add('sel');
       escolherAluno(alunos[+el.dataset.i]);
@@ -532,7 +535,7 @@ function nomeComDossie(nome) {
   var url = (typeof fiskLinkDossie === 'function') ? fiskLinkDossie(IDX_ALUNOS, nome) : '';
   if (!url) return seguro;
   return '<a class="dossie-link" href="' + url + '" title="Ver o acompanhamento deste aluno" ' +
-         'onclick="event.stopPropagation()">' + seguro + '</a>';
+         '>' + seguro + '</a>';
 }
 
 /* ============ ALUNO ESCOLHIDO ============ */
@@ -541,7 +544,7 @@ function escolherAluno(a) {
   /* linhaCard e idx (última aula feita) vêm junto: são o endereço da célula
      onde o "Lançar no card" escreve a nota do documento. */
   alunoSel = { nome: a.nome, estagio: a.book || '', escrita: p.escrita, auditiva: p.auditiva,
-               linhaCard: (a.linhaCard == null ? null : a.linhaCard),
+               linhaCard: (a.linhaCard == null ? null : a.linhaCard), raf: a.raf || '',
                idx: (a.ultimaPresencaIdx == null ? null : a.ultimaPresencaIdx) };
   modoLivre = false;
   $('camposLivre').hidden = true;
@@ -700,6 +703,8 @@ $('btnLivre').addEventListener('click', function () {
   $('msg').value = montarMensagem();
   $('painelAluno').hidden = false;
   ultimoPDF = null; esconderPreview(); esconderVerPasta(); statusDoc(''); syncAcoes();
+  /* as sugestões do aluno anterior também não podem ir para o PDF do manual (auditoria de 26/10/2026) */
+  renderSugestoes(); if ($('sugLivre')) $('sugLivre').value = '';
   /* De onde ele estava: entra no aviso para a secretaria saber onde procurar
      o aluno. `turma` é o payload da turma carregada, quando havia uma. */
   ONDE_ESTAVA = turma ? { escola: turma.escola, prof: turma.aba || turma.professor,
@@ -881,11 +886,13 @@ async function gerarPDF() {
     /* para o botão "Enviar à família pela secretaria" (assets/fisk-imprimir.js): é com escola, professor e linha do card
        que a secretaria acha o responsável e o WhatsApp. Termo livre (sem card) vai sem: ela procura o contato à mão. */
     try {
-      var _sT = document.getElementById('selTurma');
-      window.FISK_VINCULO = (!modoLivre && alunoSel && alunoSel.linhaCard != null)
-        ? { escola: document.getElementById('selEscola').value, professor: document.getElementById('selProf').value,
-            turma: _sT && _sT.selectedOptions && _sT.selectedOptions[0] ? _sT.selectedOptions[0].text : '',
-            linha: alunoSel.linhaCard, nome: alunoSel.nome } : null;
+      /* O vínculo sai da TURMA CARREGADA, não dos selects (auditoria de 26/10/2026): no modo logado os selects de
+         escola e professor ficam escondidos e vazios, e o pedido chegava à secretaria sem escola, professor nem RAF
+         (o responsável não era achado, e professor das duas escolas mandava para a secretaria errada). */
+      window.FISK_VINCULO = (!modoLivre && alunoSel && alunoSel.linhaCard != null && turma)
+        ? { escola: turma.escola || $('selEscola').value, professor: turma.aba || turma.professor || $('selProf').value,
+            turma: String(turma.turma || '').split('\n')[0], linha: alunoSel.linhaCard, nome: alunoSel.nome,
+            raf: alunoSel.raf || '' } : null;
     } catch (e) { window.FISK_VINCULO = null; }
     esconderVerPasta();          // a pasta ainda não recebeu ESTE arquivo
     mostrarPreview(url);

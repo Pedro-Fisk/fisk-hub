@@ -10,7 +10,7 @@ Google Apps Script.
 | | |
 |---|---|
 | `index.html` | home do Hub: login do professor, cards das ferramentas |
-| `planejador.html` | plano de aula + PDF (pdf-lib) + "Conversação do dia" |
+| `planejador.html` | **aposentado em 26/10/2026**: só encaminha para a `turma-de-hoje.html` levando o `#t=escola\|prof\|linha` (o link da célula e a barra lateral do card apontam para ele). Código antigo no git, commit `90da348` |
 | `2nd-chance.html`, `termo-atraso.html` | documentos em PDF do aluno, com "Salvar na pasta do aluno" |
 | `boletins.html`, `met.html`, `siele.html`, `quick-practice.html` | atalhos para ferramentas que vivem em **outros repositórios** |
 | `answer-keys*.html`, `treinamentos.html`, `visao-geral.html`, `acessos.html` | consulta e material do professor |
