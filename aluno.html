@@ -234,6 +234,18 @@
   body.theme-dark .curso-b.on{ color:var(--white); }
   body.theme-dark .painel{ background:#1e1c1c; }
   body.theme-dark .ativ-top{ background:#1e1c1c; }
+  /* os simulados do MET: um cartão por tentativa, feito para o professor fotografar e mandar ao aluno */
+  .sim{ border:1px solid var(--blue-line); border-radius:12px; padding:.6rem .8rem; margin-top:.5rem; }
+  .sim-h{ display:flex; flex-wrap:wrap; align-items:baseline; gap:.2rem .7rem; }
+  .sim-h b{ font-family:var(--font-heading); }
+  .sim-h .q{ color:var(--gray); font-size:.82rem; }
+  .sim-h .tot{ margin-left:auto; font-weight:800; }
+  .sim-sec{ display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:.4rem; margin-top:.45rem; }
+  .sim-sec div{ background:var(--blue-soft); border-radius:8px; padding:.35rem .6rem; font-size:.85rem; }
+  .sim-sec .n{ display:block; font-weight:800; font-size:1rem; }
+  .sim-sec .niv{ font-size:.75rem; color:var(--gray); }
+  body.theme-dark .sim-h b{ color:#dce7f2; }
+  body.theme-dark .sim-sec div{ background:#262323; color:#e6e1e1; }
   body.theme-dark .aluno-head .nome{ color:#dce7f2; }
   /* o radar vem do portal e fala a língua de variáveis de lá */
   #pnRadar{ --font-h:var(--font-heading); --font-b:var(--font-body); --surface:var(--white); --surface-2:var(--ui-soft,#e9eff5);
@@ -311,6 +323,17 @@
        (portalfisk.com.br/assets/radar.js, em modo professor). Abaixo dele fica o que prova o radar: a
        lista do que ele fez, o que ouviu e as gravações. -->
   <div id="pnRadar" hidden></div>
+
+  <!-- Os simulados do MET em quadro próprio (26/10/2026, pedido do Alex): o professor achava o
+       "Treino MET 24%" no radar e não achava o simulado no meio da lista de Quick Practice. Aqui
+       fica cada simulado com a nota por seção, pronto para fotografar e mostrar ao aluno. Nunca
+       as respostas: o aluno fotografa e o gabarito vaza. -->
+  <div class="painel" id="pnSim" hidden>
+    <h2>🏁 Simulados do MET</h2>
+    <p class="sub">Cada simulado que o aluno fez no Treino MET, com o acerto por seção
+      e o nível estimado. Dá para fotografar e mandar ao aluno: aqui não aparece nenhuma resposta.</p>
+    <div id="alSim"></div>
+  </div>
 
   <div class="painel" id="pnAtiv" hidden>
     <h2>🎬 O que o aluno fez</h2>
@@ -653,6 +676,7 @@ function render(d){
 
   if (st.name && !_radarAluno.name) _radarAluno.name = st.name;
   renderAtividades(fundir(ativ, d.provas || []));
+  renderSimulados(d.provas || []);
   renderPassivo(d.passivo);
   renderFala(d.fala);
   $('btnPasta').hidden = (d.escopo !== 'equipe');   // a pasta é do professor, não do aluno
@@ -714,6 +738,48 @@ function fundir(ativ, provas) {
     a.vezes = a.tentativas.length || a.vezes;
     return a;
   }).sort(function (a, b) { return (b.ultima || 0) - (a.ultima || 0); });
+}
+
+/* Os simulados do MET, um cartão por tentativa, do mais recente ao mais antigo.
+ * A seção sai do tópico de cada questão ("Listening · Detalhe", "Reading · Inferência");
+ * o que não é de nenhuma das duas é gramática. O nível vem do escore em escala 80 que o
+ * próprio simulador calculou (L e R), com a régua dele (cefr.bands, igual nas cinco cores);
+ * a seção que o mini simulado não cobriu fica sem nível. */
+var MET_FAIXAS = [[64,'C1'],[53,'B2'],[40,'B1'],[27,'A2'],[0,'abaixo de A2']];
+function metNivel(v){
+  if (v === '' || v == null || isNaN(v)) return '';
+  for (var i = 0; i < MET_FAIXAS.length; i++) if (Number(v) >= MET_FAIXAS[i][0]) return MET_FAIXAS[i][1];
+  return '';
+}
+function renderSimulados(provas){
+  var sims = provas.filter(function(x){ return x && x.q && x.tool === 'met'; })
+                   .sort(function(a, b){ return (b.t||0) - (a.t||0); });
+  $('pnSim').hidden = !sims.length;
+  if (!sims.length) return;
+  $('alSim').innerHTML = sims.map(function(x){
+    var sec = { L: { c:0, q:0 }, R: { c:0, q:0 }, G: { c:0, q:0 } };
+    (x.topicos || []).forEach(function(t){
+      var k = /^Listening/.test(t.topico) ? 'L' : /^Reading/.test(t.topico) ? 'R' : 'G';
+      sec[k].c += t.c || 0; sec[k].q += t.q || 0;
+    });
+    var nivL = metNivel(x.L), nivR = metNivel(x.R);
+    function caixa(nome, s, niv, rot){
+      if (!s.q) return '';
+      var p = Math.round(s.c / s.q * 100);
+      return '<div>' + nome + '<span class="n" style="color:'+corPct(p)+'">'+s.c+' de '+s.q+' · '+p+'%</span>' +
+             (niv ? '<span class="niv">nível estimado'+(rot||'')+': <b>'+esc(niv)+'</b></span>' : '') + '</div>';
+    }
+    var pct = Math.round((x.c||0) / x.q * 100);
+    /* o nível de Reading & Grammar é um só (é assim no MET): vai na caixa de Reading,
+       ou na de Grammar quando o mini simulado só teve gramática */
+    var secs = caixa('🎧 Listening', sec.L, nivL) +
+               caixa('📖 Reading', sec.R, sec.R.q ? nivR : '', ' de R&amp;G') +
+               caixa('✏️ Grammar', sec.G, sec.R.q ? '' : nivR, ' de R&amp;G');
+    return '<div class="sim"><div class="sim-h"><b>'+esc(x.s || 'Simulado')+'</b>' +
+      '<span class="q">'+dataHora(x.t)+'</span>' +
+      '<span class="tot" style="color:'+corPct(pct)+'">'+x.c+' de '+x.q+' · '+pct+'%</span></div>' +
+      (secs ? '<div class="sim-sec">'+secs+'</div>' : '') + '</div>';
+  }).join('');
 }
 
 function renderAtividades(ativ){

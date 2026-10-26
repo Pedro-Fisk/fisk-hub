@@ -136,7 +136,9 @@
   .final.pass{ background: #e3f5e8; color: #1f6b35; }
   .final.nopass{ background: #fdeaea; color: #a11a1a; }
   .erros{ font-size: .88rem; margin-top: .7rem; line-height: 1.6; }
-  .erros span{ display: inline-block; background: #fdf1f1; border-radius: 6px; padding: 0 .35rem; margin: 0 .2rem .2rem 0; }
+  /* a cor do texto é fixa: herdada do tema, ficava branca sobre o rosa no modo escuro e as etiquetas pareciam vazias */
+  .erros span{ display: inline-block; background: #fdf1f1; color: #7a1414; border-radius: 6px; padding: 0 .35rem; margin: 0 .2rem .2rem 0; }
+  body.theme-dark .erros span{ background: #3a1c1c; color: #ffd6d6; }
 
   /* a tabela SCORE, igual à impressa na frente da folha */
   .copie{ display: flex; gap: .6rem; align-items: flex-start; background: #fff8e1; border: 2px solid #f2c230; border-radius: 12px; padding: .7rem .9rem; margin: .9rem 0 .5rem; font-weight: 700; color: #6b4d0f; }
