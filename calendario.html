@@ -11,7 +11,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <script src="assets/fisk-shared.js?v=2026-10-26a"></script>
 <style>
-  :root{ --hora: 52px; --cal-linha: var(--ui-line, #dfe6ef); --cal-fundo: var(--white, #fff); --cal-hoje: #fff7e6; --agora: #e11d48; }
+  :root{ --hora: 34px; --cal-linha: var(--ui-line, #dfe6ef); --cal-fundo: var(--white, #fff); --cal-hoje: #fff7e6; --agora: #e11d48; }
   body.theme-dark{ --cal-linha: #2f3a48; --cal-hoje: #2a2412; }
   [hidden]{ display: none !important; }
   main{ max-width: 1240px; margin: 0 auto; padding: 1rem; width: 100%; box-sizing: border-box; }
@@ -57,7 +57,10 @@
   .ev .h{ font-weight: 800; display: block; }
   .ev .t{ font-weight: 700; display: block; }
   .ev .m{ display: block; opacity: .85; }
-  .ev.plantao{ background: repeating-linear-gradient(45deg, var(--ev-fundo), var(--ev-fundo) 6px, transparent 6px, transparent 12px); border-left-style: dashed; }
+  /* AS CORES (Pedro, 26/10/2026): toda turma no mesmo azul, o espanhol com a borda laranja, a tutoria (plantão/LC) num azul
+     mais claro e a experimental solta em roxo. Nada tracejado: tracejado lia como "a confirmar". */
+  .ev.plantao{ --ev-fundo: #f0f7ff; --ev-tx: #1e4e7a; }
+  body.theme-dark .ev.plantao{ --ev-fundo: #18273a; --ev-tx: #cfe3f7; }
   .ev.semaula{ text-decoration: line-through; opacity: .55; }
   .ev.exp{ --ev-cor: #7c3aed; --ev-fundo: #f1e9ff; --ev-tx: #4c1d95; }
   body.theme-dark .ev{ --ev-fundo: #1d2a3b; --ev-tx: #dbe6f3; }
@@ -81,7 +84,8 @@
   .cartao .tt{ font-weight: 800; }
   .cartao .mm{ font-size: .8rem; color: var(--gray); }
   .cartao.semaula{ opacity: .55; text-decoration: line-through; }
-  .cartao.plantao{ border-left-style: dashed; }
+  .cartao.plantao{ background: #f0f7ff; }
+  body.theme-dark .cartao.plantao{ background: #18273a; }
   .cartao.exp{ --ev-cor: #7c3aed; }
   .selo{ display: inline-block; font-size: .72rem; font-weight: 900; border-radius: 99px; padding: .05rem .45rem; margin: .15rem .25rem 0 0; color: #fff; background: #64748b; }
   .selo.aniv{ background: linear-gradient(90deg, #f59e0b, #ec4899); }
@@ -178,7 +182,7 @@
  * só as aulas são obrigatórias.
  * ════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
 var EP = FISK_HUB_EP;
-var INI_H = 7, FIM_H = 22;   /* a grade vai das 7h às 22h */
+var INI_H = 8, FIM_H = 22;   /* a grade vai das 8h às 22h: a primeira aula da semana é 8h30 e a de sábado, 8h (Pedro, 26/10/2026) */
 var DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'], DIAS_LC = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
 var dados = { turmas: [], semHorario: [], cal: [], lc: [], exps: [], anivs: [] };
 var segunda = inicioDaSemana(new Date()), diaSel = new Date();
@@ -214,14 +218,13 @@ function nomeCurto(t) {
   return partes.join(' - ') || linha1(t);
 }
 
-/* a cor de cada turma, pelo livro da maioria (a mesma família de cores dos estágios) */
-var CORES = [[/kids|playground|fun at school|tots/i, '#db2777'], [/teens/i, '#0d9488'], [/essentials/i, '#2563eb'], [/transitions/i, '#7c3aed'],
-             [/fluency/i, '#ea580c'], [/focus/i, '#16a34a'], [/pathways|advanced|avan/i, '#b45309'], [/inmediato|español|espanhol|nivel/i, '#dc2626']];
+/* a cor (Pedro, 26/10/2026): toda turma em azul; o espanhol, pelo livro da maioria, com a borda laranja; a tutoria, azul claro */
+var COR_AULA = '#2563eb', COR_ESPANHOL = '#ea580c', COR_TUTORIA = '#60a5fa';
 function corDaTurma(t) {
+  if (ehPlantao(t.titulo)) return COR_TUTORIA;
   var conta = {}; (t.alunos || []).forEach(function (a) { if (a.book) conta[a.book] = (conta[a.book] || 0) + 1; });
   var livro = Object.keys(conta).sort(function (a, b) { return conta[b] - conta[a]; })[0] || t.titulo;
-  for (var i = 0; i < CORES.length; i++) if (CORES[i][0].test(livro)) return CORES[i][1];
-  return '#3c6e98';
+  return /inmediato|español|espanhol|nivel|con[eé]ctate/i.test(livro) ? COR_ESPANHOL : COR_AULA;
 }
 
 /* ── chamadas ao servidor ── */
@@ -301,7 +304,7 @@ function eventosDoDia(d) {
   dados.lc.forEach(function (it) {
     if (it.dia !== DIAS_LC[wd]) return;
     var ini = minDe(it.inicio), fim = minDe(it.fim); if (ini == null) return;
-    evs.push({ tipo: 'plantao', ini: ini, fim: fim || ini + 75, titulo: 'Plantão de dúvidas' + (it.modalidade ? ' · ' + it.modalidade : ''), lc: it, semaula: fer, cor: '#0891b2', anivs: [], exps: [] });
+    evs.push({ tipo: 'plantao', ini: ini, fim: fim || ini + 75, titulo: 'Plantão de dúvidas' + (it.modalidade ? ' · ' + it.modalidade : ''), lc: it, semaula: fer, cor: COR_TUTORIA, anivs: [], exps: [] });
   });
   /* experimental sem turma reconhecida vira bloco próprio, na hora marcada */
   exps.forEach(function (x) {
@@ -356,7 +359,7 @@ function desenhar() {
     h += '<div class="g-faixas">' + fx.join('') + '</div>';
   });
   h += '<div class="g-horas">'; for (var hh = INI_H; hh < FIM_H; hh++) h += '<div>' + hh + 'h</div>'; h += '</div>';
-  var alturaH = 52;
+  var alturaH = 34;   /* o mesmo --hora do CSS: a semana inteira cabe na tela (Pedro, 26/10/2026) */
   idx.forEach(function (i) {
     var d = dias[i], ehHoje = iso(d) === hoje;
     h += '<div class="g-col' + (ehHoje ? ' hoje' : '') + '" style="height:' + ((FIM_H - INI_H) * alturaH) + 'px">';
@@ -396,14 +399,20 @@ function abreGaveta(k) {
   var e = x.e, d = x.d, dataTxt = DIAS[d.getDay()] + ' ' + ('0' + d.getDate()).slice(-2) + '/' + ('0' + (d.getMonth() + 1)).slice(-2);
   var h = '<h3 id="gavTit">' + esc(e.turma ? e.turma.titulo : e.titulo) + '</h3><div class="sub">' + dataTxt + ' · ' + hm(e.ini) + ' às ' + hm(e.fim) + (e.semaula ? ' · <b style="color:var(--red)">feriado: sem aula</b>' : '') + '</div>';
   if (e.anivs && e.anivs.length) h += '<div class="bloco"><b class="tit">🎂 Aniversário neste dia</b><ul>' + e.anivs.map(function (a) { return '<li><b>' + esc(a.nome) + '</b></li>'; }).join('') + '</ul></div>';
-  if (e.exps && e.exps.length) h += '<div class="bloco"><b class="tit">🧪 Aula experimental</b><ul>' + e.exps.map(function (x2) {
-    return '<li><b>' + esc(x2.nome) + '</b>' + (x2.idade ? ', ' + esc(x2.idade) + ' anos' : '') + (x2.hora ? ' · ' + esc(x2.hora) : '') + (x2.curso ? ' · ' + esc(x2.curso) : '') + (x2.situacao && x2.situacao !== 'agendada' ? ' · ' + esc(x2.situacao.replace('_', ' ')) : '') + '</li>';
-  }).join('') + '</ul></div>';
+  /* a experimental com tudo o que a secretaria preencheu no portal (Pedro, 26/10/2026) */
+  var SIT = { agendada: 'agendada', veio: 'veio', nao_veio: 'não veio', fechou: 'matriculou', nao_fechou: 'não matriculou' };
+  if (e.exps && e.exps.length) h += '<div class="bloco"><b class="tit">🧪 Aula experimental</b>' + e.exps.map(function (x2) {
+    var lin = function (r, v) { return v ? '<li><span style="color:var(--gray)">' + r + ':</span> ' + esc(v) + '</li>' : ''; };
+    return '<p style="margin:.2rem 0 .3rem;font-weight:800">' + esc(x2.nome) + '</p><ul style="list-style:none;padding:0;margin:0 0 .6rem">' +
+      lin('Idade', x2.idade && /^\d+$/.test(x2.idade) ? x2.idade + ' anos' : x2.idade) + lin('Horário', x2.hora) + lin('Turma', linha1(x2.turma)) + lin('Curso', x2.curso) +
+      lin('Responsável', x2.responsavel) + lin('Telefone', x2.telefone) + lin('Como conheceu a Fisk', x2.origem) + lin('Observação', x2.obs) +
+      lin('Agendada por', x2.vendedora) + lin('Situação', SIT[x2.situacao] || x2.situacao) + lin('Motivo', x2.motivo) + '</ul>';
+  }).join('') + '</div>';
   if (e.turma) {
     var t = e.turma;
     h += '<div class="bloco"><b class="tit">👥 Alunos (' + t.alunos.length + ')</b><ul>' + t.alunos.map(function (a) {
       var nome = esc(String(a.nome).replace(/\([^)]*\)/g, '').trim());
-      return '<li>' + (a.raf ? '<a class="dossie-link" href="aluno.html?raf=' + encodeURIComponent(a.raf) + '" data-raf="' + esc(a.raf) + '" data-nome="' + nome + '">' + nome + '</a>' : nome) +
+      return '<li>' + nome +   /* sem o radar de cada aluno (Pedro, 26/10/2026): demorava e ninguém abria */
         (a.book ? ' <small style="color:var(--gray)">· ' + esc(a.book) + '</small>' : '') + (Number(a.aulasAtraso) >= 4 ? ' <small style="color:var(--red);font-weight:800">· ' + a.aulasAtraso + ' aulas atrás</small>' : '') + '</li>';
     }).join('') + '</ul>';
     h += '<a class="abrir-aula" href="turma-de-hoje.html#t=' + encodeURIComponent(t.escola + '|' + t.prof + '|' + t.linha) + '">Abrir na Minha aula →</a></div>';
@@ -419,7 +428,6 @@ document.addEventListener('click', function (ev) {
   var t = ev.target.closest('[data-dia]'); if (t) { diaSel = somaDias(segunda, +t.dataset.dia); desenhar(); }
 });
 document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') $('gav').hidden = true; });
-if (typeof fiskLigarAcompanhamento === 'function') fiskLigarAcompanhamento(document, 'a.dossie-link');
 $('ant').addEventListener('click', function () { segunda = somaDias(segunda, -7); diaSel = somaDias(diaSel, -7); desenhar(); });
 $('prox').addEventListener('click', function () { segunda = somaDias(segunda, 7); diaSel = somaDias(diaSel, 7); desenhar(); });
 $('hoje').addEventListener('click', function () { segunda = inicioDaSemana(new Date()); diaSel = new Date(); desenhar(); });
