@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="assets/casa-tema.css?v=9">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
-<script src="assets/fisk-shared.js?v=2026-10-27a"></script>
+<script src="assets/fisk-shared.js?v=2026-10-27b"></script>
 <style>
   :root{ --hora: 34px; --cal-linha: var(--ui-line, #dfe6ef); --cal-fundo: var(--white, #fff); --cal-hoje: #fff7e6; --agora: #e11d48; }
   body.theme-dark{ --cal-linha: #2f3a48; --cal-hoje: #2a2412; --cal-fundo: var(--white); }   /* o --white escuro mora no body, não no :root */
@@ -251,6 +251,57 @@
              font-size: .9rem; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,.3); display: flex; gap: .9rem; align-items: center; max-width: calc(100vw - 32px); }
   .ag-toast button{ background: transparent; border: 0; color: #93c5fd; font-weight: 900; font-family: inherit; cursor: pointer; font-size: .9rem; }
   @media (max-width: 640px){ .ag-toast{ bottom: 92px; } }
+  /* ── AS QUATRO ESTÉTICAS EM PROVA (27/10/2026): ?estilo=1..4 até o Pedro escolher uma. Em todas, o cabeçalho dos
+     dias é colorido e o fundo do painel é cinza claro. A cor de cada dia mora no data-wd. ── */
+  [data-wd="1"]{ --dia-claro: #ffdfe4; --dia-forte: #e11d48; }
+  [data-wd="2"]{ --dia-claro: #ffe6cc; --dia-forte: #ea580c; }
+  [data-wd="3"]{ --dia-claro: #fff1a8; --dia-forte: #b98900; }
+  [data-wd="4"]{ --dia-claro: #d5f5de; --dia-forte: #16a34a; }
+  [data-wd="5"]{ --dia-claro: #d8e8ff; --dia-forte: #2563eb; }
+  [data-wd="6"]{ --dia-claro: #ebe0ff; --dia-forte: #7c3aed; }
+  [data-wd="0"]{ --dia-claro: #e5e7eb; --dia-forte: #6b7280; }
+  body.theme-dark [data-wd]{ --dia-claro: color-mix(in srgb, var(--dia-forte) 26%, #1b1b1b); }
+  body[class*="est-"] #painelCal{ background: #f1f3f6; }
+  body.theme-dark[class*="est-"] #painelCal{ background: #151313; }
+  /* 1. arco-íris pastel: cada dia com a sua cor, e a aula do dia na mesma cor */
+  .est-1 .g-cab[data-wd]{ background: var(--dia-claro); }
+  .est-1 .g-cab[data-wd], .est-1 .g-cab[data-wd] b{ color: var(--dia-forte); }
+  .est-1 .g-cab.hoje b{ background: var(--dia-forte); color: #fff; }
+  .est-1 .g-faixas[data-wd]{ background: color-mix(in srgb, var(--dia-claro) 40%, transparent); }
+  .est-1 .g-col .ev:not(.meu){ --ev-cor: var(--dia-forte); --ev-fundo: var(--dia-claro); --ev-tx: #2b2b2b; }
+  body.theme-dark.est-1 .g-col .ev:not(.meu){ --ev-tx: #f3f3f3; }
+  /* 2. azul Fisk: a faixa dos dias em azul-marinho, hoje em amarelo */
+  .est-2 .g-cab{ background: #1f3a5f; color: #b9cde4; border-color: #1f3a5f; }
+  .est-2 .g-cab b{ color: #fff; }
+  .est-2 .g-cab.hoje b{ background: #facc15; color: #1f3a5f; }
+  .est-2 .g-col.hoje{ background-color: #fffbe6; }
+  body.theme-dark.est-2 .g-col.hoje{ background-color: #2a2412; }
+  .est-2 .g-col .ev.aula{ --ev-fundo: #e3edfa; }
+  body.theme-dark.est-2 .g-col .ev.aula{ --ev-fundo: #1d2a3b; }
+  /* 3. abas de fichário: cada dia é uma aba colorida; as aulas parecem post-its */
+  .est-3 .grade{ border: 0; background: transparent; overflow: visible; column-gap: 5px; }
+  .est-3 .g-cab{ border: 0; }
+  .est-3 .g-cab[data-wd]{ background: var(--dia-forte); color: rgba(255,255,255,.85); border-radius: 14px 14px 0 0; }
+  .est-3 .g-cab[data-wd] b{ color: #fff; }
+  .est-3 .g-cab.hoje b{ background: #fff; color: var(--dia-forte); }
+  .est-3 .g-faixas{ border-left: 0; }
+  .est-3 .g-faixas[data-wd]{ background: var(--dia-claro); border-bottom: 0; }
+  .est-3 .g-col{ background-color: var(--cal-fundo); border-left: 0; box-shadow: inset 0 3px 0 var(--dia-claro); border-radius: 0 0 10px 10px; }
+  .est-3 .g-col.hoje{ background-color: var(--cal-hoje); }
+  .est-3 .g-col .ev:not(.meu){ --ev-fundo: #fff6b3; --ev-tx: #423b0f; border-left: 0; border-radius: 3px 3px 12px 3px; box-shadow: 0 3px 7px rgba(0,0,0,.16); transform: rotate(-.7deg); }
+  .est-3 .g-col .ev.plantao{ --ev-fundo: #d9f0ff; --ev-tx: #123c5c; }
+  .est-3 .g-col .ev.exp{ --ev-fundo: #efe2ff; }
+  body.theme-dark.est-3 .g-col .ev:not(.meu){ --ev-fundo: #4a4313; --ev-tx: #fff7c2; }
+  /* 4. colunas-cartão: cada dia é um cartão branco com a barra da cor do dia em cima */
+  .est-4 .grade{ border: 0; background: transparent; overflow: visible; column-gap: 8px; }
+  .est-4 .g-cab{ border: 0; }
+  .est-4 .g-cab[data-wd], .est-4 .g-faixas[data-wd], .est-4 .g-col{ background-color: var(--cal-fundo); border-left: 1px solid var(--cal-linha); border-right: 1px solid var(--cal-linha); }
+  .est-4 .g-cab[data-wd]{ border-top: 5px solid var(--dia-forte); border-radius: 14px 14px 0 0; color: var(--dia-forte); font-weight: 800; }
+  .est-4 .g-cab.hoje b{ background: var(--dia-forte); }
+  .est-4 .g-faixas{ border-left: 0; }
+  .est-4 .g-col{ border-bottom: 1px solid var(--cal-linha); border-radius: 0 0 14px 14px; box-shadow: 0 6px 14px rgba(15,23,42,.06); }
+  .est-4 .g-col.hoje{ background-color: var(--cal-hoje); }
+  .est-4 .g-col .ev:not(.meu){ border-radius: 10px; box-shadow: 0 2px 6px rgba(15,23,42,.1); }
 </style>
 </head>
 <body>
@@ -259,6 +310,9 @@
    cabeçalho e sem a moldura do painel; os links saem para a página de fora (base target=_top), para o "Abrir na
    Minha aula" levar o Hub inteiro à turma. */
 var EMBED = /[?&]embed=1/.test(location.search);
+/* as estéticas em prova (27/10/2026): ?estilo=1..4, até o Pedro escolher */
+var ESTILO = (/[?&]estilo=([1-4])/.exec(location.search) || [])[1];
+if (ESTILO) document.body.classList.add('est-' + ESTILO);
 if (EMBED) { document.body.classList.add('embed'); var bse = document.createElement('base'); bse.target = '_top'; document.head.appendChild(bse); }
 </script>
 
@@ -528,7 +582,7 @@ function desenhar() {
   var cols = celular() ? [iSel] : idx, alturaH = altH();
   var g = $('grade'); g.style.setProperty('--ndias', cols.length); g.style.setProperty('--hora', alturaH + 'px');
   var h = '<div class="g-cab"></div>';
-  cols.forEach(function (i) { var d = dias[i]; h += '<div class="g-cab' + (iso(d) === hoje ? ' hoje' : '') + '">' + DIAS[d.getDay()] + '<b>' + d.getDate() + '</b></div>'; });
+  cols.forEach(function (i) { var d = dias[i]; h += '<div class="g-cab' + (iso(d) === hoje ? ' hoje' : '') + '" data-wd="' + d.getDay() + '">' + DIAS[d.getDay()] + '<b>' + d.getDate() + '</b></div>'; });
   h += '<div class="g-faixas" style="border-left:0"></div>';
   cols.forEach(function (i) {
     var d = dias[i], fx = diaInteiro(d).map(function (it) { return '<span class="faixa ' + esc(it.tipo) + '" title="' + esc(it.titulo) + '">' + esc(it.titulo) + '</span>'; });
@@ -538,12 +592,12 @@ function desenhar() {
       var k = EVS.push({ e: { tipo: 'meu', titulo: o.titulo, cor: o.cor || AG_COR, ag: o }, d: d }) - 1;
       fx.push('<span class="faixa meu" role="button" tabindex="0" data-ag="' + k + '" style="--ev-cor:' + esc(o.cor || AG_COR) + '" title="' + esc(o.titulo) + '">' + esc(o.titulo) + '</span>');
     });
-    h += '<div class="g-faixas" data-d="' + iso(d) + '">' + fx.join('') + '</div>';
+    h += '<div class="g-faixas" data-d="' + iso(d) + '" data-wd="' + d.getDay() + '">' + fx.join('') + '</div>';
   });
   h += '<div class="g-horas">'; for (var hh = INI_H; hh < FIM_H; hh++) h += '<div>' + hh + 'h</div>'; h += '</div>';
   cols.forEach(function (i) {
     var d = dias[i], ehHoje = iso(d) === hoje;
-    h += '<div class="g-col' + (ehHoje ? ' hoje' : '') + '" data-d="' + iso(d) + '" style="height:' + ((FIM_H - INI_H) * alturaH) + 'px">';
+    h += '<div class="g-col' + (ehHoje ? ' hoje' : '') + '" data-d="' + iso(d) + '" data-wd="' + d.getDay() + '" style="height:' + ((FIM_H - INI_H) * alturaH) + 'px">';
     porDia[i].forEach(function (e) {
       var k = EVS.push({ e: e, d: d }) - 1;
       var top = Math.max(0, (e.ini - INI_H * 60) / 60 * alturaH), alt = Math.max(22, (e.fim - e.ini) / 60 * alturaH - 2);
