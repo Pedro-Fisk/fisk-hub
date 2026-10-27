@@ -166,6 +166,11 @@
   .ev.meu.fantasma{ box-shadow: 0 8px 22px rgba(0,0,0,.28); z-index: 6; pointer-events: none; }
   body.theme-dark .ev.meu{ --ev-fundo: var(--ev-cor); --ev-tx: #fff; }
   .faixa.meu{ background: var(--ev-cor); cursor: pointer; }
+  .ev.meu.ro{ cursor: pointer; background-image: repeating-linear-gradient(135deg, rgba(255,255,255,.14) 0 6px, transparent 6px 12px); }
+  .ev.meu.ocupado{ opacity: .75; }
+  .bal .tit.loc{ font-size: .95rem; padding: .3rem .1rem; margin: 0; border-bottom-width: 1px; }
+  .ed .turmas-ed{ display: flex; flex-direction: column; gap: .15rem; margin-top: .35rem; }
+  .ed .turmas-ed .chk{ font-weight: 600; font-size: .88rem; }
   .g-faixas[data-d]{ cursor: default; }
   .cartao.meu{ border-left-color: var(--ev-cor); }
   .cartao.meu .tt::before{ content: ''; display: inline-block; width: .6rem; height: .6rem; border-radius: 3px; background: var(--ev-cor); margin-right: .35rem; }
@@ -251,8 +256,9 @@
              font-size: .9rem; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,.3); display: flex; gap: .9rem; align-items: center; max-width: calc(100vw - 32px); }
   .ag-toast button{ background: transparent; border: 0; color: #93c5fd; font-weight: 900; font-family: inherit; cursor: pointer; font-size: .9rem; }
   @media (max-width: 640px){ .ag-toast{ bottom: 92px; } }
-  /* ── AS QUATRO ESTÉTICAS EM PROVA (27/10/2026): ?estilo=1..4 até o Pedro escolher uma. Em todas, o cabeçalho dos
-     dias é colorido e o fundo do painel é cinza claro. A cor de cada dia mora no data-wd. ── */
+  /* ── A ESTÉTICA DAS COLUNAS-CARTÃO (escolhida pelo Pedro em 27/10/2026, entre quatro provas): cada dia é um cartão
+     com a barra da cor do dia em cima, o nome do dia na mesma cor e o fundo do painel cinza claro. A cor de cada dia
+     mora no data-wd. ── */
   [data-wd="1"]{ --dia-claro: #ffdfe4; --dia-forte: #e11d48; }
   [data-wd="2"]{ --dia-claro: #ffe6cc; --dia-forte: #ea580c; }
   [data-wd="3"]{ --dia-claro: #fff1a8; --dia-forte: #b98900; }
@@ -261,47 +267,17 @@
   [data-wd="6"]{ --dia-claro: #ebe0ff; --dia-forte: #7c3aed; }
   [data-wd="0"]{ --dia-claro: #e5e7eb; --dia-forte: #6b7280; }
   body.theme-dark [data-wd]{ --dia-claro: color-mix(in srgb, var(--dia-forte) 26%, #1b1b1b); }
-  body[class*="est-"] #painelCal{ background: #f1f3f6; }
-  body.theme-dark[class*="est-"] #painelCal{ background: #151313; }
-  /* 1. arco-íris pastel: cada dia com a sua cor, e a aula do dia na mesma cor */
-  .est-1 .g-cab[data-wd]{ background: var(--dia-claro); }
-  .est-1 .g-cab[data-wd], .est-1 .g-cab[data-wd] b{ color: var(--dia-forte); }
-  .est-1 .g-cab.hoje b{ background: var(--dia-forte); color: #fff; }
-  .est-1 .g-faixas[data-wd]{ background: color-mix(in srgb, var(--dia-claro) 40%, transparent); }
-  .est-1 .g-col .ev:not(.meu){ --ev-cor: var(--dia-forte); --ev-fundo: var(--dia-claro); --ev-tx: #2b2b2b; }
-  body.theme-dark.est-1 .g-col .ev:not(.meu){ --ev-tx: #f3f3f3; }
-  /* 2. azul Fisk: a faixa dos dias em azul-marinho, hoje em amarelo */
-  .est-2 .g-cab{ background: #1f3a5f; color: #b9cde4; border-color: #1f3a5f; }
-  .est-2 .g-cab b{ color: #fff; }
-  .est-2 .g-cab.hoje b{ background: #facc15; color: #1f3a5f; }
-  .est-2 .g-col.hoje{ background-color: #fffbe6; }
-  body.theme-dark.est-2 .g-col.hoje{ background-color: #2a2412; }
-  .est-2 .g-col .ev.aula{ --ev-fundo: #e3edfa; }
-  body.theme-dark.est-2 .g-col .ev.aula{ --ev-fundo: #1d2a3b; }
-  /* 3. abas de fichário: cada dia é uma aba colorida; as aulas parecem post-its */
-  .est-3 .grade{ border: 0; background: transparent; overflow: visible; column-gap: 5px; }
-  .est-3 .g-cab{ border: 0; }
-  .est-3 .g-cab[data-wd]{ background: var(--dia-forte); color: rgba(255,255,255,.85); border-radius: 14px 14px 0 0; }
-  .est-3 .g-cab[data-wd] b{ color: #fff; }
-  .est-3 .g-cab.hoje b{ background: #fff; color: var(--dia-forte); }
-  .est-3 .g-faixas{ border-left: 0; }
-  .est-3 .g-faixas[data-wd]{ background: var(--dia-claro); border-bottom: 0; }
-  .est-3 .g-col{ background-color: var(--cal-fundo); border-left: 0; box-shadow: inset 0 3px 0 var(--dia-claro); border-radius: 0 0 10px 10px; }
-  .est-3 .g-col.hoje{ background-color: var(--cal-hoje); }
-  .est-3 .g-col .ev:not(.meu){ --ev-fundo: #fff6b3; --ev-tx: #423b0f; border-left: 0; border-radius: 3px 3px 12px 3px; box-shadow: 0 3px 7px rgba(0,0,0,.16); transform: rotate(-.7deg); }
-  .est-3 .g-col .ev.plantao{ --ev-fundo: #d9f0ff; --ev-tx: #123c5c; }
-  .est-3 .g-col .ev.exp{ --ev-fundo: #efe2ff; }
-  body.theme-dark.est-3 .g-col .ev:not(.meu){ --ev-fundo: #4a4313; --ev-tx: #fff7c2; }
-  /* 4. colunas-cartão: cada dia é um cartão branco com a barra da cor do dia em cima */
-  .est-4 .grade{ border: 0; background: transparent; overflow: visible; column-gap: 8px; }
-  .est-4 .g-cab{ border: 0; }
-  .est-4 .g-cab[data-wd], .est-4 .g-faixas[data-wd], .est-4 .g-col{ background-color: var(--cal-fundo); border-left: 1px solid var(--cal-linha); border-right: 1px solid var(--cal-linha); }
-  .est-4 .g-cab[data-wd]{ border-top: 5px solid var(--dia-forte); border-radius: 14px 14px 0 0; color: var(--dia-forte); font-weight: 800; }
-  .est-4 .g-cab.hoje b{ background: var(--dia-forte); }
-  .est-4 .g-faixas{ border-left: 0; }
-  .est-4 .g-col{ border-bottom: 1px solid var(--cal-linha); border-radius: 0 0 14px 14px; box-shadow: 0 6px 14px rgba(15,23,42,.06); }
-  .est-4 .g-col.hoje{ background-color: var(--cal-hoje); }
-  .est-4 .g-col .ev:not(.meu){ border-radius: 10px; box-shadow: 0 2px 6px rgba(15,23,42,.1); }
+  #painelCal{ background: #f1f3f6; }
+  body.theme-dark #painelCal{ background: #151313; }
+  .grade{ border: 0; background: transparent; overflow: visible; column-gap: 8px; }
+  .g-cab{ border: 0; }
+  .g-cab[data-wd], .g-faixas[data-wd], .g-col{ background-color: var(--cal-fundo); border-left: 1px solid var(--cal-linha); border-right: 1px solid var(--cal-linha); }
+  .g-cab[data-wd]{ border-top: 5px solid var(--dia-forte); border-radius: 14px 14px 0 0; color: var(--dia-forte); font-weight: 800; }
+  .g-cab.hoje b{ background: var(--dia-forte); }
+  .g-faixas{ border-left: 0; }
+  .g-col{ border-bottom: 1px solid var(--cal-linha); border-radius: 0 0 14px 14px; box-shadow: 0 6px 14px rgba(15,23,42,.06); }
+  .g-col.hoje{ background-color: var(--cal-hoje); }
+  .g-col .ev:not(.meu){ border-radius: 10px; box-shadow: 0 2px 6px rgba(15,23,42,.1); }
 </style>
 </head>
 <body>
@@ -310,9 +286,6 @@
    cabeçalho e sem a moldura do painel; os links saem para a página de fora (base target=_top), para o "Abrir na
    Minha aula" levar o Hub inteiro à turma. */
 var EMBED = /[?&]embed=1/.test(location.search);
-/* as estéticas em prova (27/10/2026): ?estilo=1..4, até o Pedro escolher */
-var ESTILO = (/[?&]estilo=([1-4])/.exec(location.search) || [])[1];
-if (ESTILO) document.body.classList.add('est-' + ESTILO);
 if (EMBED) { document.body.classList.add('embed'); var bse = document.createElement('base'); bse.target = '_top'; document.head.appendChild(bse); }
 </script>
 
@@ -357,6 +330,7 @@ if (EMBED) { document.body.classList.add('embed'); var bse = document.createElem
 
 <button type="button" class="fab" id="fab" hidden aria-label="Criar evento" title="Criar evento">＋</button>
 <div class="bal" id="bal" hidden role="dialog" aria-label="Evento"></div>
+<datalist id="agSalas"><option value="EUA"><option value="Canadá"><option value="Nova Zelândia"><option value="Austrália"><option value="Espanha"><option value="Online"></datalist>
 <div class="dlg" id="dlg" hidden></div>
 <div class="gav" id="gav" hidden>
   <div class="fundo" data-fecha></div>
@@ -387,10 +361,13 @@ var dados = { turmas: [], semHorario: [], cal: [], lc: [], exps: [], anivs: [] }
 var segunda = inicioDaSemana(new Date()), diaSel = new Date();
 function $(id) { return document.getElementById(id); }
 function esc(s) { return fiskEsc(String(s == null ? '' : s)); }
-function sessao() { return fiskSessao() || {}; }
+/* O MODO SECRETARIA (27/10/2026): o Portal da Secretaria abre esta página numa janela (calendario.html?embed=1&sec=1)
+   e entrega a sessão da secretária por postMessage (ver "A SECRETARIA" no fim). SEC fica nulo até a mensagem chegar. */
+var SEC_MODO = EMBED && /[?&]sec=1/.test(location.search), SEC = null, SEC_COMO = null;
+function sessao() { return SEC || fiskSessao() || {}; }
 function token() { return sessao().token || ''; }
 function nP(v) { return String(v || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
-function como() { var s = sessao(); if (!s.master) return null; try { return JSON.parse(localStorage.getItem('fisk_actas') || 'null'); } catch (e) { return null; } }
+function como() { if (SEC_MODO) return SEC_COMO; var s = sessao(); if (!s.master) return null; try { return JSON.parse(localStorage.getItem('fisk_actas') || 'null'); } catch (e) { return null; } }
 function eu() { var c = como(); return (c && c.name) || sessao().name || ''; }
 function minhasEscolas() {
   var c = como(), e = (c && c.name) ? c.escolas : sessao().escolas;
@@ -773,14 +750,16 @@ function montaVerComo() {
     var ps = ((j && j.profs) || []).filter(function (p) { return !p.director && String(p.cargo || '').toLowerCase().indexOf('secret') !== 0; })
       .sort(function (a, b) { return String(a.name).localeCompare(String(b.name), 'pt-BR'); });
     var c = como(), cur = (c && c.name) || '';
-    sel.innerHTML = '<option value="">👥 Ver a semana de…</option>' + ps.map(function (p) {
+    sel.innerHTML = '<option value="">' + (SEC_MODO ? '📅 A minha agenda' : '👥 Ver a semana de…') + '</option>' + ps.map(function (p) {
       return '<option value="' + esc(p.name) + '" data-esc="' + esc(p.escolas || '') + '"' + (p.name === cur ? ' selected' : '') + '>' + esc(p.name) + '</option>';
     }).join('');
     sel.hidden = false;
   }).catch(function () {});
   sel.addEventListener('change', function () {
     var o = sel.options[sel.selectedIndex];
-    try { if (sel.value) localStorage.setItem('fisk_actas', JSON.stringify({ name: sel.value, escolas: o.getAttribute('data-esc') || '' })); else localStorage.removeItem('fisk_actas'); } catch (e) {}
+    var alvo = sel.value ? { name: sel.value, escolas: o.getAttribute('data-esc') || '' } : null;
+    if (SEC_MODO) SEC_COMO = alvo;   /* a secretária escolhe o professor só nesta janela */
+    else try { if (alvo) localStorage.setItem('fisk_actas', JSON.stringify(alvo)); else localStorage.removeItem('fisk_actas'); } catch (e) {}
     carregar();
   });
 }
@@ -794,15 +773,18 @@ function carregar() {
   try { var g = JSON.parse(localStorage.getItem('cal:turmas:' + nP(nome)) || 'null'); if (g) { dados.turmas = g.t || []; dados.semHorario = g.s || []; desenhar(); } } catch (e) {}
   var parar = fiskEsperando(function (t) { $('st').textContent = t; }, ['Lendo as suas turmas no card…', 'Ainda lendo, as duas escolas de uma vez…']);
   $('st').className = 'st';
-  Promise.all([carregaTurmas(), carregaExtras()]).then(function () {
+  var semTurmas = SEC_MODO && !como();   /* a agenda da própria secretária: ela não tem aba no card */
+  if (semTurmas) { dados.turmas = []; dados.semHorario = []; }
+  Promise.all([semTurmas ? null : carregaTurmas(), carregaExtras()]).then(function () {
     parar(); if (meu !== _pedido) return;
-    $('st').textContent = dados.turmas.length ? '' : 'Não achei turmas suas no card.';
+    $('st').textContent = dados.turmas.length || semTurmas ? '' : (SEC_MODO ? 'Não achei turmas deste professor no card.' : 'Não achei turmas suas no card.');
     desenhar();
   }).catch(function (e) {
     parar(); if (meu !== _pedido) return;
     var msg = (e && e.message) || String(e);
     $('st').className = 'st err';
-    if (/sess[ãa]o/i.test(msg)) {
+    if (/sess[ãa]o/i.test(msg) && SEC_MODO) $('st').textContent = '⚠️ A sessão venceu: saia e entre de novo no Portal da Secretaria.';
+    else if (/sess[ãa]o/i.test(msg)) {
       $('st').innerHTML = '⚠️ ' + esc(msg) + ' <a href="index.html" style="font-weight:800">Entrar de novo →</a>';
       try { localStorage.removeItem('fisk_prof'); sessionStorage.setItem('fisk_sessao_caiu', '1'); } catch (e2) {}
     } else $('st').textContent = '⚠️ ' + msg;
@@ -835,7 +817,10 @@ var DIAS_LONGO = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', '
 var MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
 var agCache = {}, agCarregando = {}, agEngoleClique = false, agFantasma = null, agAvisados = {};
 
-function agLigado() { return !!token() && !como(); }
+function agLigado() { return !!token() && (!como() || SEC_MODO); }
+/* a semana guardada é de UMA agenda: a secretária troca de professor e a semana dele é outra */
+function agK(d) { var c = SEC_MODO && como(); return iso(inicioDaSemana(d)) + '|' + (c ? nP(c.name) : ''); }
+function agPara() { var c = SEC_MODO && como(); return c ? c.name : ''; }
 function hhmm(min) { return ('0' + Math.floor(min / 60)).slice(-2) + ':' + ('0' + (min % 60)).slice(-2); }
 function dDe(t) { var p = String(t).split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
 function agDataLonga(t) { var d = dDe(t); return DIAS_LONGO[d.getDay()].replace(/^./, function (c) { return c.toUpperCase(); }) + (d.getDay() % 6 ? '-feira' : '') + ', ' + d.getDate() + ' de ' + MESES[d.getMonth()]; }
@@ -848,11 +833,11 @@ function agQuando(o) {
 function agGaranteSemana() {
   $('btCriar').hidden = $('fab').hidden = !agLigado();
   if (!agLigado()) return;
-  var k = iso(segunda); if (agCache[k] || agCarregando[k]) return;
+  var k = agK(segunda); if (agCache[k] || agCarregando[k]) return;
   agCarregando[k] = true;
-  post({ action: 'agendaListar', de: k, ate: iso(somaDias(segunda, 6)) }).then(function (j) {
+  post({ action: 'agendaListar', de: iso(segunda), ate: iso(somaDias(segunda, 6)), para: agPara() }).then(function (j) {
     agCache[k] = j.eventos || []; agCarregando[k] = false;
-    if (k === iso(segunda)) desenhar();
+    if (k === agK(segunda)) desenhar();
     agLembretes();
   }).catch(function (e) { agCarregando[k] = false; console.warn('agenda', e); });
 }
@@ -860,7 +845,7 @@ function agRecarrega() { agCache = {}; agCarregando = {}; agGaranteSemana(); }
 function agDoDia(d) {
   if (!agLigado()) return [];
   var t = iso(d);
-  return (agCache[iso(inicioDaSemana(d))] || []).filter(function (o) { return o.diaInteiro ? (o.data <= t && t <= o.dataFim) : o.data === t; });
+  return (agCache[agK(d)] || []).filter(function (o) { return o.diaInteiro ? (o.data <= t && t <= o.dataFim) : o.data === t; });
 }
 
 /* ── a RRULE na tela (o servidor confere e reescreve; aqui é para montar e ler) ── */
@@ -922,9 +907,11 @@ function agPresets(t) {
 
 /* ── o bloco na grade ── */
 function agBloco(e, k, pos, alt) {
-  var curto = alt < 40, quando = hm(e.ini) + ' às ' + hm(e.fim);
-  return '<div class="ev meu' + (curto ? ' curto' : '') + '" role="button" tabindex="0" data-ag="' + k + '" title="' + esc(e.titulo + ' · ' + quando) + '" style="--ev-cor:' + esc(e.cor) + ';' + pos + '">' +
-    '<span class="t">' + esc(e.titulo) + (curto ? ', ' : '') + '</span><span class="h">' + quando + (e.ag.rrule ? ' 🔁' : '') + '</span><span class="puxa" data-puxa></span></div>';
+  var curto = alt < 40, quando = hm(e.ini) + ' às ' + hm(e.fim), ro = e.ag.ro;
+  /* o evento que a secretaria marcou para o professor chega TRANCADO: ele vê, mas não arrasta nem apaga */
+  return '<div class="ev meu' + (curto ? ' curto' : '') + (ro ? ' ro' : '') + (e.ag.ocupado ? ' ocupado' : '') + '" role="button" tabindex="0" data-ag="' + k + '" title="' + esc(e.titulo + ' · ' + quando) + '" style="--ev-cor:' + esc(e.cor) + ';' + pos + '">' +
+    '<span class="t">' + (ro && !e.ag.ocupado ? '🔒 ' : '') + esc(e.titulo) + (curto ? ', ' : '') + '</span><span class="h">' + quando + (e.ag.rrule ? ' 🔁' : '') + (e.ag.local ? ' · ' + esc(e.ag.local) : '') + '</span>' +
+    (ro ? '' : '<span class="puxa" data-puxa></span>') + '</div>';
 }
 function agMinDoY(y) { return INI_H * 60 + y / altH() * 60; }
 function agY(min) { return (min - INI_H * 60) / 60 * altH(); }
@@ -989,12 +976,14 @@ function agArrastoMover(bloco, puxa, x0, pageY) {
   };
 }
 function agCopia(o) {
-  return { titulo: o.titulo, data: o.data, dataFim: o.dataFim || o.data, ini: o.ini, fim: o.fim, diaInteiro: !!o.diaInteiro, rrule: o.rrule || '', lembrete: o.lembrete || '', desc: o.desc || '', cor: o.cor || '' };
+  return { titulo: o.titulo, data: o.data, dataFim: o.dataFim || o.data, ini: o.ini, fim: o.fim, diaInteiro: !!o.diaInteiro, rrule: o.rrule || '', lembrete: o.lembrete || '', desc: o.desc || '', cor: o.cor || '',
+           local: o.local || '', turmas: o.turmas || '' };
 }
 /* o mouse: o arrasto começa no pointerdown */
 $('grade').addEventListener('pointerdown', function (ev) {
   if (ev.button !== 0 || !agLigado() || ev.pointerType === 'touch') return;
   var bloco = ev.target.closest('.ev.meu'), col = ev.target.closest('.g-col'), arr = null;
+  if (bloco && bloco.classList.contains('ro')) return;
   if (bloco && !bloco.classList.contains('fantasma')) arr = agArrastoMover(bloco, !!ev.target.closest('[data-puxa]'), ev.clientX, ev.pageY);
   else if (col && ev.target === col) arr = agArrastoCriar(col, ev.pageY);
   if (!arr) return;
@@ -1022,6 +1011,7 @@ function agToqueCria(col, clientY) {
     arr = null; limpa();
     if (!agLigado()) return;
     var bloco = alvo.closest('.ev.meu'), col = alvo.closest('.g-col');
+    if (bloco && bloco.classList.contains('ro')) return;
     if (!(bloco && !bloco.classList.contains('fantasma')) && !(col && alvo === col)) return;
     timer = setTimeout(function () {
       timer = null;
@@ -1084,12 +1074,15 @@ function agBalaoNovo(base, ancora) {
   agAbreBalao('<div class="acoes"><button type="button" data-balx aria-label="Fechar">✕</button></div>' +
     '<input class="tit" id="balTit" placeholder="Adicionar título" maxlength="200" autocomplete="off">' +
     '<div class="lin"><span>🕒</span><span>' + agQuando(o) + '</span></div>' +
+    (agPara() ? '<div class="lin"><span>👤</span><span>Para ' + esc(agPara()) + '</span></div>' : '') +
+    '<div class="lin"><span>📍</span><input class="tit loc" id="balLocal" placeholder="Adicionar sala ou local" maxlength="120" list="agSalas" autocomplete="off"></div>' +
     '<div class="pe"><button type="button" class="bt-sec" id="balMais">Mais opções</button><button type="button" class="bt-pri" id="balSalva">Salvar</button></div>', ancora);
   var tit = $('balTit'); setTimeout(function () { tit.focus(); }, 30);
-  var salva = function () { o.titulo = tit.value.trim(); agFechaBalao(); agGravar(o, null); };
+  var pega = function () { o.titulo = tit.value.trim() || (agPara() ? 'Reunião de pais' : ''); o.local = $('balLocal').value.trim(); };
+  var salva = function () { pega(); agFechaBalao(); agGravar(o, null); };
   $('balSalva').onclick = salva;
-  tit.onkeydown = function (e) { if (e.key === 'Enter') salva(); };
-  $('balMais').onclick = function () { o.titulo = tit.value.trim(); agFechaBalao(); agEditor(o, null); };
+  tit.onkeydown = $('balLocal').onkeydown = function (e) { if (e.key === 'Enter') salva(); };
+  $('balMais').onclick = function () { pega(); agFechaBalao(); agEditor(o, null); };
   $('bal').querySelector('[data-balx]').onclick = agFechaBalao;
 }
 /* os detalhes de um evento meu */
@@ -1097,15 +1090,22 @@ function agDetalhes(k, ancora) {
   var x = EVS[k], o = x && x.e.ag; if (!o) return;
   agFechaBalao();
   var lem = AG_AVISOS.filter(function (l) { return l[0] === String(o.lembrete || ''); })[0];
-  agAbreBalao('<div class="acoes"><button type="button" id="balEd" title="Editar evento" aria-label="Editar evento">✏️</button>' +
-    '<button type="button" id="balEx" title="Excluir evento" aria-label="Excluir evento">🗑</button>' +
-    '<a href="' + esc(agLinkGoogle(o)) + '" target="_blank" rel="noopener" title="Levar ao Google Agenda" aria-label="Levar ao Google Agenda">📅</a>' +
+  agAbreBalao('<div class="acoes">' + (o.ro ? '' : '<button type="button" id="balEd" title="Editar evento" aria-label="Editar evento">✏️</button>' +
+    '<button type="button" id="balEx" title="Excluir evento" aria-label="Excluir evento">🗑</button>') +
+    (o.ocupado ? '' : '<a href="' + esc(agLinkGoogle(o)) + '" target="_blank" rel="noopener" title="Levar ao Google Agenda" aria-label="Levar ao Google Agenda">📅</a>') +
     '<button type="button" data-balx aria-label="Fechar">✕</button></div>' +
     '<div class="cab"><i></i><div><h4>' + esc(o.titulo) + '</h4><p>' + agQuando(o) + '</p>' + (o.rrule ? '<p>🔁 ' + esc(agTextoRR(o.rrule, o.serieData)) + '</p>' : '') + '</div></div>' +
+    (o.local ? '<div class="lin"><span>📍</span><span>' + esc(o.local) + '</span></div>' : '') +
+    (o.turmas ? '<div class="lin"><span>👥</span><span>' + esc(o.turmas) + '</span></div>' : '') +
     (lem && lem[0] !== '' ? '<div class="lin"><span>🔔</span><span>' + lem[1] + '</span></div>' : '') +
-    (o.desc ? '<div class="lin"><span>📝</span><span class="desc">' + esc(o.desc) + '</span></div>' : ''), ancora, o.cor || AG_COR);
-  $('balEd').onclick = function () { agFechaBalao(); agEditor(agCopia(o), o); };
-  $('balEx').onclick = function () { agFechaBalao(); agExcluir(o); };
+    (o.desc ? '<div class="lin"><span>📝</span><span class="desc">' + esc(o.desc) + '</span></div>' : '') +
+    (o.ocupado ? '<div class="lin"><span>🔒</span><span>Compromisso pessoal do professor: só o horário aparece.</span></div>' :
+     o.criadoPor && o.ro ? '<div class="lin"><span>🔒</span><span>Marcado por ' + esc(o.criadoPor) + ', da secretaria. Para mudar, fale com ela.</span></div>' :
+     o.criadoPor ? '<div class="lin"><span>✍️</span><span>Marcado por ' + esc(o.criadoPor) + '</span></div>' : ''), ancora, o.cor || AG_COR);
+  if (!o.ro) {
+    $('balEd').onclick = function () { agFechaBalao(); agEditor(agCopia(o), o); };
+    $('balEx').onclick = function () { agFechaBalao(); agExcluir(o); };
+  }
   $('bal').querySelector('[data-balx]').onclick = agFechaBalao;
 }
 function agLinkGoogle(o) {
@@ -1150,13 +1150,14 @@ function agGravar(o, antigo) {
   return pede.then(function (escopo) {
     if (!escopo) { agFechaBalao(); desenhar(); return; }
     /* desenha na hora o que dá para prever (evento novo, avulso ou "este"); a série inteira espera o servidor */
-    var lista = agCache[iso(inicioDaSemana(dDe(o.data)))];
+    var lista = agCache[agK(dDe(o.data))];
     if (lista && (!antigo || !antigo.rrule || escopo === 'este')) {
       if (antigo) { var i = lista.indexOf(antigo); if (i > -1) lista.splice(i, 1); }
       var tmp = agCopia(o); tmp.id = 'tmp'; tmp.ocorrencia = tmp.data; tmp.serieData = tmp.data; if (escopo === 'este') tmp.rrule = '';
       lista.push(tmp);
     } else if (antigo && lista) { var j = lista.indexOf(antigo); if (j > -1) lista.splice(j, 1); }
     agFechaBalao(); desenhar();
+    o.para = agPara();
     return post({ action: 'agendaSalvar', ev: o, id: antigo ? antigo.id : '', escopo: escopo, ocorrencia: antigo ? antigo.ocorrencia : '' })
       .then(function () { agToast(antigo ? 'Evento salvo' : 'Evento criado'); })
       .catch(function (e) { agToast('⚠️ ' + ((e && e.message) || 'Não consegui salvar.')); })
@@ -1167,14 +1168,31 @@ function agExcluir(o) {
   var pede = o.rrule ? agEscopo('Excluir evento recorrente', true) : Promise.resolve('todos');
   pede.then(function (escopo) {
     if (!escopo) return;
-    var lista = agCache[iso(inicioDaSemana(dDe(o.data)))] || [];
-    (agCache[iso(inicioDaSemana(dDe(o.data)))] = lista.filter(function (x) { return escopo === 'este' ? x !== o : !(x.id === o.id && (escopo === 'todos' || x.data >= o.data)); }));
+    var lista = agCache[agK(dDe(o.data))] || [];
+    (agCache[agK(dDe(o.data))] = lista.filter(function (x) { return escopo === 'este' ? x !== o : !(x.id === o.id && (escopo === 'todos' || x.data >= o.data)); }));
     desenhar();
     post({ action: 'agendaExcluir', id: o.id, escopo: escopo, ocorrencia: o.ocorrencia }).then(function () {
       /* desfazer, como no Google: só para o evento avulso, que volta inteiro */
       agToast('Evento excluído', o.rrule ? null : function () { agGravar(agCopia(o), null); }, 'Desfazer');
     }).catch(function (e) { agToast('⚠️ ' + ((e && e.message) || 'Não consegui excluir.')); }).then(agRecarrega);
   });
+}
+
+/* AS TURMAS NA REUNIÃO (o POP de meio de semestre): a secretária marca de quais turmas são os pais daquele horário, e
+   o texto que vai para o professor é o mesmo da planilha do POP, "3ª 15h (9) + 4ª 13h45 (6)", com o total de alunos */
+function agRotTurma(t) { return t.h.dias.map(function (x) { return DIAS[x]; }).join('/') + ' ' + hm(t.h.ini) + ' ' + nomeCurto(t.titulo) + ' (' + t.alunos.length + ')'; }
+function agTurmasOpcoes(atual) {
+  var ts = dados.turmas.filter(function (t) { return !ehPlantao(t.titulo); });
+  if (!ts.length) return '<small class="dica" style="margin:0">As turmas ainda não carregaram.</small>';
+  return ts.map(function (t, i) {
+    var r = agRotTurma(t);
+    return '<label class="chk"><input type="checkbox" data-turma="' + i + '"' + (String(atual || '').indexOf(r) > -1 ? ' checked' : '') + '> ' + esc(r) + '</label>';
+  }).join('');
+}
+function agTurmasEscolhidas() {
+  var ts = dados.turmas.filter(function (t) { return !ehPlantao(t.titulo); }), n = 0;
+  var rs = [].map.call(document.querySelectorAll('#edTurmas input:checked'), function (c) { var t = ts[+c.dataset.turma]; n += t.alunos.length; return agRotTurma(t); });
+  return rs.length ? rs.join(' + ') + (rs.length > 1 ? ' · ' + n + ' alunos' : '') : '';
 }
 
 /* ── o editor completo ("Mais opções"), na gaveta ── */
@@ -1184,7 +1202,8 @@ function agOpcoesHora(sel, de) {
 }
 function agEditor(o, antigo) {
   var cor = o.cor || AG_COR, rrAtual = o.rrule || '';
-  var h = '<div class="topo"><h3 id="gavTit">' + (antigo ? 'Editar evento' : 'Novo evento') + '</h3><div class="chips"><span class="chip">Só você vê este evento</span></div></div>' +
+  var h = '<div class="topo"><h3 id="gavTit">' + (antigo ? 'Editar evento' : 'Novo evento') + '</h3><div class="chips"><span class="chip">' +
+      (agPara() ? 'Para ' + esc(agPara()) + ': aparece na semana dele, trancado' : 'Só você vê este evento') + '</span></div></div>' +
     '<div class="miolo ed">' +
     '<input class="ed-tit" id="edTit" placeholder="Adicionar título" maxlength="200" value="' + esc(o.titulo) + '">' +
     '<div class="lin"><b>🕒</b><input type="date" id="edData" value="' + esc(o.data) + '" aria-label="Data">' +
@@ -1201,6 +1220,8 @@ function agEditor(o, antigo) {
       '<label><input type="radio" name="pFim" value="data"> Em <input type="date" id="pAte"></label>' +
       '<label><input type="radio" name="pFim" value="vezes"> Após <input type="number" id="pVezes" min="1" max="999" value="13"> ocorrências</label>' +
     '</div>' +
+    '<div class="lin"><b>📍</b><input type="text" id="edLocal" placeholder="Adicionar sala ou local" maxlength="120" list="agSalas" value="' + esc(o.local || '') + '" style="flex:1"></div>' +
+    (agPara() ? '<div class="lin"><b>👥</b><span style="flex:1"><b style="font-weight:800">Turmas de ' + esc(agPara()) + ' cujos pais vêm</b><span class="turmas-ed" id="edTurmas">' + agTurmasOpcoes(o.turmas) + '</span></span></div>' : '') +
     '<div class="lin"><b>🔔</b><select id="edLem" aria-label="Lembrete">' + AG_AVISOS.map(function (l) { return '<option value="' + l[0] + '"' + (l[0] === String(o.lembrete || '') ? ' selected' : '') + '>' + l[1] + '</option>'; }).join('') + '</select></div>' +
     '<small class="dica">O aviso aparece com o Hub aberto. Para ser avisado no celular, leve o evento ao Google Agenda (📅 nos detalhes).</small>' +
     '<div class="lin"><b>🎨</b><span class="cores">' + AG_PALETA.map(function (c) { return '<button type="button" data-cor="' + c[0] + '" title="' + c[1] + '" aria-label="' + c[1] + '" style="--c:' + c[0] + '"' + (c[0] === cor ? ' class="on"' : '') + '></button>'; }).join('') + '</span></div>' +
@@ -1283,7 +1304,9 @@ function agEditor(o, antigo) {
     var di = $('edDia').checked, data = $('edData').value;
     if (!data) { $('edData').focus(); return; }
     var n = { titulo: $('edTit').value.trim(), data: data, dataFim: di ? ($('edDataFim').value || data) : data, diaInteiro: di,
-              ini: di ? '' : hhmm(ini), fim: di ? '' : hhmm(fim), rrule: rrDaTela(), lembrete: $('edLem').value, desc: $('edDesc').value, cor: cor === AG_COR ? '' : cor };
+              ini: di ? '' : hhmm(ini), fim: di ? '' : hhmm(fim), rrule: rrDaTela(), lembrete: $('edLem').value, desc: $('edDesc').value, cor: cor === AG_COR ? '' : cor,
+              local: $('edLocal').value.trim(), turmas: agPara() ? agTurmasEscolhidas() : (o.turmas || '') };
+    if (!n.titulo && agPara()) n.titulo = 'Reunião de pais';
     if (n.dataFim < n.data) n.dataFim = n.data;
     gavFecha(); agGravar(n, antigo);
   };
@@ -1305,6 +1328,7 @@ $('fab').addEventListener('click', agCriarAgora);
 function agLembretes() {
   var agora = Date.now();
   Object.keys(agCache).forEach(function (k) {
+    if (!/\|$/.test(k)) return;   /* só a agenda de quem está logado avisa */
     agCache[k].forEach(function (o) {
       if (o.lembrete === '' || o.lembrete == null || o.diaInteiro || o.id === 'tmp') return;
       var chave = o.id + o.data + o.ini; if (agAvisados[chave]) return;
@@ -1321,14 +1345,33 @@ function agLembretes() {
 
 fiskInitThemeToggle('themeToggle');
 fiskInitUserMenu();
-if (!token()) {
-  $('semSessao').hidden = false;
-} else {
-  $('painelCal').hidden = false;
-  if (sessao().master) montaVerComo();
-  carregar();
-  if (!EMBED) fiskRegistrarUso('Calendário');   /* a janela da home abre em toda visita: não conta como uso */
+function iniciar() {
+  if (!token()) {
+    $('semSessao').hidden = false;
+  } else {
+    $('painelCal').hidden = false;
+    if (sessao().master || SEC_MODO) montaVerComo();
+    if (SEC_MODO) $('btAgenda').hidden = true;   /* levar as aulas ao Google é do professor */
+    carregar();
+    if (!EMBED) fiskRegistrarUso('Calendário');   /* a janela da home abre em toda visita: não conta como uso */
+  }
 }
+/* ── A SECRETARIA (27/10/2026) ──
+   O Portal da Secretaria (portalfisk.com.br/sec) abre esta página numa janela e, quando ela avisa que está pronta,
+   manda a sessão da secretária. Só se aceita a mensagem do próprio portal (ou do computador, em teste), e a sessão
+   fica só na memória desta janela: nada vai para o localStorage do Hub. */
+var SEC_ORIGENS = /^https:\/\/(www\.)?portalfisk\.com\.br$|^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+if (SEC_MODO) {
+  var _secEspera = setTimeout(function () { if (!SEC) iniciar(); }, 9000);
+  window.addEventListener('message', function (ev) {
+    var d = ev.data;
+    if (SEC || !SEC_ORIGENS.test(ev.origin) || ev.source !== window.parent || !d || d.fisk !== 'semanaSessao' || !d.token) return;
+    clearTimeout(_secEspera);
+    SEC = { token: String(d.token), name: String((d.quem && d.quem.name) || ''), escolas: (d.quem && d.quem.escolas) || '', sec: true };
+    iniciar();
+  });
+  window.parent.postMessage({ fisk: 'semanaPronta' }, '*');   /* só o aviso, sem dado: quem tem a sessão é o portal */
+} else iniciar();
 </script>
 </body>
 </html>
