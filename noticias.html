@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notícias da turma, FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-10-09c">
+<link rel="stylesheet" href="assets/casa-tema.css?v=9">
+<meta name="theme-color" content="#161414">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+<script src="assets/fisk-shared.js?v=2026-10-27a"></script>
+<style>
+  [hidden]{ display: none !important; }
+  main{ max-width: 1180px; margin: 0 auto; padding: 1.4rem 1rem 3rem; width: 100%; box-sizing: border-box; }
+  .painel{ background: var(--white); border: 2px solid var(--surface-border-color); border-radius: var(--surface-radius);
+           box-shadow: var(--surface-shadow); padding: 1.2rem 1.3rem; margin-bottom: 1rem; }
+  .painel h2{ margin: 0 0 .6rem; font-family: var(--font-heading); font-weight: 700; font-size: 1.1rem; color: var(--ui-dark, #223e5a); }
+  .aviso{ font-size: .88rem; color: var(--gray); margin: 0 0 .5rem; line-height: 1.45; }
+  .faixa-fechado{ display: flex; gap: .7rem; align-items: center; background: #fff7e6; border: 1.5px solid #f0c674; color: #6b4a0b;
+    border-radius: 12px; padding: .7rem .9rem; margin-bottom: 1rem; font-size: .92rem; line-height: 1.4; }
+  body.theme-dark .faixa-fechado{ background: #2a2412; border-color: #6b5a2a; color: #f3dfae; }
+
+  .barra{ display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; margin-bottom: 1rem; }
+  .abas{ display: inline-flex; border: 1.5px solid var(--ui-bd, #9db6cb); border-radius: 999px; overflow: hidden; }
+  .abas button{ font-family: inherit; font-weight: 800; font-size: .92rem; border: 0; background: var(--white); color: var(--ui-dark, #223e5a); padding: .55rem 1rem; cursor: pointer; }
+  .abas button[aria-pressed="true"]{ background: var(--ui, #2b4d70); color: #fff; }
+  select, input[type=text], textarea{ font-family: inherit; font-size: 1rem; color: var(--black); background: var(--white);
+    border: 1.5px solid var(--ui-bd, #9db6cb); border-radius: 10px; padding: .65rem .75rem; box-sizing: border-box; }
+  .barra select{ font-weight: 700; min-height: 42px; }
+
+  .colunas{ display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: flex-start; }
+  .col-form{ flex: 999 1 560px; min-width: 0; }
+  .col-lado{ flex: 1 1 340px; min-width: 0; }
+  .campo{ display: flex; flex-direction: column; gap: .45rem; margin-bottom: 1.2rem; }
+  .campo > label, .campo > .rot{ font-weight: 800; font-size: .9rem; color: var(--ui-dark, #223e5a); }
+  .campo .rot-linha{ display: flex; justify-content: space-between; align-items: baseline; gap: .6rem; flex-wrap: wrap; }
+  .campo .dica{ font-size: .8rem; color: var(--gray); font-weight: 600; }
+
+  .fotos{ display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: .6rem; }
+  .foto{ position: relative; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden; background: var(--ui-soft, #e9eff5); border: 2.5px solid transparent; cursor: pointer; }
+  .foto img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+  .foto.capa{ border-color: var(--ui, #2b4d70); }
+  .foto .selo{ position: absolute; left: 6px; bottom: 6px; background: var(--ui, #2b4d70); color: #fff; font-size: .7rem; font-weight: 800; border-radius: 999px; padding: 2px 8px; }
+  .foto .tira{ position: absolute; right: 6px; top: 6px; width: 28px; height: 28px; border-radius: 50%; border: 0; background: rgba(22,20,20,.7); color: #fff; font-size: 1rem; cursor: pointer; }
+  .foto .subindo{ position: absolute; inset: 0; display: grid; place-items: center; background: rgba(255,255,255,.7); font-weight: 800; font-size: .8rem; color: var(--ui-dark); }
+  .add{ aspect-ratio: 1 / 1; border-radius: 12px; border: 2px dashed var(--ui-bd, #9db6cb); background: var(--ui-soft, #f6f9fc); color: var(--ui, #2b4d70);
+    font-family: inherit; font-weight: 800; font-size: .85rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .2rem; }
+  .add span{ font-size: 1.6rem; line-height: 1; }
+  .alerta{ display: flex; gap: .6rem; background: #fff7e6; border: 1.5px solid #f0c674; color: #6b4a0b; border-radius: 12px; padding: .7rem .85rem; font-size: .9rem; line-height: 1.45; }
+  body.theme-dark .alerta{ background: #2a2412; border-color: #6b5a2a; color: #f3dfae; }
+
+  .linha-frase{ display: flex; gap: .6rem; align-items: stretch; flex-wrap: wrap; }
+  .linha-frase textarea{ flex: 1 1 280px; resize: vertical; }
+  .btn-ia{ font-family: var(--font-heading); font-weight: 700; font-size: .95rem; color: var(--ui, #2b4d70); background: var(--ui-soft, #e9eff5);
+    border: 1.5px solid var(--ui-bd, #9db6cb); border-radius: 10px; padding: .6rem 1rem; cursor: pointer; min-height: 44px; }
+  #texto{ line-height: 1.55; resize: vertical; background: var(--ui-soft, #f6f9fc); }
+  .mini-acoes{ display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+  .pilula{ font-family: inherit; font-weight: 800; font-size: .85rem; color: var(--ui, #2b4d70); background: var(--white); border: 1.5px solid var(--ui-bd, #9db6cb);
+    border-radius: 999px; padding: .4rem .85rem; cursor: pointer; }
+  .confere{ display: flex; gap: .6rem; align-items: flex-start; font-size: .9rem; line-height: 1.45; margin: 0 0 1rem; cursor: pointer; }
+  .confere input{ width: 20px; height: 20px; flex: none; margin-top: 1px; }
+  .rodape{ display: flex; gap: .7rem; flex-wrap: wrap; align-items: center; border-top: 1.5px solid var(--ui-soft, #e9eff5); padding-top: 1rem; }
+  .btn-pub{ font-family: var(--font-heading); font-weight: 700; font-size: 1.02rem; color: #fff; background: var(--ui, #2b4d70); border: 0; border-radius: 12px; padding: .85rem 1.5rem; cursor: pointer; }
+  .btn-pub:disabled{ opacity: .55; cursor: default; }
+  .st{ font-size: .88rem; color: var(--gray); margin: 0; }
+  .st.err{ color: var(--red); font-weight: 700; }
+
+  /* a prévia e o mural seguem o Portal do Aluno (preto, vermelho, cartões brancos sobre cinza) */
+  .portal{ background: #f7f6f6; border-radius: 16px; padding: 1rem; color: #161414; }
+  body.theme-dark .portal{ background: #211e1e; color: #f2efef; }
+  .nt{ background: #fff; border: 1.5px solid #ececec; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 14px rgba(22,20,20,.07); display: flex; flex-direction: column; }
+  body.theme-dark .nt{ background: #2a2727; border-color: #3a3535; }
+  .nt .capa-img{ aspect-ratio: 16 / 10; background: #e7e3df; cursor: zoom-in; }
+  .nt .capa-img img, .nt .minis img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+  .nt .minis{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; padding: 4px; }
+  .nt .minis > div{ aspect-ratio: 1 / 1; border-radius: 6px; overflow: hidden; background: #ece8e4; cursor: zoom-in; position: relative; }
+  .nt .minis .mais{ position: absolute; inset: 0; display: grid; place-items: center; background: rgba(22,20,20,.6); color: #fff; font-weight: 800; }
+  .nt .corpo{ padding: .9rem 1.05rem 1.1rem; display: flex; flex-direction: column; gap: .45rem; }
+  .nt .quando{ font-size: .72rem; font-weight: 800; letter-spacing: .04em; color: #6f6a6a; text-transform: uppercase; }
+  .nt h3{ margin: 0; font-family: var(--font-heading); font-size: 1.08rem; }
+  .nt p{ margin: 0; font-size: .95rem; line-height: 1.55; white-space: pre-line; }
+  .mural{ display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.1rem; }
+  .cab-portal{ background: #161414; color: #fff; text-align: center; padding: 1.1rem 1rem; border-bottom: 5px solid #d81f26; border-radius: 14px 14px 0 0; margin: -1rem -1rem 1rem; }
+  .cab-portal b{ font-family: var(--font-heading); font-size: 1.3rem; display: block; }
+  .cab-portal span{ color: #d8d5d5; font-size: .88rem; }
+
+  .lista-pub{ display: flex; flex-direction: column; }
+  .lista-pub .it{ display: flex; gap: .7rem; align-items: center; padding: .6rem 0; border-bottom: 1px solid var(--ui-soft, #e9eff5); }
+  .lista-pub .it:last-child{ border-bottom: 0; }
+  .lista-pub .th{ width: 48px; height: 48px; border-radius: 10px; overflow: hidden; background: var(--ui-soft); flex: none; }
+  .lista-pub .th img{ width: 100%; height: 100%; object-fit: cover; }
+  .lista-pub .tx{ flex: 1; min-width: 0; font-size: .85rem; color: var(--gray); }
+  .lista-pub .tx b{ display: block; color: var(--black); font-size: .92rem; }
+  .lista-pub button{ font-family: inherit; font-weight: 800; font-size: .82rem; background: none; border: 0; color: var(--ui, #2b4d70); cursor: pointer; padding: .3rem; }
+  .lista-pub button.apaga{ color: var(--red); }
+
+  .luz{ position: fixed; inset: 0; background: rgba(15,14,14,.94); z-index: 50; display: flex; flex-direction: column; }
+  .luz .topo{ display: flex; align-items: center; gap: 1rem; padding: 1rem 1.2rem; color: #fff; }
+  .luz .topo b{ font-family: var(--font-heading); }
+  .luz .topo button{ margin-left: auto; width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.35); background: none; color: #fff; font-size: 1.2rem; cursor: pointer; }
+  .luz .palco{ flex: 1; display: flex; align-items: center; justify-content: center; gap: 1rem; padding: 0 1rem 1.5rem; min-height: 0; }
+  .luz .palco img{ max-width: min(1000px, 100%); max-height: 100%; border-radius: 8px; object-fit: contain; }
+  .luz .seta{ flex: none; width: 52px; height: 52px; border-radius: 50%; border: 0; background: rgba(255,255,255,.15); color: #fff; font-size: 1.4rem; cursor: pointer; }
+  @media (max-width: 640px){ .luz .seta{ position: absolute; bottom: 1rem; } .luz .seta.ant{ left: 1rem; } .luz .seta.prox{ right: 1rem; } }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <a class="back-link" href="index.html" title="Voltar ao Fisk Hub">&larr; Hub</a>
+  <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
+  <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+  <h1>Notícias da turma</h1>
+  <p>As fotos da aula vão para o Canto da Família, só para os responsáveis da turma</p>
+</header>
+
+<main>
+  <section class="painel" id="semSessao" hidden>
+    <h2>🔒 Entre no Fisk Hub primeiro</h2>
+    <p class="aviso">Volte à página inicial do Hub, entre com seu usuário e abra esta ferramenta de novo.</p>
+  </section>
+  <section class="painel" id="fechado" hidden>
+    <h2>Em breve</h2>
+    <p class="aviso">As Notícias da turma ainda estão em preparação pela direção.</p>
+  </section>
+
+  <div id="app" hidden>
+    <div class="faixa-fechado" id="faixaFechado" hidden>🔒 <span><b>Só a direção vê esta ferramenta.</b> Nada daqui aparece para professores nem famílias até a publicação oficial ser autorizada.</span></div>
+
+    <div class="barra">
+      <span class="abas" role="group" aria-label="Modo">
+        <button type="button" id="abaPub" aria-pressed="true">Publicar</button>
+        <button type="button" id="abaVer" aria-pressed="false">Ver como a família</button>
+      </span>
+      <select id="verComo" hidden aria-label="Turmas de qual professor"></select>
+      <select id="turma" aria-label="Turma"><option value="">Carregando as turmas…</option></select>
+    </div>
+    <p class="st" id="stTurmas"></p>
+
+    <div class="colunas" id="telaPub">
+      <section class="painel col-form">
+        <h2 id="tituloForm">Nova notícia</h2>
+
+        <div class="campo">
+          <div class="rot-linha"><span class="rot">1. Fotos</span><span class="dica" id="contaFotos">até 10 · reduzidas aqui antes de subir · toque numa foto para ela ser a capa</span></div>
+          <div class="fotos" id="fotos">
+            <button type="button" class="add" id="btAdd"><span>＋</span>Adicionar fotos</button>
+          </div>
+          <input type="file" id="arq" accept="image/*" multiple hidden>
+          <div class="alerta" id="alertaImagem" hidden></div>
+        </div>
+
+        <div class="campo">
+          <label for="frase">2. O que aconteceu na aula (uma frase basta)</label>
+          <div class="linha-frase">
+            <textarea id="frase" rows="2" maxlength="600" placeholder="Hoje foi dia de brincadeira com o bambolê"></textarea>
+            <button type="button" class="btn-ia" id="btIA">✨ Melhorar texto</button>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="titulo">3. Título curto</label>
+          <input type="text" id="titulo" maxlength="80" placeholder="Dia do bambolê">
+        </div>
+
+        <div class="campo">
+          <label for="texto">4. Texto para a família</label>
+          <textarea id="texto" rows="5" maxlength="1500" placeholder="Escreva aqui, ou use o “Melhorar texto” a partir da sua frase."></textarea>
+          <div class="mini-acoes">
+            <span class="dica">Revise antes de publicar. O texto não cita nomes de alunos nem conta o que você não escreveu.</span>
+            <span><button type="button" class="pilula" id="btOutro">Gerar outro</button> <button type="button" class="pilula" id="btMinha">Usar a minha frase</button></span>
+          </div>
+        </div>
+
+        <label class="confere"><input type="checkbox" id="confere"> Conferi foto por foto: nenhum aluno sem autorização de imagem aparece, nenhuma criança está numa situação constrangedora e o texto não cita nomes.</label>
+        <div class="rodape">
+          <button type="button" class="btn-pub" id="btPub">Publicar nas Notícias da turma</button>
+          <button type="button" class="pilula" id="btCancela" hidden>Cancelar a edição</button>
+          <p class="st" id="stPub"></p>
+        </div>
+      </section>
+
+      <aside class="col-lado">
+        <section class="painel">
+          <h2>Como a família vai ver</h2>
+          <div class="portal"><div id="previa"></div></div>
+        </section>
+        <section class="painel">
+          <h2>Já publicadas nesta turma</h2>
+          <div class="lista-pub" id="listaPub"><p class="aviso">Escolha a turma.</p></div>
+        </section>
+      </aside>
+    </div>
+
+    <section class="painel" id="telaVer" hidden>
+      <div class="portal">
+        <div class="cab-portal"><b>Notícias da turma</b><span id="cabTurma"></span></div>
+        <div class="mural" id="mural"></div>
+        <p class="aviso" style="text-align:center;margin-top:1rem" id="rodapeMural"></p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div class="luz" id="luz" hidden role="dialog" aria-modal="true" aria-label="Foto ampliada">
+  <div class="topo"><div><b id="luzTit"></b><br><small id="luzPos"></small></div><button type="button" id="luzFecha" aria-label="Fechar">✕</button></div>
+  <div class="palco">
+    <button type="button" class="seta ant" id="luzAnt" aria-label="Foto anterior">‹</button>
+    <img id="luzImg" alt="">
+    <button type="button" class="seta prox" id="luzProx" aria-label="Próxima foto">›</button>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════════════════════════════════════════════════
+ * NOTÍCIAS DA TURMA (Pedro, 27/10/2026). O professor publica fotos da aula com um parágrafo para a família.
+ * Desenho: https://claude.ai/artifact/FGT3CjVGjy9XYNqyLWWZep · servidor: fisk-hub-backend/Noticias.js
+ * ⚠️ FECHADO até o Pedro autorizar: o servidor só responde à direção (NT_ABERTO), e esta página mostra "Em breve" a
+ * quem não pode. O "Ver como a família" é a prévia do que o Canto da Família vai mostrar; o Portal ainda não lê nada.
+ * As fotos são reduzidas AQUI (1600 px e uma miniatura de 480 px) e sobem uma de cada vez; o servidor guarda numa pasta
+ * privada e devolve os bytes só com a sessão, nunca por link.
+ * ════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
+var EP = FISK_HUB_EP;
+var MAX_FOTOS = 10;
+var est = { turmas: [], turma: null, fotos: [], capa: '', editando: '', lista: [], frase: '' };
+var cacheFoto = {};
+function $(id) { return document.getElementById(id); }
+function esc(s) { return fiskEsc(String(s == null ? '' : s)); }
+function sessao() { return fiskSessao() || {}; }
+function token() { return sessao().token || ''; }
+function nP(v) { return String(v || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
+function como() { var s = sessao(); if (!s.master) return null; try { return JSON.parse(localStorage.getItem('fisk_actas') || 'null'); } catch (e) { return null; } }
+function eu() { var c = como(); return (c && c.name) || sessao().name || ''; }
+function minhasEscolas() {
+  var c = como(), e = (c && c.name) ? c.escolas : sessao().escolas;
+  return (Array.isArray(e) ? e : String(e || '').split(/[,;]/)).map(function (x) { return String(x).trim(); }).filter(Boolean);
+}
+function linha1(t) { return String(t || '').split('\n')[0].trim(); }
+function st(id, msg, err) { var el = $(id); el.textContent = msg || ''; el.className = 'st' + (err ? ' err' : ''); }
+function get(params) {
+  params.token = token();
+  var qs = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
+  return fetch(EP + '?' + qs).then(fiskJson).then(function (j) { if (j && (j.erro || j.error)) throw new Error(j.erro || j.error); return j; });
+}
+function post(body) {
+  body.token = token();
+  return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
+    .then(fiskJson).then(function (j) { if (!j || j.ok === false) throw new Error((j && (j.erro || j.error)) || 'Não consegui.'); return j; });
+}
+var MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+var SEMANA = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
+function dataLonga(iso) {
+  var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || ''); if (!m) return '';
+  var d = new Date(+m[1], +m[2] - 1, +m[3]);
+  return SEMANA[d.getDay()] + ', ' + d.getDate() + ' de ' + MESES[d.getMonth()];
+}
+function hojeIso() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+
+/* ── as turmas (o mesmo caminho da Minha semana: a aba do professor no card de cada escola) ── */
+function carregaTurmas() {
+  var nome = eu(), sel = $('turma');
+  sel.innerHTML = '<option value="">Carregando as turmas…</option>'; st('stTurmas', '');
+  return Promise.all(minhasEscolas().map(function (escola) {
+    return get({ action: 'card', fn: 'profs', escola: escola }).then(function (j) {
+      var profs = j.profs || [];
+      var aba = profs.find(function (p) { return nP(p) === nP(nome); }) ||
+                profs.find(function (p) { return nP(p).indexOf(nP(nome).split(' ')[0]) === 0; });
+      if (!aba) return [];
+      return get({ action: 'panoramaProf', escola: escola, prof: aba }).then(function (pj) {
+        var alunos = (pj.alunos || []).filter(function (a) { return a && a.nome && !a.saiu; });
+        return (pj.turmas || []).map(function (t) {
+          var al = alunos.filter(function (a) { return a.turma === t.turma; });
+          return { escola: escola, prof: aba, titulo: linha1(t.turma), alunos: al, livro: (al[0] || {}).book || '' };
+        });
+      });
+    }).catch(function (e) { if (/sess[ãa]o/i.test((e && e.message) || '')) throw e; return []; });
+  })).then(function (ls) {
+    est.turmas = [].concat.apply([], ls).filter(function (t) { return t.alunos.length; });
+    if (!est.turmas.length) {
+      sel.innerHTML = '<option value="">' + (sessao().master && !como() ? 'Escolha um professor ao lado' : 'Nenhuma turma no card') + '</option>';
+      est.turma = null; pintaTudo(); return;
+    }
+    sel.innerHTML = est.turmas.map(function (t, i) {
+      return '<option value="' + i + '">' + esc(t.titulo) + ' · ' + esc(t.escola) + ' · ' + t.alunos.length + ' alunos</option>';
+    }).join('');
+    escolheTurma(0);
+  }).catch(function (e) { sel.innerHTML = '<option value="">Não consegui ler as turmas</option>'; st('stTurmas', e.message, true); });
+}
+function escolheTurma(i) {
+  est.turma = est.turmas[i] || null;
+  limpaForm();
+  carregaLista();
+}
+
+/* ── as notícias da turma ── */
+var _pedidoLista = 0;
+function carregaLista() {
+  var t = est.turma, meu = ++_pedidoLista;
+  $('listaPub').innerHTML = '<p class="aviso">Carregando…</p>'; $('mural').innerHTML = '';
+  if (!t) { pintaTudo(); return; }
+  post({ action: 'noticiasListar', escola: t.escola, turma: t.titulo, rafs: t.alunos.map(function (a) { return a.raf; }) }).then(function (r) {
+    if (meu !== _pedidoLista) return;
+    est.lista = r.noticias || []; est.dias = r.dias || 60;
+    var sem = r.semImagem || [];
+    $('alertaImagem').hidden = !sem.length;
+    if (sem.length) $('alertaImagem').innerHTML = '⚠️ <span><b>' + sem.length + (sem.length === 1 ? ' aluno desta turma está' : ' alunos desta turma estão') + ' sem autorização de imagem:</b> ' + esc(sem.join(', ')) + '. Confira se ' + (sem.length === 1 ? 'ele não aparece' : 'eles não aparecem') + ' nas fotos antes de publicar.</span>';
+    pintaTudo();
+  }).catch(function (e) { if (meu === _pedidoLista) $('listaPub').innerHTML = '<p class="aviso">' + esc(e.message) + '</p>'; });
+}
+
+/* a foto vem do servidor em base64 e fica guardada nesta visita (a miniatura e a grande são pedidos separados) */
+function foto(fid, tam) {
+  var k = fid + '|' + tam;
+  if (!cacheFoto[k]) cacheFoto[k] = post({ action: 'noticiaFoto', foto: fid, tam: tam }).then(function (r) { return 'data:' + (r.mime || 'image/jpeg') + ';base64,' + r.b64; })
+    .catch(function (e) { delete cacheFoto[k]; throw e; });
+  return cacheFoto[k];
+}
+function poeFoto(el, fid, tam) {
+  foto(fid, tam).then(function (src) { var img = document.createElement('img'); img.alt = ''; img.src = src; el.appendChild(img); }).catch(function () {});
+}
+
+/* ── o cartão da notícia, igual na prévia e no mural ── */
+function cartao(n) {
+  var el = document.createElement('article'); el.className = 'nt';
+  var fotos = n.fotos || [], capa = n.capa && fotos.indexOf(n.capa) > -1 ? n.capa : fotos[0];
+  var resto = fotos.filter(function (f) { return f !== capa; });
+  var ordem = capa ? [capa].concat(resto) : resto;
+  var c = document.createElement('div'); c.className = 'capa-img'; el.appendChild(c);
+  if (capa) { if (n.local) { var im = document.createElement('img'); im.alt = ''; im.src = n.local[capa]; c.appendChild(im); } else poeFoto(c, capa, 'grande'); c.onclick = function () { abreLuz(n, ordem, 0); }; }
+  if (resto.length) {
+    var m = document.createElement('div'); m.className = 'minis';
+    resto.slice(0, 4).forEach(function (f, i) {
+      var d = document.createElement('div');
+      if (n.local) { var im = document.createElement('img'); im.alt = ''; im.src = n.local[f]; d.appendChild(im); } else poeFoto(d, f, 'mini');
+      if (i === 3 && resto.length > 4) { var mais = document.createElement('span'); mais.className = 'mais'; mais.textContent = '+' + (resto.length - 3); d.appendChild(mais); }
+      d.onclick = function () { abreLuz(n, ordem, i + 1); };
+      m.appendChild(d);
+    });
+    el.appendChild(m);
+  }
+  var corpo = document.createElement('div'); corpo.className = 'corpo';
+  corpo.innerHTML = '<span class="quando">' + esc(dataLonga(n.data)) + (n.autor ? ' · ' + esc(n.autor) : '') + '</span>' +
+    '<h3>' + esc(n.titulo || 'Sem título') + '</h3><p>' + esc(n.texto || '') + '</p>';
+  el.appendChild(corpo);
+  return el;
+}
+
+function pintaTudo() {
+  var t = est.turma;
+  /* a prévia: o que está no formulário agora */
+  var local = {}; est.fotos.forEach(function (f) { if (f.id) local[f.id] = f.mini; });
+  var prev = { data: hojeIso(), autor: sessao().name || '', titulo: $('titulo').value.trim() || 'Título da notícia',
+               texto: $('texto').value.trim() || 'O texto para a família aparece aqui.', fotos: est.fotos.filter(function (f) { return f.id; }).map(function (f) { return f.id; }),
+               capa: est.capa, local: local };
+  $('previa').innerHTML = ''; $('previa').appendChild(cartao(prev));
+  /* a lista do professor */
+  var lp = $('listaPub'); lp.innerHTML = '';
+  if (!t) lp.innerHTML = '<p class="aviso">Escolha a turma.</p>';
+  else if (!est.lista.length) lp.innerHTML = '<p class="aviso">Nenhuma notícia publicada nos últimos ' + (est.dias || 60) + ' dias.</p>';
+  est.lista.forEach(function (n) {
+    var it = document.createElement('div'); it.className = 'it';
+    var th = document.createElement('div'); th.className = 'th'; if (n.capa || n.fotos[0]) poeFoto(th, n.capa || n.fotos[0], 'mini');
+    it.appendChild(th);
+    var tx = document.createElement('div'); tx.className = 'tx';
+    tx.innerHTML = '<b>' + esc(n.data.slice(8, 10) + '/' + n.data.slice(5, 7)) + ' · ' + esc(n.titulo) + '</b>' + n.fotos.length + ' foto' + (n.fotos.length === 1 ? '' : 's') + ' · ' + esc(n.autor);
+    it.appendChild(tx);
+    var ed = document.createElement('button'); ed.type = 'button'; ed.textContent = 'Editar'; ed.onclick = function () { editar(n); }; it.appendChild(ed);
+    var ap = document.createElement('button'); ap.type = 'button'; ap.className = 'apaga'; ap.textContent = 'Excluir'; ap.onclick = function () { excluir(n); }; it.appendChild(ap);
+    lp.appendChild(it);
+  });
+  /* o mural da família */
+  var mu = $('mural'); mu.innerHTML = '';
+  $('cabTurma').textContent = t ? t.titulo + ' · ' + t.escola : '';
+  if (t && !est.lista.length) mu.innerHTML = '<p class="aviso">Ainda não há notícias desta turma.</p>';
+  est.lista.forEach(function (n) { mu.appendChild(cartao(n)); });
+  $('rodapeMural').textContent = 'Cada notícia fica aqui por ' + (est.dias || 60) + ' dias. A escola guarda a cópia.';
+}
+
+/* ── as fotos: reduzir aqui, subir uma de cada vez ── */
+function reduz(arquivo, lado, qual) {
+  return new Promise(function (ok, falha) {
+    var url = URL.createObjectURL(arquivo), img = new Image();
+    img.onload = function () {
+      var k = Math.min(1, lado / Math.max(img.width, img.height)), w = Math.round(img.width * k), h = Math.round(img.height * k);
+      var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+      cv.getContext('2d').drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      ok(cv.toDataURL('image/jpeg', qual));
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); falha(new Error('Não consegui abrir esta imagem.')); };
+    img.src = url;
+  });
+}
+function pintaFotos() {
+  var box = $('fotos'); Array.prototype.slice.call(box.querySelectorAll('.foto')).forEach(function (x) { x.remove(); });
+  est.fotos.forEach(function (f) {
+    var d = document.createElement('div'); d.className = 'foto' + (f.id && f.id === est.capa ? ' capa' : '');
+    d.setAttribute('role', 'button'); d.tabIndex = 0; d.setAttribute('aria-label', 'Usar esta foto como capa');
+    var im = document.createElement('img'); im.alt = ''; im.src = f.mini; d.appendChild(im);
+    if (f.id && f.id === est.capa) { var s = document.createElement('span'); s.className = 'selo'; s.textContent = 'capa'; d.appendChild(s); }
+    if (!f.id) { var sb = document.createElement('div'); sb.className = 'subindo'; sb.textContent = f.erro ? '⚠️ falhou' : 'subindo…'; d.appendChild(sb); }
+    var x = document.createElement('button'); x.type = 'button'; x.className = 'tira'; x.textContent = '×'; x.setAttribute('aria-label', 'Tirar esta foto');
+    x.onclick = function (ev) { ev.stopPropagation(); est.fotos.splice(est.fotos.indexOf(f), 1); if (est.capa === f.id) est.capa = (est.fotos.filter(function (y) { return y.id; })[0] || {}).id || ''; pintaFotos(); pintaTudo(); };
+    d.appendChild(x);
+    d.onclick = function () { if (f.id) { est.capa = f.id; pintaFotos(); pintaTudo(); } };
+    box.insertBefore(d, $('btAdd'));
+  });
+  $('btAdd').hidden = est.fotos.length >= MAX_FOTOS;
+  $('contaFotos').textContent = est.fotos.length + ' de ' + MAX_FOTOS + ' · reduzidas aqui antes de subir · toque numa foto para ela ser a capa';
+}
+var _fila = Promise.resolve();
+function adicionaFotos(lista) {
+  var vagas = MAX_FOTOS - est.fotos.length;
+  Array.prototype.slice.call(lista, 0, Math.max(0, vagas)).forEach(function (arquivo) {
+    var f = { id: '', mini: '', erro: false }; est.fotos.push(f);
+    _fila = _fila.then(function () {
+      return Promise.all([reduz(arquivo, 1600, .82), reduz(arquivo, 480, .75)]).then(function (dd) {
+        f.mini = dd[1]; pintaFotos();
+        return post({ action: 'noticiaFotoSobe', grande: dd[0].split(',')[1], mini: dd[1].split(',')[1] });
+      }).then(function (r) {
+        f.id = r.foto; cacheFoto[r.foto + '|mini'] = Promise.resolve(f.mini);
+        if (!est.capa) est.capa = f.id;
+        pintaFotos(); pintaTudo();
+      }).catch(function (e) { f.erro = true; pintaFotos(); st('stPub', e.message, true); });
+    });
+  });
+  if (lista.length > vagas) st('stPub', 'Cabem ' + MAX_FOTOS + ' fotos por notícia. As outras ficaram de fora.', true);
+  pintaFotos();
+}
+
+/* ── o texto ── */
+function melhora() {
+  var frase = $('frase').value.trim(), bt = $('btIA');
+  if (frase.length < 8) { st('stPub', 'Escreva uma frase sobre a aula primeiro.', true); $('frase').focus(); return; }
+  /* nome de aluno não sai daqui para a IA (servidor nos EUA): a frase com um nome da turma é barrada antes */
+  var nomes = nomesNaFrase(frase);
+  if (nomes.length) { st('stPub', 'Tire o nome de aluno da frase antes (' + nomes.join(', ') + '). Escreva "a turma" ou "as crianças".', true); $('frase').focus(); return; }
+  bt.disabled = true; bt.textContent = '✨ Escrevendo…'; st('stPub', '');
+  post({ action: 'noticiaTexto', frase: frase, livro: (est.turma || {}).livro || '' }).then(function (r) {
+    $('texto').value = r.texto; est.frase = frase; pintaTudo();
+  }).catch(function (e) { st('stPub', e.message, true); }).then(function () { bt.disabled = false; bt.textContent = '✨ Melhorar texto'; });
+}
+
+function semAcento(s) { return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+function nomesNaFrase(frase) {
+  var f = ' ' + semAcento(frase).replace(/[^a-z0-9]+/g, ' ') + ' ', achou = [];
+  ((est.turma || {}).alunos || []).forEach(function (a) {
+    String(a.nome || '').split(/\s+/).slice(0, 2).forEach(function (p) {
+      var k = semAcento(p).replace(/[^a-z]/g, '');
+      if (k.length >= 3 && !/^(dos?|das?|de|e)$/.test(k) && f.indexOf(' ' + k + ' ') > -1 && achou.indexOf(p) < 0) achou.push(p);
+    });
+  });
+  return achou;
+}
+
+/* ── publicar, editar, excluir ── */
+function limpaForm() {
+  est.fotos = []; est.capa = ''; est.editando = ''; est.frase = '';
+  $('frase').value = ''; $('titulo').value = ''; $('texto').value = ''; $('confere').checked = false;
+  $('tituloForm').textContent = 'Nova notícia'; $('btPub').textContent = 'Publicar nas Notícias da turma'; $('btCancela').hidden = true;
+  st('stPub', ''); pintaFotos(); pintaTudo();
+}
+function publicar() {
+  var t = est.turma, bt = $('btPub');
+  if (!t) { st('stPub', 'Escolha a turma.', true); return; }
+  if (est.fotos.some(function (f) { return !f.id && !f.erro; })) { st('stPub', 'Espere as fotos terminarem de subir.', true); return; }
+  var ids = est.fotos.filter(function (f) { return f.id; }).map(function (f) { return f.id; });
+  if (!ids.length) { st('stPub', 'Mande pelo menos uma foto.', true); return; }
+  if (!$('titulo').value.trim()) { st('stPub', 'Dê um título curto à notícia.', true); $('titulo').focus(); return; }
+  if (!$('texto').value.trim()) { st('stPub', 'Falta o texto para a família.', true); $('texto').focus(); return; }
+  var nomes = nomesNaFrase($('texto').value + ' ' + $('titulo').value);
+  if (nomes.length) { st('stPub', 'O texto cita nome de aluno (' + nomes.join(', ') + '). Tire antes de publicar.', true); $('texto').focus(); return; }
+  if (!$('confere').checked) { st('stPub', 'Marque a conferência das fotos antes de publicar.', true); $('confere').focus(); return; }
+  bt.disabled = true; st('stPub', 'Publicando…');
+  post({ action: 'noticiaSalvar', id: est.editando || '', escola: t.escola, prof: t.prof, turma: t.titulo, titulo: $('titulo').value.trim(),
+         texto: $('texto').value.trim(), frase: $('frase').value.trim(), fotos: ids, capa: est.capa }).then(function () {
+    var era = est.editando; limpaForm(); st('stPub', era ? '✓ Notícia atualizada.' : '✓ Publicada. Só a direção vê enquanto a ferramenta não for liberada.');
+    carregaLista();
+  }).catch(function (e) { st('stPub', e.message, true); }).then(function () { bt.disabled = false; });
+}
+function editar(n) {
+  est.editando = n.id; est.capa = n.capa || n.fotos[0];
+  est.fotos = n.fotos.map(function (fid) { return { id: fid, mini: '' }; });
+  $('frase').value = n.frase || ''; $('titulo').value = n.titulo; $('texto').value = n.texto;
+  $('tituloForm').textContent = 'Editando: ' + n.titulo; $('btPub').textContent = 'Salvar a notícia'; $('btCancela').hidden = false;
+  est.fotos.forEach(function (f) { foto(f.id, 'mini').then(function (src) { f.mini = src; pintaFotos(); pintaTudo(); }).catch(function () {}); });
+  pintaFotos(); pintaTudo(); window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function excluir(n) {
+  if (!confirm('Excluir a notícia "' + n.titulo + '"? As fotos vão para a lixeira do Drive.')) return;
+  post({ action: 'noticiaExcluir', id: n.id }).then(function () { if (est.editando === n.id) limpaForm(); carregaLista(); })
+    .catch(function (e) { alert(e.message); });
+}
+
+/* ── a foto ampliada ── */
+var luz = { n: null, ordem: [], i: 0 };
+function abreLuz(n, ordem, i) { luz = { n: n, ordem: ordem, i: i }; $('luz').hidden = false; mostraLuz(); $('luzFecha').focus(); }
+function mostraLuz() {
+  var fid = luz.ordem[luz.i], img = $('luzImg');
+  $('luzTit').textContent = luz.n.titulo || ''; $('luzPos').textContent = dataLonga(luz.n.data) + ' · foto ' + (luz.i + 1) + ' de ' + luz.ordem.length;
+  $('luzAnt').hidden = luz.i === 0; $('luzProx').hidden = luz.i >= luz.ordem.length - 1;
+  img.removeAttribute('src');
+  if (luz.n.local) { img.src = luz.n.local[fid]; return; }
+  foto(fid, 'grande').then(function (src) { if (luz.ordem[luz.i] === fid) img.src = src; }).catch(function () {});
+}
+function fechaLuz() { $('luz').hidden = true; }
+$('luzFecha').onclick = fechaLuz;
+$('luzAnt').onclick = function () { if (luz.i > 0) { luz.i--; mostraLuz(); } };
+$('luzProx').onclick = function () { if (luz.i < luz.ordem.length - 1) { luz.i++; mostraLuz(); } };
+document.addEventListener('keydown', function (e) {
+  if ($('luz').hidden) return;
+  if (e.key === 'Escape') fechaLuz(); else if (e.key === 'ArrowLeft') $('luzAnt').click(); else if (e.key === 'ArrowRight') $('luzProx').click();
+});
+
+/* ── a direção escolhe de quem são as turmas (o mesmo fisk_actas do Hub) ── */
+function montaVerComo() {
+  var sel = $('verComo');
+  fetch(EP + '?action=profList').then(fiskJson).then(function (j) {
+    var ps = ((j && j.profs) || []).filter(function (p) { return !p.director && String(p.cargo || '').toLowerCase().indexOf('secret') !== 0; })
+      .sort(function (a, b) { return String(a.name).localeCompare(String(b.name), 'pt-BR'); });
+    var c = como(), cur = (c && c.name) || '';
+    sel.innerHTML = '<option value="">👥 Turmas de…</option>' + ps.map(function (p) {
+      return '<option value="' + esc(p.name) + '" data-esc="' + esc(p.escolas || '') + '"' + (p.name === cur ? ' selected' : '') + '>' + esc(p.name) + '</option>';
+    }).join('');
+    sel.hidden = false;
+  }).catch(function () {});
+  sel.addEventListener('change', function () {
+    var o = sel.options[sel.selectedIndex];
+    try { if (sel.value) localStorage.setItem('fisk_actas', JSON.stringify({ name: sel.value, escolas: o.getAttribute('data-esc') || '' })); else localStorage.removeItem('fisk_actas'); } catch (e) {}
+    carregaTurmas();
+  });
+}
+
+function modo(ver) {
+  $('abaPub').setAttribute('aria-pressed', ver ? 'false' : 'true'); $('abaVer').setAttribute('aria-pressed', ver ? 'true' : 'false');
+  $('telaPub').hidden = ver; $('telaVer').hidden = !ver;
+}
+$('abaPub').onclick = function () { modo(false); };
+$('abaVer').onclick = function () { modo(true); };
+$('turma').addEventListener('change', function () { if (this.value !== '') escolheTurma(+this.value); });
+$('btAdd').onclick = function () { $('arq').click(); };
+$('arq').addEventListener('change', function () { if (this.files && this.files.length) adicionaFotos(this.files); this.value = ''; });
+$('btIA').onclick = melhora;
+$('btOutro').onclick = melhora;
+$('btMinha').onclick = function () { $('texto').value = $('frase').value.trim(); pintaTudo(); };
+$('btPub').onclick = publicar;
+$('btCancela').onclick = limpaForm;
+['titulo', 'texto'].forEach(function (id) { $(id).addEventListener('input', pintaTudo); });
+
+fiskInitThemeToggle('themeToggle');
+fiskInitUserMenu();
+if (!token()) {
+  $('semSessao').hidden = false;
+} else {
+  post({ action: 'noticiasEstado' }).then(function (r) {
+    if (!r.pode) { $('fechado').hidden = false; return; }
+    MAX_FOTOS = r.maxFotos || MAX_FOTOS;
+    $('app').hidden = false; $('faixaFechado').hidden = !!r.aberto;
+    if (sessao().master) montaVerComo();
+    pintaFotos(); pintaTudo(); carregaTurmas();
+    fiskRegistrarUso('Notícias da turma');
+  }).catch(function (e) {
+    if (/sess[ãa]o/i.test(e.message)) $('semSessao').hidden = false;
+    else { $('fechado').hidden = false; $('fechado').querySelector('.aviso').textContent = e.message; }
+  });
+}
+</script>
+</body>
+</html>
