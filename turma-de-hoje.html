@@ -98,6 +98,9 @@
   .rot-lic{ font-weight: 800; font-size: .85rem; letter-spacing: .02em; color: var(--mar, #1d3685); }
   .passo-lic.atual .rot-lic{ color: var(--ui); }
   @media (prefers-reduced-motion: reduce){ .janela-lic{ scroll-behavior: auto; } }
+  /* no toque a janela não rola com o dedo (27/10/2026): o dedo que caía nela prendia a rolagem da página.
+     Quem troca de lição são as setas ▲ ▼, que rolam por scrollTo */
+  @media (pointer: coarse){ .janela-lic{ overflow-y: hidden; overscroll-behavior: auto; } }
   .nav-lic .setas{ display: inline-flex; gap: 8px; }
   .btn-seta{ width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--mar, #1d3685); background: var(--white); color: var(--mar, #1d3685); font-size: 18px; font-weight: 900; cursor: pointer; font-family: inherit; }
   .btn-seta:disabled{ opacity: .3; cursor: default; }
@@ -1131,7 +1134,7 @@ function reordenaComAnimacao(a, foiAtender) {
   if (ptEstado) { desenharTurma(); return; }   /* turma do plano: todos ao mesmo tempo, ninguém muda de lugar */
   var antes = {};
   document.querySelectorAll('#alunos .al').forEach(function (el) { antes[el.dataset.raf] = el.getBoundingClientRect().top; });
-  if (estado.prioridade) ordenarPorPrioridade(); else aplicarFila(); desenharTurma(); pintaFila();
+  if (estado.prioridade) ordenarPorPrioridade(); else aplicarFila(); reposicionar(a); pintaFila();
   var quieto = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var cartoes = Array.prototype.slice.call(document.querySelectorAll('#alunos .al'));
   var maior = 0;
@@ -1581,12 +1584,33 @@ function licoesDoLivro(plano) {
 function desenharTurma() {
   var caixa = $('alunos'); caixa.innerHTML = '';
   if (ptEstado) { desenharChamadaKids(caixa); return; }
-  var nCk = 0;
-  estado.alunos.forEach(function (a) { var cc = cartaoAluno(a); cc.dataset.raf = cc.dataset.raf || a.raf; caixa.appendChild(cc); var ck = (estado.dados[a.raf] || {}).planner; if (ck && ck.checking && Object.keys(ck.checking).some(function (k) { return ck.checking[k].feito; })) nCk++; });
-  $('resumo').hidden = false;
-  $('resumo').innerHTML = '<b>' + estado.alunos.length + '</b> alunos · <b>' + nCk + '</b> com Checking';   /* a turma já está no menu de cima */
+  estado.alunos.forEach(function (a) { var cc = cartaoAluno(a); cc.dataset.raf = cc.dataset.raf || a.raf; caixa.appendChild(cc); });
+  pintaResumo();
   /* o botão de prioridade mora na barra do roteiro (pintaFila), grande e numa linha só dele (16/09/2026) */
   ligaArrastar(caixa);
+  festaSeTurmaEmDia();
+}
+function pintaResumo() {
+  var nCk = estado.alunos.filter(function (a) { var ck = (estado.dados[a.raf] || {}).planner; return ck && ck.checking && Object.keys(ck.checking).some(function (k) { return ck.checking[k].feito; }); }).length;
+  $('resumo').hidden = false;
+  $('resumo').innerHTML = '<b>' + estado.alunos.length + '</b> alunos · <b>' + nCk + '</b> com Checking';   /* a turma já está no menu de cima */
+}
+/* REORDENAR SEM RECONSTRUIR (27/10/2026, "Minha aula mais leve"): atender, ↑ ↓ e arrastar refaziam a turma inteira.
+   Agora refaz só o cartão tocado e os que trocaram de número na prioridade, e MOVE os outros para o lugar novo.
+   Turma do plano (kids) ou alunos diferentes na tela: aí sim desenha tudo. */
+function reposicionar(tocado) {
+  var caixa = $('alunos');
+  if (ptEstado) { desenharTurma(); return; }
+  var noAr = {}, n = 0;
+  caixa.querySelectorAll(':scope > .al').forEach(function (c) { noAr[c.dataset.raf] = c; n++; });
+  if (n !== estado.alunos.length || caixa.children.length !== n || estado.alunos.some(function (a) { return !noAr[a.raf]; })) { desenharTurma(); return; }
+  estado.alunos.forEach(function (a, i) {
+    var c = noAr[a.raf];
+    if (a === tocado || c.dataset.rank !== String(estado.prioridade && a._rank || '')) { redesenhar(a); c = caixa.querySelector(':scope > .al[data-raf="' + a.raf + '"]'); }
+    if (caixa.children[i] !== c) caixa.insertBefore(c, caixa.children[i] || null);
+  });
+  caixa.querySelectorAll('.janela-lic').forEach(function (j) { if (j.realinha) j.realinha(); });
+  pintaResumo();
   festaSeTurmaEmDia();
 }
 /* O AVATAR COMEMORA (Pedro, 26/10/2026; assets/avatar-festa.js do portal): a turma inteira EM DIA no planner é o momento
@@ -1616,44 +1640,46 @@ function aplicaOrdemDaTela(caixa) {
   estado.alunos.sort(function (x, y) { return (pos[x.raf] == null ? 999 : pos[x.raf]) - (pos[y.raf] == null ? 999 : pos[y.raf]); });
   if (estado.prioridade) estado.alunos.forEach(function (a, k) { a._rank = fimDe(a) ? null : k + 1; });
   estado.ordemManual = true;
-  desenharTurma(); pintaFila();
+  reposicionar(null); pintaFila();
   toast('↕️ Ordem alterada. Toque em "Salvar ordem" para guardar para a aula.');
 }
 function ligaArrastar(caixa) {
-  caixa.querySelectorAll(':scope > .al').forEach(function (card) {
-    var sobe = card.querySelector('.mover .sobe'), desce = card.querySelector('.mover .desce'), alca = card.querySelector('.mover .arrasta');
-    if (sobe) sobe.addEventListener('click', function () { var p = card.previousElementSibling; if (p && p.classList.contains('al')) { caixa.insertBefore(card, p); aplicaOrdemDaTela(caixa); var n = caixa.querySelector('.al[data-raf="' + card.dataset.raf + '"]'); if (n) n.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } });
-    if (desce) desce.addEventListener('click', function () { var nx = card.nextElementSibling; if (nx && nx.classList.contains('al')) { caixa.insertBefore(nx, card); aplicaOrdemDaTela(caixa); var n = caixa.querySelector('.al[data-raf="' + card.dataset.raf + '"]'); if (n) n.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } });
-    if (!alca) return;
-    alca.addEventListener('pointerdown', function (ev) {
-      ev.preventDefault();
-      var y0 = ev.clientY, moveu = false, rolagem = null, ultimoY = ev.clientY;
-      try { alca.setPointerCapture(ev.pointerId); } catch (e) {}
-      card.classList.add('arrastando');
-      function troca(y) {
-        var r = card.getBoundingClientRect(), meio = r.top + r.height / 2;
-        var p = card.previousElementSibling, nx = card.nextElementSibling;
-        if (p && p.classList.contains('al')) { var rp = p.getBoundingClientRect(); if (meio < rp.top + Math.min(rp.height / 2, 160)) { caixa.insertBefore(card, p); y0 -= rp.height + 16; moveu = true; } }
-        if (nx && nx.classList.contains('al')) { var rn = nx.getBoundingClientRect(); if (r.bottom > rn.top + Math.min(rn.height / 2, 160)) { caixa.insertBefore(nx, card); y0 += rn.height + 16; moveu = true; } }
-        card.style.transform = 'translateY(' + (y - y0) + 'px) rotate(1deg)';
+  caixa.querySelectorAll(':scope > .al').forEach(function (card) { ligaCartao(caixa, card); });
+}
+/* um cartão por vez: o redesenhar() refaz UM cartão, e sem isto o cartão refeito perdia ↑ ↓ e a alça (27/10/2026) */
+function ligaCartao(caixa, card) {
+  var sobe = card.querySelector('.mover .sobe'), desce = card.querySelector('.mover .desce'), alca = card.querySelector('.mover .arrasta');
+  if (sobe) sobe.addEventListener('click', function () { var p = card.previousElementSibling; if (p && p.classList.contains('al')) { caixa.insertBefore(card, p); aplicaOrdemDaTela(caixa); var n = caixa.querySelector('.al[data-raf="' + card.dataset.raf + '"]'); if (n) n.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } });
+  if (desce) desce.addEventListener('click', function () { var nx = card.nextElementSibling; if (nx && nx.classList.contains('al')) { caixa.insertBefore(nx, card); aplicaOrdemDaTela(caixa); var n = caixa.querySelector('.al[data-raf="' + card.dataset.raf + '"]'); if (n) n.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } });
+  if (!alca) return;
+  alca.addEventListener('pointerdown', function (ev) {
+    ev.preventDefault();
+    var y0 = ev.clientY, moveu = false, rolagem = null, ultimoY = ev.clientY;
+    try { alca.setPointerCapture(ev.pointerId); } catch (e) {}
+    card.classList.add('arrastando');
+    function troca(y) {
+      var r = card.getBoundingClientRect(), meio = r.top + r.height / 2;
+      var p = card.previousElementSibling, nx = card.nextElementSibling;
+      if (p && p.classList.contains('al')) { var rp = p.getBoundingClientRect(); if (meio < rp.top + Math.min(rp.height / 2, 160)) { caixa.insertBefore(card, p); y0 -= rp.height + 16; moveu = true; } }
+      if (nx && nx.classList.contains('al')) { var rn = nx.getBoundingClientRect(); if (r.bottom > rn.top + Math.min(rn.height / 2, 160)) { caixa.insertBefore(nx, card); y0 += rn.height + 16; moveu = true; } }
+      card.style.transform = 'translateY(' + (y - y0) + 'px) rotate(1deg)';
+    }
+    function mexe(e) {
+      ultimoY = e.clientY; troca(e.clientY);
+      var borda = 70, h = window.innerHeight;
+      clearInterval(rolagem); rolagem = null;
+      if (e.clientY < borda || e.clientY > h - borda) {
+        var dir = e.clientY < borda ? -1 : 1;
+        rolagem = setInterval(function () { window.scrollBy(0, dir * 18); y0 -= dir * 18; troca(ultimoY); }, 16);
       }
-      function mexe(e) {
-        ultimoY = e.clientY; troca(e.clientY);
-        var borda = 70, h = window.innerHeight;
-        clearInterval(rolagem); rolagem = null;
-        if (e.clientY < borda || e.clientY > h - borda) {
-          var dir = e.clientY < borda ? -1 : 1;
-          rolagem = setInterval(function () { window.scrollBy(0, dir * 18); y0 -= dir * 18; troca(ultimoY); }, 16);
-        }
-      }
-      function solta() {
-        clearInterval(rolagem);
-        alca.removeEventListener('pointermove', mexe); alca.removeEventListener('pointerup', solta); alca.removeEventListener('pointercancel', solta);
-        card.classList.remove('arrastando'); card.style.transform = '';
-        if (moveu) aplicaOrdemDaTela(caixa);
-      }
-      alca.addEventListener('pointermove', mexe); alca.addEventListener('pointerup', solta); alca.addEventListener('pointercancel', solta);
-    });
+    }
+    function solta() {
+      clearInterval(rolagem);
+      alca.removeEventListener('pointermove', mexe); alca.removeEventListener('pointerup', solta); alca.removeEventListener('pointercancel', solta);
+      card.classList.remove('arrastando'); card.style.transform = '';
+      if (moveu) aplicaOrdemDaTela(caixa);
+    }
+    alca.addEventListener('pointermove', mexe); alca.addEventListener('pointerup', solta); alca.addEventListener('pointercancel', solta);
   });
 }
 
@@ -1743,13 +1769,35 @@ function trilhaDeLicoes(a, plano, ctx, reg, ir) {
   nav.appendChild(setas); nav.appendChild(vendo); nav.appendChild(volta);
   nav.appendChild(poeDica(nav, 'As setas mostram outra lição do livro: dá para explicar e marcar a lição seguinte sem esperar o card mudar. Para o aluno nada fica bloqueado por aqui.'));
   var jan = document.createElement('div'); jan.className = 'janela-lic'; jan.tabIndex = 0; jan.setAttribute('aria-label', 'Lições de ' + a.nome + ', role para ver as outras');
+  /* LIÇÕES SOB DEMANDA (27/10/2026, "Minha aula mais leve"): o cartão montava as 18 lições do livro, e uma turma de 16
+     passava de 14 mil nós. Agora nascem só as caixas vazias; a grade entra na lição à vista e nas vizinhas (enche). */
   var passos = [];
   plano.etapas.forEach(function (e, i) {
-    var g = gradeDaLicao(a, plano, e.id, ctx, reg, i === ir);
-    if (!g) return;
+    if (!PlannerV2.estadoEtapa(plano, e.id, ctx)) return;
     var ps = document.createElement('div'); ps.className = 'passo-lic' + (i === ir ? ' atual' : ''); ps.dataset.i = i;
-    ps.appendChild(g);   /* sem rótulo: a linha das setas diz a lição que está na janela */ jan.appendChild(ps); passos.push(ps);
+    jan.appendChild(ps); passos.push(ps);   /* sem rótulo: a linha das setas diz a lição que está na janela */
   });
+  if (!passos.length) return box;
+  var alturaH = 0;
+  var enche = function (p) {
+    var k = passos.indexOf(p), novo = false;
+    [k - 1, k, k + 1].forEach(function (j) {
+      var ps = passos[j]; if (!ps || ps.dataset.cheio) return;
+      ps.dataset.cheio = '1'; novo = true;
+      var i = +ps.dataset.i, g = gradeDaLicao(a, plano, plano.etapas[i].id, ctx, reg, i === ir);
+      if (g) ps.appendChild(g);
+    });
+    return novo;
+  };
+  /* a altura: a da maior lição já montada, para o encaixe ser sempre de uma lição inteira (as vazias herdam) */
+  var mede = function () {
+    var cheios = passos.filter(function (p) { return p.dataset.cheio; });
+    cheios.forEach(function (p) { p.style.minHeight = ''; });
+    var h = Math.max.apply(null, cheios.map(function (p) { return p.offsetHeight; }).concat(alturaH));
+    alturaH = h;
+    passos.forEach(function (p) { p.style.minHeight = h + 'px'; });
+    jan.style.height = h + 'px';
+  };
   box.appendChild(nav); box.appendChild(jan);
   var vista = function () {
     var t = jan.scrollTop, melhor = passos[0];
@@ -1758,6 +1806,7 @@ function trilhaDeLicoes(a, plano, ctx, reg, ir) {
   };
   var marca = function () {
     var p = vista(); if (!p) return;
+    if (enche(p)) { mede(); vai(p, false); }
     var i = +p.dataset.i, e = plano.etapas[i];
     estado.verLic = estado.verLic || {}; estado.verLic[a.raf] = e.id;
     vendo.innerHTML = (i === ir ? 'Lição atual: ' : 'Vendo: ') + '<b>' + esc(e.rot) + '</b>' + (e.tema && e.tema !== e.rot ? ' · ' + esc(e.tema) : '') + (i > ir ? ' <em>(à frente)</em>' : i < ir ? ' <em>(anterior)</em>' : '');
@@ -1765,22 +1814,26 @@ function trilhaDeLicoes(a, plano, ctx, reg, ir) {
     var k = passos.indexOf(p); sobe.disabled = k <= 0; desce.disabled = k >= passos.length - 1;
   };
   var vai = function (p, suave) { if (p) jan.scrollTo({ top: p.offsetTop - jan.offsetTop, behavior: suave ? 'smooth' : 'auto' }); };
-  sobe.addEventListener('click', function () { vai(passos[passos.indexOf(vista()) - 1], true); });
-  desce.addEventListener('click', function () { vai(passos[passos.indexOf(vista()) + 1], true); });
-  volta.addEventListener('click', function () { vai(passos.filter(function (p) { return +p.dataset.i === ir; })[0], true); });
+  /* a seta vai à vizinha já montada, e a de depois dela entra antes de chegar */
+  var anda = function (d) { var k = passos.indexOf(vista()) + d, p = passos[k]; if (!p) return; if (enche(p)) mede(); vai(p, true); };
+  sobe.addEventListener('click', function () { anda(-1); });
+  desce.addEventListener('click', function () { anda(1); });
+  var atual = function () { return passos.filter(function (p) { return +p.dataset.i === ir; })[0]; };
+  volta.addEventListener('click', function () { var p = atual(); if (p && enche(p)) mede(); vai(p, true); });
   var t0; jan.addEventListener('scroll', function () { clearTimeout(t0); t0 = setTimeout(marca, 80); }, { passive: true });
-  /* a altura: a da maior lição, para o encaixe ser sempre de uma lição inteira; depois abre na guardada ou na atual */
+  var alvo = function () {
+    var guardada = (estado.verLic || {})[a.raf];
+    return passos.filter(function (p) { return plano.etapas[+p.dataset.i].id === guardada; })[0] || atual() || passos[0];
+  };
+  /* abre na guardada ou na atual. A atual ±1 já nasce montada (é onde o professor trabalha) */
+  enche(alvo()); var pa = atual(); if (pa) enche(pa);
   var ajusta = function () {
     if (!jan.isConnected) { requestAnimationFrame(ajusta); return; }
-    passos.forEach(function (p) { p.style.minHeight = ''; });
-    var h = Math.max.apply(null, passos.map(function (p) { return p.offsetHeight; }));
-    passos.forEach(function (p) { p.style.minHeight = h + 'px'; });
-    jan.style.height = h + 'px';
-    var guardada = (estado.verLic || {})[a.raf];
-    var alvo = passos.filter(function (p) { return plano.etapas[+p.dataset.i].id === guardada; })[0] || passos.filter(function (p) { return +p.dataset.i === ir; })[0] || passos[0];
-    vai(alvo, false); marca();
+    mede(); vai(alvo(), false); marca();
   };
   requestAnimationFrame(ajusta);
+  /* mover o cartão no DOM (reposicionar) pode zerar a rolagem da janela: volta à lição que estava à vista */
+  jan.realinha = function () { if (jan.isConnected && alturaH) { vai(alvo(), false); marca(); } };
   return box;
 }
 /* as três aulas de UMA lição (a grade), para qualquer lição do livro: a Minha aula empilha várias numa
@@ -1847,6 +1900,7 @@ function cartaoAluno(a) {
   var reg = ctx.planner.plano.checking || {};
   var ckAtual = reg[pos.id];
   var card = document.createElement('section'); card.className = 'al'; card.dataset.raf = a.raf;
+  card.dataset.rank = estado.prioridade && a._rank || '';   /* o reposicionar refaz o cartão quando o número muda */
   if (plano) card.style.cssText = corDoEstagio(plano);   /* cada estágio com a sua cor, a mesma do planner completo */
   var cab = document.createElement('div'); cab.className = 'al-cab';
   var atras = Number(a.aulasAtraso) || 0;
@@ -1915,7 +1969,11 @@ function cartaoAluno(a) {
   }
   if (estado.atendidos[a.raf]) { var q = document.createElement('span'); q.className = 'quando'; var dt = new Date(estado.atendidos[a.raf]); q.textContent = 'Atendido às ' + ('0' + dt.getHours()).slice(-2) + ':' + ('0' + dt.getMinutes()).slice(-2); at.appendChild(q); }
   card.appendChild(at);
-  cardReal.querySelectorAll('[data-ck]').forEach(function (b) { b.addEventListener('click', function () { var e = plano && plano.etapas.find(function (x) { return x.id === b.dataset.ck; }); iniciarChecking(cardReal, a, plano, e ? { id: e.id, rot: e.rot, tema: e.tema } : pos); }); });
+  /* por delegação: as lições fora da vista só ganham os botões quando entram na janela (trilhaDeLicoes) */
+  cardReal.addEventListener('click', function (ev) {
+    var b = ev.target.closest && ev.target.closest('[data-ck]'); if (!b || !cardReal.contains(b)) return;
+    var e = plano && plano.etapas.find(function (x) { return x.id === b.dataset.ck; }); iniciarChecking(cardReal, a, plano, e ? { id: e.id, rot: e.rot, tema: e.tema } : pos);
+  });
   if (estado.aberto === a.raf) abrirChecking(cardReal, a, plano, pos);
   return cardReal;
 }
@@ -2177,6 +2235,7 @@ function redesenhar(a) {
   var velho = document.querySelector('.al[data-raf="' + a.raf + '"]');
   var novo = cartaoAluno(a);
   if (velho) velho.replaceWith(novo); else $('alunos').appendChild(novo);
+  if (novo.classList.contains('al')) ligaCartao($('alunos'), novo);
   if (aguia.raf === a.raf) desenhaAguia();
 }
 
