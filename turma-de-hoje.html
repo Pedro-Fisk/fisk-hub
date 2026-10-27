@@ -614,7 +614,7 @@ body.theme-dark .pl-salvar{ background: #10261f; }
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
-<script src="https://portalfisk.com.br/assets/avatar-festa.js?v=2026-10-26b"></script>
+<script src="https://portalfisk.com.br/assets/avatar-festa.js?v=2026-10-26c"></script>
 <script src="https://portalfisk.com.br/assets/planner-v2.js?v=b66262b64e"></script>
 <!-- o guia do Checking, lição a lição: a base comum e um arquivo por livro (Essentials, Transitions e Fluency 1 e 2, In Focus, Inmediato 1 a 3) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=5a600e1933"></script>
@@ -759,7 +759,7 @@ function alternaPrioridade() {
     var dy = t0 - c.getBoundingClientRect().top; if (Math.abs(dy) < 1) return;
     moventes.push({ c: c, dy: dy });
   });
-  var fim = function () { if (estado.prioridade && moventes.length) { somDeConquista(); confeteDaFila(); try { if (window.FiskAvatarFesta) FiskAvatarFesta.viva({ selo: '✨', som: false }); } catch (e) {} } };
+  var fim = function () { if (estado.prioridade && moventes.length) { somDeConquista(); confeteDaFila(); try { if (window.FiskAvatarFesta) FiskAvatarFesta.viva({ selo: '✨', som: false, pequena: true }); } catch (e) {} } };
   var total = 0;
   if (lento && moventes.length && document.body.animate) {
     var DUR = 3200, PASSO = 140;
