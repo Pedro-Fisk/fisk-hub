@@ -163,6 +163,20 @@
       <label class="chk"><input type="checkbox" id="soPrecisam"> só quem precisa de 2nd chance</label>
     </div>
     <div class="lista" id="lista"></div>
+    <div class="row" style="margin-top:.8rem"><button type="button" class="btn btn-ghost" id="btnLote">📦 Criar em lote (vários alunos)</button></div>
+  </div>
+
+  <!-- O LOTE (27/10/2026, pedido do Pedro): várias 2nd Chances de uma vez, com o motor fiskLote do kit. As notas são
+       as da avaliação escolhida acima; as sugestões valem para todos e o "Refazer" cita as provas de cada aluno. -->
+  <div class="painel" id="painelLote" hidden>
+    <h2>📦 2nd Chance em lote</h2>
+    <p class="aviso" style="margin:.2rem 0 .7rem">Quem tem prova abaixo de 6,0 na avaliação escolhida já vem marcado. As sugestões abaixo
+      valem para todos; o "Refazer" cita as provas de cada aluno. Cada comunicado vai para a pasta do aluno, para o card e
+      para o E-counseling, como no de um aluno só.</p>
+    <div class="sugs" id="loteSug"></div>
+    <label style="display:block;font-size:.85rem;font-weight:700;margin:.6rem 0 .3rem">Outros (uma ideia por linha, vale para todos)</label>
+    <textarea id="loteLivre" rows="2" style="width:100%"></textarea>
+    <div id="loteCaixa" style="margin-top:.9rem"></div>
   </div>
 
   <!-- 3 · aluno selecionado -->
@@ -232,7 +246,7 @@
   Ferramenta interna das escolas Fisk Taubaté · Caçapava.
 </footer>
 
-<script src="assets/fisk-shared.js?v=2026-10-26b"></script>
+<script src="assets/fisk-shared.js?v=2026-10-27a"></script>
 <!-- aviso de aluno fora do card -->
 <script src="fisk-fora-do-card.js"></script>
 <script>
@@ -251,6 +265,7 @@ var turma = null;      // payload de fn=turma
 var avSel = '1';       // avaliação em foco (1 ou 2)
 var alunoSel = null;   // { nome, estagio, escrita, auditiva }
 var modoLivre = false;
+function sairDoLote() { var pl = document.getElementById('painelLote'); if (pl) pl.hidden = true; }
 
 function statusCard(msg, kind) { var s = $('statusCard'); s.textContent = msg || ''; s.className = 'status' + (kind ? ' ' + kind : ''); }
 function ind(id, estado) { $(id).className = 'ind' + (estado ? ' ' + estado : ''); }
@@ -478,6 +493,7 @@ function abrirAlunoPorLinha(linhaCard) {
 /* ---- turma carregada: escolhe avaliação padrão e monta a lista ---- */
 function temNotas(av) { return (turma.alunos || []).some(function (a) { return parseProvas(av === '2' ? a.notasAv2 : a.notasAv1); }); }
 function onTurma(dados) {
+  sairDoLote();
   turma = dados; modoLivre = false; alunoSel = null;
   $('painelAluno').hidden = true;
   ultimoPDF = null; esconderPreview(); esconderVerPasta(); statusDoc(''); syncAcoes();
@@ -540,6 +556,7 @@ function nomeComDossie(nome) {
 
 /* ============ ALUNO ESCOLHIDO ============ */
 function escolherAluno(a) {
+  sairDoLote();
   var p = alunoProvas(a) || {};
   /* linhaCard e idx (última aula feita) vêm junto: são o endereço da célula
      onde o "Lançar no card" escreve a nota do documento. */
@@ -693,6 +710,7 @@ function avisarForaDoCard(documento) {
 
 /* ============ MODO LIVRE (sem card) ============ */
 $('btnLivre').addEventListener('click', function () {
+  sairDoLote();
   modoLivre = true;
   alunoSel = { nome: '', estagio: '', escrita: undefined, auditiva: undefined, linhaCard: null, idx: null };
   $('painelTurma').hidden = true;
@@ -953,6 +971,59 @@ if (typeof fiskLigarAcompanhamento === 'function') fiskLigarAcompanhamento(docum
 </script>
 <!-- Central de Pedidos (21/10/2026): o botão "Enviar à família pela secretaria" aparece quando o PDF é gerado -->
 <script src="assets/fisk-imprimir.js?v=2026-10-21c"></script>
-<script>if (window.fiskImpressao) fiskImpressao.ligar({ depoisDe: 'btnPDF', origem: '2nd', rotulo: '2nd Chance', acao: 'enviar', margem: '0 0 0 8px' });</script>
+<script>if (window.fiskImpressao) fiskImpressao.ligar({ depoisDe: 'btnPDF', origem: '2nd', rotulo: '2nd Chance', acao: 'enviar', margem: '0 0 0 8px' });
+/* ── O LOTE (27/10/2026): ver o comentário do #painelLote ── */
+function itensDoLote(p) {
+  var itens = [];
+  SUGESTOES.forEach(function (sg) {
+    var cb = $('loteSug').querySelector('input[value="' + sg.k + '"]');
+    if (!cb || !cb.checked) return;
+    if (sg.k === 'refazer') {
+      var ab = provasAbaixo(p).map(rotuloProva);
+      itens.push(ab.length ? ('Refazer ' + (ab.length === 2 ? 'a prova escrita e a prova auditiva' : ('a ' + ab[0].toLowerCase())) + ', buscando alcançar pelo menos 6,0.') : sg.t);
+    } else itens.push(sg.t);
+  });
+  ($('loteLivre').value || '').split('\n').forEach(function (l) { l = polirLinha(l); if (l) itens.push(l); });
+  return itens;
+}
+$('btnLote').addEventListener('click', function () {
+  if (!turma || !(turma.alunos || []).length) { alert('Abra uma turma primeiro: o lote usa os alunos dela.'); return; }
+  $('painelAluno').hidden = true; alunoSel = null; ultimoPDF = null;
+  $('lista').querySelectorAll('.aluno').forEach(function (x) { x.classList.remove('sel'); });
+  $('loteSug').innerHTML = SUGESTOES.map(function (sg) { return '<label><input type="checkbox" value="' + sg.k + '"' + (sg.on ? ' checked' : '') + '><span>' + sg.t + '</span></label>'; }).join('');
+  $('loteLivre').value = '';
+  $('painelLote').hidden = false;
+  var alunos = (turma.alunos || []).filter(function (a) { return a && a.nome; });
+  var prof = (turma.professor || turma.aba || '').trim(), turmaTxt = String(turma.turma || '').split('\n')[0].trim();
+  fiskLote($('loteCaixa'), {
+    doc: 'comunicado', plural: 'comunicados', arquivoJunto: '2nd Chance - ' + turmaTxt + '.pdf',
+    alunos: alunos.map(function (a, i) {
+      var p = alunoProvas(a) || {}, ab = provasAbaixo(p);
+      return { id: i, nome: a.nome, marcado: ab.length > 0,
+               detalhe: 'Escrita ' + fmtNota(p.escrita) + ' · Auditiva ' + fmtNota(p.auditiva) + (ab.length ? '' : ' · nada abaixo de 6,0') };
+    }),
+    gerar: function (i) {
+      var a = alunos[i], p = alunoProvas(a) || {};
+      return fisk2ndPDF({ nome: a.nome, estagio: a.book || '', prof: prof, turma: turmaTxt, escrita: p.escrita, auditiva: p.auditiva, itens: itensDoLote(p) });
+    },
+    salvar: function (i, pdf) {
+      var a = alunos[i], p = alunoProvas(a) || {}, ab = provasAbaixo(p), linhas = ['', '', ''], falhou = false;
+      var pasta = fiskSalvarNoDrive({ token: tokenSessao(), tipo: 'aluno', escola: turma.escola, professor: prof, turma: turmaTxt,
+                                      aluno: a.nome, filename: pdf.filename, bytes: pdf.bytes })
+        .then(function (r) { linhas[0] = r && r.aviso ? '📁 ✓ (fora do lugar)' : '📁 ✓'; })
+        .catch(function (e) { falhou = true; linhas[0] = e && e.code === 'pasta_nao_encontrada' ? '📁 ⚠️ sem pasta' : '📁 ⚠️ não salvou'; });
+      var card = a.linhaCard == null ? Promise.resolve(linhas[1] = '📇 —')
+        : api({ fn: 'registrarDoc', escola: turma.escola, prof: turma.aba || turma.professor || '', linhaCard: a.linhaCard, idx: a.ultimaPresencaIdx, tipo: '2nd', professor: prof })
+            .then(function () { linhas[1] = '📇 ✓'; }).catch(function () { falhou = true; linhas[1] = '📇 ⚠️'; });
+      var notas = ab.map(function (q) { return (q === 'escrita' ? 'Escrita' : 'Auditiva') + ': ' + p[q]; }).join(' · ');
+      var couns = (typeof fiskCounseling === 'function' ? fiskCounseling({ escola: turma.escola, professor: prof, turma: turma.turma || turma.titulo || '', aluno: a.nome, origem: '2nd',
+          campos: { estagio: a.book || '', prova: ab.join(' e '), motivo: notas } }) : Promise.resolve(null))
+        .then(function (j) { if (j && j.ok) linhas[2] = '💬 ✓'; else { falhou = true; linhas[2] = j && j.code === 'sem_documento' ? '💬 ⚠️ sem documento' : '💬 ⚠️'; } });
+      return Promise.all([pasta, card, couns]).then(function () { return { linhas: linhas, falhou: falhou }; });
+    }
+  });
+  $('painelLote').scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+</script>
 </body>
 </html>

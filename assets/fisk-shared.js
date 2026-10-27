@@ -988,6 +988,96 @@ function fiskGaveta_(cfg) {
  *
  * ctx: { escola, professor, turma, aluno }
  */
+/* ══ DOCUMENTOS EM LOTE (27/10/2026, pedido do Pedro: "que dentro de cada página da ferramenta ele pudesse ter a
+ * opção de criar em lote") ══════════════════════════════════════════════════════════════════════════════════════
+ * O motor é um só e mora aqui; cada ferramenta (Termo de atraso, 2nd Chance) diz só COMO gerar o PDF de um aluno e
+ * COMO salvá-lo. A lista nasce com os sinalizados já marcados, o lote anda um aluno por vez (o Apps Script tem trava
+ * e fila; dez alunos em paralelo virariam erro) e cada aluno ganha a linha de resultado dele: um erro não para o resto.
+ * No fim, um PDF só com todos, para imprimir de uma vez.
+ *   cfg = { alunos: [{ id, nome, detalhe, marcado }], doc: 'termo' (o nome no botão), plural: 'termos',
+ *           gerar: async function (id) -> { bytes, filename },
+ *           salvar: async function (id, pdf) -> { linhas: ['📁 …', '📇 …'], falhou: bool },
+ *           arquivoJunto: 'termos.pdf', antes: function () -> texto de erro ou '' (validação da tela) } */
+function fiskLote(caixa, cfg) {
+  if (!caixa || !cfg) return;
+  var e = fiskEsc, rodando = false, gerados = [];
+  caixa.innerHTML =
+    '<div class="fl-barra"><b class="fl-n"></b><span class="fl-sp"></span>' +
+    '<button type="button" class="fl-mini" data-fl="todos">Marcar todos</button><button type="button" class="fl-mini" data-fl="nenhum">Desmarcar</button></div>' +
+    '<div class="fl-lista">' + cfg.alunos.map(function (a, i) {
+      return '<label class="fl-al"><input type="checkbox" data-i="' + i + '"' + (a.marcado ? ' checked' : '') + '>' +
+        '<span class="fl-nm">' + e(a.nome) + '</span><span class="fl-det">' + e(a.detalhe || '') + '</span><span class="fl-res" id="flr' + i + '"></span></label>';
+    }).join('') + '</div>' +
+    '<div class="fl-acoes"><button type="button" class="btn-generate fl-ir"></button><button type="button" class="btn-sec fl-junto" hidden>⬇ Baixar todos num PDF só (para imprimir)</button></div>' +
+    '<p class="fl-st"></p>';
+  if (!document.getElementById('fl-css')) {
+    var st = document.createElement('style'); st.id = 'fl-css';
+    st.textContent = '.fl-barra{display:flex;align-items:center;gap:.5rem;margin:.2rem 0 .5rem}.fl-sp{flex:1}' +
+      '.fl-mini{font:inherit;font-size:.78rem;font-weight:700;border:1px solid var(--blue-bd,#9db6cb);background:var(--white,#fff);color:inherit;border-radius:99px;padding:.25rem .7rem;cursor:pointer}' +
+      '.fl-lista{border:1px solid var(--surface-border-color,#dfe6ef);border-radius:12px;overflow:hidden}' +
+      '.fl-al{display:flex;align-items:center;gap:.6rem;padding:.6rem .8rem;border-bottom:1px solid var(--surface-border-color,#dfe6ef);cursor:pointer;flex-wrap:wrap}' +
+      '.fl-al:last-child{border-bottom:0}.fl-al input{width:18px;height:18px;flex:none}.fl-nm{font-weight:700}' +
+      '.fl-det{font-size:.8rem;color:var(--gray)}.fl-res{margin-left:auto;font-size:.8rem;font-weight:700}' +
+      '.fl-res.ok{color:#1e8f4e}.fl-res.err{color:#b8860b}.fl-res.vai{color:var(--gray)}' +
+      '.fl-acoes{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.8rem}.fl-st{font-size:.86rem;font-weight:700;margin:.5rem 0 0}' +
+      '@media (max-width:560px){.fl-res{margin-left:1.6rem;width:100%}}';
+    document.head.appendChild(st);
+  }
+  var ir = caixa.querySelector('.fl-ir'), junto = caixa.querySelector('.fl-junto'), stx = caixa.querySelector('.fl-st');
+  function marcados() { return Array.prototype.filter.call(caixa.querySelectorAll('.fl-lista input'), function (c) { return c.checked; }).map(function (c) { return +c.dataset.i; }); }
+  function conta() {
+    var n = marcados().length;
+    caixa.querySelector('.fl-n').textContent = n + ' de ' + cfg.alunos.length + ' marcados';
+    ir.textContent = '📦 Gerar ' + n + ' ' + (n === 1 ? cfg.doc : cfg.plural) + ' e salvar';
+    ir.disabled = rodando || !n;
+  }
+  caixa.addEventListener('change', conta);
+  caixa.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-fl]'); if (!b || rodando) return;
+    caixa.querySelectorAll('.fl-lista input').forEach(function (c) { c.checked = b.dataset.fl === 'todos'; }); conta();
+  });
+  ir.addEventListener('click', async function () {
+    var lista = marcados(); if (!lista.length || rodando) return;
+    var erro = cfg.antes ? cfg.antes() : ''; if (erro) { alert(erro); return; }
+    if (!confirm('Gerar ' + lista.length + ' ' + (lista.length === 1 ? cfg.doc : cfg.plural) + ' e salvar cada um na pasta do aluno, no card e no E-counseling?')) return;
+    rodando = true; gerados = []; junto.hidden = true; conta();
+    caixa.querySelectorAll('.fl-lista input').forEach(function (c) { c.disabled = true; });
+    var ok = 0, comAviso = 0;
+    for (var k = 0; k < lista.length; k++) {
+      var i = lista[k], a = cfg.alunos[i], res = document.getElementById('flr' + i);
+      stx.textContent = '⏳ ' + (k + 1) + ' de ' + lista.length + ': ' + a.nome;
+      res.className = 'fl-res vai'; res.textContent = '⏳ gerando…';
+      try {
+        var pdf = await cfg.gerar(a.id);
+        gerados.push(pdf);
+        res.textContent = '⏳ salvando…';
+        var r = await cfg.salvar(a.id, pdf);
+        res.className = 'fl-res ' + (r && r.falhou ? 'err' : 'ok');
+        res.textContent = (r && r.linhas || ['✓']).join('  ·  ');
+        if (r && r.falhou) comAviso++; else ok++;
+      } catch (err) {
+        res.className = 'fl-res err'; res.textContent = '⚠️ ' + ((err && err.message) || 'não gerou'); comAviso++;
+      }
+    }
+    rodando = false;
+    caixa.querySelectorAll('.fl-lista input').forEach(function (c) { c.disabled = false; });
+    stx.textContent = '✓ Pronto: ' + ok + ' completo' + (ok === 1 ? '' : 's') + (comAviso ? ', ' + comAviso + ' com aviso (veja a linha do aluno)' : '') + '.';
+    junto.hidden = !gerados.length; conta();
+  });
+  junto.addEventListener('click', async function () {
+    if (!gerados.length || typeof PDFLib === 'undefined') return;
+    var doc = await PDFLib.PDFDocument.create();
+    for (var i = 0; i < gerados.length; i++) {
+      var src = await PDFLib.PDFDocument.load(gerados[i].bytes);
+      (await doc.copyPages(src, src.getPageIndices())).forEach(function (pg) { doc.addPage(pg); });
+    }
+    var url = URL.createObjectURL(new Blob([await doc.save()], { type: 'application/pdf' }));
+    var l = document.createElement('a'); l.href = url; l.download = cfg.arquivoJunto || 'documentos.pdf'; document.body.appendChild(l); l.click();
+    setTimeout(function () { URL.revokeObjectURL(url); l.remove(); }, 2000);
+  });
+  conta();
+}
+
 /* O DOCUMENTO DO COUNSELING DIRETO NO DOCS (Pedro, 26/10/2026, sobre a Minha semana: "que esse fosse o próprio botão
  * do counseling, sem passar pela ferramenta dentro do portal e sem passar pela pasta do aluno"). A aba nova abre NO
  * TOQUE (aberta depois da resposta, o navegador a bloquearia como pop-up) com "Abrindo…", e vai para o Google Docs

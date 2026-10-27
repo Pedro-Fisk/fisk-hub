@@ -12,7 +12,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="assets/termo-pdf.js?v=2026-10-22a"></script>
-<script src="assets/fisk-shared.js?v=2026-10-26b"></script>
+<script src="assets/fisk-shared.js?v=2026-10-27a"></script>
 <!-- aviso de aluno fora do card -->
 <script src="fisk-fora-do-card.js"></script>
 <style>
@@ -129,6 +129,7 @@
     </div>
     <div style="display:flex;gap:.6rem;margin:.6rem 0;flex-wrap:wrap">
       <button class="btn-sec" id="btnLivre" style="background:var(--blue)">✍️ Criar termo livre (sem turma)</button>
+      <button class="btn-sec" id="btnLote" style="background:#27866e">📦 Criar em lote (vários alunos)</button>
     </div>
     <div class="lista-alunos" id="listaAlunos"></div>
   </section>
@@ -193,6 +194,17 @@
       <textarea id="fSugestoes" placeholder="Escreva livremente outras dicas ou combinados com o aluno…"></textarea>
       <button class="btn-sec" id="btnPolish" hidden style="margin-top:.5rem">✨ Lapidar texto com IA</button>
     </div>
+  </section>
+
+  <!-- O LOTE (27/10/2026, pedido do Pedro): vários termos de uma vez, com o motor fiskLote do kit. Os motivos e as
+       sugestões de cima valem para todos; "Faltas às aulas" entra sozinho para quem tem 15% ou mais de faltas, como
+       no termo de um aluno só. -->
+  <section class="painel" hidden id="painelLote">
+    <h2>📦 Termos em lote</h2>
+    <p class="aviso">Os alunos atrasados já vêm marcados. Os motivos e as sugestões escolhidos acima valem para todos;
+      "Faltas às aulas" entra sozinho para quem tem 15% ou mais de faltas. Cada termo vai para a pasta do aluno, para o
+      card e para o E-counseling, como no termo de um aluno só.</p>
+    <div id="loteCaixa"></div>
   </section>
 
   <section class="painel" hidden id="painelGerar">
@@ -420,7 +432,8 @@ function comLinkDeLogin(msg) {
    secretaria ainda não concluiu não é problema do professor. O que passou a
    existir é o aviso: a secretaria fica sabendo sozinha, pelo painel "Alunos
    fora do card" do portal dela. Dedup é no servidor, por escola+turma+aluno. */
-var modoLivre = false;
+var modoLivre = false, modoLote = false;
+function sairDoLote() { modoLote = false; var pl = document.getElementById('painelLote'); if (pl) pl.hidden = true; }
 var JA_AVISOU = '';
 function avisarForaDoCard(documento) {
   var nome = ((alunoSel && alunoSel.nome) || '').trim();
@@ -442,6 +455,7 @@ function avisarForaDoCard(documento) {
     });
 }
 document.getElementById('btnLivre').addEventListener('click', function () {
+  sairDoLote();
   /* o termo livre começa limpo: motivos, sugestões e o PDF do aluno anterior iam junto (auditoria de 26/10/2026) */
   limparEscolhasDoAlunoAnterior();
   modoLivre = true;
@@ -509,6 +523,7 @@ document.getElementById('selTrocaTurma').addEventListener('change', function () 
 
 function montarLista() {
   /* turma (re)carregada: limpa a seleção anterior e esconde os painéis do aluno */
+  sairDoLote();
   alunoSel = null;
   modoLivre = false;
   ['painelSituacao','painelMotivos','painelSugestoes','painelGerar'].forEach(function (id) {
@@ -560,6 +575,7 @@ function renderListaSeHouver() {
 }
 
 function selecionarAluno(a) {
+  sairDoLote();
   /* ZERAR ANTES DE TROCAR — não é conforto, é correção.
      Trocar de aluno atualizava as métricas e deixava para trás os MOTIVOS
      marcados, as SUGESTÕES escolhidas e, pior, o `ultimoPDF` do aluno
@@ -809,6 +825,55 @@ async function gerarPDF() {
 }
 
 function valorDe(id) { return document.getElementById(id).value; }
+
+/* ── O LOTE (27/10/2026): ver o comentário do #painelLote ── */
+document.getElementById('btnLote').addEventListener('click', function () {
+  if (!payload || !payload.alunos || !payload.alunos.length) { alert('Abra uma turma primeiro: o lote usa os alunos dela.'); return; }
+  limparEscolhasDoAlunoAnterior();
+  alunoSel = null; modoLivre = false; modoLote = true;
+  document.querySelectorAll('.aluno-item').forEach(function (el) { el.classList.remove('sel'); });
+  ['painelSituacao', 'painelGerar'].forEach(function (id) { document.getElementById(id).hidden = true; });
+  document.getElementById('camposLivre').hidden = true;
+  ['painelMotivos', 'painelSugestoes', 'painelLote'].forEach(function (id) { document.getElementById(id).hidden = false; });
+  var ordem = payload.alunos.map(function (a, i) { return i; })
+    .sort(function (x, y) { return (payload.alunos[y].aulasAtraso || 0) - (payload.alunos[x].aulasAtraso || 0); });
+  var prof = String(payload.professor || payload.aba || '').trim(), turmaTxt = String(payload.turma || '').split('\n')[0].trim();
+  fiskLote(document.getElementById('loteCaixa'), {
+    doc: 'termo', plural: 'termos', arquivoJunto: 'Termos de atraso - ' + turmaTxt + '.pdf',
+    alunos: ordem.map(function (i) {
+      var a = payload.alunos[i];
+      return { id: i, nome: a.nome, marcado: !!a.precisaTermo,
+               detalhe: (a.aulasAtraso == null ? 'sem placeholder' : a.aulasAtraso + ' aula' + (a.aulasAtraso === 1 ? '' : 's') + ' de atraso') + (a.faltas ? ' · ' + a.faltas + ' falta' + (a.faltas === 1 ? '' : 's') : '') };
+    }),
+    gerar: function (i) {
+      var a = payload.alunos[i];
+      var motivos = Array.prototype.filter.call(document.querySelectorAll('#listaMotivos input'), function (c) { return c.checked; }).map(function (c) { return c.value; });
+      if (a.faltas > 0 && a.pctFaltas >= 15 && motivos.indexOf('Faltas às aulas') < 0) motivos.push('Faltas às aulas');
+      return fiskTermoPDF({
+        nome: a.nome, book: a.book || '', prof: tituloCaso(payload.professor), horario: extrairHorario(payload.turma),
+        atraso: a.aulasAtraso == null ? '' : a.aulasAtraso, faltas: a.faltas, ultima: a.ultimaLicao, prevista: a.licaoPrevista,
+        motivos: motivos, outros: valorDe('moOutros'),
+        sugestoes: Array.prototype.filter.call(document.querySelectorAll('#listaSugestoes input'), function (c) { return c.checked; }).map(function (c) { return c.value; }),
+        livres: valorDe('fSugestoes')
+      });
+    },
+    salvar: function (i, pdf) {
+      var a = payload.alunos[i], linhas = ['', '', ''], falhou = false;
+      var pasta = fiskSalvarNoDrive({ token: tokenSessao(), tipo: 'aluno', escola: payload.escola, professor: prof, turma: turmaTxt,
+                                      aluno: a.nome, filename: pdf.filename, bytes: pdf.bytes })
+        .then(function (r) { linhas[0] = '📁 ✓'; if (r && r.aviso) { linhas[0] = '📁 ✓ (fora do lugar)'; } })
+        .catch(function (e) { falhou = true; linhas[0] = e && e.code === 'pasta_nao_encontrada' ? '📁 ⚠️ sem pasta' : '📁 ⚠️ não salvou'; });
+      var card = a.linhaCard == null ? Promise.resolve(linhas[1] = '📇 —')
+        : api({ fn: 'registrarDoc', escola: payload.escola, prof: payload.aba, professor: payload.aba, linhaCard: a.linhaCard, idx: a.ultimaPresencaIdx, tipo: 'termo' })
+            .then(function () { linhas[1] = '📇 ✓'; }).catch(function () { falhou = true; linhas[1] = '📇 ⚠️'; });
+      var couns = (typeof fiskCounseling === 'function' ? fiskCounseling({ escola: payload.escola, professor: prof, turma: payload.turma || '', aluno: a.nome, origem: 'termo',
+          campos: { estagio: a.book || '', faltas: a.faltas, atrasadas: a.aulasAtraso, texto: 'Termo de atraso gerado pelo Fisk Hub (em lote).' } }) : Promise.resolve(null))
+        .then(function (j) { if (j && j.ok) linhas[2] = '💬 ✓'; else { falhou = true; linhas[2] = j && j.code === 'sem_documento' ? '💬 ⚠️ sem documento' : '💬 ⚠️'; } });
+      return Promise.all([pasta, card, couns]).then(function () { return { linhas: linhas, falhou: falhou }; });
+    }
+  });
+  document.getElementById('painelMotivos').scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
 
 /* ---- lapidação do texto livre com IA (ativa quando POLISH_URL for definido) ---- */
 if (POLISH_URL) {
