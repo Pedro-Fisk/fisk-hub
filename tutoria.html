@@ -93,11 +93,11 @@
 <body>
 
 <header class="hero">
-  <a class="back-link" href="index.html" title="Voltar ao Fisk Hub">&larr; Hub</a>
+  <a class="back-link" href="centro-de-estudos.html" title="Voltar ao Centro de Estudos">&larr; Centro de Estudos</a>
   <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
   <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
-  <h1>Frequência à Tutoria</h1>
-  <p>Quem foi ao plantão de dúvidas nos últimos 14 dias</p>
+  <h1 id="h1Pag">Frequência à Tutoria</h1>
+  <p id="subPag">Quem foi ao plantão de dúvidas nos últimos 14 dias</p>
 </header>
 
 <main>
@@ -364,11 +364,22 @@ function gradeInicia() {
 
 fiskInitThemeToggle('themeToggle');
 fiskInitUserMenu();
+/* O CENTRO DE ESTUDOS (Pedro, 27/10/2026) dividiu esta página em dois subcards: a Frequência (padrão) e os Horários
+   de tutoria (#horarios), cada um mostrando só o seu painel. */
+var SO_HORARIOS = /(^|[#&])horarios\b/.test(location.hash.slice(1));
+if (SO_HORARIOS) {
+  document.title = 'Horários de tutoria, FISK';
+  $('h1Pag').textContent = 'Horários de tutoria'; $('subPag').textContent = 'O quadro do plantão de dúvidas das duas escolas';
+  $('painelTopo').hidden = true;
+  document.querySelector('#painelGrade h2').hidden = true;
+}
 if (!sessao().token) {
   $('semSessao').hidden = false; $('painelTopo').hidden = true;
+} else if (SO_HORARIOS) {
+  gradeInicia();
+  fiskRegistrarUso('Horários de tutoria');
 } else {
   carregar(false);
-  gradeInicia();
   fiskRegistrarUso('Frequência à Tutoria');
 }
 </script>
