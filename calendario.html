@@ -181,7 +181,7 @@
   .barra .criar:hover{ filter: brightness(1.08); }
   .fab{ display: none; position: fixed; right: 18px; bottom: 22px; z-index: 8000; width: 58px; height: 58px; border-radius: 18px; border: 0;
         background: var(--ui, #3c6e98); color: #fff; font-size: 2rem; line-height: 1; box-shadow: 0 8px 22px rgba(0,0,0,.28); cursor: pointer; }
-  @media (max-width: 640px){ .fab{ display: block; } .barra .criar{ display: none; } }
+  @media (max-width: 640px){ .fab{ display: block; } .barra .criar{ display: none; } #painelCal{ overflow: hidden; } .grade{ will-change: transform; } }
 
   /* o balão (o rápido, o dos detalhes) */
   .bal{ position: fixed; z-index: 9500; width: min(380px, calc(100vw - 24px)); background: var(--white); color: inherit; border-radius: 16px;
@@ -677,7 +677,7 @@ document.addEventListener('click', function (ev) {
   }
   var b = ev.target.closest('[data-ev]'); if (b) { abreGaveta(+b.dataset.ev); return; }
   if (ev.target.closest('[data-fecha]')) { gavFecha(); return; }
-  var t = ev.target.closest('[data-dia]'); if (t) { diaSel = somaDias(segunda, +t.dataset.dia); desenhar(); }
+  var t = ev.target.closest('[data-dia]'); if (t) { var nd = somaDias(segunda, +t.dataset.dia); irParaDia(nd, iso(nd) > iso(diaSel) ? 1 : iso(nd) < iso(diaSel) ? -1 : 0); }
 });
 document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') { if (!$('dlg').hidden) return; if (!$('bal').hidden) { agFechaBalao(); return; } gavFecha(); } });
 /* ── LEVAR PARA O GOOGLE AGENDA (26/10/2026, aprovado pelo Pedro) ──────────────────────────────────────────────
@@ -740,9 +740,34 @@ $('btAgenda').addEventListener('click', function () {
   });
   gavAbre();
 });
-$('ant').addEventListener('click', function () { segunda = somaDias(segunda, -7); diaSel = somaDias(diaSel, -7); desenhar(); });
-$('prox').addEventListener('click', function () { segunda = somaDias(segunda, 7); diaSel = somaDias(diaSel, 7); desenhar(); });
-$('hoje').addEventListener('click', function () { segunda = inicioDaSemana(new Date()); diaSel = new Date(); desenhar(); });
+$('ant').addEventListener('click', function () { irParaDia(somaDias(diaSel, -7), -1, somaDias(segunda, -7)); });
+$('prox').addEventListener('click', function () { irParaDia(somaDias(diaSel, 7), 1, somaDias(segunda, 7)); });
+$('hoje').addEventListener('click', function () { var h = new Date(); irParaDia(h, iso(h) > iso(diaSel) ? 1 : iso(h) < iso(diaSel) ? -1 : 0, inicioDaSemana(h)); });
+/* O CARROSSEL DOS DIAS (Pedro, 27/10/2026: "no celular a passagem é dura"). No celular a grade mostra um dia só, e
+   trocar de dia (deslizar, tocar na tira, as setas) agora DESLIZA: o dia atual sai para um lado e o novo entra pelo
+   outro, como num carrossel. Ao deslizar, o dia acompanha o dedo (ver o toque, no bloco dos eventos). No computador,
+   ou com movimento reduzido, troca na hora. `seg` = a segunda nova, quando a seta pula a semana inteira. */
+var _carrossel = false;
+function irParaDia(novo, dir, seg) {
+  var g = $('grade');
+  function aplica() {
+    diaSel = novo;
+    segunda = seg || (iso(novo) < iso(segunda) || iso(novo) > iso(somaDias(segunda, 6)) ? inicioDaSemana(novo) : segunda);
+    desenhar();
+  }
+  var calmo = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!celular() || !dir || calmo || _carrossel) { g.style.transition = ''; g.style.transform = ''; aplica(); return; }
+  _carrossel = true;
+  var w = g.offsetWidth + 24;
+  g.style.transition = 'transform .2s cubic-bezier(.4,0,1,1), opacity .2s'; g.style.transform = 'translateX(' + (-dir * w) + 'px)'; g.style.opacity = '.4';
+  setTimeout(function () {
+    aplica();
+    g.style.transition = 'none'; g.style.transform = 'translateX(' + (dir * w) + 'px)'; g.style.opacity = '.4';
+    void g.offsetWidth;   /* o navegador assenta a posição de partida antes de animar a entrada */
+    g.style.transition = 'transform .28s cubic-bezier(.2,.8,.2,1), opacity .28s'; g.style.transform = 'translateX(0)'; g.style.opacity = '1';
+    setTimeout(function () { g.style.transition = ''; g.style.transform = ''; g.style.opacity = ''; _carrossel = false; }, 300);
+  }, 200);
+}
 /* a direção escolhe de quem é a semana (o mesmo fisk_actas do Hub e do Radar) */
 function montaVerComo() {
   var sel = $('verComo');
@@ -1001,14 +1026,14 @@ function agToqueCria(col, clientY) {
   var arr = agArrastoCriar(col, clientY + scrollY); arr.solta();
 }
 (function () {
-  var t0 = null, arr = null, timer = null, rola = null;
+  var t0 = null, arr = null, timer = null, rola = null, modo = '';   /* modo: '' (ainda não sei), 'lado' (carrossel) ou 'rola' */
   function limpa() { clearTimeout(timer); timer = null; clearInterval(rola); rola = null; }
   $('grade').addEventListener('touchstart', function (e) {
     agUltimoToque = Date.now();
     if (e.touches.length !== 1) { limpa(); t0 = null; return; }
     var tq = e.touches[0], alvo = e.target;
     t0 = { x: tq.clientX, y: tq.clientY, py: tq.pageY, alvo: alvo };
-    arr = null; limpa();
+    arr = null; modo = ''; limpa();
     if (!agLigado()) return;
     var bloco = alvo.closest('.ev.meu'), col = alvo.closest('.g-col');
     if (bloco && bloco.classList.contains('ro')) return;
@@ -1024,7 +1049,15 @@ function agToqueCria(col, clientY) {
   $('grade').addEventListener('touchmove', function (e) {
     if (!t0) return;
     var tq = e.touches[0];
-    if (!arr) { if (Math.abs(tq.clientX - t0.x) + Math.abs(tq.clientY - t0.y) > 10) limpa(); return; }
+    if (!arr) {
+      var dx = tq.clientX - t0.x, dy = tq.clientY - t0.y;
+      if (!modo && Math.abs(dx) + Math.abs(dy) > 10) { limpa(); modo = celular() && !_carrossel && Math.abs(dx) > Math.abs(dy) ? 'lado' : 'rola'; }
+      if (modo === 'lado') {   /* o dia acompanha o dedo, com um pouco de resistência */
+        e.preventDefault();
+        var g = $('grade'); g.style.transition = 'none'; g.style.transform = 'translateX(' + (dx * 0.85) + 'px)'; g.style.opacity = String(1 - Math.min(.5, Math.abs(dx) / 700));
+      }
+      return;
+    }
     e.preventDefault();
     arr.move(tq.clientX, tq.pageY);
     clearInterval(rola); rola = null;
@@ -1035,17 +1068,15 @@ function agToqueCria(col, clientY) {
     var tq = e.changedTouches && e.changedTouches[0], a = arr, ini = t0;
     limpa(); arr = null; t0 = null;
     if (a) { e.preventDefault(); a.solta(); agEngole(); return; }
-    if (!ini || !tq) return;
-    var dx = tq.clientX - ini.x, dy = tq.clientY - ini.y;
-    if (celular() && Math.abs(dx) > 60 && Math.abs(dy) < 40) {   /* deslizar para o lado troca de dia */
-      diaSel = somaDias(diaSel, dx < 0 ? 1 : -1);
-      if (iso(diaSel) > iso(somaDias(segunda, 6))) segunda = somaDias(segunda, 7);
-      if (iso(diaSel) < iso(segunda)) segunda = somaDias(segunda, -7);
-      desenhar();
-    }
+    var era = modo; modo = '';
+    if (!ini || !tq || era !== 'lado') return;
+    var dx = tq.clientX - ini.x, g = $('grade');
+    if (Math.abs(dx) > 60) { irParaDia(somaDias(diaSel, dx < 0 ? 1 : -1), dx < 0 ? 1 : -1); return; }   /* deslizar para o lado troca de dia */
+    g.style.transition = 'transform .2s ease-out, opacity .2s'; g.style.transform = ''; g.style.opacity = '';   /* pouco: volta para o lugar */
+    setTimeout(function () { if (!_carrossel) g.style.transition = ''; }, 220);
   }
   $('grade').addEventListener('touchend', fim, { passive: false });
-  $('grade').addEventListener('touchcancel', function () { if (arr) desenhar(); limpa(); arr = null; t0 = null; });
+  $('grade').addEventListener('touchcancel', function () { if (arr) desenhar(); limpa(); arr = null; t0 = null; if (modo === 'lado' && !_carrossel) { $('grade').style.transform = ''; $('grade').style.opacity = ''; } modo = ''; });
   $('grade').addEventListener('contextmenu', function (e) { if (e.target.closest('.g-col')) e.preventDefault(); });
 })();
 
