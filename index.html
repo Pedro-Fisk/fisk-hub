@@ -103,6 +103,9 @@
   #hubEntrando p{font-weight:700;margin:0}
   .an-prox{ margin:.7rem 0 .25rem; font-size:.78rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; opacity:.6; }
   .an-it.prox{ opacity:.8; }
+  /* o aniversário desta semana que já passou fica em cinza (Pedro, 27/10/2026) */
+  .an-it.passou b, .an-it.passou small{ color:var(--gray,#8a8f98); }
+  .an-it.passou .an-bolo{ filter:grayscale(1); opacity:.55; }
   /* ── FISK WORLDS / FISK MUNDO (26/10/2026) ── a mesma faixa da home do aluno no portal, uma por curso */
   .fwh{width:100%;margin:0 0 1.4rem;display:grid;grid-template-columns:1.45fr 1fr 1.15fr;gap:.9rem}
   .fwh[hidden]{display:none}
@@ -2692,12 +2695,17 @@
        só informação, mas pede o "ciente" como os outros, para o professor não deixar passar; o ciente fica no
        aparelho (não há o que registrar no servidor). */
     var DOW = { pt: ['dom','seg','ter','qua','qui','sex','sáb'], en: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], es: ['dom','lun','mar','mié','jue','vie','sáb'] };
-    function diaAniv(a){
+    function dataAniv(a){
       var h = new Date(), ano = h.getFullYear(), d = new Date(ano, a.mes - 1, a.dia);
       if (h.getMonth() === 11 && a.mes === 1) d = new Date(ano + 1, a.mes - 1, a.dia);
       if (h.getMonth() === 0 && a.mes === 12) d = new Date(ano - 1, a.mes - 1, a.dia);
+      return d;
+    }
+    function diaAniv(a){
+      var d = dataAniv(a);
       return (DOW[lang()] || DOW.pt)[d.getDay()] + ' ' + ('0' + a.dia).slice(-2) + '/' + ('0' + a.mes).slice(-2);
     }
+    function anivPassou(a){ var h = new Date(); h.setHours(0, 0, 0, 0); return !a.hoje && !a.proxima && dataAniv(a) < h; }
     function segundaISO(){ var h = new Date(); h.setDate(h.getDate() - ((h.getDay() + 6) % 7)); return h.getFullYear() + '-' + ('0' + (h.getMonth() + 1)).slice(-2) + '-' + ('0' + h.getDate()).slice(-2); }
     /* a semana que vem vem junto, embaixo (Pedro, 24/10/2026: "para o professor se planejar"); o número e o recado
        do mural contam só esta semana */
@@ -2707,7 +2715,7 @@
       $$('anTit').innerHTML = esc(tx('anTit')) + '<small>' + esc(tx('anSub')) + '</small>';
       var esta = anivDesta(), prox = aniv.filter(function(a){ return a.proxima; });
       var item = function(a){
-        return '<div class="tt-it an-it' + (a.hoje ? ' hoje' : '') + (a.proxima ? ' prox' : '') + '"><i class="an-bolo" aria-hidden="true">🎂</i><span><b>' + esc(a.nome) +
+        return '<div class="tt-it an-it' + (a.hoje ? ' hoje' : '') + (a.proxima ? ' prox' : '') + (anivPassou(a) ? ' passou' : '') + '"><i class="an-bolo" aria-hidden="true">🎂</i><span><b>' + esc(a.nome) +
           (a.hoje ? ' <em>' + esc(tx('anHoje')) + '</em>' : '') + '</b><small>' + esc(diaAniv(a)) + ' · ' + esc(a.turma) + '</small></span></div>';
       };
       anCard.hidden = false; anN.hidden = !esta.length; anN.textContent = String(esta.length);
