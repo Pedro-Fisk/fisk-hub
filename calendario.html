@@ -115,6 +115,9 @@
   .gav ul{ margin: 0; padding-left: 1.1rem; }
   .gav li{ margin: .2rem 0; font-size: .9rem; }
   .gav li a{ color: inherit; }
+  .couns{ font: 800 .72rem inherit; font-family: inherit; border: 1.5px solid var(--cal-linha); background: var(--white); color: var(--ui-dark, #223e5a);
+          border-radius: 99px; padding: .05rem .5rem; margin-left: .3rem; cursor: pointer; vertical-align: 1px; }
+  .couns:hover{ border-color: var(--ui, #3c6e98); }
   .abrir-aula{ display: block; text-align: center; margin-top: .6rem; padding: .75rem 1rem; border-radius: 12px; font-weight: 900; text-decoration: none;
                background: var(--ui, #3c6e98); color: #fff; }
 </style>
@@ -413,6 +416,7 @@ function abreGaveta(k) {
     h += '<div class="bloco"><b class="tit">👥 Alunos (' + t.alunos.length + ')</b><ul>' + t.alunos.map(function (a) {
       var nome = esc(String(a.nome).replace(/\([^)]*\)/g, '').trim());
       return '<li>' + nome +   /* sem o radar de cada aluno (Pedro, 26/10/2026): demorava e ninguém abria */
+        ' <button type="button" class="couns" data-couns="' + k + '|' + t.alunos.indexOf(a) + '" title="Abrir o e-counseling de ' + nome + '">💬 counseling</button>' +
         (a.book ? ' <small style="color:var(--gray)">· ' + esc(a.book) + '</small>' : '') + (Number(a.aulasAtraso) >= 4 ? ' <small style="color:var(--red);font-weight:800">· ' + a.aulasAtraso + ' aulas atrás</small>' : '') + '</li>';
     }).join('') + '</ul>';
     h += '<a class="abrir-aula" href="turma-de-hoje.html#t=' + encodeURIComponent(t.escola + '|' + t.prof + '|' + t.linha) + '">Abrir na Minha aula →</a></div>';
@@ -423,6 +427,16 @@ function abreGaveta(k) {
   $('gavCorpo').innerHTML = h; $('gav').hidden = false;
 }
 document.addEventListener('click', function (ev) {
+  /* o e-counseling do aluno (Pedro, 26/10/2026): a mesma gaveta da Minha aula e do Radar do Aluno */
+  var cb = ev.target.closest('[data-couns]');
+  if (cb) {
+    var p = cb.dataset.couns.split('|'), ex = EVS[+p[0]], t = ex && ex.e.turma, a = t && t.alunos[+p[1]]; if (!a) return;
+    var ctx = { escola: t.escola, professor: t.prof, turma: t.tituloInteiro || t.titulo, aluno: String(a.nome).replace(/\([^)]*\)/g, '').trim(), estagio: a.book || '' };
+    $('gav').hidden = true;
+    if (typeof fiskCounselingGaveta === 'function') fiskCounselingGaveta(ctx);
+    else window.open('counseling.html?escola=' + encodeURIComponent(ctx.escola) + '&prof=' + encodeURIComponent(ctx.professor) + '&turma=' + encodeURIComponent(String(ctx.turma).split('\n')[0]) + '&aluno=' + encodeURIComponent(ctx.aluno), '_blank', 'noopener');
+    return;
+  }
   var b = ev.target.closest('[data-ev]'); if (b) { abreGaveta(+b.dataset.ev); return; }
   if (ev.target.closest('[data-fecha]')) { $('gav').hidden = true; return; }
   var t = ev.target.closest('[data-dia]'); if (t) { diaSel = somaDias(segunda, +t.dataset.dia); desenhar(); }
