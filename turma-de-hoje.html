@@ -1046,6 +1046,36 @@ function recarregarFila(bt) {
     toast('⚠️ Não recarreguei: ' + e.message);
   }).then(function () { estado.recarregando = false; });
 }
+/* A MINHA AULA SE ATUALIZA SOZINHA (27/10/2026, Pedro: o professor abre no computador e no celular, e as marcas de um
+   aparelho têm de aparecer no outro). Relê o planner da turma ao VOLTAR para a aba (depois de 45 s fora) e a cada
+   90 s com ela aberta, e redesenha só o cartão do aluno que mudou. Não roda com anotação em digitação, Checking
+   aberto ou marca a caminho do servidor, e o que ainda está a caminho é reaplicado por cima (aplicaPendentes). */
+var _autoUlt = Date.now(), _autoRodando = false;
+function atualizaSozinha() {
+  if (_autoRodando || !estado.alunos.length || estado.recarregando || estado.aberto || estado.plantao) return;
+  var foco = document.activeElement;
+  if (foco && /^(TEXTAREA|INPUT|SELECT)$/.test(foco.tagName) && foco.closest('#alunos')) return;
+  if (Object.keys(pendentes).some(function (r) { return Object.keys(pendentes[r] || {}).length; })) return;
+  if (aguia.ov || filaMinhas().length) return;   /* planner completo aberto, ou marca da fila sem internet que o servidor ainda não tem */
+  _autoRodando = true; _autoUlt = Date.now();
+  var turma = estado.turma, pedido = _turmaPedido;
+  post({ action: 'plannerTurma', alunos: estado.alunos.map(function (a) { return { raf: a.raf, book: a.book, turma: turma }; }) }).then(function (r) {
+    if (pedido !== _turmaPedido || estado.turma !== turma || !r || !r.alunos) return;
+    var mudou = [];
+    estado.alunos.forEach(function (a) {
+      var novo = r.alunos[a.raf]; if (!novo) return;
+      if (novo.planner) novo.planner = aplicaNotasPendentes(a.raf, aplicaPendentes(a.raf, novo.planner));
+      var assin = function (d) { d = d || {}; return JSON.stringify([d.planner || null, d.feitos || null, d.evidencia || null, d.hist || null, d.atividades || null]); };   /* a situação traz hora: fora */
+      if (assin(novo) !== assin(estado.dados[a.raf])) { estado.dados[a.raf] = novo; mudou.push(a); }
+    });
+    if (!mudou.length) return;
+    if (ptEstado) desenharTurma(); else mudou.forEach(redesenhar);
+  }).catch(function () {}).then(function () { _autoRodando = false; });
+}
+document.addEventListener('visibilitychange', function () {
+  if (document.visibilityState === 'visible' && Date.now() - _autoUlt > 45000) atualizaSozinha();
+});
+setInterval(function () { if (document.visibilityState === 'visible' && Date.now() - _autoUlt > 85000) atualizaSozinha(); }, 30000);
 document.addEventListener('visibilitychange', function () {
   if (document.visibilityState !== 'visible' || !estado.foiAoPlanejador) return;
   estado.foiAoPlanejador = false;
