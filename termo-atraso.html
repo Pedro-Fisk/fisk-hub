@@ -12,7 +12,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="assets/termo-pdf.js?v=2026-10-22a"></script>
-<script src="assets/fisk-shared.js?v=2026-10-27a"></script>
+<script src="assets/fisk-shared.js?v=2026-10-27c"></script>
 <!-- aviso de aluno fora do card -->
 <script src="fisk-fora-do-card.js"></script>
 <style>
@@ -748,7 +748,7 @@ function lancarNoCard() {
   statusDoc('⏳ Registrando no card…');
   api({ fn: 'registrarDoc', escola: payload.escola, prof: payload.aba, professor: payload.aba,
         linhaCard: alunoSel.linhaCard, idx: alunoSel.ultimaPresencaIdx, tipo: 'termo' })
-    .then(function () { statusDoc(msgRegistro(), '#1e8f4e'); registrarNoCounseling().then(function (j) { statusDoc(msgRegistro() + '   ·   💬 Counseling: ' + regCounselingTxt(j), j && j.ok ? '#1e8f4e' : '#b8860b'); }); })
+    .then(function () { statusDoc(msgRegistro(), '#1e8f4e'); try { if (typeof fiskFesta === 'function') fiskFesta('📄', true); } catch (e) {} registrarNoCounseling().then(function (j) { statusDoc(msgRegistro() + '   ·   💬 Counseling: ' + regCounselingTxt(j), j && j.ok ? '#1e8f4e' : '#b8860b'); }); })
     .catch(function (e) { statusDoc('⚠️ ' + e.message, '#c0392b'); });
 }
 pares('btnDrive').forEach(function (btn) { btn.addEventListener('click', function () {

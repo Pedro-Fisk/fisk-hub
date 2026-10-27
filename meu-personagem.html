@@ -85,7 +85,7 @@
   </div>
 </main>
 
-<script src="assets/fisk-shared.js?v=2026-10-27a"></script>
+<script src="assets/fisk-shared.js?v=2026-10-27c"></script>
 <script>
 /* O boneco vem do Portal; na máquina de desenvolvimento, do portal local (a mesma regra do aluno.html) */
 var FW_BASE = /^(localhost|127\.)/.test(location.hostname) ? 'http://localhost:8811/' : 'https://portalfisk.com.br/';
@@ -244,7 +244,7 @@ var FW_BASE = /^(localhost|127\.)/.test(location.hostname) ? 'http://localhost:8
     var esc = {}; Object.keys(PADRAO).forEach(function (k) { esc[k] = E[k]; });
     post({ action: 'personagemSalvar', escolhas: esc })
       .then(function (r) {
-        if (r && r.ok) { st.textContent = T.salvo; st.className = 'estado ok'; try { if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Meu personagem (salvou)'); } catch (e) {} }
+        if (r && r.ok) { st.textContent = T.salvo; st.className = 'estado ok'; try { if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Meu personagem (salvou)'); } catch (e) {} try { if (typeof fiskFesta === 'function') fiskFesta('🧙'); } catch (e) {} }
         else { st.textContent = (r && r.error) || T.falhou; st.className = 'estado'; }
       })
       .catch(function () { st.textContent = T.falhou; st.className = 'estado'; })

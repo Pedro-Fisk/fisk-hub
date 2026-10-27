@@ -248,6 +248,35 @@ function fiskSessao() {
   try { return JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) { return null; }
 }
 
+/* ── O AVATAR COMEMORA (Pedro, 27/10/2026: "leva também para o Hub dos professores") ──────────────────────────────
+ * fiskFesta('📚') no momento GRANDE (sobe sempre); fiskFesta('📄', true) no PEQUENO (sobe na 3ª, 6ª, 9ª… do dia, com a
+ * fitinha "3 hoje!"). É o mesmo avatar 3D do portal, com a roupa que o professor montou no My Avatar (sem avatar, o Buddy),
+ * e a mesma fanfarra curta. O módulo mora no portal (assets/avatar-festa.js) e só baixa na primeira comemoração da
+ * visita; a roupa vem da rota avVisual, e a primeira vez espera por ela (até 4 s) para não mostrar o Buddy por engano.
+ * Sem sessão do Hub, não faz nada. Quem pediu "menos movimento" no sistema vê o avatar parado.
+ * ============================================================================ */
+var _fiskFesta = null;
+function fiskFesta(selo, pequena) {
+  try {
+    var s = fiskSessao();
+    if (!s || !s.name || !s.token) return;
+    if (!_fiskFesta) {
+      _fiskFesta = new Promise(function (ok, nao) {
+        if (window.FiskAvatarFesta) return ok();
+        var sc = document.createElement('script');
+        sc.src = 'https://portalfisk.com.br/assets/avatar-festa.js?v=2026-10-27';
+        sc.onload = ok; sc.onerror = nao; document.head.appendChild(sc);
+      }).then(function () {
+        var p = window.FiskAvatarFesta.prepara({ raf: 'PROF:' + s.name, profToken: s.token, endpoint: FISK_HUB_EP,
+          appKey: 'fisk_0719bacbecc857f61d1e', base: 'https://portalfisk.com.br/' });
+        return Promise.race([p, new Promise(function (ok) { setTimeout(ok, 4000); })]);
+      });
+      _fiskFesta.catch(function () { _fiskFesta = null; });
+    }
+    _fiskFesta.then(function () { window.FiskAvatarFesta.viva({ selo: selo || '🏅', pequena: !!pequena }); }).catch(function () {});
+  } catch (e) {}
+}
+
 /* ── ESPERA COM SINAL DE VIDA ───────────────────────────────────────────────
  * Ler o card leva de 5 a 40 segundos, e a tela parada nesse tempo parece
  * travada — foi a queixa depois que a Visão Geral passou a fazer uma leitura
@@ -1061,6 +1090,7 @@ function fiskLote(caixa, cfg) {
     }
     rodando = false;
     caixa.querySelectorAll('.fl-lista input').forEach(function (c) { c.disabled = false; });
+    if (ok && !comAviso) fiskFesta('📚', ok < 3);   /* lote inteiro sem aviso: o avatar comemora (grande a partir de 3 alunos) */
     stx.textContent = '✓ Pronto: ' + ok + ' completo' + (ok === 1 ? '' : 's') + (comAviso ? ', ' + comAviso + ' com aviso (veja a linha do aluno)' : '') + '.';
     junto.hidden = !gerados.length; conta();
   });

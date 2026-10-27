@@ -246,7 +246,7 @@
   Ferramenta interna das escolas Fisk Taubaté · Caçapava.
 </footer>
 
-<script src="assets/fisk-shared.js?v=2026-10-27a"></script>
+<script src="assets/fisk-shared.js?v=2026-10-27c"></script>
 <!-- aviso de aluno fora do card -->
 <script src="fisk-fora-do-card.js"></script>
 <script>
@@ -869,7 +869,7 @@ function lancarNoCard() {
     linhaCard: alunoSel.linhaCard, idx: alunoSel.idx, tipo: '2nd',
     professor: ($('fProf').value || turma.professor || turma.aba || '').trim()
   }).then(function () {
-    statusDoc('✓ Lançado no card.', 'ok');
+    statusDoc('✓ Lançado no card.', 'ok'); try { if (typeof fiskFesta === 'function') fiskFesta('📄', true); } catch (e) {} 
     registrarNoCounseling().then(function (j) { statusDoc('✓ Lançado no card.   ·   💬 Counseling: ' + regCounselingTxt(j), j && j.ok ? 'ok' : 'err'); });
   }).catch(function (e) {
     statusDoc('⚠️ ' + e.message, 'err');
