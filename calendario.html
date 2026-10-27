@@ -106,24 +106,56 @@
   /* as turmas sem horário legível */
   .sem-h li{ font-size: .85rem; margin: .2rem 0; }
 
-  /* a gaveta da aula */
+  /* A GAVETA DA AULA (redesenhada em 26/10/2026, Pedro: "deslizar suavemente da borda direita", mais larga, um aluno
+     por linha, linhas com fôlego e "uma carinha mais elegante"). A classe .on liga a animação; o hidden só sai/entra
+     nas pontas, para a gaveta poder deslizar de volta antes de sumir. */
   .gav{ position: fixed; inset: 0; z-index: 9000; }
-  .gav .fundo{ position: absolute; inset: 0; background: rgba(12,12,14,.4); }
-  .gav .caixa{ position: absolute; top: 0; right: 0; height: 100%; width: min(460px, 100vw); background: var(--white); box-shadow: -14px 0 40px rgba(0,0,0,.2);
-               overflow-y: auto; padding: 1rem 1.1rem 2rem; box-sizing: border-box; }
-  .gav h3{ font-family: var(--font-heading); margin: .2rem 0 .2rem; color: var(--ui-dark, #223e5a); }
-  .gav .fecha{ float: right; border: 0; background: transparent; font-size: 1.4rem; cursor: pointer; color: var(--gray); min-width: 44px; min-height: 44px; }
-  .gav .sub{ color: var(--gray); font-size: .85rem; margin-bottom: .7rem; }
-  .gav .bloco{ border-top: 1px solid var(--cal-linha); padding: .7rem 0; }
-  .gav .bloco b.tit{ display: block; font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; color: var(--gray); margin-bottom: .35rem; }
-  .gav ul{ margin: 0; padding-left: 1.1rem; }
-  .gav li{ margin: .2rem 0; font-size: .9rem; }
+  .gav .fundo{ position: absolute; inset: 0; background: rgba(12,14,20,.45); opacity: 0; transition: opacity .3s ease; backdrop-filter: blur(1.5px); }
+  .gav .caixa{ position: absolute; top: 0; right: 0; height: 100%; width: min(620px, 100vw); background: var(--white); box-shadow: -18px 0 48px rgba(0,0,0,.22);
+               overflow-y: auto; box-sizing: border-box; display: flex; flex-direction: column;
+               transform: translateX(104%); transition: transform .38s cubic-bezier(.22,.9,.24,1); }
+  .gav.on .fundo{ opacity: 1; }
+  .gav.on .caixa{ transform: none; }
+  @media (prefers-reduced-motion: reduce){ .gav .caixa, .gav .fundo{ transition: none; } }
+  .gav .topo{ position: relative; padding: 1.3rem 1.5rem 1.1rem; background: linear-gradient(135deg, var(--g-cor, #3c6e98), color-mix(in srgb, var(--g-cor, #3c6e98) 70%, #000)); color: #fff; }
+  .gav .topo h3{ font-family: var(--font-heading); font-size: 1.35rem; margin: 0 2.6rem .55rem 0; line-height: 1.2; color: #fff; }
+  .gav .topo .chips{ display: flex; flex-wrap: wrap; gap: .4rem; }
+  .gav .topo .chip{ font-size: .8rem; font-weight: 800; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3); border-radius: 99px; padding: .2rem .7rem; }
+  .gav .topo .chip.fer{ background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+  .gav .fecha{ position: absolute; z-index: 2; top: .7rem; right: .7rem; border: 0; background: rgba(255,255,255,.16); color: #fff; font-size: 1.35rem; line-height: 1;
+               cursor: pointer; width: 40px; height: 40px; border-radius: 50%; }
+  .gav .fecha:hover{ background: rgba(255,255,255,.3); }
+  .gav #gavCorpo{ display: flex; flex-direction: column; flex: 1; }
+  .gav .miolo{ padding: .4rem 1.5rem 1rem; flex: 1; }
+  .gav .bloco{ padding: 1rem 0 .6rem; }
+  .gav .bloco + .bloco{ border-top: 1px solid var(--cal-linha); }
+  .gav .bloco b.tit{ display: flex; align-items: center; gap: .4rem; font-size: .76rem; letter-spacing: .07em; text-transform: uppercase; color: var(--gray); margin-bottom: .55rem; }
+  .gav .bloco b.tit .n{ background: var(--ui-soft, #e9eff5); color: var(--ui-dark, #223e5a); border-radius: 99px; padding: .05rem .5rem; letter-spacing: 0; }
+  .gav ul{ margin: 0; padding: 0; list-style: none; }
+  .gav li{ font-size: .92rem; }
   .gav li a{ color: inherit; }
-  .couns{ font: 800 .72rem inherit; font-family: inherit; border: 1.5px solid var(--cal-linha); background: var(--white); color: var(--ui-dark, #223e5a);
-          border-radius: 99px; padding: .05rem .5rem; margin-left: .3rem; cursor: pointer; vertical-align: 1px; }
-  .couns:hover{ border-color: var(--ui, #3c6e98); }
-  .abrir-aula{ display: block; text-align: center; margin-top: .6rem; padding: .75rem 1rem; border-radius: 12px; font-weight: 900; text-decoration: none;
-               background: var(--ui, #3c6e98); color: #fff; }
+  /* um aluno por linha */
+  .gav .al{ display: flex; align-items: center; gap: .6rem; padding: .62rem .2rem; border-bottom: 1px solid var(--cal-linha); }
+  .gav .al:last-child{ border-bottom: 0; }
+  .gav .al .nm{ font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 0 1 auto; }
+  .gav .al .lv{ font-size: .74rem; font-weight: 700; color: var(--gray); white-space: nowrap; }
+  .gav .al .atr{ font-size: .72rem; font-weight: 800; color: #b91c1c; background: #fee2e2; border-radius: 99px; padding: .05rem .5rem; white-space: nowrap; }
+  .gav .al .esp{ flex: 1; }
+  .gav .aniv-li{ display: flex; align-items: center; gap: .55rem; padding: .5rem .7rem; border-radius: 12px; background: linear-gradient(90deg, #fff4c7, transparent); font-weight: 800; margin-bottom: .35rem; }
+  body.theme-dark .gav .aniv-li{ background: linear-gradient(90deg, #3a2e12, transparent); }
+  .gav .exp-cx{ border: 1.5px solid #ddd6fe; background: #faf7ff; border-radius: 14px; padding: .75rem .9rem; margin-bottom: .6rem; }
+  body.theme-dark .gav .exp-cx{ background: #221a33; border-color: #4c3a75; }
+  .gav .exp-cx p{ margin: 0 0 .4rem; font-weight: 800; font-size: 1rem; }
+  .gav .exp-cx li{ display: flex; gap: .5rem; padding: .18rem 0; font-size: .88rem; }
+  .gav .exp-cx li span:first-child{ color: var(--gray); min-width: 9.5rem; }
+  .couns{ font-family: inherit; font-weight: 800; font-size: .74rem; border: 1.5px solid var(--cal-linha); background: var(--white); color: var(--ui-dark, #223e5a);
+          border-radius: 99px; padding: .3rem .7rem; cursor: pointer; white-space: nowrap; flex: none; }
+  .couns:hover{ border-color: var(--ui, #3c6e98); background: var(--ui-soft, #e9eff5); }
+  .gav .pe{ position: sticky; bottom: 0; padding: .8rem 1.5rem 1rem; background: linear-gradient(to top, var(--white) 70%, transparent); }
+  .abrir-aula{ display: block; text-align: center; padding: .85rem 1rem; border-radius: 14px; font-weight: 900; text-decoration: none;
+               background: var(--g-cor, var(--ui, #3c6e98)); color: #fff; box-shadow: 0 6px 18px rgba(0,0,0,.18); }
+  .abrir-aula:hover{ filter: brightness(1.06); }
+  @media (max-width: 640px){ .gav .al{ flex-wrap: wrap; row-gap: .25rem; } .gav .al .esp{ display: none; } .gav .al .couns{ margin-left: auto; } .gav .topo, .gav .miolo, .gav .pe{ padding-left: 1.1rem; padding-right: 1.1rem; } }
 </style>
 </head>
 <body>
@@ -191,7 +223,7 @@ if (EMBED) { document.body.classList.add('embed'); var bse = document.createElem
  *   · feriados, férias e eventos: o Calendário Institucional (calList), o mesmo que a home lê;
  *   · plantão / Learning Center: a grade da escola (plantaoList), casada pelo nome como na Turma de hoje;
  *   · experimentais: profExperimentais (Experimental.js), só nome, idade, data, hora e turma;
- *   · aniversários: aniversariantesProf, que cobre a semana atual e a seguinte (as outras semanas ficam sem).
+ *   · aniversários: aniversariantesProf com `todos` (desde 26/10/2026, todos os alunos do professor, em qualquer semana).
  * No celular abre o DIA (decisão do Pedro); no computador, a semana em colunas. Cada fonte que falha some sozinha:
  * só as aulas são obrigatórias.
  * ════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
@@ -289,7 +321,7 @@ function carregaExtras() {
       return post({ action: 'plantaoList', unidade: escola }).then(function (j) { return (j.itens || []).map(function (it) { it.escola = escola; return it; }); }).catch(function () { return []; });
     })).then(function (ls) { var nome = eu(); dados.lc = [].concat.apply([], ls).filter(function (it) { return mesmaPessoa(it.professor, nome); }); }),
     post(c && c.name ? { action: 'profExperimentais', prof: c.name } : { action: 'profExperimentais' }).then(function (j) { dados.exps = j.itens || []; }).catch(function () { dados.exps = []; }),
-    post(c && c.name ? { action: 'aniversariantesProf', como: c.name } : { action: 'aniversariantesProf' }).then(function (j) { dados.anivs = j.aniversariantes || []; }).catch(function () { dados.anivs = []; })
+    post(c && c.name ? { action: 'aniversariantesProf', como: c.name, todos: 1 } : { action: 'aniversariantesProf', todos: 1 }).then(function (j) { dados.anivs = j.aniversariantes || []; }).catch(function () { dados.anivs = []; })
   ]);
 }
 
@@ -411,31 +443,52 @@ function desenhar() {
 function abreGaveta(k) {
   var x = EVS[k]; if (!x) return;
   var e = x.e, d = x.d, dataTxt = DIAS[d.getDay()] + ' ' + ('0' + d.getDate()).slice(-2) + '/' + ('0' + (d.getMonth() + 1)).slice(-2);
-  var h = '<h3 id="gavTit">' + esc(e.turma ? e.turma.titulo : e.titulo) + '</h3><div class="sub">' + dataTxt + ' · ' + hm(e.ini) + ' às ' + hm(e.fim) + (e.semaula ? ' · <b style="color:var(--red)">feriado: sem aula</b>' : '') + '</div>';
-  if (e.anivs && e.anivs.length) h += '<div class="bloco"><b class="tit">🎂 Aniversário neste dia</b><ul>' + e.anivs.map(function (a) { return '<li><b>' + esc(a.nome) + '</b></li>'; }).join('') + '</ul></div>';
+  var h = '<div class="topo"><h3 id="gavTit">' + esc(e.turma ? e.turma.titulo : e.titulo) + '</h3><div class="chips">' +
+    '<span class="chip">📅 ' + dataTxt + '</span><span class="chip">🕒 ' + hm(e.ini) + ' às ' + hm(e.fim) + '</span>' +
+    (e.turma ? '<span class="chip">👥 ' + e.turma.alunos.length + ' aluno' + (e.turma.alunos.length === 1 ? '' : 's') + '</span>' : '') +
+    (e.semaula ? '<span class="chip fer">feriado: sem aula</span>' : '') + '</div></div><div class="miolo">';
+  if (e.anivs && e.anivs.length) h += '<div class="bloco"><b class="tit">🎂 Aniversário neste dia</b>' + e.anivs.map(function (a) { return '<div class="aniv-li">🎉 ' + esc(a.nome) + '</div>'; }).join('') + '</div>';
   /* a experimental com tudo o que a secretaria preencheu no portal (Pedro, 26/10/2026) */
   var SIT = { agendada: 'agendada', veio: 'veio', nao_veio: 'não veio', fechou: 'matriculou', nao_fechou: 'não matriculou' };
   if (e.exps && e.exps.length) h += '<div class="bloco"><b class="tit">🧪 Aula experimental</b>' + e.exps.map(function (x2) {
-    var lin = function (r, v) { return v ? '<li><span style="color:var(--gray)">' + r + ':</span> ' + esc(v) + '</li>' : ''; };
-    return '<p style="margin:.2rem 0 .3rem;font-weight:800">' + esc(x2.nome) + '</p><ul style="list-style:none;padding:0;margin:0 0 .6rem">' +
+    var lin = function (r, v) { return v ? '<li><span>' + r + '</span><span>' + esc(v) + '</span></li>' : ''; };
+    return '<div class="exp-cx"><p>' + esc(x2.nome) + '</p><ul>' +
       lin('Idade', x2.idade && /^\d+$/.test(x2.idade) ? x2.idade + ' anos' : x2.idade) + lin('Horário', x2.hora) + lin('Turma', linha1(x2.turma)) + lin('Curso', x2.curso) +
       lin('Responsável', x2.responsavel) + lin('Telefone', x2.telefone) + lin('Como conheceu a Fisk', x2.origem) + lin('Observação', x2.obs) +
-      lin('Agendada por', x2.vendedora) + lin('Situação', SIT[x2.situacao] || x2.situacao) + lin('Motivo', x2.motivo) + '</ul>';
+      lin('Agendada por', x2.vendedora) + lin('Situação', SIT[x2.situacao] || x2.situacao) + lin('Motivo', x2.motivo) + '</ul></div>';
   }).join('') + '</div>';
+  var pe = '';
   if (e.turma) {
     var t = e.turma;
-    h += '<div class="bloco"><b class="tit">👥 Alunos (' + t.alunos.length + ')</b><ul>' + t.alunos.map(function (a) {
+    h += '<div class="bloco"><b class="tit">👥 Alunos <span class="n">' + t.alunos.length + '</span></b><ul>' + t.alunos.map(function (a) {
       var nome = esc(String(a.nome).replace(/\([^)]*\)/g, '').trim());
-      return '<li>' + nome +   /* sem o radar de cada aluno (Pedro, 26/10/2026): demorava e ninguém abria */
-        ' <button type="button" class="couns" data-couns="' + k + '|' + t.alunos.indexOf(a) + '" title="Abrir o e-counseling de ' + nome + '">💬 counseling</button>' +
-        (a.book ? ' <small style="color:var(--gray)">· ' + esc(a.book) + '</small>' : '') + (Number(a.aulasAtraso) >= 4 ? ' <small style="color:var(--red);font-weight:800">· ' + a.aulasAtraso + ' aulas atrás</small>' : '') + '</li>';
-    }).join('') + '</ul>';
-    h += '<a class="abrir-aula" href="turma-de-hoje.html#t=' + encodeURIComponent(t.escola + '|' + t.prof + '|' + t.linha) + '">Abrir na Minha aula →</a></div>';
+      return '<li class="al"><span class="nm" title="' + nome + '">' + nome + '</span>' +   /* sem o radar de cada aluno (Pedro, 26/10/2026): demorava e ninguém abria */
+        (a.book ? '<span class="lv">' + esc(a.book) + '</span>' : '') +
+        (Number(a.aulasAtraso) >= 4 ? '<span class="atr">' + a.aulasAtraso + ' aulas atrás</span>' : '') +
+        '<span class="esp"></span><button type="button" class="couns" data-couns="' + k + '|' + t.alunos.indexOf(a) + '" title="Abrir o e-counseling de ' + nome + '">💬 counseling</button></li>';
+    }).join('') + '</ul></div>';
+    pe = '<a class="abrir-aula" href="turma-de-hoje.html#t=' + encodeURIComponent(t.escola + '|' + t.prof + '|' + t.linha) + '">Abrir na Minha aula →</a>';
   } else if (e.lc) {
-    h += '<div class="bloco"><b class="tit">🙋 Plantão de dúvidas</b><p class="aviso">' + esc(e.lc.publico || '') + (e.lc.obs ? ' · ' + esc(e.lc.obs) : '') + '</p>' +
-      '<a class="abrir-aula" href="turma-de-hoje.html">Abrir a Minha aula →</a></div>';
+    h += '<div class="bloco"><b class="tit">🙋 Plantão de dúvidas</b><p class="aviso">' + esc(e.lc.publico || '') + (e.lc.obs ? ' · ' + esc(e.lc.obs) : '') + '</p></div>';
+    pe = '<a class="abrir-aula" href="turma-de-hoje.html">Abrir a Minha aula →</a>';
   }
-  $('gavCorpo').innerHTML = h; $('gav').hidden = false;
+  h += '</div>' + (pe ? '<div class="pe">' + pe + '</div>' : '');
+  $('gavCorpo').innerHTML = h;
+  document.querySelector('#gav .caixa').style.setProperty('--g-cor', e.cor || '#3c6e98');
+  gavAbre();
+}
+/* abre e fecha com a gaveta DESLIZANDO: o hidden sai antes e a classe .on entra no quadro seguinte (senão o navegador
+   pula a transição); ao fechar, a .on sai primeiro e o hidden só volta quando a gaveta terminou de sair */
+var _gavFecha = null;
+function gavAbre() {
+  clearTimeout(_gavFecha);
+  var g = $('gav'); g.hidden = false; g.querySelector('.caixa').scrollTop = 0;
+  requestAnimationFrame(function () { requestAnimationFrame(function () { g.classList.add('on'); }); });
+}
+function gavFecha() {
+  var g = $('gav'); if (g.hidden) return;
+  g.classList.remove('on');
+  clearTimeout(_gavFecha); _gavFecha = setTimeout(function () { g.hidden = true; }, 380);
 }
 document.addEventListener('click', function (ev) {
   /* o e-counseling do aluno (Pedro, 26/10/2026): abre o documento direto no Docs (fiskCounselingAbrirDoc, no kit) */
@@ -445,16 +498,16 @@ document.addEventListener('click', function (ev) {
     var ctx = { escola: t.escola, professor: t.prof, turma: t.tituloInteiro || t.titulo, aluno: String(a.nome).replace(/\([^)]*\)/g, '').trim(), estagio: a.book || '' };
     /* abre o documento direto no Google Docs, numa aba nova (Pedro, 26/10/2026), sem a ferramenta nem a pasta no meio */
     if (typeof fiskCounselingAbrirDoc === 'function') { fiskCounselingAbrirDoc(ctx); return; }
-    $('gav').hidden = true;
+    gavFecha();
     if (typeof fiskCounselingGaveta === 'function') fiskCounselingGaveta(ctx);
     else window.open('counseling.html?escola=' + encodeURIComponent(ctx.escola) + '&prof=' + encodeURIComponent(ctx.professor) + '&turma=' + encodeURIComponent(String(ctx.turma).split('\n')[0]) + '&aluno=' + encodeURIComponent(ctx.aluno), '_blank', 'noopener');
     return;
   }
   var b = ev.target.closest('[data-ev]'); if (b) { abreGaveta(+b.dataset.ev); return; }
-  if (ev.target.closest('[data-fecha]')) { $('gav').hidden = true; return; }
+  if (ev.target.closest('[data-fecha]')) { gavFecha(); return; }
   var t = ev.target.closest('[data-dia]'); if (t) { diaSel = somaDias(segunda, +t.dataset.dia); desenhar(); }
 });
-document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') $('gav').hidden = true; });
+document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') gavFecha(); });
 $('ant').addEventListener('click', function () { segunda = somaDias(segunda, -7); diaSel = somaDias(diaSel, -7); desenhar(); });
 $('prox').addEventListener('click', function () { segunda = somaDias(segunda, 7); diaSel = somaDias(diaSel, 7); desenhar(); });
 $('hoje').addEventListener('click', function () { segunda = inicioDaSemana(new Date()); diaSel = new Date(); desenhar(); });

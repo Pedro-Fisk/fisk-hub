@@ -3168,13 +3168,89 @@
     try { localStorage.setItem('hub_semana_aberta', sim ? '1' : '0'); } catch (e) {}
     if (sim && !corpo.querySelector('iframe')) {
       var f = document.createElement('iframe');
-      f.src = 'calendario.html?embed=1'; f.title = 'Minha semana'; f.loading = 'lazy';
+      f.src = 'calendario.html?embed=1'; f.title = 'Minha semana'; f.loading = jaViu ? 'lazy' : 'eager';   /* no dia do tour ele tem de carregar já */
       corpo.insertBefore(f, corpo.firstChild);
     }
   }
   bt.addEventListener('click', function () { abre(bt.getAttribute('aria-expanded') !== 'true'); });
   var guardado = null; try { guardado = localStorage.getItem('hub_semana_aberta'); } catch (e) {}
-  abre(guardado !== '0');
+  /* O TOUR DA MINHA SEMANA (26/10/2026, Pedro: "na próxima vez que o professor entra, já carregue mostrando o Minha
+     Semana aberto, com aquele tour do portal do aluno"). Uma vez por aparelho (chave fisk_tour_hub_semana_v1): nessa
+     vez a seção abre mesmo que tenha sido fechada. O motor é o tour.js do PORTAL, lido de lá (dado e código de outro
+     repositório se leem, não se copiam). O tour espera a tela livre (a cortina de carregamento e a do My Avatar) e o
+     calendário carregado; os passos apontam para dentro do calendário por "sombras" posicionadas sobre ele, porque o
+     motor só enxerga a página de fora. */
+  var TOUR_KEY = 'hub_semana_v1', jaViu = false;
+  try { jaViu = localStorage.getItem('fisk_tour_' + TOUR_KEY) === '1'; } catch (e) {}
+  abre(!jaViu || guardado !== '0');
+  if (jaViu) return;
+  var TOUR_JS = 'https://portalfisk.com.br/assets/tour.js?v=0d623a52b9';
+  var T = {
+    pt: [['📅 Novidade: Minha semana', 'A sua semana agora fica aqui na página inicial: <b>aulas, plantões, aniversários e feriados</b>. Toque aqui para abrir ou fechar quando quiser.'],
+         ['👆 Toque na turma', 'Cada aula aparece no dia e no horário do card. Ao tocar, você vê <b>os alunos</b>, quem faz <b>aniversário</b> e o botão para abrir a <b>Minha aula</b> já na turma certa.'],
+         ['🧪 Aula experimental', 'Quando a secretaria marcar uma <b>aula experimental</b> numa turma sua, ela aparece aqui, na aula do dia, com o nome e a idade de quem vem.'],
+         ['↗ Em tela cheia', 'Quer ver maior? Abra a <b>Minha semana</b> em tela cheia por aqui.']],
+    en: [['📅 New: My week', 'Your week now lives here on the home page: <b>classes, tutoring shifts, birthdays and holidays</b>. Tap here to open or close it anytime.'],
+         ['👆 Tap a class', 'Each class shows up on the day and time from the card. Tap it to see <b>the students</b>, <b>birthdays</b> and the button that opens <b>My class</b> on the right group.'],
+         ['🧪 Trial class', 'When the front desk books a <b>trial class</b> in one of your groups, it shows up here, on that day’s class, with the visitor’s name and age.'],
+         ['↗ Full screen', 'Want it bigger? Open <b>My week</b> in full screen here.']],
+    es: [['📅 Novedad: Mi semana', 'Tu semana ahora está aquí en la página inicial: <b>clases, tutorías, cumpleaños y feriados</b>. Toca aquí para abrirla o cerrarla cuando quieras.'],
+         ['👆 Toca la clase', 'Cada clase aparece en el día y horario del card. Al tocarla ves <b>los alumnos</b>, los <b>cumpleaños</b> y el botón para abrir <b>Mi clase</b> en el grupo correcto.'],
+         ['🧪 Clase de prueba', 'Cuando la secretaría agende una <b>clase de prueba</b> en uno de tus grupos, aparece aquí, en la clase del día, con el nombre y la edad de quien viene.'],
+         ['↗ Pantalla completa', '¿Lo quieres más grande? Abre <b>Mi semana</b> en pantalla completa aquí.']]
+  };
+  function lingua() { var l = 'en'; try { l = (typeof fiskIdioma === 'function' ? fiskIdioma() : localStorage.getItem('fisk_lang')) || 'en'; } catch (e) {} return T[l] ? l : 'en'; }
+  /* uma "sombra" na página de fora, por cima de um elemento de dentro do calendário */
+  function sombra(id, alvo) {
+    var f = corpo.querySelector('iframe'), velho = document.getElementById(id); if (velho) velho.remove();
+    if (!f || !alvo) return false;
+    var r = alvo.getBoundingClientRect(), fr = f.getBoundingClientRect();
+    if (!r.width || !r.height) return false;
+    var d = document.createElement('div'); d.id = id;
+    d.style.cssText = 'position:absolute;pointer-events:none;border-radius:10px;left:' + (fr.left + r.left + window.scrollX) + 'px;top:' + (fr.top + r.top + window.scrollY) +
+      'px;width:' + r.width + 'px;height:' + r.height + 'px';
+    document.body.appendChild(d); return true;
+  }
+  function telaLivre() {
+    var ov = document.getElementById('hubEntrando');
+    return (!ov || ov.hidden) && !document.getElementById('av-mask') && !document.querySelector('.ftour-card');
+  }
+  function calendarioPronto() {
+    var f = corpo.querySelector('iframe'), d = null; try { d = f && f.contentDocument; } catch (e) {}
+    if (!d || !d.body) return null;
+    var st = d.getElementById('st');
+    var temAula = d.querySelector('.grade .ev:not(.semaula), .dia-lista .cartao:not(.semaula)');
+    return (temAula || (st && !/Lendo|Reading|Leyendo/.test(st.textContent) && d.getElementById('painelCal') && !d.getElementById('painelCal').hidden)) ? d : null;
+  }
+  function carregaMotor(cb) {
+    if (window.FiskTour) return cb();
+    var sc = document.createElement('script'); sc.src = TOUR_JS; sc.onload = cb; sc.onerror = function () {}; document.head.appendChild(sc);
+  }
+  var t0 = Date.now();
+  (function espera() {
+    var d = calendarioPronto();
+    if (!(telaLivre() && (d || Date.now() - t0 > 25000))) { if (Date.now() - t0 < 60000) setTimeout(espera, 600); return; }
+    carregaMotor(function () {
+      if (!window.FiskTour || !telaLivre()) return;
+      var aula = d && d.querySelector('.grade .ev:not(.semaula), .dia-lista .cartao:not(.semaula)');
+      var exp = d && d.querySelector('.ev.exp, .cartao.exp');
+      if (!exp && d) { var sl = d.querySelector('.grade .selo.exp, .dia-lista .selo.exp'); exp = sl && sl.closest('.ev, .cartao'); }   /* a etiqueta 🧪 fica escondida no bloco baixo: destaca a aula inteira */
+      /* a aula escolhida precisa estar à vista DENTRO do calendário, que rola por dentro */
+      if (aula) { try { var w = d.defaultView, y = aula.getBoundingClientRect().top + w.scrollY - 140; w.scrollTo(0, Math.max(0, y)); } catch (e) {} }
+      corpo.scrollIntoView({ block: 'center' });
+      setTimeout(function () {
+        var temAula = sombra('semTourAula', aula), temExp = sombra('semTourExp', exp);
+        var x = T[lingua()];
+        window.FISK_LANG = lingua();
+        window.FiskTour.start([
+          { el: '#semHomeBtn', title: x[0][0], html: x[0][1] },
+          { el: temAula ? '#semTourAula' : '#semHomeCorpo', title: x[1][0], html: x[1][1] },
+          { el: temExp ? '#semTourExp' : '#semHomeCorpo', title: x[2][0], html: x[2][1] },
+          { el: '#semHomeCorpo .abrir', title: x[3][0], html: x[3][1] }
+        ], { key: TOUR_KEY, onDone: function () { ['semTourAula', 'semTourExp'].forEach(function (id) { var e = document.getElementById(id); if (e) e.remove(); }); } });
+      }, 700);
+    });
+  })();
 })();
 </script>
 </body>
