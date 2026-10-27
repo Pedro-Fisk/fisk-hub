@@ -445,6 +445,16 @@ body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ 
   .pt-cab .nav button{ border: 0; background: rgba(255,255,255,.2); color: #fff; border-radius: 99px; padding: .38rem .95rem; font-weight: 800; font-size: .92rem; cursor: pointer; font-family: inherit; }
   .pt-cab .nav button{ white-space: nowrap; }
   .pt-cab .nav button:hover{ background: rgba(255,255,255,.32); }
+  /* aniversariantes da semana logo abaixo do cabeçalho (Pedro, 27/10/2026); só aparece quando há */
+  .pt-aniv{ display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .45rem .6rem; padding: .75rem 1rem; border-radius: 18px;
+    background: linear-gradient(90deg, #fff8db 0%, #fff1f7 100%); border: 2px solid #fbe08a; color: #92400e; text-align: center; }
+  .pt-aniv .tit{ font-family: var(--font-heading); font-size: 1.08rem; font-weight: 800; }
+  .pt-aniv .nm{ background: #fff; border: 1px solid #fbe08a; border-radius: 99px; padding: .22rem .75rem; font-weight: 800; }
+  .pt-aniv .nm small{ font-weight: 700; opacity: .75; margin-left: .25rem; }
+  .pt-aniv .nm.hoje{ color: #fff; border-color: transparent; background: linear-gradient(90deg, #f59e0b, #ec4899); }
+  body.theme-dark .pt-aniv{ background: linear-gradient(90deg, #3a2e12 0%, #3a1830 100%); border-color: #a16207; color: #fcd34d; }
+  body.theme-dark .pt-aniv .nm{ background: #1b273a; border-color: #a16207; }
+  body.theme-dark .pt-aniv .nm.hoje{ background: linear-gradient(90deg, #f59e0b, #ec4899); color: #fff; }
   .pt-titulo{ display: flex; align-items: center; justify-content: center; gap: .55rem; margin: .5rem 0 -.2rem; font-family: var(--font-heading); font-size: 1.18rem; color: #1d2b53; }
   .pt-titulo .cont{ font-family: var(--font-body); font-size: .9rem; font-weight: 800; color: #5b6b85; }
   .pt-trans{ display: flex; flex-wrap: wrap; justify-content: center; gap: .45rem; }
@@ -1449,6 +1459,7 @@ function carregarTurma(escola, prof, linha, titulo) {
       if (aguia.ov) desenhaAguia();
       /* o aniversário mora nesta leitura: se os cartões já foram desenhados sem ela, redesenha uma vez */
       if ($('alunos').children.length && estado.alunos.some(function (a) { return nascMesDia(a); })) desenharTurma();
+      ptDesenhaAniv();
     }).catch(function (e) { console.warn('card fn=turma', e); estado.pessoais = []; });
     return Promise.all([
       post({ action: 'plannerTurma', alunos: estado.alunos.map(function (a) { return { raf: a.raf, book: a.book, turma: nomeTurma }; }) }),
@@ -2865,14 +2876,21 @@ function ptDrive(id) { return id ? 'https://drive.google.com/file/d/' + id + '/v
 function ptPasta(id) { return id ? 'https://drive.google.com/drive/folders/' + id : ''; }
 function ptLink(url, txt) { return '<a href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(txt) + '</a>'; }
 function ptPrimeiro(nome) { var n = String(nome || '').replace(/\([^)]*\)/g, '').trim().split(/\s+/)[0] || ''; return n.charAt(0).toUpperCase() + n.slice(1).toLowerCase(); }
-/* aniversariantes da semana, pela data de nascimento do card (a mesma leitura da turma que traz o telefone) */
-function ptAniversarios(s) {
-  var out = [];
+/* a faixa do cabeçalho: cada aluno pela semana do bloco do livro dele (a que o cabeçalho mostra, com as setas);
+   desenhada à parte porque o aniversário chega depois, na leitura da turma do card */
+function ptDesenhaAniv() {
+  var el = $('pt-aniv'); if (!el || !ptEstado) return;
+  var hojeMd = diaAlvoTH().slice(5), vistos = {}, lista = [];
   (estado.alunos || []).forEach(function (a) {
-    var mmdd = nascMesDia(a); if (!mmdd) return;
-    if (s.de.slice(5) <= mmdd && mmdd <= s.ate.slice(5)) out.push(ptPrimeiro(a.nome) + ' (' + mdBr(mmdd) + ')');
+    var md = nascMesDia(a); if (!md || vistos[a.raf]) return;
+    var b = ptBlocoDe(ptEstado.P, a.book), s = b && ptSemana(b).s;
+    var ok = s ? (s.de.slice(5) <= md && md <= s.ate.slice(5)) : (!ptEstado.off && !!anivSemanaCalendario(a));
+    if (ok) { vistos[a.raf] = 1; lista.push({ nome: ptPrimeiro(a.nome), md: md, hoje: !ptEstado.off && md === hojeMd }); }
   });
-  return out;
+  lista.sort(function (x, y) { return x.md < y.md ? -1 : x.md > y.md ? 1 : 0; });
+  el.hidden = !lista.length;
+  el.innerHTML = lista.length ? '<span class="tit">🎂 Aniversariante' + (lista.length > 1 ? 's' : '') + ' da semana</span>' +
+    lista.map(function (x) { return '<span class="nm' + (x.hoje ? ' hoje' : '') + '">' + esc(x.nome) + '<small>' + (x.hoje ? 'HOJE! 🎉' : mdBr(x.md)) + '</small></span>'; }).join('') : '';
 }
 function ptMarca(livro, k) { return ptEstado && ptEstado.marcas[livro + '|' + k]; }
 function ptTick(livro, k, semana) {
@@ -2917,7 +2935,8 @@ function ptDesenha() {
   var s0 = ptSemana(blocos[0]).s;
   html += '<div class="pt-cab"><h2>📘 Plano da turma</h2><div class="sub">Semana de ' + ptDataBr(s0.de) + ' a ' + ptDataBr(s0.ate) +
     (off ? ' · ' + (off > 0 ? off + ' semana' + (off > 1 ? 's' : '') + ' à frente' : (-off) + ' semana' + (off < -1 ? 's' : '') + ' atrás') : ' · a semana desta aula') + '</div>' +
-    '<div class="nav"><button type="button" data-ptoff="-1">‹ Anterior</button><button type="button" data-ptoff="0">Esta semana</button><button type="button" data-ptoff="1">Próxima ›</button></div></div>';
+    '<div class="nav"><button type="button" data-ptoff="-1">‹ Anterior</button><button type="button" data-ptoff="0">Esta semana</button><button type="button" data-ptoff="1">Próxima ›</button></div></div>' +
+    '<div class="pt-aniv" id="pt-aniv" hidden></div>';
   blocos.forEach(function (b) {
     var s = ptSemana(b).s, mus = (P.musicas && P.musicas[Object.keys(P.musicas)[0]]) || {};
     html += '<div class="pt-titulo">🎶 Momentos da aula' + (blocos.length > 1 ? ' <span class="cont">' + esc(ptLivrosDoBloco(b)) + '</span>' : '') + '</div>';
@@ -2930,8 +2949,6 @@ function ptDesenha() {
     if (s.storytelling) moms += ptMomento('m-story', '📖', 'Storytelling', esc(s.storytelling) + (s.storytellingArq && s.storytellingArq.id ? '\n' + ptLink(ptDrive(s.storytellingArq.id), '📄 Reading Activity') : '') + ptQuando('*', 'story:' + s.de), ptTick('*', 'story:' + s.de, s.de));
     var comPasta = s.comunicativaPasta && s.comunicativaPasta.id && (s.comunicativaPasta.arquivos || []).length ? ptLink(ptPasta(s.comunicativaPasta.id), '📁 atividades da semana') : '';
     if (s.comunicativa || comPasta) moms += ptMomento('m-com', '💬', 'Atividade comunicativa', esc(s.comunicativa || '') + (s.comunicativa && comPasta ? '\n' : '') + comPasta + ptQuando('*', 'com:' + s.de), ptTick('*', 'com:' + s.de, s.de));
-    var aniv = ptAniversarios(s);
-    if (aniv.length) moms += ptMomento('m-aniv', '🎂', 'Aniversário!', esc(aniv.join(', ')) + '\nHora de cantar parabéns 🎉');
     if (s.geral) moms += ptMomento('m-geral', '📚', 'Livro nesta semana', esc(s.geral));
     if (s.material) moms += ptMomento('m-mat', '🧺', 'Material da semana', esc(s.material));
     html += moms ? '<div class="pt-momentos">' + moms + '</div>' : '<div class="pt-nada" style="text-align:center">Nada além do livro nesta semana.</div>';
@@ -2967,7 +2984,8 @@ function ptDesenha() {
   html += '</div>';
   if (!ptEstado.carregou) html += '<div class="pt-nada" style="text-align:center">🔄 Lendo o que já foi feito…</div>';
   cx.innerHTML = html; cx.hidden = false;
-  var cab = cx.querySelector('.pt-cab'); if (cab) cab.parentNode.insertBefore(ptNotaTurma(), cab.nextSibling);
+  ptDesenhaAniv();
+  var cab = cx.querySelector('.pt-aniv') || cx.querySelector('.pt-cab'); if (cab) cab.parentNode.insertBefore(ptNotaTurma(), cab.nextSibling);
   cx.querySelectorAll('.pt-livro').forEach(function (el) { var c = el.querySelector('.corpo'); if (c) c.appendChild(ptNotaLivro(el.dataset.ptlivro)); });
   cx.querySelectorAll('[data-ptoff]').forEach(function (bt) { bt.addEventListener('click', function () { var v = Number(bt.dataset.ptoff); ptEstado.off = v === 0 ? 0 : ptEstado.off + v; ptDesenha(); }); });
   cx.querySelectorAll('.pt-tick').forEach(function (bt) { bt.addEventListener('click', function () { ptAlterna(bt.dataset.ptl, bt.dataset.ptk, bt.dataset.pts); }); });
