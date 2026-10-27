@@ -3376,5 +3376,23 @@
   document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') fecha(); });
 })();
 </script>
+<script>
+/* TODA FERRAMENTA EM OUTRA ABA (Pedro, 27/10/2026): os cards, as "mais usadas", a próxima aula, os jogos e o menu dos
+   boletins abrem numa aba nova, e o Hub fica na de trás. Quem decide é este bloco, e não cada link: card novo, link que
+   o script reescreve (o do Portal leva a identidade) e o que nasce depois (as mais usadas) entram sozinhos. Links para
+   dentro da própria home (#) e os botões continuam onde estão. */
+(function () {
+  var SEL = 'main.grid a.card[href], #maisUsadas a[href], a#proxAula[href], #fwHub a[href], .bol-menu a[href]';
+  function marca() {
+    [].forEach.call(document.querySelectorAll(SEL), function (a) {
+      var h = a.getAttribute('href') || '';
+      if (!h || h.charAt(0) === '#' || /^javascript:/i.test(h) || a.target === '_blank') return;
+      a.target = '_blank'; if (!/noopener/.test(a.rel || '')) a.rel = ((a.rel || '') + ' noopener').trim();
+    });
+  }
+  marca();
+  new MutationObserver(marca).observe(document.body, { childList: true, subtree: true });
+})();
+</script>
 </body>
 </html>

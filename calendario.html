@@ -283,10 +283,10 @@
 <body>
 <script>
 /* EMBUTIDO NA HOME (26/10/2026): a home do Hub mostra esta página numa janela (calendario.html?embed=1). Sem o
-   cabeçalho e sem a moldura do painel; os links saem para a página de fora (base target=_top), para o "Abrir na
-   Minha aula" levar o Hub inteiro à turma. */
+   cabeçalho e sem a moldura do painel. Os links saem numa ABA NOVA (base target=_blank; até 27/10/2026 era _top),
+   como toda ferramenta da home: o "Abrir na Minha aula" abre a turma ao lado e o Hub fica atrás (Pedro, 27/10/2026). */
 var EMBED = /[?&]embed=1/.test(location.search);
-if (EMBED) { document.body.classList.add('embed'); var bse = document.createElement('base'); bse.target = '_top'; document.head.appendChild(bse); }
+if (EMBED) { document.body.classList.add('embed'); var bse = document.createElement('base'); bse.target = '_blank'; document.head.appendChild(bse); }
 </script>
 
 <header class="hero">
