@@ -533,6 +533,8 @@ body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ 
   .pt-botoes{ display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .85rem; }
   .pt-botoes a{ flex: 1 1 160px; text-align: center; font-size: .95rem; font-weight: 900; text-decoration: none; border-radius: 14px; padding: .6rem .8rem; color: var(--lc-tx); background: var(--lc-bg); border: 2px solid var(--lc-soft); }
   .pt-botoes a:hover{ background: var(--lc); color: #fff; border-color: var(--lc); }
+  .pt-antes .corpo .pt-it, .pt-antes .corpo .pt-games{ opacity: .5; filter: grayscale(1); }
+  .pt-antes-nota{ font-size: .85rem; font-weight: 800; color: #64748b; background: #f1f5f9; border-radius: 10px; padding: .4rem .6rem; margin: .2rem 0 .4rem; }
   .pt-atras{ margin: .2rem 0 .7rem; background: #fef2f2; border: 2px solid #fca5a5; border-radius: 16px; padding: .6rem .8rem .7rem; }
   .pt-atras .tit{ display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; color: #b91c1c; font-weight: 900; font-size: 1.02rem; margin-bottom: .1rem; }
   .pt-atras .tit small{ font-weight: 800; font-size: .82rem; color: #dc2626; }
@@ -543,6 +545,13 @@ body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ 
   .pt-atras .pt-botoes{ margin-top: .55rem; }
   .pt-atras .pt-botoes a{ color: #b91c1c; background: #fff; border-color: #fca5a5; padding: .45rem .7rem; font-size: .9rem; }
   .pt-atras .pt-botoes a:hover{ background: #dc2626; color: #fff; border-color: #dc2626; }
+  .tp-box{ margin: .3rem 0 .6rem; background: #fff7ed; border: 2px solid #fdba74; border-radius: 16px; padding: .7rem .9rem; }
+  .tp-box .tit{ display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; color: #c2410c; font-weight: 900; font-size: 1.05rem; }
+  .tp-box .tit small{ font-weight: 800; font-size: .82rem; color: #ea580c; }
+  .tp-falta{ margin-top: .6rem; padding-top: .5rem; border-top: 1px dashed #fed7aa; }
+  .tp-falta h5{ margin: 0 0 .2rem; font-size: .9rem; font-weight: 900; color: #b91c1c; text-transform: uppercase; letter-spacing: .03em; }
+  .tp-falta .pt-botoes{ margin-top: .5rem; }
+  body.theme-dark .tp-box{ background: #2a1d10; border-color: #9a3412; }
   body.theme-dark .pt-atras{ background: #2a1414; border-color: #7f1d1d; }
   body.theme-dark .pt-atras .pt-botoes a{ background: #1f1111; }
   .pt-nada{ color: #64748b; font-size: .98rem; padding: .4rem 0; }
@@ -905,6 +914,9 @@ function marcarFalta(a) {
   var antes = estado.faltas[a.raf];
   estado.faltas[a.raf] = !desfazer;
   reordenaComAnimacao(a);
+  /* turma do plano: a falta também fica guardada para a tutoria (TutoriaPlano.js), que soma a ela o que a turma
+     ticou naquele dia. Calado: se falhar, a falta no card continua valendo. */
+  if (ptEstado) post({ action: 'planoTurmaFalta', escola: ptEstado.escola, turma: ptEstado.turma, raf: a.raf, nome: a.nome, livro: a.book, data: diaAlvoTH(), faltou: !desfazer }).catch(function () {});
   post({ action: 'plannerFalta', raf: a.raf, book: a.book, desfazer: desfazer }).then(function (r) {
     var c = r.card || {};
     if (c.escreveu != null) toast(desfazer ? '📇 Card: falta ' + rotDiaTH() + ' desfeita.' : '📇 Card: "a" (falta) na aula ' + rotDiaTH() + '.');
@@ -1392,6 +1404,8 @@ function initCascata() {
         var linhaPedida = pedida.linha; pedida = null;
         if (escolhe(selTurma, linhaPedida)) return;
       }
+      /* o card "Tutoria" do Hub (27/10/2026) abre a Minha Aula direto no plantão */
+      if (/[?&#]tutoria=1/.test(location.search + location.hash)) { status('🙋 Minha Aula da Tutoria: busque cada aluno que chegar pelo nome ou RAF. Kids e teens das turmas do plano mostram o que ficou em aberto pelas faltas.'); escolhe(selTurma, PLANTAO); return; }
       var agora = turmaDoHorario(turmas);
       /* o horário do plantão escrito no card ("LC FIXO - 5ª 15h às 17h30") abre o plantão, não a lista daquela linha */
       /* a tabela das Learning Center sessions diz quem é monitor e quando (Pedro, 16/09/2026) */
@@ -1588,7 +1602,8 @@ function trazerAluno(al) {
   estado.dados = estado.dados || {};
   Promise.all([
     post({ action: 'plannerTurma', alunos: [{ raf: al.raf, book: al.book, turma: al.turma }] }),
-    carregaPlano(al.book)
+    carregaPlano(al.book),
+    estado.plantao ? tutPendCarrega(al) : null
   ]).then(function (rs) {
     Object.assign(estado.dados, rs[0].alunos || {});
     if (!estado.recursos || !estado.recursos.length) estado.recursos = rs[0].recursos || [];
@@ -2026,6 +2041,8 @@ function cartaoAluno(a) {
       card.appendChild(trilhaDeLicoes(a, plano, ctx, reg, idxReal));
       var ks = quadroKS(a, plano, pos, ctx); if (ks) card.appendChild(ks);
     }
+  } else if (estado.plantao && estado.tutPend && estado.tutPend[a.raf]) {
+    card.appendChild(tutPendCaixa(a));
   } else {
     var sp = document.createElement('div'); sp.className = 'sem-plano';
     sp.textContent = 'O gabarito do ' + (a.book || 'livro') + ' ainda não foi transcrito: por enquanto só o Checking é registrado aqui.';
@@ -2918,6 +2935,12 @@ var PLANO_TURMA_PILOTO = [
   { escola: 'Caçapava', turma: /kids\s*multilevel\s*\(at[eé]\s*2º\s*ano\)\s*-\s*3ª\s*8h30/i },
   { escola: 'Taubaté', turma: /^teens\s*connect\s*2\s*-\s*3ª\s*15h/i }
 ];
+/* ABERTURA A TODOS (Pedro, 27/10/2026): o piloto vale até quinta, 29/10/2026, às 13h; dali em diante toda turma com
+   livro no plano abre a Minha Aula com o plano (o card "Tutoria · Minha Aula" do index.html abre no mesmo instante). */
+var PLANO_TURMA_ABRE = Date.parse('2026-10-29T13:00:00-03:00');
+/* O COMEÇO (Pedro, 27/10/2026): o que o plano previa ANTES desta data não é atraso de ninguém, as turmas ainda não
+   usavam o plano. Semana que terminou antes fica em cinza e não alimenta as atrasadas. */
+var PT_INICIO = '2026-10-27';
 var ptEstado = null;
 var ptCarregando = null;
 function ptCarregaDados() {
@@ -2933,7 +2956,7 @@ function ptCarregaDados() {
 }
 function ptNoPiloto(escola, turma) {
   var s = sessao() || {};
-  if (s.master) return true;
+  if (s.master || Date.now() >= PLANO_TURMA_ABRE) return true;
   return PLANO_TURMA_PILOTO.some(function (p) { return normNome(p.escola) === normNome(escola) && p.turma.test(String(turma || '').trim()); });
 }
 function planoTurmaDesmonta() {
@@ -3102,7 +3125,9 @@ function ptDesenha() {
     var mover = nL > 1 ? '<span class="mover"><button type="button" data-ptmv="-1" data-ptlv="' + esc(livro) + '"' + (iL === 0 ? ' disabled' : '') + ' aria-label="Subir ' + esc(livro) + '" title="Fazer antes">↑</button>' +
       '<button type="button" data-ptmv="1" data-ptlv="' + esc(livro) + '"' + (iL === nL - 1 ? ' disabled' : '') + ' aria-label="Descer ' + esc(livro) + '" title="Fazer depois">↓</button>' +
       '<span class="alca" title="Segure e arraste para mudar a ordem" aria-hidden="true">⠿</span></span>' : '';
-    html += '<div class="pt-livro" draggable="' + (nL > 1) + '" data-ptlivro="' + esc(livro) + '" style="' + ptCorVars(cor) + '"><div class="topo"' + (lum > 0.6 ? ' style="color:#3a2e00"' : '') + '><h3>' + esc(livro) + '</h3>' + (L && L.licao ? '<span class="lic"' + (L.licaoInferida ? ' title="Lição deduzida pelas páginas do livro (o plano traz só as páginas)"' : '') + '>' + esc(L.licao) + '</span>' : '') + mover + '</div>' +
+    var antes = s.ate < PT_INICIO;
+    if (antes && L && L.itens.length) corpo = '<div class="pt-antes-nota">Semana anterior a ' + ptDataBr(PT_INICIO) + ', quando o plano começou a ser usado: o que ficou sem tique aqui não conta como atrasado.</div>' + corpo;
+    html += '<div class="pt-livro' + (antes ? ' pt-antes' : '') + '" draggable="' + (nL > 1) + '" data-ptlivro="' + esc(livro) + '" style="' + ptCorVars(cor) + '"><div class="topo"' + (lum > 0.6 ? ' style="color:#3a2e00"' : '') + '><h3>' + esc(livro) + '</h3>' + (L && L.licao ? '<span class="lic"' + (L.licaoInferida ? ' title="Lição deduzida pelas páginas do livro (o plano traz só as páginas)"' : '') + '>' + esc(L.licao) + '</span>' : '') + mover + '</div>' +
       '<div class="quem">' + ptEstado.porLivro[livro].map(function (a) { return '<span>' + esc(ptPrimeiro(a.nome)) + '</span>'; }).join('') + '</div>' +
       '<div class="corpo">' + corpo + ptBotoesMaterial(livro, vigente) + '</div></div>';
   });
@@ -3128,7 +3153,7 @@ function ptAtrasadas(b, nome, livro, sw, vigente) {
   Object.keys(ptEstado.marcas).forEach(function (ch) { var m = ptEstado.marcas[ch]; if (ch.indexOf(nome + '|') === 0 && m.s && (!desde || m.s < desde)) desde = m.s; });
   if (!desde) return '';
   (b.semanas || []).slice(0, sw.i).forEach(function (sp, i) {
-    var Lp = (sp.livros || {})[nome]; if (sp.de < desde || !Lp || sp.de >= sw.s.de) return;
+    var Lp = (sp.livros || {})[nome]; if (sp.de < desde || sp.ate < PT_INICIO || !Lp || sp.de >= sw.s.de) return;
     var aberta = false;
     Lp.itens.forEach(function (it) {
       var m = ptMarca(nome, it.k);
@@ -3154,6 +3179,76 @@ function ptAtrasadas(b, nome, livro, sw, vigente) {
         (PT_TIPO[p.it.tipo] ? '<span class="pt-tipo ' + esc(p.it.tipo) + '">' + PT_TIPO[p.it.tipo] + '</span>' : '') + esc(p.it.t) + ptQuando(nome, p.it.k) + '</span></div>';
     }).join('') +
     lics.map(function (l) { return ptBotoesMaterial(livro, l); }).join('') + '</div>';
+}
+/* A MINHA AULA DA TUTORIA (professores via Pedro, 27/10/2026): no plantão, o aluno kids ou teens de turma do plano
+   mostra o que ficou em aberto pelas faltas (TutoriaPlano.js): para cada falta, as atividades que a turma fez
+   naquele dia, e o professor do plantão tica o que o aluno fez aqui. O tique registra a presença na tutoria
+   (Diário de Bordo, aviso ao professor, nota no card) com a lista do que foi feito. */
+function tutPendCarrega(al) {
+  return ptCarregaDados().then(function (P) {
+    if (!P || !ptBlocoDe(P, al.book)) return null;
+    return post({ action: 'tutoriaPendencias', raf: al.raf }).then(function (r) {
+      estado.tutPend = estado.tutPend || {};
+      estado.tutPend[al.raf] = { P: P, faltas: r.faltas || [] };
+    });
+  }).catch(function () { return null; });
+}
+function tutItemDoPlano(P, livro, k) {
+  var b = ptBlocoDe(P, livro); if (!b) return null;
+  for (var i = 0; i < b.semanas.length; i++) {
+    var L = (b.semanas[i].livros || {})[livro]; if (!L) continue;
+    for (var j = 0; j < L.itens.length; j++) if (L.itens[j].k === k) return { it: L.itens[j], L: L, i: i, b: b };
+  }
+  return null;
+}
+function tutPendCaixa(a) {
+  var tp = estado.tutPend[a.raf], P = tp.P, box = document.createElement('div'); box.className = 'tp-box';
+  var abertas = 0, html = '';
+  tp.faltas.forEach(function (f) {
+    var lics = [], itens = '';
+    f.itens.forEach(function (x) {
+      var d = tutItemDoPlano(P, x.livro, x.item); if (!d) return;
+      if (!x.feito) abertas++;
+      var lic = ptLicaoVigente(d.b, x.livro, d.i); if (lic && lics.indexOf(lic) < 0) lics.push(lic);
+      itens += '<div class="pt-it" style="' + ptCorVars(ptCor(x.livro)) + '"><button type="button" class="pt-tick' + (x.feito ? ' on' : '') + '" data-tpd="' + esc(f.data) + '" data-tpl="' + esc(x.livro) + '" data-tpk="' + esc(x.item) + '" aria-label="' + (x.feito ? 'Desmarcar' : 'Feito na tutoria') + '">' + (x.feito ? '✓' : '') + '</button><span class="t">' +
+        (PT_TIPO[d.it.tipo] ? '<span class="pt-tipo ' + esc(d.it.tipo) + '">' + PT_TIPO[d.it.tipo] + '</span>' : '') + esc(d.it.t) +
+        (x.feito ? '<span class="pt-quando">feito na tutoria ' + (x.feito.d === hojeIsoTH() ? 'hoje' : ptDataBr(x.feito.d)) + '</span>' : '') + '</span></div>';
+    });
+    html += '<div class="tp-falta"><h5>Faltou em ' + esc(ptDataBr(f.data)) + (lics.length ? ' · Lesson ' + esc(lics.join(', ')) : '') + '</h5>' +
+      (itens || '<div class="pt-nada">A turma não ticou nenhuma atividade do livro nesse dia.</div>') +
+      lics.map(function (l) { return ptBotoesMaterial(f.livro, l); }).join('') + '</div>';
+  });
+  box.innerHTML = '<div class="tit">📌 ' + (tp.faltas.length ? (abertas ? abertas + ' atividade' + (abertas > 1 ? 's' : '') + ' em aberto pelas faltas' : 'Tudo em dia ✓') : 'Nenhuma falta registrada na Minha Aula') +
+    '<small>' + (tp.faltas.length ? 'o que a turma fez nos dias em que ' + esc(ptPrimeiro(a.nome)) + ' faltou' : 'as faltas entram aqui a partir de 27/10/2026, marcadas pelo professor da turma') + '</small></div>' + html;
+  box.querySelectorAll('[data-tpk]').forEach(function (bt) { bt.addEventListener('click', function () { tutPendAlterna(a, bt.dataset.tpd, bt.dataset.tpl, bt.dataset.tpk); }); });
+  return box;
+}
+function tutPendAlterna(a, data, livro, k) {
+  var tp = estado.tutPend[a.raf], f = tp.faltas.filter(function (x) { return x.data === data; })[0];
+  var x = f && f.itens.filter(function (y) { return y.livro === livro && y.item === k; })[0]; if (!x) return;
+  var antes = x.feito, feito = !antes;
+  x.feito = feito ? { d: hojeIsoTH(), q: (sessao() || {}).name || '' } : null;
+  desenharTurma();
+  post({ action: 'tutoriaPlanoMarca', raf: a.raf, nome: a.nome, livro: livro, item: k, data: data, feito: feito }).then(function () {
+    tutPendDiario(a);
+  }).catch(function (e) { x.feito = antes; desenharTurma(); toast('⚠️ Não salvou (' + e.message + '). Tente de novo.'); });
+}
+/* o Diário de Bordo recebe a lista do que foi feito hoje; vários tiques seguidos viram uma escrita só */
+var tutPendTimer = {};
+function tutPendDiario(a) {
+  clearTimeout(tutPendTimer[a.raf]);
+  tutPendTimer[a.raf] = setTimeout(function () {
+    var tp = estado.tutPend[a.raf], partes = [];
+    tp.faltas.forEach(function (f) { f.itens.forEach(function (x) {
+      if (!x.feito || x.feito.d !== hojeIsoTH()) return;
+      var d = tutItemDoPlano(tp.P, x.livro, x.item); if (d) partes.push(d.it.t);
+    }); });
+    var primeira = !tutLancado[a.raf];
+    tutLancado[a.raf] = true;
+    post({ action: 'tutoriaRegistrar', raf: a.raf, book: a.book || '', escola: estado.escola, atividades: partes.length ? 'Em aberto por falta: ' + partes.join(', ') : '' }).then(function (r) {
+      if (primeira && r && r.novo && r.aluno) toast('📒 ' + String(r.aluno.nome).split(' ')[0] + ' entrou no Diário de Bordo (' + r.hora + ')');
+    }).catch(function () { if (primeira) tutLancado[a.raf] = false; });
+  }, 2500);
 }
 /* Os botões do material abrem o PORTAL (Modo Kids para os livros infantis, a chave do professor para os Teens, que
    ficam fora do Modo Kids) já no livro, nos áudios com a lição da semana aberta, ou nos vídeos com os dela em

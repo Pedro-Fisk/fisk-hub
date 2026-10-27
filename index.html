@@ -401,6 +401,20 @@
       <p data-i18n="card-tutoria-p">Veja quais alunos seus foram ao plantão de dúvidas</p>
     </a>
 
+    <!-- MINHA AULA DA TUTORIA (27/10/2026): a Minha Aula aberta direto no plantão; kids e teens das turmas do plano
+         mostram o que ficou em aberto pelas faltas. PILOTO, como o plano kids/teens: só as turmas da Maria Fernanda e do
+         Leonardo e a direção (TUTORIA_AULA_PILOTO, em updateToolLinks). -->
+    <a class="card card-tutoria card-tutoria-aula" href="turma-de-hoje.html?tutoria=1" style="display:none">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="3.5" width="16" height="17" rx="2.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8 9l1.6 1.6L12.5 7.5M8 15h.01M11 15h5M14 9.5h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>Tutoria · Minha Aula</h2>
+      <p>Receba quem chega ao plantão e veja o que cada aluno kids e teens deixou em aberto nas faltas</p>
+    </a>
+
     <!-- QUEM VEIO À TUTORIA (Pedro, 06/10/2026): a lista que ficava embaixo do Buddy virou card aqui, ao lado da
          ferramenta completa, para o professor bater o olho. Ocupa duas casas da grade e rola por dentro. Não é
          <a class="card">: não entra no "Mais usadas" nem nos atalhos. Quem preenche é o script do Buddy. -->
@@ -1578,6 +1592,8 @@
       /* O PILOTO DA TURMA DE HOJE (Pedro, 14/09/2026): a direção e o professor de teste. Para abrir para todos,
          esvazie a trava (e a da própria turma-de-hoje.html, que tem a mesma lista). */
       var TURMA_HOJE_PILOTO = ['CARLOS ALBERTO'];
+      var TUTORIA_AULA_PILOTO = ['MARIA FERNANDA', 'LEONARDO'];   /* o mesmo piloto do plano kids/teens (27/10/2026) */
+      var TUTORIA_AULA_ABRE = Date.parse('2026-10-29T13:00:00-03:00');   /* abre a todos com o plano (PLANO_TURMA_ABRE na turma-de-hoje.html) */
       /* O CORRETOR DO SIMULADO MET (19/09/2026): nasceu só para a direção; aberto para todos os professores no mesmo
          dia, depois do teste do Pedro com folhas reais. `false` volta ao piloto (a mesma chave mora na corretor-met.html) */
       var CORRETOR_ABERTO = true;
@@ -1604,6 +1620,8 @@
         if (th) th.style.display = (sv0 && (sv0.master || turmaHojeAberta(sv0) || TURMA_HOJE_PILOTO.some(function(n){ var x = normPiloto(sv0.name), y = normPiloto(n); return x === y || x.indexOf(y + ' ') === 0; }))) ? '' : 'none';
         var cmet = document.querySelector('a.card-corretor');
         if (cmet) cmet.style.display = (sv0 && (CORRETOR_ABERTO || sv0.master || sv0.director || CORRETOR_PILOTO.some(function(n){ return normPiloto(sv0.name) === normPiloto(n); }))) ? '' : 'none';
+        var tta = document.querySelector('a.card-tutoria-aula');
+        if (tta) tta.style.display = (sv0 && (sv0.master || Date.now() >= TUTORIA_AULA_ABRE || TUTORIA_AULA_PILOTO.some(function(n){ var x = normPiloto(sv0.name), y = normPiloto(n); return x === y || x.indexOf(y + ' ') === 0; }))) ? '' : 'none';
         var cnt = document.querySelector('a.card-noticias');
         if (cnt) cnt.style.display = (sv0 && sv0.master) ? '' : 'none';   /* fechado: só a direção (Noticias.js, NT_ABERTO) */
         var lp = document.querySelector('a.card-lessonplan');
