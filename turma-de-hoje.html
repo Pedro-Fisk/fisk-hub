@@ -1404,8 +1404,8 @@ function initCascata() {
         var linhaPedida = pedida.linha; pedida = null;
         if (escolhe(selTurma, linhaPedida)) return;
       }
-      /* o card "Tutoria" do Hub (27/10/2026) abre a Minha Aula direto no plantão */
-      if (/[?&#]tutoria=1/.test(location.search + location.hash)) { status('🙋 Minha Aula da Tutoria: busque cada aluno que chegar pelo nome ou RAF. Kids e teens das turmas do plano mostram o que ficou em aberto pelas faltas.'); escolhe(selTurma, PLANTAO); return; }
+      /* o subcard "Minha Tutoria" do Centro de Estudos (27/10/2026) abre a Minha Aula direto no plantão */
+      if (/[?&#]tutoria=1/.test(location.search + location.hash)) { status('🙋 Minha Tutoria: busque cada aluno que chegar pelo nome ou RAF. Kids e teens das turmas do plano mostram o que ficou em aberto pelas faltas.'); escolhe(selTurma, PLANTAO); return; }
       var agora = turmaDoHorario(turmas);
       /* o horário do plantão escrito no card ("LC FIXO - 5ª 15h às 17h30") abre o plantão, não a lista daquela linha */
       /* a tabela das Learning Center sessions diz quem é monitor e quando (Pedro, 16/09/2026) */
@@ -2936,7 +2936,7 @@ var PLANO_TURMA_PILOTO = [
   { escola: 'Taubaté', turma: /^teens\s*connect\s*2\s*-\s*3ª\s*15h/i }
 ];
 /* ABERTURA A TODOS (Pedro, 27/10/2026): o piloto vale até quinta, 29/10/2026, às 13h; dali em diante toda turma com
-   livro no plano abre a Minha Aula com o plano (o card "Tutoria · Minha Aula" do index.html abre no mesmo instante). */
+   livro no plano abre a Minha Aula com o plano (o subcard "Minha Tutoria" do Centro de Estudos abre no mesmo instante). */
 var PLANO_TURMA_ABRE = Date.parse('2026-10-29T13:00:00-03:00');
 /* O COMEÇO (Pedro, 27/10/2026): o que o plano previa ANTES desta data não é atraso de ninguém, as turmas ainda não
    usavam o plano. Semana que terminou antes fica em cinza e não alimenta as atrasadas. */
@@ -3180,7 +3180,7 @@ function ptAtrasadas(b, nome, livro, sw, vigente) {
     }).join('') +
     lics.map(function (l) { return ptBotoesMaterial(livro, l); }).join('') + '</div>';
 }
-/* A MINHA AULA DA TUTORIA (professores via Pedro, 27/10/2026): no plantão, o aluno kids ou teens de turma do plano
+/* A MINHA TUTORIA (professores via Pedro, 27/10/2026): no plantão, o aluno kids ou teens de turma do plano
    mostra o que ficou em aberto pelas faltas (TutoriaPlano.js): para cada falta, as atividades que a turma fez
    naquele dia, e o professor do plantão tica o que o aluno fez aqui. O tique registra a presença na tutoria
    (Diário de Bordo, aviso ao professor, nota no card) com a lista do que foi feito. */

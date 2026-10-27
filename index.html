@@ -388,31 +388,18 @@
       <p data-i18n="card-portal-kids-p">Áudios, vídeos e aplicativos dos livros infantis, do Magic Way ao Fun at School</p>
     </a>
 
-    <!-- Frequência à Tutoria (05/10/2026): o espelho do Diário de Bordo para o professor do aluno -->
-    <a class="card card-tutoria" href="tutoria.html">
+    <!-- CENTRO DE ESTUDOS (Pedro, 27/10/2026): um card só para tudo o que é do plantão de dúvidas. Dentro dele
+         (centro-de-estudos.html): Minha Tutoria (a Minha Aula aberta no plantão) e Frequência à Tutoria (05/10/2026). -->
+    <a class="card card-tutoria" href="centro-de-estudos.html">
       <div class="icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="9" cy="8" r="3.2" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M3 19.5c0-3.2 2.7-5.5 6-5.5s6 2.3 6 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          <path d="M15.5 9.5l2 2 4-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M3 9.5L12 5l9 4.5-9 4.5-9-4.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M7 11.6v4.2c1.4 1.3 3 1.9 5 1.9s3.6-.6 5-1.9v-4.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M21 9.5v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
       </div>
-      <h2 data-i18n="card-tutoria-h2">Frequência à Tutoria</h2>
-      <p data-i18n="card-tutoria-p">Veja quais alunos seus foram ao plantão de dúvidas</p>
-    </a>
-
-    <!-- MINHA AULA DA TUTORIA (27/10/2026): a Minha Aula aberta direto no plantão; kids e teens das turmas do plano
-         mostram o que ficou em aberto pelas faltas. PILOTO, como o plano kids/teens: só as turmas da Maria Fernanda e do
-         Leonardo e a direção (TUTORIA_AULA_PILOTO, em updateToolLinks). -->
-    <a class="card card-tutoria card-tutoria-aula" href="turma-de-hoje.html?tutoria=1" style="display:none">
-      <div class="icon">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="4" y="3.5" width="16" height="17" rx="2.5" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M8 9l1.6 1.6L12.5 7.5M8 15h.01M11 15h5M14 9.5h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <h2>Tutoria · Minha Aula</h2>
-      <p>Receba quem chega ao plantão e veja o que cada aluno kids e teens deixou em aberto nas faltas</p>
+      <h2 data-i18n="card-tutoria-h2">Centro de Estudos</h2>
+      <p data-i18n="card-tutoria-p">Minha Tutoria e Frequência à Tutoria: tudo do plantão de dúvidas num lugar só</p>
     </a>
 
     <!-- QUEM VEIO À TUTORIA (Pedro, 06/10/2026): a lista que ficava embaixo do Buddy virou card aqui, ao lado da
@@ -889,8 +876,8 @@
         'card-checking-p':  'Verifique o aproveitamento do aluno antes de avançar para a próxima lição',
         'card-ecounsel-h2': 'E-counseling',
         'card-ecounsel-p':  'Registre ocorrências e desenvolvimento do aluno',
-        'card-tutoria-h2': 'Frequência à Tutoria',
-        'card-tutoria-p':  'Veja quais alunos seus foram ao plantão de dúvidas',
+        'card-tutoria-h2': 'Centro de Estudos',
+        'card-tutoria-p':  'Minha Tutoria e Frequência à Tutoria: tudo do plantão de dúvidas num lugar só',
         'card-calendario-h2': 'Minha semana',
         'sem-abrir': 'Abrir em tela cheia ↗',
         'card-calendario-p':  'Suas aulas, plantões, experimentais e aniversários da semana',
@@ -987,8 +974,8 @@
         'card-checking-p':  'Verify student progress before moving on to the next lesson',
         'card-ecounsel-h2': 'E-counseling',
         'card-ecounsel-p':  'Log incidents and student development',
-        'card-tutoria-h2': 'Tutoring Attendance',
-        'card-tutoria-p':  'See which of your students came to the Learning Center',
+        'card-tutoria-h2': 'Study Center',
+        'card-tutoria-p':  'My Tutoring and Tutoring Attendance: everything about the Learning Center in one place',
         'card-calendario-h2': 'My week',
         'sem-abrir': 'Open full screen ↗',
         'card-calendario-p':  'Your classes, tutoring shifts, trial classes and birthdays this week',
@@ -1085,8 +1072,8 @@
         'card-checking-p':  'Verifica el aprovechamiento del alumno antes de avanzar a la próxima lección',
         'card-ecounsel-h2': 'E-counseling',
         'card-ecounsel-p':  'Registra incidencias y el desarrollo del alumno',
-        'card-tutoria-h2': 'Asistencia a la Tutoría',
-        'card-tutoria-p':  'Mira cuáles de tus alumnos fueron a la tutoría',
+        'card-tutoria-h2': 'Centro de Estudios',
+        'card-tutoria-p':  'Mi Tutoría y Asistencia a la Tutoría: todo del centro de estudios en un solo lugar',
         'card-calendario-h2': 'Mi semana',
         'sem-abrir': 'Abrir en pantalla completa ↗',
         'card-calendario-p':  'Tus clases, tutorías, clases de prueba y cumpleaños de la semana',
@@ -1592,8 +1579,6 @@
       /* O PILOTO DA TURMA DE HOJE (Pedro, 14/09/2026): a direção e o professor de teste. Para abrir para todos,
          esvazie a trava (e a da própria turma-de-hoje.html, que tem a mesma lista). */
       var TURMA_HOJE_PILOTO = ['CARLOS ALBERTO'];
-      var TUTORIA_AULA_PILOTO = ['MARIA FERNANDA', 'LEONARDO'];   /* o mesmo piloto do plano kids/teens (27/10/2026) */
-      var TUTORIA_AULA_ABRE = Date.parse('2026-10-29T13:00:00-03:00');   /* abre a todos com o plano (PLANO_TURMA_ABRE na turma-de-hoje.html) */
       /* O CORRETOR DO SIMULADO MET (19/09/2026): nasceu só para a direção; aberto para todos os professores no mesmo
          dia, depois do teste do Pedro com folhas reais. `false` volta ao piloto (a mesma chave mora na corretor-met.html) */
       var CORRETOR_ABERTO = true;
@@ -1620,8 +1605,6 @@
         if (th) th.style.display = (sv0 && (sv0.master || turmaHojeAberta(sv0) || TURMA_HOJE_PILOTO.some(function(n){ var x = normPiloto(sv0.name), y = normPiloto(n); return x === y || x.indexOf(y + ' ') === 0; }))) ? '' : 'none';
         var cmet = document.querySelector('a.card-corretor');
         if (cmet) cmet.style.display = (sv0 && (CORRETOR_ABERTO || sv0.master || sv0.director || CORRETOR_PILOTO.some(function(n){ return normPiloto(sv0.name) === normPiloto(n); }))) ? '' : 'none';
-        var tta = document.querySelector('a.card-tutoria-aula');
-        if (tta) tta.style.display = (sv0 && (sv0.master || Date.now() >= TUTORIA_AULA_ABRE || TUTORIA_AULA_PILOTO.some(function(n){ var x = normPiloto(sv0.name), y = normPiloto(n); return x === y || x.indexOf(y + ' ') === 0; }))) ? '' : 'none';
         var cnt = document.querySelector('a.card-noticias');
         if (cnt) cnt.style.display = (sv0 && sv0.master) ? '' : 'none';   /* fechado: só a direção (Noticias.js, NT_ABERTO) */
         var lp = document.querySelector('a.card-lessonplan');

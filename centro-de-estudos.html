@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Centro de Estudos, FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-10-09c">
+  <!-- a casa do professor veste a faixa do topo (campanha de 09/2026) -->
+  <link rel="stylesheet" href="assets/casa-tema.css?v=9">
+<link rel="stylesheet" href="style.css?v=2026-10-17a">
+<link rel="stylesheet" href="assets/fisk-ak.css?v=2026-08-04">
+<meta name="theme-color" content="#161414">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+<script>/* aplica o tema salvo antes da primeira pintura, para o modo escuro persistir entre as páginas sem piscar */try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
+
+  <!-- O CENTRO DE ESTUDOS (Pedro, 27/10/2026): um card só na home para tudo o que é do plantão de dúvidas, e aqui
+       dentro um subcard por ferramenta. Ferramenta nova do plantão entra aqui, não na home. -->
+  <header class="hero">
+    <a class="back-link" href="index.html" title="Voltar ao Fisk Hub">&larr; Hub</a>
+    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
+    <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+    <h1>Centro de Estudos</h1>
+    <p>Tudo do plantão de dúvidas num lugar só</p>
+  </header>
+
+  <main class="grid boletins-grid">
+
+    <!-- Minha Tutoria: a Minha Aula aberta direto no plantão; o aluno kids/teens de turma do plano mostra o que ficou
+         em aberto pelas faltas (TutoriaPlano.js). PILOTO até quinta, 29/10/2026, 13h: as turmas do plano kids/teens
+         (Maria Fernanda e Leonardo) e a direção; depois, todos (a mesma hora de PLANO_TURMA_ABRE na turma-de-hoje.html). -->
+    <a class="card card-tutoria card-minha-tutoria" href="turma-de-hoje.html?tutoria=1" style="--accent:#c2410c;display:none">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="3.5" width="16" height="17" rx="2.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8 9l1.6 1.6L12.5 7.5M8 15h.01M11 15h5M14 9.5h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>Minha Tutoria</h2>
+      <p>Receba quem chega ao plantão e veja o que cada aluno kids e teens deixou em aberto nas faltas</p>
+    </a>
+
+    <a class="card card-tutoria" href="tutoria.html">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="9" cy="8" r="3.2" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M3 19.5c0-3.2 2.7-5.5 6-5.5s6 2.3 6 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M15.5 9.5l2 2 4-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>Frequência à Tutoria</h2>
+      <p>Veja quais alunos seus foram ao plantão de dúvidas</p>
+    </a>
+
+  </main>
+
+  <footer>
+    <p>Ferramenta desenvolvida exclusivamente para uso interno das escolas Fisk. A utilização deste sistema e de seu conteúdo por pessoas ou instituições não autorizadas, incluindo professores particulares, é proibida. Desenvolvido por @fiskcacapava e @taubatefisk</p>
+  </footer>
+
+  <script src="assets/fisk-shared.js?v=2026-10-27c"></script>
+  <script>fiskInitThemeToggle('themeToggle');
+fiskInitUserMenu();
+fiskRegistrarUso("Centro de Estudos");
+(function () {
+  var ABRE = Date.parse('2026-10-29T13:00:00-03:00'), PILOTO = ['MARIA FERNANDA', 'LEONARDO'];
+  var n = function (v) { return String(v || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); };
+  var s = null; try { s = JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) {}
+  var ok = Date.now() >= ABRE || (s && (s.master || PILOTO.some(function (p) { var x = n(s.name); return x === p || x.indexOf(p + ' ') === 0; })));
+  if (ok) document.querySelector('.card-minha-tutoria').style.display = '';
+})();</script>
+</body>
+</html>
