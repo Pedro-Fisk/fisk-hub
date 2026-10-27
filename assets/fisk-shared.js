@@ -988,6 +988,31 @@ function fiskGaveta_(cfg) {
  *
  * ctx: { escola, professor, turma, aluno }
  */
+/* O DOCUMENTO DO COUNSELING DIRETO NO DOCS (Pedro, 26/10/2026, sobre a Minha semana: "que esse fosse o próprio botão
+ * do counseling, sem passar pela ferramenta dentro do portal e sem passar pela pasta do aluno"). A aba nova abre NO
+ * TOQUE (aberta depois da resposta, o navegador a bloquearia como pop-up) com "Abrindo…", e vai para o Google Docs
+ * quando o servidor devolve o endereço (counselingLer, que acha a pasta do aluno e o documento dentro dela). Aluno
+ * ainda sem documento, ou pasta não achada: a mesma aba cai na ferramenta do counseling, que sabe criar e explicar. */
+function fiskCounselingAbrirDoc(ctx) {
+  if (!ctx || !ctx.aluno) return;
+  var s = fiskSessao() || {};
+  var turma = String(ctx.turma || '').split('\n')[0];
+  var ferramenta = fiskHubBase() + 'counseling.html?escola=' + encodeURIComponent(ctx.escola || '') + '&prof=' + encodeURIComponent(ctx.professor || '') +
+    '&turma=' + encodeURIComponent(turma) + '&aluno=' + encodeURIComponent(ctx.aluno) + (ctx.estagio ? '&estagio=' + encodeURIComponent(ctx.estagio) : '');
+  var w = window.open('', '_blank');
+  if (!w) { location.href = ferramenta; return; }   /* pop-up bloqueado: abre na própria aba */
+  try {
+    w.document.write('<!doctype html><meta charset="utf-8"><title>E-counseling</title><body style="font-family:system-ui,sans-serif;display:grid;place-items:center;min-height:90vh;margin:0;color:#223e5a;background:#f4f6fb">' +
+      '<p style="font-size:1.05rem;text-align:center;padding:16px">💬 Abrindo o counseling de <b>' + fiskEsc(ctx.aluno) + '</b>…<br><small style="color:#6b7a8c">procurando o documento na pasta do aluno</small></p></body>');
+    w.document.close();
+  } catch (e) {}
+  fetch(FISK_HUB_EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action: 'counselingLer', token: s.token || '', escola: ctx.escola || '', professor: ctx.professor || '', turma: turma, aluno: ctx.aluno }) })
+    .then(function (r) { return r.json(); })
+    .then(function (j) { w.location.href = (j && j.ok && j.docUrl) ? j.docUrl : ferramenta; })
+    .catch(function () { w.location.href = ferramenta; });
+}
+
 function fiskCounselingGaveta(ctx) {
   if (!ctx || !ctx.aluno) return;
   var q = 'embed=1' +
