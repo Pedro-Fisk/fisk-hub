@@ -524,7 +524,8 @@ if (CTX_URL) {
   /* Na gaveta, o cabeçalho e a cascata são ruído: quem abriu já sabe de quem
      é o documento, e o painel de trás continua visível. O <body> ganha a
      classe para o CSS encolher o resto. Em aba cheia, o cabeçalho fica. */
-  if (EMBED) document.body.classList.add('em-gaveta');
+  /* o tema vale também na gaveta (auditoria de 26/10/2026: ela ficava sempre clara dentro do Hub escuro) */
+  if (EMBED) { document.body.classList.add('em-gaveta'); fiskInitThemeToggle('themeToggle'); }
   else { fiskInitThemeToggle('themeToggle'); fiskInitUserMenu(); }
   $('painelCard').hidden = true;
   selecionar({ nome: CTX_URL.aluno, book: Q.get('estagio') || '' });

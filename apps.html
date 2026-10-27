@@ -49,7 +49,7 @@
     color: var(--ui-dark); margin: 2rem 0 .3rem;
   }
   .ap-sec-d{ color: var(--gray); font-size: .88rem; margin: 0 0 1rem; }
-  .ap-lista{ display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 1rem; }
+  .ap-lista{ display: grid; grid-template-columns: repeat(auto-fill, minmax(min(330px, 100%), 1fr)); gap: 1rem; }
   /* o ícone da loja fica à ESQUERDA do nome: o professor reconhece o app pelo
      desenho antes de ler, que é como ele o procura no celular do aluno */
   /* ⚠️ ALINHA PELO TOPO, não pelo centro. Com `center`, o card cujo nome ocupa
@@ -273,6 +273,9 @@
    na tela e não fazia nada) */
 if (typeof fiskInitThemeToggle === 'function') fiskInitThemeToggle('themeToggle');
 if (typeof fiskInitUserMenu === 'function') fiskInitUserMenu();
+
+/* registro de uso (auditoria de 26/10/2026: esta tela não aparecia no painel da direção) */
+if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Apps');
 </script>
 </body>
 </html>

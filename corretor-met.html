@@ -927,6 +927,9 @@ if (/[?&]diag=1/.test(location.search)) {
     document.body.appendChild(cx);
   }, 1500);
 }
+
+/* registro de uso (auditoria de 26/10/2026: esta tela não aparecia no painel da direção) */
+if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Corretor do MET');
 </script>
 </body>
 </html>

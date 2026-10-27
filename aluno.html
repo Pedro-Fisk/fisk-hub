@@ -192,7 +192,7 @@
   /* ── conteúdo passivo (áudio e vídeo por lição) ── */
   .pv-livro{ border:1px solid var(--gray-light); border-radius:12px; margin-bottom:.7rem; overflow:hidden; }
   .pv-top{ display:flex; align-items:center; gap:.5rem; width:100%; padding:.6rem .8rem;
-           background:var(--gray-light); border:0; font:inherit; cursor:pointer; text-align:left; }
+           background:var(--gray-light); border:0; font:inherit; cursor:pointer; text-align:left;  color:inherit;}
   .pv-top b{ font-family:var(--font-heading); }
   .pv-top .pv-resumo{ margin-left:auto; color:var(--gray); font-size:.82rem; }
   .pv-lic{ display:grid; grid-template-columns:minmax(7rem,1fr) 5.5rem 1fr 4.6rem;
@@ -258,7 +258,7 @@
   .rf-topo{ display:flex; align-items:center; gap:.5rem; padding:.8rem 1rem; background:var(--ui,#2b4d70); color:#fff; font-family:var(--font-heading); }
   .rf-topo b{ flex:1; } .rf-x{ border:0; background:rgba(255,255,255,.15); color:#fff; width:32px; height:32px; border-radius:50%; cursor:pointer; }
   .rf-info{ padding:.7rem 1rem; font-size:.86rem; line-height:1.5; border-bottom:1px solid var(--gray-light); }
-  .rf-info.aviso{ background:#fbf3df; }
+  .rf-info.aviso{ background:#fbf3df; color:#5a4310; }   /* cor própria: no escuro o texto herdado ficava claro sobre o creme */
   #rfFrame{ display:block; width:100%; height:78vh; border:0; background:#f3f6f9; }
 </style>
 </head>
@@ -1173,6 +1173,9 @@ $('btnPasta').addEventListener('click', function(){
   carregarTurmas();
   $('q').focus();
 })();
+
+/* registro de uso (auditoria de 26/10/2026: esta tela não aparecia no painel da direção) */
+if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Radar do Aluno');
 </script>
 </body>
 </html>

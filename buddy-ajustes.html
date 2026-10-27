@@ -210,6 +210,9 @@ else post({ acao: 'ler' }).then(function (j) {
     desenhaProfs();
   }).catch(function () {});
 }).catch(function () { $('fora').hidden = false; $('foraP').textContent = 'Sem conexão com o servidor.'; });
+
+/* registro de uso (auditoria de 26/10/2026: esta tela não aparecia no painel da direção) */
+if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Ajustes do Buddy');
 </script>
 </body>
 </html>

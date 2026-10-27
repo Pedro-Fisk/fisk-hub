@@ -188,6 +188,7 @@
   .ck .ped button{ border: 0; background: none; cursor: pointer; font-weight: 900; color: var(--gray); padding: 0; }
   .ck .fim{ display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; margin-top: .4rem; }
   .ck .aviso{ font-size: .8rem; color: var(--gray); }
+  .ck .aviso.err{ color: var(--red, #c8102e); font-weight: 700; }   /* o "Escolha o resultado" saía cinza como um aviso comum */
   .ck .ok{ color: #155a48; font-weight: 800; }
   .ck .registrado{ font-size: .84rem; color: #155a48; font-weight: 700; margin-bottom: .5rem; }
   /* a fila do Planejador e o atendimento */
@@ -410,6 +411,7 @@ body.theme-dark .fila-info.roteiro{ background: #172232; border-color: #2e4560; 
 body.theme-dark .pl-tit, body.theme-dark .pl-saidas .rt-btn{ color: #dbe6f3; }
 body.theme-dark .pl-saidas .rt-btn{ background: #101a28; border-color: #2e4560; }
 body.theme-dark .pl-salvar{ background: #10261f; }
+body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ color: #86efac; }
 .aula .t{ padding: .35rem .7rem; }
 .aula .t b, body.theme-dark .aula .t b{ font-size: .98rem; }
 .aula .lista{ padding: .3rem .45rem .45rem; gap: 0; }
@@ -565,6 +567,13 @@ body.theme-dark .pl-salvar{ background: #10261f; }
   body.theme-dark .ak-id .nome, body.theme-dark .pt-titulo, body.theme-dark .ak-cab{ color: #e2e8f0; }
   body.theme-dark .pt-mom .txt, body.theme-dark .pt-it, body.theme-dark .pt-games .t{ color: #dbe6f3; }
   body.theme-dark .pt-mom{ background: #1b273a; }
+  /* MODO ESCURO (auditoria de 26/10/2026): os textos que usavam a cor ESCURECIDA do livro (--lc-tx) ou do momento
+     (--mc-tx) sobre fundo escuro passam a usar a cor viva, e os verdes e cinzas fixos clareiam */
+  body.theme-dark .pt-livro .quem span, body.theme-dark .pt-tipo, body.theme-dark .pt-games b, body.theme-dark .pt-botoes a, body.theme-dark .ak-id .livro{ color: var(--lc, #93c5fd); }
+  body.theme-dark .pt-mom.m-warm{ --mc-tx: #fdba74; } body.theme-dark .pt-mom.m-story{ --mc-tx: #c4b5fd; } body.theme-dark .pt-mom.m-com{ --mc-tx: #5eead4; }
+  body.theme-dark .pt-mom.m-mat{ --mc-tx: #cbd5e1; } body.theme-dark .pt-mom.m-aniv{ --mc-tx: #fcd34d; } body.theme-dark .pt-mom.m-geral{ --mc-tx: #93c5fd; }
+  body.theme-dark .ck .lin.crit.res{ background: #101a28; border-color: #3a5170; color: #dbe6f3; }
+  body.theme-dark .ck .registrado{ color: #86efac; }
   body.theme-dark .pt-trans a, body.theme-dark .pt-trans span{ background: #172232; border-color: #2e4560; color: #dbe6f3; }
   body.theme-dark .ak-bts button{ background: #0f1825; }
   body.theme-dark .pt-tick{ background: #0f1825; }

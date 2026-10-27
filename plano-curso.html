@@ -181,5 +181,8 @@ else Promise.all([
   desenha();
 }).catch(function (e) { status('Erro: ' + (e && e.message || e), true); });
 </script>
+<!-- registro de uso (auditoria de 26/10/2026): a página não carregava o kit e era invisível no painel da direção -->
+<script src="assets/fisk-shared.js?v=2026-10-26b"></script>
+<script>if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Plano de curso');</script>
 </body>
 </html>

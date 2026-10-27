@@ -124,9 +124,18 @@ function akAbrir(driveId, titulo, aoFechar) {
   akMedirBase();
   akAplicarZoom();
   document.getElementById('akFechar').focus();
+  /* O "voltar" do celular fecha o PDF, e não a página (auditoria de 26/10/2026: no Android ele saía do Answer Keys
+     inteiro). Abrir cria um passo no histórico; o voltar o desfaz (popstate) e o ✕ também passa por ele. */
+  try { history.pushState({ akViewer: 1 }, ''); } catch (e) {}
 }
 
+window.addEventListener('popstate', function () { if (akViewer && !akViewer.hidden) akFecharDeVez(); });
+
 function akFecharViewer() {
+  if (history.state && history.state.akViewer) { history.back(); return; }   /* o popstate fecha */
+  akFecharDeVez();
+}
+function akFecharDeVez() {
   akViewer.hidden = true;
   akFrame.src = 'about:blank';   /* solta o PDF da memória e para o carregamento */
   document.body.style.overflow = '';

@@ -12,8 +12,10 @@ Google Apps Script.
 | `index.html` | home do Hub: login do professor, cards das ferramentas |
 | `planejador.html` | **aposentado em 26/10/2026**: só encaminha para a `turma-de-hoje.html` levando o `#t=escola\|prof\|linha` (o link da célula e a barra lateral do card apontam para ele). Código antigo no git, commit `90da348` |
 | `2nd-chance.html`, `termo-atraso.html` | documentos em PDF do aluno, com "Salvar na pasta do aluno" |
-| `boletins.html`, `met.html`, `siele.html`, `quick-practice.html` | atalhos para ferramentas que vivem em **outros repositórios** |
-| `answer-keys*.html`, `treinamentos.html`, `visao-geral.html`, `acessos.html` | consulta e material do professor |
+| `boletins.html` | atalho para ferramentas que vivem em **outros repositórios** |
+| `met.html`, `siele.html`, `quick-practice.html` | atalhos aos simuladores em modo professor; **sem card na home desde 16/09/2026** (decisão do Pedro: o professor chega pelo Portal na visão do professor). Ficam no ar para quem tem o endereço |
+| `answer-keys*.html`, `treinamentos.html`, `visao-geral.html` | consulta e material do professor |
+| `acessos.html` | **aposentada em 26/10/2026**: encaminha para o `aluno.html` (Radar do Aluno, "Minhas turmas") |
 | `assets/fisk-shared.js` / `.css` | helpers compartilhados (tema, menu de usuário, idioma, Drive, pulso de uso) |
 | `apps-script/` | só um README: o backend **não mora aqui**, mora em `fisk-hub-backend` |
 | `conversation_maker/` | protótipo Python de geração de conteúdo (único código com dependências) |

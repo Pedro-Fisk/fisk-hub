@@ -109,6 +109,8 @@
   body.theme-dark .zap-t{ color:#f1f5fb; } body.theme-dark .zap pre{ background:#1f2937; color:#e6edf6; } body.theme-dark .zap{ border-top-color:#3a4a63; }
   .msg a{ color:#2563eb; font-weight:700; word-break:break-all; } body.theme-dark .msg:not(.eu) a{ color:#93c5fd; }
   .aula-i a.pst{ text-decoration:none; font-size:.95rem; margin-left:.35rem; }
+  body.theme-dark .prop a.lk{ color:#93c5fd; } body.theme-dark .acoes .dito, body.theme-dark .med, body.theme-dark .sug-i small, body.theme-dark .aula-t small, body.theme-dark .zap-t small{ color:#a9b8ca; }
+  body.theme-dark .prop td.cv-nv{ color:#f1f5fb !important; }
   .prop a.lk{ display:inline; background:none; color:#2563eb; padding:0; font-weight:800; text-decoration:underline; font-size:inherit; }
   .prop.feita{ border-color:#16a34a; } .prop.cancelada{ border-color:#c5d3e3; opacity:.75; }
   body.theme-dark .prop .res.ok{ color:#86efac; } body.theme-dark .prop .res.err{ color:#fca5a5; } body.theme-dark .prop .bts .nao{ background:#3a4a63; color:#e6edf6; }
@@ -614,7 +616,7 @@ function cartaoConversation(pr, idConversa) {
   var marcadas = (x.combos || []).map(function (c) { return c.level + '|' + c.age; });
   var cab = '<tr><th></th>' + (x.faixas || []).map(function (f) { return '<th style="font-size:.74rem;font-weight:800;color:#5b6b7c;padding:.2rem .35rem">' + esc(f[1]) + '</th>'; }).join('') + '</tr>';
   var linhas = (x.niveis || []).map(function (n) {
-    return '<tr><td style="font-weight:800;font-size:.86rem;color:#16243a;padding:.2rem .5rem .2rem 0;white-space:nowrap">' + esc(n[1]) + '</td>' + (x.faixas || []).map(function (f) {
+    return '<tr><td class="cv-nv" style="font-weight:800;font-size:.86rem;color:#16243a;padding:.2rem .5rem .2rem 0;white-space:nowrap">' + esc(n[1]) + '</td>' + (x.faixas || []).map(function (f) {
       var existe = !(n[0] === 'teens' && f[0] !== 'preteens');   /* o nível Teens só existe para pré-adolescentes */
       return '<td style="text-align:center;padding:.15rem">' + (existe ? '<button type="button" class="cmc" data-k="' + n[0] + '|' + f[0] + '" style="width:2.3rem;height:2rem;border-radius:8px;border:2px solid #c7d3e3;background:#fff;cursor:pointer;font-weight:900"></button>' : '<span style="color:#c7d3e3">·</span>') + '</td>';
     }).join('') + '</tr>';
