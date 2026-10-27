@@ -79,8 +79,6 @@
   .tira button.sel small{ color: #e8f0fb; }
   .tira button i{ display: block; width: 6px; height: 6px; border-radius: 50%; margin: .15rem auto 0; background: transparent; }
   .tira button.tem i{ background: currentColor; opacity: .6; }
-  .dia-lista{ display: none; }
-  .dia-lista .vazio{ color: var(--gray); font-size: .9rem; padding: 1rem 0; text-align: center; }
   .cartao{ display: flex; gap: .7rem; width: 100%; text-align: left; font-family: inherit; border: 1px solid var(--cal-linha); border-left: 5px solid var(--ev-cor, #3c6e98);
            background: var(--white); color: inherit; border-radius: 12px; padding: .7rem .8rem; margin-bottom: .55rem; cursor: pointer; }
   .cartao .hh{ font-family: var(--font-heading); font-weight: 800; min-width: 3.4rem; color: var(--ui-dark, #223e5a); }
@@ -97,9 +95,9 @@
   .selo.fer{ background: #dc2626; }
 
   @media (max-width: 640px){
-    .grade{ display: none; }
     .tira{ display: flex; }
-    .dia-lista{ display: block; }
+    .grade{ margin-bottom: 76px; }   /* o botão + não cobre a última hora */
+    .g-col .ev{ font-size: .82rem; }
     .barra .quem{ margin-left: 0; width: 100%; }
   }
 
@@ -159,7 +157,7 @@
   /* ── OS MEUS EVENTOS, como no Google Agenda (27/10/2026) ── */
   .grade{ user-select: none; -webkit-user-select: none; }
   .agora{ pointer-events: none; }
-  .ev.meu{ background: var(--ev-cor); color: #fff; border-left: 0; padding: .2rem .45rem; cursor: grab; touch-action: none; }
+  .ev.meu{ background: var(--ev-cor); color: #fff; border-left: 0; padding: .2rem .45rem; cursor: grab; }
   .ev.meu .t{ font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .ev.meu .h{ font-weight: 600; opacity: .92; }
   .ev.meu.curto .t, .ev.meu.curto .h{ display: inline; }
@@ -172,15 +170,13 @@
   .cartao.meu{ border-left-color: var(--ev-cor); }
   .cartao.meu .tt::before{ content: ''; display: inline-block; width: .6rem; height: .6rem; border-radius: 3px; background: var(--ev-cor); margin-right: .35rem; }
   .selo.meu{ background: var(--ev-cor); cursor: pointer; border: 0; font-family: inherit; }
-  .livre{ display: block; width: 100%; text-align: left; font-family: inherit; font-size: .82rem; font-weight: 700; color: var(--gray); background: transparent;
-          border: 1.5px dashed var(--cal-linha); border-radius: 12px; padding: .5rem .8rem; margin-bottom: .55rem; cursor: pointer;
-          -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
-  .livre:active, .livre.segura{ background: var(--ui-soft, #e9eff5); color: var(--ui-dark, #223e5a); }
+  .grade{ -webkit-touch-callout: none; }
+  @media (pointer: coarse){ .ev.meu .puxa{ height: 18px; } .ev.meu .puxa::after{ content: ''; position: absolute; left: 50%; bottom: 5px; width: 22px; height: 4px; margin-left: -11px; border-radius: 3px; background: rgba(255,255,255,.75); } }
   .barra .criar{ background: var(--ui, #3c6e98); color: #fff; border-color: var(--ui, #3c6e98); box-shadow: 0 2px 6px rgba(0,0,0,.15); }
   .barra .criar:hover{ filter: brightness(1.08); }
   .fab{ display: none; position: fixed; right: 18px; bottom: 22px; z-index: 8000; width: 58px; height: 58px; border-radius: 18px; border: 0;
         background: var(--ui, #3c6e98); color: #fff; font-size: 2rem; line-height: 1; box-shadow: 0 8px 22px rgba(0,0,0,.28); cursor: pointer; }
-  @media (max-width: 640px){ .fab{ display: block; } .barra .criar{ display: none; } .dia-lista{ padding-bottom: 72px; } }
+  @media (max-width: 640px){ .fab{ display: block; } .barra .criar{ display: none; } }
 
   /* o balão (o rápido, o dos detalhes) */
   .bal{ position: fixed; z-index: 9500; width: min(380px, calc(100vw - 24px)); background: var(--white); color: inherit; border-radius: 16px;
@@ -296,7 +292,6 @@ if (EMBED) { document.body.classList.add('embed'); var bse = document.createElem
     <div class="tira" id="tira"></div>
     <p class="st" id="st"></p>
     <div class="grade" id="grade"></div>
-    <div class="dia-lista" id="diaLista"></div>
   </section>
 
   <section class="painel" id="painelSemH" hidden>
@@ -527,12 +522,15 @@ function desenhar() {
   var mostra = dias.map(function (d, i) { return i < 6 || porDia[i].length || diaInteiro(d).length || agDoDia(d).length; });
   var idx = dias.map(function (d, i) { return i; }).filter(function (i) { return mostra[i]; });
   EVS = [];
-  /* computador */
-  var g = $('grade'); g.style.setProperty('--ndias', idx.length);
+  if (iso(diaSel) < iso(segunda) || iso(diaSel) > iso(somaDias(segunda, 6))) diaSel = dias[0];
+  var iSel = dias.map(iso).indexOf(iso(diaSel));
+  /* no computador, a semana; no celular, só o dia escolhido na tira (a "visão Dia" do app do Google, 27/10/2026) */
+  var cols = celular() ? [iSel] : idx, alturaH = altH();
+  var g = $('grade'); g.style.setProperty('--ndias', cols.length); g.style.setProperty('--hora', alturaH + 'px');
   var h = '<div class="g-cab"></div>';
-  idx.forEach(function (i) { var d = dias[i]; h += '<div class="g-cab' + (iso(d) === hoje ? ' hoje' : '') + '">' + DIAS[d.getDay()] + '<b>' + d.getDate() + '</b></div>'; });
+  cols.forEach(function (i) { var d = dias[i]; h += '<div class="g-cab' + (iso(d) === hoje ? ' hoje' : '') + '">' + DIAS[d.getDay()] + '<b>' + d.getDate() + '</b></div>'; });
   h += '<div class="g-faixas" style="border-left:0"></div>';
-  idx.forEach(function (i) {
+  cols.forEach(function (i) {
     var d = dias[i], fx = diaInteiro(d).map(function (it) { return '<span class="faixa ' + esc(it.tipo) + '" title="' + esc(it.titulo) + '">' + esc(it.titulo) + '</span>'; });
     anivsDoDia(d).forEach(function (a) { fx.push('<span class="faixa aniv" title="' + esc(a.nome) + ' · ' + esc(linha1(a.turma)) + '">🎂 ' + esc(String(a.nome).split(' ')[0]) + '</span>'); });
     agDoDia(d).forEach(function (o) {
@@ -543,8 +541,7 @@ function desenhar() {
     h += '<div class="g-faixas" data-d="' + iso(d) + '">' + fx.join('') + '</div>';
   });
   h += '<div class="g-horas">'; for (var hh = INI_H; hh < FIM_H; hh++) h += '<div>' + hh + 'h</div>'; h += '</div>';
-  var alturaH = 34;   /* o mesmo --hora do CSS: a semana inteira cabe na tela (Pedro, 26/10/2026) */
-  idx.forEach(function (i) {
+  cols.forEach(function (i) {
     var d = dias[i], ehHoje = iso(d) === hoje;
     h += '<div class="g-col' + (ehHoje ? ' hoje' : '') + '" data-d="' + iso(d) + '" style="height:' + ((FIM_H - INI_H) * alturaH) + 'px">';
     porDia[i].forEach(function (e) {
@@ -559,35 +556,11 @@ function desenhar() {
     h += '</div>';
   });
   g.innerHTML = h;
-  /* celular: a tira dos dias e a lista do dia escolhido */
-  if (iso(diaSel) < iso(segunda) || iso(diaSel) > iso(somaDias(segunda, 6))) diaSel = dias[0];
+  /* celular: a tira dos dias */
   $('tira').innerHTML = idx.map(function (i) {
     var d = dias[i], tem = porDia[i].length || diaInteiro(d).length || agDoDia(d).length;
     return '<button type="button" data-dia="' + i + '" class="' + (iso(d) === iso(diaSel) ? 'sel' : '') + (tem ? ' tem' : '') + '"><small>' + DIAS[d.getDay()] + '</small><b>' + d.getDate() + '</b><i></i></button>';
   }).join('');
-  var iSel = dias.map(iso).indexOf(iso(diaSel)), lista = porDia[iSel] || [], dSel = dias[iSel];
-  var topo = diaInteiro(dSel).map(function (it) { return '<span class="selo ' + (it.tipo === 'feriado' || it.tipo === 'ferias' ? 'fer' : '') + '">' + esc(it.titulo) + '</span>'; })
-    .concat(anivsDoDia(dSel).map(function (a) { return '<span class="selo aniv">🎂 ' + esc(a.nome) + ' · ' + esc(linha1(a.turma)) + '</span>'; }))
-    .concat(agDoDia(dSel).filter(function (o) { return o.diaInteiro; }).map(function (o) {
-      var k = EVS.push({ e: { tipo: 'meu', titulo: o.titulo, cor: o.cor || AG_COR, ag: o }, d: dSel }) - 1;
-      return '<button type="button" class="selo meu" data-ag="' + k + '" style="--ev-cor:' + esc(o.cor || AG_COR) + '">' + esc(o.titulo) + '</button>';
-    })).join('');
-  /* os horários livres entre os compromissos: tocar (ou tocar e segurar) num deles cria o evento ali */
-  var livre = function (a, b) { return agLigado() && b - a >= 30 ? '<button type="button" class="livre" data-livre="' + a + '">＋ ' + hm(a) + ' às ' + hm(b) + ' livre</button>' : ''; };
-  var cursor = INI_H * 60, corpo = '';
-  lista.forEach(function (e) {
-    corpo += livre(cursor, e.ini); cursor = Math.max(cursor, e.fim);
-    var k = EVS.push({ e: e, d: dSel }) - 1;
-    if (e.tipo === 'meu') {
-      corpo += '<button type="button" class="cartao meu" data-ag="' + k + '" style="--ev-cor:' + esc(e.cor) + '"><span class="hh">' + hm(e.ini) + '<small>até ' + hm(e.fim) + '</small></span>' +
-        '<span><span class="tt">' + esc(e.titulo) + '</span>' + (e.ag.rrule ? '<br><span class="mm">🔁 ' + esc(agTextoRR(e.ag.rrule, e.ag.serieData)) + '</span>' : '') + '</span></button>';
-      return;
-    }
-    corpo += '<button type="button" class="cartao ' + e.tipo + (e.semaula ? ' semaula' : '') + '" data-ev="' + k + '" style="--ev-cor:' + e.cor + '"><span class="hh">' + hm(e.ini) + '<small>até ' + hm(e.fim) + '</small></span>' +
-      '<span><span class="tt">' + esc(e.titulo) + '</span><br><span class="mm">' + rotMeta(e, dSel) + '</span><br>' + selos(e) + '</span></button>';
-  });
-  corpo += livre(cursor, FIM_H * 60);
-  $('diaLista').innerHTML = (topo ? '<div style="margin:.2rem 0 .6rem">' + topo + '</div>' : '') + (lista.length ? '' : '<div class="vazio">Nenhuma aula neste dia.</div>') + corpo;
   /* turmas sem horário */
   $('painelSemH').hidden = !dados.semHorario.length;
   $('semH').innerHTML = dados.semHorario.map(function (t) { return '<li>' + esc(t.titulo) + (minhasEscolas().length > 1 ? ' <small>(' + esc(t.escola) + ')</small>' : '') + '</li>'; }).join('');
@@ -654,8 +627,9 @@ document.addEventListener('click', function (ev) {
   /* os meus eventos: o clique abre os detalhes (o arrasto já tratou o dele) */
   var ag = ev.target.closest('[data-ag]');
   if (ag) { if (!agEngoleClique) agDetalhes(+ag.dataset.ag, ag); return; }
-  var lv = ev.target.closest('[data-livre]');
-  if (lv) { if (!agEngoleClique) agNovoNoLivre(+lv.dataset.livre, lv); return; }
+  /* no celular, tocar numa hora vazia cria o evento de 1 h ali, como no app do Google (o mouse já criou no pointerdown) */
+  var colT = ev.target.classList && ev.target.classList.contains('g-col') && ev.target;
+  if (colT && agLigado() && Date.now() - agUltimoToque < 900) { if (!agEngoleClique) agToqueCria(colT, ev.clientY); return; }
   var fx = ev.target.classList && ev.target.classList.contains('g-faixas') && ev.target.dataset.d;
   if (fx && agLigado()) { agBalaoNovo({ data: fx, diaInteiro: true }, ev.target); return; }
   /* o e-counseling do aluno (Pedro, 26/10/2026): abre o documento direto no Docs (fiskCounselingAbrirDoc, no kit) */
@@ -738,18 +712,6 @@ $('btAgenda').addEventListener('click', function () {
 $('ant').addEventListener('click', function () { segunda = somaDias(segunda, -7); diaSel = somaDias(diaSel, -7); desenhar(); });
 $('prox').addEventListener('click', function () { segunda = somaDias(segunda, 7); diaSel = somaDias(diaSel, 7); desenhar(); });
 $('hoje').addEventListener('click', function () { segunda = inicioDaSemana(new Date()); diaSel = new Date(); desenhar(); });
-/* o celular troca de dia com o dedo: arrastar para o lado */
-(function () {
-  var x0 = null; $('diaLista').addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
-  $('diaLista').addEventListener('touchend', function (e) {
-    if (x0 == null) return; var dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) < 60) return;
-    diaSel = somaDias(diaSel, dx < 0 ? 1 : -1);
-    if (iso(diaSel) > iso(somaDias(segunda, 6))) segunda = somaDias(segunda, 7);
-    if (iso(diaSel) < iso(segunda)) segunda = somaDias(segunda, -7);
-    desenhar();
-  });
-})();
-
 /* a direção escolhe de quem é a semana (o mesmo fisk_actas do Hub e do Radar) */
 function montaVerComo() {
   var sel = $('verComo');
@@ -801,14 +763,18 @@ function carregar() {
  *   · arrastar o evento move (para outra hora ou outro dia), puxar a borda de baixo muda a duração;
  *   · clicar abre os detalhes com editar, excluir e levar ao Google Agenda;
  *   · em evento repetido, editar ou excluir pergunta "Este evento / Este e os seguintes / Todos os eventos".
- * No celular, tocar (ou tocar e segurar) num horário livre da lista cria o evento ali, e há o botão "+".
+ * No celular, a grade do dia: tocar e segurar pega o evento (ou cria um na hora vazia) e o dedo arrasta; há o botão "+".
  * O servidor (Agenda.js no fisk-hub-backend, aba _eventosAgenda) guarda a repetição como RRULE e devolve só as
  * ocorrências da semana pedida. Primeira etapa: evento PESSOAL. No "ver como" da direção eles não aparecem: a semana
  * é de outra pessoa, e os eventos são de quem está logado.
  * ════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
 var AG_PALETA = [['#d50000', 'Tomate'], ['#e67c73', 'Flamingo'], ['#f4511e', 'Tangerina'], ['#f6bf26', 'Banana'], ['#33b679', 'Sálvia'], ['#0b8043', 'Manjericão'],
                 ['#039be5', 'Pavão'], ['#3f51b5', 'Mirtilo'], ['#7986cb', 'Lavanda'], ['#8e24aa', 'Uva'], ['#616161', 'Grafite']];
-var AG_COR = '#039be5', AG_ALT = 34;   /* AG_ALT = o --hora do CSS e o alturaH do desenhar() */
+var AG_COR = '#039be5';
+/* a altura de uma hora: 34 px no computador (a semana inteira cabe na tela, Pedro 26/10/2026), 52 px no celular, para o dedo */
+function celular() { return window.matchMedia('(max-width: 640px)').matches; }
+function altH() { return celular() ? 52 : 34; }
+window.matchMedia('(max-width: 640px)').addEventListener('change', function () { desenhar(); });
 var AG_AVISOS = [['', 'Sem lembrete'], ['0', 'Na hora'], ['5', '5 minutos antes'], ['10', '10 minutos antes'], ['15', '15 minutos antes'], ['30', '30 minutos antes'],
                     ['60', '1 hora antes'], ['120', '2 horas antes'], ['1440', '1 dia antes'], ['10080', '1 semana antes']];
 var DIAS_LONGO = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
@@ -906,16 +872,17 @@ function agBloco(e, k, pos, alt) {
   return '<div class="ev meu' + (curto ? ' curto' : '') + '" role="button" tabindex="0" data-ag="' + k + '" title="' + esc(e.titulo + ' · ' + quando) + '" style="--ev-cor:' + esc(e.cor) + ';' + pos + '">' +
     '<span class="t">' + esc(e.titulo) + (curto ? ', ' : '') + '</span><span class="h">' + quando + (e.ag.rrule ? ' 🔁' : '') + '</span><span class="puxa" data-puxa></span></div>';
 }
-function agMinDoY(y) { return INI_H * 60 + y / AG_ALT * 60; }
-function agY(min) { return (min - INI_H * 60) / 60 * AG_ALT; }
+function agMinDoY(y) { return INI_H * 60 + y / altH() * 60; }
+function agY(min) { return (min - INI_H * 60) / 60 * altH(); }
 function agLimita(m) { return Math.max(INI_H * 60, Math.min(FIM_H * 60, m)); }
 function agEngole() { agEngoleClique = true; setTimeout(function () { agEngoleClique = false; }, 60); }
 
-/* arrastar numa coluna vazia: o evento nasce do intervalo; sem arrastar, 1 h a partir da meia hora clicada */
-function agIniciaCriar(ev, col) {
-  ev.preventDefault();
+/* OS ARRASTOS. Cada um devolve { move(x, pageY), solta() }, e quem os alimenta é o mouse (pointer, no computador) ou o
+   dedo (toque longo, no celular). Tudo em pageY: no celular a página rola enquanto o dedo arrasta. */
+/* arrastar numa coluna vazia: o evento nasce do intervalo; sem arrastar, 1 h a partir da meia hora tocada */
+function agArrastoCriar(col, pageY) {
   agFechaBalao();
-  var r = col.getBoundingClientRect(), m0 = agMinDoY(ev.clientY - r.top), Y0 = ev.clientY, mexeu = false;
+  var topo = col.getBoundingClientRect().top + scrollY, m0 = agMinDoY(pageY - topo), Y0 = pageY, mexeu = false;
   var a = Math.floor(m0 / 30) * 30, b = Math.min(a + 60, FIM_H * 60);
   var fant = document.createElement('div'); fant.className = 'ev meu fantasma'; col.appendChild(fant);
   function pinta() {
@@ -924,63 +891,119 @@ function agIniciaCriar(ev, col) {
     fant.classList.toggle('curto', agY(b) - agY(a) < 40);
   }
   pinta();
-  function move(e) {
-    if (!mexeu && Math.abs(e.clientY - Y0) < 5) return;
-    mexeu = true;
-    var m = agMinDoY(e.clientY - r.top);
-    if (m >= m0) { a = Math.floor(m0 / 15) * 15; b = Math.max(a + 15, Math.ceil(m / 15) * 15); }
-    else { b = Math.ceil(m0 / 15) * 15; a = Math.min(b - 15, Math.floor(m / 15) * 15); }
-    a = agLimita(a); b = agLimita(b); if (b <= a) b = a + 15;
-    pinta();
-  }
-  function solta() {
-    document.removeEventListener('pointermove', move); document.removeEventListener('pointerup', solta);
-    agFantasma = fant;
-    agBalaoNovo({ data: col.dataset.d, ini: a, fim: b }, fant);
-  }
-  document.addEventListener('pointermove', move); document.addEventListener('pointerup', solta);
+  return {
+    move: function (x, y) {
+      if (!mexeu && Math.abs(y - Y0) < 5) return;
+      mexeu = true;
+      var m = agMinDoY(y - topo);
+      if (m >= m0) { a = Math.floor(m0 / 15) * 15; b = Math.max(a + 15, Math.ceil(m / 15) * 15); }
+      else { b = Math.ceil(m0 / 15) * 15; a = Math.min(b - 15, Math.floor(m / 15) * 15); }
+      a = agLimita(a); b = agLimita(b); if (b <= a) b = a + 15;
+      pinta();
+    },
+    solta: function () { agFantasma = fant; agBalaoNovo({ data: col.dataset.d, ini: a, fim: b }, fant); }
+  };
 }
-
-/* arrastar o evento move; a borda de baixo muda a duração. Sem arrastar, o clique segue para os detalhes. */
-function agIniciaMover(ev, bloco, puxa) {
-  var x = EVS[+bloco.dataset.ag], o = x && x.e.ag; if (!o) return;
-  ev.preventDefault();
+/* arrastar o evento move (de hora e, no computador, de dia); a borda de baixo muda a duração */
+function agArrastoMover(bloco, puxa, x0, pageY) {
+  var x = EVS[+bloco.dataset.ag], o = x && x.e.ag; if (!o) return null;
   agFechaBalao();
-  var ini = minDe(o.ini), fim = minDe(o.fim), dur = fim - ini, X0 = ev.clientX, Y0 = ev.clientY, mexeu = false, nIni = ini, nFim = fim, col = bloco.parentNode;
-  function move(e) {
-    if (!mexeu && Math.abs(e.clientX - X0) + Math.abs(e.clientY - Y0) < 5) return;
-    if (!mexeu) { mexeu = true; bloco.classList.add('arrastando'); bloco.style.left = '3px'; bloco.style.width = 'calc(100% - 6px)'; }
-    var passo = Math.round((e.clientY - Y0) / AG_ALT * 60 / 15) * 15;
-    if (puxa) nFim = Math.max(ini + 15, Math.min(FIM_H * 60, fim + passo));
-    else {
-      nIni = Math.max(INI_H * 60, Math.min(FIM_H * 60 - dur, ini + passo)); nFim = nIni + dur;
-      [].forEach.call(document.querySelectorAll('#grade .g-col'), function (c) {
-        var rc = c.getBoundingClientRect(); if (e.clientX >= rc.left && e.clientX < rc.right && c !== col) { col = c; c.appendChild(bloco); }
-      });
+  var ini = minDe(o.ini), fim = minDe(o.fim), dur = fim - ini, Y0 = pageY, mexeu = false, nIni = ini, nFim = fim, col = bloco.parentNode;
+  return {
+    move: function (cx, y) {
+      if (!mexeu && Math.abs(cx - x0) + Math.abs(y - Y0) < 5) return;
+      if (!mexeu) { mexeu = true; bloco.classList.add('arrastando'); bloco.style.left = '3px'; bloco.style.width = 'calc(100% - 6px)'; }
+      var passo = Math.round((y - Y0) / altH() * 60 / 15) * 15;
+      if (puxa) nFim = Math.max(ini + 15, Math.min(FIM_H * 60, fim + passo));
+      else {
+        nIni = Math.max(INI_H * 60, Math.min(FIM_H * 60 - dur, ini + passo)); nFim = nIni + dur;
+        [].forEach.call(document.querySelectorAll('#grade .g-col'), function (c) {
+          var rc = c.getBoundingClientRect(); if (cx >= rc.left && cx < rc.right && c !== col) { col = c; c.appendChild(bloco); }
+        });
+      }
+      bloco.style.top = agY(nIni) + 'px'; bloco.style.height = Math.max(14, agY(nFim) - agY(nIni) - 2) + 'px';
+      bloco.querySelector('.h').textContent = hm(nIni) + ' às ' + hm(nFim);
+    },
+    solta: function () {
+      if (!mexeu) return false;
+      agEngole();
+      if (col.dataset.d === o.data && nIni === ini && nFim === fim) { desenhar(); return true; }
+      var novo = agCopia(o); novo.data = novo.dataFim = col.dataset.d; novo.ini = hhmm(nIni); novo.fim = hhmm(nFim);
+      agGravar(novo, o);
+      return true;
     }
-    bloco.style.top = agY(nIni) + 'px'; bloco.style.height = Math.max(14, agY(nFim) - agY(nIni) - 2) + 'px';
-    bloco.querySelector('.h').textContent = hm(nIni) + ' às ' + hm(nFim);
-  }
-  function solta() {
-    document.removeEventListener('pointermove', move); document.removeEventListener('pointerup', solta);
-    if (!mexeu) return;
-    agEngole();
-    if (col.dataset.d === o.data && nIni === ini && nFim === fim) { desenhar(); return; }
-    var novo = agCopia(o); novo.data = novo.dataFim = col.dataset.d; novo.ini = hhmm(nIni); novo.fim = hhmm(nFim);
-    agGravar(novo, o);
-  }
-  document.addEventListener('pointermove', move); document.addEventListener('pointerup', solta);
+  };
 }
 function agCopia(o) {
   return { titulo: o.titulo, data: o.data, dataFim: o.dataFim || o.data, ini: o.ini, fim: o.fim, diaInteiro: !!o.diaInteiro, rrule: o.rrule || '', lembrete: o.lembrete || '', desc: o.desc || '', cor: o.cor || '' };
 }
+/* o mouse: o arrasto começa no pointerdown */
 $('grade').addEventListener('pointerdown', function (ev) {
   if (ev.button !== 0 || !agLigado() || ev.pointerType === 'touch') return;
-  var bloco = ev.target.closest('.ev.meu');
-  if (bloco && !bloco.classList.contains('fantasma')) { agIniciaMover(ev, bloco, !!ev.target.closest('[data-puxa]')); return; }
-  var col = ev.target.closest('.g-col');
-  if (col && ev.target === col) agIniciaCriar(ev, col);
+  var bloco = ev.target.closest('.ev.meu'), col = ev.target.closest('.g-col'), arr = null;
+  if (bloco && !bloco.classList.contains('fantasma')) arr = agArrastoMover(bloco, !!ev.target.closest('[data-puxa]'), ev.clientX, ev.pageY);
+  else if (col && ev.target === col) arr = agArrastoCriar(col, ev.pageY);
+  if (!arr) return;
+  ev.preventDefault();
+  function move(e) { arr.move(e.clientX, e.pageY); }
+  function solta() { document.removeEventListener('pointermove', move); document.removeEventListener('pointerup', solta); arr.solta(); }
+  document.addEventListener('pointermove', move); document.addEventListener('pointerup', solta);
 });
+/* O DEDO (Pedro, 27/10/2026: "arrastar um evento no celular, igual no Google Agenda"). Como no app: tocar e SEGURAR
+   (0,4 s, com uma vibração) pega o evento ou começa um novo na hora vazia; daí o dedo arrasta e a página não rola. Sem
+   segurar, o dedo rola a página como sempre, o toque simples abre o evento (ou cria 1 h na hora vazia) e o deslize para
+   o lado troca de dia. Perto da borda da tela, a página rola sozinha para o arrasto continuar. */
+var agUltimoToque = 0;
+function agToqueCria(col, clientY) {
+  var arr = agArrastoCriar(col, clientY + scrollY); arr.solta();
+}
+(function () {
+  var t0 = null, arr = null, timer = null, rola = null;
+  function limpa() { clearTimeout(timer); timer = null; clearInterval(rola); rola = null; }
+  $('grade').addEventListener('touchstart', function (e) {
+    agUltimoToque = Date.now();
+    if (e.touches.length !== 1) { limpa(); t0 = null; return; }
+    var tq = e.touches[0], alvo = e.target;
+    t0 = { x: tq.clientX, y: tq.clientY, py: tq.pageY, alvo: alvo };
+    arr = null; limpa();
+    if (!agLigado()) return;
+    var bloco = alvo.closest('.ev.meu'), col = alvo.closest('.g-col');
+    if (!(bloco && !bloco.classList.contains('fantasma')) && !(col && alvo === col)) return;
+    timer = setTimeout(function () {
+      timer = null;
+      arr = bloco ? agArrastoMover(bloco, !!alvo.closest('[data-puxa]'), t0.x, t0.py) : agArrastoCriar(col, t0.py);
+      if (!arr) return;
+      if (navigator.vibrate) navigator.vibrate(15);
+      if (bloco) { bloco.classList.add('arrastando'); }
+    }, 400);
+  }, { passive: true });
+  $('grade').addEventListener('touchmove', function (e) {
+    if (!t0) return;
+    var tq = e.touches[0];
+    if (!arr) { if (Math.abs(tq.clientX - t0.x) + Math.abs(tq.clientY - t0.y) > 10) limpa(); return; }
+    e.preventDefault();
+    arr.move(tq.clientX, tq.pageY);
+    clearInterval(rola); rola = null;
+    var borda = tq.clientY > innerHeight - 70 ? 8 : tq.clientY < 90 ? -8 : 0;
+    if (borda) { var cx = tq.clientX, cy = tq.clientY; rola = setInterval(function () { scrollBy(0, borda); arr.move(cx, cy + scrollY); }, 30); }
+  }, { passive: false });
+  function fim(e) {
+    var tq = e.changedTouches && e.changedTouches[0], a = arr, ini = t0;
+    limpa(); arr = null; t0 = null;
+    if (a) { e.preventDefault(); a.solta(); agEngole(); return; }
+    if (!ini || !tq) return;
+    var dx = tq.clientX - ini.x, dy = tq.clientY - ini.y;
+    if (celular() && Math.abs(dx) > 60 && Math.abs(dy) < 40) {   /* deslizar para o lado troca de dia */
+      diaSel = somaDias(diaSel, dx < 0 ? 1 : -1);
+      if (iso(diaSel) > iso(somaDias(segunda, 6))) segunda = somaDias(segunda, 7);
+      if (iso(diaSel) < iso(segunda)) segunda = somaDias(segunda, -7);
+      desenhar();
+    }
+  }
+  $('grade').addEventListener('touchend', fim, { passive: false });
+  $('grade').addEventListener('touchcancel', function () { if (arr) desenhar(); limpa(); arr = null; t0 = null; });
+  $('grade').addEventListener('contextmenu', function (e) { if (e.target.closest('.g-col')) e.preventDefault(); });
+})();
 
 /* ── os balões ── */
 function agPosiciona(ancora) {
@@ -1215,7 +1238,7 @@ function agEditor(o, antigo) {
   setTimeout(function () { if (!antigo) $('edTit').focus(); }, 400);
 }
 
-/* ── os botões de criar (o "＋ Criar" do computador, o "+" do celular) e o horário livre do celular ── */
+/* ── os botões de criar (o "＋ Criar" do computador, o "+" do celular) ── */
 function agCriarAgora() {
   /* no celular, o dia aberto; no computador, hoje (ou a segunda, numa semana que não é esta) */
   var d = innerWidth <= 640 ? diaSel : (estaSemana(segunda) ? new Date() : segunda);
@@ -1224,23 +1247,6 @@ function agCriarAgora() {
 }
 $('btCriar').addEventListener('click', agCriarAgora);
 $('fab').addEventListener('click', agCriarAgora);
-function agNovoNoLivre(min, el) {
-  var a = Math.ceil(min / 15) * 15, b = Math.min(FIM_H * 60, a + 60);
-  agBalaoNovo({ data: iso(diaSel), ini: a, fim: b }, el);
-}
-/* tocar e segurar: abre já com o dedo no lugar, sem esperar soltar */
-(function () {
-  var t = null, alvo = null;
-  $('diaLista').addEventListener('touchstart', function (e) {
-    var lv = e.target.closest('[data-livre]'); if (!lv) return;
-    alvo = lv; lv.classList.add('segura');
-    t = setTimeout(function () { t = null; if (navigator.vibrate) navigator.vibrate(15); agEngole(); agEngoleClique = true; agNovoNoLivre(+lv.dataset.livre, lv); setTimeout(function () { agEngoleClique = false; }, 600); }, 450);
-  }, { passive: true });
-  var solta = function () { if (t) clearTimeout(t); t = null; if (alvo) alvo.classList.remove('segura'); alvo = null; };
-  $('diaLista').addEventListener('touchend', solta); $('diaLista').addEventListener('touchmove', solta, { passive: true }); $('diaLista').addEventListener('touchcancel', solta);
-  $('diaLista').addEventListener('contextmenu', function (e) { if (e.target.closest('[data-livre]')) e.preventDefault(); });
-})();
-
 /* ── o lembrete, com a página aberta ── */
 function agLembretes() {
   var agora = Date.now();
