@@ -63,6 +63,31 @@
   .links a{font-size:.82rem;font-weight:700;color:var(--blue);text-decoration:none;border:1px solid var(--blue-bd);
            border-radius:99px;padding:.3rem .75rem}
   @media (max-width:520px){ .vis .obs{padding-left:0} .vis .qd{min-width:0} }
+
+  /* o quadro da tutoria: as cores e a grade do Portal do Aluno (portal-aluno-fisk/assets/portal.css, .pl-*). Mexeu
+     nas cores lá, mexa aqui: o professor e o aluno têm de ler o mesmo quadro. */
+  .pl-legenda{display:flex;flex-wrap:wrap;gap:.45rem;margin:.6rem 0 .8rem}
+  .pl-tag{display:inline-flex;align-items:center;gap:.4rem;font-size:.72rem;font-weight:700;color:var(--gray);background:var(--blue-soft);border:1px solid var(--blue-bd);border-radius:999px;padding:.22rem .6rem}
+  .pl-ponto{width:.8rem;height:.8rem;border-radius:4px;flex:none;border:1px solid rgba(0,0,0,.12)}
+  .c-jovens{background:#22A7E8} .c-criancas{background:#F7E3A1} .c-espanhol{background:linear-gradient(90deg,#22A7E8 50%,#ED7D31 50%)}
+  .c-so-es{background:#ED7D31} .c-online{background:#5DC435} .c-online-es{background:linear-gradient(90deg,#5DC435 50%,#ED7D31 50%)}
+  .pl-flex{display:flex;gap:.6rem;align-items:flex-start;flex-wrap:wrap}
+  .pl-wrap{flex:1 1 30rem;min-width:0;overflow-x:auto}
+  .pl-grade{border-collapse:separate;border-spacing:4px 7px;font-size:.74rem;width:100%;min-width:30rem;table-layout:fixed;--pl-azul:#083899}
+  .pl-grade th{font-family:var(--font-heading);font-weight:800;font-size:.68rem;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:var(--pl-azul);border-radius:8px;border-left:3px solid var(--red,#C8102E);padding:.35rem .2rem}
+  .pl-grade th.pl-hora-col{background:transparent;border-left:0;width:7rem}
+  .pl-grade td{background:var(--blue-soft);border-radius:8px;padding:0;vertical-align:middle;text-align:center;height:3.1rem}
+  .pl-grade td.pl-hora{background:transparent;padding:0 .3rem 0 0}
+  .pl-grade td.pl-hora span{display:flex;align-items:center;justify-content:center;height:100%;border:1.5px solid var(--blue-bd);border-left:3px solid var(--red,#C8102E);border-radius:8px;background:var(--white);font-weight:800;font-size:.66rem;line-height:1.2;padding:.15rem .25rem}
+  .pl-grade-sab{min-width:0;width:auto;table-layout:auto}
+  .pl-grade-sab th:not(.pl-hora-col),.pl-grade-sab td:not(.pl-hora){min-width:10rem}
+  .pl-vaga{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;border-radius:8px;padding:.2rem;color:#1a1a1a;overflow:hidden;line-height:1.15}
+  .pl-vaga.meu{box-shadow:inset 0 0 0 3px #111827}
+  .pl-prof{font-family:var(--font-heading);font-weight:800;font-size:.76rem;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pl-obs{font-size:.6rem;font-weight:700;opacity:.8;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pl-vaga.is-off{opacity:.5;filter:saturate(.5)}
+  body.theme-dark .pl-grade td.pl-hora span{background:#1e1c1c;color:#f2efef}
+  body.theme-dark .pl-vaga.meu{box-shadow:inset 0 0 0 3px #fde68a}
 </style>
 </head>
 <body>
@@ -115,6 +140,21 @@
     <h2>📒 O Diário de Bordo</h2>
     <p class="aviso">A planilha continua sendo o registro oficial. Esta tela só lê.</p>
     <div class="links" id="links"></div>
+  </section>
+
+  <!-- OS HORÁRIOS DA TUTORIA (26/10/2026, pedido do Pedro): o MESMO quadro que o aluno vê no Portal (Centro de Estudos ·
+       Tutorias), lido da mesma rota aberta (plantaoList) e com as mesmas cores e legenda, para o professor consultar
+       rápido. Os horários do próprio professor ficam destacados. -->
+  <section class="painel" id="painelGrade" hidden>
+    <h2>🗓️ Horários da tutoria</h2>
+    <p class="aviso">O mesmo quadro que o aluno vê no Portal. Seus horários aparecem com borda.</p>
+    <div class="seg" role="group" aria-label="Escola" id="gradeEscolas" hidden></div>
+    <div class="pl-legenda" id="plLegenda"></div>
+    <div class="pl-flex">
+      <div class="pl-wrap"><table class="pl-grade"><thead id="plHead"></thead><tbody id="plBody"></tbody></table></div>
+      <div id="plSabWrap" hidden><table class="pl-grade pl-grade-sab"><thead id="plSabHead"></thead><tbody id="plSabBody"></tbody></table></div>
+    </div>
+    <p class="aviso" id="plNota" hidden style="margin-top:.6rem"></p>
   </section>
 
 </main>
@@ -243,12 +283,92 @@ document.querySelectorAll('[data-ver]').forEach(function (b) {
 });
 $('btnAtualizar').addEventListener('click', function () { carregar(true); });
 
+/* ── O QUADRO DA TUTORIA (26/10/2026): o mesmo que o aluno vê no Portal ── */
+var PL_DIAS = [['SEG', 'Seg'], ['TER', 'Ter'], ['QUA', 'Qua'], ['QUI', 'Qui'], ['SEX', 'Sex']];
+function plClasse(it) {
+  if (it.publico === 'criancas') return 'c-criancas';
+  if (it.modalidade === 'online') return it.publico === 'espanhol' ? 'c-online-es' : 'c-online';
+  if (it.publico === 'espanhol') return 'c-espanhol';
+  if (it.publico === 'so_espanhol' || it.publico === 'so-es') return 'c-so-es';
+  return 'c-jovens';
+}
+function plChave(it) { return it.inicio + '|' + (it.fim || ''); }
+function plFaixaTxt(it) { return it.fim ? it.inicio + ' às ' + it.fim : it.inicio; }
+function plFaixasDe(lista) {
+  var fx = [];
+  lista.forEach(function (i) { if (!fx.some(function (f) { return f.chave === plChave(i); })) fx.push({ chave: plChave(i), ex: i }); });
+  fx.sort(function (a, b) { return a.chave.localeCompare(b.chave); });
+  return fx;
+}
+function plEhMeu(it) {
+  var t = norm(it.professor).replace(/^(PROF(A|ESSORA?)?\.?\s+|TEACHER\s+)/, ''), p = norm(euSou());
+  if (!t || !p) return false;
+  return t === p || p.indexOf(t + ' ') === 0 || t.indexOf(p + ' ') === 0 || (t.indexOf(' ') < 0 && p.split(' ')[0] === t);
+}
+function plVaga(i) {
+  return '<span class="pl-vaga ' + plClasse(i) + (i.publico === 'criancas' ? ' is-off' : '') + (plEhMeu(i) ? ' meu' : '') + '"' + (i.obs ? ' title="' + esc(i.obs) + '"' : '') + '>' +
+    '<span class="pl-prof">' + esc(i.professor || '—') + '</span>' + (i.obs ? '<span class="pl-obs">' + esc(i.obs) + '</span>' : '') +
+    (i.modalidade === 'online' ? '<span class="pl-obs">online</span>' : '') + '</span>';
+}
+function gradeDesenha(j) {
+  var itens = (j && j.itens) || [];
+  $('painelGrade').hidden = false;
+  var semana = itens.filter(function (i) { return i.dia !== 'SAB'; }), sabado = itens.filter(function (i) { return i.dia === 'SAB'; });
+  var dias = PL_DIAS.filter(function (d) { return semana.some(function (i) { return i.dia === d[0]; }); });
+  if (!itens.length) { $('plHead').innerHTML = ''; $('plBody').innerHTML = '<tr><td style="background:transparent;height:auto;padding:.6rem;color:var(--gray)">A escola ainda não publicou o quadro de tutoria.</td></tr>'; }
+  else {
+    $('plHead').innerHTML = '<tr><th class="pl-hora-col"></th>' + dias.map(function (d) { return '<th>' + d[1] + '</th>'; }).join('') + '</tr>';
+    $('plBody').innerHTML = plFaixasDe(semana).map(function (f) {
+      return '<tr><td class="pl-hora"><span>' + esc(plFaixaTxt(f.ex)) + '</span></td>' + dias.map(function (d) {
+        var nesse = semana.filter(function (i) { return i.dia === d[0] && plChave(i) === f.chave; });
+        return nesse.length ? '<td>' + nesse.map(plVaga).join('') + '</td>' : '<td></td>';
+      }).join('') + '</tr>';
+    }).join('');
+  }
+  $('plSabWrap').hidden = !sabado.length;
+  if (sabado.length) {
+    $('plSabHead').innerHTML = '<tr><th class="pl-hora-col"></th><th>Sáb</th></tr>';
+    $('plSabBody').innerHTML = plFaixasDe(sabado).map(function (f) {
+      return '<tr><td class="pl-hora"><span>' + esc(plFaixaTxt(f.ex)) + '</span></td><td>' + sabado.filter(function (i) { return plChave(i) === f.chave; }).map(plVaga).join('') + '</td></tr>';
+    }).join('');
+  }
+  var tags = [['c-jovens', 'Inglês · todas as idades'], ['c-espanhol', 'Inglês e espanhol · todas as idades'], ['c-so-es', 'Espanhol · todas as idades'],
+              ['c-online', 'Tutoria online · a partir de 12 anos'], ['c-online-es', 'Tutoria online · inglês e espanhol · a partir de 12 anos']];
+  if (itens.some(function (i) { return i.publico === 'criancas'; })) tags.push(['c-criancas', 'Crianças · até 11 anos']);
+  $('plLegenda').innerHTML = tags.map(function (g) { return '<span class="pl-tag"><span class="pl-ponto ' + g[0] + '"></span>' + esc(g[1]) + '</span>'; }).join('');
+  $('plNota').hidden = !(j && j.nota); $('plNota').textContent = (j && j.nota) || '';
+}
+var gradeEscola = '';
+function gradeCarrega(escola) {
+  gradeEscola = escola;
+  document.querySelectorAll('[data-pl-esc]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.plEsc === escola ? 'true' : 'false'); });
+  try { var c = JSON.parse(localStorage.getItem('tut:grade:' + escola) || 'null'); if (c) gradeDesenha(c); } catch (e) {}
+  fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plantaoList', unidade: escola }) })
+    .then(fiskJson).then(function (j) {
+      if (!j || !j.ok || escola !== gradeEscola) return;
+      try { localStorage.setItem('tut:grade:' + escola, JSON.stringify(j)); } catch (e) {}
+      gradeDesenha(j);
+    }).catch(function () {});
+}
+function gradeInicia() {
+  var s = sessao(), e = s.escolas;
+  var escolas = (Array.isArray(e) ? e : String(e || '').split(/[,;]/)).map(function (x) { return String(x).trim(); }).filter(Boolean);
+  if (!escolas.length) escolas = ['Caçapava', 'Taubaté'];
+  if (escolas.length > 1) {
+    $('gradeEscolas').hidden = false;
+    $('gradeEscolas').innerHTML = escolas.map(function (x) { return '<button type="button" data-pl-esc="' + esc(x) + '">' + esc(x) + '</button>'; }).join('');
+    $('gradeEscolas').addEventListener('click', function (ev) { var b = ev.target.closest('[data-pl-esc]'); if (b) gradeCarrega(b.dataset.plEsc); });
+  }
+  gradeCarrega(escolas[0]);
+}
+
 fiskInitThemeToggle('themeToggle');
 fiskInitUserMenu();
 if (!sessao().token) {
   $('semSessao').hidden = false; $('painelTopo').hidden = true;
 } else {
   carregar(false);
+  gradeInicia();
   fiskRegistrarUso('Frequência à Tutoria');
 }
 </script>
