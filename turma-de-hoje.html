@@ -1054,12 +1054,17 @@ function recarregarFila(bt) {
    90 s com ela aberta, e redesenha só o cartão do aluno que mudou. Não roda com anotação em digitação, Checking
    aberto ou marca a caminho do servidor, e o que ainda está a caminho é reaplicado por cima (aplicaPendentes). */
 var _autoUlt = Date.now(), _autoRodando = false;
-function atualizaSozinha() {
-  if (_autoRodando || !estado.alunos.length || estado.recarregando || estado.aberto || estado.plantao) return;
+/* as travas das duas atualizações (a completa de 90 s e a leve de 15 s) */
+function podeAtualizar() {
+  if (!estado.alunos.length || estado.recarregando || estado.aberto || estado.plantao) return false;
   var foco = document.activeElement;
-  if (foco && /^(TEXTAREA|INPUT|SELECT)$/.test(foco.tagName) && foco.closest('#alunos')) return;
-  if (Object.keys(pendentes).some(function (r) { return Object.keys(pendentes[r] || {}).length; })) return;
-  if (aguia.ov || filaMinhas().length) return;   /* planner completo aberto, ou marca da fila sem internet que o servidor ainda não tem */
+  if (foco && /^(TEXTAREA|INPUT|SELECT)$/.test(foco.tagName) && foco.closest('#alunos')) return false;
+  if (Object.keys(pendentes).some(function (r) { return Object.keys(pendentes[r] || {}).length; })) return false;
+  if (aguia.ov || filaMinhas().length) return false;   /* planner completo aberto, ou marca da fila sem internet que o servidor ainda não tem */
+  return true;
+}
+function atualizaSozinha() {
+  if (_autoRodando || !podeAtualizar()) return;
   _autoRodando = true; _autoUlt = Date.now();
   var turma = estado.turma, pedido = _turmaPedido;
   post({ action: 'plannerTurma', alunos: estado.alunos.map(function (a) { return { raf: a.raf, book: a.book, turma: turma }; }) }).then(function (r) {
@@ -1079,6 +1084,36 @@ document.addEventListener('visibilitychange', function () {
   if (document.visibilityState === 'visible' && Date.now() - _autoUlt > 45000) atualizaSozinha();
 });
 setInterval(function () { if (document.visibilityState === 'visible' && Date.now() - _autoUlt > 85000) atualizaSozinha(); }, 30000);
+/* AS BOLINHAS DO ALUNO EM ~20 s (27/10/2026, Pedro: "os alunos marcam bolinhas, mas demora para aparecer no planner do
+   professor"). O aluno grava na hora; quem demorava era esta tela, que só relia a turma a cada 90 s. A cada 15 s ela
+   pergunta à rota leve `plannerNovidades` (backend 775) quem teve o planner carimbado desde a última pergunta, e
+   recebe o planner só desses. `_novDesde` é do relógio do SERVIDOR (a resposta traz `agora`); a 1ª pergunta depois
+   de abrir a turma volta 90 s, para cobrir o tempo que o próprio plannerTurma levou. A completa de 90 s continua:
+   a metade da plataforma (atividade feita, áudio ouvido) não mora na aba do planner. */
+var _novDesde = 0, _novRodando = false, _novUlt = 0;
+function buscaNovidades() {
+  if (_novRodando || !_novDesde || _autoRodando || !podeAtualizar()) return;
+  _novRodando = true; _novUlt = Date.now();
+  var turma = estado.turma, pedido = _turmaPedido;
+  post({ action: 'plannerNovidades', desde: _novDesde, alunos: estado.alunos.map(function (a) { return { raf: a.raf, book: a.book }; }) }).then(function (r) {
+    if (pedido !== _turmaPedido || estado.turma !== turma || !r || !r.ok) return;
+    if (!podeAtualizar()) return;   /* o professor tocou numa bolinha no meio: fica para a próxima, sem andar o relógio */
+    _novDesde = (Number(r.agora) || Date.now()) - 15000;   /* folga: gravação que começou antes do `agora` pode chegar depois */
+    var mudou = [];
+    Object.keys(r.mudou || {}).forEach(function (raf) {
+      var a = estado.alunos.filter(function (x) { return String(x.raf).trim().toUpperCase() === raf; })[0];
+      var d = a && estado.dados[a.raf]; if (!d) return;
+      var pl = aplicaNotasPendentes(a.raf, aplicaPendentes(a.raf, r.mudou[raf]));
+      if (JSON.stringify(pl) !== JSON.stringify(d.planner || null)) { d.planner = pl; mudou.push(a); }
+    });
+    if (!mudou.length) return;
+    if (ptEstado) desenharTurma(); else mudou.forEach(redesenhar);
+  }).catch(function () {}).then(function () { _novRodando = false; });
+}
+setInterval(function () { if (document.visibilityState === 'visible' && Date.now() - _novUlt > 15000) buscaNovidades(); }, 5000);
+document.addEventListener('visibilitychange', function () {
+  if (document.visibilityState === 'visible' && Date.now() - _novUlt > 5000) buscaNovidades();
+});
 document.addEventListener('visibilitychange', function () {
   if (document.visibilityState !== 'visible' || !estado.foiAoPlanejador) return;
   estado.foiAoPlanejador = false;
@@ -1425,6 +1460,7 @@ function carregarTurma(escola, prof, linha, titulo) {
            (auditoria de 15/09/2026: o cartão voltava para a Introduction e a marca ia para a lição errada) */
         var antes = estado.dados || {};
         estado.dados = rs[0].alunos || {};
+        _novDesde = Date.now() - 90000;   /* a consulta leve parte daqui (buscaNovidades) */
         estado.visitantes.forEach(function (v) { if (!estado.dados[v.raf] && antes[v.raf]) estado.dados[v.raf] = antes[v.raf]; });
         estado.recursos = rs[0].recursos || [];
         estado.plano = rs[1] && rs[1].plano || null;
