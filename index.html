@@ -139,8 +139,11 @@
   .bol-menu a{display:flex;align-items:center;gap:.5rem;padding:.55rem .7rem;border-radius:10px;font-weight:800;font-size:.9rem;text-decoration:none;color:var(--ui-dark,#223e5a);background:var(--ui-soft,#e9eff5)}
   .bol-menu a:hover{filter:brightness(.96)}
   body.theme-dark .bol-menu{background:#1e1c1c;border-color:#3a3535}
+  /* a MESMA cara do card Minha aula (style.css, .card-turmahoje): azul-marinho, borda azul e o brilho verde-limão que
+     pulsa, para o professor ver que os dois são a mesma ferramenta (Pedro, 27/10/2026) */
   .prox-aula{display:flex;align-items:center;gap:.8rem;margin:0 0 1rem;padding:.75rem 1rem;border-radius:14px;text-decoration:none;color:#fff;
-    background:linear-gradient(100deg,#0e7490,#155e75);box-shadow:0 4px 0 #0b4a5c;transition:transform .14s ease}
+    background:linear-gradient(145deg,#1d3685 0%,#142a6b 100%);border:2px solid #3b5bc4;
+    box-shadow:0 0 0 2px rgba(212,233,9,.55), 0 0 26px 6px rgba(59,91,196,.55);animation:hubThGlow 2.8s ease-in-out infinite;transition:transform .14s ease}
   .prox-aula[hidden]{display:none}
   .prox-aula:hover{transform:translateY(-2px)}
   .prox-aula .ic{font-size:1.5rem;flex:none}
@@ -148,9 +151,10 @@
   .prox-aula .tx small{font-size:.74rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
   .prox-aula .tx b{font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .prox-aula .tx span{font-size:.84rem;opacity:.9}
-  .prox-aula .go{margin-left:auto;flex:none;background:#fff;color:#0e7490;border-radius:999px;padding:.45rem .9rem;font-weight:800;font-size:.86rem;white-space:nowrap}
-  .prox-aula.agora{background:linear-gradient(100deg,#15803d,#166534);box-shadow:0 4px 0 #0f4a26}
-  .prox-aula.agora .go{color:#15803d}
+  .prox-aula .go{margin-left:auto;flex:none;background:#d4e909;color:#142a6b;border-radius:999px;padding:.45rem .9rem;font-weight:800;font-size:.86rem;white-space:nowrap}
+  .prox-aula .tx small{color:#d4e909;opacity:1}
+  .prox-aula:hover{box-shadow:0 0 0 2px #d4e909, 0 0 34px 10px rgba(59,91,196,.7)}
+  @media (prefers-reduced-motion:reduce){ .prox-aula{animation:none} }
   @media (max-width:560px){ .prox-aula .go{padding:.45rem .7rem} .prox-aula .go span{display:none} }
   /* ── MINHA SEMANA na home (26/10/2026, Pedro): seção recolhível embaixo de "Outras ferramentas" ── */
   .sem-home{margin:0 0 1.6rem}
@@ -210,7 +214,6 @@
     <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
     <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
     <h1>Fisk Hub</h1>
-    <p data-i18n="subtitle">Ferramentas rápidas para o seu dia a dia em sala de aula</p>
     <!-- A FRASE DO DIA (Pedro, 26/10/2026): o acervo mora no Portal (assets/frases-equipe.js), o mesmo do Portal da
          Secretaria. Uma por visita, sem repetir a última; clicar troca. Sem o arquivo, o parágrafo fica escondido. -->
     <p class="hero-frase" id="heroFrase" hidden title="Clique para outra frase" style="font-style:italic;opacity:.92;max-width:44rem;margin:.55rem auto 0;cursor:pointer;transition:opacity .3s"></p>
@@ -276,7 +279,7 @@
     </a>
     <a class="fwh-f fwh-es" id="fw-hub-es" href="https://portalfisk.com.br/#raf=0000-000&curso=es&ir=worlds">
       <span class="fwh-t"><span class="fwh-tag" data-i18n="fw-tag-es">JOGO 3D · ESPANHOL</span><b>Fisk Mundo <svg class="fwh-band" viewBox="0 0 30 20" aria-label="Espanha"><rect width="30" height="20" fill="#aa151b"/><rect y="5" width="30" height="10" fill="#f1bf00"/></svg></b></span>
-      <span class="fwh-go">▶</span>
+      <span class="fwh-go">Jugar ▶</span>   <!-- em espanhol em qualquer idioma do Hub: o jogo é em espanhol (Pedro, 27/10/2026) -->
     </a>
     <!-- MEU PERSONAGEM (26/10/2026): o professor monta o mago ou a bruxa com que entra no jogo em 2027 -->
     <a class="fwh-p" href="meu-personagem.html">
@@ -777,12 +780,20 @@
        mostra os Fisk Dólares e nada quebra. -->
   <script src="https://portalfisk.com.br/assets/mana.js"></script>
   <script src="https://portalfisk.com.br/assets/equipe-cortina.js?v=2026-10-24a"></script>
-  <script src="https://portalfisk.com.br/assets/frases-equipe.js?v=2026-10-26a"></script>
+  <script src="https://portalfisk.com.br/assets/frases-equipe.js?v=2026-10-27a"></script>
   <script>
-    (function () {
+    /* no idioma do Hub (Pedro, 27/10/2026): o acervo tem professor (pt), professor_en e professor_es, na mesma ordem.
+       Sem a lista do idioma (arquivo antigo em cache), fica a de português. Trocar o idioma no menu sorteia de novo. */
+    window.hubFrase = function () {
       var el = document.getElementById('heroFrase'); if (!el || !window.FISK_FRASES) return;
-      el.textContent = '✨ ' + FISK_FRASES.sorteia('professor'); el.hidden = false;
-      el.addEventListener('click', function () { el.style.opacity = '0'; setTimeout(function () { el.textContent = '✨ ' + FISK_FRASES.sorteia('professor'); el.style.opacity = ''; }, 300); });
+      var l = 'en'; try { l = typeof fiskIdioma === 'function' ? fiskIdioma() : (localStorage.getItem('fisk_lang') || 'en'); } catch (e) {}
+      var chave = l === 'pt' || !FISK_FRASES['professor_' + l] ? 'professor' : 'professor_' + l;
+      el.textContent = '✨ ' + FISK_FRASES.sorteia(chave); el.hidden = false;
+    };
+    window.hubFrase();
+    (function () {
+      var el = document.getElementById('heroFrase'); if (!el) return;
+      el.addEventListener('click', function () { el.style.opacity = '0'; setTimeout(function () { window.hubFrase(); el.style.opacity = ''; }, 300); });
     })();
   </script>
   <script src="assets/fisk-shared.js?v=2026-10-27c"></script>
@@ -1528,6 +1539,9 @@
          barra da direção/visita também (o "Sair" dela vem do dicionário) */
       function trocaIdioma(lang){
         applyLang(lang);
+        if (window.hubFrase) window.hubFrase();
+        if (window.pintaProxAula) window.pintaProxAula();
+        if (window.pintaMaisUsadas) window.pintaMaisUsadas();
         fillBar(saved());
       }
 
@@ -3184,10 +3198,13 @@
     PADRAO.forEach(function (sel) { entra(document.querySelector('main.grid ' + sel)); });
     if (!lista.length) { BOX.hidden = true; return; }
     BOX.hidden = false;
-    BOX.innerHTML = '<span class="mu-rot">Ferramentas mais usadas por você</span>' + lista.map(function (x) {
+    var l = typeof fiskIdioma === 'function' ? fiskIdioma() : 'en';
+    var rot = { pt: 'Ferramentas mais usadas por você', en: 'Your most used tools', es: 'Tus herramientas más usadas' }[l] || 'Your most used tools';
+    BOX.innerHTML = '<span class="mu-rot">' + rot + '</span>' + lista.map(function (x) {
       return '<a class="mu-chip" href="' + x.h.replace(/"/g, '&quot;') + '">' + x.t.replace(/[<>&]/g, '') + '</a>';
     }).join('');
   }
+  window.pintaMaisUsadas = pinta;
   setTimeout(pinta, 400);   /* depois de a sessão decidir quais cards aparecem */
 })();
 </script>
@@ -3295,6 +3312,11 @@
    num iframe desta mesma página) grava as turmas de novo. */
 (function () {
   var el = document.getElementById('proxAula'); if (!el) return;
+  /* no idioma do Hub (Pedro, 27/10/2026); o nome da ferramenta é o mesmo do card: Minha aula, My Class, Mi clase */
+  var TXT = { pt: { prox: 'Sua próxima aula', agora: 'Em aula agora', ate: 'até', as: 'às', em: 'em', alunos: 'alunos', depois: 'depois mais N hoje', abrir: 'Abrir na Minha aula' },
+              en: { prox: 'Your next class', agora: 'In class now', ate: 'until', as: 'at', em: 'in', alunos: 'students', depois: 'N more later today', abrir: 'Open in My Class' },
+              es: { prox: 'Tu próxima clase', agora: 'En clase ahora', ate: 'hasta las', as: 'a las', em: 'en', alunos: 'alumnos', depois: 'después N más hoy', abrir: 'Abrir en Mi clase' } };
+  function idioma() { try { return typeof fiskIdioma === 'function' ? fiskIdioma() : 'en'; } catch (e) { return 'en'; } }
   function sess() { try { return JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) { return null; } }
   function nP(v) { return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
   function eu(s) { if (s.master) { try { var a = JSON.parse(localStorage.getItem('fisk_actas') || 'null'); if (a && a.name) return a.name; } catch (e) {} } return s.name || ''; }
@@ -3318,15 +3340,16 @@
     var d = new Date(), wd = d.getDay(), min = d.getHours() * 60 + d.getMinutes();
     var hoje = turmas.filter(function (t) { return t.h && t.h.dias.indexOf(wd) > -1 && t.h.fim > min; }).sort(function (a, b) { return a.h.ini - b.h.ini; });
     var t = hoje[0]; if (!t) { el.hidden = true; return; }
-    var agora = t.h.ini <= min, falta = t.h.ini - min;
-    var quando = agora ? 'até ' + hm(t.h.fim) : 'às ' + hm(t.h.ini) + (falta <= 180 ? ' (em ' + (falta >= 60 ? Math.floor(falta / 60) + 'h' + (falta % 60 ? ('0' + (falta % 60)).slice(-2) : '') : falta + ' min') + ')' : '');
+    var agora = t.h.ini <= min, falta = t.h.ini - min, T = TXT[idioma()] || TXT.pt;
+    var quando = agora ? T.ate + ' ' + hm(t.h.fim) : T.as + ' ' + hm(t.h.ini) + (falta <= 180 ? ' (' + T.em + ' ' + (falta >= 60 ? Math.floor(falta / 60) + 'h' + (falta % 60 ? ('0' + (falta % 60)).slice(-2) : '') : falta + ' min') + ')' : '');
     el.className = 'prox-aula' + (agora ? ' agora' : '');
     el.href = 'turma-de-hoje.html#t=' + encodeURIComponent(t.escola + '|' + t.prof + '|' + t.linha);
-    el.innerHTML = '<span class="ic" aria-hidden="true">' + (agora ? '🟢' : '🕒') + '</span><span class="tx"><small>' + (agora ? 'Em aula agora' : 'Sua próxima aula') + '</small>' +
-      '<b>' + fiskEsc(curto(t.titulo)) + ' ' + quando + '</b><span>' + (t.alunos || []).length + ' alunos' + (hoje.length > 1 ? ' · depois mais ' + (hoje.length - 1) + ' hoje' : '') + '</span></span>' +
-      '<span class="go"><span>Abrir na Minha aula</span> →</span>';
+    el.innerHTML = '<span class="ic" aria-hidden="true">' + (agora ? '🟢' : '🕒') + '</span><span class="tx"><small>' + (agora ? T.agora : T.prox) + '</small>' +
+      '<b>' + fiskEsc(curto(t.titulo)) + ' ' + quando + '</b><span>' + (t.alunos || []).length + ' ' + T.alunos + (hoje.length > 1 ? ' · ' + T.depois.replace('N', hoje.length - 1) : '') + '</span></span>' +
+      '<span class="go"><span>' + T.abrir + '</span> →</span>';
     el.hidden = false;
   }
+  window.pintaProxAula = pinta;
   pinta();
   setInterval(pinta, 60000);
   window.addEventListener('storage', function (e) { if (e.key && e.key.indexOf('cal:') === 0) pinta(); });
