@@ -482,12 +482,20 @@ body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ 
   .pt-mom.m-warm{ --mc-bg: #fff4e8; --mc-bd: #ffd9b0; --mc-tx: #b45309; }
   .pt-mom.m-story{ --mc-bg: #f2f0ff; --mc-bd: #d9d2ff; --mc-tx: #5b21b6; }
   .pt-mom.m-com{ --mc-bg: #e9f8f5; --mc-bd: #bfeade; --mc-tx: #0f766e; }
-  .pt-mom.m-mat{ --mc-bg: #f4f6fa; --mc-bd: #e1e6ef; --mc-tx: #334155; }
+  .pt-mom.m-mat{ --mc-bg: #f4f6fa; --mc-bd: #e1e6ef; --mc-tx: #334155; grid-column: span 2; }
+  /* o material da semana em lista, um bloco por estágio (Pedro, 27/10/2026) */
+  .pt-mat{ display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: .6rem; white-space: normal; margin-top: .2rem; }
+  .pt-mat-est{ background: #fff; border-radius: 14px; border: 1px solid #e1e6ef; border-left: 5px solid var(--lc); padding: .55rem .8rem .6rem; }
+  .pt-mat-est h5{ margin: 0 0 .25rem; font-family: var(--font-heading); font-size: .98rem; color: var(--lc-tx); }
+  .pt-mat-est ul{ margin: 0; padding-left: 1.15rem; }
+  .pt-mat-est li{ margin: .1rem 0; }
+  body.theme-dark .pt-mat-est{ background: #15202f; border-color: #2a3a52; border-left-color: var(--lc); }
+  body.theme-dark .pt-mat-est h5{ color: var(--lc); }
   .pt-mom.m-aniv{ --mc-bg: #fff8db; --mc-bd: #fbe08a; --mc-tx: #a16207; }
   .pt-mom.m-geral{ --mc-bg: #eef6ff; --mc-bd: #cfe3ff; --mc-tx: #1d4ed8; }
   .pt-livros{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
   .pt-livros > .pt-livro:only-child{ grid-column: 1 / -1; }
-  @media (max-width: 720px){ .pt-livros{ grid-template-columns: 1fr; } .pt-momentos{ grid-template-columns: 1fr; } }
+  @media (max-width: 720px){ .pt-livros{ grid-template-columns: 1fr; } .pt-momentos{ grid-template-columns: 1fr; } .pt-mom.m-mat{ grid-column: auto; } }
   .pt-livro{ border-radius: 22px; overflow: hidden; background: #fff; border: 2px solid var(--lc-soft); box-shadow: 0 6px 18px rgba(20,30,60,.06); }
   .pt-livro .topo{ background: var(--lc); color: #fff; padding: .85rem 1.1rem; display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
   .pt-livro .topo h3{ margin: 0; font-family: var(--font-heading); font-size: 1.15rem; }
@@ -528,6 +536,8 @@ body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ 
   .ak-cab .cont{ font-family: var(--font-body); font-size: .9rem; font-weight: 900; padding: .2rem .65rem; border-radius: 99px; background: #eef2f8; color: #475569; }
   .ak-cab .cont.v{ background: #d1fae5; color: #047857; }
   .ak-cab .cont.f{ background: #fee2e2; color: #b91c1c; }
+  .ak-cab .ak-todos{ font-family: var(--font-body); font-size: .92rem; font-weight: 900; padding: .3rem .9rem; border-radius: 99px; border: 2px solid #10b981; background: #10b981; color: #fff; cursor: pointer; }
+  .ak-cab .ak-todos:hover{ background: #059669; border-color: #059669; }
   .al.al-kids{ padding: 0; border-radius: 18px; border: 2px solid #e8ecf4; box-shadow: none; margin-bottom: .55rem; background: #fff; overflow: hidden; }
   .al.al-kids.veio{ border-color: #a7f3d0; background: #f6fffb; }
   .al.al-kids.aniv{ border-color: #f5c542; background: linear-gradient(90deg, #fff8db 0%, #ffffff 60%); box-shadow: 0 0 0 3px rgba(245,197,66,.25); }
@@ -2676,6 +2686,15 @@ function desenharChamadaKids(caixa) {
   var nVeio = lista.filter(function (a) { return estado.atendidos[a.raf]; }).length, nFalta = lista.filter(faltouHoje).length;
   var cab = document.createElement('div'); cab.className = 'ak-cab';
   cab.innerHTML = '🙋 Presenças dos alunos <span class="cont">' + lista.length + ' alunos</span><span class="cont v">✓ ' + nVeio + ' vieram</span><span class="cont f">✗ ' + nFalta + ' faltaram</span>';
+  /* "marcar todos" (Pedro, 27/10/2026): marca Veio em quem ainda não tem nem Veio nem Faltou; depois é só desmarcar
+     quem não veio. A tela muda na hora; o card é escrito um aluno por vez, para não disputar a planilha. */
+  var semMarca = lista.filter(function (a) { return !estado.atendidos[a.raf] && !faltouHoje(a); });
+  if (semMarca.length > 1) {
+    var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'ak-todos'; bt.textContent = '✓ Marcar todos que vieram';
+    bt.title = 'Marca Veio em ' + semMarca.length + ' alunos; depois desmarque quem não veio';
+    bt.addEventListener('click', function () { presencaTodosKids(semMarca); });
+    cab.appendChild(bt);
+  }
   caixa.appendChild(cab);
   lista.forEach(function (a) {
     var veio = !!estado.atendidos[a.raf], faltou = faltouHoje(a);
@@ -2711,19 +2730,37 @@ function licaoDeHoje(a) {
   var adv = String(L.licao || '').match(/^\s*Adv\s*(\d)/i); if (adv) return 'Adv' + adv[1];
   var n = ptLicaoVigente(b, nome, i); return n ? 'L' + n : '';
 }
-function presencaKids(a) {
-  var desfazer = !!estado.atendidos[a.raf];
-  if (desfazer) delete estado.atendidos[a.raf]; else estado.atendidos[a.raf] = Date.now();
+function presencaTodosKids(lista) {
+  var falhas = 0;
+  lista.forEach(function (a) { estado.atendidos[a.raf] = Date.now(); });
   guardaAtendidos(); desenharTurma();
+  toast('✓ ' + lista.length + ' alunos marcados. Desmarque quem não veio.');
+  lista.reduce(function (p, a) {
+    return p.then(function () {
+      if (!estado.atendidos[a.raf]) return;   /* desmarcado enquanto a fila andava: nada a escrever */
+      return presencaKids(a, true, true).catch(function () { falhas++; });
+    });
+  }, Promise.resolve()).then(function () {
+    toast(falhas ? '⚠️ ' + falhas + ' presença' + (falhas > 1 ? 's não foram' : ' não foi') + ' ao card. Marque de novo.' : '📇 Card atualizado com as presenças.');
+  });
+}
+/* quieto: sem o aviso de sucesso e com o erro devolvido (o "marcar todos" avisa uma vez no fim);
+   jaMarcado: a tela já mostra Veio, falta só o card */
+function presencaKids(a, quieto, jaMarcado) {
+  var desfazer = !jaMarcado && !!estado.atendidos[a.raf];
+  if (!jaMarcado) { if (desfazer) delete estado.atendidos[a.raf]; else estado.atendidos[a.raf] = Date.now(); guardaAtendidos(); desenharTurma(); }
   return post({ action: 'plannerPresenca', raf: a.raf, book: a.book, lic: licaoDeHoje(a), desfazer: desfazer }).then(function (r) {
     var c = r.card || {};
+    if (quieto) return;
     if (c.escreveu) toast('📇 Card: "' + c.escreveu + '" na aula ' + rotDiaTH() + '.');
     else if (c.desfez) toast('📇 Card: presença ' + rotDiaTH() + ' desfeita.');
     else if (c.jaEstava) toast('📇 O card já tinha "' + c.jaEstava + '" na aula ' + rotDiaTH() + ' e não foi alterado.');
     else if (c.motivo) toast('📇 Card não alterado: ' + c.motivo + '.');
   }).catch(function (e) {
     if (desfazer) estado.atendidos[a.raf] = Date.now(); else delete estado.atendidos[a.raf];
-    guardaAtendidos(); desenharTurma(); toast('⚠️ Não salvou a presença (' + e.message + '). Tente de novo.');
+    guardaAtendidos(); desenharTurma();
+    if (quieto) throw e;
+    toast('⚠️ Não salvou a presença (' + e.message + '). Tente de novo.');
   });
 }
 /* o dia e o mês do aniversário: a célula de DATA chega do backend em ISO (aaaa-mm-dd, sem ambiguidade); a de TEXTO
@@ -2925,6 +2962,26 @@ function ptTransicoes(b, s, mus) {
     }).join('');
   }).join('');
 }
+/* o material vem do plano como texto, uma linha por estágio ("Hello B: ...", "MWG - ..."): vira um bloco por
+   estágio, na cor do livro, com um item por vírgula. Linha sem rótulo fica sem título. */
+var PT_MAT_SIGLAS = { MWG: 'Magic Way Green', MWB: 'Magic Way Blue', MWY: 'Magic Way Yellow', MWR: 'Magic Way Red' };
+function ptMaterial(txt) {
+  return '<div class="pt-mat">' + String(txt || '').split(/\n+/).map(function (lin) {
+    lin = lin.trim(); if (!lin) return '';
+    var m = lin.match(/^([A-Za-z][\w-]*(?: [A-Za-z][\w-]*)?)\s*[:\-–]\s+(.*)$/), rot = m ? m[1] : '', resto = m ? m[2] : lin;
+    var nome = PT_MAT_SIGLAS[rot.toUpperCase()] || rot;
+    var itens = [], cur = '', fundo = 0;   /* vírgula dentro de parênteses não separa: "(sugar, rice or sand)" */
+    resto.replace(/\s+\/\s+/g, '|').split('').forEach(function (ch) {
+      if (ch === '(') fundo++; else if (ch === ')' && fundo) fundo--;
+      if (!fundo && /[,;|]/.test(ch)) { itens.push(cur); cur = ''; } else cur += ch;
+    });
+    itens.push(cur);
+    itens = itens.map(function (x) { return x.trim().replace(/[.,]+$/, ''); }).filter(Boolean);
+    if (!itens.length) return '';
+    return '<div class="pt-mat-est" style="' + ptCorVars(ptCor(nome)) + '">' + (nome ? '<h5>' + esc(nome) + '</h5>' : '') +
+      '<ul>' + itens.map(function (x) { return '<li>' + esc(x.charAt(0).toUpperCase() + x.slice(1)) + '</li>'; }).join('') + '</ul></div>';
+  }).join('') + '</div>';
+}
 function ptMomento(cls, ic, titulo, txt, tick) {
   return '<div class="pt-mom ' + cls + '">' + (tick || '') + '<div class="ic" aria-hidden="true">' + ic + '</div><h4>' + titulo + '</h4><div class="txt">' + txt + '</div></div>';
 }
@@ -2950,7 +3007,7 @@ function ptDesenha() {
     var comPasta = s.comunicativaPasta && s.comunicativaPasta.id && (s.comunicativaPasta.arquivos || []).length ? ptLink(ptPasta(s.comunicativaPasta.id), '📁 atividades da semana') : '';
     if (s.comunicativa || comPasta) moms += ptMomento('m-com', '💬', 'Atividade comunicativa', esc(s.comunicativa || '') + (s.comunicativa && comPasta ? '\n' : '') + comPasta + ptQuando('*', 'com:' + s.de), ptTick('*', 'com:' + s.de, s.de));
     if (s.geral) moms += ptMomento('m-geral', '📚', 'Livro nesta semana', esc(s.geral));
-    if (s.material) moms += ptMomento('m-mat', '🧺', 'Material da semana', esc(s.material));
+    if (s.material) moms += ptMomento('m-mat', '🧺', 'Material da semana', ptMaterial(s.material));
     html += moms ? '<div class="pt-momentos">' + moms + '</div>' : '<div class="pt-nada" style="text-align:center">Nada além do livro nesta semana.</div>';
   });
   html += '<div class="pt-titulo">📚 Livros da turma</div><div class="pt-livros">';
