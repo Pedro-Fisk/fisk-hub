@@ -468,8 +468,13 @@ body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ 
   .pt-nota label small{ font-family: var(--font-body); font-weight: 800; font-size: .84rem; color: #b45309; }
   .pt-nota textarea{ width: 100%; min-height: 84px; box-sizing: border-box; border: 1.5px solid #f3d27a; border-radius: 12px; padding: .6rem .7rem; font-family: var(--font-body); font-size: 1rem; line-height: 1.45; resize: vertical; background: #fff; }
   .pt-nota .st{ font-size: .82rem; font-weight: 800; color: #047857; min-height: 1.1em; margin-top: .3rem; }
-  .pt-nota-livro{ margin-top: .8rem; padding: .7rem .8rem; border-radius: 14px; }
-  .pt-nota-livro label{ font-size: .95rem; }
+  .pt-nota-livro{ margin-top: .8rem; padding: .45rem .8rem; border-radius: 14px; }
+  .pt-nota-livro.aberta{ padding-bottom: .7rem; }
+  .pt-nota-bt{ display: flex; align-items: center; gap: .3rem; width: 100%; background: none; border: 0; padding: .2rem 0; color: #92400e; font-family: var(--font-heading); font-weight: 700; font-size: .95rem; cursor: pointer; text-align: left; }
+  .pt-nota-bt .tem{ font-family: var(--font-body); font-weight: 900; font-size: .84rem; color: #b45309; }
+  .pt-nota-bt .seta{ margin-left: auto; transition: transform .15s ease; }
+  .pt-nota-livro.aberta .pt-nota-bt .seta{ transform: rotate(180deg); }
+  .pt-nota-corpo small{ display: block; font-weight: 800; font-size: .84rem; color: #b45309; margin: .25rem 0 .45rem; }
   .pt-nota-livro textarea{ min-height: 64px; font-size: .95rem; }
   body.theme-dark .pt-nota{ background: #2b2513; border-color: #6d5a23; }
   body.theme-dark .pt-nota textarea{ background: #0f1825; color: #e2e8f0; border-color: #6d5a23; }
@@ -507,8 +512,8 @@ body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ 
   .pt-livro.arrastando{ opacity: .45; }
   .pt-livro.alvo{ outline: 3px dashed var(--lc); outline-offset: 3px; }
   .pt-livro .topo .lic{ background: rgba(255,255,255,.25); border-radius: 99px; padding: .15rem .65rem; font-weight: 900; font-size: .88rem; }
-  .pt-livro .quem{ display: flex; flex-wrap: wrap; gap: .3rem; padding: .7rem 1.1rem 0; }
-  .pt-livro .quem span{ font-size: 1rem; font-weight: 800; background: var(--lc-bg); color: var(--lc-tx); border-radius: 99px; padding: .2rem .6rem; }
+  .pt-livro .quem{ display: flex; flex-wrap: wrap; gap: .45rem; padding: .85rem 1.1rem .2rem; }
+  .pt-livro .quem span{ font-size: 1.3rem; font-weight: 900; background: var(--lc-bg); color: var(--lc-tx); border: 2px solid var(--lc-soft); border-radius: 99px; padding: .3rem .95rem; line-height: 1.2; }
   .pt-livro .corpo{ padding: .55rem 1.1rem 1rem; }
   .pt-it{ display: flex; align-items: flex-start; gap: .65rem; padding: .5rem 0; border-top: 1px dashed #e7eaf3; font-size: 1.02rem; line-height: 1.4; }
   .pt-it:first-child{ border-top: 0; }
@@ -528,8 +533,18 @@ body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ 
   .pt-botoes{ display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .85rem; }
   .pt-botoes a{ flex: 1 1 160px; text-align: center; font-size: .95rem; font-weight: 900; text-decoration: none; border-radius: 14px; padding: .6rem .8rem; color: var(--lc-tx); background: var(--lc-bg); border: 2px solid var(--lc-soft); }
   .pt-botoes a:hover{ background: var(--lc); color: #fff; border-color: var(--lc); }
-  .pt-pend{ margin-top: .7rem; font-size: .95rem; }
-  .pt-pend summary{ cursor: pointer; color: #b45309; font-weight: 900; }
+  .pt-atras{ margin: .2rem 0 .7rem; background: #fef2f2; border: 2px solid #fca5a5; border-radius: 16px; padding: .6rem .8rem .7rem; }
+  .pt-atras .tit{ display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; color: #b91c1c; font-weight: 900; font-size: 1.02rem; margin-bottom: .1rem; }
+  .pt-atras .tit small{ font-weight: 800; font-size: .82rem; color: #dc2626; }
+  .pt-atras .pt-it{ border-top-color: #fecaca; }
+  .pt-atras .pt-tick{ border-color: #dc2626; }
+  .pt-atras .pt-tick.on{ background: #dc2626; }
+  .pt-atr{ display: block; font-size: .78rem; font-weight: 900; color: #dc2626; text-transform: uppercase; letter-spacing: .03em; margin-bottom: .1rem; }
+  .pt-atras .pt-botoes{ margin-top: .55rem; }
+  .pt-atras .pt-botoes a{ color: #b91c1c; background: #fff; border-color: #fca5a5; padding: .45rem .7rem; font-size: .9rem; }
+  .pt-atras .pt-botoes a:hover{ background: #dc2626; color: #fff; border-color: #dc2626; }
+  body.theme-dark .pt-atras{ background: #2a1414; border-color: #7f1d1d; }
+  body.theme-dark .pt-atras .pt-botoes a{ background: #1f1111; }
   .pt-nada{ color: #64748b; font-size: .98rem; padding: .4rem 0; }
   /* presenças */
   .ak-cab{ display: flex; align-items: center; justify-content: center; gap: .55rem; flex-wrap: wrap; margin: .6rem 0 .8rem; font-family: var(--font-heading); font-size: 1.18rem; color: #1d2b53; }
@@ -2898,7 +2913,7 @@ function montaNotaKids(box, a) {
    _planoTurma). PILOTO: só as turmas abaixo, e a direção (master) em qualquer
    turma que tenha livro no plano. */
 var PLANO_TURMA_SEM = '2026-2';
-var PLANO_TURMA_V = '20261023e';
+var PLANO_TURMA_V = '20261027a';
 var PLANO_TURMA_PILOTO = [
   { escola: 'Caçapava', turma: /kids\s*multilevel\s*\(at[eé]\s*2º\s*ano\)\s*-\s*3ª\s*8h30/i },
   { escola: 'Taubaté', turma: /^teens\s*connect\s*2\s*-\s*3ª\s*15h/i }
@@ -2943,7 +2958,7 @@ function planoTurmaMonta(escola, turma) {
       ptEstado.marcas = r.marcas || {}; ptEstado.nota = r.nota || null; ptEstado.carregou = true;
       if (ptEstado.notaEl) { var ta = ptEstado.notaEl.querySelector('textarea'); if (ta && !ta.value) ta.value = (ptEstado.nota && ptEstado.nota.texto) || ''; ta.disabled = false; }
       ptEstado.notasLivro = r.notasLivro || {};
-      Object.keys(ptEstado.notaLivroEl || {}).forEach(function (lv) { var tl = ptEstado.notaLivroEl[lv].querySelector('textarea'); if (tl && !tl.value) tl.value = (ptEstado.notasLivro[ptNotaLivroChave(lv)] || {}).texto || ''; if (tl) tl.disabled = false; });
+      Object.keys(ptEstado.notaLivroEl || {}).forEach(function (lv) { var tl = ptEstado.notaLivroEl[lv].querySelector('textarea'); if (tl && !tl.value) tl.value = (ptEstado.notasLivro[ptNotaLivroChave(lv)] || {}).texto || ''; if (tl) tl.disabled = false; if (ptEstado.notaLivroEl[lv]._marca) ptEstado.notaLivroEl[lv]._marca(); });
       ptDesenha();
     }).catch(function (e) { toast('⚠️ Não li as marcas do plano (' + e.message + ').'); if (ptEstado) { ptEstado.carregou = true; ptDesenha(); } });
   });
@@ -2995,7 +3010,7 @@ function ptTick(livro, k, semana) {
     (ptEstado.carregou ? '' : ' disabled') + ' aria-label="' + (m ? 'Desmarcar' : 'Marcar como feito') + '">' + (m ? '✓' : '') + '</button>';
 }
 function ptQuando(livro, k) { var m = ptMarca(livro, k); return m && m.d ? '<span class="pt-quando">' + (m.d === diaAlvoTH() ? 'hoje' : ptDataBr(m.d)) + '</span>' : ''; }
-var PT_TIPO = { te: 'TE', sb: 'SB', md: 'MD', video: 'VÍDEO', hw: 'HW', hwc: 'HWC', app: 'APP', outro: '' };
+var PT_TIPO = { te: 'TE', sb: 'SB', md: 'MD', video: 'VÍDEO', app: 'APP', outro: '' };   /* sem HW: desde out/2026 a tarefa é feita em aula */
 /* a cor de cada livro: a mesma do card do estágio no Modo Kids do portal (KIDS.livros); teens com as deles */
 var PT_CORES = [[/magic\s*way\s*yellow/i, '#EAB308'], [/magic\s*way\s*blue/i, '#2563EB'], [/magic\s*way\s*red/i, '#DC2626'], [/magic\s*way\s*green/i, '#16A34A'],
   [/hello\s*a\b/i, '#EC4899'], [/hello\s*b\b/i, '#A855F7'], [/slide/i, '#F97316'], [/see.?saw/i, '#0EA5A0'], [/merry/i, '#E11D48'], [/maze/i, '#6366F1'],
@@ -3080,14 +3095,8 @@ function ptDesenha() {
       });
       if ((L.games || []).length) corpo += '<div class="pt-games">' + ptTick(nome, 'games:' + s.de, s.de) + '<span class="t"><b>🎲 Games e extras</b>' + esc(L.games.join('\n')) + ptQuando(nome, 'games:' + s.de) + '</span></div>';
     }
-    /* o que ficou para trás: atividades de semanas anteriores deste livro ainda sem tique, só a partir do primeiro
-       tique dele (antes disso a turma não usava o plano aqui, e acusar o semestre inteiro seria só ruído) */
-    var desde = '';
-    Object.keys(ptEstado.marcas).forEach(function (ch) { var m = ptEstado.marcas[ch]; if (ch.indexOf(nome + '|') === 0 && m.s && (!desde || m.s < desde)) desde = m.s; });
-    var pend = [];
-    if (desde) (b.semanas || []).slice(0, sw.i).forEach(function (sp) { if (sp.de < desde) return; var Lp = (sp.livros || {})[nome]; if (!Lp) return; Lp.itens.forEach(function (it) { if (!ptMarca(nome, it.k)) pend.push({ s: sp, it: it }); }); });
-    if (ptEstado.carregou && pend.length) corpo += '<details class="pt-pend"><summary>⏳ ' + pend.length + ' atividade' + (pend.length > 1 ? 's' : '') + ' de semanas anteriores sem tique</summary>' +
-      pend.slice(-40).map(function (p) { return '<div class="pt-it">' + ptTick(nome, p.it.k, p.s.de) + '<span class="t"><span class="pt-tipo">' + esc(ptDataBr(p.s.de)) + '</span>' + esc(p.it.t) + '</span></div>'; }).join('') + '</details>';
+    var vigente = ptLicaoVigente(b, nome, sw.i);
+    corpo = ptAtrasadas(b, nome, livro, sw, vigente) + corpo;
     var cor = ptCor(livro), claro = parseInt(cor.slice(1), 16), lum = (0.299 * (claro >> 16) + 0.587 * ((claro >> 8) & 255) + 0.114 * (claro & 255)) / 255;
     var iL = ptEstado.livros.indexOf(livro), nL = ptEstado.livros.length;
     var mover = nL > 1 ? '<span class="mover"><button type="button" data-ptmv="-1" data-ptlv="' + esc(livro) + '"' + (iL === 0 ? ' disabled' : '') + ' aria-label="Subir ' + esc(livro) + '" title="Fazer antes">↑</button>' +
@@ -3095,7 +3104,7 @@ function ptDesenha() {
       '<span class="alca" title="Segure e arraste para mudar a ordem" aria-hidden="true">⠿</span></span>' : '';
     html += '<div class="pt-livro" draggable="' + (nL > 1) + '" data-ptlivro="' + esc(livro) + '" style="' + ptCorVars(cor) + '"><div class="topo"' + (lum > 0.6 ? ' style="color:#3a2e00"' : '') + '><h3>' + esc(livro) + '</h3>' + (L && L.licao ? '<span class="lic"' + (L.licaoInferida ? ' title="Lição deduzida pelas páginas do livro (o plano traz só as páginas)"' : '') + '>' + esc(L.licao) + '</span>' : '') + mover + '</div>' +
       '<div class="quem">' + ptEstado.porLivro[livro].map(function (a) { return '<span>' + esc(ptPrimeiro(a.nome)) + '</span>'; }).join('') + '</div>' +
-      '<div class="corpo">' + corpo + ptBotoesMaterial(livro, ptLicaoVigente(b, nome, sw.i)) + '</div></div>';
+      '<div class="corpo">' + corpo + ptBotoesMaterial(livro, vigente) + '</div></div>';
   });
   html += '</div>';
   if (!ptEstado.carregou) html += '<div class="pt-nada" style="text-align:center">🔄 Lendo o que já foi feito…</div>';
@@ -3107,6 +3116,44 @@ function ptDesenha() {
   cx.querySelectorAll('.pt-tick').forEach(function (bt) { bt.addEventListener('click', function () { ptAlterna(bt.dataset.ptl, bt.dataset.ptk, bt.dataset.pts); }); });
   cx.querySelectorAll('[data-ptmv]').forEach(function (bt) { bt.addEventListener('click', function () { ptMoveLivro(bt.dataset.ptlv, Number(bt.dataset.ptmv)); }); });
   ptLigaArrastarLivros(cx);
+}
+/* AS ATRASADAS (professores, 27/10/2026): a atividade do livro que ficou sem tique numa semana anterior vem para o
+   TOPO do cartão da semana que está na tela, em vermelho e com a semana de onde veio, para o professor não ter de
+   voltar semana a semana caçando bolinha perdida. Tiquei hoje: ela fica à vista, marcada, até o fim do dia. Só a partir
+   do primeiro tique do livro (antes disso a turma não usava o plano aqui, e acusar o semestre inteiro seria só ruído).
+   Se a atrasada é de outra lição, os áudios e vídeos DAQUELA lição vêm junto. Games e extras não atrasam. */
+function ptAtrasadas(b, nome, livro, sw, vigente) {
+  if (!ptEstado.carregou) return '';
+  var desde = '', hoje = diaAlvoTH(), lista = [], lics = [];
+  Object.keys(ptEstado.marcas).forEach(function (ch) { var m = ptEstado.marcas[ch]; if (ch.indexOf(nome + '|') === 0 && m.s && (!desde || m.s < desde)) desde = m.s; });
+  if (!desde) return '';
+  (b.semanas || []).slice(0, sw.i).forEach(function (sp, i) {
+    var Lp = (sp.livros || {})[nome]; if (sp.de < desde || !Lp || sp.de >= sw.s.de) return;
+    var aberta = false;
+    Lp.itens.forEach(function (it) {
+      var m = ptMarca(nome, it.k);
+      if (!m) aberta = true;
+      if (!m || (m.d === hoje && m.s === sp.de)) lista.push({ s: sp, it: it });
+    });
+    var lic = aberta && ptLicaoVigente(b, nome, i);
+    if (lic && lic !== vigente && lics.indexOf(lic) < 0) lics.push(lic);
+  });
+  var abertas = lista.filter(function (p) { return !ptMarca(nome, p.it.k); }).length;
+  if (!lista.length) return '';
+  var mostra = lista.slice(-40), escondidas = lista.length - mostra.length;
+  function quando(sp) {
+    var n = Math.round((Date.parse(sw.s.de) - Date.parse(sp.de)) / (7 * 864e5));
+    return n <= 1 ? 'da semana passada' : n === 2 ? 'da semana retrasada' : 'de ' + n + ' semanas atrás';
+  }
+  return '<div class="pt-atras"><div class="tit">⏰ ' + (abertas ? abertas + ' atividade' + (abertas > 1 ? 's' : '') + ' atrasada' + (abertas > 1 ? 's' : '') : 'Atrasadas em dia ✓') +
+    '<small>ficaram sem tique em aulas anteriores</small></div>' +
+    (escondidas ? '<div class="pt-nada">+ ' + escondidas + ' mais antiga' + (escondidas > 1 ? 's' : '') + ' (volte nas semanas para ver)</div>' : '') +
+    mostra.map(function (p) {
+      var Lp = p.s.livros[nome];
+      return '<div class="pt-it">' + ptTick(nome, p.it.k, p.s.de) + '<span class="t"><span class="pt-atr">atrasada ' + quando(p.s) + ' · ' + esc(ptDataBr(p.s.de)) + (Lp.licao ? ' · ' + esc(Lp.licao) : '') + '</span>' +
+        (PT_TIPO[p.it.tipo] ? '<span class="pt-tipo ' + esc(p.it.tipo) + '">' + PT_TIPO[p.it.tipo] + '</span>' : '') + esc(p.it.t) + ptQuando(nome, p.it.k) + '</span></div>';
+    }).join('') +
+    lics.map(function (l) { return ptBotoesMaterial(livro, l); }).join('') + '</div>';
 }
 /* Os botões do material abrem o PORTAL (Modo Kids para os livros infantis, a chave do professor para os Teens, que
    ficam fora do Modo Kids) já no livro, nos áudios com a lição da semana aberta, ou nos vídeos com os dela em
@@ -3159,14 +3206,22 @@ function ptNotaLivro(livro) {
   ptEstado.notaLivroEl = ptEstado.notaLivroEl || {};
   if (ptEstado.notaLivroEl[livro]) return ptEstado.notaLivroEl[livro];
   var box = document.createElement('div'); box.className = 'pt-nota pt-nota-livro';
-  box.innerHTML = '<label>📝 Anotações deste livro <small>valem para ' + esc(livro) + ', em todas as semanas</small></label>' +
-    '<textarea maxlength="4000" placeholder="Ex.: o grupo deste livro precisa revisar a Lesson 3, quem está atrasado, o que ficou para a próxima…"></textarea><div class="st"></div>';
+  /* recolhida, como a anotação de cada aluno (professores, 27/10/2026): o botão avisa quando já tem texto */
+  box.innerHTML = '<button type="button" class="pt-nota-bt" aria-expanded="false">📝 Anotações deste livro<span class="tem"></span><span class="seta" aria-hidden="true">▾</span></button>' +
+    '<div class="pt-nota-corpo" hidden><small>valem para ' + esc(livro) + ', em todas as semanas</small>' +
+    '<textarea maxlength="4000" placeholder="Ex.: o grupo deste livro precisa revisar a Lesson 3, quem está atrasado, o que ficou para a próxima…"></textarea><div class="st"></div></div>';
+  var bt = box.querySelector('.pt-nota-bt'), corpoN = box.querySelector('.pt-nota-corpo');
+  bt.addEventListener('click', function () {
+    corpoN.hidden = !corpoN.hidden; bt.setAttribute('aria-expanded', String(!corpoN.hidden)); box.classList.toggle('aberta', !corpoN.hidden);
+    if (!corpoN.hidden) box.querySelector('textarea').focus();
+  });
+  box._marca = function () { var tem = !!box.querySelector('textarea').value.trim(); bt.classList.toggle('tem', tem); bt.querySelector('.tem').textContent = tem ? ' · tem anotação' : ''; };
   var ta = box.querySelector('textarea'), st = box.querySelector('.st'), timer = null;
   var salvo = ((ptEstado.notasLivro || {})[ptNotaLivroChave(livro)] || {}).texto || '';
-  ta.value = salvo; ta.disabled = !ptEstado.carregou;
+  ta.value = salvo; ta.disabled = !ptEstado.carregou; box._marca();
   var turma = ptEstado.turma, escola = ptEstado.escola;
   function salvar() {
-    var v = ta.value.trim();
+    var v = ta.value.trim(); box._marca();
     if (v === salvo.trim()) return;
     st.textContent = 'Salvando…';
     post({ action: 'planoTurmaMarca', escola: escola, turma: turma, nota: v, notaLivro: ptNotaLivroChave(livro) }).then(function () { salvo = v; st.textContent = '✓ Salvo'; })

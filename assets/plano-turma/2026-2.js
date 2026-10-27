@@ -68,8 +68,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "f2021205",
-         "t": "HW - cortar Worksheet A",
-         "tipo": "hw"
+         "t": "Cortar Worksheet A",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -138,8 +138,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "d68f782f",
-         "t": "HW Worksheet p.1",
-         "tipo": "hw"
+         "t": "Worksheet p.1",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -234,8 +234,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "b6533d16",
-         "t": "HW pg: 9 and 10 - in class pg: 11 (video act 3)",
-         "tipo": "hw"
+         "t": "Jolly’s Book p. 9 and 10, p. 11 (video act 3)",
+         "tipo": "video"
         }
        ],
        "games": [
@@ -258,8 +258,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "bc3eb9e3",
-         "t": "HW Worksheet p.2",
-         "tipo": "hw"
+         "t": "Worksheet p.2",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -356,8 +356,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "ebafce21",
-         "t": "HW pg 12 and 13 - in class pg: 14 (video act 3)",
-         "tipo": "hw"
+         "t": "Jolly’s Book p. 12 and 13, p. 14 (video act 3)",
+         "tipo": "video"
         }
        ],
        "games": [
@@ -380,8 +380,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "fbfd3704",
-         "t": "HW Worksheet p. 6",
-         "tipo": "hw"
+         "t": "Worksheet p. 6",
+         "tipo": "outro"
         },
         {
          "k": "3424f84e",
@@ -479,8 +479,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "e5fe5f8e",
-         "t": "HW Jolly’s pg 15 to 17",
-         "tipo": "hw"
+         "t": "Jolly’s pg 15 to 17",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -503,8 +503,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "6f739a9e",
-         "t": "HW: Worksheet p. 5",
-         "tipo": "hw"
+         "t": "Worksheet p. 5",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -630,8 +630,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "b67e001d",
-         "t": "HW: cyber missions 5+6",
-         "tipo": "hw"
+         "t": "Cyber missions 5+6",
+         "tipo": "app"
         }
        ],
        "games": [
@@ -704,8 +704,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "7491ed3b",
-         "t": "HW Jolly’s playbook pg 22 and 23",
-         "tipo": "hw"
+         "t": "Jolly’s playbook pg 22 and 23",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -728,8 +728,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "4709dfa9",
-         "t": "HW: Worksheet p. 9",
-         "tipo": "hw"
+         "t": "Worksheet p. 9",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -819,8 +819,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "fd52fc79",
-         "t": "HW Jolly’s playbook pg23",
-         "tipo": "hw"
+         "t": "Jolly’s playbook pg23",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -843,8 +843,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "c29829aa",
-         "t": "HW: Cyber Missions 7+8",
-         "tipo": "hw"
+         "t": "Cyber Missions 7+8",
+         "tipo": "app"
         }
        ],
        "games": [
@@ -916,8 +916,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "e6b976eb",
-         "t": "HW Jolly Play’s Book: pg. 24/25",
-         "tipo": "hw"
+         "t": "Jolly Play’s Book: pg. 24/25",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -940,8 +940,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "447f4731",
-         "t": "HW: Buddy’s app",
-         "tipo": "hw"
+         "t": "Buddy’s app",
+         "tipo": "app"
         }
        ],
        "games": [
@@ -1017,8 +1017,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "19e698be",
-         "t": "HW jolly´s Play Book pg. 26",
-         "tipo": "hw"
+         "t": "Jolly´s Play Book pg. 26",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -1041,8 +1041,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "4575b522",
-         "t": "HW: Cyber Missions 9/10",
-         "tipo": "hw"
+         "t": "Cyber Missions 9/10",
+         "tipo": "app"
         },
         {
          "k": "1d6b49f7",
@@ -1119,8 +1119,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "bb0fc473",
-         "t": "HW Jolly´s Play Book pg. 27",
-         "tipo": "hw"
+         "t": "Jolly´s Play Book pg. 27",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -1143,8 +1143,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "af43a2fc",
-         "t": "HW: Worksheet p. 12 (if there wasn’t enough time in the previous class)",
-         "tipo": "hw"
+         "t": "Worksheet p. 12 (if there wasn’t enough time in the previous class)",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -1216,8 +1216,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "a230393b",
-         "t": "HW Jolly´s Play Book pg. 28",
-         "tipo": "hw"
+         "t": "Jolly´s Play Book pg. 28",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -1240,8 +1240,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "f5b6b63d",
-         "t": "HW: Cyber Missions",
-         "tipo": "hw"
+         "t": "Cyber Missions",
+         "tipo": "app"
         },
         {
          "k": "5308bd47",
@@ -1326,8 +1326,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "70771c05",
-         "t": "HW Jolly´s Play Book pg.29",
-         "tipo": "hw"
+         "t": "Jolly´s Play Book pg.29",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -1350,8 +1350,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "9aa65e69",
-         "t": "HW: Worksheet p. 17",
-         "tipo": "hw"
+         "t": "Worksheet p. 17",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -1422,8 +1422,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "60b4b7d2",
-         "t": "HW Jolly´s Play Book pg. 30",
-         "tipo": "hw"
+         "t": "Jolly´s Play Book pg. 30",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -1446,8 +1446,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "158580f3",
-         "t": "HW: Cyber Mission",
-         "tipo": "hw"
+         "t": "Cyber Mission",
+         "tipo": "app"
         },
         {
          "k": "6408f978",
@@ -1529,8 +1529,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "c833f238",
-         "t": "HW Jolly´s Play Book pg. 31",
-         "tipo": "hw"
+         "t": "Jolly´s Play Book pg. 31",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -1553,8 +1553,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "db4f137c",
-         "t": "HW: Cyber Missions",
-         "tipo": "hw"
+         "t": "Cyber Missions",
+         "tipo": "app"
         },
         {
          "k": "a700a8a5",
@@ -1628,8 +1628,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "4b5e9f7b",
-         "t": "HW Jolly´s Play Book pg. 32",
-         "tipo": "hw"
+         "t": "Jolly´s Play Book pg. 32",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -1652,8 +1652,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "d4b8580b",
-         "t": "HW: Worksheet p. 23",
-         "tipo": "hw"
+         "t": "Worksheet p. 23",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -1721,8 +1721,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "083248c8",
-         "t": "HW Jolly´s Play Book pg. 33",
-         "tipo": "hw"
+         "t": "Jolly´s Play Book pg. 33",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -1745,8 +1745,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "f6fb6bbb",
-         "t": "HW: Cyber Missions",
-         "tipo": "hw"
+         "t": "Cyber Missions",
+         "tipo": "app"
         },
         {
          "k": "e1657d88",
@@ -1823,8 +1823,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "be0a3d10",
-         "t": "HW Jolly´s Play Book pg. 34",
-         "tipo": "hw"
+         "t": "Jolly´s Play Book pg. 34",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -1847,8 +1847,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "5aa7093d",
-         "t": "HW: Cyber Missions",
-         "tipo": "hw"
+         "t": "Cyber Missions",
+         "tipo": "app"
         }
        ],
        "games": [
@@ -1925,8 +1925,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "6b34795c",
-         "t": "HW Jolly´s Play Book pg. 35",
-         "tipo": "hw"
+         "t": "Jolly´s Play Book pg. 35",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -1949,8 +1949,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "f54a949c",
-         "t": "HW: Worksheet p. 25",
-         "tipo": "hw"
+         "t": "Worksheet p. 25",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -2145,8 +2145,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "385783d1",
-         "t": "HW: Worksheet p. 1",
-         "tipo": "hw"
+         "t": "Worksheet p. 1",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -2162,11 +2162,6 @@ window.PLANO_TURMA["2026-2"] = {
          "k": "d761a50d",
          "t": ": SB p.8-13",
          "tipo": "outro"
-        },
-        {
-         "k": "f0e68e18",
-         "t": "HW",
-         "tipo": "hw"
         },
         {
          "k": "2333ad2b",
@@ -2235,8 +2230,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "d82aa2a1",
-         "t": "HW: WB -p.9",
-         "tipo": "hw"
+         "t": "WB -p.9",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -2272,11 +2267,6 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "L2",
        "itens": [
         {
-         "k": "fa1c3c00",
-         "t": "HWC: Worksheet p 2 and 3",
-         "tipo": "hwc"
-        },
-        {
          "k": "58fbba49",
          "t": "TE p. 24 to 31",
          "tipo": "te"
@@ -2304,11 +2294,6 @@ window.PLANO_TURMA["2026-2"] = {
          "k": "a5600921",
          "t": "SB p. 10 (WB)+  p.20-25",
          "tipo": "sb"
-        },
-        {
-         "k": "1269d03d",
-         "t": "HW",
-         "tipo": "hw"
         },
         {
          "k": "e3b06901",
@@ -2362,8 +2347,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "3f40f15e",
-         "t": "HW: Worksheet p. 4",
-         "tipo": "hw"
+         "t": "Worksheet p. 4",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -2381,8 +2366,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "b854c4cd",
-         "t": "HW: WB p.13",
-         "tipo": "hw"
+         "t": "WB p.13",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -2419,11 +2404,6 @@ window.PLANO_TURMA["2026-2"] = {
        "licao": "L3",
        "itens": [
         {
-         "k": "2a4653b1",
-         "t": "HWC:  Worksheet p. 4",
-         "tipo": "hwc"
-        },
-        {
          "k": "fbd4d1da",
          "t": "TE p. 40 to 46",
          "tipo": "te"
@@ -2459,8 +2439,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "eabd38e7",
-         "t": "HW: WB p.14",
-         "tipo": "hw"
+         "t": "WB p.14",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -2506,8 +2486,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "0b85b8c0",
-         "t": "HW:Worksheet B - p.9",
-         "tipo": "hw"
+         "t": "Worksheet B - p.9",
+         "tipo": "outro"
         },
         {
          "k": "588969d5",
@@ -2530,8 +2510,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "b7ec71af",
-         "t": "HW: WB p.15",
-         "tipo": "hw"
+         "t": "WB p.15",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -2579,11 +2559,6 @@ window.PLANO_TURMA["2026-2"] = {
          "k": "2d903cf6",
          "t": "SB p. 34 to 37",
          "tipo": "sb"
-        },
-        {
-         "k": "3522a567",
-         "t": "HW: NO homework",
-         "tipo": "hw"
         }
        ],
        "games": [
@@ -2601,8 +2576,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "5930a078",
-         "t": "HW: WB p. 16",
-         "tipo": "hw"
+         "t": "WB p. 16",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -2643,8 +2618,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "662caba0",
-         "t": "HW: Worksheet p. 11 (Cut out the cards)",
-         "tipo": "hw"
+         "t": "Worksheet p. 11 (Cut out the cards)",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -2659,11 +2634,6 @@ window.PLANO_TURMA["2026-2"] = {
          "k": "4e2146d5",
          "t": "SB -p.44-49",
          "tipo": "sb"
-        },
-        {
-         "k": "fe44d80b",
-         "t": "HW",
-         "tipo": "hw"
         },
         {
          "k": "b6ed515b",
@@ -2718,8 +2688,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "d2ff06d0",
-         "t": "HW: RW the Story time in your house (p. 44)",
-         "tipo": "hw"
+         "t": "RW the Story time (p. 44)",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -2739,11 +2709,6 @@ window.PLANO_TURMA["2026-2"] = {
          "k": "2fced68d",
          "t": "SB p. 50-55",
          "tipo": "sb"
-        },
-        {
-         "k": "eac73885",
-         "t": "HW",
-         "tipo": "hw"
         },
         {
          "k": "e413faa7",
@@ -2788,8 +2753,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "62fbb8c6",
-         "t": "HW:  SB p. 48 exercise B",
-         "tipo": "hw"
+         "t": "SB p. 48 exercise B",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -2809,11 +2774,6 @@ window.PLANO_TURMA["2026-2"] = {
          "k": "7eb42b69",
          "t": "p.56-58",
          "tipo": "outro"
-        },
-        {
-         "k": "a2e7e1de",
-         "t": "HW",
-         "tipo": "hw"
         },
         {
          "k": "110384a5",
@@ -2859,8 +2819,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "bc91a203",
-         "t": "HW: Play Take the right Photo game again in your house (SB p. 50)",
-         "tipo": "hw"
+         "t": "Play Take the right Photo game again (SB p. 50)",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -2875,11 +2835,6 @@ window.PLANO_TURMA["2026-2"] = {
          "k": "90950dd0",
          "t": "p. 59-63",
          "tipo": "outro"
-        },
-        {
-         "k": "5a46cdc6",
-         "t": "HW",
-         "tipo": "hw"
         },
         {
          "k": "4631148a",
@@ -2930,8 +2885,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "e35d483b",
-         "t": "HW: Worksheet p. 15 (Cut out the cards)",
-         "tipo": "hw"
+         "t": "Worksheet p. 15 (Cut out the cards)",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -2951,11 +2906,6 @@ window.PLANO_TURMA["2026-2"] = {
          "k": "ab0771f7",
          "t": "Vocabulary TE p.103",
          "tipo": "outro"
-        },
-        {
-         "k": "d6dff974",
-         "t": "HW",
-         "tipo": "hw"
         },
         {
          "k": "463db4d8",
@@ -3007,11 +2957,6 @@ window.PLANO_TURMA["2026-2"] = {
          "k": "329c8f14",
          "t": "SB p. 59 to 63",
          "tipo": "sb"
-        },
-        {
-         "k": "02b6dc5c",
-         "t": "HW: No homework",
-         "tipo": "hw"
         }
        ],
        "games": [
@@ -3026,11 +2971,6 @@ window.PLANO_TURMA["2026-2"] = {
          "k": "bfa8a6a0",
          "t": "p.71 - 73",
          "tipo": "outro"
-        },
-        {
-         "k": "a14dcae6",
-         "t": "HW",
-         "tipo": "hw"
         },
         {
          "k": "dd37eab6",
@@ -3082,8 +3022,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "b37bb9cc",
-         "t": "HW: Worksheet p. 17 (Cut out the cards)",
-         "tipo": "hw"
+         "t": "Worksheet p. 17 (Cut out the cards)",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -3098,11 +3038,6 @@ window.PLANO_TURMA["2026-2"] = {
          "k": "1ca0a9cd",
          "t": "p. 74-77",
          "tipo": "outro"
-        },
-        {
-         "k": "6b004c01",
-         "t": "HW",
-         "tipo": "hw"
         },
         {
          "k": "e7e22306",
@@ -3149,8 +3084,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "57483c1b",
-         "t": "HW: Worksheet p. 18 and 19 (Cut out the cards)",
-         "tipo": "hw"
+         "t": "Worksheet p. 18 and 19 (Cut out the cards)",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -3165,11 +3100,6 @@ window.PLANO_TURMA["2026-2"] = {
          "k": "ee71fd7c",
          "t": "p. 78-81",
          "tipo": "outro"
-        },
-        {
-         "k": "7924af69",
-         "t": "HW",
-         "tipo": "hw"
         },
         {
          "k": "c59a1103",
@@ -3215,8 +3145,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "89d855e2",
-         "t": "HW: SB p. 76 exercise B",
-         "tipo": "hw"
+         "t": "SB p. 76 exercise B",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -3231,11 +3161,6 @@ window.PLANO_TURMA["2026-2"] = {
          "k": "544fb97e",
          "t": "p. 82-87",
          "tipo": "outro"
-        },
-        {
-         "k": "be07bf30",
-         "t": "HW",
-         "tipo": "hw"
         },
         {
          "k": "4ff0b85b",
@@ -3283,8 +3208,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "fe57b85b",
-         "t": "HW: Worksheet p. 20",
-         "tipo": "hw"
+         "t": "Worksheet p. 20",
+         "tipo": "outro"
         }
        ],
        "games": [
@@ -3344,11 +3269,6 @@ window.PLANO_TURMA["2026-2"] = {
          "k": "0957fd68",
          "t": "SB p. 82 to 85",
          "tipo": "sb"
-        },
-        {
-         "k": "33b29243",
-         "t": "HW: No homework",
-         "tipo": "hw"
         }
        ],
        "games": [
@@ -3541,8 +3461,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "dc2cfa6e",
-         "t": "HW pg. 80",
-         "tipo": "hw"
+         "t": "SB p. 80",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -3571,8 +3491,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "960ccfcf",
-         "t": "HW - p. 12/13",
-         "tipo": "hw"
+         "t": "SB p. 12/13",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -3617,8 +3537,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "d0d09b10",
-         "t": "HW p. 81",
-         "tipo": "hw"
+         "t": "SB p. 81",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -3647,8 +3567,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "e23122cd",
-         "t": "HW - p. 20/21",
-         "tipo": "hw"
+         "t": "SB p. 20/21",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -3704,8 +3624,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "b8d261dc",
-         "t": "HW p. 82/83",
-         "tipo": "hw"
+         "t": "SB p. 82/83",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -3732,8 +3652,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "01233fb7",
-         "t": "HW - p. 28/29",
-         "tipo": "hw"
+         "t": "SB p. 28/29",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -3790,8 +3710,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "4d2524e6",
-         "t": "HW p. 84",
-         "tipo": "hw"
+         "t": "SB p. 84",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -3818,8 +3738,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "8bddf6f0",
-         "t": "HW - p. 38/39",
-         "tipo": "hw"
+         "t": "SB p. 38/39",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -3878,8 +3798,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "dc891b4c",
-         "t": "HW p. 85",
-         "tipo": "hw"
+         "t": "SB p. 85",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -3912,8 +3832,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "779f4a7c",
-         "t": "HW - p. 36 (B)",
-         "tipo": "hw"
+         "t": "SB p. 36 (B)",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -3973,8 +3893,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "d6a3f1ca",
-         "t": "HW p. 86/87",
-         "tipo": "hw"
+         "t": "SB p. 86/87",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -4001,8 +3921,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "d6bead49",
-         "t": "HW - p. 46/47",
-         "tipo": "hw"
+         "t": "SB p. 46/47",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -4057,8 +3977,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "41943277",
-         "t": "HW p. 88",
-         "tipo": "hw"
+         "t": "SB p. 88",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -4091,8 +4011,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "56257558",
-         "t": "HW - p. 54/55",
-         "tipo": "hw"
+         "t": "SB p. 54/55",
+         "tipo": "sb"
         }
        ]
       }
@@ -4138,8 +4058,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "faf1d348",
-         "t": "HW p. 89",
-         "tipo": "hw"
+         "t": "SB p. 89",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -4240,8 +4160,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "1960f18f",
-         "t": "HW - p. 68/69",
-         "tipo": "hw"
+         "t": "SB p. 68/69",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -4291,8 +4211,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "4ca81bcc",
-         "t": "HW p. 90",
-         "tipo": "hw"
+         "t": "SB p. 90",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -4324,8 +4244,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "598826f1",
-         "t": "HW - p. 66 (B)",
-         "tipo": "hw"
+         "t": "SB p. 66 (B)",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -4364,8 +4284,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "8a9cb375",
-         "t": "HW p.91",
-         "tipo": "hw"
+         "t": "SB p. 91",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -4393,8 +4313,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "8b7fb20b",
-         "t": "HW - p. 76/77",
-         "tipo": "hw"
+         "t": "SB p. 76/77",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -4447,8 +4367,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "d1e322d4",
-         "t": "HW p. 92/93",
-         "tipo": "hw"
+         "t": "SB p. 92/93",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -4476,8 +4396,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "fbdb2a2b",
-         "t": "HW - p. 84/85",
-         "tipo": "hw"
+         "t": "SB p. 84/85",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -4532,8 +4452,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "3c8c1b66",
-         "t": "HW p. 94",
-         "tipo": "hw"
+         "t": "SB p. 94",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -4570,8 +4490,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "e6b48fa0",
-         "t": "HW - p. 94/95",
-         "tipo": "hw"
+         "t": "SB p. 94/95",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -4616,8 +4536,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "f4e195f8",
-         "t": "HW p. 95",
-         "tipo": "hw"
+         "t": "SB p. 95",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -4649,8 +4569,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "5973a6d7",
-         "t": "HW - p. 102/103",
-         "tipo": "hw"
+         "t": "SB p. 102/103",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -4695,8 +4615,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "03e1b868",
-         "t": "HW p. 96",
-         "tipo": "hw"
+         "t": "SB p. 96",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -4723,8 +4643,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "8045ad67",
-         "t": "HW - p. 110/111",
-         "tipo": "hw"
+         "t": "SB p. 110/111",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -4768,8 +4688,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "ebb682a5",
-         "t": "HW p. 97",
-         "tipo": "hw"
+         "t": "SB p. 97",
+         "tipo": "sb"
         }
        ],
        "games": [
@@ -4846,8 +4766,8 @@ window.PLANO_TURMA["2026-2"] = {
         },
         {
          "k": "08dda70d",
-         "t": "HW p. 98/99",
-         "tipo": "hw"
+         "t": "SB p. 98/99",
+         "tipo": "sb"
         }
        ],
        "games": [

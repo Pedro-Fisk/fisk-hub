@@ -390,6 +390,11 @@ for b in blocos:
                 k = chave(s['de'], nome, it['t']); vistos[k] = vistos.get(k, 0) + 1
                 it['k'] = k + (str(vistos[k]) if vistos[k] > 1 else '')
 
+# sem tarefa de casa desde out/2026: o HW vira atividade de aula (as chaves acima já usaram o texto original)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from sem_tarefa import semTarefa
+semTarefa(blocos)
+
 # ── as ligações com o Drive ────────────────────────────────────────────────
 MUS, RA, COM, MAT = musicas(), readingActivities(), comunicativas(), materiais()
 def raDe(titulo):
