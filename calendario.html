@@ -191,6 +191,7 @@ if (EMBED) { document.body.classList.add('embed'); var bse = document.createElem
       <span class="semana" id="rotSemana"></span>
       <span class="quem" id="quem"></span>
       <select id="verComo" hidden aria-label="Ver a semana de outro professor"></select>
+      <button type="button" id="btAgenda" title="Levar as suas aulas para o Google Agenda">📅 Google Agenda</button>
     </div>
     <div class="tira" id="tira"></div>
     <p class="st" id="st"></p>
@@ -316,7 +317,12 @@ function carregaExtras() {
   var ano = new Date().getFullYear(), c = como();
   return Promise.all([
     Promise.all([ano, ano + 1].map(function (a) { return post({ action: 'calList', publico: 'pedag', ano: String(a) }).then(function (j) { return j.itens || []; }).catch(function () { return []; }); }))
-      .then(function (ls) { dados.cal = [].concat.apply([], ls); }),
+      .then(function (ls) {
+        dados.cal = [].concat.apply([], ls);
+        /* os dias sem aula ficam guardados para a faixa "Sua próxima aula" da home não anunciar aula em feriado */
+        try { localStorage.setItem('cal:semaula', JSON.stringify(dados.cal.filter(function (it) { return it.tipo === 'feriado' || it.tipo === 'ferias'; })
+          .map(function (it) { return { i: it.inicio, f: it.fim || it.inicio, u: it.unidades || [] }; }))); } catch (e) {}
+      }),
     Promise.all(minhasEscolas().map(function (escola) {
       return post({ action: 'plantaoList', unidade: escola }).then(function (j) { return (j.itens || []).map(function (it) { it.escola = escola; return it; }); }).catch(function () { return []; });
     })).then(function (ls) { var nome = eu(); dados.lc = [].concat.apply([], ls).filter(function (it) { return mesmaPessoa(it.professor, nome); }); }),
@@ -379,8 +385,25 @@ function selos(e) {
     (e.anivs && e.anivs.length ? '<span class="selo aniv">🎂 ' + e.anivs.map(function (a) { return esc(String(a.nome).split(' ')[0]); }).join(', ') + '</span>' : '') +
     (e.exps && e.exps.length && e.tipo !== 'exp' ? '<span class="selo exp">🧪 ' + e.exps.length + ' experimental' + (e.exps.length > 1 ? 'is' : '') + '</span>' : '');
 }
-function rotMeta(e) {
-  if (e.tipo === 'aula') return e.turma.alunos.length + ' aluno' + (e.turma.alunos.length === 1 ? '' : 's') + (e.turma.escola && minhasEscolas().length > 1 ? ' · ' + esc(e.turma.escola) : '');
+/* A LIÇÃO DO DIA (26/10/2026, aprovada pelo Pedro): a lição prevista que mais se repete entre os alunos da turma
+   (licaoPrevista do card, a mesma régua do atraso) e quantos estão atrás dela. Ela diz onde a turma deveria estar
+   AGORA, por isso só aparece nas aulas desta semana: numa semana futura ou passada ela seria um chute. */
+function licaoDaTurma(t) {
+  var conta = {}, atr = 0;
+  (t.alunos || []).forEach(function (a) {
+    var l = String(a.licaoPrevista || '').trim(); if (l) conta[l] = (conta[l] || 0) + 1;
+    if (Number(a.aulasAtraso) >= 1) atr++;
+  });
+  var lic = Object.keys(conta).sort(function (x, y) { return conta[y] - conta[x]; })[0] || '';
+  return { licao: lic, atrasados: atr };
+}
+function estaSemana(d) { var s0 = inicioDaSemana(new Date()); return d && iso(d) >= iso(s0) && iso(d) <= iso(somaDias(s0, 6)); }
+function rotMeta(e, d) {
+  if (e.tipo === 'aula') {
+    var ld = estaSemana(d) ? licaoDaTurma(e.turma) : null;
+    return e.turma.alunos.length + ' aluno' + (e.turma.alunos.length === 1 ? '' : 's') + (e.turma.escola && minhasEscolas().length > 1 ? ' · ' + esc(e.turma.escola) : '') +
+      (ld && ld.licao ? ' · 📖 ' + esc(ld.licao) : '') + (ld && ld.atrasados ? ' · ' + ld.atrasados + ' atrasado' + (ld.atrasados === 1 ? '' : 's') : '');
+  }
   if (e.tipo === 'plantao') return 'Learning Center';
   return '';
 }
@@ -414,7 +437,7 @@ function desenhar() {
       var top = Math.max(0, (e.ini - INI_H * 60) / 60 * alturaH), alt = Math.max(22, (e.fim - e.ini) / 60 * alturaH - 2);
       var larg = 100 / e.ncol;
       h += '<button type="button" class="ev ' + e.tipo + (e.semaula ? ' semaula' : '') + '" data-ev="' + k + '" style="--ev-cor:' + e.cor + ';top:' + top + 'px;height:' + alt + 'px;left:calc(' + (e.col * larg) + '% + 3px);right:auto;width:calc(' + larg + '% - 6px)">' +
-        '<span class="h">' + hm(e.ini) + '–' + hm(e.fim) + '</span><span class="t">' + esc(e.titulo) + '</span><span class="m">' + rotMeta(e) + '</span>' + selos(e) + '</button>';
+        '<span class="h">' + hm(e.ini) + '–' + hm(e.fim) + '</span><span class="t">' + esc(e.titulo) + '</span><span class="m">' + rotMeta(e, d) + '</span>' + selos(e) + '</button>';
     });
     if (ehHoje) { var n = new Date(), min = n.getHours() * 60 + n.getMinutes(); if (min >= INI_H * 60 && min <= FIM_H * 60) h += '<div class="agora" style="top:' + ((min - INI_H * 60) / 60 * alturaH) + 'px"></div>'; }
     h += '</div>';
@@ -432,7 +455,7 @@ function desenhar() {
   $('diaLista').innerHTML = (topo ? '<div style="margin:.2rem 0 .6rem">' + topo + '</div>' : '') + (lista.length ? lista.map(function (e) {
     var k = EVS.push({ e: e, d: dSel }) - 1;
     return '<button type="button" class="cartao ' + e.tipo + (e.semaula ? ' semaula' : '') + '" data-ev="' + k + '" style="--ev-cor:' + e.cor + '"><span class="hh">' + hm(e.ini) + '<small>até ' + hm(e.fim) + '</small></span>' +
-      '<span><span class="tt">' + esc(e.titulo) + '</span><br><span class="mm">' + rotMeta(e) + '</span><br>' + selos(e) + '</span></button>';
+      '<span><span class="tt">' + esc(e.titulo) + '</span><br><span class="mm">' + rotMeta(e, dSel) + '</span><br>' + selos(e) + '</span></button>';
   }).join('') : '<div class="vazio">Nenhuma aula neste dia.</div>');
   /* turmas sem horário */
   $('painelSemH').hidden = !dados.semHorario.length;
@@ -446,6 +469,12 @@ function abreGaveta(k) {
   var h = '<div class="topo"><h3 id="gavTit">' + esc(e.turma ? e.turma.titulo : e.titulo) + '</h3><div class="chips">' +
     '<span class="chip">📅 ' + dataTxt + '</span><span class="chip">🕒 ' + hm(e.ini) + ' às ' + hm(e.fim) + '</span>' +
     (e.turma ? '<span class="chip">👥 ' + e.turma.alunos.length + ' aluno' + (e.turma.alunos.length === 1 ? '' : 's') + '</span>' : '') +
+    (function () {   /* a lição do dia, só nas aulas desta semana (ver licaoDaTurma) */
+      if (!e.turma || !estaSemana(d)) return '';
+      var ld = licaoDaTurma(e.turma);
+      return (ld.licao ? '<span class="chip">📖 Lição prevista: ' + esc(ld.licao) + '</span>' : '') +
+             (ld.atrasados ? '<span class="chip">⏳ ' + ld.atrasados + ' atrasado' + (ld.atrasados === 1 ? '' : 's') + '</span>' : '');
+    })() +
     (e.semaula ? '<span class="chip fer">feriado: sem aula</span>' : '') + '</div></div><div class="miolo">';
   if (e.anivs && e.anivs.length) h += '<div class="bloco"><b class="tit">🎂 Aniversário neste dia</b>' + e.anivs.map(function (a) { return '<div class="aniv-li">🎉 ' + esc(a.nome) + '</div>'; }).join('') + '</div>';
   /* a experimental com tudo o que a secretaria preencheu no portal (Pedro, 26/10/2026) */
@@ -508,6 +537,66 @@ document.addEventListener('click', function (ev) {
   var t = ev.target.closest('[data-dia]'); if (t) { diaSel = somaDias(segunda, +t.dataset.dia); desenhar(); }
 });
 document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') gavFecha(); });
+/* ── LEVAR PARA O GOOGLE AGENDA (26/10/2026, aprovado pelo Pedro) ──────────────────────────────────────────────
+   Duas portas, porque o celular não importa arquivo de agenda no app do Google:
+   · por turma: o link de "criar evento" do próprio Google Agenda, já preenchido e repetindo toda semana até o fim do
+     semestre (abre no app, no celular, e no navegador, no computador);
+   · todas de uma vez: um arquivo .ics com lembrete 15 min antes (computador e iPhone).
+   O fim do semestre é uma regra simples: 30/06 no 1º, 19/12 no 2º. Mudou a turma de horário, é só levar de novo. */
+var DIA_RR = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+function fimSemestre() { var d = new Date(); return d.getMonth() < 6 ? d.getFullYear() + '0630' : d.getFullYear() + '1219'; }
+function proxData(dias) {   /* a primeira aula a partir de hoje */
+  var d = new Date(); d.setHours(0, 0, 0, 0);
+  for (var i = 0; i < 7; i++) { var x = somaDias(d, i); if (dias.indexOf(x.getDay()) > -1) return x; }
+  return d;
+}
+function stamp(d, min) { return iso(d).replace(/-/g, '') + 'T' + ('0' + Math.floor(min / 60)).slice(-2) + ('0' + (min % 60)).slice(-2) + '00'; }
+function eventoDe(t) {
+  var d0 = proxData(t.h.dias);
+  return { titulo: 'Fisk · ' + nomeCurto(t.titulo), ini: stamp(d0, t.h.ini), fim: stamp(d0, t.h.fim),
+           rrule: 'FREQ=WEEKLY;BYDAY=' + t.h.dias.map(function (x) { return DIA_RR[x]; }).join(',') + ';UNTIL=' + fimSemestre() + 'T235959Z',
+           local: 'Fisk ' + t.escola, det: linha1(t.titulo) + ' · ' + t.alunos.length + ' alunos\nMinha aula: ' + location.origin + location.pathname.replace(/[^/]*$/, '') + 'turma-de-hoje.html#t=' + encodeURIComponent(t.escola + '|' + t.prof + '|' + t.linha) };
+}
+function linkGoogle(ev) {
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(ev.titulo) + '&dates=' + ev.ini + '/' + ev.fim +
+    '&ctz=America/Sao_Paulo&recur=' + encodeURIComponent('RRULE:' + ev.rrule) + '&location=' + encodeURIComponent(ev.local) + '&details=' + encodeURIComponent(ev.det);
+}
+function arquivoIcs(evs) {
+  var e = function (v) { return String(v).replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/[,;]/g, function (c) { return '\\' + c; }); };
+  var agora = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+  return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Fisk Hub//Minha semana//PT', 'CALSCALE:GREGORIAN',
+    'BEGIN:VTIMEZONE', 'TZID:America/Sao_Paulo', 'BEGIN:STANDARD', 'DTSTART:19700101T000000', 'TZOFFSETFROM:-0300', 'TZOFFSETTO:-0300', 'TZNAME:-03', 'END:STANDARD', 'END:VTIMEZONE']
+    .concat([].concat.apply([], evs.map(function (ev, i) {
+      return ['BEGIN:VEVENT', 'UID:fisk-' + agora + '-' + i + '@fiskhub', 'DTSTAMP:' + agora, 'DTSTART;TZID=America/Sao_Paulo:' + ev.ini, 'DTEND;TZID=America/Sao_Paulo:' + ev.fim,
+              'RRULE:' + ev.rrule, 'SUMMARY:' + e(ev.titulo), 'LOCATION:' + e(ev.local), 'DESCRIPTION:' + e(ev.det),
+              'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:' + e(ev.titulo), 'TRIGGER:-PT15M', 'END:VALARM', 'END:VEVENT'];
+    }))).concat(['END:VCALENDAR']).join('\r\n');
+}
+$('btAgenda').addEventListener('click', function () {
+  var turmas = dados.turmas.filter(function (t) { return t.h && !ehPlantao(t.titulo); });
+  var h = '<div class="topo"><h3 id="gavTit">📅 Levar para o Google Agenda</h3><div class="chips"><span class="chip">' + turmas.length + ' turma' + (turmas.length === 1 ? '' : 's') +
+    '</span><span class="chip">toda semana até ' + fimSemestre().slice(6) + '/' + fimSemestre().slice(4, 6) + '</span></div></div><div class="miolo">';
+  if (!turmas.length) h += '<p class="aviso" style="margin-top:1rem">As suas turmas ainda não carregaram. Espere a semana aparecer e tente de novo.</p>';
+  else {
+    h += '<div class="bloco"><b class="tit">Uma turma de cada vez</b><p class="aviso">Abre o Google Agenda com a aula preenchida, repetindo toda semana. Funciona no celular e no computador: é só tocar em Salvar lá.</p><ul>' +
+      turmas.map(function (t) {
+        return '<li class="al"><span class="nm">' + esc(nomeCurto(t.titulo)) + '</span><span class="lv">' + t.h.dias.map(function (x) { return DIAS[x]; }).join('/') + ' ' + hm(t.h.ini) + '</span><span class="esp"></span>' +
+          '<a class="couns" target="_blank" rel="noopener" href="' + esc(linkGoogle(eventoDe(t))) + '">Adicionar ↗</a></li>';
+      }).join('') + '</ul></div>';
+    h += '<div class="bloco"><b class="tit">Todas de uma vez</b><p class="aviso">Um arquivo com todas as aulas e um lembrete 15 minutos antes. No computador, abra o Google Agenda, Configurações, Importar. No iPhone, toque no arquivo e em Adicionar tudo.</p>' +
+      '<button type="button" class="couns" id="btIcs">⬇ Baixar o arquivo da agenda (.ics)</button></div>';
+  }
+  h += '</div>';
+  $('gavCorpo').innerHTML = h;
+  document.querySelector('#gav .caixa').style.setProperty('--g-cor', '#0e7490');
+  var bi = document.getElementById('btIcs');
+  if (bi) bi.addEventListener('click', function () {
+    var blob = new Blob([arquivoIcs(turmas.map(eventoDe))], { type: 'text/calendar;charset=utf-8' });
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'minha-semana-fisk.ics'; document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  });
+  gavAbre();
+});
 $('ant').addEventListener('click', function () { segunda = somaDias(segunda, -7); diaSel = somaDias(diaSel, -7); desenhar(); });
 $('prox').addEventListener('click', function () { segunda = somaDias(segunda, 7); diaSel = somaDias(diaSel, 7); desenhar(); });
 $('hoje').addEventListener('click', function () { segunda = inicioDaSemana(new Date()); diaSel = new Date(); desenhar(); });

@@ -128,6 +128,19 @@
   @media (max-width:1100px){ .fwh{grid-template-columns:1.3fr 1fr} .fwh-p{grid-column:1/-1;min-height:64px} }
   @media (max-width:560px){ .fwh{grid-template-columns:1fr;gap:.7rem} .fwh-f{min-height:72px} .fwh-t b{font-size:1.1rem} }
 
+  .prox-aula{display:flex;align-items:center;gap:.8rem;margin:0 0 1rem;padding:.75rem 1rem;border-radius:14px;text-decoration:none;color:#fff;
+    background:linear-gradient(100deg,#0e7490,#155e75);box-shadow:0 4px 0 #0b4a5c;transition:transform .14s ease}
+  .prox-aula[hidden]{display:none}
+  .prox-aula:hover{transform:translateY(-2px)}
+  .prox-aula .ic{font-size:1.5rem;flex:none}
+  .prox-aula .tx{display:flex;flex-direction:column;min-width:0}
+  .prox-aula .tx small{font-size:.74rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
+  .prox-aula .tx b{font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .prox-aula .tx span{font-size:.84rem;opacity:.9}
+  .prox-aula .go{margin-left:auto;flex:none;background:#fff;color:#0e7490;border-radius:999px;padding:.45rem .9rem;font-weight:800;font-size:.86rem;white-space:nowrap}
+  .prox-aula.agora{background:linear-gradient(100deg,#15803d,#166534);box-shadow:0 4px 0 #0f4a26}
+  .prox-aula.agora .go{color:#15803d}
+  @media (max-width:560px){ .prox-aula .go{padding:.45rem .7rem} .prox-aula .go span{display:none} }
   /* ── MINHA SEMANA na home (26/10/2026, Pedro): seção recolhível embaixo de "Outras ferramentas" ── */
   .sem-home{margin:0 0 1.6rem}
   .sem-home-btn{width:100%;display:flex;align-items:center;gap:.6rem;font-family:var(--font-heading);font-weight:800;font-size:1.05rem;color:var(--ui-dark,#223e5a);
@@ -238,6 +251,9 @@
        montada pelo próprio aparelho, contando os cliques nos cards; nada sai daqui e nada é escondido da grade. -->
   <div class="home-cols">
   <div class="home-esq">
+  <!-- SUA PRÓXIMA AULA (26/10/2026, aprovada pelo Pedro): a próxima aula de hoje, lida do que a Minha semana guardou no
+       aparelho (cal:turmas:<nome>), sem chamada nova ao servidor. Some sem dado, fora de dia de aula e em feriado. -->
+  <a class="prox-aula" id="proxAula" hidden></a>
   <!-- FISK WORLDS (26/10/2026): o jogo do Portal do Aluno, para o professor jogar também, e o convite para montar o
        personagem. Desde 26/10 à noite (Pedro) as três peças ficam numa linha só, na largura da coluna das ferramentas:
        o inglês primeiro e maior (com o subtítulo), o espanhol menor e sem subtítulo, o personagem por último; uma
@@ -3240,6 +3256,48 @@
       }, 700);
     });
   })();
+})();
+</script>
+<script>
+/* SUA PRÓXIMA AULA (26/10/2026): ver o comentário no HTML. Redesenha a cada minuto e quando a Minha semana (que mora
+   num iframe desta mesma página) grava as turmas de novo. */
+(function () {
+  var el = document.getElementById('proxAula'); if (!el) return;
+  function sess() { try { return JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) { return null; } }
+  function nP(v) { return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
+  function eu(s) { if (s.master) { try { var a = JSON.parse(localStorage.getItem('fisk_actas') || 'null'); if (a && a.name) return a.name; } catch (e) {} } return s.name || ''; }
+  function hm(m) { return Math.floor(m / 60) + 'h' + (m % 60 ? ('0' + (m % 60)).slice(-2) : ''); }
+  function curto(t) {
+    var p = String(t || '').split('\n')[0].split(/\s+[-–]\s+|\s+[-–]|[-–]\s+/).filter(function (x) {
+      return x && !/\d{1,2}\s*[h:]\d{0,2}|\d[ªº°]|^\s*\d+\s*$|\b(seg|ter|qua|qui|sex|s[aá]b|dom)[a-z]*\b/i.test(x.replace(/\([^)]*\)/g, ''));
+    });
+    return p.join(' - ') || String(t || '').split('\n')[0];
+  }
+  function semAulaHoje(escolas) {
+    var c = []; try { c = JSON.parse(localStorage.getItem('cal:semaula') || '[]'); } catch (e) {}
+    var d = new Date(), hoje = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+    return c.some(function (x) { return x.i <= hoje && hoje <= x.f && (!x.u || !x.u.length || x.u.some(function (u) { return escolas.indexOf(u) > -1; })); });
+  }
+  function pinta() {
+    var s = sess(); if (!s || !s.token) { el.hidden = true; return; }
+    var g = null; try { g = JSON.parse(localStorage.getItem('cal:turmas:' + nP(eu(s))) || 'null'); } catch (e) {}
+    var turmas = (g && g.t) || [], escolas = String(s.escolas || '').split(/[,;]/).map(function (x) { return x.trim(); });
+    if (!turmas.length || semAulaHoje(escolas)) { el.hidden = true; return; }
+    var d = new Date(), wd = d.getDay(), min = d.getHours() * 60 + d.getMinutes();
+    var hoje = turmas.filter(function (t) { return t.h && t.h.dias.indexOf(wd) > -1 && t.h.fim > min; }).sort(function (a, b) { return a.h.ini - b.h.ini; });
+    var t = hoje[0]; if (!t) { el.hidden = true; return; }
+    var agora = t.h.ini <= min, falta = t.h.ini - min;
+    var quando = agora ? 'até ' + hm(t.h.fim) : 'às ' + hm(t.h.ini) + (falta <= 180 ? ' (em ' + (falta >= 60 ? Math.floor(falta / 60) + 'h' + (falta % 60 ? ('0' + (falta % 60)).slice(-2) : '') : falta + ' min') + ')' : '');
+    el.className = 'prox-aula' + (agora ? ' agora' : '');
+    el.href = 'turma-de-hoje.html#t=' + encodeURIComponent(t.escola + '|' + t.prof + '|' + t.linha);
+    el.innerHTML = '<span class="ic" aria-hidden="true">' + (agora ? '🟢' : '🕒') + '</span><span class="tx"><small>' + (agora ? 'Em aula agora' : 'Sua próxima aula') + '</small>' +
+      '<b>' + fiskEsc(curto(t.titulo)) + ' ' + quando + '</b><span>' + (t.alunos || []).length + ' alunos' + (hoje.length > 1 ? ' · depois mais ' + (hoje.length - 1) + ' hoje' : '') + '</span></span>' +
+      '<span class="go"><span>Abrir na Minha aula</span> →</span>';
+    el.hidden = false;
+  }
+  pinta();
+  setInterval(pinta, 60000);
+  window.addEventListener('storage', function (e) { if (e.key && e.key.indexOf('cal:') === 0) pinta(); });
 })();
 </script>
 </body>
