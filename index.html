@@ -218,6 +218,12 @@
     <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
     <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
     <h1>Fisk Hub</h1>
+    <!-- TROCA DE PERFIL (Pedro, 27/10/2026): quem é professor e também secretário (contas "NOME" e "NOME (SEC)") pula
+         para o Portal da Secretaria já logado, sem senha (rota perfilTroca). Só aparece para quem tem as duas contas. -->
+    <div id="perfilTroca" style="display:none;margin:.55rem auto 0;border:1.5px solid rgba(255,255,255,.4);border-radius:999px;overflow:hidden;font-weight:800;font-size:.85rem">
+      <span style="padding:.4rem 1rem;background:#fff;color:#161414">🎓 Professor</span>
+      <button type="button" id="perfilIrSec" style="padding:.4rem 1rem;background:transparent;color:inherit;border:0;font:inherit;cursor:pointer" title="Abrir o Portal da Secretaria com a sua conta de secretaria">🗂️ Secretaria</button>
+    </div>
     <!-- A FRASE DO DIA (Pedro, 26/10/2026): o acervo mora no Portal (assets/frases-equipe.js), o mesmo do Portal da
          Secretaria. Uma por visita, sem repetir a última; clicar troca. Sem o arquivo, o parágrafo fica escondido. -->
     <p class="hero-frase" id="heroFrase" hidden title="Clique para outra frase" style="font-style:italic;opacity:.92;max-width:44rem;margin:.55rem auto 0;cursor:pointer;transition:opacity .3s"></p>
@@ -1675,7 +1681,24 @@
         if (window._cmSync) window._cmSync(); // re-monta o link do Conversation Maker com o token novo
         setTimeout(function(){ if (window._mdLoad) window._mdLoad(); }, 0);
         registrarHome();
+        perfilVerifica(prof);
       }
+      /* a troca de perfil: pergunta ao servidor se esta conta tem a outra metade ("NOME (SEC)") */
+      function perfilVerifica(prof){
+        var box = $('perfilTroca'); if (!box) return; box.style.display = 'none';
+        if (!prof || !prof.token || prof.viewingAs || prof.master) return;
+        post({ action:'perfilTroca', de:'prof', token: prof.token, so: true }).then(function(r){
+          if (r && r.ok && r.gemeo) box.style.display = 'inline-flex';
+        }).catch(function(){});
+      }
+      $('perfilIrSec').addEventListener('click', function(){
+        var s = saved(), b = this; if (!s || !s.token) return;
+        b.disabled = true; b.textContent = 'Abrindo…';
+        post({ action:'perfilTroca', de:'prof', token: s.token }).then(function(r){
+          if (r && r.ok && r.token) { location.href = 'https://portalfisk.com.br/secretaria.html#sectok=' + encodeURIComponent(r.token); return; }
+          b.disabled = false; b.textContent = '🗂️ Secretaria'; alert((r && r.error) || 'Não consegui abrir a secretaria.');
+        }).catch(function(){ b.disabled = false; b.textContent = '🗂️ Secretaria'; alert('Erro de conexão.'); });
+      });
 
       /* A home também é uma "ferramenta" no painel de uso da direção: sem ela
          o tempo logado só começaria a contar quando o professor abrisse a
@@ -2205,6 +2228,22 @@
         if (era && era.viewingAs){ location.href = 'https://portalfisk.com.br/diretor.html'; return; }
         location.reload();
       });
+
+      /* A TROCA DE PERFIL (27/10/2026): o Portal da Secretaria abre o Hub com #perfiltok=<sessão nova de professor>,
+         emitida pelo perfilTroca a partir da sessão de secretaria da mesma pessoa. É uma sessão normal (não visita). */
+      var mPerf = location.hash.match(/#perfiltok=([^&]+)/);
+      if (mPerf){
+        var tokP = decodeURIComponent(mPerf[1]);
+        history.replaceState(null, '', location.pathname + location.search);
+        msg.textContent = tr('pg-wait');
+        post({ action:'profCheck', token: tokP }).then(function(res){
+          if (res && res.ok && res.prof){
+            try{ localStorage.removeItem('fisk_actas'); localStorage.removeItem('fisk_minidash'); }catch(e){}
+            res.prof.token = tokP; enter(res.prof);
+          } else { loadProfs(); setMode('login'); setPlaceholders(); msg.textContent = (res && res.error) || tr('pg-err'); }
+        }).catch(function(){ loadProfs(); setMode('login'); setPlaceholders(); msg.textContent = tr('pg-err'); });
+        return;
+      }
 
       /* "Ver como professor": #proftok=<token> de VISITA, emitido pelo Painel da
          Direção (dirImpersonate, exige token de diretor). Validado no servidor
