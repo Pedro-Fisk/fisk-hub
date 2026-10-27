@@ -12,7 +12,7 @@
 <script src="assets/fisk-shared.js?v=2026-10-27a"></script>
 <style>
   :root{ --hora: 34px; --cal-linha: var(--ui-line, #dfe6ef); --cal-fundo: var(--white, #fff); --cal-hoje: #fff7e6; --agora: #e11d48; }
-  body.theme-dark{ --cal-linha: #2f3a48; --cal-hoje: #2a2412; }
+  body.theme-dark{ --cal-linha: #2f3a48; --cal-hoje: #2a2412; --cal-fundo: var(--white); }   /* o --white escuro mora no body, não no :root */
   [hidden]{ display: none !important; }
   body.embed{ background: var(--white); }
   body.embed .hero{ display: none; }
@@ -156,6 +156,105 @@
                background: var(--g-cor, var(--ui, #3c6e98)); color: #fff; box-shadow: 0 6px 18px rgba(0,0,0,.18); }
   .abrir-aula:hover{ filter: brightness(1.06); }
   @media (max-width: 640px){ .gav .al{ flex-wrap: wrap; row-gap: .25rem; } .gav .al .esp{ display: none; } .gav .al .couns{ margin-left: auto; } .gav .topo, .gav .miolo, .gav .pe{ padding-left: 1.1rem; padding-right: 1.1rem; } }
+  /* ── OS MEUS EVENTOS, como no Google Agenda (27/10/2026) ── */
+  .grade{ user-select: none; -webkit-user-select: none; }
+  .agora{ pointer-events: none; }
+  .ev.meu{ background: var(--ev-cor); color: #fff; border-left: 0; padding: .2rem .45rem; cursor: grab; touch-action: none; }
+  .ev.meu .t{ font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ev.meu .h{ font-weight: 600; opacity: .92; }
+  .ev.meu.curto .t, .ev.meu.curto .h{ display: inline; }
+  .ev.meu .puxa{ position: absolute; left: 0; right: 0; bottom: 0; height: 8px; cursor: ns-resize; }
+  .ev.meu.arrastando{ opacity: .85; box-shadow: 0 8px 22px rgba(0,0,0,.28); z-index: 6; cursor: grabbing; }
+  .ev.meu.fantasma{ box-shadow: 0 8px 22px rgba(0,0,0,.28); z-index: 6; pointer-events: none; }
+  body.theme-dark .ev.meu{ --ev-fundo: var(--ev-cor); --ev-tx: #fff; }
+  .faixa.meu{ background: var(--ev-cor); cursor: pointer; }
+  .g-faixas[data-d]{ cursor: default; }
+  .cartao.meu{ border-left-color: var(--ev-cor); }
+  .cartao.meu .tt::before{ content: ''; display: inline-block; width: .6rem; height: .6rem; border-radius: 3px; background: var(--ev-cor); margin-right: .35rem; }
+  .selo.meu{ background: var(--ev-cor); cursor: pointer; border: 0; font-family: inherit; }
+  .livre{ display: block; width: 100%; text-align: left; font-family: inherit; font-size: .82rem; font-weight: 700; color: var(--gray); background: transparent;
+          border: 1.5px dashed var(--cal-linha); border-radius: 12px; padding: .5rem .8rem; margin-bottom: .55rem; cursor: pointer;
+          -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+  .livre:active, .livre.segura{ background: var(--ui-soft, #e9eff5); color: var(--ui-dark, #223e5a); }
+  .barra .criar{ background: var(--ui, #3c6e98); color: #fff; border-color: var(--ui, #3c6e98); box-shadow: 0 2px 6px rgba(0,0,0,.15); }
+  .barra .criar:hover{ filter: brightness(1.08); }
+  .fab{ display: none; position: fixed; right: 18px; bottom: 22px; z-index: 8000; width: 58px; height: 58px; border-radius: 18px; border: 0;
+        background: var(--ui, #3c6e98); color: #fff; font-size: 2rem; line-height: 1; box-shadow: 0 8px 22px rgba(0,0,0,.28); cursor: pointer; }
+  @media (max-width: 640px){ .fab{ display: block; } .barra .criar{ display: none; } .dia-lista{ padding-bottom: 72px; } }
+
+  /* o balão (o rápido, o dos detalhes) */
+  .bal{ position: fixed; z-index: 9500; width: min(380px, calc(100vw - 24px)); background: var(--white); color: inherit; border-radius: 16px;
+        box-shadow: 0 18px 50px rgba(0,0,0,.3); padding: .5rem 1rem 1rem; box-sizing: border-box; border: 1px solid var(--cal-linha); }
+  .bal .acoes{ display: flex; justify-content: flex-end; gap: .15rem; margin: 0 -.5rem .2rem 0; }
+  .bal .acoes button, .bal .acoes a{ border: 0; background: transparent; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 1.05rem;
+        display: grid; place-items: center; text-decoration: none; color: var(--ui-dark, #223e5a); }
+  .bal .acoes button:hover, .bal .acoes a:hover{ background: var(--ui-soft, #e9eff5); }
+  body.theme-dark .bal .acoes button, body.theme-dark .bal .acoes a{ color: #dbe6f3; }
+  body.theme-dark .bal .acoes button:hover, body.theme-dark .bal .acoes a:hover{ background: #2a3442; }
+  .bal .cab{ display: flex; gap: .75rem; align-items: flex-start; }
+  .bal .cab i{ flex: none; width: 14px; height: 14px; border-radius: 4px; margin-top: .4rem; background: var(--ev-cor); }
+  .bal h4{ margin: 0 0 .2rem; font-family: var(--font-heading); font-size: 1.25rem; line-height: 1.25; color: var(--ui-dark, #223e5a); word-break: break-word; }
+  body.theme-dark .bal h4{ color: #f2efef; }
+  .bal p{ margin: .15rem 0; font-size: .88rem; }
+  .bal .lin{ display: flex; gap: .75rem; margin-top: .55rem; font-size: .88rem; }
+  .bal .lin span:first-child{ flex: none; width: 14px; text-align: center; }
+  .bal .desc{ white-space: pre-wrap; word-break: break-word; }
+  .bal .tit{ width: 100%; box-sizing: border-box; font-family: inherit; font-size: 1.3rem; border: 0; border-bottom: 2px solid var(--cal-linha); background: transparent;
+             color: inherit; padding: .5rem .1rem; outline: none; margin-bottom: .6rem; }
+  .bal .tit:focus{ border-bottom-color: var(--ui, #3c6e98); }
+  .bal .pe{ display: flex; justify-content: flex-end; gap: .5rem; margin-top: .9rem; }
+  .bt-pri, .bt-sec{ font-family: inherit; font-weight: 800; font-size: .9rem; border-radius: 10px; padding: .55rem 1.1rem; cursor: pointer; min-height: 40px; }
+  .bt-pri{ background: var(--ui, #3c6e98); color: #fff; border: 0; }
+  .bt-pri:hover{ filter: brightness(1.08); }
+  .bt-sec{ background: transparent; color: var(--ui, #3c6e98); border: 0; }
+  body.theme-dark .bt-sec{ color: #9cc3ea; }
+  .bt-sec:hover{ background: var(--ui-soft, #e9eff5); }
+  body.theme-dark .bt-sec:hover{ background: #2a3442; }
+  .bt-sec.perigo{ color: #b91c1c; margin-right: auto; }
+  body.theme-dark .bt-sec.perigo{ color: #fca5a5; }
+  @media (max-width: 640px){
+    .bal{ left: 0 !important; right: 0; top: auto !important; bottom: 0; width: 100%; border-radius: 20px 20px 0 0; padding-bottom: calc(1rem + env(safe-area-inset-bottom)); }
+  }
+
+  /* a pergunta do evento repetido */
+  .dlg{ position: fixed; inset: 0; z-index: 9800; display: grid; place-items: center; background: rgba(12,14,20,.45); }
+  .dlg .cx{ background: var(--white); border-radius: 16px; padding: 1.2rem 1.3rem 1rem; width: min(360px, calc(100vw - 32px)); box-shadow: 0 18px 50px rgba(0,0,0,.3); box-sizing: border-box; }
+  .dlg h4{ margin: 0 0 .7rem; font-family: var(--font-heading); font-size: 1.1rem; }
+  .dlg label{ display: flex; gap: .6rem; align-items: center; padding: .45rem 0; font-size: .95rem; cursor: pointer; }
+  .dlg input{ width: 18px; height: 18px; accent-color: var(--ui, #3c6e98); }
+  .dlg .pe{ display: flex; justify-content: flex-end; gap: .5rem; margin-top: .8rem; }
+
+  /* o editor completo, dentro da gaveta */
+  .ed .ed-tit{ width: 100%; box-sizing: border-box; font-family: var(--font-heading); font-size: 1.4rem; border: 0; border-bottom: 2px solid var(--cal-linha);
+               background: transparent; color: inherit; padding: .6rem .1rem; outline: none; margin: .8rem 0 .6rem; }
+  .ed .ed-tit:focus{ border-bottom-color: var(--g-cor, #3c6e98); }
+  .ed .lin{ display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin: .65rem 0; font-size: .92rem; }
+  .ed .lin > b{ width: 1.4rem; text-align: center; font-weight: 400; }
+  .ed input[type=date], .ed input[type=number], .ed select, .ed textarea{ font-family: inherit; font-size: .92rem; border: 1.5px solid var(--cal-linha); border-radius: 10px;
+        background: var(--white); color: inherit; padding: .5rem .6rem; min-height: 40px; box-sizing: border-box; }
+  body.theme-dark .ed input, body.theme-dark .ed select, body.theme-dark .ed textarea{ color-scheme: dark; }
+  .ed input[type=number]{ width: 4.6rem; }
+  .ed textarea{ width: 100%; min-height: 110px; resize: vertical; }
+  .ed .chk{ display: inline-flex; align-items: center; gap: .45rem; cursor: pointer; font-weight: 700; }
+  .ed .chk input{ width: 18px; height: 18px; accent-color: var(--g-cor, #3c6e98); }
+  .ed .pers{ border: 1.5px solid var(--cal-linha); border-radius: 14px; padding: .8rem .9rem; margin: .3rem 0 .6rem 1.9rem; background: var(--ui-soft, #f4f7fb); }
+  body.theme-dark .ed .pers{ background: #19212c; }
+  .ed .pers .lin{ margin: .4rem 0; }
+  .ed .pers label{ display: flex; align-items: center; gap: .45rem; padding: .2rem 0; cursor: pointer; }
+  .ed .dias{ display: flex; gap: .3rem; }
+  .ed .dias button{ width: 34px; height: 34px; border-radius: 50%; border: 0; font-family: inherit; font-weight: 800; font-size: .8rem; cursor: pointer;
+                    background: var(--cal-linha); color: var(--ui-dark, #223e5a); }
+  body.theme-dark .ed .dias button{ color: #dbe6f3; }
+  .ed .dias button.on{ background: var(--g-cor, #3c6e98); color: #fff; }
+  .ed .cores{ display: flex; flex-wrap: wrap; gap: .4rem; }
+  .ed .cores button{ width: 28px; height: 28px; border-radius: 50%; border: 0; cursor: pointer; background: var(--c); box-shadow: inset 0 0 0 2px rgba(255,255,255,.0); }
+  .ed .cores button.on{ box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--c); }
+  .ed small.dica{ display: block; color: var(--gray); font-size: .78rem; margin: -.3rem 0 .5rem 1.9rem; }
+  .ed-pe{ display: flex; gap: .5rem; justify-content: flex-end; }
+  .ag-toast{ position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 9900; background: #1f2937; color: #fff; border-radius: 12px; padding: .7rem 1rem;
+             font-size: .9rem; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,.3); display: flex; gap: .9rem; align-items: center; max-width: calc(100vw - 32px); }
+  .ag-toast button{ background: transparent; border: 0; color: #93c5fd; font-weight: 900; font-family: inherit; cursor: pointer; font-size: .9rem; }
+  @media (max-width: 640px){ .ag-toast{ bottom: 92px; } }
 </style>
 </head>
 <body>
@@ -172,7 +271,7 @@ if (EMBED) { document.body.classList.add('embed'); var bse = document.createElem
   <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
   <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
   <h1>Minha semana</h1>
-  <p>Suas aulas, plantões, experimentais, aniversários e os dias sem aula</p>
+  <p>Suas aulas, plantões, experimentais, aniversários, os dias sem aula e os seus compromissos</p>
 </header>
 
 <main>
@@ -191,6 +290,7 @@ if (EMBED) { document.body.classList.add('embed'); var bse = document.createElem
       <span class="semana" id="rotSemana"></span>
       <span class="quem" id="quem"></span>
       <select id="verComo" hidden aria-label="Ver a semana de outro professor"></select>
+      <button type="button" class="criar" id="btCriar" hidden title="Criar um evento na sua agenda">＋ Criar</button>
       <button type="button" id="btAgenda" title="Levar as suas aulas para o Google Agenda">📅 Google Agenda</button>
     </div>
     <div class="tira" id="tira"></div>
@@ -206,6 +306,9 @@ if (EMBED) { document.body.classList.add('embed'); var bse = document.createElem
   </section>
 </main>
 
+<button type="button" class="fab" id="fab" hidden aria-label="Criar evento" title="Criar evento">＋</button>
+<div class="bal" id="bal" hidden role="dialog" aria-label="Evento"></div>
+<div class="dlg" id="dlg" hidden></div>
 <div class="gav" id="gav" hidden>
   <div class="fundo" data-fecha></div>
   <div class="caixa" role="dialog" aria-modal="true" aria-labelledby="gavTit">
@@ -364,6 +467,12 @@ function eventosDoDia(d) {
     var ini = minDe(x.hora); if (ini == null) ini = 8 * 60;
     evs.push({ tipo: 'exp', ini: ini, fim: ini + 60, titulo: '🧪 Experimental: ' + x.nome, exps: [x], anivs: [], cor: '#7c3aed' });
   });
+  /* os eventos que o professor criou (ver "OS MEUS EVENTOS" abaixo) */
+  agDoDia(d).forEach(function (o) {
+    if (o.diaInteiro) return;
+    var ini = minDe(o.ini), fim = minDe(o.fim); if (ini == null || fim == null) return;
+    evs.push({ tipo: 'meu', ini: ini, fim: fim, titulo: o.titulo, cor: o.cor || AG_COR, ag: o, anivs: [], exps: [] });
+  });
   evs.sort(function (a, b) { return a.ini - b.ini || a.fim - b.fim; });
   /* lado a lado quando se sobrepõem */
   var cols = [];
@@ -409,12 +518,13 @@ function rotMeta(e, d) {
 }
 var EVS = [];
 function desenhar() {
+  agGaranteSemana();
   $('rotSemana').textContent = rotSemana();
   var hoje = iso(new Date()), dias = [];
   for (var i = 0; i < 7; i++) dias.push(somaDias(segunda, i));
   var porDia = dias.map(eventosDoDia);
   /* domingo só aparece se tiver alguma coisa */
-  var mostra = dias.map(function (d, i) { return i < 6 || porDia[i].length || diaInteiro(d).length; });
+  var mostra = dias.map(function (d, i) { return i < 6 || porDia[i].length || diaInteiro(d).length || agDoDia(d).length; });
   var idx = dias.map(function (d, i) { return i; }).filter(function (i) { return mostra[i]; });
   EVS = [];
   /* computador */
@@ -425,17 +535,23 @@ function desenhar() {
   idx.forEach(function (i) {
     var d = dias[i], fx = diaInteiro(d).map(function (it) { return '<span class="faixa ' + esc(it.tipo) + '" title="' + esc(it.titulo) + '">' + esc(it.titulo) + '</span>'; });
     anivsDoDia(d).forEach(function (a) { fx.push('<span class="faixa aniv" title="' + esc(a.nome) + ' · ' + esc(linha1(a.turma)) + '">🎂 ' + esc(String(a.nome).split(' ')[0]) + '</span>'); });
-    h += '<div class="g-faixas">' + fx.join('') + '</div>';
+    agDoDia(d).forEach(function (o) {
+      if (!o.diaInteiro) return;
+      var k = EVS.push({ e: { tipo: 'meu', titulo: o.titulo, cor: o.cor || AG_COR, ag: o }, d: d }) - 1;
+      fx.push('<span class="faixa meu" role="button" tabindex="0" data-ag="' + k + '" style="--ev-cor:' + esc(o.cor || AG_COR) + '" title="' + esc(o.titulo) + '">' + esc(o.titulo) + '</span>');
+    });
+    h += '<div class="g-faixas" data-d="' + iso(d) + '">' + fx.join('') + '</div>';
   });
   h += '<div class="g-horas">'; for (var hh = INI_H; hh < FIM_H; hh++) h += '<div>' + hh + 'h</div>'; h += '</div>';
   var alturaH = 34;   /* o mesmo --hora do CSS: a semana inteira cabe na tela (Pedro, 26/10/2026) */
   idx.forEach(function (i) {
     var d = dias[i], ehHoje = iso(d) === hoje;
-    h += '<div class="g-col' + (ehHoje ? ' hoje' : '') + '" style="height:' + ((FIM_H - INI_H) * alturaH) + 'px">';
+    h += '<div class="g-col' + (ehHoje ? ' hoje' : '') + '" data-d="' + iso(d) + '" style="height:' + ((FIM_H - INI_H) * alturaH) + 'px">';
     porDia[i].forEach(function (e) {
       var k = EVS.push({ e: e, d: d }) - 1;
       var top = Math.max(0, (e.ini - INI_H * 60) / 60 * alturaH), alt = Math.max(22, (e.fim - e.ini) / 60 * alturaH - 2);
       var larg = 100 / e.ncol;
+      if (e.tipo === 'meu') { h += agBloco(e, k, 'top:' + top + 'px;height:' + alt + 'px;left:calc(' + (e.col * larg) + '% + 3px);right:auto;width:calc(' + larg + '% - 6px)', alt); return; }
       h += '<button type="button" class="ev ' + e.tipo + (e.semaula ? ' semaula' : '') + '" data-ev="' + k + '" style="--ev-cor:' + e.cor + ';top:' + top + 'px;height:' + alt + 'px;left:calc(' + (e.col * larg) + '% + 3px);right:auto;width:calc(' + larg + '% - 6px)">' +
         '<span class="h">' + hm(e.ini) + '–' + hm(e.fim) + '</span><span class="t">' + esc(e.titulo) + '</span><span class="m">' + rotMeta(e, d) + '</span>' + selos(e) + '</button>';
     });
@@ -446,17 +562,32 @@ function desenhar() {
   /* celular: a tira dos dias e a lista do dia escolhido */
   if (iso(diaSel) < iso(segunda) || iso(diaSel) > iso(somaDias(segunda, 6))) diaSel = dias[0];
   $('tira').innerHTML = idx.map(function (i) {
-    var d = dias[i], tem = porDia[i].length || diaInteiro(d).length;
+    var d = dias[i], tem = porDia[i].length || diaInteiro(d).length || agDoDia(d).length;
     return '<button type="button" data-dia="' + i + '" class="' + (iso(d) === iso(diaSel) ? 'sel' : '') + (tem ? ' tem' : '') + '"><small>' + DIAS[d.getDay()] + '</small><b>' + d.getDate() + '</b><i></i></button>';
   }).join('');
   var iSel = dias.map(iso).indexOf(iso(diaSel)), lista = porDia[iSel] || [], dSel = dias[iSel];
   var topo = diaInteiro(dSel).map(function (it) { return '<span class="selo ' + (it.tipo === 'feriado' || it.tipo === 'ferias' ? 'fer' : '') + '">' + esc(it.titulo) + '</span>'; })
-    .concat(anivsDoDia(dSel).map(function (a) { return '<span class="selo aniv">🎂 ' + esc(a.nome) + ' · ' + esc(linha1(a.turma)) + '</span>'; })).join('');
-  $('diaLista').innerHTML = (topo ? '<div style="margin:.2rem 0 .6rem">' + topo + '</div>' : '') + (lista.length ? lista.map(function (e) {
+    .concat(anivsDoDia(dSel).map(function (a) { return '<span class="selo aniv">🎂 ' + esc(a.nome) + ' · ' + esc(linha1(a.turma)) + '</span>'; }))
+    .concat(agDoDia(dSel).filter(function (o) { return o.diaInteiro; }).map(function (o) {
+      var k = EVS.push({ e: { tipo: 'meu', titulo: o.titulo, cor: o.cor || AG_COR, ag: o }, d: dSel }) - 1;
+      return '<button type="button" class="selo meu" data-ag="' + k + '" style="--ev-cor:' + esc(o.cor || AG_COR) + '">' + esc(o.titulo) + '</button>';
+    })).join('');
+  /* os horários livres entre os compromissos: tocar (ou tocar e segurar) num deles cria o evento ali */
+  var livre = function (a, b) { return agLigado() && b - a >= 30 ? '<button type="button" class="livre" data-livre="' + a + '">＋ ' + hm(a) + ' às ' + hm(b) + ' livre</button>' : ''; };
+  var cursor = INI_H * 60, corpo = '';
+  lista.forEach(function (e) {
+    corpo += livre(cursor, e.ini); cursor = Math.max(cursor, e.fim);
     var k = EVS.push({ e: e, d: dSel }) - 1;
-    return '<button type="button" class="cartao ' + e.tipo + (e.semaula ? ' semaula' : '') + '" data-ev="' + k + '" style="--ev-cor:' + e.cor + '"><span class="hh">' + hm(e.ini) + '<small>até ' + hm(e.fim) + '</small></span>' +
+    if (e.tipo === 'meu') {
+      corpo += '<button type="button" class="cartao meu" data-ag="' + k + '" style="--ev-cor:' + esc(e.cor) + '"><span class="hh">' + hm(e.ini) + '<small>até ' + hm(e.fim) + '</small></span>' +
+        '<span><span class="tt">' + esc(e.titulo) + '</span>' + (e.ag.rrule ? '<br><span class="mm">🔁 ' + esc(agTextoRR(e.ag.rrule, e.ag.serieData)) + '</span>' : '') + '</span></button>';
+      return;
+    }
+    corpo += '<button type="button" class="cartao ' + e.tipo + (e.semaula ? ' semaula' : '') + '" data-ev="' + k + '" style="--ev-cor:' + e.cor + '"><span class="hh">' + hm(e.ini) + '<small>até ' + hm(e.fim) + '</small></span>' +
       '<span><span class="tt">' + esc(e.titulo) + '</span><br><span class="mm">' + rotMeta(e, dSel) + '</span><br>' + selos(e) + '</span></button>';
-  }).join('') : '<div class="vazio">Nenhuma aula neste dia.</div>');
+  });
+  corpo += livre(cursor, FIM_H * 60);
+  $('diaLista').innerHTML = (topo ? '<div style="margin:.2rem 0 .6rem">' + topo + '</div>' : '') + (lista.length ? '' : '<div class="vazio">Nenhuma aula neste dia.</div>') + corpo;
   /* turmas sem horário */
   $('painelSemH').hidden = !dados.semHorario.length;
   $('semH').innerHTML = dados.semHorario.map(function (t) { return '<li>' + esc(t.titulo) + (minhasEscolas().length > 1 ? ' <small>(' + esc(t.escola) + ')</small>' : '') + '</li>'; }).join('');
@@ -520,6 +651,13 @@ function gavFecha() {
   clearTimeout(_gavFecha); _gavFecha = setTimeout(function () { g.hidden = true; }, 380);
 }
 document.addEventListener('click', function (ev) {
+  /* os meus eventos: o clique abre os detalhes (o arrasto já tratou o dele) */
+  var ag = ev.target.closest('[data-ag]');
+  if (ag) { if (!agEngoleClique) agDetalhes(+ag.dataset.ag, ag); return; }
+  var lv = ev.target.closest('[data-livre]');
+  if (lv) { if (!agEngoleClique) agNovoNoLivre(+lv.dataset.livre, lv); return; }
+  var fx = ev.target.classList && ev.target.classList.contains('g-faixas') && ev.target.dataset.d;
+  if (fx && agLigado()) { agBalaoNovo({ data: fx, diaInteiro: true }, ev.target); return; }
   /* o e-counseling do aluno (Pedro, 26/10/2026): abre o documento direto no Docs (fiskCounselingAbrirDoc, no kit) */
   var cb = ev.target.closest('[data-couns]');
   if (cb) {
@@ -536,7 +674,7 @@ document.addEventListener('click', function (ev) {
   if (ev.target.closest('[data-fecha]')) { gavFecha(); return; }
   var t = ev.target.closest('[data-dia]'); if (t) { diaSel = somaDias(segunda, +t.dataset.dia); desenhar(); }
 });
-document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') gavFecha(); });
+document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') { if (!$('dlg').hidden) return; if (!$('bal').hidden) { agFechaBalao(); return; } gavFecha(); } });
 /* ── LEVAR PARA O GOOGLE AGENDA (26/10/2026, aprovado pelo Pedro) ──────────────────────────────────────────────
    Duas portas, porque o celular não importa arquivo de agenda no app do Google:
    · por turma: o link de "criar evento" do próprio Google Agenda, já preenchido e repetindo toda semana até o fim do
@@ -652,6 +790,472 @@ function carregar() {
       $('st').innerHTML = '⚠️ ' + esc(msg) + ' <a href="index.html" style="font-weight:800">Entrar de novo →</a>';
       try { localStorage.removeItem('fisk_prof'); sessionStorage.setItem('fisk_sessao_caiu', '1'); } catch (e2) {}
     } else $('st').textContent = '⚠️ ' + msg;
+  });
+}
+
+/* ══ OS MEUS EVENTOS, como no Google Agenda (27/10/2026) ════════════════════════════════════════════════════════
+ * Pedido do Pedro: "assim como no Google Agenda", o professor cria na própria semana o compromisso dele (reunião de
+ * pais, lembrete), com repetição, duração, lembrete e cor. O que imita o Google, gesto por gesto:
+ *   · arrastar numa coluna vazia cria o evento naquele intervalo (passos de 15 min); um clique cria 1 h na meia hora;
+ *   · abre o balão rápido (título, Salvar, "Mais opções"); "Mais opções" abre o editor completo na gaveta;
+ *   · arrastar o evento move (para outra hora ou outro dia), puxar a borda de baixo muda a duração;
+ *   · clicar abre os detalhes com editar, excluir e levar ao Google Agenda;
+ *   · em evento repetido, editar ou excluir pergunta "Este evento / Este e os seguintes / Todos os eventos".
+ * No celular, tocar (ou tocar e segurar) num horário livre da lista cria o evento ali, e há o botão "+".
+ * O servidor (Agenda.js no fisk-hub-backend, aba _eventosAgenda) guarda a repetição como RRULE e devolve só as
+ * ocorrências da semana pedida. Primeira etapa: evento PESSOAL. No "ver como" da direção eles não aparecem: a semana
+ * é de outra pessoa, e os eventos são de quem está logado.
+ * ════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
+var AG_PALETA = [['#d50000', 'Tomate'], ['#e67c73', 'Flamingo'], ['#f4511e', 'Tangerina'], ['#f6bf26', 'Banana'], ['#33b679', 'Sálvia'], ['#0b8043', 'Manjericão'],
+                ['#039be5', 'Pavão'], ['#3f51b5', 'Mirtilo'], ['#7986cb', 'Lavanda'], ['#8e24aa', 'Uva'], ['#616161', 'Grafite']];
+var AG_COR = '#039be5', AG_ALT = 34;   /* AG_ALT = o --hora do CSS e o alturaH do desenhar() */
+var AG_AVISOS = [['', 'Sem lembrete'], ['0', 'Na hora'], ['5', '5 minutos antes'], ['10', '10 minutos antes'], ['15', '15 minutos antes'], ['30', '30 minutos antes'],
+                    ['60', '1 hora antes'], ['120', '2 horas antes'], ['1440', '1 dia antes'], ['10080', '1 semana antes']];
+var DIAS_LONGO = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
+var MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+var agCache = {}, agCarregando = {}, agEngoleClique = false, agFantasma = null, agAvisados = {};
+
+function agLigado() { return !!token() && !como(); }
+function hhmm(min) { return ('0' + Math.floor(min / 60)).slice(-2) + ':' + ('0' + (min % 60)).slice(-2); }
+function dDe(t) { var p = String(t).split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+function agDataLonga(t) { var d = dDe(t); return DIAS_LONGO[d.getDay()].replace(/^./, function (c) { return c.toUpperCase(); }) + (d.getDay() % 6 ? '-feira' : '') + ', ' + d.getDate() + ' de ' + MESES[d.getMonth()]; }
+function agQuando(o) {
+  if (o.diaInteiro) return agDataLonga(o.data) + (o.dataFim && o.dataFim !== o.data ? ' até ' + agDataLonga(o.dataFim) : '') + ' · dia inteiro';
+  return agDataLonga(o.data) + ' · ' + hm(minDe(o.ini)) + ' às ' + hm(minDe(o.fim));
+}
+
+/* ── a leitura: uma semana por vez, guardada enquanto a página estiver aberta ── */
+function agGaranteSemana() {
+  $('btCriar').hidden = $('fab').hidden = !agLigado();
+  if (!agLigado()) return;
+  var k = iso(segunda); if (agCache[k] || agCarregando[k]) return;
+  agCarregando[k] = true;
+  post({ action: 'agendaListar', de: k, ate: iso(somaDias(segunda, 6)) }).then(function (j) {
+    agCache[k] = j.eventos || []; agCarregando[k] = false;
+    if (k === iso(segunda)) desenhar();
+    agLembretes();
+  }).catch(function (e) { agCarregando[k] = false; console.warn('agenda', e); });
+}
+function agRecarrega() { agCache = {}; agCarregando = {}; agGaranteSemana(); }
+function agDoDia(d) {
+  if (!agLigado()) return [];
+  var t = iso(d);
+  return (agCache[iso(inicioDaSemana(d))] || []).filter(function (o) { return o.diaInteiro ? (o.data <= t && t <= o.dataFim) : o.data === t; });
+}
+
+/* ── a RRULE na tela (o servidor confere e reescreve; aqui é para montar e ler) ── */
+function agParseRR(s) {
+  s = String(s || '').replace(/^RRULE:/i, ''); if (!s) return null;
+  var r = { freq: '', intervalo: 1, dias: [], nth: 0, ate: '', vezes: 0 };
+  s.split(';').forEach(function (p) {
+    var kv = p.split('='), k = kv[0], v = kv[1] || '';
+    if (k === 'FREQ') r.freq = v;
+    else if (k === 'INTERVAL') r.intervalo = +v || 1;
+    else if (k === 'COUNT') r.vezes = +v || 0;
+    else if (k === 'UNTIL') r.ate = v.slice(0, 4) + '-' + v.slice(4, 6) + '-' + v.slice(6, 8);
+    else if (k === 'BYDAY') v.split(',').forEach(function (x) { var m = /^(-?\d)?([A-Z]{2})$/.exec(x); if (m) { if (m[1]) r.nth = +m[1]; r.dias.push(DIA_RR.indexOf(m[2])); } });
+  });
+  return r.freq ? r : null;
+}
+function agMontaRR(r) {
+  var p = ['FREQ=' + r.freq];
+  if (r.intervalo > 1) p.push('INTERVAL=' + r.intervalo);
+  if (r.freq === 'WEEKLY' && r.dias.length) p.push('BYDAY=' + r.dias.slice().sort(function (a, b) { return ((a + 6) % 7) - ((b + 6) % 7); }).map(function (x) { return DIA_RR[x]; }).join(','));
+  if (r.freq === 'MONTHLY' && r.nth) p.push('BYDAY=' + r.nth + DIA_RR[r.dias[0]]);
+  if (r.vezes) p.push('COUNT=' + r.vezes); else if (r.ate) p.push('UNTIL=' + r.ate.replace(/-/g, ''));
+  return p.join(';');
+}
+function agEnesimo(n, wd) {   /* "na quarta terça", "no último sábado" */
+  var masc = wd === 0 || wd === 6;
+  if (n < 0) return (masc ? 'no último ' : 'na última ') + DIAS_LONGO[wd];
+  return (masc ? 'no ' + ['primeiro', 'segundo', 'terceiro', 'quarto', 'quinto'][n - 1] : 'na ' + ['primeira', 'segunda', 'terceira', 'quarta', 'quinta'][n - 1]) + ' ' + DIAS_LONGO[wd];
+}
+function agListaDias(ds) {
+  var nomes = ds.slice().sort(function (a, b) { return ((a + 6) % 7) - ((b + 6) % 7); }).map(function (x) { return DIAS_LONGO[x]; });
+  return nomes.length > 1 ? nomes.slice(0, -1).join(', ') + ' e ' + nomes[nomes.length - 1] : nomes[0];
+}
+function agTextoRR(rr, dataIni) {
+  var r = agParseRR(rr); if (!r) return '';
+  var d = dDe(dataIni), n = r.intervalo, t;
+  if (r.freq === 'DAILY') t = n > 1 ? 'A cada ' + n + ' dias' : 'Todos os dias';
+  else if (r.freq === 'WEEKLY') {
+    var ds = r.dias.length ? r.dias : [d.getDay()];
+    if (n === 1 && ds.slice().sort().join() === '1,2,3,4,5') t = 'Todos os dias úteis (segunda a sexta)';
+    else t = (n > 1 ? 'A cada ' + n + ' semanas: ' : 'Semanal: ') + (ds.length === 1 ? (ds[0] % 6 ? 'toda ' : 'todo ') : '') + agListaDias(ds);
+  }
+  else if (r.freq === 'MONTHLY') t = (n > 1 ? 'A cada ' + n + ' meses' : 'Mensal') + (r.nth ? ' ' + agEnesimo(r.nth, r.dias[0]) : ' no dia ' + d.getDate());
+  else t = (n > 1 ? 'A cada ' + n + ' anos' : 'Anual') + ' em ' + d.getDate() + ' de ' + MESES[d.getMonth()];
+  if (r.vezes) t += ', ' + r.vezes + ' vez' + (r.vezes > 1 ? 'es' : '');
+  else if (r.ate) t += ', até ' + r.ate.split('-').reverse().join('/');
+  return t;
+}
+/* as opções prontas do menu "Não se repete", como as do Google, que mudam com a data */
+function agPresets(t) {
+  var d = dDe(t), wd = d.getDay(), dia = d.getDate(), nth = Math.ceil(dia / 7), ultimo = dia + 7 > new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  var ps = [['nada', '', 'Não se repete'], ['diaria', 'FREQ=DAILY', 'Todos os dias'], ['semanal', 'FREQ=WEEKLY;BYDAY=' + DIA_RR[wd], 'Semanal: ' + (wd % 6 ? 'toda ' : 'todo ') + DIAS_LONGO[wd]]];
+  if (nth <= 4) ps.push(['enesimo', 'FREQ=MONTHLY;BYDAY=' + nth + DIA_RR[wd], 'Mensal ' + agEnesimo(nth, wd)]);
+  if (ultimo) ps.push(['ultimo', 'FREQ=MONTHLY;BYDAY=-1' + DIA_RR[wd], 'Mensal ' + agEnesimo(-1, wd)]);
+  ps.push(['mensal', 'FREQ=MONTHLY', 'Mensal no dia ' + dia], ['anual', 'FREQ=YEARLY', 'Anual em ' + dia + ' de ' + MESES[d.getMonth()]],
+          ['uteis', 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR', 'Todos os dias úteis (segunda a sexta)']);
+  return ps;
+}
+
+/* ── o bloco na grade ── */
+function agBloco(e, k, pos, alt) {
+  var curto = alt < 40, quando = hm(e.ini) + ' às ' + hm(e.fim);
+  return '<div class="ev meu' + (curto ? ' curto' : '') + '" role="button" tabindex="0" data-ag="' + k + '" title="' + esc(e.titulo + ' · ' + quando) + '" style="--ev-cor:' + esc(e.cor) + ';' + pos + '">' +
+    '<span class="t">' + esc(e.titulo) + (curto ? ', ' : '') + '</span><span class="h">' + quando + (e.ag.rrule ? ' 🔁' : '') + '</span><span class="puxa" data-puxa></span></div>';
+}
+function agMinDoY(y) { return INI_H * 60 + y / AG_ALT * 60; }
+function agY(min) { return (min - INI_H * 60) / 60 * AG_ALT; }
+function agLimita(m) { return Math.max(INI_H * 60, Math.min(FIM_H * 60, m)); }
+function agEngole() { agEngoleClique = true; setTimeout(function () { agEngoleClique = false; }, 60); }
+
+/* arrastar numa coluna vazia: o evento nasce do intervalo; sem arrastar, 1 h a partir da meia hora clicada */
+function agIniciaCriar(ev, col) {
+  ev.preventDefault();
+  agFechaBalao();
+  var r = col.getBoundingClientRect(), m0 = agMinDoY(ev.clientY - r.top), Y0 = ev.clientY, mexeu = false;
+  var a = Math.floor(m0 / 30) * 30, b = Math.min(a + 60, FIM_H * 60);
+  var fant = document.createElement('div'); fant.className = 'ev meu fantasma'; col.appendChild(fant);
+  function pinta() {
+    fant.style.cssText = '--ev-cor:' + AG_COR + ';top:' + agY(a) + 'px;height:' + Math.max(14, agY(b) - agY(a) - 2) + 'px;left:3px;right:3px';
+    fant.innerHTML = '<span class="t">(Sem título)</span><span class="h">' + hm(a) + ' às ' + hm(b) + '</span>';
+    fant.classList.toggle('curto', agY(b) - agY(a) < 40);
+  }
+  pinta();
+  function move(e) {
+    if (!mexeu && Math.abs(e.clientY - Y0) < 5) return;
+    mexeu = true;
+    var m = agMinDoY(e.clientY - r.top);
+    if (m >= m0) { a = Math.floor(m0 / 15) * 15; b = Math.max(a + 15, Math.ceil(m / 15) * 15); }
+    else { b = Math.ceil(m0 / 15) * 15; a = Math.min(b - 15, Math.floor(m / 15) * 15); }
+    a = agLimita(a); b = agLimita(b); if (b <= a) b = a + 15;
+    pinta();
+  }
+  function solta() {
+    document.removeEventListener('pointermove', move); document.removeEventListener('pointerup', solta);
+    agFantasma = fant;
+    agBalaoNovo({ data: col.dataset.d, ini: a, fim: b }, fant);
+  }
+  document.addEventListener('pointermove', move); document.addEventListener('pointerup', solta);
+}
+
+/* arrastar o evento move; a borda de baixo muda a duração. Sem arrastar, o clique segue para os detalhes. */
+function agIniciaMover(ev, bloco, puxa) {
+  var x = EVS[+bloco.dataset.ag], o = x && x.e.ag; if (!o) return;
+  ev.preventDefault();
+  agFechaBalao();
+  var ini = minDe(o.ini), fim = minDe(o.fim), dur = fim - ini, X0 = ev.clientX, Y0 = ev.clientY, mexeu = false, nIni = ini, nFim = fim, col = bloco.parentNode;
+  function move(e) {
+    if (!mexeu && Math.abs(e.clientX - X0) + Math.abs(e.clientY - Y0) < 5) return;
+    if (!mexeu) { mexeu = true; bloco.classList.add('arrastando'); bloco.style.left = '3px'; bloco.style.width = 'calc(100% - 6px)'; }
+    var passo = Math.round((e.clientY - Y0) / AG_ALT * 60 / 15) * 15;
+    if (puxa) nFim = Math.max(ini + 15, Math.min(FIM_H * 60, fim + passo));
+    else {
+      nIni = Math.max(INI_H * 60, Math.min(FIM_H * 60 - dur, ini + passo)); nFim = nIni + dur;
+      [].forEach.call(document.querySelectorAll('#grade .g-col'), function (c) {
+        var rc = c.getBoundingClientRect(); if (e.clientX >= rc.left && e.clientX < rc.right && c !== col) { col = c; c.appendChild(bloco); }
+      });
+    }
+    bloco.style.top = agY(nIni) + 'px'; bloco.style.height = Math.max(14, agY(nFim) - agY(nIni) - 2) + 'px';
+    bloco.querySelector('.h').textContent = hm(nIni) + ' às ' + hm(nFim);
+  }
+  function solta() {
+    document.removeEventListener('pointermove', move); document.removeEventListener('pointerup', solta);
+    if (!mexeu) return;
+    agEngole();
+    if (col.dataset.d === o.data && nIni === ini && nFim === fim) { desenhar(); return; }
+    var novo = agCopia(o); novo.data = novo.dataFim = col.dataset.d; novo.ini = hhmm(nIni); novo.fim = hhmm(nFim);
+    agGravar(novo, o);
+  }
+  document.addEventListener('pointermove', move); document.addEventListener('pointerup', solta);
+}
+function agCopia(o) {
+  return { titulo: o.titulo, data: o.data, dataFim: o.dataFim || o.data, ini: o.ini, fim: o.fim, diaInteiro: !!o.diaInteiro, rrule: o.rrule || '', lembrete: o.lembrete || '', desc: o.desc || '', cor: o.cor || '' };
+}
+$('grade').addEventListener('pointerdown', function (ev) {
+  if (ev.button !== 0 || !agLigado() || ev.pointerType === 'touch') return;
+  var bloco = ev.target.closest('.ev.meu');
+  if (bloco && !bloco.classList.contains('fantasma')) { agIniciaMover(ev, bloco, !!ev.target.closest('[data-puxa]')); return; }
+  var col = ev.target.closest('.g-col');
+  if (col && ev.target === col) agIniciaCriar(ev, col);
+});
+
+/* ── os balões ── */
+function agPosiciona(ancora) {
+  var b = $('bal'), r = ancora.getBoundingClientRect(), w = b.offsetWidth, h = b.offsetHeight;
+  var left = r.right + 10; if (left + w > innerWidth - 10) left = r.left - w - 10; if (left < 10) left = Math.max(10, (innerWidth - w) / 2);
+  b.style.left = left + 'px'; b.style.top = Math.max(10, Math.min(innerHeight - h - 10, r.top)) + 'px';
+}
+function agAbreBalao(html, ancora, cor) {
+  var b = $('bal'); b.innerHTML = html; b.style.setProperty('--ev-cor', cor || AG_COR); b.hidden = false;
+  agPosiciona(ancora);
+}
+function agFechaBalao() {
+  $('bal').hidden = true;
+  if (agFantasma) { agFantasma.remove(); agFantasma = null; }
+}
+document.addEventListener('pointerdown', function (ev) {
+  var b = $('bal'); if (b.hidden || b.contains(ev.target) || !$('dlg').hidden) return;
+  if (ev.target.closest('[data-ag]')) return;   /* o clique no outro evento troca o balão, não só fecha */
+  agFechaBalao();
+});
+/* o balão rápido: título e Salvar, ou "Mais opções" */
+function agBalaoNovo(base, ancora) {
+  var o = { titulo: '', data: base.data, dataFim: base.data, diaInteiro: !!base.diaInteiro, ini: base.diaInteiro ? '' : hhmm(base.ini), fim: base.diaInteiro ? '' : hhmm(base.fim), rrule: '', lembrete: '', desc: '', cor: '' };
+  agAbreBalao('<div class="acoes"><button type="button" data-balx aria-label="Fechar">✕</button></div>' +
+    '<input class="tit" id="balTit" placeholder="Adicionar título" maxlength="200" autocomplete="off">' +
+    '<div class="lin"><span>🕒</span><span>' + agQuando(o) + '</span></div>' +
+    '<div class="pe"><button type="button" class="bt-sec" id="balMais">Mais opções</button><button type="button" class="bt-pri" id="balSalva">Salvar</button></div>', ancora);
+  var tit = $('balTit'); setTimeout(function () { tit.focus(); }, 30);
+  var salva = function () { o.titulo = tit.value.trim(); agFechaBalao(); agGravar(o, null); };
+  $('balSalva').onclick = salva;
+  tit.onkeydown = function (e) { if (e.key === 'Enter') salva(); };
+  $('balMais').onclick = function () { o.titulo = tit.value.trim(); agFechaBalao(); agEditor(o, null); };
+  $('bal').querySelector('[data-balx]').onclick = agFechaBalao;
+}
+/* os detalhes de um evento meu */
+function agDetalhes(k, ancora) {
+  var x = EVS[k], o = x && x.e.ag; if (!o) return;
+  agFechaBalao();
+  var lem = AG_AVISOS.filter(function (l) { return l[0] === String(o.lembrete || ''); })[0];
+  agAbreBalao('<div class="acoes"><button type="button" id="balEd" title="Editar evento" aria-label="Editar evento">✏️</button>' +
+    '<button type="button" id="balEx" title="Excluir evento" aria-label="Excluir evento">🗑</button>' +
+    '<a href="' + esc(agLinkGoogle(o)) + '" target="_blank" rel="noopener" title="Levar ao Google Agenda" aria-label="Levar ao Google Agenda">📅</a>' +
+    '<button type="button" data-balx aria-label="Fechar">✕</button></div>' +
+    '<div class="cab"><i></i><div><h4>' + esc(o.titulo) + '</h4><p>' + agQuando(o) + '</p>' + (o.rrule ? '<p>🔁 ' + esc(agTextoRR(o.rrule, o.serieData)) + '</p>' : '') + '</div></div>' +
+    (lem && lem[0] !== '' ? '<div class="lin"><span>🔔</span><span>' + lem[1] + '</span></div>' : '') +
+    (o.desc ? '<div class="lin"><span>📝</span><span class="desc">' + esc(o.desc) + '</span></div>' : ''), ancora, o.cor || AG_COR);
+  $('balEd').onclick = function () { agFechaBalao(); agEditor(agCopia(o), o); };
+  $('balEx').onclick = function () { agFechaBalao(); agExcluir(o); };
+  $('bal').querySelector('[data-balx]').onclick = agFechaBalao;
+}
+function agLinkGoogle(o) {
+  var dts = o.diaInteiro ? o.data.replace(/-/g, '') + '/' + iso(somaDias(dDe(o.dataFim || o.data), 1)).replace(/-/g, '')
+                         : stamp(dDe(o.data), minDe(o.ini)) + '/' + stamp(dDe(o.data), minDe(o.fim));
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(o.titulo) + '&dates=' + dts + '&ctz=America/Sao_Paulo' +
+    (o.rrule ? '&recur=' + encodeURIComponent('RRULE:' + o.rrule) : '') + (o.desc ? '&details=' + encodeURIComponent(o.desc) : '');
+}
+
+/* ── "Este evento / Este e os seguintes / Todos os eventos" ── */
+function agEscopo(titulo, comEste) {
+  return new Promise(function (ok) {
+    var d = $('dlg');
+    d.innerHTML = '<div class="cx" role="dialog" aria-modal="true"><h4>' + titulo + '</h4>' +
+      (comEste ? '<label><input type="radio" name="agEsc" value="este" checked> Este evento</label>' : '') +
+      '<label><input type="radio" name="agEsc" value="seguintes"' + (comEste ? '' : ' checked') + '> Este e os seguintes</label>' +
+      '<label><input type="radio" name="agEsc" value="todos"> Todos os eventos</label>' +
+      '<div class="pe"><button type="button" class="bt-sec" data-r="0">Cancelar</button><button type="button" class="bt-pri" data-r="1">OK</button></div></div>';
+    d.hidden = false;
+    var fim = function (v) { d.hidden = true; d.onclick = null; document.removeEventListener('keydown', tecla, true); ok(v); };
+    var tecla = function (e) { if (e.key === 'Escape') { e.stopPropagation(); fim(null); } };
+    document.addEventListener('keydown', tecla, true);
+    d.onclick = function (e) {
+      if (e.target === d) return fim(null);
+      var b = e.target.closest('[data-r]'); if (!b) return;
+      fim(b.dataset.r === '1' ? d.querySelector('input[name=agEsc]:checked').value : null);
+    };
+  });
+}
+
+/* ── gravar e excluir ── */
+function agToast(txt, acao, rot) {
+  var t = document.querySelector('.ag-toast'); if (t) t.remove();
+  t = document.createElement('div'); t.className = 'ag-toast'; t.setAttribute('role', 'status');
+  t.innerHTML = '<span>' + esc(txt) + '</span>' + (acao ? '<button type="button">' + esc(rot) + '</button>' : '');
+  if (acao) t.querySelector('button').onclick = function () { t.remove(); acao(); };
+  document.body.appendChild(t);
+  setTimeout(function () { t.remove(); }, acao ? 7000 : 3500);
+}
+function agGravar(o, antigo) {
+  var pede = antigo && antigo.rrule ? agEscopo('Editar evento recorrente', o.rrule === antigo.rrule) : Promise.resolve('todos');
+  return pede.then(function (escopo) {
+    if (!escopo) { agFechaBalao(); desenhar(); return; }
+    /* desenha na hora o que dá para prever (evento novo, avulso ou "este"); a série inteira espera o servidor */
+    var lista = agCache[iso(inicioDaSemana(dDe(o.data)))];
+    if (lista && (!antigo || !antigo.rrule || escopo === 'este')) {
+      if (antigo) { var i = lista.indexOf(antigo); if (i > -1) lista.splice(i, 1); }
+      var tmp = agCopia(o); tmp.id = 'tmp'; tmp.ocorrencia = tmp.data; tmp.serieData = tmp.data; if (escopo === 'este') tmp.rrule = '';
+      lista.push(tmp);
+    } else if (antigo && lista) { var j = lista.indexOf(antigo); if (j > -1) lista.splice(j, 1); }
+    agFechaBalao(); desenhar();
+    return post({ action: 'agendaSalvar', ev: o, id: antigo ? antigo.id : '', escopo: escopo, ocorrencia: antigo ? antigo.ocorrencia : '' })
+      .then(function () { agToast(antigo ? 'Evento salvo' : 'Evento criado'); })
+      .catch(function (e) { agToast('⚠️ ' + ((e && e.message) || 'Não consegui salvar.')); })
+      .then(agRecarrega);
+  });
+}
+function agExcluir(o) {
+  var pede = o.rrule ? agEscopo('Excluir evento recorrente', true) : Promise.resolve('todos');
+  pede.then(function (escopo) {
+    if (!escopo) return;
+    var lista = agCache[iso(inicioDaSemana(dDe(o.data)))] || [];
+    (agCache[iso(inicioDaSemana(dDe(o.data)))] = lista.filter(function (x) { return escopo === 'este' ? x !== o : !(x.id === o.id && (escopo === 'todos' || x.data >= o.data)); }));
+    desenhar();
+    post({ action: 'agendaExcluir', id: o.id, escopo: escopo, ocorrencia: o.ocorrencia }).then(function () {
+      /* desfazer, como no Google: só para o evento avulso, que volta inteiro */
+      agToast('Evento excluído', o.rrule ? null : function () { agGravar(agCopia(o), null); }, 'Desfazer');
+    }).catch(function (e) { agToast('⚠️ ' + ((e && e.message) || 'Não consegui excluir.')); }).then(agRecarrega);
+  });
+}
+
+/* ── o editor completo ("Mais opções"), na gaveta ── */
+function agOpcoesHora(sel, de) {
+  var h = ''; for (var m = de || 0; m < 24 * 60; m += 15) h += '<option value="' + m + '"' + (m === sel ? ' selected' : '') + '>' + hm(m) + '</option>';
+  return h;
+}
+function agEditor(o, antigo) {
+  var cor = o.cor || AG_COR, rrAtual = o.rrule || '';
+  var h = '<div class="topo"><h3 id="gavTit">' + (antigo ? 'Editar evento' : 'Novo evento') + '</h3><div class="chips"><span class="chip">Só você vê este evento</span></div></div>' +
+    '<div class="miolo ed">' +
+    '<input class="ed-tit" id="edTit" placeholder="Adicionar título" maxlength="200" value="' + esc(o.titulo) + '">' +
+    '<div class="lin"><b>🕒</b><input type="date" id="edData" value="' + esc(o.data) + '" aria-label="Data">' +
+      '<span id="edHoras"><select id="edIni" aria-label="Início"></select> até <select id="edFim" aria-label="Fim"></select></span>' +
+      '<span id="edAte" hidden>até <input type="date" id="edDataFim" value="' + esc(o.dataFim || o.data) + '" aria-label="Data do fim"></span></div>' +
+    '<div class="lin"><b></b><label class="chk"><input type="checkbox" id="edDia"' + (o.diaInteiro ? ' checked' : '') + '> Dia inteiro</label></div>' +
+    '<div class="lin"><b>🔁</b><select id="edRep" aria-label="Repetição"></select></div>' +
+    '<div class="pers" id="edPers" hidden>' +
+      '<div class="lin">Repetir a cada <input type="number" id="pInt" min="1" max="99" value="1"> <select id="pFreq"><option value="DAILY">dia(s)</option><option value="WEEKLY">semana(s)</option><option value="MONTHLY">mês(es)</option><option value="YEARLY">ano(s)</option></select></div>' +
+      '<div class="lin" id="pSem">Repetir: <span class="dias">' + [1, 2, 3, 4, 5, 6, 0].map(function (w) { return '<button type="button" data-wd="' + w + '" title="' + DIAS_LONGO[w] + '">' + 'DSTQQSS'[w] + '</button>'; }).join('') + '</span></div>' +
+      '<div id="pMes"><label><input type="radio" name="pMes" value="dia" checked> <span id="pMesDia"></span></label><label id="pMesNthL"><input type="radio" name="pMes" value="nth"> <span id="pMesNth"></span></label></div>' +
+      '<div class="lin" style="margin-top:.6rem"><b style="width:auto;font-weight:800">Termina</b></div>' +
+      '<label><input type="radio" name="pFim" value="nunca" checked> Nunca</label>' +
+      '<label><input type="radio" name="pFim" value="data"> Em <input type="date" id="pAte"></label>' +
+      '<label><input type="radio" name="pFim" value="vezes"> Após <input type="number" id="pVezes" min="1" max="999" value="13"> ocorrências</label>' +
+    '</div>' +
+    '<div class="lin"><b>🔔</b><select id="edLem" aria-label="Lembrete">' + AG_AVISOS.map(function (l) { return '<option value="' + l[0] + '"' + (l[0] === String(o.lembrete || '') ? ' selected' : '') + '>' + l[1] + '</option>'; }).join('') + '</select></div>' +
+    '<small class="dica">O aviso aparece com o Hub aberto. Para ser avisado no celular, leve o evento ao Google Agenda (📅 nos detalhes).</small>' +
+    '<div class="lin"><b>🎨</b><span class="cores">' + AG_PALETA.map(function (c) { return '<button type="button" data-cor="' + c[0] + '" title="' + c[1] + '" aria-label="' + c[1] + '" style="--c:' + c[0] + '"' + (c[0] === cor ? ' class="on"' : '') + '></button>'; }).join('') + '</span></div>' +
+    '<div class="lin"><b>📝</b><textarea id="edDesc" placeholder="Adicionar descrição" maxlength="4000" style="flex:1">' + esc(o.desc) + '</textarea></div>' +
+    '</div><div class="pe ed-pe">' + (antigo ? '<button type="button" class="bt-sec perigo" id="edEx">Excluir</button>' : '') +
+    '<button type="button" class="bt-sec" data-fecha>Cancelar</button><button type="button" class="bt-pri" id="edSalva">Salvar</button></div>';
+  $('gavCorpo').innerHTML = h;
+  var caixa = document.querySelector('#gav .caixa'); caixa.style.setProperty('--g-cor', cor);
+  var ini = minDe(o.ini), fim = minDe(o.fim);
+  if (ini == null) { var agora = new Date(); ini = Math.min(21, Math.max(INI_H, agora.getHours() + 1)) * 60; fim = ini + 60; }
+  function horas() { $('edIni').innerHTML = agOpcoesHora(ini); $('edFim').innerHTML = agOpcoesHora(fim, ini + 15); }
+  horas();
+  $('edIni').onchange = function () { var dur = fim - ini; ini = +this.value; fim = Math.min(24 * 60 - 15, ini + dur); horas(); };
+  $('edFim').onchange = function () { fim = +this.value; };
+  function diaInt() { var di = $('edDia').checked; $('edHoras').hidden = di; $('edAte').hidden = !di; }
+  $('edDia').onchange = diaInt; diaInt();
+  /* a repetição: as prontas mudam com a data; a que não for nenhuma delas aparece com o próprio texto */
+  var tipo = 'nada';
+  function presets() {
+    var ps = agPresets($('edData').value || o.data), ach = ps.filter(function (p) { return p[1] === rrAtual; })[0];
+    if (tipo !== 'pers') { if (ach) tipo = ach[0]; else if (rrAtual) tipo = 'atual'; }
+    var hh = ps.map(function (p) { return '<option value="' + p[0] + '"' + (p[0] === tipo ? ' selected' : '') + '>' + p[2] + '</option>'; }).join('');
+    if (rrAtual && !ach) hh += '<option value="atual"' + (tipo === 'atual' ? ' selected' : '') + '>' + esc(agTextoRR(rrAtual, $('edData').value || o.data)) + '</option>';
+    $('edRep').innerHTML = hh + '<option value="pers"' + (tipo === 'pers' ? ' selected' : '') + '>Personalizar…</option>';
+    var d = dDe($('edData').value || o.data), n = Math.ceil(d.getDate() / 7);
+    $('pMesDia').textContent = 'Mensal no dia ' + d.getDate();
+    $('pMesNth').textContent = 'Mensal ' + agEnesimo(n > 4 ? -1 : n, d.getDay());
+  }
+  function rrDaTela() {
+    var v = $('edRep').value;
+    if (v === 'atual') return rrAtual;
+    if (v !== 'pers') return (agPresets($('edData').value).filter(function (p) { return p[0] === v; })[0] || [0, ''])[1];
+    var d = dDe($('edData').value), n = Math.ceil(d.getDate() / 7);
+    var r = { freq: $('pFreq').value, intervalo: Math.max(1, +$('pInt').value || 1), dias: [], nth: 0, ate: '', vezes: 0 };
+    if (r.freq === 'WEEKLY') { [].forEach.call($('pSem').querySelectorAll('.on'), function (b) { r.dias.push(+b.dataset.wd); }); if (!r.dias.length) r.dias = [d.getDay()]; }
+    if (r.freq === 'MONTHLY' && document.querySelector('input[name=pMes]:checked').value === 'nth') { r.nth = n > 4 ? -1 : n; r.dias = [d.getDay()]; }
+    var fimT = document.querySelector('input[name=pFim]:checked').value;
+    if (fimT === 'data' && $('pAte').value) r.ate = $('pAte').value;
+    if (fimT === 'vezes') r.vezes = Math.max(1, Math.min(999, +$('pVezes').value || 1));
+    return agMontaRR(r);
+  }
+  function pers() {
+    var f = $('pFreq').value;
+    $('pSem').hidden = f !== 'WEEKLY'; $('pMes').hidden = f !== 'MONTHLY';
+    $('edPers').hidden = $('edRep').value !== 'pers';
+  }
+  function abrePers(rr) {   /* o painel nasce da repetição que estava escolhida (ou da semanal no dia da data) */
+    var d = dDe($('edData').value), r = agParseRR(rr) || { freq: 'WEEKLY', intervalo: 1, dias: [d.getDay()], nth: 0, ate: '', vezes: 0 };
+    $('pFreq').value = r.freq; $('pInt').value = r.intervalo;
+    var ds = r.dias.length && r.freq === 'WEEKLY' ? r.dias : [d.getDay()];
+    [].forEach.call($('pSem').querySelectorAll('button'), function (b) { b.classList.toggle('on', ds.indexOf(+b.dataset.wd) > -1); });
+    document.querySelector('input[name=pMes][value=' + (r.nth ? 'nth' : 'dia') + ']').checked = true;
+    document.querySelector('input[name=pFim][value=' + (r.vezes ? 'vezes' : r.ate ? 'data' : 'nunca') + ']').checked = true;
+    if (r.vezes) $('pVezes').value = r.vezes;
+    $('pAte').value = r.ate || iso(somaDias(d, 90));
+  }
+  presets(); pers();
+  $('edRep').onchange = function () {
+    if (this.value === 'pers') {
+      var antes = tipo === 'atual' ? rrAtual : (agPresets($('edData').value).filter(function (p) { return p[0] === tipo; })[0] || [0, ''])[1];
+      abrePers(antes); tipo = 'pers';
+    } else tipo = this.value;
+    pers();
+  };
+  $('pFreq').onchange = pers;
+  $('pSem').onclick = function (e) { var b = e.target.closest('[data-wd]'); if (b) b.classList.toggle('on'); };
+  $('pAte').onfocus = function () { document.querySelector('input[name=pFim][value=data]').checked = true; };
+  $('pVezes').onfocus = function () { document.querySelector('input[name=pFim][value=vezes]').checked = true; };
+  $('edData').onchange = function () {
+    if (!this.value) return;
+    if ($('edDataFim').value < this.value) $('edDataFim').value = this.value;
+    if (tipo !== 'atual' && tipo !== 'pers') { var p = agPresets(this.value).filter(function (x) { return x[0] === tipo; })[0]; rrAtual = p ? p[1] : ''; if (!p) tipo = 'nada'; }
+    presets(); pers();
+  };
+  document.querySelector('#gavCorpo .cores').onclick = function (e) {
+    var b = e.target.closest('[data-cor]'); if (!b) return;
+    cor = b.dataset.cor; [].forEach.call(this.children, function (x) { x.classList.toggle('on', x === b); }); caixa.style.setProperty('--g-cor', cor);
+  };
+  $('edSalva').onclick = function () {
+    var di = $('edDia').checked, data = $('edData').value;
+    if (!data) { $('edData').focus(); return; }
+    var n = { titulo: $('edTit').value.trim(), data: data, dataFim: di ? ($('edDataFim').value || data) : data, diaInteiro: di,
+              ini: di ? '' : hhmm(ini), fim: di ? '' : hhmm(fim), rrule: rrDaTela(), lembrete: $('edLem').value, desc: $('edDesc').value, cor: cor === AG_COR ? '' : cor };
+    if (n.dataFim < n.data) n.dataFim = n.data;
+    gavFecha(); agGravar(n, antigo);
+  };
+  if (antigo) $('edEx').onclick = function () { gavFecha(); agExcluir(antigo); };
+  gavAbre();
+  setTimeout(function () { if (!antigo) $('edTit').focus(); }, 400);
+}
+
+/* ── os botões de criar (o "＋ Criar" do computador, o "+" do celular) e o horário livre do celular ── */
+function agCriarAgora() {
+  /* no celular, o dia aberto; no computador, hoje (ou a segunda, numa semana que não é esta) */
+  var d = innerWidth <= 640 ? diaSel : (estaSemana(segunda) ? new Date() : segunda);
+  var h = Math.min(21, Math.max(INI_H, new Date().getHours() + 1)) * 60;
+  agEditor({ titulo: '', data: iso(d), dataFim: iso(d), ini: hhmm(h), fim: hhmm(h + 60), diaInteiro: false, rrule: '', lembrete: '', desc: '', cor: '' }, null);
+}
+$('btCriar').addEventListener('click', agCriarAgora);
+$('fab').addEventListener('click', agCriarAgora);
+function agNovoNoLivre(min, el) {
+  var a = Math.ceil(min / 15) * 15, b = Math.min(FIM_H * 60, a + 60);
+  agBalaoNovo({ data: iso(diaSel), ini: a, fim: b }, el);
+}
+/* tocar e segurar: abre já com o dedo no lugar, sem esperar soltar */
+(function () {
+  var t = null, alvo = null;
+  $('diaLista').addEventListener('touchstart', function (e) {
+    var lv = e.target.closest('[data-livre]'); if (!lv) return;
+    alvo = lv; lv.classList.add('segura');
+    t = setTimeout(function () { t = null; if (navigator.vibrate) navigator.vibrate(15); agEngole(); agEngoleClique = true; agNovoNoLivre(+lv.dataset.livre, lv); setTimeout(function () { agEngoleClique = false; }, 600); }, 450);
+  }, { passive: true });
+  var solta = function () { if (t) clearTimeout(t); t = null; if (alvo) alvo.classList.remove('segura'); alvo = null; };
+  $('diaLista').addEventListener('touchend', solta); $('diaLista').addEventListener('touchmove', solta, { passive: true }); $('diaLista').addEventListener('touchcancel', solta);
+  $('diaLista').addEventListener('contextmenu', function (e) { if (e.target.closest('[data-livre]')) e.preventDefault(); });
+})();
+
+/* ── o lembrete, com a página aberta ── */
+function agLembretes() {
+  var agora = Date.now();
+  Object.keys(agCache).forEach(function (k) {
+    agCache[k].forEach(function (o) {
+      if (o.lembrete === '' || o.lembrete == null || o.diaInteiro || o.id === 'tmp') return;
+      var chave = o.id + o.data + o.ini; if (agAvisados[chave]) return;
+      var quando = dDe(o.data).getTime() + (minDe(o.ini) - (+o.lembrete)) * 60000, falta = quando - agora;
+      if (falta < 0 || falta > 12 * 3600000) return;
+      agAvisados[chave] = 1;
+      setTimeout(function () {
+        agToast('🔔 ' + o.titulo + ' · ' + hm(minDe(o.ini)));
+        try { if (window.Notification && Notification.permission === 'granted') new Notification(o.titulo, { body: agQuando(o) }); } catch (e) {}
+      }, falta);
+    });
   });
 }
 
