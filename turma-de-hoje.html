@@ -538,6 +538,11 @@ body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ 
   .ak-cab .cont.f{ background: #fee2e2; color: #b91c1c; }
   .ak-cab .ak-todos{ font-family: var(--font-body); font-size: .92rem; font-weight: 900; padding: .3rem .9rem; border-radius: 99px; border: 2px solid #10b981; background: #10b981; color: #fff; cursor: pointer; }
   .ak-cab .ak-todos:hover{ background: #059669; border-color: #059669; }
+  .ak-pend{ display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .5rem .8rem; margin: -.3rem 0 .8rem; padding: .6rem 1rem; border-radius: 14px;
+    background: #fffbeb; border: 2px dashed #f59e0b; color: #92400e; font-weight: 700; text-align: center; }
+  .ak-pend button{ border: 0; border-radius: 99px; padding: .35rem .95rem; font-weight: 900; font-family: inherit; background: #f59e0b; color: #fff; cursor: pointer; }
+  .ak-pend button:disabled{ opacity: .6; cursor: default; }
+  body.theme-dark .ak-pend{ background: #3a2e12; color: #fcd34d; }
   .al.al-kids{ padding: 0; border-radius: 18px; border: 2px solid #e8ecf4; box-shadow: none; margin-bottom: .55rem; background: #fff; overflow: hidden; }
   .al.al-kids.veio{ border-color: #a7f3d0; background: #f6fffb; }
   .al.al-kids.aniv{ border-color: #f5c542; background: linear-gradient(90deg, #fff8db 0%, #ffffff 60%); box-shadow: 0 0 0 3px rgba(245,197,66,.25); }
@@ -2696,6 +2701,15 @@ function desenharChamadaKids(caixa) {
     cab.appendChild(bt);
   }
   caixa.appendChild(cab);
+  var nPend = Object.keys(pendCard()).length;
+  if (nPend) {
+    var fx = document.createElement('div'); fx.className = 'ak-pend';
+    fx.innerHTML = '<span>⏳ ' + nPend + ' presença' + (nPend > 1 ? 's' : '') + ' ainda não ' + (nPend > 1 ? 'foram' : 'foi') + ' para o card. Desmarque quem não veio; o envio é automático depois de 3 minutos sem mexer na chamada.</span>' +
+      '<button type="button"' + (envioCard.rodando ? ' disabled' : '') + '>' + (envioCard.rodando ? 'Enviando…' : '📇 Enviar ao card agora') + '</button>';
+    fx.querySelector('button').addEventListener('click', enviarPendentesCard);
+    caixa.appendChild(fx);
+    if (!envioCard.timer && !envioCard.rodando) agendaEnvioCard();
+  }
   lista.forEach(function (a) {
     var veio = !!estado.atendidos[a.raf], faltou = faltouHoje(a);
     var obs = ((estado.dados[a.raf] || {}).planner || {}).obs || '';
@@ -2710,8 +2724,13 @@ function desenharChamadaKids(caixa) {
       '<button type="button" class="ak-nota' + (obs ? ' tem' : '') + '">📝 Anotações sobre o aluno' + (obs ? ' · tem anotação' : '') + '</button>';
     var nota = document.createElement('div'); nota.className = 'ak-obs'; nota.hidden = true;
     el.appendChild(nota);
-    el.querySelector('.ak-veio').addEventListener('click', function () { if (faltouHoje(a)) { toast('Desfaça a falta antes de marcar que veio.'); return; } presencaKids(a); });
+    el.querySelector('.ak-veio').addEventListener('click', function () {
+      if (faltouHoje(a)) { toast('Desfaça a falta antes de marcar que veio.'); return; }
+      if (tiraPendente(a)) { desenharTurma(); return; }   /* do "marcar todos" e ainda fora do card: só sai da tela */
+      presencaKids(a);
+    });
     el.querySelector('.ak-falta').addEventListener('click', function () {
+      tiraPendente(a);   /* nada no card para desfazer: o "a" vai direto */
       if (!estado.atendidos[a.raf]) { marcarFalta(a); return; }
       presencaKids(a).then(function () { marcarFalta(a); });   /* veio e depois faltou: devolve o placeholder antes do "a" */
     });
@@ -2730,20 +2749,59 @@ function licaoDeHoje(a) {
   var adv = String(L.licao || '').match(/^\s*Adv\s*(\d)/i); if (adv) return 'Adv' + adv[1];
   var n = ptLicaoVigente(b, nome, i); return n ? 'L' + n : '';
 }
+/* O "MARCAR TODOS" SÓ VAI AO CARD NO FIM (Pedro, 27/10/2026): o professor marca todos e depois desmarca quem faltou.
+   Gravar na hora deixava a presença no card antes da falta chegar, e a falta não sobrescreve presença. Então a leva
+   fica pendente (na tela e no localStorage, ao lado dos atendidos): desmarcar só tira da tela, Faltou lança o "a"
+   direto, e o card recebe as presenças pelo botão ou sozinho depois de 3 minutos sem mexer na chamada.
+   O Veio de um aluno só continua gravando na hora. */
+var ENVIO_CARD_MS = 3 * 60 * 1000;
+var envioCard = { timer: 0, rodando: false };
+function pendCard() {
+  var k = chaveAtend() + ':pend';
+  if (estado._pendK !== k) { estado._pendK = k; try { estado.pendCard = JSON.parse(localStorage.getItem(k) || '{}') || {}; } catch (e) { estado.pendCard = {}; } }
+  return estado.pendCard;
+}
+function guardaPendCard() { try { localStorage.setItem(estado._pendK, JSON.stringify(estado.pendCard)); } catch (e) {} }
+function tiraPendente(a) {
+  var p = pendCard(); if (!p[a.raf]) return false;
+  delete p[a.raf]; delete estado.atendidos[a.raf]; guardaPendCard(); guardaAtendidos(); agendaEnvioCard();
+  return true;
+}
+function agendaEnvioCard() {
+  clearTimeout(envioCard.timer); envioCard.timer = 0;
+  if (Object.keys(pendCard()).length) envioCard.timer = setTimeout(enviarPendentesCard, ENVIO_CARD_MS);
+}
 function presencaTodosKids(lista) {
+  var p = pendCard();
+  lista.forEach(function (a) { estado.atendidos[a.raf] = Date.now(); p[a.raf] = 1; });
+  guardaAtendidos(); guardaPendCard(); agendaEnvioCard(); desenharTurma();
+  toast('✓ ' + lista.length + ' alunos marcados. Desmarque quem não veio; o card recebe as presenças depois.');
+}
+function enviarPendentesCard() {
+  if (envioCard.rodando) return;
+  clearTimeout(envioCard.timer); envioCard.timer = 0;
+  var p = pendCard(), porRaf = {};
+  estado.alunos.forEach(function (a) { porRaf[a.raf] = a; });
+  var fila = Object.keys(p).map(function (r) { return porRaf[r]; }).filter(function (a) { return a && estado.atendidos[a.raf] && !faltouHoje(a); });
+  Object.keys(p).forEach(function (r) { if (!porRaf[r] || !estado.atendidos[r]) delete p[r]; });   /* trocou de turma ou já saiu */
+  guardaPendCard();
+  if (!fila.length) { desenharTurma(); return; }
+  envioCard.rodando = true; desenharTurma();
   var falhas = 0;
-  lista.forEach(function (a) { estado.atendidos[a.raf] = Date.now(); });
-  guardaAtendidos(); desenharTurma();
-  toast('✓ ' + lista.length + ' alunos marcados. Desmarque quem não veio.');
-  lista.reduce(function (p, a) {
-    return p.then(function () {
-      if (!estado.atendidos[a.raf]) return;   /* desmarcado enquanto a fila andava: nada a escrever */
-      return presencaKids(a, true, true).catch(function () { falhas++; });
+  fila.reduce(function (pr, a) {
+    return pr.then(function () {
+      if (!p[a.raf] || !estado.atendidos[a.raf]) return;
+      return presencaKids(a, true, true).then(function () { delete p[a.raf]; guardaPendCard(); }, function () { falhas++; });
     });
   }, Promise.resolve()).then(function () {
-    toast(falhas ? '⚠️ ' + falhas + ' presença' + (falhas > 1 ? 's não foram' : ' não foi') + ' ao card. Marque de novo.' : '📇 Card atualizado com as presenças.');
+    envioCard.rodando = false; desenharTurma();
+    if (falhas) { toast('⚠️ ' + falhas + ' presença' + (falhas > 1 ? 's não foram' : ' não foi') + ' para o card. Tente "Enviar ao card agora" de novo.'); agendaEnvioCard(); }
+    else toast('📇 Card atualizado com as presenças.');
   });
 }
+window.addEventListener('beforeunload', function (e) {
+  if (estado.turma && Object.keys(pendCard()).length) { e.preventDefault(); e.returnValue = ''; }
+});
 /* quieto: sem o aviso de sucesso e com o erro devolvido (o "marcar todos" avisa uma vez no fim);
    jaMarcado: a tela já mostra Veio, falta só o card */
 function presencaKids(a, quieto, jaMarcado) {
@@ -2757,6 +2815,7 @@ function presencaKids(a, quieto, jaMarcado) {
     else if (c.jaEstava) toast('📇 O card já tinha "' + c.jaEstava + '" na aula ' + rotDiaTH() + ' e não foi alterado.');
     else if (c.motivo) toast('📇 Card não alterado: ' + c.motivo + '.');
   }).catch(function (e) {
+    if (jaMarcado) throw e;   /* da leva pendente: continua Veio na tela e pendente, para tentar de novo */
     if (desfazer) estado.atendidos[a.raf] = Date.now(); else delete estado.atendidos[a.raf];
     guardaAtendidos(); desenharTurma();
     if (quieto) throw e;
