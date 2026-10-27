@@ -614,6 +614,7 @@ body.theme-dark .pl-salvar{ background: #10261f; }
 </main>
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
+<script src="https://portalfisk.com.br/assets/avatar-festa.js?v=2026-10-26a"></script>
 <script src="https://portalfisk.com.br/assets/planner-v2.js?v=b66262b64e"></script>
 <!-- o guia do Checking, lição a lição: a base comum e um arquivo por livro (Essentials, Transitions e Fluency 1 e 2, In Focus, Inmediato 1 a 3) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=5a600e1933"></script>
@@ -1547,7 +1548,26 @@ function desenharTurma() {
   $('resumo').innerHTML = '<b>' + estado.alunos.length + '</b> alunos · <b>' + nCk + '</b> com Checking';   /* a turma já está no menu de cima */
   /* o botão de prioridade mora na barra do roteiro (pintaFila), grande e numa linha só dele (16/09/2026) */
   ligaArrastar(caixa);
+  festaSeTurmaEmDia();
 }
+/* O AVATAR COMEMORA (Pedro, 26/10/2026; assets/avatar-festa.js do portal): a turma inteira EM DIA no planner é o momento
+   grande do professor. Só na virada (alguém saiu do atraso nesta visita), nunca ao abrir uma turma que já estava em dia. */
+var TURMA_EM_DIA = {};
+function festaSeTurmaEmDia() {
+  try {
+    if (!window.FiskAvatarFesta || !estado.alunos.length) return;
+    var k = estado.escola + '|' + estado.prof + '|' + estado.turma, niveis = estado.alunos.map(function (a) { return prioDados(a).nivel; });
+    if (niveis.some(function (n) { return n === 'semdados'; })) return;
+    var emDia = niveis.every(function (n) { return n === 'emdia'; });
+    if (emDia && TURMA_EM_DIA[k] === false) { try { somDeConquista(); } catch (e) {} FiskAvatarFesta.viva({ selo: '📒', som: false }); }
+    TURMA_EM_DIA[k] = emDia;
+  } catch (e) {}
+}
+(function () {
+  var s = sessao();
+  if (window.FiskAvatarFesta && s && s.name && s.token)
+    FiskAvatarFesta.prepara({ raf: 'PROF:' + s.name, profToken: s.token, endpoint: FISK_HUB_EP, appKey: 'fisk_0719bacbecc857f61d1e', base: 'https://portalfisk.com.br/' });
+})();
 /* ── ARRASTAR A ORDEM (pedido dos professores, 18/09/2026) ──
    Voltou o que o Planejador tinha: o professor segura a alça ⠿ do cartão e arrasta para onde quiser, antes ou depois
    de "Ordenar por prioridade" (a ferramenta sugere, o professor decide). Como os cartões são altos, há também ↑ ↓.
