@@ -1488,3 +1488,176 @@ function fiskBuscaMeusAlunos(q) {
   function vai() { pode().then(function (ok) { if (ok) monta(); }); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', vai); else vai();
 })();
+
+/* ══ A SEMANA DE ANIVERSÁRIO DO PROFESSOR (Pedro, 28/10/2026) ═══════════════════════════════════════════════════════
+ * "O Hub inteiro dele colorido e animado na semana", como o Portal do Aluno já faz na semana do aluno. Na semana
+ * (segunda a domingo, a régua do Portal) toda página do Hub ganha a faixa de festa, balões subindo pelas bordas e um
+ * confete por dia; NO DIA (ou no primeiro acesso depois dele, dentro da semana) abre a cortina de parabéns em nome da
+ * escola, e ao fechar o avatar do professor comemora (fiskFesta).
+ * Quem decide é o SERVIDOR (rota profAniversario, Equipe.js no backend), pela data que a pessoa preencheu na cortina
+ * dos dados da equipe. A resposta vale o dia inteiro no aparelho: uma chamada por dia, não por página. Sem data
+ * preenchida, sem rede ou com qualquer defeito: nada aparece, e o Hub segue igual (falha fechada).
+ * Prévia da direção: entre com a conta de direção e abra qualquer página com #ver-aniversario (não grava nada).
+ * Quem pediu "menos movimento" no sistema vê a festa parada: a faixa sem movimento, sem balões e sem confete.
+ * ============================================================================ */
+(function () {
+  if (window.parent !== window) return;
+  var s = (typeof fiskSessao === 'function') ? fiskSessao() : null;
+  if (!s || !s.token || !s.name) return;
+  var previa = /ver-aniversario/.test(location.hash) && !!s.master;
+  if (s.viewingAs && !previa) return;   /* a direção "vendo como" um professor não herda a festa de ninguém */
+  var agora = new Date(), DIA = agora.getFullYear() + '-' + ('0' + (agora.getMonth() + 1)).slice(-2) + '-' + ('0' + agora.getDate()).slice(-2);
+  var QUEM = String(s.name).toUpperCase().replace(/[^A-Z0-9]/g, '');
+  var CH = 'fisk_aniv_prof:' + QUEM;
+  var parado = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var TX = {
+    pt: { fita: '🎂 É a semana do seu aniversário, {n}! O Hub está em festa com você.', fitaDia: '🎉 Hoje é o seu dia, {n}! Feliz aniversário!',
+          titulo: 'Feliz aniversário, {n}!', sub: 'Hoje o dia é todo seu.', titPassou: 'Parabéns pelo seu dia, {n}!',
+          subPassou: 'O seu aniversário foi nesta semana, e a festa continua até domingo.',
+          carta: 'Toda a equipe da <b>{e}</b> deseja um feliz aniversário! Obrigado por cada aula, por cada aluno acolhido e por cada conquista que passa pelas suas mãos. Que o seu novo ano venha com muita saúde, alegria e realizações.',
+          assina: 'Com carinho, a equipe {e}', fechar: 'Obrigado! 🎉', abrir: 'Abrir a mensagem de parabéns' },
+    en: { fita: '🎂 It\'s your birthday week, {n}! The Hub is celebrating with you.', fitaDia: '🎉 Today is your day, {n}! Happy birthday!',
+          titulo: 'Happy birthday, {n}!', sub: 'Today is all about you.', titPassou: 'Happy birthday, {n}!',
+          subPassou: 'Your birthday was this week, and the party goes on until Sunday.',
+          carta: 'Everyone at <b>{e}</b> wishes you a very happy birthday! Thank you for every class, every student you welcome and every achievement that goes through your hands. May your new year bring health, joy and many accomplishments.',
+          assina: 'With love, the {e} team', fechar: 'Thank you! 🎉', abrir: 'Open the birthday message' },
+    es: { fita: '🎂 ¡Es la semana de tu cumpleaños, {n}! El Hub está de fiesta contigo.', fitaDia: '🎉 ¡Hoy es tu día, {n}! ¡Feliz cumpleaños!',
+          titulo: '¡Feliz cumpleaños, {n}!', sub: 'Hoy el día es todo tuyo.', titPassou: '¡Felicidades por tu día, {n}!',
+          subPassou: 'Tu cumpleaños fue esta semana, y la fiesta sigue hasta el domingo.',
+          carta: '¡Todo el equipo de <b>{e}</b> te desea un feliz cumpleaños! Gracias por cada clase, por cada alumno que recibes y por cada logro que pasa por tus manos. Que tu nuevo año venga con mucha salud, alegría y realizaciones.',
+          assina: 'Con cariño, el equipo {e}', fechar: '¡Gracias! 🎉', abrir: 'Abrir el mensaje de cumpleaños' }
+  };
+  function tx() { var l = (typeof fiskIdioma === 'function') ? fiskIdioma() : 'pt'; return TX[l] || TX.pt; }
+  function ler() { try { var g = JSON.parse(localStorage.getItem(CH) || 'null'); if (g && g.d === DIA && g.r) return g.r; } catch (e) {} return null; }
+  function pega() {
+    if (previa) return Promise.resolve({ ok: true, semana: true, hoje: true, nome: String(s.fullName || s.name).replace(/\s*\(.*?\)/g, '').trim().split(/\s+/)[0], escola: 'Caçapava' });
+    var r = ler(); if (r) return Promise.resolve(r);
+    return fetch(FISK_HUB_EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'profAniversario', token: s.token }) })
+      .then(fiskJson).then(function (j) {
+        if (!j || j.ok !== true) return null;
+        try { localStorage.setItem(CH, JSON.stringify({ d: DIA, r: j })); } catch (e) {}
+        return j;
+      }).catch(function () { return null; });
+  }
+
+  function estilo() {
+    if (document.getElementById('fkAnivProfCss')) return;
+    var st = document.createElement('style'); st.id = 'fkAnivProfCss';
+    st.textContent =
+      '#fkAnivFita{position:relative;z-index:50;display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.55rem max(16px,env(safe-area-inset-right,0px)) .55rem max(16px,env(safe-area-inset-left,0px));' +
+        'font:inherit;font-weight:700;font-size:.95rem;line-height:1.35;text-align:center;color:#3b1d00;border:0;width:100%;cursor:default;' +
+        'background:linear-gradient(90deg,#ffd6e8,#ffe9a8,#c9f2d7,#cfe3ff,#e6d4ff,#ffd6e8);background-size:300% 100%;animation:fkAnivFita 14s linear infinite;' +
+        'box-shadow:inset 0 -3px 0 rgba(0,0,0,.06)}' +
+      '#fkAnivFita.dia{cursor:pointer}#fkAnivFita.dia:hover{filter:saturate(1.2)}' +
+      '@keyframes fkAnivFita{from{background-position:0 0}to{background-position:300% 0}}' +
+      /* o fundo: confete parado, bem leve, atrás do conteúdo */
+      '#fkAnivFundo{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.55;' +
+        'background-image:radial-gradient(circle at 12% 18%,#f472b6 0 3px,transparent 4px),radial-gradient(circle at 78% 12%,#facc15 0 3px,transparent 4px),' +
+        'radial-gradient(circle at 40% 70%,#34d399 0 3px,transparent 4px),radial-gradient(circle at 88% 64%,#60a5fa 0 3px,transparent 4px),' +
+        'radial-gradient(circle at 24% 92%,#a78bfa 0 3px,transparent 4px),radial-gradient(circle at 62% 40%,#fb923c 0 2px,transparent 3px);background-size:260px 260px}' +
+      /* os balões sobem pelas bordas, por cima de tudo mas sem pegar clique */
+      '.fkBalao{position:fixed;bottom:-140px;z-index:9000;pointer-events:none;width:46px;height:58px;border-radius:50% 50% 48% 52%/58% 58% 42% 42%;opacity:.88;' +
+        'box-shadow:inset -7px -9px 0 rgba(0,0,0,.12),inset 6px 6px 0 rgba(255,255,255,.35);animation:fkAnivSobe linear infinite}' +
+      '.fkBalao:before{content:"";position:absolute;left:50%;bottom:-5px;margin-left:-4px;border:4px solid transparent;border-bottom-color:inherit;border-top:0;filter:brightness(.9)}' +
+      '.fkBalao:after{content:"";position:absolute;left:50%;top:100%;width:1px;height:62px;background:rgba(100,100,100,.45)}' +
+      '@keyframes fkAnivSobe{0%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-62vh) rotate(4deg)}100%{transform:translateY(-130vh) rotate(-3deg)}}' +
+      '@media (max-width:640px){.fkBalao.b4,.fkBalao.b5,.fkBalao.b6{display:none}.fkBalao{width:36px;height:46px}}' +
+      /* a cortina do dia */
+      '#fkAnivCort{position:fixed;inset:0;z-index:10050;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(30,16,48,.55);backdrop-filter:blur(3px);animation:fkAnivAbre .35s ease}' +
+      '#fkAnivCort .c{position:relative;width:min(460px,100%);max-height:calc(100vh - 32px);overflow:auto;border-radius:22px;padding:2rem 1.6rem 1.5rem;text-align:center;color:#2a1838;' +
+        'background:linear-gradient(160deg,#fff7fb 0%,#fffaf0 55%,#f3fbff 100%);box-shadow:0 24px 60px rgba(30,16,48,.4),0 0 0 3px #f9c4dd}' +
+      '#fkAnivCort .bolo{font-size:3.6rem;line-height:1;margin-bottom:.4rem;animation:fkAnivPula 1.6s ease-in-out infinite}' +
+      '#fkAnivCort h2{margin:.2rem 0 .25rem;font-size:1.65rem;line-height:1.2;text-wrap:balance;color:#9d174d}' +
+      '#fkAnivCort .sub{margin:0 0 1rem;font-size:1rem;color:#6b4a7a}' +
+      '#fkAnivCort .carta{margin:0 0 .9rem;font-size:1rem;line-height:1.55;text-align:left;background:#fff;border:1px dashed #f3a8c9;border-radius:14px;padding:.9rem 1rem}' +
+      '#fkAnivCort .assina{margin:0 0 1.2rem;font-style:italic;color:#7c5a8c;font-size:.92rem}' +
+      '#fkAnivCort button{font:inherit;font-weight:700;font-size:1rem;border:0;border-radius:999px;padding:.75rem 1.6rem;cursor:pointer;color:#fff;' +
+        'background:linear-gradient(90deg,#db2777,#f59e0b);box-shadow:0 6px 16px rgba(219,39,119,.35)}' +
+      '@keyframes fkAnivAbre{from{opacity:0}to{opacity:1}}@keyframes fkAnivPula{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}' +
+      'body.theme-dark #fkAnivFita{color:#2a1400}body.theme-dark #fkAnivFundo{opacity:.3}' +
+      'body.theme-dark #fkAnivCort .c{background:linear-gradient(160deg,#2a1d33,#2b2417 60%,#18242e);color:#f5e9ff;box-shadow:0 24px 60px rgba(0,0,0,.6),0 0 0 3px #7a2e57}' +
+      'body.theme-dark #fkAnivCort h2{color:#f9a8d4}body.theme-dark #fkAnivCort .sub,body.theme-dark #fkAnivCort .assina{color:#d8c2e6}' +
+      'body.theme-dark #fkAnivCort .carta{background:rgba(255,255,255,.05);border-color:#7a2e57}' +
+      '@media (prefers-reduced-motion:reduce){#fkAnivFita,.fkBalao,#fkAnivCort .bolo{animation:none}.fkBalao{display:none}}' +
+      '@media print{#fkAnivFita,#fkAnivFundo,.fkBalao,#fkAnivCort,#fkAnivConf{display:none !important}}';
+    document.head.appendChild(st);
+  }
+
+  function baloes() {
+    var cores = ['#f472b6', '#facc15', '#34d399', '#60a5fa', '#a78bfa', '#fb923c'];
+    var lados = [3, 94, 8, 89, 1.5, 96.5];   /* % da largura: só nas bordas, longe do texto */
+    cores.forEach(function (c, i) {
+      var b = document.createElement('div'); b.className = 'fkBalao b' + (i + 1); b.setAttribute('aria-hidden', 'true');
+      b.style.left = lados[i] + '%'; b.style.background = c; b.style.borderBottomColor = c;
+      b.style.animationDuration = (19 + i * 3) + 's'; b.style.animationDelay = (-i * 4.3) + 's';
+      document.body.appendChild(b);
+    });
+  }
+
+  function confete() {
+    if (parado || document.getElementById('fkAnivConf')) return;
+    var cv = document.createElement('canvas'); cv.id = 'fkAnivConf';
+    cv.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:10060;pointer-events:none';
+    document.body.appendChild(cv);
+    var W = cv.width = innerWidth, H = cv.height = innerHeight, ctx = cv.getContext('2d');
+    var cores = ['#f472b6', '#facc15', '#34d399', '#60a5fa', '#a78bfa', '#fb923c', '#ef4444'], P = [];
+    for (var i = 0; i < 160; i++) P.push({ x: Math.random() * W, y: -20 - Math.random() * H * .5, vx: (Math.random() - .5) * 3, vy: 2 + Math.random() * 4,
+      r: Math.random() * Math.PI, vr: (Math.random() - .5) * .3, w: 6 + Math.random() * 6, h: 8 + Math.random() * 8, c: cores[i % cores.length] });
+    var t0 = performance.now();
+    (function passo(t) {
+      var dt = t - t0; ctx.clearRect(0, 0, W, H);
+      P.forEach(function (p) { p.x += p.vx; p.y += p.vy; p.vy += .04; p.r += p.vr; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r);
+        ctx.globalAlpha = Math.max(0, 1 - Math.max(0, dt - 2600) / 900); ctx.fillStyle = p.c; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * .6); ctx.restore(); });
+      if (dt < 3500) requestAnimationFrame(passo); else cv.remove();
+    })(t0);
+  }
+
+  function cortina(r) {
+    if (document.getElementById('fkAnivCort')) return;
+    var T = tx(), nome = fiskEsc(r.nome || ''), esc = 'Fisk' + (r.escola ? ' ' + fiskEsc(r.escola) : '');
+    var passou = r.passou && !r.hoje;
+    var d = document.createElement('div'); d.id = 'fkAnivCort'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-labelledby', 'fkAnivTit');
+    d.innerHTML = '<div class="c"><div class="bolo" aria-hidden="true">🎂</div>' +
+      '<h2 id="fkAnivTit">' + (passou ? T.titPassou : T.titulo).replace('{n}', nome) + '</h2>' +
+      '<p class="sub">' + (passou ? T.subPassou : T.sub) + '</p>' +
+      '<p class="carta">' + T.carta.replace('{e}', esc) + '</p>' +
+      '<p class="assina">' + T.assina.replace('{e}', esc) + '</p>' +
+      '<button type="button">' + T.fechar + '</button></div>';
+    document.body.appendChild(d);
+    confete();
+    var bt = d.querySelector('button'); try { bt.focus(); } catch (e) {}
+    function fecha() {
+      d.remove(); document.removeEventListener('keydown', esc_);
+      try { if (!previa) localStorage.setItem(CH + ':cortina', String(new Date().getFullYear())); } catch (e) {}
+      try { if (typeof fiskFesta === 'function') fiskFesta('🎂'); } catch (e) {}
+    }
+    function esc_(e) { if (e.key === 'Escape') fecha(); }
+    bt.addEventListener('click', fecha);
+    d.addEventListener('click', function (e) { if (e.target === d) fecha(); });
+    document.addEventListener('keydown', esc_);
+  }
+
+  function festa(r) {
+    if (!r || !r.semana || document.getElementById('fkAnivFita')) return;
+    estilo();
+    document.body.classList.add('fk-aniv');
+    var T = tx(), nome = fiskEsc(r.nome || ''), noDia = r.hoje || r.passou;
+    var f = document.createElement(noDia ? 'button' : 'div'); f.id = 'fkAnivFita';
+    if (noDia) { f.type = 'button'; f.className = 'dia'; f.title = T.abrir; f.addEventListener('click', function () { cortina(r); }); }
+    f.innerHTML = (r.hoje ? T.fitaDia : T.fita).replace('{n}', nome);
+    document.body.insertBefore(f, document.body.firstChild);
+    var fundo = document.createElement('div'); fundo.id = 'fkAnivFundo'; fundo.setAttribute('aria-hidden', 'true'); document.body.appendChild(fundo);
+    baloes();
+    var ano = String(new Date().getFullYear()), viu = '';
+    try { viu = localStorage.getItem(CH + ':cortina') || ''; } catch (e) {}
+    if (noDia && (viu !== ano || previa)) { setTimeout(function () { cortina(r); }, 700); return; }
+    /* um confete por dia, na primeira página que abrir */
+    var CC = CH + ':confete:' + DIA, ja = '';
+    try { ja = localStorage.getItem(CC) || ''; } catch (e) {}
+    if (!ja || previa) { setTimeout(confete, 600); try { localStorage.setItem(CC, '1'); } catch (e) {} }
+  }
+
+  function vai() { pega().then(festa).catch(function () {}); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', vai); else vai();
+})();
