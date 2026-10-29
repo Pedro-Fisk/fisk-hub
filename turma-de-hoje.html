@@ -637,6 +637,12 @@ body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ 
   body.theme-dark .ak-obs{ background: #2b2513; border-color: #6d5a23; }
   body.theme-dark .ak-obs textarea{ background: #0f1825; color: #e2e8f0; border-color: #6d5a23; }
   body.pt-ativo .sem-plano, body.pt-ativo .btn-ck, body.pt-ativo .btn-atend, body.pt-ativo .al-cab .pill.pos{ display: none; }
+/* as capas dos livros (29/10/2026) */
+.cv-livro{border-radius:50%;flex:none;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);vertical-align:middle}
+.cv-resumo{display:inline-flex;align-items:center;gap:.45rem}
+.cv-resumo.cv-varios .cv-livro.empilha{margin-right:-10px;box-shadow:0 0 0 2px var(--surface,#fff),0 1px 4px rgba(0,0,0,.2)}
+.cv-resumo.cv-varios b{margin-left:14px}
+.al-cab .cv-livro.na-linha{margin-left:.35rem}
 </style>
 </head>
 <body>
@@ -681,6 +687,8 @@ body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ 
 
 <!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
 <script src="https://portalfisk.com.br/assets/avatar-festa.js?v=2026-10-26c"></script>
+<!-- as capas redondas dos livros (FiskCapas), servidas pelo portal: a mesma tabela do aluno, da secretaria e da direção -->
+<script src="https://portalfisk.com.br/assets/capas.js?v=1"></script>
 <script src="https://portalfisk.com.br/assets/planner-v2.js?v=b66262b64e"></script>
 <!-- o guia do Checking, lição a lição: a base comum e um arquivo por livro (Essentials, Transitions e Fluency 1 e 2, In Focus, Inmediato 1 a 3) -->
 <script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=5a600e1933"></script>
@@ -1505,6 +1513,7 @@ function carregarTurma(escola, prof, linha, titulo) {
     status('🔄 ' + estado.alunos.length + ' alunos. Lendo o planner de cada um…');
     estado.turma = nomeTurma; estado.atendidos = lerAtendidos();
     var livros = {}; estado.alunos.forEach(function (a) { if (a.book) livros[livroId(a.book)] = a.book; });
+    estado.capaTurma = capaDaTurma(estado.alunos);
     /* telefone, aniversário e as células de avaliação (o Gerador de Boletins
        escreve lá) vêm da mesma leitura da turma que o Planejador usa; corre
        por fora e só o planner completo espera por ela */
@@ -1697,7 +1706,7 @@ function desenharTurma() {
 function pintaResumo() {
   var nCk = estado.alunos.filter(function (a) { var ck = (estado.dados[a.raf] || {}).planner; return ck && ck.checking && Object.keys(ck.checking).some(function (k) { return ck.checking[k].feito; }); }).length;
   $('resumo').hidden = false;
-  $('resumo').innerHTML = '<b>' + estado.alunos.length + '</b> alunos · <b>' + nCk + '</b> com Checking';   /* a turma já está no menu de cima */
+  $('resumo').innerHTML = capasDoResumo() + '<b>' + estado.alunos.length + '</b> alunos · <b>' + nCk + '</b> com Checking';   /* a turma já está no menu de cima */
 }
 /* REORDENAR SEM RECONSTRUIR (27/10/2026, "Minha aula mais leve"): atender, ↑ ↓ e arrastar refaziam a turma inteira.
    Agora refaz só o cartão tocado e os que trocaram de número na prioridade, e MOVE os outros para o lugar novo.
@@ -1995,6 +2004,31 @@ function gradeDaLicao(a, plano, etapaId, ctx, reg, ehAtual) {
   });
   return grade;
 }
+/* AS CAPAS DOS LIVROS (Pedro, 29/10/2026). Na turma acadêmica todos estão no mesmo livro: uma bolinha só, no resumo
+   de cima, e nenhuma na linha (quinze capas iguais não dizem nada). Na turma personalizada, cada aluno ganha a dele
+   na própria linha. O aluno de fora (visitante, plantão) com livro diferente do da turma também ganha a dele. */
+function capaImg(book, px, cls) {
+  try { var h = window.FiskCapas ? window.FiskCapas.img(book, 'cv-livro' + (cls ? ' ' + cls : ''), book) : ''; return h ? h.replace('<img ', '<img width="' + px + '" height="' + px + '" ') : ''; } catch (e) { return ''; }
+}
+function capaDaTurma(alunos) {
+  if (!window.FiskCapas) return null;
+  var ids = {}; (alunos || []).forEach(function (a) { var id = FiskCapas.id(a.book); if (id) ids[id] = a.book; });
+  var k = Object.keys(ids);
+  return k.length === 1 ? { id: k[0], book: ids[k[0]] } : null;
+}
+function capasDoResumo() {
+  if (!window.FiskCapas) return '';
+  if (estado.capaTurma) return '<span class="cv-resumo">' + capaImg(estado.capaTurma.book, 40) + '<b>' + esc(estado.capaTurma.book) + '</b></span> · ';
+  var vistos = {}, h = '';
+  estado.alunos.forEach(function (a) { var id = FiskCapas.id(a.book); if (id && !vistos[id]) { vistos[id] = 1; h += capaImg(a.book, 30, 'empilha'); } });
+  return h ? '<span class="cv-resumo cv-varios">' + h + '<b>' + Object.keys(vistos).length + ' livros</b></span> · ' : '';
+}
+function capaNaLinha(a) {
+  if (!window.FiskCapas) return '';
+  var id = FiskCapas.id(a.book);
+  if (!id || (estado.capaTurma && estado.capaTurma.id === id)) return '';
+  return capaImg(a.book, 34, 'na-linha');
+}
 function cartaoAluno(a) {
   var plano = planoDe(a.book);
   var ctx = ctxDe(a);
@@ -2016,7 +2050,7 @@ function cartaoAluno(a) {
   var aniv = anivSemanaCalendario(a), anivHoje = aniv && anivEhHoje(a);
   if (aniv) card.classList.add('aniv');
   cab.innerHTML = '<span class="mover"><button type="button" class="arrasta" aria-label="Arrastar ' + esc(a.nome) + ' para outra posição" title="Segure e arraste para mudar a ordem">⠿</button><button type="button" class="sobe" aria-label="Subir ' + esc(a.nome) + '" title="Subir uma posição">↑</button><button type="button" class="desce" aria-label="Descer ' + esc(a.nome) + '" title="Descer uma posição">↓</button></span><span class="nome">' + (aniv ? '🎂 ' : '') + esc(a.nome) + '</span>' + rafTag(a) +
-    (aniv ? '<span class="ak-aniv' + (anivHoje ? ' hoje' : '') + '">🎉 ' + (anivHoje ? 'Aniversário HOJE!' : 'Aniversário ' + esc(aniv)) + '</span>' : '') + (a.visitante ? '<span class="visita" title="Aluno trazido pela busca">' + (estado.plantao ? 'plantão' : 'de outra turma') + (a.turma ? ' · ' + esc(String(a.turma).split('\n')[0]) : '') + '</span><button type="button" class="tirar" data-tirar="' + esc(a.raf) + '">Tirar da tela</button>' : '') + '<span class="livro' + (plano ? ' cor' : '') + '">' + esc(a.book || '') + '</span>' +
+    (aniv ? '<span class="ak-aniv' + (anivHoje ? ' hoje' : '') + '">🎉 ' + (anivHoje ? 'Aniversário HOJE!' : 'Aniversário ' + esc(aniv)) + '</span>' : '') + (a.visitante ? '<span class="visita" title="Aluno trazido pela busca">' + (estado.plantao ? 'plantão' : 'de outra turma') + (a.turma ? ' · ' + esc(String(a.turma).split('\n')[0]) : '') + '</span><button type="button" class="tirar" data-tirar="' + esc(a.raf) + '">Tirar da tela</button>' : '') + capaNaLinha(a) + '<span class="livro' + (plano ? ' cor' : '') + '">' + esc(a.book || '') + '</span>' +
     (estado.prioridade ? '' : plan ? '<span class="pill nv-' + esc(plan.nivel || 'emdia') + '">' + esc(nivelRot[plan.nivel] || plan.nivel || '') + '</span>' : (estado.plano ? '<span class="pill fora">fora do roteiro</span>' : '')) +
     (estado.prioridade && a._rank ? '<span class="pill prio nv-' + esc(a._prio.nivel) + '" title="' + esc(prioMotivo(a._prio)) + '">⚡ ' + a._rank + 'º · ' + esc(prioMotivo(a._prio)) + '</span>' : '') +
     avisoAtendimento(a) +
