@@ -582,6 +582,11 @@ body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ 
   body.theme-dark .al.aniv .al-cab{ background: linear-gradient(90deg, #3a2e12 0%, rgba(58,46,18,0) 75%); }
   body.theme-dark .al.aniv .al-cab .nome, body.theme-dark .al.al-kids.aniv .ak-id .nome{ color: #fcd34d; }
   body.theme-dark .al.al-kids.aniv{ background: linear-gradient(90deg, #3a2e12 0%, #1b273a 60%); }
+  /* RAF à vista no cartão (adultos, teens e kids), toque copia (Pedro, 29/10/2026) */
+  .raf-tag{ display: inline-flex; align-items: center; gap: .25rem; margin-left: .4rem; font: 800 .78rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .02em; color: #1d3685; background: #eef2fb; border: 1.5px solid #d6deea; border-radius: 7px; padding: .2rem .45rem; cursor: pointer; vertical-align: 2px; white-space: nowrap; }
+  .raf-tag:hover{ border-color: #1d3685; }
+  .raf-tag.copiado{ background: #10b981; border-color: #10b981; color: #fff; }
+  body.theme-dark .raf-tag{ background: #1b2a44; border-color: #2e4560; color: #c7d6f5; }
   .ak-aniv{ display: inline-block; margin-left: .35rem; font-size: .82rem; font-weight: 900; color: #fff; background: linear-gradient(90deg, #f59e0b, #ec4899); border-radius: 99px; padding: .14rem .6rem; vertical-align: 2px; }
   .al.al-kids.faltou{ border-color: #fecaca; background: #fff8f8; opacity: 1; filter: none; }
   .al.al-kids.faltou .ak-id .nome{ color: #991b1b; }
@@ -1318,6 +1323,13 @@ function avisoCardTH(a, c) {
   toast('📇 ' + pri + ': a presença NÃO foi para o card (' + (/não encontrado/.test(m) ? 'não achei o aluno no card' : m) + '). Lance direto no card.', 7000);
 }
 function esc(s) { return fiskEsc(String(s == null ? '' : s)); }
+function rafTag(a) { return a && a.raf ? '<button type="button" class="raf-tag" data-raf-copia="' + esc(a.raf) + '" title="RAF do aluno · toque para copiar">RAF ' + esc(a.raf) + '</button>' : ''; }
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-raf-copia]'); if (!b) return;
+  e.stopPropagation();
+  var raf = b.getAttribute('data-raf-copia'), ok = function () { b.classList.add('copiado'); b.textContent = '✓ copiado'; setTimeout(function () { b.classList.remove('copiado'); b.textContent = 'RAF ' + raf; }, 1400); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(raf).then(ok, function () {});
+}, true);
 function planoDe(book) { return window[planoGlobal(book)] || null; }
 
 /* ── a cascata, a mesma do Planejador ── */
@@ -2003,7 +2015,7 @@ function cartaoAluno(a) {
   if (a.visitante) card.classList.add('visitante');
   var aniv = anivSemanaCalendario(a), anivHoje = aniv && anivEhHoje(a);
   if (aniv) card.classList.add('aniv');
-  cab.innerHTML = '<span class="mover"><button type="button" class="arrasta" aria-label="Arrastar ' + esc(a.nome) + ' para outra posição" title="Segure e arraste para mudar a ordem">⠿</button><button type="button" class="sobe" aria-label="Subir ' + esc(a.nome) + '" title="Subir uma posição">↑</button><button type="button" class="desce" aria-label="Descer ' + esc(a.nome) + '" title="Descer uma posição">↓</button></span><span class="nome">' + (aniv ? '🎂 ' : '') + esc(a.nome) + '</span>' +
+  cab.innerHTML = '<span class="mover"><button type="button" class="arrasta" aria-label="Arrastar ' + esc(a.nome) + ' para outra posição" title="Segure e arraste para mudar a ordem">⠿</button><button type="button" class="sobe" aria-label="Subir ' + esc(a.nome) + '" title="Subir uma posição">↑</button><button type="button" class="desce" aria-label="Descer ' + esc(a.nome) + '" title="Descer uma posição">↓</button></span><span class="nome">' + (aniv ? '🎂 ' : '') + esc(a.nome) + '</span>' + rafTag(a) +
     (aniv ? '<span class="ak-aniv' + (anivHoje ? ' hoje' : '') + '">🎉 ' + (anivHoje ? 'Aniversário HOJE!' : 'Aniversário ' + esc(aniv)) + '</span>' : '') + (a.visitante ? '<span class="visita" title="Aluno trazido pela busca">' + (estado.plantao ? 'plantão' : 'de outra turma') + (a.turma ? ' · ' + esc(String(a.turma).split('\n')[0]) : '') + '</span><button type="button" class="tirar" data-tirar="' + esc(a.raf) + '">Tirar da tela</button>' : '') + '<span class="livro' + (plano ? ' cor' : '') + '">' + esc(a.book || '') + '</span>' +
     (estado.prioridade ? '' : plan ? '<span class="pill nv-' + esc(plan.nivel || 'emdia') + '">' + esc(nivelRot[plan.nivel] || plan.nivel || '') + '</span>' : (estado.plano ? '<span class="pill fora">fora do roteiro</span>' : '')) +
     (estado.prioridade && a._rank ? '<span class="pill prio nv-' + esc(a._prio.nivel) + '" title="' + esc(prioMotivo(a._prio)) + '">⚡ ' + a._rank + 'º · ' + esc(prioMotivo(a._prio)) + '</span>' : '') +
@@ -2750,7 +2762,7 @@ function desenharChamadaKids(caixa) {
     var el = document.createElement('section'); el.className = 'al al-kids' + (veio ? ' veio' : '') + (faltou ? ' faltou' : '') + (aniv ? ' aniv' : ''); el.dataset.raf = a.raf;
     el.setAttribute('style', ptCorVars(ptCor(a.book)));
     el.innerHTML = '<div class="ak-lin"><span class="ak-av" aria-hidden="true">' + esc(nome.charAt(0)) + '</span>' +
-      '<span class="ak-id"><span class="nome">' + (aniv ? '🎂 ' : '') + esc(nome) + '</span>' + (aniv ? ' <span class="ak-aniv' + (anivEhHoje(a) ? ' hoje' : '') + '">🎉 ' + (anivEhHoje(a) ? 'Aniversário HOJE!' : 'Aniversário ' + esc(aniv)) + '</span>' : '') + '<br><span class="livro">' + esc(a.book || '') + '</span></span>' +
+      '<span class="ak-id"><span class="nome">' + (aniv ? '🎂 ' : '') + esc(nome) + '</span>' + (aniv ? ' <span class="ak-aniv' + (anivEhHoje(a) ? ' hoje' : '') + '">🎉 ' + (anivEhHoje(a) ? 'Aniversário HOJE!' : 'Aniversário ' + esc(aniv)) + '</span>' : '') + '<br><span class="livro">' + esc(a.book || '') + '</span>' + rafTag(a) + '</span>' +
       '<span class="ak-bts"><button type="button" class="ak-veio' + (veio ? ' on' : '') + '"><span class="bx">' + (veio ? '✓' : '') + '</span>Veio</button>' +
       '<button type="button" class="ak-falta' + (faltou ? ' on' : '') + '">✗ Faltou</button></span></div>' +
       '<button type="button" class="ak-nota' + (obs ? ' tem' : '') + '">📝 Anotações sobre o aluno' + (obs ? ' · tem anotação' : '') + '</button>';
