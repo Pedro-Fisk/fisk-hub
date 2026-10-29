@@ -11,6 +11,8 @@
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <script src="assets/fisk-shared.js?v=2026-10-28a"></script>
+<!-- as capas redondas dos livros (FiskCapas), servidas pelo portal -->
+<script src="https://portalfisk.com.br/assets/capas.js?v=1"></script>
 <!-- activityId → nome legível ("mp:essentials-1:frozen-1" → "Frozen · Part I").
      Gerado por scripts/build-atividades-index.js no portal-aluno-fisk. -->
 <script src="assets/atividades-index.js"></script>
@@ -260,6 +262,10 @@
   .rf-info{ padding:.7rem 1rem; font-size:.86rem; line-height:1.5; border-bottom:1px solid var(--gray-light); }
   .rf-info.aviso{ background:#fbf3df; color:#5a4310; }   /* cor própria: no escuro o texto herdado ficava claro sobre o creme */
   #rfFrame{ display:block; width:100%; height:78vh; border:0; background:#f3f6f9; }
+/* as capas dos livros (29/10/2026) */
+.aluno-head .al-capa{flex:none;display:flex}
+.aluno-head .al-capa-img{width:72px;height:72px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.achado .ach-capa{float:left;width:36px;height:36px;border-radius:50%;margin:0 .55rem 0 0;box-shadow:0 1px 4px rgba(0,0,0,.18)}
 </style>
 </head>
 <body>
@@ -297,6 +303,7 @@
   <!-- 2 · acompanhamento -->
   <div class="painel" id="pnAluno" hidden>
     <div class="aluno-head">
+      <span class="al-capa" id="alCapa" hidden></span>
       <div>
         <div class="nome" id="alNome">—</div>
         <div class="meta" id="alMeta"></div>
@@ -531,6 +538,7 @@ function pintaAchados(l, meus, limpar){
     if (!a || !a.raf || _vistosBusca[a.raf]) return;
     _vistosBusca[a.raf] = true;
     html += '<button type="button" class="achado" data-raf="'+esc(a.raf)+'">'+
+            (window.FiskCapas && a.book ? FiskCapas.img(a.book, 'ach-capa', '') : '')+
             '<b>'+esc(a.name)+'</b>'+(meus ? '<i class="meu">sua turma</i>' : '')+
             '<span>'+esc(a.turma||'')+(a.book?' · '+esc(a.book):'')+'<br>'+esc(a.raf)+'</span></button>';
   });
@@ -618,6 +626,9 @@ function ligarCounseling(st){
 function render(d){
   var st = d.student || {};
   $('alNome').textContent = st.name || '—';
+  /* a capa do livro ao lado do nome (Pedro, 29/10/2026): o estágio de relance, antes de ler qualquer linha */
+  var capa = ''; try { capa = window.FiskCapas ? window.FiskCapas.img(st.book, 'al-capa-img', st.book || '') : ''; } catch (e) {}
+  $('alCapa').innerHTML = capa; $('alCapa').hidden = !capa;
   ligarCounseling(st);
   $('alMeta').innerHTML = esc(st.turma || 'sem turma') + ' &middot; ' + esc(st.book || 'sem estágio') +
                           ' &middot; <b>' + esc(st.raf) + '</b>';
