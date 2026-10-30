@@ -285,7 +285,7 @@
   Ferramenta interna das escolas Fisk Taubaté · Caçapava.
 </footer>
 
-<script src="assets/fisk-shared.js?v=2026-10-28a"></script>
+<script src="assets/fisk-shared.js?v=2026-10-30a"></script>
 <script>
 /* ============================================================
    RADAR DA TURMA (22/09/2026). Substitui a Visão Geral das Turmas,
@@ -341,8 +341,7 @@ function comSessao(p) {
 function api(params) {
   params = comSessao(params);   // action=card + token da sessão
   var qs = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
-  return fetch(API_URL + '?' + qs)
-    .then(fiskJson)
+  return fiskFetch(API_URL + '?' + qs)
     .then(function (j) { if (j && j.erro) throw new Error(j.erro); return j; });
 }
 
@@ -351,7 +350,7 @@ function api(params) {
 function panorama(escola, prof) {
   var qs = 'action=panoramaProf&token=' + encodeURIComponent(tokenSessao()) +
            '&escola=' + encodeURIComponent(escola) + '&prof=' + encodeURIComponent(prof);
-  return fetch(API_URL + '?' + qs).then(fiskJson)
+  return fiskFetch(API_URL + '?' + qs)
     .then(function (j) { if (!j || !j.ok) throw new Error((j && j.erro) || 'panorama falhou'); return j; });
 }
 
@@ -431,7 +430,7 @@ function selecionarNaCascata(escola, prof, auto) {
 function setupVgActAs() {
   var wrap = $('vgActAsWrap'), sb = $('vgActAs');
   wrap.hidden = false;
-  fetch(EP_HUB + '?action=profList').then(fiskJson).then(function (res) {
+  fiskFetch(EP_HUB + '?action=profList').then(function (res) {
     var ps = ((res && res.profs) || []).filter(function (p) { return !p.director; })
       .sort(function (a, b) { return String(a.name).localeCompare(String(b.name), 'pt-BR'); });
     var cur = ''; try { cur = (JSON.parse(localStorage.getItem('fisk_actas') || 'null') || {}).name || ''; } catch (e) {}
@@ -555,9 +554,8 @@ function radarDaTurma(rafs){
   var lotes = [];
   for (var i = 0; i < rafs.length; i += 60) lotes.push(rafs.slice(i, i + 60));
   return Promise.all(lotes.map(function(l){
-    return fetch(API_URL, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
-                            body: JSON.stringify({ action:'radarTurma', token: tokenSessao(), rafs: l }) })
-      .then(fiskJson).then(function(j){ if (!j || !j.ok) throw new Error((j && j.error) || 'o radar não veio'); return j.alunos || []; });
+    return fiskFetch(API_URL, { action:'radarTurma', token: tokenSessao(), rafs: l })
+      .then(function(j){ if (!j || !j.ok) throw new Error((j && j.error) || 'o radar não veio'); return j.alunos || []; });
   })).then(function(ls){ return [].concat.apply([], ls); });
 }
 

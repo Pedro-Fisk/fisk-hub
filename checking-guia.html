@@ -135,6 +135,8 @@
 <script src="https://portalfisk.com.br/assets/checking/guia-i1.js?v=551896a136"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-i2.js?v=56bd0516a9"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-i3.js?v=e326479afd"></script>
+<!-- o kit vem ANTES do script da página: o Salvar usa o fiskFetch (30/10/2026) -->
+<script src="assets/fisk-shared.js?v=2026-10-30a"></script>
 <script>
 var $ = function (id) { return document.getElementById(id); };
 var q = new URLSearchParams(location.search);
@@ -292,8 +294,7 @@ function pintaFeedback(main) {
     if (!fb.resultado) { var okR = box.querySelector('[data-ok]'); okR.hidden = false; okR.textContent = T2('Choose the result first: Approved or Study more.', 'Elige el resultado primero: Aprobado o Estudia más.'); box.querySelector('.grupo.res').scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
     salvar.disabled = true; salvar.textContent = T2('Saving…', 'Guardando…');
     var checking = { licao: licaoId, feito: 1, resultado: fb.resultado, melhores: fb.melhores.slice(), melhor: fb.melhores[0] || null, melhorar: fb.melhorar.slice(), pedidos: fb.pedidos.slice(), bilhete: fb.bilhete.trim() };
-    fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plannerProf', token: token(), raf: raf, book: book, patch: { checking: checking } }) })
-      .then(function (r) { return r.json(); })
+    fiskFetch(EP, { action: 'plannerProf', token: token(), raf: raf, book: book, patch: { checking: checking } })
       .then(function (r) {
         if (!r || !r.ok) throw new Error((r && (r.error || r.erro)) || 'not saved');
         /* AVISA A MINHA AULA, na aba de trás. Ela abre esta tela com `rel="noopener"`, então `window.opener` é
@@ -337,7 +338,6 @@ document.addEventListener('keydown', function (ev) {
 });
 </script>
 <!-- registro de uso (auditoria de 26/10/2026): a página não carregava o kit e era invisível no painel da direção -->
-<script src="assets/fisk-shared.js?v=2026-10-28a"></script>
 <script>if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Guia do Checking');</script>
 </body>
 </html>

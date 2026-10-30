@@ -52,6 +52,52 @@ function fiskMsgRespostaEstranha(resp, corpo) {
          'avise o Pedro — pode ser o backend precisando ser publicado de novo.';
 }
 
+/* ── PEDIDO COM TEMPO LIMITE (auditoria de 30/10/2026, B9) ────────────────
+ * Nenhuma página do Hub tinha teto para um pedido ao Apps Script: um script
+ * travado (até 6 min) deixava "Procurando…" girando para sempre. Aqui o
+ * pedido ganha um AbortController com 45 s por padrão (o card lento leva até
+ * 40 s, fisk-shared.js:283), a resposta passa pelo fiskJson e o tempo
+ * estourado vira UM erro reconhecível:
+ *
+ *     { code: 'timeout', message: 'O servidor demorou mais de 45 s' }
+ *
+ * Quem chama decide o que fazer com ele (a Minha aula guarda a marca; as
+ * telas de documento mostram a causa). O pedido abortado aqui PODE ter chegado
+ * ao servidor e ser gravado lá: quem reenvia precisa ser idempotente.
+ *
+ * Uso:  fiskFetch(url)                      → GET
+ *       fiskFetch(url, { action: 'x' })     → POST, corpo em texto puro (sem preflight)
+ *       fiskFetch(url, body, { timeoutMs: 25000 })
+ * Só acrescenta: fetch + fiskJson continuam valendo onde já estão.
+ */
+var FISK_FETCH_TIMEOUT_MS = 45000;
+function fiskFetch(url, body, opts) {
+  opts = opts || {};
+  var ms = opts.timeoutMs > 0 ? opts.timeoutMs : FISK_FETCH_TIMEOUT_MS;
+  var init = { method: opts.method || (body == null ? 'GET' : 'POST') };
+  if (body != null) {
+    init.headers = { 'Content-Type': 'text/plain;charset=utf-8' };
+    init.body = typeof body === 'string' ? body : JSON.stringify(body);
+  }
+  var ctrl = (typeof AbortController === 'function') ? new AbortController() : null;
+  if (ctrl) init.signal = ctrl.signal;
+  var estourou = false;
+  var timer = setTimeout(function () { estourou = true; if (ctrl) ctrl.abort(); }, ms);
+  return fetch(url, init)
+    .then(function (r) { clearTimeout(timer); return fiskJson(r); })
+    .catch(function (e) {
+      clearTimeout(timer);
+      if (estourou || (e && e.name === 'AbortError')) {
+        var et = new Error('O servidor demorou mais de ' + Math.round(ms / 1000) + ' s');
+        et.code = 'timeout';
+        throw et;
+      }
+      throw e;
+    });
+}
+/** O erro veio do tempo limite do fiskFetch? */
+function fiskEhTimeout(e) { return !!(e && (e.code === 'timeout' || e.name === 'AbortError')); }
+
 /** Liga um botão de alternar modo escuro/claro, com persistência em localStorage. */
 function fiskInitThemeToggle(buttonId, opts) {
   opts = opts || {};
@@ -622,16 +668,12 @@ function fiskCounseling(opts) {
     var s = fiskSessao();
     if (!s || !s.token) return Promise.resolve(null);
     if (!opts || !opts.aluno || !opts.escola) return Promise.resolve(null);
-    return fetch(FISK_HUB_EP, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({
+    return fiskFetch(FISK_HUB_EP, {
         action: 'counselingEscrever', token: s.token,
         escola: opts.escola, professor: opts.professor || '',
         turma: String(opts.turma || '').split('\n')[0],
         aluno: opts.aluno, origem: opts.origem || 'manual', campos: opts.campos || {}
       })
-    }).then(function (r) { return r.json(); })
       .then(function (j) { if (typeof opts.aoTerminar === 'function') opts.aoTerminar(j); return j; })
       .catch(function () { return null; });
   } catch (e) { return Promise.resolve(null); }
@@ -1126,9 +1168,7 @@ function fiskCounselingAbrirDoc(ctx) {
       '<p style="font-size:1.05rem;text-align:center;padding:16px">💬 Abrindo o counseling de <b>' + fiskEsc(ctx.aluno) + '</b>…<br><small style="color:#6b7a8c">procurando o documento na pasta do aluno</small></p></body>');
     w.document.close();
   } catch (e) {}
-  fetch(FISK_HUB_EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ action: 'counselingLer', token: s.token || '', escola: ctx.escola || '', professor: ctx.professor || '', turma: turma, aluno: ctx.aluno }) })
-    .then(function (r) { return r.json(); })
+  fiskFetch(FISK_HUB_EP, { action: 'counselingLer', token: s.token || '', escola: ctx.escola || '', professor: ctx.professor || '', turma: turma, aluno: ctx.aluno })
     .then(function (j) { w.location.href = (j && j.ok && j.docUrl) ? j.docUrl : ferramenta; })
     .catch(function () { w.location.href = ferramenta; });
 }
@@ -1361,7 +1401,7 @@ function fiskBuscaMeusAlunos(q) {
        enganosa possível, porque a chave está certa. */
     fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: 'hwGet', key: KEY, raf: 'PROF:' + nome }) })
-      .then(function (r) { return r.json(); })
+      .then(fiskJson)
       .then(function (j) {
         if (!j || !j.ok || !CASAS[j.casa]) return;
         try { localStorage.setItem(k, JSON.stringify({ casa: j.casa, em: j.em || null })); } catch (e) {}

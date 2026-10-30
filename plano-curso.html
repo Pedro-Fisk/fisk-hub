@@ -34,6 +34,8 @@
 <div class="status" id="status">Lendo o planner…</div>
 <div id="corpo"></div>
 <script src="https://portalfisk.com.br/assets/planner-v2.js?v=b66262b64e"></script>
+<!-- o kit vem ANTES do script da página: a leitura do planner usa o fiskFetch já na abertura (30/10/2026) -->
+<script src="assets/fisk-shared.js?v=2026-10-30a"></script>
 <script>
 var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
 var $ = function (id) { return document.getElementById(id); };
@@ -118,7 +120,7 @@ document.title = 'Plano de curso' + (nome ? ' · ' + nome : '') + ' · Fisk';
 if (!raf || !book) { status('Faltou o aluno: abra esta página pelo botão da Minha aula.', true); }
 else Promise.all([
   carregaPlano(book),
-  fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plannerTurma', token: token(), alunos: [{ raf: raf, book: book, turma: turma }] }) }).then(function (r) { return r.json(); })
+  fiskFetch(EP, { action: 'plannerTurma', token: token(), alunos: [{ raf: raf, book: book, turma: turma }] })
 ]).then(function (rs) {
   var plano = rs[0], j = rs[1];
   if (!plano) { status('O gabarito do ' + book + ' não carregou.', true); return; }
@@ -149,7 +151,7 @@ else Promise.all([
     desenha();
     var patch = { notas: {} }; patch.notas[t] = {}; patch.notas[t][crit] = {}; patch.notas[t][crit][k] = v;
     salvando = salvando.then(function () {
-      return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plannerProf', token: token(), raf: raf, book: book, patch: patch, semCard: q.get('plantao') === '1' }) }).then(function (r) { return r.json(); });
+      return fiskFetch(EP, { action: 'plannerProf', token: token(), raf: raf, book: book, patch: patch, semCard: q.get('plantao') === '1' });
     }).then(function (r) { if (!r || r.ok === false) throw new Error((r && (r.erro || r.error)) || 'não salvou'); })
       .catch(function (e) { status('⚠️ A nota não salvou (' + (e && e.message || e) + '). Digite de novo.', true); });
   }
@@ -168,7 +170,7 @@ else Promise.all([
     desenha();
     var patch = { itens: {} }; patch.itens[it.id] = marca;
     salvando = salvando.then(function () {
-      return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plannerProf', token: token(), raf: raf, book: book, patch: patch, semCard: q.get('plantao') === '1' }) }).then(function (r) { return r.json(); });
+      return fiskFetch(EP, { action: 'plannerProf', token: token(), raf: raf, book: book, patch: patch, semCard: q.get('plantao') === '1' });
     }).then(function (r) {
       if (!r || r.ok === false) throw new Error((r && (r.erro || r.error)) || 'não salvou');
       if (r.card && r.card.escreveu) status('📇 Card: ' + r.card.escreveu + ' na aula de hoje.' + (r.card.fora === 'anterior' ? ' É a lição em que o aluno está (você marcou algo da ' + (r.card.marcou || 'lição anterior') + ').' : ''));
@@ -182,7 +184,6 @@ else Promise.all([
 }).catch(function (e) { status('Erro: ' + (e && e.message || e), true); });
 </script>
 <!-- registro de uso (auditoria de 26/10/2026): a página não carregava o kit e era invisível no painel da direção -->
-<script src="assets/fisk-shared.js?v=2026-10-28a"></script>
 <script>if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Plano de curso');</script>
 </body>
 </html>

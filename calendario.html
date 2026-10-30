@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="assets/casa-tema.css?v=9">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
-<script src="assets/fisk-shared.js?v=2026-10-28a"></script>
+<script src="assets/fisk-shared.js?v=2026-10-30a"></script>
 <style>
   :root{ --hora: 34px; --cal-linha: var(--ui-line, #dfe6ef); --cal-fundo: var(--white, #fff); --cal-hoje: #fff7e6; --agora: #e11d48; }
   body.theme-dark{ --cal-linha: #2f3a48; --cal-hoje: #2a2412; --cal-fundo: var(--white); }   /* o --white escuro mora no body, não no :root */
@@ -408,12 +408,12 @@ function corDaTurma(t) {
 function get(params) {
   params.token = token();
   var qs = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
-  return fetch(EP + '?' + qs).then(fiskJson).then(function (j) { if (j && (j.erro || j.error)) throw new Error(j.erro || j.error); return j; });
+  return fiskFetch(EP + '?' + qs).then(function (j) { if (j && (j.erro || j.error)) throw new Error(j.erro || j.error); return j; });
 }
 function post(body) {
   body.token = token();
-  return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
-    .then(fiskJson).then(function (j) { if (!j || j.ok === false) throw new Error((j && (j.erro || j.error)) || 'Não consegui.'); return j; });
+  return fiskFetch(EP, body)
+    .then(function (j) { if (!j || j.ok === false) throw new Error((j && (j.erro || j.error)) || 'Não consegui.'); return j; });
 }
 
 /* as turmas: para cada escola do professor, a aba dele no card (o nome da aba pode ser só o primeiro nome) */
@@ -772,7 +772,7 @@ function irParaDia(novo, dir, seg) {
 /* a direção escolhe de quem é a semana (o mesmo fisk_actas do Hub e do Radar) */
 function montaVerComo() {
   var sel = $('verComo');
-  fetch(EP + '?action=profList').then(fiskJson).then(function (j) {
+  fiskFetch(EP + '?action=profList').then(function (j) {
     var ps = ((j && j.profs) || []).filter(function (p) { return !p.director && String(p.cargo || '').toLowerCase().indexOf('secret') !== 0; })
       .sort(function (a, b) { return String(a.name).localeCompare(String(b.name), 'pt-BR'); });
     var c = como(), cur = (c && c.name) || '';
