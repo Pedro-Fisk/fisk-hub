@@ -807,7 +807,7 @@
       el.addEventListener('click', function () { el.style.opacity = '0'; setTimeout(function () { window.hubFrase(); el.style.opacity = ''; }, 300); });
     })();
   </script>
-  <script src="assets/fisk-shared.js?v=2026-10-30a"></script>
+  <script src="assets/fisk-shared.js?v=2026-10-30b"></script>
   <script>
     fiskInitThemeToggle('themeToggle');
 
@@ -1658,6 +1658,8 @@
 
       function enter(prof){
         try{ localStorage.setItem('fisk_prof', JSON.stringify(prof)); }catch(e){}
+        /* o logo do topo segue quem entrou: a direção (master) volta ao Painel da Direção (fisk-shared.js) */
+        try{ if (window.fiskLigaLogo) window.fiskLigaLogo(); }catch(e){}
         document.body.classList.remove('prof-out');
         document.body.classList.add('prof-in'); if (window._avisosLiga) window._avisosLiga();
         fillBar(prof);
@@ -2220,6 +2222,7 @@
         /* sessão E o que o Hub guardou sobre os alunos neste aparelho (M12); a fila de marcas pendentes fica */
         if (typeof fiskLimparAoSair === 'function') fiskLimparAoSair();
         else { try{ localStorage.removeItem('fisk_prof'); localStorage.removeItem('fisk_actas'); localStorage.removeItem('fisk_minidash'); }catch(e){} }
+        try{ if (window.fiskLigaLogo) window.fiskLigaLogo(); }catch(e){}
         // saindo de uma visita da direção: volta para o Painel da Direção
         if (era && era.viewingAs){ location.href = 'https://portalfisk.com.br/diretor.html'; return; }
         location.reload();

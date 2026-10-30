@@ -534,28 +534,38 @@ function fiskHubBase() {
   return externo ? 'https://pedro-fisk.github.io/fisk-hub/' : '';
 }
 
-/* ---------- O logo do cabeçalho leva à home do Hub ----------
+/* ---------- O logo do cabeçalho leva à CASA de quem está logado ----------
  * Um ponto só para todas as páginas que usam o kit: o `.hero-logo` ganha um
- * link em volta. Na própria home ele fica como está (não há para onde ir).
- * As páginas de fora (boletim, planner, conversation maker) recebem a URL de
- * produção pelo fiskHubBase(). */
+ * link em volta. As páginas de fora (boletim, planner, conversation maker)
+ * recebem a URL de produção pelo fiskHubBase().
+ * A CASA (Pedro, 30/10/2026: "o logo tem que apontar para a home de onde a
+ * pessoa pertence"): o professor volta à home do Hub; a DIREÇÃO (acesso master,
+ * vinda do Painel da Direção) volta ao Painel da Direção, inclusive da própria
+ * home do Hub. O "Ver como professor" é visita, não master: segue como o
+ * professor. Os logos escritos à mão (.hub-home, .inicio, .tn-home) seguem a
+ * mesma regra. A home chama window.fiskLigaLogo() depois do login. */
 (function () {
+  var PAINEL_DIRECAO = 'https://portalfisk.com.br/diretor.html';
   function liga() {
-    var base = fiskHubBase();
-    if (!base && /(^|\/)(index\.html)?$/.test(location.pathname)) return;
+    var base = fiskHubBase(), s = fiskSessao(), dir = !!(s && s.master);
+    var naHome = !base && /(^|\/)(index\.html)?$/.test(location.pathname);
+    var alvo = dir ? PAINEL_DIRECAO : base + 'index.html', rot = dir ? 'Painel da Direção' : 'Fisk Hub';
+    var marca = function (a) { a.href = alvo; a.title = rot; a.setAttribute('aria-label', 'Voltar ao ' + rot); };
     var logos = document.querySelectorAll('.hero .hero-logo');
     for (var i = 0; i < logos.length; i++) {
-      var img = logos[i];
-      if (img.closest('a')) continue;
+      var img = logos[i], ja = img.closest('a');
+      if (ja) { if (ja.classList.contains('hero-home')) { if (naHome && !dir) { ja.parentNode.insertBefore(img, ja); ja.remove(); } else marca(ja); } continue; }
+      if (naHome && !dir) continue;   /* na home do Hub, o professor já está em casa */
       var a = document.createElement('a');
-      a.className = 'hero-home';
-      a.href = base + 'index.html';
-      a.title = 'Fisk Hub';
-      a.setAttribute('aria-label', 'Voltar ao Fisk Hub');
+      a.className = 'hero-home'; marca(a);
       img.parentNode.insertBefore(a, img);
       a.appendChild(img);
     }
+    var maos = document.querySelectorAll('a.hub-home, a.inicio, a.tn-home');
+    for (var j = 0; j < maos.length; j++) if (dir) { if (!maos[j].dataset.casaHub) maos[j].dataset.casaHub = maos[j].getAttribute('href'); marca(maos[j]); }
+      else if (maos[j].dataset.casaHub) maos[j].setAttribute('href', maos[j].dataset.casaHub);
   }
+  window.fiskLigaLogo = liga;
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', liga);
   else liga();
 })();
