@@ -413,14 +413,10 @@ function mostrarErroApi(err) {
   /* Sessão expirada é o erro mais comum aqui, e o único com conserto óbvio.
      A mensagem do servidor é boa, mas chegava como texto puro: o professor
      lia "entre novamente pelo Fisk Hub" e tinha de descobrir sozinho como
-     voltar. Agora vem com a porta. */
-  el.innerHTML = '⚠️ ' + fiskEsc(err.message) + comLinkDeLogin(err.message);
-}
-/* Devolve o link para o Hub quando o erro é de sessão; senão, string vazia. */
-function comLinkDeLogin(msg) {
-  if (!/sess[ãa]o/i.test(String(msg || ''))) return '';
-  var base = (typeof fiskHubBase === 'function') ? fiskHubBase() : '';
-  return ' <a href="' + base + 'index.html" style="font-weight:800">Entrar de novo →</a>';
+     voltar. Agora vem com a porta, pela rotina do kit (que também apaga a
+     sessão vencida, para o link não voltar à home logada). */
+  if (fiskEhErroDeSessao(err)) { fiskExigirSessao(el, err.message); return; }
+  el.innerHTML = '⚠️ ' + fiskEsc(err.message);
 }
 
 /* ---- modo livre: termo sem vínculo com turma (ex.: aluno ainda não
@@ -722,7 +718,7 @@ function registrarTudo() {
       turma: (payload && payload.turma ? String(payload.turma).split('\n')[0] : '').trim(),
       aluno: ultimoPDF.aluno, filename: ultimoPDF.filename, bytes: ultimoPDF.bytes
     }).then(function (r) { REG.pasta = '📁 Pasta: ✓ "' + ((r && r.pasta) || ultimoPDF.aluno) + '"'; mostrarVerPasta(r); })
-      .catch(function () { REG.pasta = '📁 Pasta: ⚠️ não salvou'; REG.falhou = 1; })
+      .catch(function (e) { REG.pasta = '📁 Pasta: ⚠️ ' + ((e && e.motivo) || fiskMotivoDePasta(e)); REG.falhou = 1; })   /* a causa e a porta (M3) */
       .then(regMostra);
   } else { REG.pasta = '📁 Pasta: ⚠️ não salvou (recarregue a página)'; REG.falhou = 1; }
   api({ fn: 'registrarDoc', escola: payload.escola, prof: payload.aba, professor: payload.aba,
@@ -761,7 +757,7 @@ pares('btnDrive').forEach(function (btn) { btn.addEventListener('click', functio
     professor: ((fProf && fProf.value) || (payload && (payload.professor || payload.aba)) || '').trim(),
     turma: (payload && payload.turma ? String(payload.turma).split('\n')[0] : '').trim(),
     aluno: ultimoPDF.aluno, filename: ultimoPDF.filename, bytes: ultimoPDF.bytes
-  }).then(mostrarVerPasta).catch(function () {});
+  }).then(mostrarVerPasta).catch(function (e) { statusDoc('⚠️ Não salvou: ' + ((e && e.motivo) || fiskMotivoDePasta(e)), '#c0392b'); });
 }); });
 
 async function gerarPDF() {

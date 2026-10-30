@@ -201,11 +201,9 @@ async function fiskSalvarNoDrive(opts) {
      arquivos de nome IDÊNTICO e os antigos se acumulam na pasta. */
   if (opts.substituiPrefixo) payload.substituiPrefixo = opts.substituiPrefixo;
   if (opts.substituiSufixo) payload.substituiSufixo = opts.substituiSufixo;
-  // corpo como string simples (text/plain) evita preflight CORS no Apps Script
-  var resp = await fetch(endpoint, { method: 'POST', body: JSON.stringify(payload) });
-  var j;
-  try { j = await resp.json(); }
-  catch (e) { throw new Error(fiskMsgRespostaEstranha(resp, '')); }
+  // corpo como string simples (text/plain) evita preflight CORS no Apps Script; teto de 90 s porque o PDF
+  // vai em base64 e o Drive ainda escreve (auditoria de 30/10/2026, B9/M3)
+  var j = await fiskFetch(endpoint, JSON.stringify(payload), { timeoutMs: opts.timeoutMs || 90000 });
   if (!j || j.ok !== true) {
     var err = new Error((j && j.erro) || 'falha ao salvar no Drive');
     err.code = (j && j.code) || '';
@@ -241,18 +239,28 @@ async function fiskEnviarParaPasta(buttonEl, getOpts) {
     return r;
   } catch (e) {
     buttonEl.textContent = old; buttonEl.disabled = false;
-    var ondeAlvo = (opts && opts.tipo === 'turma') ? 'da turma' : 'do aluno';
-    if (e.code === 'sem_endpoint') {
-      alert('⚙️ O salvamento no Drive ainda não foi configurado.\n\nPublique o endpoint (apps-script/Code.gs) e cole a URL em FISK_SAVE_URL (assets/fisk-shared.js).');
-    } else if (e.code === 'pasta_nao_encontrada') {
-      alert('⚠️ ATENÇÃO: a pasta ' + ondeAlvo + ' NÃO foi encontrada no drive compartilhado.\n\n' +
-            'O documento NÃO foi salvo. Baixe o PDF manualmente (botão de gerar/baixar) ou ' +
-            'confira/crie a pasta no Drive e tente de novo.' + (e.message ? '\n\n(' + e.message + ')' : ''));
-    } else {
-      alert('Não deu para salvar no Drive: ' + (e.message || e));
-    }
+    /* Sem alert (auditoria de 30/10/2026, M3): o pop-up genérico igualava pasta inexistente (secretaria) a
+       escrita negada (Pedro), e ao fechá-lo sobrava "não salvou". A causa e a porta ficam na página, ao lado do
+       botão, e viajam em e.motivo para a linha de status de quem chamou. */
+    e.motivo = fiskMotivoDePasta(e, opts && opts.tipo);
+    fiskAvisoDePasta(buttonEl, 'NÃO salvou: ' + e.motivo + '. O PDF continua no botão de baixar.');
     throw e;
   }
+}
+
+/* A CAUSA DE NÃO TER SALVO, com a porta (quem resolve): pasta inexistente é a secretaria; escrita recusada é o
+   Pedro (setupDriveEscrita); tempo estourado é esperar. Serve às linhas de status do 2nd Chance e do Termo. */
+function fiskMotivoDePasta(e, tipo) {
+  var code = (e && e.code) || '', msg = String((e && e.message) || e || '');
+  var quem = tipo === 'turma' ? 'da turma' : 'do aluno';
+  if (code === 'pasta_nao_encontrada') return 'pasta ' + quem + ' não encontrada: peça à secretaria para criar';
+  if (code === 'pasta_recusada') return 'não salvou: pasta do aluno não encontrada na turma';
+  if (code === 'timeout') return 'o servidor demorou (' + msg + '): confira a pasta antes de tentar de novo';
+  if (code === 'sem_endpoint') return 'o salvamento no Drive não está configurado: avise o Pedro';
+  if (/permiss|autoriza|negad|denied|insufficient|escrita|setupDrive/i.test(msg)) return 'o Drive recusou a escrita: avise o Pedro';
+  if (/sess[ãa]o/i.test(msg)) return 'sua sessão expirou: entre de novo no Hub';
+  if (/não respondeu com dados|página de erro|pediu login/i.test(msg)) return 'o servidor não respondeu: tente de novo em instantes';
+  return msg || 'não salvou';
 }
 
 /**
@@ -323,6 +331,28 @@ function fiskPerguntaDeSaida() {
   var n = fiskMarcasPendentes();
   return 'Sair da sua conta neste computador?' + (n ? '\n\n⏳ ' + n + ' marca' + (n === 1 ? '' : 's') + ' de presença ainda não ' + (n === 1 ? 'chegou' : 'chegaram') + ' ao servidor. ' +
     (n === 1 ? 'Ela fica guardada' : 'Elas ficam guardadas') + ' neste aparelho e ' + (n === 1 ? 'vai sozinha' : 'vão sozinhas') + ' quando você entrar de novo na Minha aula.' : '');
+}
+
+/* ── SESSÃO EXIGIDA, SESSÃO VENCIDA: uma rotina para as quatro telas (auditoria de 30/10/2026, M4) ──
+ * Termo, 2nd Chance e Minha aula tinham cada uma a sua; o E-counseling montava a cascata, chamava o backend sem
+ * sessão e escrevia "sessão expirada" sem link. Dois usos:
+ *   fiskExigirSessao(el)        → devolve a sessão; sem ela, escreve "🔒 Entre no Fisk Hub…" com o link e devolve null
+ *   fiskExigirSessao(el, msg)   → o servidor recusou a sessão: escreve msg com "Entrar de novo →", apaga a sessão
+ *                                 velha (senão o link voltava à home logada e a tela falhava de novo) e avisa a home
+ * `el` é a linha de status da página (innerHTML). */
+function fiskEhErroDeSessao(e) { return /sess[ãa]o/i.test(String((e && e.message) || e || '')); }
+function fiskExigirSessao(el, msg) {
+  var s = fiskSessao();
+  if (s && s.token && !msg) return s;
+  var base = fiskHubBase();
+  if (el) {
+    el.innerHTML = msg
+      ? '⚠️ ' + fiskEsc(msg) + ' <a href="' + base + 'index.html" style="font-weight:800">Entrar de novo →</a>'
+      : '🔒 Entre no Fisk Hub para abrir esta ferramenta. <a href="' + base + 'index.html" style="font-weight:800">Entrar →</a>';
+    el.hidden = false;
+  }
+  if (msg) { try { localStorage.removeItem('fisk_prof'); sessionStorage.setItem('fisk_sessao_caiu', '1'); } catch (e) {} }
+  return null;
 }
 
 /** Sessão do professor gravada pelo login do Hub. */

@@ -244,7 +244,12 @@ function montarSelect(sel, placeholder, itens) {
    A pré-seleção NUNCA trava o seletor: substituição é frequente e todo
    professor acessa as turmas de todos (regra firme do Pedro). */
 var selEscola = $('selEscola'), selProf = $('selProf'), selTurma = $('selTurma');
-if (!CTX_URL) {
+/* Sem sessão do Hub a tela NÃO chama o backend (auditoria de 30/10/2026, M4): antes montava a cascata, pedia
+   as escolas e só então escrevia "sessão expirada" sem porta. A rotina do kit escreve "🔒 Entre no Fisk Hub…"
+   com o link, e os seletores ficam quietos. */
+var SESSAO_OK = !!fiskExigirSessao($('statusCard'));
+if (!SESSAO_OK) { $('statusCard').className = 'status erro'; [selEscola, selProf, selTurma].forEach(function (s) { s.disabled = true; }); }
+if (!CTX_URL && SESSAO_OK) {
   selEscola.innerHTML = '<option value="" disabled selected>Carregando escolas…</option>';
   selEscola.disabled = true;
   ind('indEscola', 'spin');
@@ -334,9 +339,8 @@ function erroApi(err) {
     }
   });
   el.className = 'status erro';
-  el.textContent = /sess/i.test(msg)
-    ? '🔒 ' + msg + ' Volte ao Fisk Hub e entre de novo.'
-    : '⚠️ ' + msg;
+  if (fiskEhErroDeSessao(msg)) { fiskExigirSessao(el, msg); return; }   /* a porta, e a sessão vencida apagada (M4) */
+  el.textContent = '⚠️ ' + msg;
 }
 
 function montarLista(dados) {
@@ -419,6 +423,7 @@ function selecionar(a) {
     pararEspera();
     if (alunoSel !== a) return;
     st.className = 'status erro';
+    if (fiskEhErroDeSessao(e)) { fiskExigirSessao(st, e.message); return; }
     st.textContent = '⚠️ ' + ((e && e.message) || e);
   });
 }
@@ -529,7 +534,8 @@ if (CTX_URL) {
   if (EMBED) { document.body.classList.add('em-gaveta'); fiskInitThemeToggle('themeToggle'); }
   else { fiskInitThemeToggle('themeToggle'); fiskInitUserMenu(); }
   $('painelCard').hidden = true;
-  selecionar({ nome: CTX_URL.aluno, book: Q.get('estagio') || '' });
+  if (SESSAO_OK) selecionar({ nome: CTX_URL.aluno, book: Q.get('estagio') || '' });
+  else { $('statusDoc').className = 'status erro'; fiskExigirSessao($('statusDoc')); }   /* na gaveta a linha de status é outra */
   var pre = Q.get('texto');
   if (pre) $('fTexto').value = pre;
 } else {

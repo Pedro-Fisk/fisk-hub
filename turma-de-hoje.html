@@ -1474,11 +1474,10 @@ function turmaDoHorario(turmas) {
 }
 function erro(e) {
   var msg = (e && e.message) || 'erro';
-  if (/sess[ãa]o/i.test(msg)) {
-    $('status').className = 'status err'; $('status').hidden = false;
-    $('status').innerHTML = '⚠️ ' + esc(msg) + ' <a href="index.html" style="font-weight:800">Entrar de novo →</a>';
-    /* a sessão vencida sai daqui mesmo: senão o link voltava à home logada e a Minha aula falhava de novo */
-    try { localStorage.removeItem('fisk_prof'); sessionStorage.setItem('fisk_sessao_caiu', '1'); } catch (e2) {}
+  if (fiskEhErroDeSessao(msg)) {
+    /* a sessão vencida sai daqui mesmo (o kit apaga): senão o link voltava à home logada e a Minha aula falhava de novo */
+    $('status').className = 'status err';
+    fiskExigirSessao($('status'), msg);
     return;
   }
   status('⚠️ ' + msg, true);

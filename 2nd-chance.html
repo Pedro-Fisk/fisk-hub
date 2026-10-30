@@ -411,11 +411,9 @@ function initSessao(p) {
 function erroDeSessaoOuCascata(e) {
   var msg = (e && e.message) || 'erro';
   var el = document.getElementById('statusCard');
-  if (/sess[ãa]o/i.test(msg)) {
-    var base = (typeof fiskHubBase === 'function') ? fiskHubBase() : '';
+  if (fiskEhErroDeSessao(msg)) {
     el.className = 'status err';
-    el.innerHTML = '⚠️ ' + fiskEsc(msg) +
-      ' <a href="' + base + 'index.html" style="font-weight:800">Entrar de novo →</a>';
+    fiskExigirSessao(el, msg);   /* a rotina do kit: mensagem, porta, e a sessão velha apagada */
     return;
   }
   statusCard('⚠️ ' + msg + ', use a cascata.', 'err');
@@ -787,7 +785,7 @@ function salvarNaPasta(btn) {
   }).then(function (r) {
     statusDoc('✓ Salvo na pasta "' + ((r && r.pasta) || ultimoPDF.aluno) + '".', 'ok');
     mostrarVerPasta(r);
-  }).catch(function () { /* o helper já avisou o professor no alert */ });
+  }).catch(function (e) { statusDoc('⚠️ Não salvou: ' + ((e && e.motivo) || fiskMotivoDePasta(e)), 'err'); });
 }
 
 /* O E-counseling do aluno também fica sabendo (20/09/2026): a notificação de
@@ -836,7 +834,7 @@ function registrarTudo() {
       turma: ($('fTurma').value || turma.turma || '').trim(),
       aluno: ultimoPDF.aluno, filename: ultimoPDF.filename, bytes: ultimoPDF.bytes
     }).then(function (r) { REG.pasta = '📁 Pasta: ✓ "' + ((r && r.pasta) || ultimoPDF.aluno) + '"'; mostrarVerPasta(r); })
-      .catch(function () { REG.pasta = '📁 Pasta: ⚠️ não salvou'; REG.falhou = 1; })
+      .catch(function (e) { REG.pasta = '📁 Pasta: ⚠️ ' + ((e && e.motivo) || fiskMotivoDePasta(e)); REG.falhou = 1; })   /* a causa e a porta (M3) */
       .then(regMostra);
   } else { REG.pasta = '📁 Pasta: ⚠️ não salvou (recarregue a página)'; REG.falhou = 1; }
   api({ fn: 'registrarDoc', escola: turma.escola, prof: turma.aba || turma.professor || '',
