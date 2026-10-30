@@ -807,7 +807,7 @@
       el.addEventListener('click', function () { el.style.opacity = '0'; setTimeout(function () { window.hubFrase(); el.style.opacity = ''; }, 300); });
     })();
   </script>
-  <script src="assets/fisk-shared.js?v=2026-10-30a"></script>
+  <script src="assets/fisk-shared.js?v=2026-10-30b"></script>
   <script>
     fiskInitThemeToggle('themeToggle');
 
@@ -1229,12 +1229,7 @@
        Traz o ano corrente e o seguinte, para dezembro não mostrar um
        calendário que acaba no dia 31. */
     async function fetchCalendario(ano) {
-      const res = await fetch(CAL_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'calList', publico: 'pedag', ano: String(ano) })
-      });
-      const json = await fiskJson(res);
+      const json = await fiskFetch(CAL_ENDPOINT, { action: 'calList', publico: 'pedag', ano: String(ano) });
       if (!json || !json.ok) throw new Error((json && json.error) || 'calList falhou');
       return json.itens || [];
     }
@@ -1639,7 +1634,7 @@
       function setupActAs(){
         var sb = $('profActAs'); if (!sb) return;
         sb.hidden = false;
-        fetch(EP+'?action=profList').then(fiskJson).then(function(res){
+        fiskFetch(EP+'?action=profList').then(function(res){
           var ps = ((res&&res.profs)||[]).filter(function(p){ return !p.director; })
             .sort(function(a,b){ return String(a.name).localeCompare(String(b.name),'pt-BR'); });
           var cur = (actingSaved()||{}).name || '';
@@ -2160,7 +2155,7 @@
         sel.innerHTML = '<option value="" disabled selected>' + tr('pg-loading') + '</option>';
         sel.disabled = true; sel.classList.add('carregando'); $('pgCarrega').hidden = false;
         var pronto = function(){ sel.disabled = false; sel.classList.remove('carregando'); $('pgCarrega').hidden = true; };
-        fetch(EP + '?action=profList').then(fiskJson).then(function(res){
+        fiskFetch(EP + '?action=profList').then(function(res){
           pronto();
           var ps = ((res && res.profs) || []).filter(ehProfessor);
           ps.sort(function(a, b){ return String(a.name).localeCompare(String(b.name), 'pt-BR'); });
@@ -2187,8 +2182,7 @@
       }
 
       function post(body){
-        return fetch(EP, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
-          body: JSON.stringify(body) }).then(fiskJson);
+        return fiskFetch(EP, body);
       }
 
       function submit(){
@@ -2225,7 +2219,9 @@
          elemento, este ouvinte estourava e levava junto as linhas de baixo */
       $('profLogout').addEventListener('click', function(){
         var era = saved();
-        try{ localStorage.removeItem('fisk_prof'); localStorage.removeItem('fisk_actas'); localStorage.removeItem('fisk_minidash'); }catch(e){}
+        /* sessão E o que o Hub guardou sobre os alunos neste aparelho (M12); a fila de marcas pendentes fica */
+        if (typeof fiskLimparAoSair === 'function') fiskLimparAoSair();
+        else { try{ localStorage.removeItem('fisk_prof'); localStorage.removeItem('fisk_actas'); localStorage.removeItem('fisk_minidash'); }catch(e){} }
         try{ if (window.fiskLigaLogo) window.fiskLigaLogo(); }catch(e){}
         // saindo de uma visita da direção: volta para o Painel da Direção
         if (era && era.viewingAs){ location.href = 'https://portalfisk.com.br/diretor.html'; return; }
@@ -2363,7 +2359,7 @@
       function api(p){
         var P = comSessao(p);
         var qs = Object.keys(P).map(function(k){ return k+'='+encodeURIComponent(P[k]); }).join('&');
-        return fetch(API+'?'+qs).then(fiskJson)
+        return fiskFetch(API+'?'+qs)
           .then(function(j){ if (j && j.erro) throw new Error(j.erro); return j; });
       }
       /* Todas as turmas do professor numa leitura só. Não passa pela ponte
@@ -2371,7 +2367,7 @@
       function panorama(escola, prof){
         var qs = 'action=panoramaProf&token=' + encodeURIComponent(tokenSessao()) +
                  '&escola=' + encodeURIComponent(escola) + '&prof=' + encodeURIComponent(prof);
-        return fetch(API+'?'+qs).then(fiskJson)
+        return fiskFetch(API+'?'+qs)
           .then(function(j){ if (!j || !j.ok) throw new Error((j && j.erro) || 'panorama falhou'); return j; });
       }
       /* "média (com todos os critérios do boletim): 8,2" — o \s* antigo esbarrava no parêntese e a média voltava null em
@@ -2523,9 +2519,7 @@
               pinta(l, true, true);
             });
           }
-          fetch(API, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
-                       body: JSON.stringify({ action:'alunoBusca', token: tokenSessao(), q: q }) })
-            .then(fiskJson)
+          fiskFetch(API, { action:'alunoBusca', token: tokenSessao(), q: q })
             .then(function(res){
               if (inp.value.trim() !== q) return;
               var l = (res && res.alunos) || [];
@@ -2638,7 +2632,7 @@
     function post(body){
       var s = sess(); if (!s || !s.token) return Promise.reject(new Error('sem sessão'));
       body.token = s.token;
-      return fetch(FISK_HUB_EP, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(body) }).then(function(r){ return r.json(); });
+      return fiskFetch(FISK_HUB_EP, body);
     }
     function hojeIso(){ var d = new Date(); return d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2); }
     function ddmm(ms){ var d = new Date(ms); return ('0'+d.getDate()).slice(-2) + '/' + ('0'+(d.getMonth()+1)).slice(-2); }
@@ -3180,7 +3174,7 @@
     if (!HWP_LIGADO) return;
     fetch(EP, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action:'hwProf', token: s.token }) })
-      .then(function(r){ return r.json(); })
+      .then(fiskJson)
       .then(function(j){ if (j && j.ok && j.casa) { dados = j; pinta(); } })
       .catch(function(){});    // sem rede o painel não aparece, e está certo
 
@@ -3188,7 +3182,7 @@
        de ninguém em particular, é o resultado das quatro casas. */
     fetch(EP, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action:'hwTaca', key:'fisk_0719bacbecc857f61d1e' }) })
-      .then(function(r){ return r.json(); })
+      .then(fiskJson)
       .then(function(j){ if (j && j.ok) { taca = j; pintaTaca(); } })
       .catch(function(){});
   })();

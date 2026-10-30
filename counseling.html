@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="assets/casa-tema.css?v=9">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
-<script src="assets/fisk-shared.js?v=2026-10-30a"></script>
+<script src="assets/fisk-shared.js?v=2026-10-30b"></script>
 <style>
   /* A paleta do chrome vem do kit compartilhado (--ui*). Com fallback: se o
      professor ainda tiver o kit antigo em cache, --ui não existe e o botão
@@ -217,7 +217,7 @@ function api(params) {
   var P = { action: 'card', token: tokenSessao() };
   Object.keys(params).forEach(function (k) { P[k] = params[k]; });
   var qs = Object.keys(P).map(function (k) { return k + '=' + encodeURIComponent(P[k]); }).join('&');
-  return fetch(API_URL + '?' + qs).then(fiskJson)
+  return fiskFetch(API_URL + '?' + qs)
     .then(function (j) { if (j.erro) throw new Error(j.erro); return j; });
 }
 /* As rotas do counseling são POST com corpo em texto puro: é o que evita o
@@ -225,7 +225,16 @@ function api(params) {
 function post(acao, extra) {
   var body = { action: acao, token: tokenSessao() };
   Object.keys(extra || {}).forEach(function (k) { body[k] = extra[k]; });
-  return fetch(API_URL, { method: 'POST', body: JSON.stringify(body) }).then(fiskJson);
+  return fiskFetch(API_URL, body);
+}
+/* O mesmo POST, mas se o backend responder cod 'pasta_fora_da_turma' (pasta do aluno só achada em outra
+   turma/professor), mostra o caminho, pergunta, e repete com confirmaPasta:true. Recusa rejeita com
+   code 'pasta_recusada'. Enquanto o backend não mandar esse cod, é igual ao post(). */
+function postComPasta(acao, extra, pergunta, recusa) {
+  return fiskComPastaConfirmada(function (mais) {
+    var b = {}; Object.keys(extra || {}).forEach(function (k) { b[k] = extra[k]; }); Object.keys(mais).forEach(function (k) { b[k] = mais[k]; });
+    return post(acao, b);
+  }, pergunta, recusa);
 }
 function ind(id, estado) { document.getElementById(id).className = 'ind' + (estado ? ' ' + estado : ''); }
 function $(id) { return document.getElementById(id); }
@@ -244,7 +253,12 @@ function montarSelect(sel, placeholder, itens) {
    A pré-seleção NUNCA trava o seletor: substituição é frequente e todo
    professor acessa as turmas de todos (regra firme do Pedro). */
 var selEscola = $('selEscola'), selProf = $('selProf'), selTurma = $('selTurma');
-if (!CTX_URL) {
+/* Sem sessão do Hub a tela NÃO chama o backend (auditoria de 30/10/2026, M4): antes montava a cascata, pedia
+   as escolas e só então escrevia "sessão expirada" sem porta. A rotina do kit escreve "🔒 Entre no Fisk Hub…"
+   com o link, e os seletores ficam quietos. */
+var SESSAO_OK = !!fiskExigirSessao($('statusCard'));
+if (!SESSAO_OK) { $('statusCard').className = 'status erro'; [selEscola, selProf, selTurma].forEach(function (s) { s.disabled = true; }); }
+if (!CTX_URL && SESSAO_OK) {
   selEscola.innerHTML = '<option value="" disabled selected>Carregando escolas…</option>';
   selEscola.disabled = true;
   ind('indEscola', 'spin');
@@ -334,9 +348,8 @@ function erroApi(err) {
     }
   });
   el.className = 'status erro';
-  el.textContent = /sess/i.test(msg)
-    ? '🔒 ' + msg + ' Volte ao Fisk Hub e entre de novo.'
-    : '⚠️ ' + msg;
+  if (fiskEhErroDeSessao(msg)) { fiskExigirSessao(el, msg); return; }   /* a porta, e a sessão vencida apagada (M4) */
+  el.textContent = '⚠️ ' + msg;
 }
 
 function montarLista(dados) {
@@ -391,7 +404,7 @@ function selecionar(a) {
 
   /* só vale a resposta do aluno que está na tela (auditoria de 26/10/2026: o histórico do A aparecia sob o nome
      do B, e o "Salvar" gravava no B) */
-  post('counselingLer', contexto()).then(function (j) {
+  postComPasta('counselingLer', contexto(), 'Abrir mesmo assim o documento dessa pasta?', 'pasta do aluno não encontrada na turma: peça à secretaria para conferir').then(function (j) {
     pararEspera();
     if (alunoSel !== a) return;
     dadosDoc = null;
@@ -419,6 +432,7 @@ function selecionar(a) {
     pararEspera();
     if (alunoSel !== a) return;
     st.className = 'status erro';
+    if (fiskEhErroDeSessao(e)) { fiskExigirSessao(st, e.message); return; }
     st.textContent = '⚠️ ' + ((e && e.message) || e);
   });
 }
@@ -476,7 +490,7 @@ $('btnCriar').addEventListener('click', function () {
   var b = this;
   b.disabled = true; b.textContent = '⏳ Criando…';
   var ctx = contexto(); ctx.faixa = $('selFaixa').value;
-  post('counselingCriar', ctx).then(function (j) {
+  postComPasta('counselingCriar', ctx, 'Criar o documento mesmo assim nessa pasta?').then(function (j) {
     b.disabled = false; b.textContent = '➕ Criar o documento';
     if (!j || j.ok !== true) {
       $('statusDoc').className = 'status erro';
@@ -502,7 +516,7 @@ $('btnSalvar').addEventListener('click', function () {
   var ctx = contexto();
   ctx.origem = 'manual';
   ctx.campos = { texto: texto, estagio: $('fEstagio').value.trim() };
-  post('counselingEscrever', ctx).then(function (j) {
+  postComPasta('counselingEscrever', ctx, 'Registrar mesmo assim no counseling dessa pasta?').then(function (j) {
     b.disabled = false; b.textContent = '💾 Salvar no documento';
     if (!j || j.ok !== true) {
       st.className = 'status erro';
@@ -529,7 +543,8 @@ if (CTX_URL) {
   if (EMBED) { document.body.classList.add('em-gaveta'); fiskInitThemeToggle('themeToggle'); }
   else { fiskInitThemeToggle('themeToggle'); fiskInitUserMenu(); }
   $('painelCard').hidden = true;
-  selecionar({ nome: CTX_URL.aluno, book: Q.get('estagio') || '' });
+  if (SESSAO_OK) selecionar({ nome: CTX_URL.aluno, book: Q.get('estagio') || '' });
+  else { $('statusDoc').className = 'status erro'; fiskExigirSessao($('statusDoc')); }   /* na gaveta a linha de status é outra */
   var pre = Q.get('texto');
   if (pre) $('fTexto').value = pre;
 } else {

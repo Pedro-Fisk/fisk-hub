@@ -703,7 +703,7 @@ body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ 
 <script src="https://portalfisk.com.br/assets/checking/guia-i2.js?v=56bd0516a9"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-i3.js?v=e326479afd"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-<script src="assets/fisk-shared.js?v=2026-10-30a"></script>
+<script src="assets/fisk-shared.js?v=2026-10-30b"></script>
 <script>
 fiskInitThemeToggle('themeToggle');
 fiskInitUserMenu();
@@ -1269,15 +1269,15 @@ function status(msg, err) { var el = $('status'); el.textContent = msg || ''; el
 function get(params) {
   params.token = token();
   var qs = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
-  return fetch(EP + '?' + qs).then(fiskJson).then(function (j) { if (j && (j.erro || j.error)) throw new Error(j.erro || j.error); return j; });
+  return fiskFetch(EP + '?' + qs).then(function (j) { if (j && (j.erro || j.error)) throw new Error(j.erro || j.error); return j; });
 }
-function post(body) {
+function post(body, opcoes) {
   body.token = token();
   if (body.action === 'plannerProf' && estado.plantao) body.semCard = true;
   if ((body.action === 'plannerProf' || body.action === 'plannerFalta') && estado.ontem && !estado.plantao) body.data = ontemIsoTH();
   if (body.action === 'plannerFalta' && !body.quem) body.quem = (sessao() || {}).name || estado.prof || '';   /* plantão não é aula: o card não muda (Pedro, 16/09/2026) */
-  return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
-    .then(fiskJson).then(function (j) { if (!j || j.ok === false) throw new Error((j && (j.erro || j.error)) || 'Não consegui.'); return j; })
+  return fiskFetch(EP, body, opcoes)
+    .then(function (j) { if (!j || j.ok === false) throw new Error((j && (j.erro || j.error)) || 'Não consegui.'); return j; })
     .then(function (j) {
       /* a primeira marca do monitor no planner do aluno já é a presença dele na tutoria */
       if (body.action === 'plannerProf' && estado.plantao && body.raf && !tutLancado[body.raf]) {
@@ -1474,11 +1474,10 @@ function turmaDoHorario(turmas) {
 }
 function erro(e) {
   var msg = (e && e.message) || 'erro';
-  if (/sess[ãa]o/i.test(msg)) {
-    $('status').className = 'status err'; $('status').hidden = false;
-    $('status').innerHTML = '⚠️ ' + esc(msg) + ' <a href="index.html" style="font-weight:800">Entrar de novo →</a>';
-    /* a sessão vencida sai daqui mesmo: senão o link voltava à home logada e a Minha aula falhava de novo */
-    try { localStorage.removeItem('fisk_prof'); sessionStorage.setItem('fisk_sessao_caiu', '1'); } catch (e2) {}
+  if (fiskEhErroDeSessao(msg)) {
+    /* a sessão vencida sai daqui mesmo (o kit apaga): senão o link voltava à home logada e a Minha aula falhava de novo */
+    $('status').className = 'status err';
+    fiskExigirSessao($('status'), msg);
     return;
   }
   status('⚠️ ' + msg, true);
@@ -1569,8 +1568,8 @@ function nPessoa(v) { return String(v || '').normalize('NFD').replace(/[\u0300-\
 var LC = {};
 function carregaLC(escola) {
   try { var c = JSON.parse(localStorage.getItem('th:lc:' + escola) || 'null'); if (c) LC[escola] = c; } catch (e) {}
-  fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plantaoList', unidade: escola }) })
-    .then(fiskJson).then(function (j) {
+  fiskFetch(EP, { action: 'plantaoList', unidade: escola })
+    .then(function (j) {
       if (!j || !j.ok) return;
       LC[escola] = j.itens || [];
       try { localStorage.setItem('th:lc:' + escola, JSON.stringify(LC[escola])); } catch (e) {}
@@ -2278,11 +2277,17 @@ function aplicaPendentes(raf, planner) {
 var FILA_K = 'th:fila:v1';
 function filaLe() { try { return JSON.parse(localStorage.getItem(FILA_K) || '[]'); } catch (e) { return []; } }
 function filaGrava(f) { try { localStorage.setItem(FILA_K, JSON.stringify(f.slice(-300))); } catch (e) {} pintaFilaOff(); }
+/* Rede CAÍDA é só isto: o navegador diz que está offline, ou o fetch falhou de fato (TypeError "Failed to
+   fetch" / "Load failed" / "NetworkError"). O TEMPO LIMITE não entra aqui (auditoria de 30/10/2026, A1): em dia
+   de card lento, cada marca estourava os 25 s, a tela dizia "📴 Sem internet" com internet e reenviava um pedido
+   que quase sempre já tinha gravado. */
 function ehDeRede(e) {
-  if (!navigator.onLine) return true;
+  if (navigator.onLine === false) return true;
+  if (typeof fiskEhTimeout === 'function' && fiskEhTimeout(e)) return false;
   var m = String((e && e.message) || e || '');
-  return /failed to fetch|load failed|networkerror|network request|demorou demais|conexão|connection/i.test(m);
+  return (e instanceof TypeError) || /failed to fetch|load failed|networkerror|network request/i.test(m);
 }
+function ehLento(e) { return typeof fiskEhTimeout === 'function' && fiskEhTimeout(e); }
 /* Auditoria de 26/10/2026, três regras novas:
    · cada marca guardada leva a DATA da aula e o NOME de quem marcou. Sem a data, a marca de segunda enviada
      na quarta caía na aula de quarta; com ela, o servidor grava no planner e recusa o card fora do dia;
@@ -2304,7 +2309,7 @@ function pintaFilaOff() {
   var f = filaMinhas();
   if (!f.length) { el.hidden = true; el.innerHTML = ''; return; }
   el.hidden = false;
-  el.innerHTML = '<span>⏳ ' + f.length + ' marca' + (f.length === 1 ? '' : 's') + ' esperando a internet. Elas estão guardadas neste aparelho e vão sozinhas quando a rede voltar.</span>' +
+  el.innerHTML = '<span>⏳ ' + f.length + ' marca' + (f.length === 1 ? '' : 's') + ' esperando a internet ou o servidor. Elas estão guardadas neste aparelho e vão sozinhas quando a rede voltar ou o servidor responder.</span>' +
     '<button type="button" data-fila-agora>Tentar agora</button>';
   el.querySelector('[data-fila-agora]').addEventListener('click', function () { filaDrena(true); });
 }
@@ -2323,6 +2328,7 @@ function filaDrena(avisar) {
   }).catch(function (e) {
     filaEnviando = false;
     if (/sess[ãa]o/i.test(e.message || '')) { if (avisar) toast('⚠️ Sua sessão expirou. Entre de novo no Hub: as marcas guardadas continuam aqui e vão depois.', 7000); return; }
+    if (ehLento(e)) { if (avisar) toast('⏳ O servidor ainda está lento. As marcas continuam guardadas e vão na próxima tentativa.'); return; }
     if (!ehDeRede(e)) { tira(); toast('⚠️ Uma marca guardada não foi aceita: ' + e.message); }
     else if (avisar) toast('⚠️ Ainda sem internet. As marcas continuam guardadas.');
   });
@@ -2346,9 +2352,8 @@ function confirmar(a, id, marca) {
   var k = a.raf + '|' + id;
   var anterior = salvando[k] || Promise.resolve();
   salvando[k] = anterior.then(function () {
-    var pedido = post({ action: 'plannerProf', raf: a.raf, book: a.book, patch: patch });
-    var limite = new Promise(function (_, rej) { setTimeout(function () { rej(new Error('o servidor demorou demais')); }, 25000); });
-    return Promise.race([pedido, limite]);
+    /* o teto de 25 s mora no fiskFetch: estourou, o pedido é abortado aqui e o erro chega com code 'timeout' */
+    return post({ action: 'plannerProf', raf: a.raf, book: a.book, patch: patch }, { timeoutMs: 25000 });
   }).then(function (r) {
     console.log('plannerProf', id, marca, r);
     if (pendentes[a.raf] && pendentes[a.raf][id] === marca) delete pendentes[a.raf][id];
@@ -2361,7 +2366,12 @@ function confirmar(a, id, marca) {
   }).catch(function (e) {
     if (pendentes[a.raf] && pendentes[a.raf][id] === marca) delete pendentes[a.raf][id];
     console.error('plannerProf falhou', id, e);
-    if (ehDeRede(e)) {   /* rede caiu: a marca fica na tela e o pedido espera no aparelho */
+    if (ehLento(e)) {   /* o servidor demorou: a marca fica na tela e a fila confirma depois (o patch é idempotente) */
+      filaEnfileira({ raf: a.raf, book: a.book, patch: patch, quando: Date.now() });
+      toast('⏳ O servidor está lento; a marca ficou guardada e será confirmada.', 5000);
+      return;
+    }
+    if (ehDeRede(e)) {   /* rede caiu de verdade: a marca fica na tela e o pedido espera no aparelho */
       filaEnfileira({ raf: a.raf, book: a.book, patch: patch, quando: Date.now() });
       toast('📴 Sem internet: guardei a marca e envio quando a rede voltar.');
       return;
@@ -2427,11 +2437,17 @@ function desenhaAguia() {
   aguia.ov.scrollTop = y;
 }
 /* O PLANNER COMPLETO EM OUTRA ABA (Pedro, 15/09/2026). A página avulsa (plano-curso.html) lê o planner do servidor;
-   o que só a leitura da turma do card tem (telefone, aniversário, as células das provas) vai pelo localStorage,
-   que as duas abas dividem, e nunca pela URL. */
+   o que só a leitura da turma do card tem (as células das provas) vai pelo localStorage, que as duas abas
+   dividem, e nunca pela URL. Auditoria de 30/10/2026 (A3): telefone e nascimento NÃO vão mais (ficavam para
+   sempre no computador da sala); só o nome, o responsável e as notas, que são o que o plano de curso usa. A chave
+   é apagada por quem lê, e antes de gravar varre as que sobraram de abas que nunca abriram. */
 function abrirEmOutraAba(a) {
   var pes = pessoaisDe(a) || {};
-  try { localStorage.setItem('pc:' + a.raf, JSON.stringify({ t: Date.now(), nome: String(pes.nome || a.nome || '').replace(/\s*\([^)]*\)/g, '').trim(), nascimento: pes.nascimentoTxt || pes.nascimento || '', telefone: pes.telAluno || '', respNome: pes.respNome || '', respTel: pes.respTel || '', notasAv1: pes.notasAv1 || '', notasAv2: pes.notasAv2 || '' })); } catch (e) {}
+  try {
+    var velhas = []; for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k && k.indexOf('pc:') === 0) velhas.push(k); }
+    velhas.forEach(function (k) { localStorage.removeItem(k); });
+    localStorage.setItem('pc:' + a.raf, JSON.stringify({ t: Date.now(), nome: String(pes.nome || a.nome || '').replace(/\s*\([^)]*\)/g, '').trim(), respNome: pes.respNome || '', notasAv1: pes.notasAv1 || '', notasAv2: pes.notasAv2 || '' }));
+  } catch (e) {}
   var q = new URLSearchParams({ raf: a.raf, book: a.book || '', prof: estado.prof || '', turma: estado.turma || '', escola: estado.escola || '' });
   if (estado.plantao) q.set('plantao', '1');
   window.open('plano-curso.html?' + q.toString(), '_blank');

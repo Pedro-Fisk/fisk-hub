@@ -52,6 +52,52 @@ function fiskMsgRespostaEstranha(resp, corpo) {
          'avise o Pedro — pode ser o backend precisando ser publicado de novo.';
 }
 
+/* ── PEDIDO COM TEMPO LIMITE (auditoria de 30/10/2026, B9) ────────────────
+ * Nenhuma página do Hub tinha teto para um pedido ao Apps Script: um script
+ * travado (até 6 min) deixava "Procurando…" girando para sempre. Aqui o
+ * pedido ganha um AbortController com 45 s por padrão (o card lento leva até
+ * 40 s, fisk-shared.js:283), a resposta passa pelo fiskJson e o tempo
+ * estourado vira UM erro reconhecível:
+ *
+ *     { code: 'timeout', message: 'O servidor demorou mais de 45 s' }
+ *
+ * Quem chama decide o que fazer com ele (a Minha aula guarda a marca; as
+ * telas de documento mostram a causa). O pedido abortado aqui PODE ter chegado
+ * ao servidor e ser gravado lá: quem reenvia precisa ser idempotente.
+ *
+ * Uso:  fiskFetch(url)                      → GET
+ *       fiskFetch(url, { action: 'x' })     → POST, corpo em texto puro (sem preflight)
+ *       fiskFetch(url, body, { timeoutMs: 25000 })
+ * Só acrescenta: fetch + fiskJson continuam valendo onde já estão.
+ */
+var FISK_FETCH_TIMEOUT_MS = 45000;
+function fiskFetch(url, body, opts) {
+  opts = opts || {};
+  var ms = opts.timeoutMs > 0 ? opts.timeoutMs : FISK_FETCH_TIMEOUT_MS;
+  var init = { method: opts.method || (body == null ? 'GET' : 'POST') };
+  if (body != null) {
+    init.headers = { 'Content-Type': 'text/plain;charset=utf-8' };
+    init.body = typeof body === 'string' ? body : JSON.stringify(body);
+  }
+  var ctrl = (typeof AbortController === 'function') ? new AbortController() : null;
+  if (ctrl) init.signal = ctrl.signal;
+  var estourou = false;
+  var timer = setTimeout(function () { estourou = true; if (ctrl) ctrl.abort(); }, ms);
+  return fetch(url, init)
+    .then(function (r) { clearTimeout(timer); return fiskJson(r); })
+    .catch(function (e) {
+      clearTimeout(timer);
+      if (estourou || (e && e.name === 'AbortError')) {
+        var et = new Error('O servidor demorou mais de ' + Math.round(ms / 1000) + ' s');
+        et.code = 'timeout';
+        throw et;
+      }
+      throw e;
+    });
+}
+/** O erro veio do tempo limite do fiskFetch? */
+function fiskEhTimeout(e) { return !!(e && (e.code === 'timeout' || e.name === 'AbortError')); }
+
 /** Liga um botão de alternar modo escuro/claro, com persistência em localStorage. */
 function fiskInitThemeToggle(buttonId, opts) {
   opts = opts || {};
@@ -140,6 +186,35 @@ function fiskBytesToBase64(bytes) {
  * Resolve com { ok:true, url, pasta }. Rejeita com Error cujo .code pode
  * ser 'pasta_nao_encontrada'.
  */
+/* ── A PASTA DO HOMÔNIMO (contrato novo do backend, achado 20 da auditoria de 30/10/2026) ──
+ * Quando a pasta do aluno não existe na turma do card, o backend achava UMA pasta com o mesmo nome em qualquer
+ * turma/professor da escola e gravava lá só com um aviso: aluno novo sem pasta + homônimo em outra turma = termo,
+ * 2nd chance e counseling na pasta do outro. Pelo contrato novo ele responde
+ *     { ok:false, cod:'pasta_fora_da_turma', aviso, pastaNome, pastaCaminho }
+ * e só grava ali se o pedido voltar com confirmaPasta:true. Aqui o professor vê o caminho e decide num confirm;
+ * recusou, o erro sai com code 'pasta_recusada'. Enquanto o backend não mandar esse cod, nada muda. */
+function fiskEhPastaFora(j) { return !!(j && j.ok === false && (j.cod || j.code) === 'pasta_fora_da_turma'); }
+function fiskConfirmarPastaFora(j, pergunta) {
+  var txt = '⚠️ ' + (j.aviso || 'A pasta do aluno não foi encontrada na turma; existe uma com o mesmo nome em outro lugar.') +
+    '\n\nPasta: ' + (j.pastaNome || '?') + (j.pastaCaminho ? '\n' + j.pastaCaminho : '') +
+    '\n\n' + (pergunta || 'Salvar mesmo assim nessa pasta?');
+  return window.confirm(txt);
+}
+function fiskErroPastaRecusada(j, recusa) {
+  var e = new Error(recusa || 'não salvou: pasta do aluno não encontrada na turma');
+  e.code = 'pasta_recusada'; e.resposta = j;
+  return e;
+}
+/* fazer(extra) faz o pedido com os campos extra; se a resposta pedir confirmação, pergunta e repete com
+   { confirmaPasta: true }. Devolve a resposta final; recusa rejeita com code 'pasta_recusada'. */
+function fiskComPastaConfirmada(fazer, pergunta, recusa) {
+  return Promise.resolve().then(function () { return fazer({}); }).then(function (j) {
+    if (!fiskEhPastaFora(j)) return j;
+    if (!fiskConfirmarPastaFora(j, pergunta)) throw fiskErroPastaRecusada(j, recusa);
+    return fazer({ confirmaPasta: true });
+  });
+}
+
 async function fiskSalvarNoDrive(opts) {
   var endpoint = opts.endpoint || FISK_SAVE_URL;
   if (!endpoint) { var ec = new Error('URL de salvamento não configurada (defina FISK_SAVE_URL em fisk-shared.js após publicar o endpoint)'); ec.code = 'sem_endpoint'; throw ec; }
@@ -155,11 +230,15 @@ async function fiskSalvarNoDrive(opts) {
      arquivos de nome IDÊNTICO e os antigos se acumulam na pasta. */
   if (opts.substituiPrefixo) payload.substituiPrefixo = opts.substituiPrefixo;
   if (opts.substituiSufixo) payload.substituiSufixo = opts.substituiSufixo;
-  // corpo como string simples (text/plain) evita preflight CORS no Apps Script
-  var resp = await fetch(endpoint, { method: 'POST', body: JSON.stringify(payload) });
-  var j;
-  try { j = await resp.json(); }
-  catch (e) { throw new Error(fiskMsgRespostaEstranha(resp, '')); }
+  // corpo como string simples (text/plain) evita preflight CORS no Apps Script; teto de 90 s porque o PDF
+  // vai em base64 e o Drive ainda escreve (auditoria de 30/10/2026, B9/M3)
+  var j = await fiskFetch(endpoint, JSON.stringify(payload), { timeoutMs: opts.timeoutMs || 90000 });
+  /* pasta só achada em outra turma/professor: o professor confirma pelo caminho, ou não salva */
+  if (fiskEhPastaFora(j) && !payload.confirmaPasta) {
+    if (!fiskConfirmarPastaFora(j)) throw fiskErroPastaRecusada(j);
+    payload.confirmaPasta = true;
+    j = await fiskFetch(endpoint, JSON.stringify(payload), { timeoutMs: opts.timeoutMs || 90000 });
+  }
   if (!j || j.ok !== true) {
     var err = new Error((j && j.erro) || 'falha ao salvar no Drive');
     err.code = (j && j.code) || '';
@@ -195,18 +274,28 @@ async function fiskEnviarParaPasta(buttonEl, getOpts) {
     return r;
   } catch (e) {
     buttonEl.textContent = old; buttonEl.disabled = false;
-    var ondeAlvo = (opts && opts.tipo === 'turma') ? 'da turma' : 'do aluno';
-    if (e.code === 'sem_endpoint') {
-      alert('⚙️ O salvamento no Drive ainda não foi configurado.\n\nPublique o endpoint (apps-script/Code.gs) e cole a URL em FISK_SAVE_URL (assets/fisk-shared.js).');
-    } else if (e.code === 'pasta_nao_encontrada') {
-      alert('⚠️ ATENÇÃO: a pasta ' + ondeAlvo + ' NÃO foi encontrada no drive compartilhado.\n\n' +
-            'O documento NÃO foi salvo. Baixe o PDF manualmente (botão de gerar/baixar) ou ' +
-            'confira/crie a pasta no Drive e tente de novo.' + (e.message ? '\n\n(' + e.message + ')' : ''));
-    } else {
-      alert('Não deu para salvar no Drive: ' + (e.message || e));
-    }
+    /* Sem alert (auditoria de 30/10/2026, M3): o pop-up genérico igualava pasta inexistente (secretaria) a
+       escrita negada (Pedro), e ao fechá-lo sobrava "não salvou". A causa e a porta ficam na página, ao lado do
+       botão, e viajam em e.motivo para a linha de status de quem chamou. */
+    e.motivo = fiskMotivoDePasta(e, opts && opts.tipo);
+    fiskAvisoDePasta(buttonEl, 'NÃO salvou: ' + e.motivo + '. O PDF continua no botão de baixar.');
     throw e;
   }
+}
+
+/* A CAUSA DE NÃO TER SALVO, com a porta (quem resolve): pasta inexistente é a secretaria; escrita recusada é o
+   Pedro (setupDriveEscrita); tempo estourado é esperar. Serve às linhas de status do 2nd Chance e do Termo. */
+function fiskMotivoDePasta(e, tipo) {
+  var code = (e && e.code) || '', msg = String((e && e.message) || e || '');
+  var quem = tipo === 'turma' ? 'da turma' : 'do aluno';
+  if (code === 'pasta_nao_encontrada') return 'pasta ' + quem + ' não encontrada: peça à secretaria para criar';
+  if (code === 'pasta_recusada') return 'não salvou: pasta do aluno não encontrada na turma';
+  if (code === 'timeout') return 'o servidor demorou (' + msg + '): confira a pasta antes de tentar de novo';
+  if (code === 'sem_endpoint') return 'o salvamento no Drive não está configurado: avise o Pedro';
+  if (/permiss|autoriza|negad|denied|insufficient|escrita|setupDrive/i.test(msg)) return 'o Drive recusou a escrita: avise o Pedro';
+  if (/sess[ãa]o/i.test(msg)) return 'sua sessão expirou: entre de novo no Hub';
+  if (/não respondeu com dados|página de erro|pediu login/i.test(msg)) return 'o servidor não respondeu: tente de novo em instantes';
+  return msg || 'não salvou';
 }
 
 /**
@@ -242,6 +331,64 @@ async function fiskWithSpinner(buttonEl, asyncFn, opts) {
    não tinha como sair sem voltar.
    Chame fiskInitUserMenu() no fim do script da página (o CSS vem deste kit).
    ============================================================================ */
+
+/* ── O QUE O HUB GUARDOU NO APARELHO SAI JUNTO COM A SESSÃO (auditoria de 30/10/2026, M12) ──
+ * O "Sair" apagava só fisk_prof, fisk_actas e fisk_minidash; ficavam no computador da sala as listas de alunos
+ * com RAF (cal:turmas:*, th:lista:*), os atendimentos (th:atend:*), o que a Minha aula deixa para o plano de
+ * curso (pc:*), o uso (hub:*) e a grade da tutoria (tut:*). Aqui varre tudo isso, no localStorage e no
+ * sessionStorage. A fila de marcas não enviadas (th:fila:v1) é a exceção: com itens pendentes ela FICA, porque
+ * são presenças que ainda não chegaram ao servidor e vão sozinhas quando a pessoa entrar de novo.
+ * Devolve quantas marcas ficaram guardadas. */
+var FISK_PREFIXOS_LOCAIS = ['pc:', 'cal:', 'th:', 'hub:', 'tut:'];
+var FISK_FILA_MARCAS = 'th:fila:v1';
+function fiskMarcasPendentes() {
+  try { var f = JSON.parse(localStorage.getItem(FISK_FILA_MARCAS) || '[]'); return Array.isArray(f) ? f.length : 0; } catch (e) { return 0; }
+}
+function fiskLimparAoSair() {
+  var pendentes = fiskMarcasPendentes();
+  ['fisk_prof', 'fisk_actas', 'fisk_minidash'].forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
+  [localStorage, sessionStorage].forEach(function (st) {
+    var tirar = [];
+    try {
+      for (var i = 0; i < st.length; i++) {
+        var k = st.key(i);
+        if (!k) continue;
+        if (k === FISK_FILA_MARCAS && pendentes) continue;
+        for (var p = 0; p < FISK_PREFIXOS_LOCAIS.length; p++) if (k.indexOf(FISK_PREFIXOS_LOCAIS[p]) === 0) { tirar.push(k); break; }
+      }
+      tirar.forEach(function (k) { st.removeItem(k); });
+    } catch (e) {}
+  });
+  return pendentes;
+}
+/* A pergunta do "Sair", com o aviso das marcas guardadas quando há alguma. */
+function fiskPerguntaDeSaida() {
+  var n = fiskMarcasPendentes();
+  return 'Sair da sua conta neste computador?' + (n ? '\n\n⏳ ' + n + ' marca' + (n === 1 ? '' : 's') + ' de presença ainda não ' + (n === 1 ? 'chegou' : 'chegaram') + ' ao servidor. ' +
+    (n === 1 ? 'Ela fica guardada' : 'Elas ficam guardadas') + ' neste aparelho e ' + (n === 1 ? 'vai sozinha' : 'vão sozinhas') + ' quando você entrar de novo na Minha aula.' : '');
+}
+
+/* ── SESSÃO EXIGIDA, SESSÃO VENCIDA: uma rotina para as quatro telas (auditoria de 30/10/2026, M4) ──
+ * Termo, 2nd Chance e Minha aula tinham cada uma a sua; o E-counseling montava a cascata, chamava o backend sem
+ * sessão e escrevia "sessão expirada" sem link. Dois usos:
+ *   fiskExigirSessao(el)        → devolve a sessão; sem ela, escreve "🔒 Entre no Fisk Hub…" com o link e devolve null
+ *   fiskExigirSessao(el, msg)   → o servidor recusou a sessão: escreve msg com "Entrar de novo →", apaga a sessão
+ *                                 velha (senão o link voltava à home logada e a tela falhava de novo) e avisa a home
+ * `el` é a linha de status da página (innerHTML). */
+function fiskEhErroDeSessao(e) { return /sess[ãa]o/i.test(String((e && e.message) || e || '')); }
+function fiskExigirSessao(el, msg) {
+  var s = fiskSessao();
+  if (s && s.token && !msg) return s;
+  var base = fiskHubBase();
+  if (el) {
+    el.innerHTML = msg
+      ? '⚠️ ' + fiskEsc(msg) + ' <a href="' + base + 'index.html" style="font-weight:800">Entrar de novo →</a>'
+      : '🔒 Entre no Fisk Hub para abrir esta ferramenta. <a href="' + base + 'index.html" style="font-weight:800">Entrar →</a>';
+    el.hidden = false;
+  }
+  if (msg) { try { localStorage.removeItem('fisk_prof'); sessionStorage.setItem('fisk_sessao_caiu', '1'); } catch (e) {} }
+  return null;
+}
 
 /** Sessão do professor gravada pelo login do Hub. */
 function fiskSessao() {
@@ -557,12 +704,8 @@ function fiskInitUserMenu(opts) {
 
   menu.querySelector('.fu-sair').addEventListener('click', function () {
     if (typeof opts.onSair === 'function') { fechar(); opts.onSair(); return; }
-    if (!window.confirm('Sair da sua conta neste computador?')) return;
-    try {
-      localStorage.removeItem('fisk_prof');
-      localStorage.removeItem('fisk_actas');
-      localStorage.removeItem('fisk_minidash');
-    } catch (x) {}
+    if (!window.confirm(fiskPerguntaDeSaida())) return;
+    fiskLimparAoSair();   /* sessão E o que o Hub guardou sobre os alunos neste aparelho */
     location.href = base + 'index.html';
   });
 
@@ -632,16 +775,17 @@ function fiskCounseling(opts) {
     var s = fiskSessao();
     if (!s || !s.token) return Promise.resolve(null);
     if (!opts || !opts.aluno || !opts.escola) return Promise.resolve(null);
-    return fetch(FISK_HUB_EP, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({
-        action: 'counselingEscrever', token: s.token,
-        escola: opts.escola, professor: opts.professor || '',
-        turma: String(opts.turma || '').split('\n')[0],
-        aluno: opts.aluno, origem: opts.origem || 'manual', campos: opts.campos || {}
-      })
-    }).then(function (r) { return r.json(); })
+    return fiskComPastaConfirmada(function (mais) {
+        var corpo = {
+          action: 'counselingEscrever', token: s.token,
+          escola: opts.escola, professor: opts.professor || '',
+          turma: String(opts.turma || '').split('\n')[0],
+          aluno: opts.aluno, origem: opts.origem || 'manual', campos: opts.campos || {}
+        };
+        Object.keys(mais).forEach(function (k) { corpo[k] = mais[k]; });
+        return fiskFetch(FISK_HUB_EP, corpo);
+      }, 'Registrar mesmo assim no counseling dessa pasta?')
+      .catch(function (e) { return (e && e.code === 'pasta_recusada') ? { ok: false, code: 'pasta_recusada', erro: e.message } : null; })
       .then(function (j) { if (typeof opts.aoTerminar === 'function') opts.aoTerminar(j); return j; })
       .catch(function () { return null; });
   } catch (e) { return Promise.resolve(null); }
@@ -1136,9 +1280,11 @@ function fiskCounselingAbrirDoc(ctx) {
       '<p style="font-size:1.05rem;text-align:center;padding:16px">💬 Abrindo o counseling de <b>' + fiskEsc(ctx.aluno) + '</b>…<br><small style="color:#6b7a8c">procurando o documento na pasta do aluno</small></p></body>');
     w.document.close();
   } catch (e) {}
-  fetch(FISK_HUB_EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ action: 'counselingLer', token: s.token || '', escola: ctx.escola || '', professor: ctx.professor || '', turma: turma, aluno: ctx.aluno }) })
-    .then(function (r) { return r.json(); })
+  fiskComPastaConfirmada(function (mais) {
+      var corpo = { action: 'counselingLer', token: s.token || '', escola: ctx.escola || '', professor: ctx.professor || '', turma: turma, aluno: ctx.aluno };
+      Object.keys(mais).forEach(function (k) { corpo[k] = mais[k]; });
+      return fiskFetch(FISK_HUB_EP, corpo);
+    }, 'Abrir mesmo assim o documento dessa pasta?')
     .then(function (j) { w.location.href = (j && j.ok && j.docUrl) ? j.docUrl : ferramenta; })
     .catch(function () { w.location.href = ferramenta; });
 }
@@ -1371,7 +1517,7 @@ function fiskBuscaMeusAlunos(q) {
        enganosa possível, porque a chave está certa. */
     fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: 'hwGet', key: KEY, raf: 'PROF:' + nome }) })
-      .then(function (r) { return r.json(); })
+      .then(fiskJson)
       .then(function (j) {
         if (!j || !j.ok || !CASAS[j.casa]) return;
         try { localStorage.setItem(k, JSON.stringify({ casa: j.casa, em: j.em || null })); } catch (e) {}

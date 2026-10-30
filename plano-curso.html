@@ -34,6 +34,8 @@
 <div class="status" id="status">Lendo o planner…</div>
 <div id="corpo"></div>
 <script src="https://portalfisk.com.br/assets/planner-v2.js?v=b66262b64e"></script>
+<!-- o kit vem ANTES do script da página: a leitura do planner usa o fiskFetch já na abertura (30/10/2026) -->
+<script src="assets/fisk-shared.js?v=2026-10-30b"></script>
 <script>
 var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
 var $ = function (id) { return document.getElementById(id); };
@@ -58,9 +60,16 @@ $('voltar').addEventListener('click', function (ev) {
   window.close();
   setTimeout(function () { location.href = 'turma-de-hoje.html'; }, 250);   /* o navegador recusou fechar */
 });
-/* o que a Turma de hoje deixou para esta aba (abrirEmOutraAba): vale por 10 minutos */
+/* o que a Turma de hoje deixou para esta aba (abrirEmOutraAba): vale por 10 minutos. Lido, SAI do localStorage
+   (auditoria de 30/10/2026, A3: a chave nunca era apagada) e fica só no sessionStorage desta aba, para o F5 não
+   perder as notas; a aba fechada leva junto. */
 var pes = {};
-try { var h = JSON.parse(localStorage.getItem('pc:' + raf) || 'null'); if (h && Date.now() - h.t < 10 * 60000) pes = h; } catch (e) {}
+try {
+  var h = JSON.parse(localStorage.getItem('pc:' + raf) || 'null');
+  if (h) { localStorage.removeItem('pc:' + raf); try { sessionStorage.setItem('pc:' + raf, JSON.stringify(h)); } catch (e2) {} }
+  else h = JSON.parse(sessionStorage.getItem('pc:' + raf) || 'null');
+  if (h && Date.now() - h.t < 10 * 60000) pes = h;
+} catch (e) {}
 if (!nome && pes.nome) nome = pes.nome;
 if (!pes.notasAv1 && !pes.notasAv2) setTimeout(function () { var e = document.getElementById('status'); if (e && !e.textContent) { e.textContent = 'As notas do boletim não vieram nesta aba (abra pelo botão "Ver planner completo" da Minha aula). A tabela mostra só o que o professor digitou.'; e.className = 'status'; e.hidden = false; } }, 1200);
 /* a média da célula (auditoria de 15/09/2026): a busca solta pegava a PRIMEIRA aparição da palavra, e uma observação
@@ -118,7 +127,7 @@ document.title = 'Plano de curso' + (nome ? ' · ' + nome : '') + ' · Fisk';
 if (!raf || !book) { status('Faltou o aluno: abra esta página pelo botão da Minha aula.', true); }
 else Promise.all([
   carregaPlano(book),
-  fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plannerTurma', token: token(), alunos: [{ raf: raf, book: book, turma: turma }] }) }).then(function (r) { return r.json(); })
+  fiskFetch(EP, { action: 'plannerTurma', token: token(), alunos: [{ raf: raf, book: book, turma: turma }] })
 ]).then(function (rs) {
   var plano = rs[0], j = rs[1];
   if (!plano) { status('O gabarito do ' + book + ' não carregou.', true); return; }
@@ -135,7 +144,7 @@ else Promise.all([
   function desenha() {
     var y = window.scrollY;
     PlannerV2.planoCompleto($('corpo'), plano, ctx, { nome: nome, raf: raf, prof: prof, turma: turma, escola: escola, hist: d.hist || [], aoClicar: clicar,
-      aluno: { nome: nome, nascimento: pes.nascimento || '', telefone: pes.telefone || '', respNome: pes.respNome || '', respTel: pes.respTel || '' },
+      aluno: { nome: nome, respNome: pes.respNome || '' },   /* telefone e nascimento não saem mais da Minha aula (A3) */
       notas: notasDe(ctx.planner.plano.notas),
       /* sem os dados do card (link direto, outro navegador, passados os 10 min), a coluna 1 não vira campo: digitar ali
          gravaria uma "correção" por cima de uma nota que a tela nem leu (auditoria de 15/09/2026) */
@@ -149,7 +158,7 @@ else Promise.all([
     desenha();
     var patch = { notas: {} }; patch.notas[t] = {}; patch.notas[t][crit] = {}; patch.notas[t][crit][k] = v;
     salvando = salvando.then(function () {
-      return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plannerProf', token: token(), raf: raf, book: book, patch: patch, semCard: q.get('plantao') === '1' }) }).then(function (r) { return r.json(); });
+      return fiskFetch(EP, { action: 'plannerProf', token: token(), raf: raf, book: book, patch: patch, semCard: q.get('plantao') === '1' });
     }).then(function (r) { if (!r || r.ok === false) throw new Error((r && (r.erro || r.error)) || 'não salvou'); })
       .catch(function (e) { status('⚠️ A nota não salvou (' + (e && e.message || e) + '). Digite de novo.', true); });
   }
@@ -168,7 +177,7 @@ else Promise.all([
     desenha();
     var patch = { itens: {} }; patch.itens[it.id] = marca;
     salvando = salvando.then(function () {
-      return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plannerProf', token: token(), raf: raf, book: book, patch: patch, semCard: q.get('plantao') === '1' }) }).then(function (r) { return r.json(); });
+      return fiskFetch(EP, { action: 'plannerProf', token: token(), raf: raf, book: book, patch: patch, semCard: q.get('plantao') === '1' });
     }).then(function (r) {
       if (!r || r.ok === false) throw new Error((r && (r.erro || r.error)) || 'não salvou');
       if (r.card && r.card.escreveu) status('📇 Card: ' + r.card.escreveu + ' na aula de hoje.' + (r.card.fora === 'anterior' ? ' É a lição em que o aluno está (você marcou algo da ' + (r.card.marcou || 'lição anterior') + ').' : ''));
@@ -182,7 +191,6 @@ else Promise.all([
 }).catch(function (e) { status('Erro: ' + (e && e.message || e), true); });
 </script>
 <!-- registro de uso (auditoria de 26/10/2026): a página não carregava o kit e era invisível no painel da direção -->
-<script src="assets/fisk-shared.js?v=2026-10-30a"></script>
 <script>if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Plano de curso');</script>
 </body>
 </html>
