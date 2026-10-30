@@ -60,9 +60,16 @@ $('voltar').addEventListener('click', function (ev) {
   window.close();
   setTimeout(function () { location.href = 'turma-de-hoje.html'; }, 250);   /* o navegador recusou fechar */
 });
-/* o que a Turma de hoje deixou para esta aba (abrirEmOutraAba): vale por 10 minutos */
+/* o que a Turma de hoje deixou para esta aba (abrirEmOutraAba): vale por 10 minutos. Lido, SAI do localStorage
+   (auditoria de 30/10/2026, A3: a chave nunca era apagada) e fica só no sessionStorage desta aba, para o F5 não
+   perder as notas; a aba fechada leva junto. */
 var pes = {};
-try { var h = JSON.parse(localStorage.getItem('pc:' + raf) || 'null'); if (h && Date.now() - h.t < 10 * 60000) pes = h; } catch (e) {}
+try {
+  var h = JSON.parse(localStorage.getItem('pc:' + raf) || 'null');
+  if (h) { localStorage.removeItem('pc:' + raf); try { sessionStorage.setItem('pc:' + raf, JSON.stringify(h)); } catch (e2) {} }
+  else h = JSON.parse(sessionStorage.getItem('pc:' + raf) || 'null');
+  if (h && Date.now() - h.t < 10 * 60000) pes = h;
+} catch (e) {}
 if (!nome && pes.nome) nome = pes.nome;
 if (!pes.notasAv1 && !pes.notasAv2) setTimeout(function () { var e = document.getElementById('status'); if (e && !e.textContent) { e.textContent = 'As notas do boletim não vieram nesta aba (abra pelo botão "Ver planner completo" da Minha aula). A tabela mostra só o que o professor digitou.'; e.className = 'status'; e.hidden = false; } }, 1200);
 /* a média da célula (auditoria de 15/09/2026): a busca solta pegava a PRIMEIRA aparição da palavra, e uma observação
@@ -137,7 +144,7 @@ else Promise.all([
   function desenha() {
     var y = window.scrollY;
     PlannerV2.planoCompleto($('corpo'), plano, ctx, { nome: nome, raf: raf, prof: prof, turma: turma, escola: escola, hist: d.hist || [], aoClicar: clicar,
-      aluno: { nome: nome, nascimento: pes.nascimento || '', telefone: pes.telefone || '', respNome: pes.respNome || '', respTel: pes.respTel || '' },
+      aluno: { nome: nome, respNome: pes.respNome || '' },   /* telefone e nascimento não saem mais da Minha aula (A3) */
       notas: notasDe(ctx.planner.plano.notas),
       /* sem os dados do card (link direto, outro navegador, passados os 10 min), a coluna 1 não vira campo: digitar ali
          gravaria uma "correção" por cima de uma nota que a tela nem leu (auditoria de 15/09/2026) */

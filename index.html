@@ -2217,7 +2217,9 @@
          elemento, este ouvinte estourava e levava junto as linhas de baixo */
       $('profLogout').addEventListener('click', function(){
         var era = saved();
-        try{ localStorage.removeItem('fisk_prof'); localStorage.removeItem('fisk_actas'); localStorage.removeItem('fisk_minidash'); }catch(e){}
+        /* sessão E o que o Hub guardou sobre os alunos neste aparelho (M12); a fila de marcas pendentes fica */
+        if (typeof fiskLimparAoSair === 'function') fiskLimparAoSair();
+        else { try{ localStorage.removeItem('fisk_prof'); localStorage.removeItem('fisk_actas'); localStorage.removeItem('fisk_minidash'); }catch(e){} }
         // saindo de uma visita da direção: volta para o Painel da Direção
         if (era && era.viewingAs){ location.href = 'https://portalfisk.com.br/diretor.html'; return; }
         location.reload();

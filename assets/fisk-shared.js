@@ -289,6 +289,42 @@ async function fiskWithSpinner(buttonEl, asyncFn, opts) {
    Chame fiskInitUserMenu() no fim do script da página (o CSS vem deste kit).
    ============================================================================ */
 
+/* ── O QUE O HUB GUARDOU NO APARELHO SAI JUNTO COM A SESSÃO (auditoria de 30/10/2026, M12) ──
+ * O "Sair" apagava só fisk_prof, fisk_actas e fisk_minidash; ficavam no computador da sala as listas de alunos
+ * com RAF (cal:turmas:*, th:lista:*), os atendimentos (th:atend:*), o que a Minha aula deixa para o plano de
+ * curso (pc:*), o uso (hub:*) e a grade da tutoria (tut:*). Aqui varre tudo isso, no localStorage e no
+ * sessionStorage. A fila de marcas não enviadas (th:fila:v1) é a exceção: com itens pendentes ela FICA, porque
+ * são presenças que ainda não chegaram ao servidor e vão sozinhas quando a pessoa entrar de novo.
+ * Devolve quantas marcas ficaram guardadas. */
+var FISK_PREFIXOS_LOCAIS = ['pc:', 'cal:', 'th:', 'hub:', 'tut:'];
+var FISK_FILA_MARCAS = 'th:fila:v1';
+function fiskMarcasPendentes() {
+  try { var f = JSON.parse(localStorage.getItem(FISK_FILA_MARCAS) || '[]'); return Array.isArray(f) ? f.length : 0; } catch (e) { return 0; }
+}
+function fiskLimparAoSair() {
+  var pendentes = fiskMarcasPendentes();
+  ['fisk_prof', 'fisk_actas', 'fisk_minidash'].forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
+  [localStorage, sessionStorage].forEach(function (st) {
+    var tirar = [];
+    try {
+      for (var i = 0; i < st.length; i++) {
+        var k = st.key(i);
+        if (!k) continue;
+        if (k === FISK_FILA_MARCAS && pendentes) continue;
+        for (var p = 0; p < FISK_PREFIXOS_LOCAIS.length; p++) if (k.indexOf(FISK_PREFIXOS_LOCAIS[p]) === 0) { tirar.push(k); break; }
+      }
+      tirar.forEach(function (k) { st.removeItem(k); });
+    } catch (e) {}
+  });
+  return pendentes;
+}
+/* A pergunta do "Sair", com o aviso das marcas guardadas quando há alguma. */
+function fiskPerguntaDeSaida() {
+  var n = fiskMarcasPendentes();
+  return 'Sair da sua conta neste computador?' + (n ? '\n\n⏳ ' + n + ' marca' + (n === 1 ? '' : 's') + ' de presença ainda não ' + (n === 1 ? 'chegou' : 'chegaram') + ' ao servidor. ' +
+    (n === 1 ? 'Ela fica guardada' : 'Elas ficam guardadas') + ' neste aparelho e ' + (n === 1 ? 'vai sozinha' : 'vão sozinhas') + ' quando você entrar de novo na Minha aula.' : '');
+}
+
 /** Sessão do professor gravada pelo login do Hub. */
 function fiskSessao() {
   try { return JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) { return null; }
@@ -593,12 +629,8 @@ function fiskInitUserMenu(opts) {
 
   menu.querySelector('.fu-sair').addEventListener('click', function () {
     if (typeof opts.onSair === 'function') { fechar(); opts.onSair(); return; }
-    if (!window.confirm('Sair da sua conta neste computador?')) return;
-    try {
-      localStorage.removeItem('fisk_prof');
-      localStorage.removeItem('fisk_actas');
-      localStorage.removeItem('fisk_minidash');
-    } catch (x) {}
+    if (!window.confirm(fiskPerguntaDeSaida())) return;
+    fiskLimparAoSair();   /* sessão E o que o Hub guardou sobre os alunos neste aparelho */
     location.href = base + 'index.html';
   });
 

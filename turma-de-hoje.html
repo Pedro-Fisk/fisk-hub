@@ -2438,11 +2438,17 @@ function desenhaAguia() {
   aguia.ov.scrollTop = y;
 }
 /* O PLANNER COMPLETO EM OUTRA ABA (Pedro, 15/09/2026). A página avulsa (plano-curso.html) lê o planner do servidor;
-   o que só a leitura da turma do card tem (telefone, aniversário, as células das provas) vai pelo localStorage,
-   que as duas abas dividem, e nunca pela URL. */
+   o que só a leitura da turma do card tem (as células das provas) vai pelo localStorage, que as duas abas
+   dividem, e nunca pela URL. Auditoria de 30/10/2026 (A3): telefone e nascimento NÃO vão mais (ficavam para
+   sempre no computador da sala); só o nome, o responsável e as notas, que são o que o plano de curso usa. A chave
+   é apagada por quem lê, e antes de gravar varre as que sobraram de abas que nunca abriram. */
 function abrirEmOutraAba(a) {
   var pes = pessoaisDe(a) || {};
-  try { localStorage.setItem('pc:' + a.raf, JSON.stringify({ t: Date.now(), nome: String(pes.nome || a.nome || '').replace(/\s*\([^)]*\)/g, '').trim(), nascimento: pes.nascimentoTxt || pes.nascimento || '', telefone: pes.telAluno || '', respNome: pes.respNome || '', respTel: pes.respTel || '', notasAv1: pes.notasAv1 || '', notasAv2: pes.notasAv2 || '' })); } catch (e) {}
+  try {
+    var velhas = []; for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k && k.indexOf('pc:') === 0) velhas.push(k); }
+    velhas.forEach(function (k) { localStorage.removeItem(k); });
+    localStorage.setItem('pc:' + a.raf, JSON.stringify({ t: Date.now(), nome: String(pes.nome || a.nome || '').replace(/\s*\([^)]*\)/g, '').trim(), respNome: pes.respNome || '', notasAv1: pes.notasAv1 || '', notasAv2: pes.notasAv2 || '' }));
+  } catch (e) {}
   var q = new URLSearchParams({ raf: a.raf, book: a.book || '', prof: estado.prof || '', turma: estado.turma || '', escola: estado.escola || '' });
   if (estado.plantao) q.set('plantao', '1');
   window.open('plano-curso.html?' + q.toString(), '_blank');
