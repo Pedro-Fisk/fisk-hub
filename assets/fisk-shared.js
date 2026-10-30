@@ -186,6 +186,35 @@ function fiskBytesToBase64(bytes) {
  * Resolve com { ok:true, url, pasta }. Rejeita com Error cujo .code pode
  * ser 'pasta_nao_encontrada'.
  */
+/* ── A PASTA DO HOMÔNIMO (contrato novo do backend, achado 20 da auditoria de 30/10/2026) ──
+ * Quando a pasta do aluno não existe na turma do card, o backend achava UMA pasta com o mesmo nome em qualquer
+ * turma/professor da escola e gravava lá só com um aviso: aluno novo sem pasta + homônimo em outra turma = termo,
+ * 2nd chance e counseling na pasta do outro. Pelo contrato novo ele responde
+ *     { ok:false, cod:'pasta_fora_da_turma', aviso, pastaNome, pastaCaminho }
+ * e só grava ali se o pedido voltar com confirmaPasta:true. Aqui o professor vê o caminho e decide num confirm;
+ * recusou, o erro sai com code 'pasta_recusada'. Enquanto o backend não mandar esse cod, nada muda. */
+function fiskEhPastaFora(j) { return !!(j && j.ok === false && (j.cod || j.code) === 'pasta_fora_da_turma'); }
+function fiskConfirmarPastaFora(j, pergunta) {
+  var txt = '⚠️ ' + (j.aviso || 'A pasta do aluno não foi encontrada na turma; existe uma com o mesmo nome em outro lugar.') +
+    '\n\nPasta: ' + (j.pastaNome || '?') + (j.pastaCaminho ? '\n' + j.pastaCaminho : '') +
+    '\n\n' + (pergunta || 'Salvar mesmo assim nessa pasta?');
+  return window.confirm(txt);
+}
+function fiskErroPastaRecusada(j, recusa) {
+  var e = new Error(recusa || 'não salvou: pasta do aluno não encontrada na turma');
+  e.code = 'pasta_recusada'; e.resposta = j;
+  return e;
+}
+/* fazer(extra) faz o pedido com os campos extra; se a resposta pedir confirmação, pergunta e repete com
+   { confirmaPasta: true }. Devolve a resposta final; recusa rejeita com code 'pasta_recusada'. */
+function fiskComPastaConfirmada(fazer, pergunta, recusa) {
+  return Promise.resolve().then(function () { return fazer({}); }).then(function (j) {
+    if (!fiskEhPastaFora(j)) return j;
+    if (!fiskConfirmarPastaFora(j, pergunta)) throw fiskErroPastaRecusada(j, recusa);
+    return fazer({ confirmaPasta: true });
+  });
+}
+
 async function fiskSalvarNoDrive(opts) {
   var endpoint = opts.endpoint || FISK_SAVE_URL;
   if (!endpoint) { var ec = new Error('URL de salvamento não configurada (defina FISK_SAVE_URL em fisk-shared.js após publicar o endpoint)'); ec.code = 'sem_endpoint'; throw ec; }
@@ -204,6 +233,12 @@ async function fiskSalvarNoDrive(opts) {
   // corpo como string simples (text/plain) evita preflight CORS no Apps Script; teto de 90 s porque o PDF
   // vai em base64 e o Drive ainda escreve (auditoria de 30/10/2026, B9/M3)
   var j = await fiskFetch(endpoint, JSON.stringify(payload), { timeoutMs: opts.timeoutMs || 90000 });
+  /* pasta só achada em outra turma/professor: o professor confirma pelo caminho, ou não salva */
+  if (fiskEhPastaFora(j) && !payload.confirmaPasta) {
+    if (!fiskConfirmarPastaFora(j)) throw fiskErroPastaRecusada(j);
+    payload.confirmaPasta = true;
+    j = await fiskFetch(endpoint, JSON.stringify(payload), { timeoutMs: opts.timeoutMs || 90000 });
+  }
   if (!j || j.ok !== true) {
     var err = new Error((j && j.erro) || 'falha ao salvar no Drive');
     err.code = (j && j.code) || '';
@@ -730,12 +765,17 @@ function fiskCounseling(opts) {
     var s = fiskSessao();
     if (!s || !s.token) return Promise.resolve(null);
     if (!opts || !opts.aluno || !opts.escola) return Promise.resolve(null);
-    return fiskFetch(FISK_HUB_EP, {
-        action: 'counselingEscrever', token: s.token,
-        escola: opts.escola, professor: opts.professor || '',
-        turma: String(opts.turma || '').split('\n')[0],
-        aluno: opts.aluno, origem: opts.origem || 'manual', campos: opts.campos || {}
-      })
+    return fiskComPastaConfirmada(function (mais) {
+        var corpo = {
+          action: 'counselingEscrever', token: s.token,
+          escola: opts.escola, professor: opts.professor || '',
+          turma: String(opts.turma || '').split('\n')[0],
+          aluno: opts.aluno, origem: opts.origem || 'manual', campos: opts.campos || {}
+        };
+        Object.keys(mais).forEach(function (k) { corpo[k] = mais[k]; });
+        return fiskFetch(FISK_HUB_EP, corpo);
+      }, 'Registrar mesmo assim no counseling dessa pasta?')
+      .catch(function (e) { return (e && e.code === 'pasta_recusada') ? { ok: false, code: 'pasta_recusada', erro: e.message } : null; })
       .then(function (j) { if (typeof opts.aoTerminar === 'function') opts.aoTerminar(j); return j; })
       .catch(function () { return null; });
   } catch (e) { return Promise.resolve(null); }
@@ -1230,7 +1270,11 @@ function fiskCounselingAbrirDoc(ctx) {
       '<p style="font-size:1.05rem;text-align:center;padding:16px">💬 Abrindo o counseling de <b>' + fiskEsc(ctx.aluno) + '</b>…<br><small style="color:#6b7a8c">procurando o documento na pasta do aluno</small></p></body>');
     w.document.close();
   } catch (e) {}
-  fiskFetch(FISK_HUB_EP, { action: 'counselingLer', token: s.token || '', escola: ctx.escola || '', professor: ctx.professor || '', turma: turma, aluno: ctx.aluno })
+  fiskComPastaConfirmada(function (mais) {
+      var corpo = { action: 'counselingLer', token: s.token || '', escola: ctx.escola || '', professor: ctx.professor || '', turma: turma, aluno: ctx.aluno };
+      Object.keys(mais).forEach(function (k) { corpo[k] = mais[k]; });
+      return fiskFetch(FISK_HUB_EP, corpo);
+    }, 'Abrir mesmo assim o documento dessa pasta?')
     .then(function (j) { w.location.href = (j && j.ok && j.docUrl) ? j.docUrl : ferramenta; })
     .catch(function () { w.location.href = ferramenta; });
 }

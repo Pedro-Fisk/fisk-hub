@@ -227,6 +227,15 @@ function post(acao, extra) {
   Object.keys(extra || {}).forEach(function (k) { body[k] = extra[k]; });
   return fiskFetch(API_URL, body);
 }
+/* O mesmo POST, mas se o backend responder cod 'pasta_fora_da_turma' (pasta do aluno só achada em outra
+   turma/professor), mostra o caminho, pergunta, e repete com confirmaPasta:true. Recusa rejeita com
+   code 'pasta_recusada'. Enquanto o backend não mandar esse cod, é igual ao post(). */
+function postComPasta(acao, extra, pergunta, recusa) {
+  return fiskComPastaConfirmada(function (mais) {
+    var b = {}; Object.keys(extra || {}).forEach(function (k) { b[k] = extra[k]; }); Object.keys(mais).forEach(function (k) { b[k] = mais[k]; });
+    return post(acao, b);
+  }, pergunta, recusa);
+}
 function ind(id, estado) { document.getElementById(id).className = 'ind' + (estado ? ' ' + estado : ''); }
 function $(id) { return document.getElementById(id); }
 function esc(s) {
@@ -395,7 +404,7 @@ function selecionar(a) {
 
   /* só vale a resposta do aluno que está na tela (auditoria de 26/10/2026: o histórico do A aparecia sob o nome
      do B, e o "Salvar" gravava no B) */
-  post('counselingLer', contexto()).then(function (j) {
+  postComPasta('counselingLer', contexto(), 'Abrir mesmo assim o documento dessa pasta?', 'pasta do aluno não encontrada na turma: peça à secretaria para conferir').then(function (j) {
     pararEspera();
     if (alunoSel !== a) return;
     dadosDoc = null;
@@ -481,7 +490,7 @@ $('btnCriar').addEventListener('click', function () {
   var b = this;
   b.disabled = true; b.textContent = '⏳ Criando…';
   var ctx = contexto(); ctx.faixa = $('selFaixa').value;
-  post('counselingCriar', ctx).then(function (j) {
+  postComPasta('counselingCriar', ctx, 'Criar o documento mesmo assim nessa pasta?').then(function (j) {
     b.disabled = false; b.textContent = '➕ Criar o documento';
     if (!j || j.ok !== true) {
       $('statusDoc').className = 'status erro';
@@ -507,7 +516,7 @@ $('btnSalvar').addEventListener('click', function () {
   var ctx = contexto();
   ctx.origem = 'manual';
   ctx.campos = { texto: texto, estagio: $('fEstagio').value.trim() };
-  post('counselingEscrever', ctx).then(function (j) {
+  postComPasta('counselingEscrever', ctx, 'Registrar mesmo assim no counseling dessa pasta?').then(function (j) {
     b.disabled = false; b.textContent = '💾 Salvar no documento';
     if (!j || j.ok !== true) {
       st.className = 'status erro';

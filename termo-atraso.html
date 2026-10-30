@@ -703,6 +703,7 @@ function regCounselingTxt(j) {
   if (j.ok) return j.jaExistia ? '✓ já estava registrado' : '✓ registrado';
   if (j.code === 'sem_documento') return '⚠️ o aluno não tem documento de counseling na pasta';
   if (j.code === 'pasta_nao_encontrada') return '⚠️ pasta do aluno não encontrada';
+  if (j.code === 'pasta_recusada') return '⚠️ não registrou: pasta do aluno não encontrada na turma';
   return '⚠️ ' + (j.erro || j.error || 'não registrou');
 }
 function registrarTudo() {
