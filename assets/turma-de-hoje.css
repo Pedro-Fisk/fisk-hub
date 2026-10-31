@@ -1,0 +1,614 @@
+/* turma-de-hoje.html: o CSS que morava inline no <head>; extraído em 31/10/2026 (auditoria de 30/10, M6).
+   O navegador guarda em cache pelo ?v= (scripts/bump-version.js). */
+  body{ padding-bottom: 4rem; }
+  .painel{ background: var(--white); border: 1px solid var(--surface-border-color); border-radius: var(--surface-radius); box-shadow: var(--surface-shadow); padding: 1rem 1.2rem; margin: 1.4rem auto 1rem; max-width: 1500px; }
+  .cascata{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: .6rem; }
+  .cascata label{ display: block; font-size: .74rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--gray); margin-bottom: .25rem; }
+  .cascata select{ width: 100%; padding: .55rem .7rem; border: 1.5px solid var(--ui-bd); border-radius: 10px; font-family: var(--font-body); font-size: .92rem; background: var(--white); color: var(--black); }
+  .status{ font-size: .88rem; color: var(--gray); padding: .5rem 0 0; }
+  .status.err{ color: var(--red-dark); font-weight: 700; }
+  .busca-al{ position: relative; margin-top: .7rem; }
+  .busca-al label{ display: block; font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--gray); margin-bottom: .25rem; }
+  .busca-al input{ width: 100%; font: inherit; font-size: 1rem; padding: .6rem .8rem; border: 2px solid #c9d4e8; border-radius: 10px; background: #fff; color: #14161c; }
+  .busca-al input:focus{ outline: none; border-color: #1d3685; }
+  .achados-al{ position: absolute; left: 0; right: 0; top: 100%; z-index: 30; background: #fff; border: 1px solid #c9d4e8; border-radius: 10px; margin-top: .25rem; max-height: 320px; overflow: auto; box-shadow: 0 8px 24px rgba(20,22,28,.15); }
+  .achados-al button{ display: flex; width: 100%; gap: .6rem; align-items: baseline; text-align: left; background: none; border: 0; border-bottom: 1px solid #eef1f6; padding: .6rem .8rem; font: inherit; color: #14161c; cursor: pointer; }
+  .achados-al button:hover, .achados-al button:focus-visible{ background: #eef3fb; outline: none; }
+  .achados-al small{ color: var(--gray); }
+  .achados-al .vazio{ padding: .6rem .8rem; color: var(--gray); }
+  .pill.prio-btn{ margin-left:auto; background:#1d3685; color:#fff; border:0; cursor:pointer; font: inherit; font-weight:800; }
+  .pill.prio{ font-weight:800; }
+  .pill.prio.nv-alta{ background:#fde2e2; color:#a11a1a; } .pill.prio.nv-media{ background:#fff1d6; color:#8a5300; } .pill.prio.nv-emdia{ background:#e3f5e8; color:#1f6b35; } .pill.prio.nv-semdados{ background:#eef1f6; color:#555; }
+  .al-cab .pill{ max-width: 100%; white-space: normal; }
+  .pill.sem-at{ background:#fdeaea; color:#a11a1a; border:1px solid #f0b4b4; font-weight:800; }
+  .pill.outro-prof{ background: #fff4e0; color: #8a4b00; border: 1px solid #f3c77a; }
+  .al.visitante{ outline: 3px dashed #7c3aed; outline-offset: -3px; }
+  .al .visita{ font-size: .78rem; font-weight: 800; color: #7c3aed; background: #f1ebff; border-radius: 99px; padding: .15rem .6rem; }
+  .al .tirar{ font: inherit; font-size: .8rem; border: 1px solid #c9d4e8; background: #fff; border-radius: 99px; padding: .15rem .6rem; cursor: pointer; }
+  .resumo{ display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin: .2rem 0 .6rem; font-size: .84rem; color: var(--gray); }
+  .resumo b{ color: var(--black); }
+
+  /* o aluno */
+  .al{ background: var(--white); border: 1px solid var(--surface-border-color); border-radius: var(--surface-radius); box-shadow: var(--surface-shadow); margin: 0 auto .8rem; max-width: 1500px; overflow: hidden; }
+  .al-cab{ display: flex; align-items: center; gap: .7rem; padding: .75rem 1rem; flex-wrap: wrap; }
+  .al-cab .mover{ display: inline-flex; gap: .2rem; align-items: center; order: 99; margin-left: auto; }   /* no canto direito do cartão (Pedro, 19/09/2026) */
+  .al-cab .mover button{ border: 1.5px solid var(--ui-line, #d6deea); background: #fff; color: #1d3685; border-radius: 8px; min-width: 30px; height: 30px; font-weight: 900; cursor: pointer; font-family: inherit; line-height: 1; }
+  .al-cab .mover .arrasta{ cursor: grab; touch-action: none; font-size: 1.05rem; }
+  .al-cab .mover button:hover{ border-color: #1d3685; background: #f3f6fc; }
+  .al.arrastando{ position: relative; z-index: 50; box-shadow: 0 22px 44px rgba(20,22,28,.28); opacity: .96; transition: none; }
+  .al.arrastando .al-cab .mover .arrasta{ cursor: grabbing; }
+  body.theme-dark .al-cab .mover button{ background: #172232; color: #dbe6f3; border-color: #2e4560; }
+  .al-cab .nome{ font-family: var(--font-heading); font-weight: 700; font-size: 1.02rem; }
+  .al-cab .livro{ font-size: .8rem; color: var(--gray); }
+  .pill{ display: inline-flex; align-items: center; gap: .3rem; font-size: .74rem; font-weight: 800; padding: .2rem .6rem; border-radius: 99px; white-space: nowrap; background: var(--ui-soft); color: var(--ui-ink); }
+  .pill.pos{ background: #e4f3f1; color: #155a48; }
+  .pill.atras{ background: #fdf6e6; color: #6b4d0f; }
+  .pill.chk{ background: #d4e909; color: #3f4703; }
+  .pill.chk.falta{ background: var(--gray-light); color: var(--gray); }
+  .al-cab .acoes{ margin-left: auto; display: flex; gap: .4rem; }
+  .btn{ font-family: var(--font-body); font-weight: 800; border-radius: 999px; border: 0; cursor: pointer; }
+  /* o Checking é coisa à parte: o botão é do verde-amarelo da plataforma, não o verde de abrir */
+  .btn-ck{ background: #d4e909; color: #3f4703; padding: .5rem .95rem; font-size: .84rem; box-shadow: 0 3px 0 #a8b907; }
+  .aula .btn-ck{ width: 100%; margin-top: .5rem; }
+  .aula .libera{ font-size: .74rem; color: var(--gray); margin: .35rem 0 0; line-height: 1.3; }
+  .btn-ck:disabled{ opacity: .5; cursor: default; box-shadow: none; }
+  .btn-ghost{ background: var(--white); border: 1.5px solid var(--ui-bd); color: var(--ui-ink); padding: .45rem .9rem; font-size: .82rem; }
+
+  /* as três aulas */
+  .aulas{ display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: .6rem; padding: 0 1rem .9rem; }
+  .aula{ border: 1px solid var(--ui-line); border-radius: 12px; padding: .55rem .65rem; background: #f8fafc; }
+  .aula.atual{ border: 2px solid var(--ui); background: var(--white); }
+  .nav-lic{ display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; padding: 0 1rem .5rem; }
+  .janela-lic{ overflow-y: auto; overscroll-behavior: contain; scroll-snap-type: y mandatory; margin: 0 1rem .9rem; border-radius: 12px; }
+  .janela-lic:focus-visible{ outline: 3px solid var(--ui); outline-offset: 2px; }
+  .passo-lic{ scroll-snap-align: start; display: flex; flex-direction: column; gap: .4rem; padding: .3rem 0 .5rem; }
+  .passo-lic .aulas{ padding: 0; }
+  .rot-lic{ font-weight: 800; font-size: .85rem; letter-spacing: .02em; color: var(--mar, #1d3685); }
+  .passo-lic.atual .rot-lic{ color: var(--ui); }
+  @media (prefers-reduced-motion: reduce){ .janela-lic{ scroll-behavior: auto; } }
+  /* no toque a janela não rola com o dedo (27/10/2026): o dedo que caía nela prendia a rolagem da página.
+     Quem troca de lição são as setas ▲ ▼, que rolam por scrollTo */
+  @media (pointer: coarse){ .janela-lic{ overflow-y: hidden; overscroll-behavior: auto; } }
+  .nav-lic .setas{ display: inline-flex; gap: 8px; }
+  .btn-seta{ width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--mar, #1d3685); background: var(--white); color: var(--mar, #1d3685); font-size: 18px; font-weight: 900; cursor: pointer; font-family: inherit; }
+  .btn-seta:disabled{ opacity: .3; cursor: default; }
+  .btn-seta:focus-visible{ outline: 3px solid var(--ui); outline-offset: 2px; }
+  .nav-lic .vendo{ flex: 1 1 auto; font-size: .92rem; }
+  .nav-lic .vendo em{ font-style: normal; color: var(--ui); font-weight: 700; }
+  .btn-nav{ border: 2px solid var(--mar, #1d3685); background: var(--white); color: var(--mar, #1d3685); border-radius: 999px; padding: .3rem .8rem; font: inherit; font-weight: 800; font-size: .88rem; cursor: pointer; }
+  .btn-nav:disabled{ opacity: .3; cursor: default; }
+  .btn-nav.volta{ background: var(--mar, #1d3685); color: #fff; }
+  .btn-nav:focus-visible{ outline: 3px solid var(--ui); outline-offset: 2px; }
+  .aula .t{ display: flex; align-items: baseline; gap: .5rem; font-size: .74rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--gray); margin-bottom: .35rem; }
+  .aula .t b{ color: var(--ui-ink); font-size: .84rem; letter-spacing: 0; text-transform: none; font-family: var(--font-heading); }
+  .aula .t .agora{ margin-left: auto; background: var(--ui); color: #fff; border-radius: 99px; padding: .05rem .5rem; font-size: .68rem; }
+  .it{ display: flex; align-items: center; gap: .7rem; padding: .35rem .45rem; border-radius: 14px; font-size: .95rem; font-weight: 700; color: var(--ui-ink); border: 0; background: transparent; width: 100%; text-align: left; font-family: inherit; cursor: default; }
+  .it.pode{ cursor: pointer; }
+  .it.pode:hover{ background: var(--ui-soft); }
+  .it.feito{ color: var(--gray); }
+  .it.feito .tx{ text-decoration: line-through; }
+  /* quem confirmou e quando: miúdo, numa linha só, PENDURADO embaixo do nome
+     e fora do fluxo. Dentro do texto ele quebrava a linha e a caixa da aula
+     crescia a cada toque do professor (Pedro, 14/09/2026). O risco não
+     herda o risco do nome, porque texto posicionado não recebe decoração. */
+  .it .tx{ position: relative; flex: 1 1 auto; min-width: 0; }
+  .it .quem{ position: absolute; left: 0; right: 0; top: 100%; margin-top: 1px; font-size: .6rem; line-height: 1; color: var(--gray); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* com a assinatura, o nome sobe um pouco para o par ficar no meio da linha (a altura não muda) */
+  .it .tx.com-quem{ transform: translateY(-.3rem); }
+  .it .pg{ margin-left: auto; font-weight: 600; font-size: .74rem; color: var(--gray); white-space: nowrap; }
+  /* a bolinha: as cores das mãos estão no GABARITO DAS MARCAS, no fim deste estilo */
+  .mk{ flex: 0 0 38px; width: 38px; height: 38px; border-radius: 50%; border: 3px solid #1d3685; background: #fff; }
+  .pill.aguia{ background:#fff; border:1.5px solid #1d3685; color:#1d3685; text-decoration:none; cursor:pointer; font-family: inherit; }
+  /* o triângulo ocupa a caixa inteira, como a bolinha: com folga de 4,5 dentro
+     dos 30 do desenho ele saía com dois terços da largura dela e parecia
+     menor (Pedro, 14/09/2026). Os mesmos pontos do planner-v2.js do portal. */
+  .mk.tri{ border-radius: 0; width: 38px; height: 34px; border: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,2 28.5,25.5 1.5,25.5' fill='%23fff' stroke='%23d91e9e' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
+  .mk.tri.on{ background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,3 27.5,24.5 2.5,24.5' fill='%23d91e9e' stroke='%23d91e9e' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
+  .legenda{ font-size: .95rem; color: var(--gray); display: flex; flex-wrap: wrap; gap: 1.1rem; padding: .5rem 0 0; align-items: center; }
+  .legenda i{ display: inline-block; vertical-align: middle; margin-right: .25rem; }
+  /* MINHA AULA ENXUTA (Pedro, 19/09/2026): a legenda abre num toque; o resto da lista está no comentário do cartão */
+  .leg-det summary{ cursor: pointer; font-weight: 800; color: var(--ui); list-style: none; }
+  .leg-det summary::-webkit-details-marker{ display: none; }
+  .pl-mais{ position: relative; }
+  .pl-mais > summary{ list-style: none; cursor: pointer; height: 100%; display: flex; align-items: center; }
+  .pl-mais > summary::-webkit-details-marker{ display: none; }
+  .pl-mais-menu{ position: absolute; right: 0; top: calc(100% + 6px); z-index: 20; display: flex; flex-direction: column; gap: 6px; background: var(--white, #fff); border: 1px solid var(--ui-bd, #d6deea); border-radius: 12px; padding: 8px; box-shadow: 0 8px 22px rgba(15,31,78,.15); white-space: nowrap; }
+  .leg-det[open] .leg-itens{ display: flex; flex-wrap: wrap; gap: 1.1rem; padding-top: .4rem; }
+  .aula .t .dt{ margin-left: auto; text-transform: none; letter-spacing: 0; font-size: .72rem; font-weight: 800; background: #eef2fa; color: var(--gray); border-radius: 999px; padding: .1rem .5rem; }
+  .aula .t .dt.dada{ background: #e4f3f1; color: #155a48; } .aula .t .dt.falta, .aula .t .dt.tarde{ background: #fde8e8; color: #b91c1c; } .aula .t .dt.semdata{ opacity: .6; }
+  .it .capa{ width: 44px; height: 28px; object-fit: cover; border-radius: 5px; flex: 0 0 44px; border: 1px solid var(--ui-line); }
+  .sem-plano{ padding: 0 1rem .9rem; font-size: .84rem; color: var(--gray); }
+
+  /* o registro do Checking */
+  .ck{ border-top: 1px solid var(--ui-line); background: #fbfce6; padding: .9rem 1rem 1rem; }
+  .ck h4{ margin: 0 0 .5rem; font-family: var(--font-heading); font-size: .98rem; }
+  .ck .lin{ display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-bottom: .55rem; }
+  .ck label.rot{ font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--gray); width: 100%; }
+  .chip{ font-family: var(--font-body); font-weight: 800; font-size: .8rem; padding: .45rem .9rem; border-radius: 99px; border: 1.5px solid var(--ui-bd); background: var(--white); color: var(--ui-ink); cursor: pointer; }
+  .ck .lin.crit{ gap: .6rem; padding: .6rem .7rem; border-radius: 14px; }
+  /* verde para o que foi bem, vermelho-claro para o que precisa melhorar: o
+     professor bate o olho e sabe de que lado está (pedido do Pedro, 13/09) */
+  .ck .lin.crit.bom{ background: #e4f3f1; border: 1px solid #cfe6e1; }
+  .ck .lin.crit.bom label.rot{ color: #155a48; }
+  .ck .lin.crit.ruim{ background: #fde2e2; border: 1px solid #f5b8b8; }
+  .ck .lin.crit.ruim label.rot{ color: #8a1c1c; }
+  .ck .lin.crit.ruim .chip.on{ background: #d81f26; border-color: #d81f26; }
+  .ck .lin.crit .chip{ padding: .5rem 1rem; }
+  /* o resultado do Checking (Pedro, 21/09/2026): o primeiro campo, e obrigatório */
+  .ck .lin.crit.res{ background: #f4f6fb; border: 1px solid #d7deeb; }
+  .ck .lin.crit.res .chip.on[data-v="aprovado"]{ background: #1f8a5b; border-color: #1f8a5b; }
+  .ck .lin.crit.res .chip.on[data-v="estudar"]{ background: #c2410c; border-color: #c2410c; }
+  .ck-feito.estudar{ background: #fff1e6; border-color: #f3c7a6; }
+  .ck-feito.estudar b{ color: #8a2d06; }
+  .ck .notas{ display: flex; flex-wrap: wrap; gap: .35rem; }
+  .ck .notas .chip{ min-width: 2.6rem; text-align: center; padding: .45rem .5rem; }
+  .chip.on{ background: #1d3685; color: #fff; border-color: #1d3685; }
+  .chip.on.melhor{ background: var(--green); border-color: var(--green); }
+  .chip.on.pior{ background: #d91e9e; border-color: #d91e9e; }
+  .ck select, .ck input[type=text], .ck textarea{ font-family: var(--font-body); font-size: .88rem; padding: .45rem .6rem; border: 1.5px solid var(--ui-bd); border-radius: 10px; background: var(--white); color: var(--black); }
+  .ck textarea{ width: 100%; min-height: 64px; resize: vertical; }
+  .ck input[type=text]{ flex: 1 1 200px; }
+  .ck .pedidos{ display: flex; flex-wrap: wrap; gap: .35rem; }
+  .ck .prontos{ display: flex; flex-wrap: wrap; gap: .3rem; width: 100%; }
+  .ck .prontos .chip{ font-size: .76rem; padding: .28rem .6rem; }
+  /* o pronto que a dimensão marcada em "precisa melhorar" pede */
+  .ck .prontos .chip.sug:not(.on){ border-color: #d91e9e; box-shadow: inset 0 0 0 1px #d91e9e; }
+  .ck .prontos .chip.sug::after{ content: ' ●'; color: #d91e9e; }
+  .ck .prontos .chip.sug.on::after{ color: #fff; }
+  .ck .ped{ background: var(--ui-soft); border-radius: 99px; padding: .25rem .6rem; font-size: .8rem; font-weight: 700; display: inline-flex; gap: .35rem; align-items: center; }
+  .ck .ped button{ border: 0; background: none; cursor: pointer; font-weight: 900; color: var(--gray); padding: 0; }
+  .ck .fim{ display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; margin-top: .4rem; }
+  .ck .aviso{ font-size: .8rem; color: var(--gray); }
+  .ck .aviso.err{ color: var(--red, #c8102e); font-weight: 700; }   /* o "Escolha o resultado" saía cinza como um aviso comum */
+  .ck .ok{ color: #155a48; font-weight: 800; }
+  .ck .registrado{ font-size: .84rem; color: #155a48; font-weight: 700; margin-bottom: .5rem; }
+  /* a fila do Planejador e o atendimento */
+  .fila-info{ max-width: 1500px; margin: 0 auto .8rem; display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; font-size: .84rem; color: var(--gray); background: #e4f3f1; border: 1px solid #cfe6e1; border-radius: 12px; padding: .55rem .9rem; }
+  .fila-info b{ color: #155a48; }
+  .fila-info a{ margin-left: auto; font-weight: 800; color: #155a48; }
+  .fila-info .btn-recarrega{ border: 1.5px solid #155a48; background: #fff; color: #155a48; border-radius: 999px; padding: .25rem .75rem; font-family: var(--font-body); font-weight: 800; font-size: .8rem; cursor: pointer; }
+  .fila-info .btn-recarrega:disabled{ opacity: .6; cursor: default; }
+  .fila-info.sem .btn-recarrega{ border-color: var(--ui-bd); color: var(--ui-ink); }
+  .fila-info.sem{ background: var(--ui-soft); border-color: var(--ui-line); }
+  .fila-info.sem b{ color: var(--ui-ink); }
+  .fila-info.roteiro{ flex-direction: column; align-items: stretch; }
+  .rt-ontem{ background:#fff4c2; color:#6b4e00; border-radius:8px; padding:.15rem .5rem }
+  .prio-grande{ width: 100%; border: 0; border-radius: 14px; background: #1d3685; color: #fff; font-family: var(--font-body); font-weight: 800; font-size: 1.05rem; padding: .8rem 1rem; cursor: pointer; box-shadow: 0 4px 0 #0f2260; }
+  .prio-grande:focus-visible, .rt-btn:focus-visible{ outline: 3px solid #d4e909; outline-offset: 2px; }
+  .rt-linha{ display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+  .rt-info{ margin-right: auto; }
+  .rt-data{ display: inline-flex; align-items: center; gap: .35rem; font-weight: 700; color: var(--ui-ink); }
+  .rt-data input{ font-family: var(--font-body); font-size: .85rem; border: 1.5px solid var(--ui-line); border-radius: 8px; padding: .2rem .4rem; }
+  .rt-btn{ border: 1.5px solid #155a48; background: #fff; color: #155a48; border-radius: 999px; padding: .3rem .8rem; font-family: var(--font-body); font-weight: 800; font-size: .82rem; cursor: pointer; }
+  .rt-btn.forte{ background: #31a889; border-color: #31a889; color: #fff; }
+  .rt-btn:disabled{ opacity: .7; cursor: default; }
+  .pill.nv-alta{ background: #fde2e2; color: #8a1c1c; }
+  .pill.nv-media{ background: #fdf6e6; color: #6b4d0f; }
+  .pill.nv-emdia{ background: #e4f3f1; color: #155a48; }
+  .pill.fora{ background: var(--gray-light); color: var(--gray); }
+  .al .plano-ativ{ padding: 0 1rem .6rem; font-size: .84rem; color: var(--ui-ink); }
+  .al .plano-ativ i{ color: var(--gray); }
+  .al .atend{ padding: .6rem 1rem .9rem; display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; border-top: 1px solid var(--ui-line); }
+  /* o .btn do kit é inline-flex sem justify: na largura toda o texto encostava à esquerda */
+  .btn-atend{ background: var(--green); color: #fff; padding: .7rem 1rem; font-size: .92rem; box-shadow: 0 3px 0 var(--green-dark); width: 100%; justify-content: center; }
+  .al .atend .quando{ width: 100%; text-align: center; }
+  .al.atendido{ opacity: .72; }
+  .al.faltou{ opacity: .5; filter: grayscale(1); }
+  .al.faltou .al-corpo{ display: none; }
+  .al .atend .btn-atend{ width: auto; flex: 1 1 auto; }
+  .btn-falta{ background: #fff; color: var(--gray); border: 2px solid var(--gray-light); box-shadow: none; padding: .62rem 1.1rem; font-size: .92rem; flex: 0 0 auto; }
+  .al.faltou .btn-falta{ background: var(--gray-light); }
+  .al.atendido .btn-atend{ background: var(--gray-light); color: var(--gray); box-shadow: none; }
+  .al .atend .quando{ font-size: .8rem; color: #155a48; font-weight: 700; }
+  .it.salvando{ opacity: .5; }
+  /* a anotação livre do professor, à direita de cada aluno; some com um toque
+     quando a tela vai para a TV (dado sensível) */
+  .al-corpo{ display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 0; }
+  .al-corpo > .esq{ min-width: 0; }
+  .obs{ border-left: 1px solid var(--ui-line); background: #fffbea; padding: .8rem .9rem; display: flex; flex-direction: column; gap: .5rem; }
+  .obs label{ font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #7a5b00; }
+  .obs textarea{ width: 100%; min-height: 110px; resize: vertical; font-family: var(--font-body); font-size: .88rem; padding: .55rem .65rem; border: 1.5px solid #e8d48a; border-radius: 10px; background: #fff; color: var(--black); }
+  .obs .st{ font-size: .74rem; color: var(--gray); min-height: 1em; }
+  /* o botão do e-counseling deixou de ser promessa em 20/09/2026 */
+  .obs .ec{ font-size: .78rem; border: 1.5px solid var(--ui-bd); background: transparent; color: var(--ui-dark, #223e5a); border-radius: 999px; padding: .4rem .8rem; font-family: var(--font-body); font-weight: 800; cursor: pointer; }
+  .obs .ec:hover{ background: var(--ui-soft, #e9eff5); }
+  .obs .ec-linha{ display: flex; gap: .4rem; flex-wrap: wrap; }
+  /* esconder as anotações BORRA a caixa e não mexe na largura das aulas:
+     a tela mudando de proporção na TV era um susto (Pedro, 14/09/2026) */
+  body.sem-obs .obs > *{ filter: blur(7px); pointer-events: none; user-select: none; }
+  body.sem-obs .obs{ position: relative; }
+  body.sem-obs .obs::after{ content: '🙈 anotações escondidas'; position: absolute; inset: 0; display: grid; place-items: center; font-size: .82rem; font-weight: 800; color: var(--gray); }
+  .obs-toggle{ margin-left: auto; border: 1.5px solid var(--ui-bd); background: var(--white); color: var(--ui-ink); border-radius: 999px; padding: .35rem .8rem; font-family: var(--font-body); font-weight: 800; font-size: .8rem; cursor: pointer; }
+  body.theme-dark .obs{ background: #26301a; border-color: #2e4560; }
+  body.theme-dark .obs textarea{ background: #101a28; color: #dbe6f3; border-color: #4a5a3a; }
+  @media (max-width: 760px){ .al-corpo{ grid-template-columns: 1fr; } .obs{ border-left: 0; border-top: 1px solid var(--ui-line); } }
+  /* A INTERNET DA SALA (19/09/2026): marca feita sem rede não se perde. Ela fica na fila do aparelho, o aviso
+     amarelo diz quantas estão esperando, e o envio tenta sozinho quando a rede volta. */
+  /* AJUDA NA PRÓPRIA TELA (19/09/2026): um "?" ao lado do bloco, com duas linhas. O guia em PDF ninguém abre no meio da aula. */
+  .dica{ border: 1.5px solid var(--ui-bd, #d6deea); background: var(--white, #fff); color: var(--ui, #1d3685); width: 20px; height: 20px; border-radius: 50%; font: 800 .72rem/1 var(--font-body); cursor: pointer; padding: 0; flex: 0 0 auto; }
+  .dica:hover{ border-color: var(--ui, #1d3685); }
+  .dica-tx{ background: #eef4ff; border: 1.5px solid #cddcf5; border-radius: 10px; padding: .5rem .8rem; font-size: .85rem; font-weight: 600; color: #1f2d57; margin: .4rem 0; max-width: 62ch; }
+  body.theme-dark .dica-tx{ background: #16233a; border-color: #2e4560; color: #dbe6f3; }
+  .fila-off[hidden]{ display: none; }   /* o display:flex abaixo ganharia do hidden */
+  .fila-off{ max-width: 1500px; margin: 0 auto .6rem; background: #fff4d6; border: 1.5px solid #e5b62b; color: #4a3a10; border-radius: 12px; padding: .6rem .9rem; font-weight: 800; display: flex; gap: .8rem; align-items: center; flex-wrap: wrap; }
+  .fila-off button{ border: 1.5px solid #b8890f; background: #fff; color: #6b4d0f; border-radius: 999px; padding: .35rem .9rem; font: inherit; font-size: .85rem; cursor: pointer; }
+  .toast{ position: fixed; left: 50%; bottom: 1.4rem; transform: translateX(-50%); max-width: min(92vw, 46rem); text-align: center; line-height: 1.3; background: #1d3685; color: #fff; padding: .7rem 1.1rem; border-radius: 1.3rem; font-weight: 800; font-size: .9rem; box-shadow: 0 8px 24px rgba(0,0,0,.25); z-index: 150; }
+  /* o planner completo abre POR CIMA da turma, com os dados que ela já tem
+     (Pedro, 14/09/2026): acima do menu do professor (60), abaixo do aviso
+     (150), para o "📇 Card: L3" e o "não salvou" aparecerem sobre ele */
+  body.com-aguia{ overflow: hidden; }
+  .aguia-ov{ position: fixed; inset: 0; z-index: 100; background: #eef1f7; overflow: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+  .aguia-topo{ position: sticky; top: 0; z-index: 3; background: #1d3685; color: #fff; display: flex; align-items: center; gap: .75rem; padding: .6rem 1rem; flex-wrap: wrap; }
+  .aguia-topo .voltar{ background: #fff; color: #1d3685; border: 0; border-radius: 999px; padding: .5rem 1rem; font-family: var(--font-body); font-weight: 900; font-size: .9rem; cursor: pointer; box-shadow: 0 2px 0 #0f2260; }
+  .aguia-topo h2{ margin: 0; color: #fff; font-family: var(--font-heading); font-size: 1rem; font-weight: 700; }
+  .aguia-topo .sub{ opacity: .85; font-size: .84rem; }
+  body.theme-dark .aguia-ov{ background: #0f1724; }
+  @media print{
+    body.com-aguia > *:not(.aguia-ov){ display: none !important; }
+    body.com-aguia{ overflow: visible; }
+    .aguia-ov{ position: static; overflow: visible; background: #fff; }
+    .aguia-topo{ display: none; }
+  }
+
+  body.theme-dark .painel, body.theme-dark .al{ background: #172232; border-color: #2e4560; }
+  body.theme-dark .aula{ background: #101a28; border-color: #2e4560; }
+  body.theme-dark .aula.atual{ background: #172232; }
+  body.theme-dark .it{ color: #dbe6f3; }
+  body.theme-dark .ck{ background: #1b2436; }
+  body.theme-dark .chip, body.theme-dark .cascata select, body.theme-dark .ck select, body.theme-dark .ck input, body.theme-dark .ck textarea{ background: #101a28; color: #dbe6f3; border-color: #3a5170; }
+  body.theme-dark .chip.on{ color: #fff; }
+  body.theme-dark .ck .ped{ background: #26364d; color: #dbe6f3; }
+  body.theme-dark .resumo b, body.theme-dark .aula .t b{ color: #dbe6f3; }
+  @media (max-width: 640px){ .al-cab .acoes{ margin-left: 0; width: 100%; } }
+  /* ── A CÉLULA DA AULA NO DESENHO DO PLANNER COMPLETO (Pedro, 14/09/2026):
+     faixa azul-marinho com o nome da aula e a data numa pílula branca, corpo
+     azul-claro, bolinha de 30, página à direita e a Exploration em
+     verde-amarelo. As duas visões leem como uma coisa só; a aula de agora
+     ganha o anel verde-amarelo que a lição atual tem no planner completo. ── */
+  .aulas{ gap: .7rem; }
+  /* as cores vêm do plano do livro (--pil, --mar, --ac, --acTxt, calculadas em corDoEstagio como no planner completo); o azul é a reserva */
+  .aula, body.theme-dark .aula, body.theme-dark .aula.atual{ background: var(--pil, #dce6f2); border: 2px solid var(--mar, #1d3685); border-radius: 12px; padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+  .aula.atual, body.theme-dark .aula.atual{ background: var(--pil, #dce6f2); border-color: var(--mar, #1d3685); box-shadow: 0 0 0 3px var(--ac, #d4e909); }
+  .aula .t{ margin: 0; background: var(--mar, #1d3685); color: rgba(255,255,255,.78); padding: .5rem .75rem; align-items: center; font-size: .72rem; }
+  .aula .t b, body.theme-dark .aula .t b{ color: #fff; font-size: 1.05rem; }
+  .aula .t .dt, .aula .t .agora{ margin-left: auto; background: #fff; color: var(--mar, #1d3685); border-radius: 999px; padding: .15rem .6rem; font-size: .74rem; font-weight: 800; text-transform: none; letter-spacing: 0; white-space: nowrap; opacity: 1; }
+  .aula .t .dt.dada{ background: #fff; color: var(--mar, #1d3685); }
+  .aula .t .dt.falta, .aula .t .dt.tarde{ background: #ffd9d9; color: #b91c1c; }
+  .aula .t .agora{ background: var(--ac, #d4e909); color: var(--acTxt, #3a3400); }
+  .aula .lista{ padding: .45rem .55rem .65rem; display: flex; flex-direction: column; gap: 1px; flex: 1; }
+  .aula .it, body.theme-dark .aula .it{ color: #0f1f4e; font-size: .97rem; padding: .3rem .5rem; border-radius: 9px; min-height: 42px; }
+  .aula .it.pode:hover{ background: rgba(255,255,255,.65); }
+  .aula .it.xp{ background: var(--ac, #d4e909); color: var(--acTxt, #3a3400); }
+  .aula .it.feito{ color: #0f1f4e; }
+  .it.breve{ opacity: .45; filter: grayscale(1); cursor: default; }
+  .aula .it.feito .tx{ opacity: .6; }
+  .aula .it .pg{ font-weight: 700; opacity: .7; font-size: .78rem; color: inherit; }
+  .aula .it .quem{ color: #54648d; }
+  .mk{ flex: 0 0 30px; width: 30px; height: 30px; }
+  .mk.tri{ width: 30px; height: 27px; flex-basis: 30px; }
+  .mk.cheia-a{ background: #1d3685; }
+  .mk.quad{ border-radius: 8px; }
+  .aula .btn-ck{ margin-top: auto; }
+  .aula .it + .btn-ck{ margin-top: .6rem; }
+  .aula .libera{ color: #54648d; }
+  .aula .sug1{ margin: .5rem .55rem .55rem; background: #e4f3f1; border: 1px solid #cfe6e1; border-radius: 10px; padding: .35rem .55rem; display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+  .aula .sug1 .st{ flex-basis: 100%; font-size: .66rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #155a48; }
+  .aula .sug1 .nm{ font-weight: 800; color: #0f1f4e; font-size: .92rem; }
+  .aula .sug1.ok .nm{ text-decoration: line-through; opacity: .7; }
+  .aula .sug1 .pct{ margin-left: auto; background: #fff; border-radius: 999px; padding: 0 .5rem; font-weight: 800; color: #155a48; font-size: .78rem; }
+  /* CHECKING FEITO É VERDE (Pedro, 19/09/2026): antes o bloco pegava a cor do estágio, a mesma do botão de
+     registrar, e de longe os dois liam igual. Agora feito = verde, a fazer = o amarelo do botão. */
+  .aula .ck-feito{ margin-top: auto; display: flex; align-items: center; gap: .65rem; background: #e3f4ec; color: #14532d; border: 1.5px solid #34a06f; border-radius: 10px; padding: .5rem .7rem; }
+  .aula .it + .ck-feito{ margin-top: .6rem; }
+  .aula.ck-ok .t{ background: #14532d; }   /* o cabeçalho da aula do Checking feito também fica verde */
+  .aula .ck-feito .mk{ border-color: #14532d; background: #34a06f; }
+  .aula .btn-ck{ background: var(--ac, #d4e909); color: var(--acTxt, #3f4703); }
+  .al-cab .livro.cor{ background: var(--tab); color: #fff; border-radius: 999px; padding: .1rem .6rem; font-weight: 800; }
+  .aula .ck-feito b{ display: block; font-family: var(--font-heading); font-size: .95rem; line-height: 1.2; }
+  .aula .ck-feito small{ display: block; font-size: .76rem; font-weight: 700; opacity: .85; line-height: 1.3; }
+  .btn-ck-editar{ width: 100%; margin-top: .45rem; justify-content: center; background: #f2f5f9; color: #54648d; border: 1.5px solid #c3ccdb; padding: .38rem .9rem; font-size: .8rem; box-shadow: none; }
+  /* ── O QUADRO DO KEEP STUDYING (Pedro, 14/09/2026): a célula verde da
+     coluna do planner completo, numa linha própria embaixo das aulas. Como
+     quarta coluna ele espremia as aulas (a coluna delas não passa de 1198 px,
+     por causa da anotação) e os nomes quebravam em duas linhas. ── */
+  /* compacto (Pedro, 14/09/2026): colunas iguais, uma linha por item (o nome
+     longo corta com reticências e aparece inteiro no title), a contagem ao
+     lado do título e o "também fez" numa linha só com o rótulo */
+  .al .aula.ks, body.theme-dark .al .aula.ks{ margin: -.25rem 1rem .9rem; background: #e4f3f1; border-color: #cfe6e1; }
+  .aula.ks .t{ background: transparent; color: #155a48; padding: .45rem .8rem 0; }
+  .aula.ks .t .dt{ margin-left: .5rem; background: #fff; color: #155a48; padding: .05rem .5rem; font-size: .7rem; }
+  .aula.ks .lista{ padding: .15rem .45rem .45rem; }
+  .ks-sug{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: .9rem; row-gap: 0; }
+  /* colunas pelo número de itens, para não sobrar um órfão na segunda linha: 5 e 6 em três, 7 e 8 em quatro */
+  .ks-sug.c1{ grid-template-columns: minmax(0, 1fr); } .ks-sug.c2{ grid-template-columns: repeat(2, minmax(0, 1fr)); } .ks-sug.c3{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (max-width: 1200px){ .ks-sug.c3, .ks-sug.c4{ grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 640px){ .ks-sug.c2, .ks-sug.c3, .ks-sug.c4{ grid-template-columns: minmax(0, 1fr); } }
+  .ksi{ display: flex; align-items: center; gap: .4rem; min-height: 30px; padding: .1rem .35rem; font-size: .86rem; font-weight: 700; color: #0f1f4e; min-width: 0; }
+  .ksi .ic{ flex: 0 0 20px; text-align: center; font-size: .95rem; }
+  .ksi .nm{ flex: 0 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ksi.feito .nm{ text-decoration: line-through; opacity: .6; }
+  .ksi .pct{ flex: 0 0 auto; background: #fff; color: #155a48; border-radius: 999px; padding: 0 .45rem; font-size: .76rem; font-weight: 800; white-space: nowrap; }
+  .ks-mais{ margin: .3rem .35rem 0; border-top: 1px dashed #9fcfc4; padding-top: .35rem; font-size: .76rem; color: #155a48; display: flex; flex-wrap: wrap; align-items: center; gap: .25rem .3rem; }
+  .ks-sug:empty + .ks-mais{ margin-top: 0; border-top: 0; padding-top: 0; }
+  .ks-mais b{ font-size: .64rem; text-transform: uppercase; letter-spacing: .06em; margin-right: .3rem; }
+  .ks-mais span{ background: #fff; border-radius: 999px; padding: .05rem .5rem; font-weight: 800; color: #0f1f4e; }
+  .ks-mais span i{ font-style: normal; color: #155a48; }
+  .btn-ck-editar:hover{ background: #e7ecf4; color: #1d3685; border-color: #9fb0c9; }
+  /* a nota do Checking é só do professor: com as anotações escondidas (tela na TV), ela borra junto */
+  body.sem-obs .nota-priv{ filter: blur(5px); user-select: none; }
+  /* e no planner completo por cima da turma: a nota do Checking (.pv2-priv) e a tabela das provas (Pedro, 14/09/2026: a TV mostrava) */
+  body.sem-obs .aguia-ov .pv2-priv, body.sem-obs .aguia-ov .notas table{ filter: blur(6px); user-select: none; pointer-events: none; }
+  .aguia-topo .obs-toggle{ margin-left: auto; background: rgba(255,255,255,.15); color: #fff; border: 0; }
+  /* ── O GABARITO DAS MARCAS (aprovado pelo Pedro, 14/09/2026), o mesmo do
+     planner-v2.js: azul-marinho = o aluno (com ✓ branco quando o portal
+     comprovou); verde escuro #a8b907, na borda e no recheio = o professor.
+     Sem listras. ── */
+  .mk{ --prof: #a8b907; }
+  .mk.l-a, .mk.l-plat{ background: linear-gradient(90deg,#1d3685 50%,#fff 50%); }
+  .mk.r-plat{ background: linear-gradient(90deg,#fff 50%,#1d3685 50%); }
+  .mk.l-a.r-plat{ background: #1d3685; }
+  .mk.r-prof{ background: linear-gradient(90deg,#fff 50%,var(--prof) 50%); }
+  .mk.l-a.r-prof, .mk.l-plat.r-prof{ background: linear-gradient(90deg,#1d3685 50%,var(--prof) 50%); }
+  .mk.l-prof{ background: linear-gradient(90deg,var(--prof) 50%,#fff 50%); }
+  .mk.cheia-prof{ background: var(--prof); border-color: var(--prof); }
+  /* feita antes do Planner (o corte de 15/09/2026): cinza até alguém mexer */
+  .mk.ant{ background: #aeb5c2 !important; border-color: #aeb5c2 !important; }
+  .mk.tri.ant{ background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,3 27.5,24.5 2.5,24.5' fill='%23aeb5c2' stroke='%23aeb5c2' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat !important; }
+  .mk.dep-prof{ border-color: var(--prof); }
+  .mk.plat{ background: #1d3685 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/64% no-repeat; border-color: #1d3685; }
+  .aula .it.xp .mk.dep-prof, .aula .it.xp .mk.cheia-prof{ border-color: #3a3400; }
+
+/* painel do Planejador e cards mais baixos (Pedro, 17/09/2026) */
+.fila-info.roteiro, .fila-info.roteiro.sem{ gap: .65rem; padding: .75rem .9rem; background: #fff; border: 1px solid var(--ui-line, #d6deea); border-radius: 16px; box-shadow: 0 2px 10px rgba(15,31,78,.06); }
+.pl-topo{ display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .7rem; }
+.pl-tit{ font-family: var(--font-heading); font-weight: 900; font-size: 1rem; color: #1d3685; letter-spacing: .01em; }
+.fila-info .pl-rec{ margin-left: auto; }
+.pl-topo .rt-info{ flex-basis: 100%; font-size: .82rem; color: #54648d; }
+.pl-topo .rt-info b{ color: #155a48; }
+.fila-info.sem .pl-topo .rt-info b{ color: #1d3685; }
+.fila-info .pl-rec{ border: 0; background: #eef2fa; color: #1d3685; padding: .3rem .75rem; }
+.fila-info .pl-rec:hover{ background: #dfe7f5; }
+.pl-acoes{ display: flex; flex-wrap: wrap; align-items: stretch; gap: .5rem; }
+.pl-acoes .prio-grande{ width: auto; flex: 1 1 220px; font-size: .95rem; padding: .55rem 1rem; border-radius: 12px; box-shadow: 0 3px 0 #0f2260; }
+.pl-acoes .prio-grande.on{ background: #fff; color: #1d3685; box-shadow: inset 0 0 0 2px #1d3685; }
+.pl-salvar{ display: flex; align-items: stretch; border: 1.5px solid #31a889; border-radius: 12px; overflow: hidden; background: #f3fbf9; }
+.pl-salvar .rt-data{ padding: 0 .5rem 0 .75rem; font-size: .8rem; color: #155a48; }
+.pl-salvar .rt-data input{ border: 0; background: transparent; font-weight: 800; color: #155a48; padding: .2rem 0; }
+.pl-salvar .rt-btn{ border: 0; border-radius: 0; padding: .45rem 1rem; }
+.pl-saidas{ display: flex; flex-wrap: wrap; gap: .4rem; }
+.pl-saidas .rt-btn{ border: 1px solid var(--ui-line, #d6deea); color: #1d3685; border-radius: 12px; padding: .45rem .8rem; font-weight: 700; }
+.pl-saidas .rt-btn:hover{ border-color: #1d3685; background: #f5f8fd; }
+body.theme-dark .fila-info.roteiro{ background: #172232; border-color: #2e4560; }
+body.theme-dark .pl-tit, body.theme-dark .pl-saidas .rt-btn{ color: #dbe6f3; }
+body.theme-dark .pl-saidas .rt-btn{ background: #101a28; border-color: #2e4560; }
+body.theme-dark .pl-salvar{ background: #10261f; }
+body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ color: #86efac; }
+.aula .t{ padding: .35rem .7rem; }
+.aula .t b, body.theme-dark .aula .t b{ font-size: .98rem; }
+.aula .lista{ padding: .3rem .45rem .45rem; gap: 0; }
+.aula .it, body.theme-dark .aula .it{ min-height: 34px; padding: .15rem .45rem; font-size: .92rem; line-height: 1.25; }
+.aula .it .mk{ flex-basis: 26px; width: 26px; height: 26px; }
+.aula .it .mk.tri{ height: 23px; }
+.aula .btn-ck, .aula .ck-feito{ padding-top: .4rem; padding-bottom: .4rem; }
+.aula .it + .btn-ck, .aula .it + .ck-feito{ margin-top: .4rem; }
+
+
+  /* ══ A MINHA AULA DAS TURMAS KIDS E TEENS (23/10/2026, redesenho a pedido do Pedro) ══════════════════════
+     Mais leve e colorida: cada livro com a cor dele (a mesma do Modo Kids do portal), fonte maior, a aula em
+     MOMENTOS e as presenças num bloco próprio. Coluna mais estreita no computador e respiro de 14px no celular. */
+  body.pt-ativo main{ max-width: 1180px; margin-left: auto; margin-right: auto; }
+  #alunos.pre-velho{ opacity: .6; cursor: progress; }
+  body.pt-ativo .painel, body.pt-ativo #alunos, body.pt-ativo .pt{ width: 100%; max-width: 1180px; margin-left: auto; margin-right: auto; box-sizing: border-box; }
+  body.pt-ativo #resumo{ display: none !important; }
+  body.pt-ativo main{ padding-left: 24px; padding-right: 24px; box-sizing: border-box; }
+  @media (max-width: 720px){ body.pt-ativo main{ padding-left: 14px; padding-right: 14px; } }
+  .pt{ display: grid; gap: 1.1rem; margin: 0 auto 1.4rem; font-size: 1.04rem; }
+  .pt-cab{ text-align: center; padding: 1.3rem 1rem 1.1rem; border-radius: 22px; color: #fff; position: relative; overflow: hidden;
+    background: linear-gradient(120deg, #7C3AED 0%, #2563EB 45%, #0EA5A0 100%); box-shadow: 0 10px 28px rgba(37,99,235,.22); }
+  .pt-cab::before, .pt-cab::after{ content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,.12); }
+  .pt-cab::before{ width: 160px; height: 160px; left: -40px; top: -60px; }
+  .pt-cab::after{ width: 110px; height: 110px; right: -24px; bottom: -44px; }
+  .pt-cab h2{ font-family: var(--font-heading); font-size: 1.55rem; margin: 0; letter-spacing: -.01em; position: relative; }
+  .pt-cab .sub{ margin-top: .25rem; font-size: 1.02rem; opacity: .95; position: relative; }
+  .pt-cab .nav{ margin-top: .8rem; display: inline-flex; gap: .4rem; position: relative; }
+  .pt-cab .nav button{ border: 0; background: rgba(255,255,255,.2); color: #fff; border-radius: 99px; padding: .38rem .95rem; font-weight: 800; font-size: .92rem; cursor: pointer; font-family: inherit; }
+  .pt-cab .nav button{ white-space: nowrap; }
+  .pt-cab .nav button:hover{ background: rgba(255,255,255,.32); }
+  /* aniversariantes da semana logo abaixo do cabeçalho (Pedro, 27/10/2026); só aparece quando há */
+  .pt-aniv{ display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .45rem .6rem; padding: .75rem 1rem; border-radius: 18px;
+    background: linear-gradient(90deg, #fff8db 0%, #fff1f7 100%); border: 2px solid #fbe08a; color: #92400e; text-align: center; }
+  .pt-aniv .tit{ font-family: var(--font-heading); font-size: 1.08rem; font-weight: 800; }
+  .pt-aniv .nm{ background: #fff; border: 1px solid #fbe08a; border-radius: 99px; padding: .22rem .75rem; font-weight: 800; }
+  .pt-aniv .nm small{ font-weight: 700; opacity: .75; margin-left: .25rem; }
+  .pt-aniv .nm.hoje{ color: #fff; border-color: transparent; background: linear-gradient(90deg, #f59e0b, #ec4899); }
+  body.theme-dark .pt-aniv{ background: linear-gradient(90deg, #3a2e12 0%, #3a1830 100%); border-color: #a16207; color: #fcd34d; }
+  body.theme-dark .pt-aniv .nm{ background: #1b273a; border-color: #a16207; }
+  body.theme-dark .pt-aniv .nm.hoje{ background: linear-gradient(90deg, #f59e0b, #ec4899); color: #fff; }
+  .pt-titulo{ display: flex; align-items: center; justify-content: center; gap: .55rem; margin: .5rem 0 -.2rem; font-family: var(--font-heading); font-size: 1.18rem; color: #1d2b53; }
+  .pt-titulo .cont{ font-family: var(--font-body); font-size: .9rem; font-weight: 800; color: #5b6b85; }
+  .pt-trans{ display: flex; flex-wrap: wrap; justify-content: center; gap: .45rem; }
+  .pt-trans a, .pt-trans span{ display: inline-flex; align-items: center; gap: .35rem; text-decoration: none; font-weight: 800; font-size: .9rem; padding: .42rem .85rem; border-radius: 99px; background: #fff; border: 2px solid #e6e9f5; color: #3b3f73; }
+  .pt-trans a:hover{ border-color: #c7b8f5; background: #faf7ff; }
+  /* colunas FIXAS (Pedro, 23/10/2026): com auto-fit a grade esticava os cartões conforme a quantidade da semana */
+  .pt-momentos{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; }
+  @media (max-width: 980px){ .pt-momentos{ grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .pt-nota{ background: #fffbea; border: 2px solid #fde68a; border-radius: 20px; padding: .9rem 1rem; }
+  .pt-nota label{ display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; font-family: var(--font-heading); font-weight: 700; font-size: 1.05rem; color: #92400e; margin-bottom: .5rem; }
+  .pt-nota label small{ font-family: var(--font-body); font-weight: 800; font-size: .84rem; color: #b45309; }
+  .pt-nota textarea{ width: 100%; min-height: 84px; box-sizing: border-box; border: 1.5px solid #f3d27a; border-radius: 12px; padding: .6rem .7rem; font-family: var(--font-body); font-size: 1rem; line-height: 1.45; resize: vertical; background: #fff; }
+  .pt-nota .st{ font-size: .82rem; font-weight: 800; color: #047857; min-height: 1.1em; margin-top: .3rem; }
+  .pt-nota-livro{ margin-top: .8rem; padding: .45rem .8rem; border-radius: 14px; }
+  .pt-nota-livro.aberta{ padding-bottom: .7rem; }
+  .pt-nota-bt{ display: flex; align-items: center; gap: .3rem; width: 100%; background: none; border: 0; padding: .2rem 0; color: #92400e; font-family: var(--font-heading); font-weight: 700; font-size: .95rem; cursor: pointer; text-align: left; }
+  .pt-nota-bt .tem{ font-family: var(--font-body); font-weight: 900; font-size: .84rem; color: #b45309; }
+  .pt-nota-bt .seta{ margin-left: auto; transition: transform .15s ease; }
+  .pt-nota-livro.aberta .pt-nota-bt .seta{ transform: rotate(180deg); }
+  .pt-nota-corpo small{ display: block; font-weight: 800; font-size: .84rem; color: #b45309; margin: .25rem 0 .45rem; }
+  .pt-nota-livro textarea{ min-height: 64px; font-size: .95rem; }
+  body.theme-dark .pt-nota{ background: #2b2513; border-color: #6d5a23; }
+  body.theme-dark .pt-nota textarea{ background: #0f1825; color: #e2e8f0; border-color: #6d5a23; }
+  .pt-mom{ position: relative; border-radius: 20px; padding: 1rem 1rem .95rem; background: var(--mc-bg); border: 2px solid var(--mc-bd); }
+  .pt-mom .ic{ width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; font-size: 1.4rem; background: #fff; box-shadow: 0 3px 10px rgba(0,0,0,.06); }
+  .pt-mom h4{ margin: .6rem 0 .25rem; font-family: var(--font-heading); font-size: 1.05rem; color: var(--mc-tx); }
+  .pt-mom .txt{ font-size: 1rem; line-height: 1.45; color: #2b3044; white-space: pre-line; }
+  .pt-mom .txt a{ color: var(--mc-tx); font-weight: 800; }
+  .pt-mom .pt-tick{ position: absolute; top: .9rem; right: .9rem; }
+  .pt-mom.m-warm{ --mc-bg: #fff4e8; --mc-bd: #ffd9b0; --mc-tx: #b45309; }
+  .pt-mom.m-story{ --mc-bg: #f2f0ff; --mc-bd: #d9d2ff; --mc-tx: #5b21b6; }
+  .pt-mom.m-com{ --mc-bg: #e9f8f5; --mc-bd: #bfeade; --mc-tx: #0f766e; }
+  .pt-mom.m-mat{ --mc-bg: #f4f6fa; --mc-bd: #e1e6ef; --mc-tx: #334155; grid-column: 1 / -1; }   /* a linha inteira: largo em vez de alto */
+  /* o material da semana em lista, um bloco por estágio (Pedro, 27/10/2026) */
+  .pt-mat{ display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: .6rem; white-space: normal; margin-top: .2rem; }
+  .pt-mat-est{ background: #fff; border-radius: 14px; border: 1px solid #e1e6ef; border-left: 5px solid var(--lc); padding: .55rem .8rem .6rem; }
+  .pt-mat-est h5{ margin: 0 0 .25rem; font-family: var(--font-heading); font-size: .98rem; color: var(--lc-tx); }
+  .pt-mat-est ul{ margin: 0; padding-left: 1.15rem; }
+  .pt-mat-est li{ margin: .1rem 0; }
+  body.theme-dark .pt-mat-est{ background: #15202f; border-color: #2a3a52; border-left-color: var(--lc); }
+  body.theme-dark .pt-mat-est h5{ color: var(--lc); }
+  .pt-mom.m-aniv{ --mc-bg: #fff8db; --mc-bd: #fbe08a; --mc-tx: #a16207; }
+  .pt-mom.m-geral{ --mc-bg: #eef6ff; --mc-bd: #cfe3ff; --mc-tx: #1d4ed8; }
+  .pt-livros{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+  .pt-livros > .pt-livro:only-child{ grid-column: 1 / -1; }
+  @media (max-width: 720px){ .pt-livros{ grid-template-columns: 1fr; } .pt-momentos{ grid-template-columns: 1fr; } .pt-mom.m-mat{ grid-column: auto; } }
+  .pt-livro{ border-radius: 22px; overflow: hidden; background: #fff; border: 2px solid var(--lc-soft); box-shadow: 0 6px 18px rgba(20,30,60,.06); }
+  .pt-livro .topo{ background: var(--lc); color: #fff; padding: .85rem 1.1rem; display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+  .pt-livro .topo h3{ margin: 0; font-family: var(--font-heading); font-size: 1.15rem; }
+  .pt-livro .topo .mover{ margin-left: auto; display: inline-flex; gap: .3rem; align-items: center; }
+  .pt-livro .topo .mover button{ width: 32px; height: 32px; border-radius: 10px; border: 0; background: rgba(255,255,255,.25); color: inherit; font-weight: 900; font-size: 1rem; cursor: pointer; font-family: inherit; }
+  .pt-livro .topo .mover button:hover{ background: rgba(255,255,255,.4); }
+  .pt-livro .topo .mover button:disabled{ opacity: .35; cursor: default; }
+  .pt-livro .topo .alca{ font-size: 1.25rem; cursor: grab; padding: 0 .2rem; opacity: .85; }
+  .pt-livro.arrastando{ opacity: .45; }
+  .pt-livro.alvo{ outline: 3px dashed var(--lc); outline-offset: 3px; }
+  .pt-livro .topo .lic{ background: rgba(255,255,255,.25); border-radius: 99px; padding: .15rem .65rem; font-weight: 900; font-size: .88rem; }
+  .pt-livro .quem{ display: flex; flex-wrap: wrap; gap: .45rem; padding: .85rem 1.1rem .2rem; }
+  .pt-livro .quem span{ font-size: 1.3rem; font-weight: 900; background: var(--lc-bg); color: var(--lc-tx); border: 2px solid var(--lc-soft); border-radius: 99px; padding: .3rem .95rem; line-height: 1.2; }
+  .pt-livro .corpo{ padding: .55rem 1.1rem 1rem; }
+  .pt-it{ display: flex; align-items: flex-start; gap: .65rem; padding: .5rem 0; border-top: 1px dashed #e7eaf3; font-size: 1.02rem; line-height: 1.4; }
+  .pt-it:first-child{ border-top: 0; }
+  .pt-it .t{ flex: 1; padding-top: .12rem; }
+  .pt-tipo{ display: inline-block; font-size: .72rem; font-weight: 900; padding: .1rem .45rem; border-radius: 7px; background: var(--lc-bg, #eef3fb); color: var(--lc-tx, #1d3685); margin-right: .4rem; vertical-align: 2px; letter-spacing: .02em; }
+  .pt-tipo.hw, .pt-tipo.hwc{ background: #fff1d6; color: #9a5b00; }
+  .pt-tipo.video{ background: #ffe4ec; color: #be123c; }
+  .pt-games{ margin-top: .6rem; background: var(--lc-bg); border-radius: 16px; padding: .7rem .8rem; display: flex; gap: .65rem; align-items: flex-start; }
+  .pt-games .t{ flex: 1; font-size: .98rem; line-height: 1.45; white-space: pre-line; }
+  .pt-games b{ color: var(--lc-tx); display: block; margin-bottom: .15rem; }
+  .pt-tick{ width: 30px; height: 30px; flex: 0 0 30px; border-radius: 50%; border: 2.5px solid var(--lc, #9fb0c8); background: #fff; cursor: pointer; display: grid; place-items: center; font-weight: 900; color: #fff; font-size: .95rem; padding: 0; transition: transform .12s ease, background .15s ease; }
+  .pt-tick:hover{ transform: scale(1.08); }
+  .pt-tick.on{ background: var(--lc, #10b981); border-color: var(--lc, #10b981); }
+  .pt-mom .pt-tick{ --lc: var(--mc-tx); }
+  .pt-tick:disabled{ opacity: .45; cursor: wait; }
+  .pt-quando{ font-size: .78rem; color: #059669; font-weight: 900; margin-left: .35rem; white-space: nowrap; }
+  .pt-botoes{ display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .85rem; }
+  .pt-botoes a{ flex: 1 1 160px; text-align: center; font-size: .95rem; font-weight: 900; text-decoration: none; border-radius: 14px; padding: .6rem .8rem; color: var(--lc-tx); background: var(--lc-bg); border: 2px solid var(--lc-soft); }
+  .pt-botoes a:hover{ background: var(--lc); color: #fff; border-color: var(--lc); }
+  .pt-antes .corpo .pt-it, .pt-antes .corpo .pt-games{ opacity: .5; filter: grayscale(1); }
+  .pt-antes-nota{ font-size: .85rem; font-weight: 800; color: #64748b; background: #f1f5f9; border-radius: 10px; padding: .4rem .6rem; margin: .2rem 0 .4rem; }
+  .pt-atras{ margin: .2rem 0 .7rem; background: #fef2f2; border: 2px solid #fca5a5; border-radius: 16px; padding: .6rem .8rem .7rem; }
+  .pt-atras .tit{ display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; color: #b91c1c; font-weight: 900; font-size: 1.02rem; margin-bottom: .1rem; }
+  .pt-atras .tit small{ font-weight: 800; font-size: .82rem; color: #dc2626; }
+  .pt-atras .pt-it{ border-top-color: #fecaca; }
+  .pt-atras .pt-tick{ border-color: #dc2626; }
+  .pt-atras .pt-tick.on{ background: #dc2626; }
+  .pt-atr{ display: block; font-size: .78rem; font-weight: 900; color: #dc2626; text-transform: uppercase; letter-spacing: .03em; margin-bottom: .1rem; }
+  .pt-atras .pt-botoes{ margin-top: .55rem; }
+  .pt-atras .pt-botoes a{ color: #b91c1c; background: #fff; border-color: #fca5a5; padding: .45rem .7rem; font-size: .9rem; }
+  .pt-atras .pt-botoes a:hover{ background: #dc2626; color: #fff; border-color: #dc2626; }
+  .tp-box{ margin: .3rem 0 .6rem; background: #fff7ed; border: 2px solid #fdba74; border-radius: 16px; padding: .7rem .9rem; }
+  .tp-box .tit{ display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; color: #c2410c; font-weight: 900; font-size: 1.05rem; }
+  .tp-box .tit small{ font-weight: 800; font-size: .82rem; color: #ea580c; }
+  .tp-falta{ margin-top: .6rem; padding-top: .5rem; border-top: 1px dashed #fed7aa; }
+  .tp-falta h5{ margin: 0 0 .2rem; font-size: .9rem; font-weight: 900; color: #b91c1c; text-transform: uppercase; letter-spacing: .03em; }
+  .tp-falta .pt-botoes{ margin-top: .5rem; }
+  body.theme-dark .tp-box{ background: #2a1d10; border-color: #9a3412; }
+  body.theme-dark .pt-atras{ background: #2a1414; border-color: #7f1d1d; }
+  body.theme-dark .pt-atras .pt-botoes a{ background: #1f1111; }
+  .pt-nada{ color: #64748b; font-size: .98rem; padding: .4rem 0; }
+  /* presenças */
+  .ak-cab{ display: flex; align-items: center; justify-content: center; gap: .55rem; flex-wrap: wrap; margin: .6rem 0 .8rem; font-family: var(--font-heading); font-size: 1.18rem; color: #1d2b53; }
+  .ak-cab .cont{ font-family: var(--font-body); font-size: .9rem; font-weight: 900; padding: .2rem .65rem; border-radius: 99px; background: #eef2f8; color: #475569; }
+  .ak-cab .cont.v{ background: #d1fae5; color: #047857; }
+  .ak-cab .cont.f{ background: #fee2e2; color: #b91c1c; }
+  .ak-cab .ak-todos{ font-family: var(--font-body); font-size: .92rem; font-weight: 900; padding: .3rem .9rem; border-radius: 99px; border: 2px solid #10b981; background: #10b981; color: #fff; cursor: pointer; }
+  .ak-cab .ak-todos:hover{ background: #059669; border-color: #059669; }
+  .ak-pend{ display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .5rem .8rem; margin: -.3rem 0 .8rem; padding: .6rem 1rem; border-radius: 14px;
+    background: #fffbeb; border: 2px dashed #f59e0b; color: #92400e; font-weight: 700; text-align: center; }
+  .ak-pend button{ border: 0; border-radius: 99px; padding: .35rem .95rem; font-weight: 900; font-family: inherit; background: #f59e0b; color: #fff; cursor: pointer; }
+  .ak-pend button:disabled{ opacity: .6; cursor: default; }
+  body.theme-dark .ak-pend{ background: #3a2e12; color: #fcd34d; }
+  .al.al-kids{ padding: 0; border-radius: 18px; border: 2px solid #e8ecf4; box-shadow: none; margin-bottom: .55rem; background: #fff; overflow: hidden; }
+  .al.al-kids.veio{ border-color: #a7f3d0; background: #f6fffb; }
+  .al.al-kids.aniv{ border-color: #f5c542; background: linear-gradient(90deg, #fff8db 0%, #ffffff 60%); box-shadow: 0 0 0 3px rgba(245,197,66,.25); }
+  .al.al-kids.aniv .ak-id .nome{ color: #92400e; font-size: 1.16rem; }
+  /* o aniversariante da semana em TODOS os cartões (Pedro, 26/10/2026: "a ideia é esse aluno estar em destaque",
+     a semana inteira, adultos, teens e kids) */
+  .al.aniv{ border-color: #f5c542; box-shadow: 0 0 0 3px rgba(245,197,66,.3); }
+  .al.aniv .al-cab{ background: linear-gradient(90deg, #fff4c7 0%, rgba(255,244,199,0) 75%); }
+  .al.aniv .al-cab .nome{ color: #92400e; font-size: 1.12rem; }
+  .al.aniv .ak-aniv.hoje{ animation: anivPulsa 1.6s ease-in-out infinite; }
+  @keyframes anivPulsa{ 50%{ transform: scale(1.08); } }
+  @media (prefers-reduced-motion: reduce){ .al.aniv .ak-aniv.hoje{ animation: none; } }
+  body.theme-dark .al.aniv .al-cab{ background: linear-gradient(90deg, #3a2e12 0%, rgba(58,46,18,0) 75%); }
+  body.theme-dark .al.aniv .al-cab .nome, body.theme-dark .al.al-kids.aniv .ak-id .nome{ color: #fcd34d; }
+  body.theme-dark .al.al-kids.aniv{ background: linear-gradient(90deg, #3a2e12 0%, #1b273a 60%); }
+  /* RAF à vista no cartão (adultos, teens e kids), toque copia (Pedro, 29/10/2026) */
+  .raf-tag{ display: inline-flex; align-items: center; gap: .25rem; margin-left: .4rem; font: 800 .78rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .02em; color: #1d3685; background: #eef2fb; border: 1.5px solid #d6deea; border-radius: 7px; padding: .2rem .45rem; cursor: pointer; vertical-align: 2px; white-space: nowrap; }
+  .raf-tag:hover{ border-color: #1d3685; }
+  .raf-tag.copiado{ background: #10b981; border-color: #10b981; color: #fff; }
+  body.theme-dark .raf-tag{ background: #1b2a44; border-color: #2e4560; color: #c7d6f5; }
+  .ak-aniv{ display: inline-block; margin-left: .35rem; font-size: .82rem; font-weight: 900; color: #fff; background: linear-gradient(90deg, #f59e0b, #ec4899); border-radius: 99px; padding: .14rem .6rem; vertical-align: 2px; }
+  .al.al-kids.faltou{ border-color: #fecaca; background: #fff8f8; opacity: 1; filter: none; }
+  .al.al-kids.faltou .ak-id .nome{ color: #991b1b; }
+  .ak-lin{ display: flex; align-items: center; gap: .8rem; padding: .7rem 1rem; flex-wrap: wrap; }
+  .ak-av{ width: 40px; height: 40px; flex: 0 0 40px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-heading); font-weight: 700; color: #fff; background: var(--lc, #64748b); font-size: 1rem; }
+  .ak-id{ flex: 1 1 180px; min-width: 0; }
+  .ak-id .nome{ font-family: var(--font-heading); font-weight: 700; font-size: 1.08rem; color: #1e293b; line-height: 1.2; }
+  .ak-id .livro{ font-size: .86rem; font-weight: 800; color: var(--lc-tx, #475569); }
+  .ak-bts{ display: flex; gap: .9rem; align-items: center; margin-left: auto; }
+  .ak-bts button{ display: inline-flex; align-items: center; gap: .4rem; border-radius: 12px; padding: .5rem .95rem; font-weight: 900; font-size: .98rem; cursor: pointer; font-family: inherit; border: 2px solid; background: #fff; }
+  .ak-veio{ border-color: #6ee7b7 !important; color: #047857; }
+  .ak-veio .bx{ width: 18px; height: 18px; border-radius: 5px; border: 2.5px solid #10b981; display: inline-grid; place-items: center; font-size: .8rem; line-height: 1; }
+  .ak-veio.on{ background: #10b981 !important; border-color: #10b981 !important; color: #fff; }
+  .ak-veio.on .bx{ background: #fff; color: #10b981; border-color: #fff; }
+  .ak-falta{ border-color: #fca5a5 !important; color: #b91c1c; }
+  .ak-falta.on{ background: #dc2626 !important; border-color: #dc2626 !important; color: #fff; }
+  .ak-nota{ display: flex; align-items: center; gap: .4rem; margin: 0 1rem .7rem 3.75rem; background: none; border: 0; padding: 0; color: #64748b; font-weight: 800; font-size: .92rem; cursor: pointer; font-family: inherit; }
+  .ak-nota.tem{ color: #b45309; }
+  .ak-nota:hover{ color: #1d4ed8; }
+  .ak-obs{ margin: 0 1rem .9rem 3.75rem; background: #fffbea; border: 2px solid #fde68a; border-radius: 14px; padding: .7rem; }
+  .ak-obs textarea{ width: 100%; min-height: 76px; border: 1.5px solid #f3d27a; border-radius: 10px; padding: .55rem .65rem; font-family: var(--font-body); font-size: 1rem; resize: vertical; background: #fff; box-sizing: border-box; }
+  .ak-obs .st{ font-size: .82rem; font-weight: 800; color: #047857; min-height: 1.1em; margin: .3rem 0; }
+  .ak-obs .acoes{ display: flex; gap: .5rem; flex-wrap: wrap; }
+  .ak-obs .acoes button{ border: 2px solid #e2d3a0; background: #fff; color: #7c5a00; border-radius: 10px; padding: .42rem .8rem; font-weight: 900; font-size: .9rem; cursor: pointer; font-family: inherit; }
+  .ak-obs .acoes button:hover{ border-color: #b45309; }
+  @media (max-width: 720px){
+    .ak-lin{ gap: .6rem; padding: .7rem .8rem; }
+    .ak-bts{ width: 100%; margin-left: 0; gap: .6rem; }
+    .ak-bts button{ flex: 1; justify-content: center; }
+    .ak-nota, .ak-obs{ margin-left: .8rem; margin-right: .8rem; }
+    .pt-cab h2{ font-size: 1.35rem; }
+    .pt-cab .nav button{ padding: .36rem .7rem; font-size: .85rem; }
+  }
+  body.theme-dark .pt-livro, body.theme-dark .al.al-kids{ background: #172232; border-color: #2e4560; }
+  body.theme-dark .ak-id .nome, body.theme-dark .pt-titulo, body.theme-dark .ak-cab{ color: #e2e8f0; }
+  body.theme-dark .pt-mom .txt, body.theme-dark .pt-it, body.theme-dark .pt-games .t{ color: #dbe6f3; }
+  body.theme-dark .pt-mom{ background: #1b273a; }
+  /* MODO ESCURO (auditoria de 26/10/2026): os textos que usavam a cor ESCURECIDA do livro (--lc-tx) ou do momento
+     (--mc-tx) sobre fundo escuro passam a usar a cor viva, e os verdes e cinzas fixos clareiam */
+  body.theme-dark .pt-livro .quem span, body.theme-dark .pt-tipo, body.theme-dark .pt-games b, body.theme-dark .pt-botoes a, body.theme-dark .ak-id .livro{ color: var(--lc, #93c5fd); }
+  body.theme-dark .pt-mom.m-warm{ --mc-tx: #fdba74; } body.theme-dark .pt-mom.m-story{ --mc-tx: #c4b5fd; } body.theme-dark .pt-mom.m-com{ --mc-tx: #5eead4; }
+  body.theme-dark .pt-mom.m-mat{ --mc-tx: #cbd5e1; } body.theme-dark .pt-mom.m-aniv{ --mc-tx: #fcd34d; } body.theme-dark .pt-mom.m-geral{ --mc-tx: #93c5fd; }
+  body.theme-dark .ck .lin.crit.res{ background: #101a28; border-color: #3a5170; color: #dbe6f3; }
+  body.theme-dark .ck .registrado{ color: #86efac; }
+  body.theme-dark .pt-trans a, body.theme-dark .pt-trans span{ background: #172232; border-color: #2e4560; color: #dbe6f3; }
+  body.theme-dark .ak-bts button{ background: #0f1825; }
+  body.theme-dark .pt-tick{ background: #0f1825; }
+  body.theme-dark .ak-obs{ background: #2b2513; border-color: #6d5a23; }
+  body.theme-dark .ak-obs textarea{ background: #0f1825; color: #e2e8f0; border-color: #6d5a23; }
+  body.pt-ativo .sem-plano, body.pt-ativo .btn-ck, body.pt-ativo .btn-atend, body.pt-ativo .al-cab .pill.pos{ display: none; }
+/* as capas dos livros (29/10/2026) */
+.cv-livro{border-radius:50%;flex:none;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);vertical-align:middle}
+.cv-resumo{display:inline-flex;align-items:center;gap:.45rem}
+.cv-resumo.cv-varios .cv-livro.empilha{margin-right:-10px;box-shadow:0 0 0 2px var(--surface,#fff),0 1px 4px rgba(0,0,0,.2)}
+.cv-resumo.cv-varios b{margin-left:14px}
+.al-cab .cv-livro.na-linha{margin-left:.35rem}
