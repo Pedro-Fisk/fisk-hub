@@ -2909,7 +2909,9 @@
   try { jaViu = localStorage.getItem('fisk_tour_' + TOUR_KEY) === '1'; } catch (e) {}
   abre(!jaViu || guardado !== '0');
   if (jaViu) return;
-  var TOUR_JS = 'https://portalfisk.com.br/assets/tour.js?v=0d623a52b9';
+  /* o ?v= é o md5 (10 primeiros caracteres) do assets/tour.js do portal-aluno-fisk, o mesmo que o index.html do portal
+     carrega; conferido em 31/10/2026 (md5 -q assets/tour.js). Mudou lá, muda aqui. */
+  var TOUR_JS = 'https://portalfisk.com.br/assets/tour.js?v=e563524203';
   var T = {
     pt: [['📅 Novidade: Minha semana', 'A sua semana agora fica aqui na página inicial: <b>aulas, plantões, aniversários e feriados</b>. Toque aqui para abrir ou fechar quando quiser.'],
          ['👆 Toque na turma', 'Cada aula aparece no dia e no horário do card. Ao tocar, você vê <b>os alunos</b>, quem faz <b>aniversário</b> e o botão para abrir a <b>Minha aula</b> já na turma certa.'],
