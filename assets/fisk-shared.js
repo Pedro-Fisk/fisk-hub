@@ -697,7 +697,7 @@ function fiskInitUserMenu(opts) {
     '<div class="fu-head"><b>' + fiskEsc(s.fullName || s.name) + '</b>' +
       (escolas ? '<span>' + fiskEsc(escolas.split(',').join(' + ')) + '</span>' : '') + '</div>' +
     '<a class="fu-item" href="' + base + 'index.html">🏠 Fisk Hub</a>' +
-    '<a class="fu-item" href="' + base + 'visao-geral.html">📊 Minhas turmas</a>' +
+    '<a class="fu-item" href="' + base + 'visao-geral.html">📊 Radar da Turma</a>' +
     /* O E-COUNSELING DE QUALQUER TELA (Pedro, 20/09/2026). Não é mais um
        atalho para uma página: é a busca pelo nome do aluno aqui dentro, e a
        gaveta abre por cima do que o professor estava fazendo. Vive no menu
@@ -783,14 +783,49 @@ var FISK_HUB_EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwD
 var FISK_PULSO_MIN = 5;    // de quanto em quanto tempo o pulso sai
 var FISK_PULSO_OCIO = 10;  // sem toque nenhum por este tempo, o pulso para
 
-function fiskRegistrarUso(ferramenta) {
+/* UM ID ESTÁVEL POR FERRAMENTA (auditoria de 30/10/2026, B7): o painel de uso da direção agrupa pelo texto, e a
+   ferramenta que muda de nome ("Turma de hoje" → "Minha aula") virava duas linhas. O `id` é um slug fixo que não muda
+   com o rótulo; o nome continua indo junto, legível. O backend que ainda não conhece o campo ignora e nada quebra.
+   A tabela está documentada no CLAUDE.md: id novo entra aqui E lá. */
+var FISK_FERRAMENTAS = {
+  'hub-inicio': 'Fisk Hub (início)', 'minha-aula': 'Minha aula', 'radar-turma': 'Radar da Turma', 'radar-aluno': 'Radar do Aluno',
+  'centro-estudos': 'Centro de Estudos', 'centro-estudos-frequencia': 'Centro de Estudos: frequência', 'centro-estudos-horarios': 'Centro de Estudos: horários',
+  'answer-keys': 'Answer Keys', '2nd-chance': '2nd Chance', 'termo-atraso': 'Termo de Atraso', 'buddy': 'Buddy auxiliar', 'buddy-ajustes': 'Ajustes do Buddy',
+  'calendario': 'Minha semana', 'counseling': 'E-counseling', 'treinamentos': 'Treinamentos', 'apps': 'Apps', 'avatar': 'My Avatar',
+  'personagem': 'Meu personagem', 'personagem-salvou': 'Meu personagem (salvou)', 'hogwarts': 'Cerimônia de Seleção', 'noticias': 'Notícias da turma',
+  'plano-curso': 'Plano de curso', 'checking-guia': 'Guia do Checking', 'raf-temporario': 'RAF temporário', 'corretor-met': 'Corretor do MET',
+  'central-pedidos': 'Central de Pedidos', 'boletins': 'Boletins', 'quick-practice': 'Quick Practice', 'treino-met': 'Treino MET', 'treino-siele': 'Treino SIELE'
+};
+/* O GLOSSÁRIO DO CENTRO DE ESTUDOS (auditoria de 30/10/2026, M8): o mesmo lugar tinha quatro nomes (Centro de Estudos,
+   Learning Center, plantão de dúvidas, tutoria). Fica UM nome nos rótulos, Centro de Estudos, e estas três linhas
+   aparecem na primeira abertura (uma vez por aparelho, chave fisk_glos_centro) para quem conhecia pelos outros. */
+function fiskGlossarioCentro(onde) {
+  try { if (localStorage.getItem('fisk_glos_centro') === '1') return null; } catch (e) {}
+  if (!onde) return null;
+  var box = document.createElement('div');
+  box.className = 'fk-glossario';
+  box.style.cssText = 'margin:.8rem auto;max-width:860px;padding:.7rem 1rem;border-radius:12px;border:1.5px solid #cddcf5;background:#eef4ff;color:#1f2d57;font-size:.9rem;line-height:1.5;position:relative';
+  box.innerHTML = '<b>Centro de Estudos = Learning Center = plantão de dúvidas.</b><br>' +
+    'É o mesmo lugar: o horário em que o aluno vem tirar dúvidas com um monitor, fora da aula.<br>' +
+    'A Frequência mostra quem veio; os Horários, o quadro; a Minha aula atende quem chega.' +
+    '<button type="button" aria-label="Entendi" style="position:absolute;top:.3rem;right:.4rem;border:0;background:none;font-size:1rem;cursor:pointer;color:inherit;min-width:44px;min-height:44px">✕</button>';
+  box.querySelector('button').addEventListener('click', function () { box.remove(); try { localStorage.setItem('fisk_glos_centro', '1'); } catch (e) {} });
+  if (document.body.classList.contains('theme-dark')) { box.style.background = '#16233a'; box.style.borderColor = '#2e4560'; box.style.color = '#dbe6f3'; }
+  onde.insertBefore(box, onde.firstChild);
+  return box;
+}
+function fiskIdDaFerramenta(nome) {
+  for (var k in FISK_FERRAMENTAS) if (FISK_FERRAMENTAS[k] === nome) return k;
+  return String(nome || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+function fiskRegistrarUso(ferramenta, id) {
   try {
     var s = fiskSessao();
     if (!s || !s.token || !ferramenta) return;
     fetch(FISK_HUB_EP, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'usoFerramenta', token: s.token, ferramenta: ferramenta })
+      body: JSON.stringify({ action: 'usoFerramenta', token: s.token, ferramenta: ferramenta, id: id || fiskIdDaFerramenta(ferramenta) })
     }).catch(function () {});
     fiskPulso(ferramenta);
   } catch (e) {}
@@ -1426,8 +1461,8 @@ function fiskAcompanhamento(raf, opts) {
   var url = fiskHubBase() + 'aluno.html?raf=' + encodeURIComponent(raf) + '&embed=1' +
             (opts.turma ? '&turma=' + encodeURIComponent(opts.turma) : '');
   return fiskGaveta_({
-    id: 'fiskAcompGaveta', rotulo: 'Acompanhamento do aluno',
-    titulo: opts.nome || 'Acompanhamento do Aluno',
+    id: 'fiskAcompGaveta', rotulo: 'Radar do Aluno',   /* o mesmo nome da página e do card (auditoria de 30/10/2026, M9) */
+    titulo: opts.nome || 'Radar do Aluno',
     url: url, urlCheia: url.replace('&embed=1', '')
   });
 }

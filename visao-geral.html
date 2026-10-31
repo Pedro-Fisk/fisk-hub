@@ -285,7 +285,7 @@
   Ferramenta interna das escolas Fisk Taubaté · Caçapava.
 </footer>
 
-<script src="assets/fisk-shared.js?v=6668a3cd3e"></script>
+<script src="assets/fisk-shared.js?v=31797bd89a"></script>
 <script>
 /* ============================================================
    RADAR DA TURMA (22/09/2026). Substitui a Visão Geral das Turmas,
@@ -305,7 +305,7 @@ var LIMITE_ATRASO = 4; // mesma régua do termo/planejador
 var $ = function (id) { return document.getElementById(id); };
 fiskInitThemeToggle('themeToggle');
 fiskInitUserMenu();
-fiskRegistrarUso("Radar da Turma");
+fiskRegistrarUso("Radar da Turma", "radar-turma");
 
 function statusCard(msg, kind) { var s = $('statusCard'); s.textContent = msg || ''; s.className = 'status' + (kind ? ' ' + kind : ''); }
 

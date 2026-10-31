@@ -156,6 +156,32 @@ as cores, o padrão e o brasão da casa dele, nas dezessete páginas.
   do professor segue com a versão antiga por tempo indeterminado (até 31/10/2026
   o carimbo era de data, subido à mão nas trinta e uma páginas).
 
+## Um nome por ferramenta, um id por ferramenta (31/10/2026)
+
+Auditoria de 30/10 (M8, M9, B7): a tutoria tinha quatro nomes e o painel de uso
+da direção agrupa pelo texto, então ferramenta renomeada virava duas linhas.
+Regras: **Minha aula**, **Radar da Turma**, **Radar do Aluno** e **Centro de
+Estudos** (= Learning Center = plantão; o glossário de três linhas é o
+`fiskGlossarioCentro` do kit, uma vez por aparelho) em todo rótulo, e
+`fiskRegistrarUso(nome, id)` manda o `id` fixo além do nome. A tabela vive em
+`FISK_FERRAMENTAS` no `assets/fisk-shared.js`; id novo entra lá E aqui.
+
+| id | nome |
+|---|---|
+| `hub-inicio` | Fisk Hub (início) |
+| `minha-aula` | Minha aula (`turma-de-hoje.html`) |
+| `radar-turma` | Radar da Turma (`visao-geral.html`) |
+| `radar-aluno` | Radar do Aluno (`aluno.html`, também a gaveta) |
+| `centro-estudos` · `centro-estudos-frequencia` · `centro-estudos-horarios` | Centro de Estudos (hub, frequência, horários) |
+| `answer-keys` | Answer Keys (as quatro páginas) |
+| `2nd-chance` · `termo-atraso` · `counseling` | 2nd Chance · Termo de Atraso · E-counseling |
+| `buddy` · `buddy-ajustes` | Buddy auxiliar · Ajustes do Buddy |
+| `calendario` | Minha semana (`calendario.html`) |
+| `treinamentos` · `apps` · `noticias` · `plano-curso` · `checking-guia` | idem |
+| `avatar` · `personagem` · `personagem-salvou` · `hogwarts` | My Avatar · Meu personagem · Cerimônia de Seleção |
+| `raf-temporario` · `corretor-met` · `central-pedidos` · `boletins` | idem |
+| `quick-practice` · `treino-met` · `treino-siele` | atalhos sem card |
+
 ## O cabeçalho das páginas (09/10/2026)
 
 - **Canto esquerdo = UM voltar, com o nome do destino** (`← Hub`, `← Answer Keys`,

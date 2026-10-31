@@ -5,7 +5,7 @@
 /* ═══ bloco 1 ═══ */
 fiskInitThemeToggle('themeToggle');
 fiskInitUserMenu();
-fiskRegistrarUso("Turma de hoje");
+fiskRegistrarUso("Minha aula", "minha-aula");   /* o nome da tela e o id fixo do painel de uso (auditoria de 30/10/2026, M8/B7) */
 
 var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
 var $ = function (id) { return document.getElementById(id); };
@@ -737,7 +737,7 @@ function initCascata() {
     lista('turmas:' + escola + '|' + prof, { action: 'card', fn: 'turmas', escola: escola, prof: prof }, 'turmas', function (turmas, doCache) {
       if (selEscola.value !== escola || selProf.value !== prof) return;
       var antes = selTurma.value;
-      montarSelect(selTurma, 'Escolha a turma…', [{ v: PLANTAO, t: '🙋 Plantão de dúvidas (alunos da escola, pela busca)' }].concat(turmas.map(function (t) { return { v: t.linhaTitulo, t: t.titulo }; })));
+      montarSelect(selTurma, 'Escolha a turma…', [{ v: PLANTAO, t: '🙋 Centro de Estudos (alunos da escola, pela busca)' }].concat(turmas.map(function (t) { return { v: t.linhaTitulo, t: t.titulo }; })));
       if (antes && (antes === PLANTAO || turmas.some(function (t) { return String(t.linhaTitulo) === antes; }))) { selTurma.value = antes; return; }
       if (pedida && pedida.escola === escola && pedida.prof === prof) {
         var linhaPedida = pedida.linha; pedida = null;
@@ -749,10 +749,10 @@ function initCascata() {
       /* o horário do plantão escrito no card ("LC FIXO - 5ª 15h às 17h30") abre o plantão, não a lista daquela linha */
       /* a tabela das Learning Center sessions diz quem é monitor e quando (Pedro, 16/09/2026) */
       var lc = lcAgora(escola, prof);
-      if (lc) { status('🙋 Learning Center session (' + lc.inicio + (lc.fim ? '–' + lc.fim : '') + '): busque cada aluno pelo nome ou RAF.'); escolhe(selTurma, PLANTAO); return; }
+      if (lc) { status('🙋 Centro de Estudos (' + lc.inicio + (lc.fim ? '–' + lc.fim : '') + '): busque cada aluno pelo nome ou RAF.'); escolhe(selTurma, PLANTAO); return; }
       if (agora && ehPlantao(agora.titulo)) { status('🕒 Horário do plantão de dúvidas.'); escolhe(selTurma, PLANTAO); return; }
       if (agora) { status('🕒 Turma do horário de agora: ' + agora.titulo.split('\n')[0] + '. Troque acima se for outra.'); escolhe(selTurma, agora.linhaTitulo); return; }
-      if (ehMonitor(prof)) { status('🙋 Plantão de dúvidas: busque cada aluno pelo nome ou RAF.'); escolhe(selTurma, PLANTAO); return; }
+      if (ehMonitor(prof)) { status('🙋 Centro de Estudos: busque cada aluno pelo nome ou RAF.'); escolhe(selTurma, PLANTAO); return; }
       if (!doCache) status('Fora do horário de aula de ' + prof + ': escolha a turma acima.');
       else status('Fora do horário de aula de ' + prof + ': escolha a turma acima.');
     });
@@ -978,7 +978,8 @@ function carregarPlantao(escola, prof) {
   estado.atendidos = lerAtendidos();
   juntaVisitantes(); aplicarFila();
   $('fila').hidden = true; $('legenda').hidden = false;
-  status('🙋 Plantão de dúvidas em ' + escola + ': busque cada aluno pelo nome ou RAF em "Trazer outro aluno". Eles entram na ordem em que chegam.');
+  status('🙋 Centro de Estudos em ' + escola + ': busque cada aluno pelo nome ou RAF em "Trazer outro aluno". Eles entram na ordem em que chegam.');
+  try { if (typeof fiskGlossarioCentro === 'function') fiskGlossarioCentro(document.querySelector('main')); } catch (e) {}   /* o glossário, uma vez (M8) */
   desenharTurma();
   try { $('qAluno').focus(); } catch (e) {}
 }

@@ -92,7 +92,7 @@
         'card-ecounsel-h2': 'E-counseling',
         'card-ecounsel-p':  'Registre ocorrências e desenvolvimento do aluno',
         'card-tutoria-h2': 'Centro de Estudos',
-        'card-tutoria-p':  'Minha Tutoria, Frequência e Horários de tutoria: tudo do plantão de dúvidas num lugar só',
+        'card-tutoria-p':  'Atender, frequência e horários do Centro de Estudos (o Learning Center, o plantão de dúvidas) num lugar só',
         'card-calendario-h2': 'Minha semana',
         'sem-abrir': 'Abrir em tela cheia ↗',
         'card-calendario-p':  'Suas aulas, plantões, experimentais e aniversários da semana',
@@ -181,7 +181,7 @@
         'card-ecounsel-h2': 'E-counseling',
         'card-ecounsel-p':  'Log incidents and student development',
         'card-tutoria-h2': 'Learning Center',
-        'card-tutoria-p':  'My Tutoring, Tutoring Attendance and Tutoring Schedule, all in one place',
+        'card-tutoria-p':  'Attend, attendance and schedule of the Learning Center (the tutoring sessions), all in one place',
         'card-calendario-h2': 'My week',
         'sem-abrir': 'Open full screen ↗',
         'card-calendario-p':  'Your classes, tutoring shifts, trial classes and birthdays this week',
@@ -270,7 +270,7 @@
         'card-ecounsel-h2': 'E-counseling',
         'card-ecounsel-p':  'Registra incidencias y el desarrollo del alumno',
         'card-tutoria-h2': 'Centro de Estudios',
-        'card-tutoria-p':  'Mi Tutoría, Asistencia y Horarios de tutoría: todo en un solo lugar',
+        'card-tutoria-p':  'Atender, asistencia y horarios del Centro de Estudios (el Learning Center, la tutoría) en un solo lugar',
         'card-calendario-h2': 'Mi semana',
         'sem-abrir': 'Abrir en pantalla completa ↗',
         'card-calendario-p':  'Tus clases, tutorías, clases de prueba y cumpleaños de la semana',
@@ -555,7 +555,7 @@
 
       function registrarHome(){
         levaIdentidadeAoPortal();
-        if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Fisk Hub (início)');
+        if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Fisk Hub (início)', 'hub-inicio');
         avisoNovidade();
         cortinaDoAvatar();
         // campanha da direção, se houver alguma no ar para a equipe
@@ -2290,7 +2290,7 @@
   function fecha() { var m = card.querySelector('.bol-menu'); if (m) m.remove(); }
   card.addEventListener('click', function (ev) {
     if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button !== 0) return;
-    if (ev.target.closest('.bol-menu a')) { if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Boletins'); setTimeout(fecha, 50); return; }
+    if (ev.target.closest('.bol-menu a')) { if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Boletins', 'boletins'); setTimeout(fecha, 50); return; }
     ev.preventDefault();
     if (card.querySelector('.bol-menu')) { fecha(); return; }
     var m = document.createElement('div'); m.className = 'bol-menu'; m.setAttribute('role', 'menu');
