@@ -22,7 +22,7 @@
 <script>/* aplica o tema salvo antes da primeira pintura, para o modo escuro persistir entre as páginas sem piscar */try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
 <script>/* porteira do professor: decide antes da 1ª pintura se mostra o login ou o hub (sem flash) */try{document.body.classList.add(localStorage.getItem("fisk_prof")?"prof-in":"prof-out");}catch(e){document.body.classList.add("prof-out");}</script>
 
-  <link rel="stylesheet" href="assets/index.css?v=f40c0054b7">
+  <link rel="stylesheet" href="assets/index.css?v=05df237ecc">
 
   <div id="profGate">
     <!-- ⚠️ O SELETOR DE IDIOMA SAIU DESTA TELA DE LOGIN EM 23/09/2026 (pedido
@@ -55,6 +55,8 @@
       <button type="button" id="pgSubmit" class="pg-btn">Entrar</button>
       <p id="pgMsg" class="pg-msg"></p>
       <p class="pg-help" data-i18n="pg-help">Sem usuário ou esqueceu a senha? Fale com a direção.</p>
+      <!-- LINKS CRUZADOS DOS TRÊS LOGINS (auditoria de 30/10/2026, Onda 4): quem caiu na porta errada acha a certa aqui -->
+      <p class="pg-cross"><a href="https://portalfisk.com.br/secretaria.html" data-i18n="pg-sou-sec">Sou da secretaria</a> · <a href="https://portalfisk.com.br" data-i18n="pg-sou-aluno">Sou aluno</a></p>
     </div>
   </div>
 
@@ -595,8 +597,8 @@
   <script src="https://portalfisk.com.br/assets/equipe-cortina.js?v=2026-10-24a"></script>
   <script src="https://portalfisk.com.br/assets/frases-equipe.js?v=2026-10-27a"></script>
   
-  <script src="assets/fisk-shared.js?v=475f40b4f9"></script>
+  <script src="assets/fisk-shared.js?v=6668a3cd3e"></script>
   <script src="assets/fisk-pre-aula.js?v=43e6e651bf"></script>
-  <script src="assets/index.js?v=17b816a700"></script>
+  <script src="assets/index.js?v=77aa9e8490"></script>
 </body>
 </html>

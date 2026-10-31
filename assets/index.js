@@ -7,7 +7,7 @@
        Sem a lista do idioma (arquivo antigo em cache), fica a de português. Trocar o idioma no menu sorteia de novo. */
     window.hubFrase = function () {
       var el = document.getElementById('heroFrase'); if (!el || !window.FISK_FRASES) return;
-      var l = 'en'; try { l = typeof fiskIdioma === 'function' ? fiskIdioma() : (localStorage.getItem('fisk_lang') || 'en'); } catch (e) {}
+      var l = 'pt'; try { l = typeof fiskIdioma === 'function' ? fiskIdioma() : (localStorage.getItem('fisk_lang') || 'pt'); } catch (e) {}
       var chave = l === 'pt' || !FISK_FRASES['professor_' + l] ? 'professor' : 'professor_' + l;
       el.textContent = '✨ ' + FISK_FRASES.sorteia(chave); el.hidden = false;
     };
@@ -25,8 +25,8 @@
     ════════════════════════════════════════════════ */
     /* UMA chave só desde 09/10/2026: `fisk_lang`, lida e gravada pelo kit
        (fiskIdioma / fiskDefinirIdioma). A antiga `fisk-lang` desta página é
-       migrada lá dentro. O padrão continua inglês. */
-    let _lang = (typeof fiskIdioma === 'function') ? fiskIdioma() : 'en';
+       migrada lá dentro. O padrão é português desde 31/10/2026 (auditoria de 30/10). */
+    let _lang = (typeof fiskIdioma === 'function') ? fiskIdioma() : 'pt';
 
     const T = {
       pt: {
@@ -35,7 +35,7 @@
         'pg-tab-login':'Entrar','pg-tab-register':'Criar conta','pg-name':'Seu nome',
         'pg-name-ph':'Selecione seu nome…','pg-fullname':'Nome completo (opcional)',
         'pg-fullname-ph':'Ex.: Maria Fernanda Silva','pg-pass':'Senha','pg-pass2':'Confirmar senha',
-        'pg-help':'Sem usuário ou esqueceu a senha? Fale com a direção.','pg-logout':'Sair','pg-loading':'Carregando…','pg-loading-names':'Buscando os professores no servidor…','pg-entering':'Preparando o seu Hub…',
+        'pg-help':'Sem usuário ou esqueceu a senha? Fale com a direção.','pg-sou-sec':'Sou da secretaria','pg-sou-aluno':'Sou aluno','pg-logout':'Sair','pg-loading':'Carregando…','pg-loading-names':'Buscando os professores no servidor…','pg-entering':'Preparando o seu Hub…',
         'pg-pick-name':'Selecione seu nome.','pg-need-pass':'Digite sua senha.','pg-wait':'Aguarde…',
         'pg-short':'Senha muito curta (mínimo 4).','pg-nomatch':'As senhas não conferem.',
         'pg-err':'Erro de conexão. Tente de novo.','pg-hello':'Olá',
@@ -124,7 +124,7 @@
         'pg-tab-login':'Sign in','pg-tab-register':'Create account','pg-name':'Your name',
         'pg-name-ph':'Select your name…','pg-fullname':'Full name (optional)',
         'pg-fullname-ph':'e.g., Maria Fernanda Silva','pg-pass':'Password','pg-pass2':'Confirm password',
-        'pg-help':"No account or forgot your password? Talk to the office.",'pg-logout':'Log out','pg-loading':'Loading…','pg-loading-names':'Fetching the teachers from the server…','pg-entering':'Getting your Hub ready…',
+        'pg-help':"No account or forgot your password? Talk to the office.",'pg-sou-sec':'I work at the front office','pg-sou-aluno':'I am a student','pg-logout':'Log out','pg-loading':'Loading…','pg-loading-names':'Fetching the teachers from the server…','pg-entering':'Getting your Hub ready…',
         'pg-pick-name':'Select your name.','pg-need-pass':'Enter your password.','pg-wait':'Please wait…',
         'pg-short':'Password too short (min. 4).','pg-nomatch':"Passwords don't match.",
         'pg-err':'Connection error. Try again.','pg-hello':'Hi',
@@ -213,7 +213,7 @@
         'pg-tab-login':'Entrar','pg-tab-register':'Crear cuenta','pg-name':'Tu nombre',
         'pg-name-ph':'Selecciona tu nombre…','pg-fullname':'Nombre completo (opcional)',
         'pg-fullname-ph':'Ej.: María Fernanda Silva','pg-pass':'Contraseña','pg-pass2':'Confirmar contraseña',
-        'pg-help':'¿Sin usuario u olvidaste tu contraseña? Habla con la dirección.','pg-logout':'Salir','pg-loading':'Cargando…','pg-loading-names':'Buscando a los profesores en el servidor…','pg-entering':'Preparando tu Hub…',
+        'pg-help':'¿Sin usuario u olvidaste tu contraseña? Habla con la dirección.','pg-sou-sec':'Soy de la secretaría','pg-sou-aluno':'Soy alumno','pg-logout':'Salir','pg-loading':'Cargando…','pg-loading-names':'Buscando a los profesores en el servidor…','pg-entering':'Preparando tu Hub…',
         'pg-pick-name':'Selecciona tu nombre.','pg-need-pass':'Escribe tu contraseña.','pg-wait':'Espera…',
         'pg-short':'Contraseña muy corta (mín. 4).','pg-nomatch':'Las contraseñas no coinciden.',
         'pg-err':'Error de conexión. Inténtalo de nuevo.','pg-hello':'Hola',
@@ -572,10 +572,10 @@
          mostra o aviso e o Hub abre inteiro. Cortina que trava o professor no
          meio da aula é pior do que aviso não lido.
 
-         NOS TRÊS IDIOMAS do Hub, e não só em português: o padrão da casa é
-         INGLÊS (`fiskIdioma()`, padrão 'en'), então um aviso só em
-         português apareceria em outra língua que não a da tela para a maior
-         parte dos professores. Segue o `_lang` do momento em que abre.
+         NOS TRÊS IDIOMAS do Hub, e não só em português: o professor pode ter
+         escolhido `en` ou `es` no menu (`fiskIdioma()`; o padrão é `pt` desde
+         31/10/2026), e um aviso só em português apareceria em outra língua
+         que não a da tela. Segue o `_lang` do momento em que abre.
 
          ⚠️ A SENHA APARECE AQUI, e por isso ela não está escrita em texto no
          fonte: o Hub é servido pelo GitHub Pages e a página é pública, então
@@ -2104,7 +2104,7 @@
     PADRAO.forEach(function (sel) { entra(document.querySelector('main.grid ' + sel)); });
     if (!lista.length) { BOX.hidden = true; return; }
     BOX.hidden = false;
-    var l = typeof fiskIdioma === 'function' ? fiskIdioma() : 'en';
+    var l = typeof fiskIdioma === 'function' ? fiskIdioma() : 'pt';
     var rot = { pt: 'Ferramentas mais usadas por você', en: 'Your most used tools', es: 'Tus herramientas más usadas' }[l] || 'Your most used tools';
     BOX.innerHTML = '<span class="mu-rot">' + rot + '</span>' + lista.map(function (x) {
       return '<a class="mu-chip" href="' + x.h.replace(/"/g, '&quot;') + '">' + x.t.replace(/[<>&]/g, '') + '</a>';
@@ -2177,7 +2177,7 @@
          ['🧪 Clase de prueba', 'Cuando la secretaría agende una <b>clase de prueba</b> en uno de tus grupos, aparece aquí, en la clase del día, con el nombre y la edad de quien viene.'],
          ['↗ Pantalla completa', '¿Lo quieres más grande? Abre <b>Mi semana</b> en pantalla completa aquí.']]
   };
-  function lingua() { var l = 'en'; try { l = (typeof fiskIdioma === 'function' ? fiskIdioma() : localStorage.getItem('fisk_lang')) || 'en'; } catch (e) {} return T[l] ? l : 'en'; }
+  function lingua() { var l = 'pt'; try { l = (typeof fiskIdioma === 'function' ? fiskIdioma() : localStorage.getItem('fisk_lang')) || 'pt'; } catch (e) {} return T[l] ? l : 'pt'; }
   /* uma "sombra" na página de fora, por cima de um elemento de dentro do calendário */
   function sombra(id, alvo) {
     var f = corpo.querySelector('iframe'), velho = document.getElementById(id); if (velho) velho.remove();
@@ -2240,7 +2240,7 @@
   var TXT = { pt: { prox: 'Sua próxima aula', agora: 'Em aula agora', ate: 'até', as: 'às', em: 'em', alunos: 'alunos', depois: 'depois mais N hoje', abrir: 'Abrir na Minha aula' },
               en: { prox: 'Your next class', agora: 'In class now', ate: 'until', as: 'at', em: 'in', alunos: 'students', depois: 'N more later today', abrir: 'Open in My Class' },
               es: { prox: 'Tu próxima clase', agora: 'En clase ahora', ate: 'hasta las', as: 'a las', em: 'en', alunos: 'alumnos', depois: 'después N más hoy', abrir: 'Abrir en Mi clase' } };
-  function idioma() { try { return typeof fiskIdioma === 'function' ? fiskIdioma() : 'en'; } catch (e) { return 'en'; } }
+  function idioma() { try { return typeof fiskIdioma === 'function' ? fiskIdioma() : 'pt'; } catch (e) { return 'pt'; } }
   function sess() { try { return JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) { return null; } }
   function nP(v) { return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
   function eu(s) { if (s.master) { try { var a = JSON.parse(localStorage.getItem('fisk_actas') || 'null'); if (a && a.name) return a.name; } catch (e) {} } return s.name || ''; }

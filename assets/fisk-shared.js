@@ -631,10 +631,11 @@ var FISK_IDIOMAS = [
  * antiga apagada. Ela ganha da nova de propósito: era a da home, ou seja, a
  * língua que o professor de fato via na tela.
  *
- * O PADRÃO É `en`: é a língua em que o Hub abre para todo professor desde
- * 23/09/2026 (decisão do Pedro). Com padrão `pt`, a home mudaria de língua
- * sozinha para quem nunca escolheu nada. */
-var FISK_LANG_PADRAO = 'en';
+ * O PADRÃO VOLTOU A SER `pt` em 31/10/2026 (auditoria de 30/10, tema 8: o login
+ * estava em inglês e todas as ferramentas em português). O Hub inteiro fala
+ * português; `en` e `es` continuam no seletor do menu, e quem já escolheu
+ * mantém a escolha (a chave `fisk_lang` gravada vale antes do padrão). */
+var FISK_LANG_PADRAO = 'pt';
 function fiskIdiomaValido(l) { return l === 'pt' || l === 'en' || l === 'es'; }
 
 /** Idioma escolhido pelo professor: vale para todas as páginas. */
