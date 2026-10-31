@@ -1271,6 +1271,13 @@ function reordenaComAnimacao(a, foiAtender) {
 function sessao() { try { return JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) { return null; } }
 function token() { var s = sessao(); return (s && s.token) || ''; }
 function status(msg, err) { var el = $('status'); el.textContent = msg || ''; el.className = 'status' + (err ? ' err' : ''); el.hidden = !msg; }
+/* o mesmo status, com HTML já escapado por quem chama (a lista dos alunos sem RAF leva link) */
+function statusHtml(html, err) { var el = $('status'); el.innerHTML = html || ''; el.className = 'status' + (err ? ' err' : ''); el.hidden = !html; }
+/* O CONTADOR DE SEGUNDOS (auditoria de 30/10/2026, A6): fiskEsperando do kit no status, em toda leitura que segura a
+   tela. Um de cada vez: a espera nova encerra a anterior, e `esperaFim()` encerra no sucesso E no erro. */
+var _thEsperaFim = null;
+function espera(frases) { esperaFim(); _thEsperaFim = fiskEsperando(function (t) { status(t); }, frases); }
+function esperaFim() { if (_thEsperaFim) { _thEsperaFim(); _thEsperaFim = null; } }
 function get(params) {
   params.token = token();
   var qs = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
@@ -1381,16 +1388,27 @@ function initCascata() {
     if (pr[0] && pr[1] && pr[2]) pedida = { escola: pr[0], prof: pr[1], linha: String(pr[2]) };
     history.replaceState(null, '', location.pathname + location.search);
   }
-  var LISTA_V = 'th:lista:';
+  /* AS LISTAS GUARDADAS VALEM POR UM TEMPO (auditoria de 30/10/2026, A6): escolas e professores mudam raramente (6 h),
+     turmas um pouco mais (1 h). Fresca, a lista guardada é a lista, sem reler o card; vencida, pinta na hora e relê por
+     trás, como antes. Formato {t, v}; o formato antigo (vetor puro) conta como vencido. Sem lista guardada, o status
+     conta os segundos. */
+  var LISTA_V = 'th:lista:', LISTA_VALE = { escolas: 6 * 3600000, profs: 6 * 3600000, turmas: 3600000 };
+  var LISTA_FRASE = { escolas: 'Lendo as escolas no card…', profs: 'Lendo os professores no card…', turmas: 'Lendo as turmas no card…' };
   function lista(chave, params, campo, pinta) {
-    var guardada = null;
-    try { guardada = JSON.parse(localStorage.getItem(LISTA_V + chave) || 'null'); } catch (e) {}
-    if (guardada && guardada.length) pinta(guardada, true);
+    var guardada = null, fresca = false, tipo = chave.split(':')[0];
+    try {
+      var g = JSON.parse(localStorage.getItem(LISTA_V + chave) || 'null');
+      if (Array.isArray(g)) guardada = g;
+      else if (g && Array.isArray(g.v)) { guardada = g.v; fresca = Date.now() - (g.t || 0) < (LISTA_VALE[tipo] || 3600000); }
+    } catch (e) {}
+    if (guardada && guardada.length) { pinta(guardada, true); if (fresca) return; }
+    else espera([LISTA_FRASE[tipo] || 'Lendo o card…', 'O card está demorando, mas vem…', 'Ainda lendo o card… em dias de card lento passa de 30 s']);
     get(params).then(function (j) {
+      if (!guardada || !guardada.length) esperaFim();
       var nova = j[campo] || [];
-      try { localStorage.setItem(LISTA_V + chave, JSON.stringify(nova)); } catch (e) {}
+      try { localStorage.setItem(LISTA_V + chave, JSON.stringify({ t: Date.now(), v: nova })); } catch (e) {}
       if (!guardada || JSON.stringify(guardada) !== JSON.stringify(nova)) pinta(nova, false);
-    }).catch(function (e) { if (!guardada) erro(e); });
+    }).catch(function (e) { if (!guardada || !guardada.length) { esperaFim(); erro(e); } });
   }
   function escolhe(sel, valor) {
     if (!valor || !Array.prototype.some.call(sel.options, function (o) { return o.value === String(valor); })) return false;
@@ -1523,8 +1541,9 @@ function carregarTurma(escola, prof, linha, titulo) {
   planoTurmaDesmonta();
   estado.escola = escola; estado.prof = prof; estado.turma = titulo; estado.plantao = false; estado.prioridade = false; estado.ontem = false;
   $('alunos').innerHTML = ''; $('resumo').hidden = true; $('legenda').hidden = true;
-  status('🔄 Lendo a turma no card…');
+  esperaFim();
   if (guardado) { guardado.vivo = true; preMostraTurma(guardado, meu, escola); }
+  else espera(['Lendo a turma no card…', 'O card está demorando, mas vem…', 'Ainda lendo o card… em dias de card lento passa de 30 s']);
   /* o panorama é rota de GET no backend (doGet); por POST ele cai na guarda
      genérica de chave e volta "chave inválida" */
   get({ action: 'panoramaProf', escola: escola, prof: prof }).then(function (j) {
@@ -1532,6 +1551,7 @@ function carregarTurma(escola, prof, linha, titulo) {
     var turmaPan = (j.turmas || []).find(function (t) { return String(t.linhaTitulo) === String(linha); });
     var nomeTurma = turmaPan ? turmaPan.turma : titulo;
     var alunos = (j.alunos || []).filter(function (a) { return !a.saiu && (a.turma === nomeTurma || a.turma === titulo); });
+    esperaFim();
     if (!alunos.length) {
       if (guardado) { guardado.vivo = false; $('alunos').innerHTML = ''; $('legenda').hidden = true; preTrava(false); }
       /* turma vazia não pode deixar a anterior na tela: o "Salvar ordem" gravaria os alunos dela como roteiro desta */
@@ -1543,7 +1563,7 @@ function carregarTurma(escola, prof, linha, titulo) {
     /* com o guardado na tela, nada muda até a leitura terminar: os cartões continuam ligados aos alunos que estão ali */
     if (!guardado) {
       estado.alunos = comRaf;
-      status('🔄 ' + estado.alunos.length + ' alunos. Lendo o planner de cada um…');
+      espera([comRaf.length + ' alunos. Lendo o planner de cada um…', comRaf.length + ' alunos. O planner está demorando, mas vem…', comRaf.length + ' alunos. Ainda lendo os planners…']);
       estado.turma = nomeTurma; estado.atendidos = lerAtendidos();
       estado.capaTurma = capaDaTurma(estado.alunos);
     }
@@ -1566,6 +1586,7 @@ function carregarTurma(escola, prof, linha, titulo) {
       Promise.all(Object.keys(livros).map(function (k) { return carregaPlano(livros[k]); }))
     ]).then(function (rs) {
         if (meu !== _turmaPedido) return;
+        esperaFim();
         if (window.FiskPreAula) FiskPreAula.guarda(escola, prof, linha, { nomeTurma: nomeTurma, alunos: comRaf, semRaf: semRaf.length, dados: rs[0].alunos || {}, recursos: rs[0].recursos || [], plano: rs[1] && rs[1].plano || null });
         if (guardado) {
           preTrava(false);
@@ -1583,7 +1604,7 @@ function carregarTurma(escola, prof, linha, titulo) {
         estado.recursos = rs[0].recursos || [];
         estado.plano = rs[1] && rs[1].plano || null;
         aplicarFila();
-        status(semRaf.length ? semRaf.length + ' aluno(s) sem RAF no card ficaram de fora.' : '');
+        statusSemRaf(semRaf);
         $('legenda').hidden = false;
         pintaFila();
         juntaVisitantes();
@@ -1592,9 +1613,21 @@ function carregarTurma(escola, prof, linha, titulo) {
       });
   }).catch(function (e) {
     if (meu !== _turmaPedido) return;
+    esperaFim();
     if (guardado && !/sess[ãa]o/i.test((e && e.message) || '')) { status('⚠️ Não consegui atualizar. Isto é o que foi lido às ' + preHoraTH(guardado.t) + '.', true); return; }
     erro(e);
   });
+}
+/* QUEM FICOU DE FORA, PELO NOME (auditoria de 30/10/2026, M1): o Radar da Turma já dizia "sem RAF no card" em cada um;
+   aqui o professor só via o número e não sabia para quem pedir o RAF temporário. Cada nome leva ao RAF temporário do
+   Hub já com a busca preenchida (#q=). */
+function statusSemRaf(semRaf) {
+  if (!semRaf || !semRaf.length) { status(''); return; }
+  var itens = semRaf.map(function (a) {
+    var nome = String(a.nome || '').replace(/\s*\([^)]*\)/g, '').trim() || '(sem nome)';
+    return '<b>' + esc(nome) + '</b> <a href="raf-temporario.html#q=' + encodeURIComponent(nome) + '" target="_blank" rel="noopener">RAF temporário →</a>';
+  });
+  statusHtml('⚠️ ' + semRaf.length + (semRaf.length === 1 ? ' aluno sem RAF no card ficou de fora: ' : ' alunos sem RAF no card ficaram de fora: ') + itens.join(' · '), true);
 }
 
 /* ── OUTRO ALUNO NA TURMA (Pedro, 15/09/2026) ──

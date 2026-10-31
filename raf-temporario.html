@@ -236,6 +236,9 @@ if (!sessao().token) {
 } else {
   carregar();
   fiskRegistrarUso('RAF temporário');
+  /* a Minha aula manda o nome do aluno sem RAF em #q= (31/10/2026): a busca já vem preenchida e feita */
+  var mQ = location.hash.match(/#q=([^&]+)/);
+  if (mQ) { try { $('q').value = decodeURIComponent(mQ[1]); buscar(); } catch (e) {} history.replaceState(null, '', location.pathname + location.search); }
 }
 </script>
 </body>
