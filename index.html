@@ -81,28 +81,7 @@
     <p class="hero-frase" id="heroFrase" hidden title="Clique para outra frase" style="font-style:italic;opacity:.92;max-width:44rem;margin:.55rem auto 0;cursor:pointer;transition:opacity .3s"></p>
   </header>
 
-  <!-- resumo instantâneo das turmas do professor logado (dados do card, cache 30 min) -->
-  <section class="mini-dash" id="miniDash" hidden>
-    <a class="md-cta" href="visao-geral.html">
-      <span class="md-ic">📊</span>
-      <b data-i18n="md-title">Radar da Turma</b>
-      <span class="md-go" data-i18n="md-more">ver análise completa →</span>
-    </a>
-    <div class="md-kpis" id="mdKpis"></div>
-    <!-- Busca de aluno. Fica AQUI, e não numa ferramenta a mais na grade,
-         porque a pergunta que ela responde é de meio de aula ("o aluno fez
-         mesmo a atividade?") — tem de estar a um campo de distância, não a
-         dois cliques. Leva ao Acompanhamento do Aluno (aluno.html). -->
-    <div class="md-busca">
-      <!-- O título é o que faz a busca ser ENCONTRADA. Sem ele, o campo era
-           só uma caixa cinza no meio do painel: quem não sabia que existia
-           não descobria, e é justamente a ferramenta mais usada do Hub. -->
-      <label class="md-busca-t" for="mdQ" data-i18n="md-busca-t">🎓 Acompanhamento do Aluno</label>
-      <input id="mdQ" type="search" autocomplete="off" spellcheck="false"
-             data-i18n-ph="md-busca-ph" placeholder="🔎 Buscar aluno por nome ou RAF…">
-      <div class="md-achados" id="mdAchados" hidden></div>
-    </div>
-  </section>
+  <!-- o mini-dash do topo (resumo das turmas e busca de aluno) saiu em 31/10/2026: estava desligado desde 19/09 (B8) -->
 
   <!-- ══ A SUA CASA (campanha de 09/2026) ══════════════════════════════════
        Aparece só para quem já fez a Cerimônia, e some sozinho quando a
@@ -598,6 +577,6 @@
   
   <script src="assets/fisk-shared.js?v=48e15c5b28"></script>
   <script src="assets/fisk-pre-aula.js?v=43e6e651bf"></script>
-  <script src="assets/index.js?v=c540dfde79"></script>
+  <script src="assets/index.js?v=bbf8174810"></script>
 </body>
 </html>
