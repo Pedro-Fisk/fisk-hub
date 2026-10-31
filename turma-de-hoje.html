@@ -429,6 +429,7 @@ body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ 
      Mais leve e colorida: cada livro com a cor dele (a mesma do Modo Kids do portal), fonte maior, a aula em
      MOMENTOS e as presenças num bloco próprio. Coluna mais estreita no computador e respiro de 14px no celular. */
   body.pt-ativo main{ max-width: 1180px; margin-left: auto; margin-right: auto; }
+  #alunos.pre-velho{ opacity: .6; cursor: progress; }
   body.pt-ativo .painel, body.pt-ativo #alunos, body.pt-ativo .pt{ width: 100%; max-width: 1180px; margin-left: auto; margin-right: auto; box-sizing: border-box; }
   body.pt-ativo #resumo{ display: none !important; }
   body.pt-ativo main{ padding-left: 24px; padding-right: 24px; box-sizing: border-box; }
@@ -704,6 +705,7 @@ body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ 
 <script src="https://portalfisk.com.br/assets/checking/guia-i3.js?v=e326479afd"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="assets/fisk-shared.js?v=2026-10-30b"></script>
+<script src="assets/fisk-pre-aula.js?v=2026-10-30a"></script>
 <script>
 fiskInitThemeToggle('themeToggle');
 fiskInitUserMenu();
@@ -1488,12 +1490,38 @@ function erro(e) {
    (auditoria de 26/10/2026: trocar de turma no mesmo segundo em que a da hora abria deixava a resposta
    atrasada da primeira vencer, e os cartões da turma B saíam com o planner e a ordem da A). */
 var _turmaPedido = 0;
+/* A TURMA PRÉ-CARREGADA (30/10/2026, assets/fisk-pre-aula.js): o que a home do Hub guardou aparece na hora e a leitura de
+   sempre corre por trás. Até 5 min o professor marca normalmente; mais velho, os cartões ficam travados até atualizar. */
+var PRE_USAVEL = 5 * 60000;
+function preTrava(on) { var el = $('alunos'); if (el) el.classList.toggle('pre-velho', !!on); }
+document.addEventListener('click', function (e) {
+  if (!e.target.closest || !e.target.closest('#alunos.pre-velho')) return;
+  e.preventDefault(); e.stopPropagation(); status('🕒 Atualizando a turma… as marcas voltam em instantes.');
+}, true);
+function preHoraTH(t) { return new Date(t).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); }
+function preMostraTurma(g, meu, escola) {
+  estado.alunos = g.alunos; estado.turma = g.nomeTurma; estado.atendidos = lerAtendidos(); estado.pessoais = null;
+  estado.dados = g.dados; estado.recursos = g.recursos || []; estado.plano = g.plano || null;
+  var livros = {}; estado.alunos.forEach(function (a) { if (a.book) livros[livroId(a.book)] = a.book; });
+  estado.capaTurma = capaDaTurma(estado.alunos);
+  return Promise.all(Object.keys(livros).map(function (k) { return carregaPlano(livros[k]); })).then(function () {
+    if (meu !== _turmaPedido || !g.vivo) return;
+    _novDesde = g.t - 90000;
+    aplicarFila(); $('legenda').hidden = false; pintaFila(); juntaVisitantes(); desenharTurma();
+    planoTurmaMonta(escola, g.nomeTurma);
+    if (Date.now() - g.t > PRE_USAVEL) preTrava(true);
+    status('🕒 Lido às ' + preHoraTH(g.t) + '. Atualizando por trás…');
+  });
+}
 function carregarTurma(escola, prof, linha, titulo) {
   var meu = ++_turmaPedido;
+  preTrava(false);
+  var guardado = window.FiskPreAula ? FiskPreAula.le(escola, prof, linha) : null;
   planoTurmaDesmonta();
   estado.escola = escola; estado.prof = prof; estado.turma = titulo; estado.plantao = false; estado.prioridade = false; estado.ontem = false;
   $('alunos').innerHTML = ''; $('resumo').hidden = true; $('legenda').hidden = true;
   status('🔄 Lendo a turma no card…');
+  if (guardado) { guardado.vivo = true; preMostraTurma(guardado, meu, escola); }
   /* o panorama é rota de GET no backend (doGet); por POST ele cai na guarda
      genérica de chave e volta "chave inválida" */
   get({ action: 'panoramaProf', escola: escola, prof: prof }).then(function (j) {
@@ -1502,21 +1530,25 @@ function carregarTurma(escola, prof, linha, titulo) {
     var nomeTurma = turmaPan ? turmaPan.turma : titulo;
     var alunos = (j.alunos || []).filter(function (a) { return !a.saiu && (a.turma === nomeTurma || a.turma === titulo); });
     if (!alunos.length) {
+      if (guardado) { guardado.vivo = false; $('alunos').innerHTML = ''; $('legenda').hidden = true; preTrava(false); }
       /* turma vazia não pode deixar a anterior na tela: o "Salvar ordem" gravaria os alunos dela como roteiro desta */
       estado.alunos = []; estado.dados = {}; estado.plano = null;
       if ($('fila')) $('fila').hidden = true;
       status('Nenhum aluno ativo nesta turma no card.'); return;
     }
-    var semRaf = alunos.filter(function (a) { return !a.raf; });
-    estado.alunos = alunos.filter(function (a) { return a.raf; });
-    status('🔄 ' + estado.alunos.length + ' alunos. Lendo o planner de cada um…');
-    estado.turma = nomeTurma; estado.atendidos = lerAtendidos();
-    var livros = {}; estado.alunos.forEach(function (a) { if (a.book) livros[livroId(a.book)] = a.book; });
-    estado.capaTurma = capaDaTurma(estado.alunos);
+    var semRaf = alunos.filter(function (a) { return !a.raf; }), comRaf = alunos.filter(function (a) { return a.raf; });
+    /* com o guardado na tela, nada muda até a leitura terminar: os cartões continuam ligados aos alunos que estão ali */
+    if (!guardado) {
+      estado.alunos = comRaf;
+      status('🔄 ' + estado.alunos.length + ' alunos. Lendo o planner de cada um…');
+      estado.turma = nomeTurma; estado.atendidos = lerAtendidos();
+      estado.capaTurma = capaDaTurma(estado.alunos);
+    }
+    var livros = {}; comRaf.forEach(function (a) { if (a.book) livros[livroId(a.book)] = a.book; });
     /* telefone, aniversário e as células de avaliação (o Gerador de Boletins
        escreve lá) vêm da mesma leitura da turma que o Planejador usa; corre
        por fora e só o planner completo espera por ela */
-    estado.pessoais = null;
+    if (!guardado) estado.pessoais = null;
     get({ action: 'card', fn: 'turma', escola: escola, prof: prof, linha: linha }).then(function (j) {
       if (meu !== _turmaPedido) return;
       estado.pessoais = (j && j.alunos) || [];
@@ -1526,11 +1558,19 @@ function carregarTurma(escola, prof, linha, titulo) {
       ptDesenhaAniv();
     }).catch(function (e) { console.warn('card fn=turma', e); estado.pessoais = []; });
     return Promise.all([
-      post({ action: 'plannerTurma', alunos: estado.alunos.map(function (a) { return { raf: a.raf, book: a.book, turma: nomeTurma }; }) }),
+      post({ action: 'plannerTurma', alunos: comRaf.map(function (a) { return { raf: a.raf, book: a.book, turma: nomeTurma }; }) }),
       post({ action: 'planejamentoLe', escola: escola, prof: prof, turma: nomeTurma }).catch(function () { return { plano: null }; }),
       Promise.all(Object.keys(livros).map(function (k) { return carregaPlano(livros[k]); }))
     ]).then(function (rs) {
         if (meu !== _turmaPedido) return;
+        if (window.FiskPreAula) FiskPreAula.guarda(escola, prof, linha, { nomeTurma: nomeTurma, alunos: comRaf, semRaf: semRaf.length, dados: rs[0].alunos || {}, recursos: rs[0].recursos || [], plano: rs[1] && rs[1].plano || null });
+        if (guardado) {
+          preTrava(false);
+          /* marca a caminho ou anotação aberta: fica como está, e a atualização de 90 s traz o resto sem apagar nada */
+          if (!podeAtualizar()) { status(''); return; }
+          Object.keys(rs[0].alunos || {}).forEach(function (raf) { var d = rs[0].alunos[raf]; if (d.planner) d.planner = aplicaNotasPendentes(raf, aplicaPendentes(raf, d.planner)); });
+          estado.alunos = comRaf; estado.turma = nomeTurma; estado.atendidos = lerAtendidos(); estado.capaTurma = capaDaTurma(estado.alunos);
+        }
         /* o visitante fica na tela ao trocar de turma: o planner dele NÃO pode ser apagado pela leitura da turma nova
            (auditoria de 15/09/2026: o cartão voltava para a Introduction e a marca ia para a lição errada) */
         var antes = estado.dados || {};
@@ -1547,7 +1587,11 @@ function carregarTurma(escola, prof, linha, titulo) {
         desenharTurma();
         planoTurmaMonta(escola, nomeTurma);
       });
-  }).catch(function (e) { if (meu === _turmaPedido) erro(e); });
+  }).catch(function (e) {
+    if (meu !== _turmaPedido) return;
+    if (guardado && !/sess[ãa]o/i.test((e && e.message) || '')) { status('⚠️ Não consegui atualizar. Isto é o que foi lido às ' + preHoraTH(guardado.t) + '.', true); return; }
+    erro(e);
+  });
 }
 
 /* ── OUTRO ALUNO NA TURMA (Pedro, 15/09/2026) ──

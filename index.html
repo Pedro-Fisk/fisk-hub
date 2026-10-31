@@ -808,6 +808,7 @@
     })();
   </script>
   <script src="assets/fisk-shared.js?v=2026-10-30b"></script>
+  <script src="assets/fisk-pre-aula.js?v=2026-10-30a"></script>
   <script>
     fiskInitThemeToggle('themeToggle');
 
@@ -3409,6 +3410,7 @@
   window.pintaProxAula = pinta;
   pinta();
   setInterval(pinta, 60000);
+  if (window.FiskPreAula) FiskPreAula.comecar();
   window.addEventListener('storage', function (e) { if (e.key && e.key.indexOf('cal:') === 0) pinta(); });
 })();
 </script>
