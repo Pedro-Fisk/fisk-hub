@@ -156,6 +156,18 @@ as cores, o padrão e o brasão da casa dele, nas dezessete páginas.
   do professor segue com a versão antiga por tempo indeterminado (até 31/10/2026
   o carimbo era de data, subido à mão nas trinta e uma páginas).
 
+## A identidade do aluno vai no fragmento (31/10/2026)
+
+B1 da auditoria de 30/10: `counseling.html` recebe o aluno em `#aluno=` e
+`aluno.html` o RAF em `#raf=` (o resto, escola/prof/turma/embed, fica na
+query). Quem lê é `fiskParamUrl('raf')` do kit, fragmento primeiro e query
+depois, e ele apaga o valor da barra depois de lido. **A query continua
+aceita** para links antigos (o Painel da Direção monta `aluno.html?raf=…#dirtok=`).
+Produtores: `fiskLinkDossie`, `fiskCounselingAbrirDoc`, `fiskCounselingGaveta`,
+`fiskAcompanhamento`, `calendario.html`, `visao-geral.html`, `aluno.html`.
+⚠️ Num iframe, trocar só o fragmento NÃO recarrega a página: o `fiskGaveta_`
+recarrega à mão quando só o `#` mudou.
+
 ## O tema é UMA chave: `fisk_theme` (31/10/2026)
 
 `fisk_theme` (`dark`/`light`) é a chave que o Hub, o Portal do Aluno e a

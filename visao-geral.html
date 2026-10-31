@@ -285,7 +285,7 @@
   Ferramenta interna das escolas Fisk Taubaté · Caçapava.
 </footer>
 
-<script src="assets/fisk-shared.js?v=48e15c5b28"></script>
+<script src="assets/fisk-shared.js?v=282254175d"></script>
 <script>
 /* ============================================================
    RADAR DA TURMA (22/09/2026). Substitui a Visão Geral das Turmas,
@@ -657,7 +657,7 @@ function pinta(prof){
       (a.cons != null ? '<span title="constância" class="pill ' + (a.cons >= 70 ? 'emdia' : a.cons >= 50 ? 'media' : 'alta') + '">🧭 ' + a.cons + '%</span>' : '') +
       (ck ? '<span class="pill ' + (ck.resultado === 'estudar' ? 'media' : 'emdia') + '">' + esc(ck.licao) + (ck.resultado === 'estudar' ? ' 📚' : ' ✓') + '</span>' : '');
     if (!a.raf) return '<div class="rt-al sem"><div class="nm">' + esc(a.nome) + '</div><div class="sb">sem RAF no card</div></div>';
-    return '<a class="rt-al ac-link" href="aluno.html?raf=' + encodeURIComponent(a.raf) + '&de=radar" data-raf="' + esc(a.raf) + '" data-nome="' + esc(a.nome).replace(/"/g, '&quot;') + '" data-turma="' + esc(a.turma).replace(/"/g, '&quot;') + '">' +
+    return '<a class="rt-al ac-link" href="aluno.html?de=radar#raf=' + encodeURIComponent(a.raf) + '" data-raf="' + esc(a.raf) + '" data-nome="' + esc(a.nome).replace(/"/g, '&quot;') + '" data-turma="' + esc(a.turma).replace(/"/g, '&quot;') + '">' +
       '<div class="mini">' + radarSVG(a.eixos, { R: 44 }) + '</div>' +
       '<div class="nm">' + esc(a.nome) + '</div><div class="sb">' + esc(a.book || '') + (r && r.ultima ? ' · ' + haQuanto(r.ultima) : '') + '</div>' +
       '<div class="pills">' + (pills || '<span class="pill cinza">sem evidência ainda</span>') + '</div></a>';
@@ -696,7 +696,7 @@ function tabela(){
   }).join('') + '</tr></thead><tbody>' + ls.map(function(a){
     return '<tr>' + cols.map(function(k){
       var v = k.v(a);
-      if (k.id === 'nome') return '<td>' + (a.raf ? '<a class="ac-link" href="aluno.html?raf=' + encodeURIComponent(a.raf) + '&de=radar" data-raf="' + esc(a.raf) + '" data-nome="' + esc(a.nome).replace(/"/g, '&quot;') + '">' + esc(a.nome) + '</a>' : esc(a.nome)) + '</td>';
+      if (k.id === 'nome') return '<td>' + (a.raf ? '<a class="ac-link" href="aluno.html?de=radar#raf=' + encodeURIComponent(a.raf) + '" data-raf="' + esc(a.raf) + '" data-nome="' + esc(a.nome).replace(/"/g, '&quot;') + '">' + esc(a.nome) + '</a>' : esc(a.nome)) + '</td>';
       if (k.id === 'turma') return '<td>' + esc(v) + '</td>';
       if (k.num) {
         var pouca = EIXOS.some(function(e){ return e.id === k.id; }) && a.eixos[k.id] && a.eixos[k.id].pouca;

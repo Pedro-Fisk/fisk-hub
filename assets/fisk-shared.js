@@ -1255,10 +1255,30 @@ function fiskMesmaPessoa(nomeDaGrade, nomeDaSessao) {
   return t.indexOf(' ') < 0 && p.split(' ')[0] === t;
 }
 
-/** URL do Acompanhamento de um aluno, ou '' se ainda não sabemos o RAF dele. */
+/* ═══ A IDENTIDADE DO ALUNO VAI NO FRAGMENTO (auditoria de 30/10/2026, B1) ═══════════════════════════════════════
+ * `counseling.html?aluno=NOME` e `aluno.html?raf=1234` deixavam o nome e o RAF no histórico e no Referer. Desde
+ * 31/10/2026 os links do Hub levam `#aluno=` e `#raf=` (o que o Portal do Aluno já faz, identidade-no-fragmento), e o
+ * fragmento é apagado da barra depois de lido, como o `#dirtok=` do Painel. A QUERY CONTINUA ACEITA por um tempo:
+ * links antigos (favoritos, o Painel da Direção que monta `aluno.html?raf=…#dirtok=`) seguem abrindo.
+ *   fiskParamUrl('raf') → o valor, do fragmento ou da query, ou ''. */
+function fiskParamUrl(nome, opts) {
+  var v = '';
+  try {
+    var m = new RegExp('[#&]' + nome + '=([^&]*)').exec(location.hash || '');
+    if (m) v = decodeURIComponent(m[1].replace(/\+/g, ' '));
+    else v = new URLSearchParams(location.search).get(nome) || '';
+    if (m && !(opts && opts.manter)) {
+      var resto = (location.hash || '').replace(/^#/, '').split('&').filter(function (p) { return p && p.indexOf(nome + '=') !== 0; }).join('&');
+      history.replaceState(null, '', location.pathname + location.search + (resto ? '#' + resto : ''));
+    }
+  } catch (e) {}
+  return v;
+}
+
+/** URL do Radar de um aluno, ou '' se ainda não sabemos o RAF dele. */
 function fiskLinkDossie(idx, nome) {
   var a = idx && idx[fiskChaveAluno(nome)];
-  return a ? (fiskHubBase() + 'aluno.html?raf=' + encodeURIComponent(a.raf)) : '';
+  return a ? (fiskHubBase() + 'aluno.html#raf=' + encodeURIComponent(a.raf)) : '';
 }
 
 /** Rótulo curto do estudo em casa, para as telas que listam alunos. */
@@ -1344,7 +1364,12 @@ function fiskGaveta_(cfg) {
       if (e.key === 'Escape' && g.classList.contains('on')) fecha();
     });
   }
-  g.querySelector('.fk-gaveta-frame').src = cfg.url;
+  var fr = g.querySelector('.fk-gaveta-frame');
+  /* a identidade vai no fragmento (B1): trocar só o #raf= num iframe NÃO recarrega a página de dentro, então, se o
+     que mudou foi só o fragmento, o iframe é recarregado à mão; de about:blank (o fechar zera) carrega normal */
+  var antes = String(fr.getAttribute('src') || '').split('#')[0], depois = String(cfg.url).split('#')[0];
+  fr.src = cfg.url;
+  if (antes && antes === depois) { try { fr.contentWindow.location.reload(); } catch (e) { fr.src = 'about:blank'; setTimeout(function () { fr.src = cfg.url; }, 0); } }
   g.querySelector('.fk-gaveta-full').href = cfg.urlCheia || cfg.url;
   g.querySelector('.fk-gaveta-nome').textContent = cfg.titulo || cfg.rotulo;
   g.classList.add('on');
@@ -1467,7 +1492,7 @@ function fiskCounselingAbrirDoc(ctx) {
   var s = fiskSessao() || {};
   var turma = String(ctx.turma || '').split('\n')[0];
   var ferramenta = fiskHubBase() + 'counseling.html?escola=' + encodeURIComponent(ctx.escola || '') + '&prof=' + encodeURIComponent(ctx.professor || '') +
-    '&turma=' + encodeURIComponent(turma) + '&aluno=' + encodeURIComponent(ctx.aluno) + (ctx.estagio ? '&estagio=' + encodeURIComponent(ctx.estagio) : '');
+    '&turma=' + encodeURIComponent(turma) + (ctx.estagio ? '&estagio=' + encodeURIComponent(ctx.estagio) : '') + '#aluno=' + encodeURIComponent(ctx.aluno);   /* o nome no fragmento (B1) */
   var w = window.open('', '_blank');
   if (!w) { location.href = ferramenta; return; }   /* pop-up bloqueado: abre na própria aba */
   try {
@@ -1490,15 +1515,15 @@ function fiskCounselingGaveta(ctx) {
     '&escola=' + encodeURIComponent(ctx.escola || '') +
     '&prof=' + encodeURIComponent(ctx.professor || '') +
     '&turma=' + encodeURIComponent(String(ctx.turma || '').split('\n')[0]) +
-    '&aluno=' + encodeURIComponent(ctx.aluno) +
     (ctx.estagio ? '&estagio=' + encodeURIComponent(ctx.estagio) : '') +
     (ctx.texto ? '&texto=' + encodeURIComponent(ctx.texto) : '');
+  var frag = '#aluno=' + encodeURIComponent(ctx.aluno);   /* o nome no fragmento (B1) */
   var base = fiskHubBase() + 'counseling.html?';
   return fiskGaveta_({
     id: 'fiskCounselingGaveta', rotulo: 'E-counseling',
     titulo: '💬 ' + ctx.aluno,
-    url: base + q,
-    urlCheia: base + q.replace('embed=1&', '')
+    url: base + q + frag,
+    urlCheia: base + q.replace('embed=1&', '') + frag
   });
 }
 
@@ -1571,12 +1596,13 @@ function fiskCounselingBusca() {
 function fiskAcompanhamento(raf, opts) {
   if (!raf) return;
   opts = opts || {};
-  var url = fiskHubBase() + 'aluno.html?raf=' + encodeURIComponent(raf) + '&embed=1' +
-            (opts.turma ? '&turma=' + encodeURIComponent(opts.turma) : '');
+  var q = 'embed=1' + (opts.turma ? '&turma=' + encodeURIComponent(opts.turma) : '');
+  var frag = '#raf=' + encodeURIComponent(raf);   /* o RAF no fragmento (B1) */
+  var base = fiskHubBase() + 'aluno.html?';
   return fiskGaveta_({
     id: 'fiskAcompGaveta', rotulo: 'Radar do Aluno',   /* o mesmo nome da página e do card (auditoria de 30/10/2026, M9) */
     titulo: opts.nome || 'Radar do Aluno',
-    url: url, urlCheia: url.replace('&embed=1', '')
+    url: base + q + frag, urlCheia: base + q.replace('embed=1&', '').replace('embed=1', '') + frag
   });
 }
 
