@@ -61,7 +61,8 @@ window.FiskPreAula = (function () {
     roda(l.filter(function (t) { var i = idadeMin(t), falta = t.h.ini - min; return i === Infinity || (falta <= ANTES_MIN && i > RENOVA_MIN); }));
   }
   function comecar() {
-    setTimeout(tique, 3000); setInterval(tique, 60000);
+    setTimeout(tique, 3000);
+    if (typeof fiskPollVisivel === 'function') fiskPollVisivel(tique, 60000); else setInterval(tique, 60000);   /* só na aba visível */
     window.addEventListener('storage', function (e) { if (e.key && e.key.indexOf('cal:turmas:') === 0) tique(); });   /* a Minha semana grava as turmas num iframe */
   }
   return { le: le, guarda: guarda, limpa: limpa, comecar: comecar, tique: tique, deHoje: deHoje };

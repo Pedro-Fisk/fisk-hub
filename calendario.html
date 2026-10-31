@@ -5,11 +5,11 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Minha semana, FISK</title>
-<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-10-09c">
-<link rel="stylesheet" href="assets/casa-tema.css?v=9">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=d6b8607281">
+<link rel="stylesheet" href="assets/casa-tema.css?v=1e1bb28a31">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
-<script src="assets/fisk-shared.js?v=2026-10-30b"></script>
+<script src="assets/fisk-shared.js?v=475f40b4f9"></script>
 <style>
   :root{ --hora: 34px; --cal-linha: var(--ui-line, #dfe6ef); --cal-fundo: var(--white, #fff); --cal-hoje: #fff7e6; --agora: #e11d48; }
   body.theme-dark{ --cal-linha: #2f3a48; --cal-hoje: #2a2412; --cal-fundo: var(--white); }   /* o --white escuro mora no body, não no :root */
@@ -443,10 +443,19 @@ function carregaTurmas() {
     try { localStorage.setItem('cal:turmas:' + nP(nome), JSON.stringify({ t: dados.turmas, s: dados.semHorario })); } catch (e) {}
   });
 }
+/* O CALENDÁRIO FICA UM DIA NO APARELHO (auditoria de 30/10/2026, A4): calList por ano em hub:cal:pedag:<ano>, com dono
+   (fiskCacheLe). A home grava o mesmo cache quando a rota profHome traz o calendário; a Minha semana só pede o que
+   não tem. Os aniversariantes (todos os alunos, para a grade) ficam 30 min em hub:aniv:todos. */
+function calListAno(a) {
+  var g = fiskCacheLe('hub:cal:pedag:' + a, FISK_CACHE_DIA);
+  if (g) return Promise.resolve(g);
+  return post({ action: 'calList', publico: 'pedag', ano: String(a) }).then(function (j) { if (j && j.ok) fiskCacheGuarda('hub:cal:pedag:' + a, j.itens || []); return j.itens || []; }).catch(function () { return []; });
+}
 function carregaExtras() {
   var ano = new Date().getFullYear(), c = como();
+  var chaveAniv = 'hub:aniv:todos:' + ((c && c.name) || ''), anivG = fiskCacheLe(chaveAniv, FISK_CACHE_30MIN);
   return Promise.all([
-    Promise.all([ano, ano + 1].map(function (a) { return post({ action: 'calList', publico: 'pedag', ano: String(a) }).then(function (j) { return j.itens || []; }).catch(function () { return []; }); }))
+    Promise.all([ano, ano + 1].map(calListAno))
       .then(function (ls) {
         dados.cal = [].concat.apply([], ls);
         /* os dias sem aula ficam guardados para a faixa "Sua próxima aula" da home não anunciar aula em feriado */
@@ -457,7 +466,8 @@ function carregaExtras() {
       return post({ action: 'plantaoList', unidade: escola }).then(function (j) { return (j.itens || []).map(function (it) { it.escola = escola; return it; }); }).catch(function () { return []; });
     })).then(function (ls) { var nome = eu(); dados.lc = [].concat.apply([], ls).filter(function (it) { return mesmaPessoa(it.professor, nome); }); }),
     post(c && c.name ? { action: 'profExperimentais', prof: c.name } : { action: 'profExperimentais' }).then(function (j) { dados.exps = j.itens || []; }).catch(function () { dados.exps = []; }),
-    post(c && c.name ? { action: 'aniversariantesProf', como: c.name, todos: 1 } : { action: 'aniversariantesProf', todos: 1 }).then(function (j) { dados.anivs = j.aniversariantes || []; }).catch(function () { dados.anivs = []; })
+    anivG ? Promise.resolve(dados.anivs = anivG)
+          : post(c && c.name ? { action: 'aniversariantesProf', como: c.name, todos: 1 } : { action: 'aniversariantesProf', todos: 1 }).then(function (j) { dados.anivs = j.aniversariantes || []; if (j && j.ok) fiskCacheGuarda(chaveAniv, dados.anivs); }).catch(function () { dados.anivs = []; })
   ]);
 }
 

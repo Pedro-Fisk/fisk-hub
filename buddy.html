@@ -5,12 +5,12 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Buddy, auxiliar do professor · FISK</title>
-<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-10-09c">
-<link rel="stylesheet" href="assets/casa-tema.css?v=9">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=d6b8607281">
+<link rel="stylesheet" href="assets/casa-tema.css?v=1e1bb28a31">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
-<script src="assets/fisk-shared.js?v=2026-10-30b"></script>
-<script src="assets/buddy-conversas.js?v=2026-10-06i"></script>
+<script src="assets/fisk-shared.js?v=475f40b4f9"></script>
+<script src="assets/buddy-conversas.js?v=28a082469c"></script>
 <style>
   [hidden]{ display:none !important; }
   .hero{ padding-bottom:1.1rem; }
@@ -362,16 +362,18 @@ function bolha(html) { var d = document.createElement('div'); d.className = 'msg
 
 /* ── A JANELINHA ACOMPANHA O PROFESSOR (Pedro, 06/10/2026). A bolinha do Hub abre esta página dentro de um iframe, e
    cada página nova é um iframe novo: sem isto, trocar de tela era perder a conversa. O que foi dito fica guardado
-   nesta aba do navegador (sessionStorage) e é redesenhado ao abrir; o fio da conversa com o modelo continua no
-   servidor (6 h). Recomeça com "Nova conversa", no limite de perguntas, ou quando o servidor abre outra. ── */
+   no aparelho (localStorage com dono, fiskCacheGuarda: o Hub abre cada ferramenta em OUTRA aba, e o sessionStorage
+   é por aba, então até 31/10/2026 a janelinha abria vazia em cada ferramenta) e é redesenhado ao abrir; o fio da
+   conversa com o modelo continua no servidor (6 h). Recomeça com "Nova conversa", no limite de perguntas, ou quando
+   o servidor abre outra. ── */
 var MEM_K = 'fisk_buddy_mini', MEM = [], restaurando = false;
 function memDono() { return String(sess().token || '').slice(0, 12) + '|' + comoQuem; }
 function memSalva() {
   if (!MINI) return;
-  try { sessionStorage.setItem(MEM_K, JSON.stringify({ q: Date.now(), dono: memDono(), conversa: conversa, itens: MEM.slice(-40), turno: $('turnoTxt').textContent })); } catch (e) {}
+  fiskCacheGuarda(MEM_K, { q: Date.now(), dono: memDono(), conversa: conversa, itens: MEM.slice(-40), turno: $('turnoTxt').textContent });
 }
 function memPoe(it) { if (!MINI || restaurando) return; MEM.push(it); memSalva(); }
-function memLimpa() { MEM = []; try { sessionStorage.removeItem(MEM_K); } catch (e) {} }
+function memLimpa() { MEM = []; fiskCacheApaga(MEM_K); }
 /* o cartão foi confirmado ou cancelado: ao redesenhar, ele volta como uma linha, sem botões */
 function memFecha(conv, id, txt) {
   MEM.forEach(function (it) { if (it.t === 'props' && it.c === conv) it.l.forEach(function (p) { if (p.id && p.id === id) p._fim = txt; }); });
@@ -379,8 +381,8 @@ function memFecha(conv, id, txt) {
 }
 function memRestaura() {
   if (!MINI) return false;
-  var g = null; try { g = JSON.parse(sessionStorage.getItem(MEM_K) || 'null'); } catch (e) { g = null; }
-  if (!g || !g.itens || !g.itens.length || g.dono !== memDono() || Date.now() - g.q > 6 * 3600000) return false;
+  var g = fiskCacheLe(MEM_K, 6 * 3600000);
+  if (!g || !g.itens || !g.itens.length || g.dono !== memDono()) return false;
   restaurando = true; aberturaN++; $('chat').innerHTML = '';
   try {
     g.itens.forEach(function (it) {
@@ -1100,7 +1102,9 @@ function recusa(t, p) { fechaCortina(); $('fora').hidden = false; $('foraT').tex
   var s = sess();
   if (!s.token) return recusa('🔒 Entre no Fisk Hub primeiro', 'Volte à página inicial do Hub, entre com seu usuário e abra o Buddy de novo.');
   if (s.master) { try { comoQuem = (JSON.parse(localStorage.getItem('fisk_actas') || 'null') || {}).name || ''; } catch (e) {} }
-  post({ action: 'buddyInfo' }).then(function (j) {
+  /* a mesma resposta que a bolinha do Hub guardou (30 min, com dono): a página abre sem perguntar de novo */
+  var guardado = (typeof fiskCacheLe === 'function') ? fiskCacheLe(FISK_BUDDY_INFO_CHAVE, FISK_CACHE_30MIN) : null;
+  (guardado && guardado.info ? Promise.resolve(guardado.info) : post({ action: 'buddyInfo' }).then(function (j) { if (typeof fiskBuddyInfoGuarda === 'function') fiskBuddyInfoGuarda(j); return j; })).then(function (j) {
     if (!j || j.ok !== true) return recusa('🔒 Sessão expirada', 'Entre de novo pelo Fisk Hub.');
     info = j;
     if (!j.piloto) return recusa('🧪 O Buddy auxiliar está em piloto', 'Por enquanto ele está com poucos professores, para a gente medir como ele se sai. Em breve chega para todos.');

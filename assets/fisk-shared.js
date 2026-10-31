@@ -339,7 +339,7 @@ async function fiskWithSpinner(buttonEl, asyncFn, opts) {
  * sessionStorage. A fila de marcas não enviadas (th:fila:v1) é a exceção: com itens pendentes ela FICA, porque
  * são presenças que ainda não chegaram ao servidor e vão sozinhas quando a pessoa entrar de novo.
  * Devolve quantas marcas ficaram guardadas. */
-var FISK_PREFIXOS_LOCAIS = ['pc:', 'cal:', 'th:', 'hub:', 'tut:'];
+var FISK_PREFIXOS_LOCAIS = ['pc:', 'cal:', 'th:', 'hub:', 'tut:', 'fisk_buddy_fab', 'fisk_buddy_mini', 'fisk_buddy_aberto', 'fisk_aniv_lista'];
 var FISK_FILA_MARCAS = 'th:fila:v1';
 function fiskMarcasPendentes() {
   try { var f = JSON.parse(localStorage.getItem(FISK_FILA_MARCAS) || '[]'); return Array.isArray(f) ? f.length : 0; } catch (e) { return 0; }
@@ -361,6 +361,53 @@ function fiskLimparAoSair() {
   });
   return pendentes;
 }
+/* ══ CACHES COM VALIDADE E DONO (auditoria de 30/10/2026, A4 e A5) ═══════════════════════════════════════════════
+ * O Hub abre toda ferramenta em outra aba, e o sessionStorage é por aba: o que uma página guardava ali a próxima
+ * refazia. Tudo o que é resposta do servidor que pode ser reaproveitada mora no localStorage, no formato
+ * {t, dono, v}: `t` é quando foi guardado, `dono` são os 12 primeiros caracteres do token (outra conta no mesmo
+ * aparelho não lê o que não é dela) e `v` é o valor. `fiskCacheLe` devolve null quando venceu ou é de outro dono.
+ * As chaves entram em FISK_PREFIXOS_LOCAIS, e o "Sair" apaga. */
+function fiskDono() { var s = fiskSessao(); return s && s.token ? String(s.token).slice(0, 12) : ''; }
+function fiskCacheLe(chave, maxMs) {
+  try {
+    var g = JSON.parse(localStorage.getItem(chave) || 'null');
+    if (!g || typeof g !== 'object' || !('v' in g) || g.dono !== fiskDono()) return null;
+    if (maxMs != null && Date.now() - (g.t || 0) > maxMs) return null;
+    return g.v;
+  } catch (e) { return null; }
+}
+function fiskCacheGuarda(chave, valor) {
+  try { localStorage.setItem(chave, JSON.stringify({ t: Date.now(), dono: fiskDono(), v: valor })); } catch (e) {}   /* sem espaço: só não guarda */
+  return valor;
+}
+function fiskCacheApaga(chave) { try { localStorage.removeItem(chave); } catch (e) {} }
+var FISK_CACHE_30MIN = 30 * 60000, FISK_CACHE_DIA = 24 * 3600000;
+
+/* ══ POLLING SÓ NA ABA VISÍVEL (auditoria de 30/10/2026) ════════════════════════════════════════════════════════
+ * Troca o setInterval que fala com o backend: a aba escondida não pede nada, e ao voltar a aparecer o próximo
+ * pedido sai quando o prazo vencer (na hora, se já venceu). `fn` devolve uma promessa (ou false): rejeitada ou
+ * false, o intervalo dobra até `max` (8× por padrão); resolvida, volta ao de sempre. Devolve {parar, agora}. */
+function fiskPollVisivel(fn, ms, opts) {
+  opts = opts || {};
+  var base = ms, atual = ms, max = opts.max || ms * 8, timer = null, ultimo = Date.now(), rodando = false;
+  function agenda(d) { clearTimeout(timer); timer = setTimeout(roda, Math.max(0, d)); }
+  function roda() {
+    timer = null;
+    if (document.hidden) return;   /* escondida: dorme; o visibilitychange acorda */
+    if (rodando) { agenda(atual); return; }
+    var r; rodando = true; ultimo = Date.now();
+    try { r = fn(); } catch (e) { r = Promise.reject(e); }
+    Promise.resolve(r).then(function (ok) { atual = ok === false ? Math.min(atual * 2, max) : base; }, function () { atual = Math.min(atual * 2, max); })
+      .then(function () { rodando = false; if (!document.hidden) agenda(atual); });
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { clearTimeout(timer); timer = null; return; }
+    if (!timer && !rodando) agenda(atual - (Date.now() - ultimo));
+  });
+  agenda(atual);
+  return { parar: function () { clearTimeout(timer); timer = null; }, agora: function () { agenda(0); } };
+}
+
 /* A pergunta do "Sair", com o aviso das marcas guardadas quando há alguma. */
 function fiskPerguntaDeSaida() {
   var n = fiskMarcasPendentes();
@@ -798,17 +845,16 @@ function fiskPulso(ferramenta) {
   ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(function (ev) {
     window.addEventListener(ev, function () { ultimoToque = Date.now(); }, { passive: true });
   });
-  setInterval(function () {
+  fiskPollVisivel(function () {
     try {
-      if (document.visibilityState !== 'visible') return;
       if (Date.now() - ultimoToque > FISK_PULSO_OCIO * 60000) return;
       var s = fiskSessao();
       if (!s || !s.token) return;
-      fetch(FISK_HUB_EP, {
+      return fetch(FISK_HUB_EP, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'usoPulso', token: s.token, ferramenta: ferramenta || '' })
-      }).catch(function () {});
+      });
     } catch (e) {}
   }, FISK_PULSO_MIN * 60000);
 }
@@ -1540,28 +1586,34 @@ function fiskBuscaMeusAlunos(q) {
  * Buddy, que a janelinha oferece em "⤢ Página do Buddy".
  *
  * Só aparece para quem o servidor diz que pode usar o Buddy (`buddyInfo`), e a
- * resposta fica 30 minutos no aparelho para as outras páginas não perguntarem
- * de novo. Não aparece na própria página do Buddy, dentro de iframe (gavetas),
- * nem para quem não tem sessão.
+ * resposta fica 30 minutos no aparelho (localStorage, com dono: fiskCacheLe) para
+ * as outras páginas e as outras abas não perguntarem de novo; a página do Buddy
+ * lê o mesmo cache. Na home a resposta vem dentro do `profHome` (window.__fiskProfHome):
+ * se esse pedido está no ar, espera por ele em vez de perguntar de novo. Não aparece
+ * na própria página do Buddy, dentro de iframe (gavetas), nem para quem não tem sessão.
  * ═══════════════════════════════════════════════════════════════════════════ */
+var FISK_BUDDY_INFO_CHAVE = 'fisk_buddy_fab', FISK_ANIV_LISTA_CHAVE = 'fisk_aniv_lista';
+/* guarda a resposta do buddyInfo (a mesma para a bolinha e para a página do Buddy) e devolve {ok, q, info} */
+function fiskBuddyInfoGuarda(j) {
+  var g = { ok: !!(j && j.ok === true && j.piloto && j.chave), q: Date.now(), info: (j && j.ok === true) ? j : null };
+  fiskCacheGuarda(FISK_BUDDY_INFO_CHAVE, g);   /* o "não pode" também fica, por 5 min (quem lê decide) */
+  return g;
+}
 (function () {
   if (window.parent !== window) return;
   if (/buddy(-ajustes)?\.html/.test(location.pathname)) return;
   var s = (typeof fiskSessao === 'function') ? fiskSessao() : null;
   if (!s || !s.token) return;
-  var CHAVE = 'fisk_buddy_fab:' + String(s.token).slice(0, 12);
   function pode() {
-    try {
-      var g = JSON.parse(sessionStorage.getItem(CHAVE) || 'null');
-      /* o "pode" vale 30 min; o "não pode" só 5, para a abertura com hora marcada chegar logo a quem já estava no Hub */
-      if (g && Date.now() - g.q < (g.ok ? 30 : 5) * 60000) return Promise.resolve(!!g.ok);
-    } catch (e) {}
-    return fetch(FISK_HUB_EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'buddyInfo', token: s.token }) })
-      .then(fiskJson).then(function (j) {
-        var ok = !!(j && j.ok === true && j.piloto && j.chave);
-        try { sessionStorage.setItem(CHAVE, JSON.stringify({ ok: ok, q: Date.now() })); } catch (e) {}
-        return ok;
-      }).catch(function () { return false; });
+    /* o "pode" vale 30 min; o "não pode" só 5, para a abertura com hora marcada chegar logo a quem já estava no Hub */
+    var g = fiskCacheLe(FISK_BUDDY_INFO_CHAVE, FISK_CACHE_30MIN);
+    if (g && (g.ok || Date.now() - g.q < 5 * 60000)) return Promise.resolve(!!g.ok);
+    var pedido = window.__fiskProfHome
+      ? window.__fiskProfHome.then(function (r) { if (r && r.buddy && r.buddy.ok === true) return r.buddy; throw new Error('sem buddy no profHome'); })
+      : Promise.reject();
+    return pedido.catch(function () {
+      return fetch(FISK_HUB_EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'buddyInfo', token: s.token }) }).then(fiskJson);
+    }).then(function (j) { return fiskBuddyInfoGuarda(j).ok; }).catch(function () { return false; });
   }
   function monta() {
     if (document.getElementById('fkBuddyFab')) return;
@@ -1591,7 +1643,7 @@ function fiskBuscaMeusAlunos(q) {
     function abre(sim) {
       document.body.classList.toggle('fk-buddy-aberto', !!sim);
       /* aberta numa página, aberta na próxima: quem está conversando não precisa reabrir a cada tela */
-      try { if (sim) sessionStorage.setItem('fisk_buddy_aberto', '1'); else sessionStorage.removeItem('fisk_buddy_aberto'); } catch (e) {}
+      if (sim) fiskCacheGuarda('fisk_buddy_aberto', 1); else fiskCacheApaga('fisk_buddy_aberto');
       if (!sim || fr) return;
       fr = document.createElement('iframe'); fr.title = 'Buddy, auxiliar do professor'; fr.allow = 'microphone';
       fr.src = base + 'buddy.html?mini=1'; jan.appendChild(fr);
@@ -1599,7 +1651,7 @@ function fiskBuscaMeusAlunos(q) {
     bt.addEventListener('click', function () { abre(!document.body.classList.contains('fk-buddy-aberto')); });
     window.addEventListener('message', function (e) { if (e.data && e.data.fiskBuddy === 'fecha') abre(false); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && document.body.classList.contains('fk-buddy-aberto')) abre(false); });
-    try { if (sessionStorage.getItem('fisk_buddy_aberto') === '1') abre(true); } catch (e) {}
+    if (fiskCacheLe('fisk_buddy_aberto', 6 * 3600000)) abre(true);   /* aberta numa ferramenta, aberta na próxima (6 h, o fio da conversa no servidor) */
     balaoAniversario(bt, abre);
   }
   /* O URSO AVISA DOS ANIVERSÁRIOS (Pedro, 23/10/2026): um balão saindo da bolinha, uma vez por dia, com os alunos do
@@ -1609,10 +1661,13 @@ function fiskBuscaMeusAlunos(q) {
     var hoje = new Date(), dia = hoje.getFullYear() + '-' + (hoje.getMonth() + 1) + '-' + hoje.getDate();
     var CH = 'fisk_aniv_balao:' + dia + ':' + String(s.token).slice(0, 12);
     try { if (localStorage.getItem(CH) === '1') return; } catch (e) {}
-    var CC = 'fisk_aniv_lista:' + String(s.token).slice(0, 12), lista = null;
-    try { var g = JSON.parse(sessionStorage.getItem(CC) || 'null'); if (g && Date.now() - g.q < 30 * 60000) lista = g.l; } catch (e) {}
-    var pega = lista ? Promise.resolve(lista) : fetch(FISK_HUB_EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'aniversariantesProf', token: s.token }) })
-      .then(fiskJson).then(function (j) { var l = (j && j.ok && j.aniversariantes) || []; try { sessionStorage.setItem(CC, JSON.stringify({ q: Date.now(), l: l })); } catch (e) {} return l; }).catch(function () { return []; });
+    var lista = fiskCacheLe(FISK_ANIV_LISTA_CHAVE, FISK_CACHE_30MIN);
+    var doHome = window.__fiskProfHome
+      ? window.__fiskProfHome.then(function (r) { if (r && r.aniversariantes && r.aniversariantes.ok) return r.aniversariantes; throw new Error('sem aniversariantes no profHome'); })
+      : Promise.reject();
+    var pega = lista ? Promise.resolve(lista) : doHome.catch(function () {
+      return fetch(FISK_HUB_EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'aniversariantesProf', token: s.token }) }).then(fiskJson);
+    }).then(function (j) { var l = (j && j.ok && j.aniversariantes) || []; if (j && j.ok) fiskCacheGuarda(FISK_ANIV_LISTA_CHAVE, l); return l; }).catch(function () { return []; });
     pega.then(function (l) {
       if (!l || !l.length || document.getElementById('fkAnivBalao')) return;
       var dd = function (a) { return ('0' + a.dia).slice(-2) + '/' + ('0' + a.mes).slice(-2); };
