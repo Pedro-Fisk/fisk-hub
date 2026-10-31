@@ -23,6 +23,7 @@
   body.theme-light .tn-box{ box-shadow:0 18px 60px rgba(0,0,0,.3) } body.theme-light #pw-gate{ background:var(--tn-bg) }
   body.theme-light .tn-bar .theme-toggle:hover{ color:#161414 } body.theme-light .tn-close:hover{ color:#161414 } body.theme-light .tn-back:hover{ color:#161414 }
   body.theme-light .pw-out:hover{ color:#161414 }
+  body.theme-light .tn-logo{ color:#161414 } body.theme-light .tn-play{ color:#161414 }
   /* Página escura por padrão, no estilo da plataforma FISK EXPO; clara só para quem escolheu o modo claro no Hub. */
   *{box-sizing:border-box}
   body{margin:0;min-height:100vh;background:var(--tn-bg);color:var(--tn-txt);font-family:'Nunito',system-ui,sans-serif;display:flex;flex-direction:column}
@@ -471,6 +472,10 @@ var TN_EP='https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOm
    body.theme-light quando ela vale "light". */
 (function () {
   var b = document.getElementById('themeToggle'); if (!b) return;
+  /* A CHAVE SÓ É GRAVADA QUANDO O PROFESSOR ESCOLHE O CLARO: esta página é escura sem escolha, e gravar "dark" ao
+     voltar ao escuro escureceria o Hub inteiro de quem nunca tinha escolhido tema. Voltar ao escuro apaga a chave se
+     ela não existia ao abrir; quem já tinha preferência gravada continua mudando o resto do Hub junto. */
+  var tinhaChave = false; try { tinhaChave = localStorage.getItem('fisk_theme') !== null; } catch (e) {}
   function pinta() {
     var claro = document.body.classList.contains('theme-light');
     b.textContent = claro ? '🌙' : '☀️';
@@ -480,7 +485,11 @@ var TN_EP='https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOm
   b.addEventListener('click', function () {
     var claro = !document.body.classList.contains('theme-light');
     document.body.classList.toggle('theme-light', claro);
-    try { localStorage.setItem('fisk_theme', claro ? 'light' : 'dark'); } catch (e) {}
+    try {
+      if (claro) { localStorage.setItem('fisk_theme', 'light'); tinhaChave = true; }
+      else if (tinhaChave) localStorage.setItem('fisk_theme', 'dark');
+      else localStorage.removeItem('fisk_theme');
+    } catch (e) {}
     pinta();
   });
 })();
