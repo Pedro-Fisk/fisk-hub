@@ -26,10 +26,16 @@
   .topo a.inicio img { height: 22px; width: auto; display: block; }
   .topo a.inicio:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
   .status { padding: 12px 16px; color: #54648d; font-weight: 700; } .status.err { color: #b91c1c; }
+  /* MODO ESCURO (31/10/2026): a mesma chave fisk_theme das outras telas. O corpo vem do planner-v2.js do portal e
+     pinta com as cores dele; aqui escurecem a página, a barra e o status, para a abertura não piscar claro. */
+  body.theme-dark { background: #121212; color: #eef1f7; }
+  body.theme-dark .topo { background: #0f2260; }
+  body.theme-dark .status { color: #aab4c8; } body.theme-dark .status.err { color: #f5a3a3; }
   @media print { .topo { display: none; } body { background: #fff; } }
 </style>
 </head>
 <body>
+<script>/* o tema salvo (fisk_theme, a mesma chave do Portal e da Secretaria) antes da 1ª pintura: sem piscar claro (auditoria de 30/10/2026, M11) */try{var _t=localStorage.getItem("fisk_theme");if(_t==="dark"||(!_t&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches))document.body.classList.add("theme-dark");}catch(e){}</script>
 <div class="topo"><a class="voltar" href="turma-de-hoje.html" id="voltar">← Minha aula</a><a class="inicio" href="index.html" title="Fisk Hub" aria-label="Voltar ao Fisk Hub"><img src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava"></a><h1>🦅 Plano de curso</h1><span class="sub" id="quem"></span></div>
 <div class="status" id="status">Lendo o planner…</div>
 <div id="corpo"></div>

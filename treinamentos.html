@@ -11,11 +11,23 @@
 <meta name="theme-color" content="#14181b">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <style>
-  /* Página sempre escura, no estilo da plataforma FISK EXPO. */
+  /* A PALETA EM VARIÁVEIS (31/10/2026): a página continua escura por padrão (o estilo da FISK EXPO, decisão de
+     26/10), mas segue a MESMA chave de tema das outras telas, fisk_theme: quem escolheu o modo claro no Hub vê a
+     variante clara aqui também (body.theme-light), e o 🌙 da barra grava a mesma chave. */
+  :root{ --tn-bg:#14181b; --tn-bar:#191e22; --tn-card:#22282d; --tn-foot:#23292e; --tn-chip:#31383e; --tn-line:#313a41;
+    --tn-txt:#f2efef; --tn-txt2:#e8edf0; --tn-mut:#c9d2d8; --tn-dim:#8b969e; --tn-dim2:#a8b3bb; --tn-foot-txt:#77828a; --tn-arrow:rgba(20,24,27,.85); }
+  body.theme-light{ --tn-bg:#f4f6f8; --tn-bar:#ffffff; --tn-card:#ffffff; --tn-foot:#f1f3f5; --tn-chip:#e6eaee; --tn-line:#d6dce2;
+    --tn-txt:#161414; --tn-txt2:#222; --tn-mut:#4b5563; --tn-dim:#6b7280; --tn-dim2:#6b7280; --tn-foot-txt:#6b7280; --tn-arrow:rgba(255,255,255,.9); }
+  body.theme-light .tn-bar{ box-shadow:0 2px 12px rgba(0,0,0,.08) } body.theme-light .tn-card:hover{ box-shadow:0 10px 26px rgba(0,0,0,.15) }
+  body.theme-light .tn-arrow{ color:#161414; box-shadow:0 2px 10px rgba(0,0,0,.2) } body.theme-light .tn-arrow:hover{ color:#fff }
+  body.theme-light .tn-box{ box-shadow:0 18px 60px rgba(0,0,0,.3) } body.theme-light #pw-gate{ background:var(--tn-bg) }
+  body.theme-light .tn-bar .theme-toggle:hover{ color:#161414 } body.theme-light .tn-close:hover{ color:#161414 } body.theme-light .tn-back:hover{ color:#161414 }
+  body.theme-light .pw-out:hover{ color:#161414 }
+  /* Página escura por padrão, no estilo da plataforma FISK EXPO; clara só para quem escolheu o modo claro no Hub. */
   *{box-sizing:border-box}
-  body{margin:0;min-height:100vh;background:#14181b;color:#f2efef;font-family:'Nunito',system-ui,sans-serif;display:flex;flex-direction:column}
+  body{margin:0;min-height:100vh;background:var(--tn-bg);color:var(--tn-txt);font-family:'Nunito',system-ui,sans-serif;display:flex;flex-direction:column}
 
-  .tn-bar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:18px;padding:14px 28px;background:#191e22;box-shadow:0 2px 12px rgba(0,0,0,.4)}
+  .tn-bar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:18px;padding:14px 28px;background:var(--tn-bar);box-shadow:0 2px 12px rgba(0,0,0,.4)}
   /* O LOGO DA FISK, EM IMAGEM, É A HOME (09/10/2026): o mesmo de todas as
      páginas do Hub. O letreiro ao lado é só o título desta tela. */
   .tn-home{flex:none;display:block;line-height:0;border-radius:6px}
@@ -24,39 +36,39 @@
   .tn-home:focus-visible{outline:2px solid #fff;outline-offset:3px}
   .tn-logo{font-family:'Poppins';font-weight:800;font-size:19px;letter-spacing:.5px;color:#fff;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
   .tn-search{flex:1;max-width:340px;margin-left:auto;position:relative}
-  .tn-search input{width:100%;background:#22282d;border:1.5px solid #313a41;border-radius:999px;padding:9px 16px 9px 38px;color:#f2efef;font-family:inherit;font-size:14px;outline:none}
+  .tn-search input{width:100%;background:var(--tn-card);border:1.5px solid var(--tn-line);border-radius:999px;padding:9px 16px 9px 38px;color:var(--tn-txt);font-family:inherit;font-size:14px;outline:none}
   .tn-search input:focus{border-color:#d81f26}
-  .tn-search input::placeholder{color:#8b969e}
-  .tn-search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:#8b969e}
-  .tn-back{flex:none;color:#c9d2d8;text-decoration:none;font-size:13.5px;font-weight:700;white-space:nowrap}
+  .tn-search input::placeholder{color:var(--tn-dim)}
+  .tn-search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--tn-dim)}
+  .tn-back{flex:none;color:var(--tn-mut);text-decoration:none;font-size:13.5px;font-weight:700;white-space:nowrap}
   .tn-back:hover{color:#fff}
   /* o .theme-toggle compartilhado é absoluto (nasceu para o hero); aqui ele
      entra no fluxo da barra, no canto direito. O voltar fica à ESQUERDA,
      como em todas as páginas. */
   .tn-bar .theme-toggle{position:static;flex:none;width:34px;height:34px;font-size:16px;
     display:inline-flex;align-items:center;justify-content:center;padding:0;cursor:pointer;
-    background:transparent;border:1.5px solid #313a41;border-radius:999px;color:#c9d2d8}
+    background:transparent;border:1.5px solid var(--tn-line);border-radius:999px;color:var(--tn-mut)}
   .tn-bar .theme-toggle:hover{color:#fff;border-color:#5a6870}
 
   main{flex:1;padding:26px 0 46px}
   .tn-row{margin:0 0 34px}
-  .tn-row h2{font-family:'Poppins';font-weight:700;font-size:16px;margin:0 0 12px;padding:0 28px;color:#e8edf0}
+  .tn-row h2{font-family:'Poppins';font-weight:700;font-size:16px;margin:0 0 12px;padding:0 28px;color:var(--tn-txt2)}
   .tn-strip{position:relative}
   .tn-scroller{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x proximity;padding:4px 28px 14px;scrollbar-width:none}
   .tn-scroller::-webkit-scrollbar{display:none}
 
-  .tn-card{flex:0 0 300px;scroll-snap-align:start;border-radius:12px;overflow:hidden;background:#22282d;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease;border:none;padding:0;text-align:left;color:inherit;font-family:inherit}
+  .tn-card{flex:0 0 300px;scroll-snap-align:start;border-radius:12px;overflow:hidden;background:var(--tn-card);cursor:pointer;transition:transform .15s ease,box-shadow .15s ease;border:none;padding:0;text-align:left;color:inherit;font-family:inherit}
   .tn-card:hover{transform:translateY(-3px) scale(1.015);box-shadow:0 10px 26px rgba(0,0,0,.45)}
   .tn-thumb{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;padding:16px}
   .tn-thumb b{font-family:'Poppins';font-style:italic;font-weight:900;font-size:19px;line-height:1.25;text-transform:uppercase;color:#fff;text-align:center;transform:rotate(-4deg);text-shadow:2.5px 2.5px 0 rgba(0,0,0,.35),0 0 18px rgba(255,255,255,.25)}
-  .tn-foot{display:flex;align-items:center;gap:10px;padding:11px 14px;background:#23292e}
+  .tn-foot{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--tn-foot)}
   .tn-play{width:30px;height:30px;border-radius:50%;background:transparent;border:none;color:#fff;display:flex;align-items:center;justify-content:center;flex:none;padding:0}
   .tn-play svg{width:20px;height:20px}
-  .tn-chip{margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;letter-spacing:.5px;color:#e8edf0;background:#31383e;border-radius:6px;padding:4px 9px}
+  .tn-chip{margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;letter-spacing:.5px;color:var(--tn-txt2);background:var(--tn-chip);border-radius:6px;padding:4px 9px}
   .tn-chip svg{width:12px;height:12px}
   /* a data da reunião fica colada no play, não no canto: quem procura uma
      gravação procura pela data, então ela vem antes dos selos de material */
-  .tn-chip.data{margin-left:0;background:transparent;color:#a8b3bb;padding:4px 0;letter-spacing:.02em}
+  .tn-chip.data{margin-left:0;background:transparent;color:var(--tn-dim2);padding:4px 0;letter-spacing:.02em}
 
   /* gradientes dos cards (rotação por item, como na EXPO) */
   .g0{background:linear-gradient(120deg,#b3002d,#f5772b)}
@@ -66,26 +78,26 @@
   .g4{background:linear-gradient(120deg,#c40e46,#8a3ce0)}
   .g5{background:linear-gradient(120deg,#d81f26,#f7b32b)}
 
-  .tn-arrow{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;border:none;background:rgba(20,24,27,.85);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;box-shadow:0 2px 10px rgba(0,0,0,.5)}
+  .tn-arrow{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;border:none;background:var(--tn-arrow);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;box-shadow:0 2px 10px rgba(0,0,0,.5)}
   .tn-arrow:hover{background:#d81f26}
   .tn-arrow svg{width:20px;height:20px}
   .tn-prev{left:8px}
   .tn-next{right:8px}
   .tn-arrow[hidden]{display:none}
 
-  .tn-empty{padding:40px 28px;color:#8b969e;font-size:15px;display:none}
-  .tn-carregando{padding:0 28px 10px;color:#8b969e;font-size:13px}
+  .tn-empty{padding:40px 28px;color:var(--tn-dim);font-size:15px;display:none}
+  .tn-carregando{padding:0 28px 10px;color:var(--tn-dim);font-size:13px}
   @media (max-width:640px){ .tn-carregando{padding:0 14px 10px} }
 
   /* player */
   .tn-modal{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.82);align-items:center;justify-content:center;padding:24px}
   .tn-modal.open{display:flex}
-  .tn-box{width:min(960px,96vw);background:#191e22;border-radius:14px;overflow:hidden;box-shadow:0 18px 60px rgba(0,0,0,.6)}
+  .tn-box{width:min(960px,96vw);background:var(--tn-bar);border-radius:14px;overflow:hidden;box-shadow:0 18px 60px rgba(0,0,0,.6)}
   .tn-box-head{display:flex;align-items:center;gap:12px;padding:13px 18px}
-  .tn-box-head h3{margin:0;font-family:'Poppins';font-weight:700;font-size:15px;flex:1;color:#f2efef}
-  .tn-box-head a{color:#e8edf0;font-size:12.5px;font-weight:800;text-decoration:none;background:#31383e;border-radius:6px;padding:5px 11px}
+  .tn-box-head h3{margin:0;font-family:'Poppins';font-weight:700;font-size:15px;flex:1;color:var(--tn-txt)}
+  .tn-box-head a{color:var(--tn-txt2);font-size:12.5px;font-weight:800;text-decoration:none;background:var(--tn-chip);border-radius:6px;padding:5px 11px}
   .tn-box-head a:hover{background:#d81f26}
-  .tn-close{background:none;border:none;color:#c9d2d8;font-size:22px;cursor:pointer;padding:2px 6px;line-height:1}
+  .tn-close{background:none;border:none;color:var(--tn-mut);font-size:22px;cursor:pointer;padding:2px 6px;line-height:1}
   .tn-close:hover{color:#fff}
   .tn-stage{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:#000}
   .tn-env{position:absolute;inset:0}
@@ -101,7 +113,7 @@
   .tn-stage.drv-cel{aspect-ratio:4/3}
   .tn-stage.drv-cel .tn-env{inset:auto;left:0;top:0;width:768px;height:576px;transform-origin:0 0}
 
-  footer{text-align:center;padding:1.4rem 1.5rem;color:#77828a;font-size:.78rem}
+  footer{text-align:center;padding:1.4rem 1.5rem;color:var(--tn-foot-txt);font-size:.78rem}
   footer p{margin:0 auto;max-width:720px;line-height:1.5}
 
   @media (max-width:640px){
@@ -116,18 +128,18 @@
   }
 
   /* ── Gate: login do professor ── */
-  #pw-gate{position:fixed;inset:0;z-index:200;background:#14181b;display:flex;align-items:center;justify-content:center;padding:1.5rem}
+  #pw-gate{position:fixed;inset:0;z-index:200;background:var(--tn-bg);display:flex;align-items:center;justify-content:center;padding:1.5rem}
   #pw-gate.hidden{display:none}
-  .pw-box{background:#191e22;border-radius:16px;padding:2.5rem 2rem;width:min(380px,100%);box-shadow:0 18px 60px rgba(0,0,0,.6);text-align:center}
+  .pw-box{background:var(--tn-bar);border-radius:16px;padding:2.5rem 2rem;width:min(380px,100%);box-shadow:0 18px 60px rgba(0,0,0,.6);text-align:center}
   .pw-fisk{height:46px;width:auto;display:block;margin:0 auto .5rem}
   .pw-logo{font-family:'Poppins';font-weight:800;font-size:1.5rem;color:#fff;margin-bottom:.25rem}.pw-logo span{color:#d81f26}
-  .pw-sub{color:#8b969e;font-size:.88rem;margin-bottom:1.6rem}
-  .pw-field{width:100%;background:#22282d;border:1.5px solid #313a41;border-radius:10px;padding:.85rem 1.1rem;color:#f2efef;font-family:inherit;font-size:1rem;outline:none;text-align:center;letter-spacing:.08em;transition:border-color .15s}
+  .pw-sub{color:var(--tn-dim);font-size:.88rem;margin-bottom:1.6rem}
+  .pw-field{width:100%;background:var(--tn-card);border:1.5px solid var(--tn-line);border-radius:10px;padding:.85rem 1.1rem;color:var(--tn-txt);font-family:inherit;font-size:1rem;outline:none;text-align:center;letter-spacing:.08em;transition:border-color .15s}
   /* o nome é escolhido numa lista, não digitado: é a mesma porta do Hub, e
      assim ninguém erra a grafia do próprio nome de acesso */
   select.pw-field{letter-spacing:normal;margin-bottom:.7rem;cursor:pointer;
     appearance:none;-webkit-appearance:none;text-align-last:center}
-  select.pw-field option{background:#22282d;color:#f2efef}
+  select.pw-field option{background:var(--tn-card);color:var(--tn-txt)}
   .pw-field:focus{border-color:#d81f26}
   .pw-field.shake{animation:shake .35s ease}
   @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
@@ -135,11 +147,12 @@
   .pw-btn:hover{background:#b81920}
   .pw-err{color:#f87171;font-size:.82rem;margin-top:.65rem;min-height:1.1rem}
   /* a saída da porteira: quem chegou sem sessão e não vai entrar volta ao Hub */
-  .pw-out{display:inline-block;margin-top:.6rem;color:#c9d2d8;font-size:.88rem;font-weight:700;text-decoration:none}
+  .pw-out{display:inline-block;margin-top:.6rem;color:var(--tn-mut);font-size:.88rem;font-weight:700;text-decoration:none}
   .pw-out:hover{color:#fff;text-decoration:underline}
 </style>
 </head>
 <body>
+<script>/* o tema (fisk_theme, a mesma chave do Hub) antes da 1ª pintura: escura por padrão, clara só por escolha */try{if(localStorage.getItem("fisk_theme")==="light")document.body.classList.add("theme-light");}catch(e){}</script>
 
   <div id="pw-gate">
     <div class="pw-box">
@@ -162,7 +175,8 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
       <input type="search" id="tnSearch" placeholder="Pesquisar treinamento">
     </div>
-    <!-- o 🌙 saiu em 26/10/2026: esta página é sempre escura e o botão não fazia nada -->
+    <!-- o 🌙 voltou em 31/10/2026: alterna a variante clara/escura pela mesma chave fisk_theme das outras telas -->
+    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo claro" title="Alternar modo claro">☀️</button>
   </nav>
 
   <main id="tnMain"></main>
@@ -445,6 +459,25 @@ var TN_EP='https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOm
 </script>
 <!-- registro de uso (painel da direção): esta página não carregava o kit
      compartilhado, então era a única ferramenta do Hub invisível no log -->
-<script>fiskInitThemeToggle('themeToggle'); fiskRegistrarUso("Treinamentos", "treinamentos");</script>
+<script>
+/* O TEMA DESTA PÁGINA é o inverso das outras: escura por padrão, clara só por escolha. Por isso o botão não usa o
+   fiskInitThemeToggle (que começa claro e liga body.theme-dark): lê e grava a MESMA chave fisk_theme, e pinta
+   body.theme-light quando ela vale "light". */
+(function () {
+  var b = document.getElementById('themeToggle'); if (!b) return;
+  function pinta() {
+    var claro = document.body.classList.contains('theme-light');
+    b.textContent = claro ? '🌙' : '☀️';
+    b.setAttribute('aria-label', claro ? 'Alternar modo escuro' : 'Alternar modo claro'); b.title = b.getAttribute('aria-label');
+  }
+  pinta();
+  b.addEventListener('click', function () {
+    var claro = !document.body.classList.contains('theme-light');
+    document.body.classList.toggle('theme-light', claro);
+    try { localStorage.setItem('fisk_theme', claro ? 'light' : 'dark'); } catch (e) {}
+    pinta();
+  });
+})();
+fiskRegistrarUso("Treinamentos", "treinamentos");</script>
 </body>
 </html>

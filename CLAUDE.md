@@ -156,6 +156,17 @@ as cores, o padrão e o brasão da casa dele, nas dezessete páginas.
   do professor segue com a versão antiga por tempo indeterminado (até 31/10/2026
   o carimbo era de data, subido à mão nas trinta e uma páginas).
 
+## O tema é UMA chave: `fisk_theme` (31/10/2026)
+
+`fisk_theme` (`dark`/`light`) é a chave que o Hub, o Portal do Aluno e a
+Secretaria leem, e é a única: `hw_tema` é outra coisa (as cores da casa). O
+`fiskInitThemeToggle` grava e lê; toda página de cara própria carrega a linha
+de pré-pintura logo depois do `<body>` (tema salvo, ou a preferência do
+sistema quando nada foi salvo), senão pisca clara no modo escuro (M11 da
+auditoria de 30/10). `treinamentos.html` é a exceção de desenho: escura por
+padrão (FISK EXPO) e clara só com `fisk_theme = light`, pela mesma chave.
+Página nova sem dark mode: variáveis próprias e um bloco `body.theme-dark`.
+
 ## Um nome por ferramenta, um id por ferramenta (31/10/2026)
 
 Auditoria de 30/10 (M8, M9, B7): a tutoria tinha quatro nomes e o painel de uso

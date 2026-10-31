@@ -56,6 +56,10 @@
   .bt.sorte{background:var(--ui-soft);color:var(--ink)}
   .estado{font-weight:700;font-size:.86rem;color:var(--soft)}
   .estado.ok{color:#14794a}
+  /* MODO ESCURO (31/10/2026): a mesma chave fisk_theme das outras telas; as variáveis trocam, o resto segue */
+  body.theme-dark{--bg:#121212;--card:#1c1a1a;--ink:#eef1f7;--soft:#aab4c8;--ui-soft:#262f3a;--ui-line:#3a4660}
+  body.theme-dark .op{background:#262323;color:var(--ink)}
+  body.theme-dark .op[aria-pressed="true"]{background:var(--ui);color:#fff}
   @media (max-width:860px){
     .grade{grid-template-columns:1fr}
     /* no celular o palco fica preso no topo: quem rola pelas opções continua vendo o boneco mudar */
@@ -65,6 +69,7 @@
 </style>
 </head>
 <body>
+<script>/* o tema salvo (fisk_theme, a mesma chave do Portal e da Secretaria) antes da 1ª pintura: sem piscar claro (auditoria de 30/10/2026, M11) */try{var _t=localStorage.getItem("fisk_theme");if(_t==="dark"||(!_t&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches))document.body.classList.add("theme-dark");}catch(e){}</script>
 <header class="topo">
   <a class="volta" href="index.html" data-t="voltar">← Hub</a>
   <a href="index.html" style="line-height:0"><img src="https://portalfisk.com.br/worlds/img/fisk-logo-branco.png" alt="Fisk"></a>
