@@ -1240,6 +1240,21 @@ function fiskAlunosDoProf() {
   return _fiskAlunos;
 }
 
+/* ═══ "ESTA PESSOA DA GRADE É QUEM ESTÁ LOGADO?" (auditoria de 30/10/2026, M15) ═══════════════════════════════════
+ * A Minha aula, a Minha semana e os Horários do Centro de Estudos tinham cada um a sua régua para dizer se o nome
+ * escrito na grade de monitores ("Prof. Nicole", "Teacher Carlos", "Nicole") é o professor da sessão ("NICOLE",
+ * "CARLOS ALBERTO DA SILVA"). Três cópias discordavam sobre quais plantões eram dele. Fica UMA:
+ *   fiskMesmaPessoa(nomeDaGrade, nomeDaSessao) → true quando é a mesma pessoa.
+ * Regras: sem acento, sem "Prof./Professora/Teacher", maiúsculas; iguais, ou um começa com o outro mais espaço, ou
+ * a grade traz só o primeiro nome e ele bate com o primeiro da sessão. */
+function fiskNormPessoa(v) { return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
+function fiskMesmaPessoa(nomeDaGrade, nomeDaSessao) {
+  var t = fiskNormPessoa(nomeDaGrade).replace(/^(PROF(A|ESSORA?)?\.?\s+|TEACHER\s+)/, ''), p = fiskNormPessoa(nomeDaSessao);
+  if (!t || !p) return false;
+  if (t === p || p.indexOf(t + ' ') === 0 || t.indexOf(p + ' ') === 0) return true;
+  return t.indexOf(' ') < 0 && p.split(' ')[0] === t;
+}
+
 /** URL do Acompanhamento de um aluno, ou '' se ainda não sabemos o RAF dele. */
 function fiskLinkDossie(idx, nome) {
   var a = idx && idx[fiskChaveAluno(nome)];
@@ -1783,7 +1798,8 @@ function fiskBuddyInfoGuarda(j) {
       fr.src = base + 'buddy.html?mini=1'; jan.appendChild(fr);
     }
     bt.addEventListener('click', function () { abre(!document.body.classList.contains('fk-buddy-aberto')); });
-    window.addEventListener('message', function (e) { if (e.data && e.data.fiskBuddy === 'fecha') abre(false); });
+    /* a origem é conferida dos dois lados (auditoria de 30/10/2026, B15): o buddy.html manda para location.origin e aqui só vale de lá */
+    window.addEventListener('message', function (e) { if (e.origin === location.origin && e.data && e.data.fiskBuddy === 'fecha') abre(false); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && document.body.classList.contains('fk-buddy-aberto')) abre(false); });
     if (fiskCacheLe('fisk_buddy_aberto', 6 * 3600000)) abre(true);   /* aberta numa ferramenta, aberta na próxima (6 h, o fio da conversa no servidor) */
     balaoAniversario(bt, abre);
@@ -1814,7 +1830,8 @@ function fiskBuddyInfoGuarda(j) {
       st.textContent = '#fkAnivBalao{position:fixed;z-index:9989;right:16px;bottom:88px;max-width:290px;background:#fff;border:2px solid #f5c542;border-radius:16px 16px 4px 16px;' +
         'padding:.7rem 2rem .7rem .85rem;font:inherit;font-size:.92rem;line-height:1.4;color:#3b2a00;box-shadow:0 10px 26px rgba(146,64,14,.22);cursor:pointer;animation:fkAniv .4s ease}' +
         '#fkAnivBalao button{position:absolute;top:.35rem;right:.4rem;border:0;background:none;font-size:1rem;cursor:pointer;color:#92400e}' +
-        'body.fk-buddy-aberto #fkAnivBalao{display:none}@keyframes fkAniv{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}' +
+        /* com o Buddy aberto o balão não some (B15): sai de trás da janela e fica à esquerda dela; no celular a janela ocupa a tela toda, aí sim some */
+        'body.fk-buddy-aberto #fkAnivBalao{right:452px;bottom:16px}@media (max-width:760px){body.fk-buddy-aberto #fkAnivBalao{display:none}}@keyframes fkAniv{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}' +
         'body.theme-dark #fkAnivBalao{background:#2b2513;color:#fde68a;border-color:#6d5a23}@media print{#fkAnivBalao{display:none}}';
       document.head.appendChild(st);
       var b = document.createElement('div'); b.id = 'fkAnivBalao'; b.setAttribute('role', 'status');

@@ -2128,12 +2128,16 @@
   var s = null; try { s = JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) {}
   if (!s || !s.token) return;
   sec.hidden = false;
+  /* A CHAVE TEM DONO (auditoria de 30/10/2026, M7): `hub_semana_aberta` era de todo mundo que entrasse no aparelho,
+     então o professor que fechou a seção ontem a via aberta de novo se outro tivesse entrado. Fica por conta
+     (hub:semana:<conta>), e o prefixo hub: some no "Sair". */
+  var CH_SEMANA = 'hub:semana:' + String(s.name || '').replace(/[^A-Za-z0-9]/g, '').toUpperCase();
   /* abrir e fechar DESLIZANDO (Pedro, 27/10/2026): a altura vai de 0 à do conteúdo (e volta), com um esmaecer. O
      calendário tem altura fixa, então a altura final já é conhecida antes de ele carregar. Na abertura da página
      não anima. Ao fechar, os cantos do botão só se arredondam quando a seção terminou de subir. */
   var _anima = null;
   function abre(sim, animar) {
-    try { localStorage.setItem('hub_semana_aberta', sim ? '1' : '0'); } catch (e) {}
+    try { localStorage.setItem(CH_SEMANA, sim ? '1' : '0'); localStorage.removeItem('hub_semana_aberta'); } catch (e) {}
     if (sim && !corpo.querySelector('iframe')) {
       var f = document.createElement('iframe');
       f.src = 'calendario.html?embed=1'; f.title = 'Minha semana'; f.loading = jaViu ? 'lazy' : 'eager';   /* no dia do tour ele tem de carregar já */
@@ -2154,7 +2158,7 @@
     }
   }
   bt.addEventListener('click', function () { abre(corpo.hidden || corpo.style.height === '0px' ? true : false, true); });
-  var guardado = null; try { guardado = localStorage.getItem('hub_semana_aberta'); } catch (e) {}
+  var guardado = null; try { guardado = localStorage.getItem(CH_SEMANA); if (guardado === null) guardado = localStorage.getItem('hub_semana_aberta'); } catch (e) {}   /* a chave antiga vale até a primeira gravação */
   /* O TOUR DA MINHA SEMANA (26/10/2026, Pedro: "na próxima vez que o professor entra, já carregue mostrando o Minha
      Semana aberto, com aquele tour do portal do aluno"). Uma vez por aparelho (chave fisk_tour_hub_semana_v1): nessa
      vez a seção abre mesmo que tenha sido fechada. O motor é o tour.js do PORTAL, lido de lá (dado e código de outro

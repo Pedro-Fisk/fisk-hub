@@ -944,13 +944,8 @@ function carregaLC(escola) {
       try { localStorage.setItem('th:lc:' + escola, JSON.stringify(LC[escola])); } catch (e) {}
     }).catch(function () {});
 }
-function mesmaPessoa(tabela, prof) {
-  var t = nPessoa(tabela).replace(/^(PROF(A|ESSORA?)?\.?\s+|TEACHER\s+)/, ''), p = nPessoa(prof);
-  if (!t || !p) return false;
-  if (t === p || p.indexOf(t + ' ') === 0 || t.indexOf(p + ' ') === 0) return true;
-  /* a grade costuma trazer só o primeiro nome ("Nicole") */
-  return t.indexOf(' ') < 0 && p.split(' ')[0] === t;
-}
+/* a régua é do kit desde 31/10/2026 (fiskMesmaPessoa, M15): a mesma da Minha semana e dos Horários do Centro de Estudos */
+function mesmaPessoa(tabela, prof) { return fiskMesmaPessoa(tabela, prof); }
 function lcAgora(escola, prof) {
   var itens = LC[escola] || [], s = sessao() || {};
   var d = new Date(), dia = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'][d.getDay()], min = d.getHours() * 60 + d.getMinutes();
