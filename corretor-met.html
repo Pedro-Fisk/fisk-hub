@@ -312,7 +312,7 @@
   </section>
 </main>
 
-<script src="assets/fisk-shared.js?v=475f40b4f9"></script>
+<script src="assets/fisk-shared.js?v=282254175d"></script>
 <script src="assets/corretor-met/omr-met.js?v=f37ce0c71c"></script>
 <script>
 'use strict';
@@ -793,7 +793,16 @@ $('proximo').addEventListener('click', function () {
       });
     }
     if (card.ok) { toast('✓ ' + a.nome.split(' ')[0] + ' salvo e lançado no TEST ' + card.test + ' do card (' + (j.notaCard || '') + ').'); try { if (typeof fiskFesta === 'function') fiskFesta('📝', true); } catch (e) {} }
-    else alert('A correção de ' + a.nome + ' foi salva e o aluno já vê a tabela no Portal, mas a nota NÃO foi lançada no card:\n\n' + (card.motivo || 'motivo desconhecido') + '.\n\nLance à mão no card, se for o caso.');
+    else {
+      /* SEM ALERT (auditoria de 30/10/2026, B4): a correção deu certo, e o pop-up em cima de um acerto treina a fechar
+         sem ler. A linha amarela fica na tela, com o nome do aluno e a causa, até a próxima correção ou o ✕. */
+      var av = $('avisoCard');
+      if (!av) { av = document.createElement('div'); av.id = 'avisoCard'; av.className = 'status'; av.style.cssText = 'margin:.6rem 0 0;padding:.6rem .75rem;border-radius:8px;border:1px solid #e3c07a;background:#fdf6e6;color:#7a5a12;font-size:14px;font-weight:600;line-height:1.45;position:relative;padding-right:3rem'; $('p2').insertBefore(av, $('p2').firstChild); }
+      av.innerHTML = '⚠️ A correção de <b>' + esc(a.nome) + '</b> foi salva e o aluno já vê a tabela no Portal, mas a nota <b>não foi lançada no card</b>: ' + esc(card.motivo || 'motivo desconhecido') + '. Lance à mão no card, se for o caso.' +
+        '<button type="button" aria-label="Fechar" style="position:absolute;top:.2rem;right:.3rem;border:0;background:none;font-size:1rem;cursor:pointer;color:inherit;min-width:44px;min-height:44px">✕</button>';
+      av.querySelector('button').addEventListener('click', function () { av.remove(); });
+      av.hidden = false;
+    }
     estado.aluno = null; $('escolhido').hidden = true; limpaLeitura(); liberaFoto();
     $('filtro').value = ''; pintaLote(); pintaAlunos(); carregaHistorico();
     $('p2').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -929,7 +938,7 @@ if (/[?&]diag=1/.test(location.search)) {
 }
 
 /* registro de uso (auditoria de 26/10/2026: esta tela não aparecia no painel da direção) */
-if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Corretor do MET');
+if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Corretor do MET', 'corretor-met');
 </script>
 </body>
 </html>

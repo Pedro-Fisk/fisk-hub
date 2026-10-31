@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="assets/casa-tema.css?v=1e1bb28a31">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
-<script src="assets/fisk-shared.js?v=475f40b4f9"></script>
+<script src="assets/fisk-shared.js?v=282254175d"></script>
 <style>
   :root{ --hora: 34px; --cal-linha: var(--ui-line, #dfe6ef); --cal-fundo: var(--white, #fff); --cal-hoje: #fff7e6; --agora: #e11d48; }
   body.theme-dark{ --cal-linha: #2f3a48; --cal-hoje: #2a2412; --cal-fundo: var(--white); }   /* o --white escuro mora no body, não no :root */
@@ -282,6 +282,7 @@
 </style>
 </head>
 <body>
+<script>/* o tema salvo (fisk_theme, a mesma chave do Portal e da Secretaria) antes da 1ª pintura: sem piscar claro (auditoria de 30/10/2026, M11) */try{var _t=localStorage.getItem("fisk_theme");if(_t==="dark"||(!_t&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches))document.body.classList.add("theme-dark");}catch(e){}</script>
 <script>
 /* EMBUTIDO NA HOME (26/10/2026): a home do Hub mostra esta página numa janela (calendario.html?embed=1). Sem o
    cabeçalho e sem a moldura do painel. Os links saem numa ABA NOVA (base target=_blank; até 27/10/2026 era _top),
@@ -379,12 +380,8 @@ function inicioDaSemana(d) { var x = new Date(d.getFullYear(), d.getMonth(), d.g
 function somaDias(d, n) { var x = new Date(d); x.setDate(x.getDate() + n); return x; }
 function hm(min) { return Math.floor(min / 60) + 'h' + (min % 60 ? ('0' + (min % 60)).slice(-2) : ''); }
 function minDe(txt) { var m = /^(\d{1,2})[:h](\d{2})?/.exec(String(txt || '').trim()); return m ? (+m[1]) * 60 + (+(m[2] || 0)) : null; }
-function mesmaPessoa(tabela, prof) {
-  var t = nP(tabela).replace(/^(PROF(A|ESSORA?)?\.?\s+|TEACHER\s+)/, ''), p = nP(prof);
-  if (!t || !p) return false;
-  if (t === p || p.indexOf(t + ' ') === 0 || t.indexOf(p + ' ') === 0) return true;
-  return t.indexOf(' ') < 0 && p.split(' ')[0] === t;
-}
+/* a régua é do kit desde 31/10/2026 (fiskMesmaPessoa, M15): a mesma da Minha aula e dos Horários do Centro de Estudos */
+function mesmaPessoa(tabela, prof) { return fiskMesmaPessoa(tabela, prof); }
 function ehPlantao(titulo) { return /\bLC\b|plant[aã]o|learning\s*center|centro de estudos/i.test(String(titulo || '')); }
 function linha1(t) { return String(t || '').split('\n')[0].trim(); }
 /* o nome da turma sem o dia e a hora, que o bloco já mostra: "ADVANCED - 2ª/4ª 17h30 às 18h45" vira "ADVANCED" */
@@ -683,7 +680,7 @@ document.addEventListener('click', function (ev) {
     if (typeof fiskCounselingAbrirDoc === 'function') { fiskCounselingAbrirDoc(ctx); return; }
     gavFecha();
     if (typeof fiskCounselingGaveta === 'function') fiskCounselingGaveta(ctx);
-    else window.open('counseling.html?escola=' + encodeURIComponent(ctx.escola) + '&prof=' + encodeURIComponent(ctx.professor) + '&turma=' + encodeURIComponent(String(ctx.turma).split('\n')[0]) + '&aluno=' + encodeURIComponent(ctx.aluno), '_blank', 'noopener');
+    else window.open('counseling.html?escola=' + encodeURIComponent(ctx.escola) + '&prof=' + encodeURIComponent(ctx.professor) + '&turma=' + encodeURIComponent(String(ctx.turma).split('\n')[0]) + '#aluno=' + encodeURIComponent(ctx.aluno), '_blank', 'noopener');   /* o nome no fragmento (B1) */
     return;
   }
   var b = ev.target.closest('[data-ev]'); if (b) { abreGaveta(+b.dataset.ev); return; }
@@ -1395,7 +1392,7 @@ function iniciar() {
     if (sessao().master || SEC_MODO) montaVerComo();
     if (SEC_MODO) $('btAgenda').hidden = true;   /* levar as aulas ao Google é do professor */
     carregar();
-    if (!EMBED) fiskRegistrarUso('Calendário');   /* a janela da home abre em toda visita: não conta como uso */
+    if (!EMBED) fiskRegistrarUso('Minha semana', 'calendario');   /* a janela da home abre em toda visita: não conta como uso */
   }
 }
 /* ── A SECRETARIA (27/10/2026) ──

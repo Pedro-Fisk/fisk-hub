@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Frequência à Tutoria, FISK</title>
+<title>Frequência ao Centro de Estudos, FISK</title>
 <link rel="stylesheet" href="assets/fisk-shared.css?v=d6b8607281">
 <link rel="stylesheet" href="assets/casa-tema.css?v=1e1bb28a31">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
-<script src="assets/fisk-shared.js?v=475f40b4f9"></script>
+<script src="assets/fisk-shared.js?v=282254175d"></script>
 <style>
   :root{ --blue:var(--ui,#2b4d70); --blue-mid:var(--ui-mid,#3d6b93); --blue-pill:var(--ui-pill,#1d3349);
          --blue-soft:var(--ui-soft,#e9eff5); --blue-ink:var(--ui-ink,#1d3349); --blue-bd:var(--ui-bd,#9db6cb); }
@@ -91,13 +91,14 @@
 </style>
 </head>
 <body>
+<script>/* o tema salvo (fisk_theme, a mesma chave do Portal e da Secretaria) antes da 1ª pintura: sem piscar claro (auditoria de 30/10/2026, M11) */try{var _t=localStorage.getItem("fisk_theme");if(_t==="dark"||(!_t&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches))document.body.classList.add("theme-dark");}catch(e){}</script>
 
 <header class="hero">
   <a class="back-link" href="centro-de-estudos.html" title="Voltar ao Centro de Estudos">&larr; Centro de Estudos</a>
   <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
   <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
-  <h1 id="h1Pag">Frequência à Tutoria</h1>
-  <p id="subPag">Quem foi ao plantão de dúvidas nos últimos 14 dias</p>
+  <h1 id="h1Pag">Frequência ao Centro de Estudos</h1>
+  <p id="subPag">Quem foi ao Centro de Estudos nos últimos 14 dias</p>
 </header>
 
 <main>
@@ -300,11 +301,8 @@ function plFaixasDe(lista) {
   fx.sort(function (a, b) { return a.chave.localeCompare(b.chave); });
   return fx;
 }
-function plEhMeu(it) {
-  var t = norm(it.professor).replace(/^(PROF(A|ESSORA?)?\.?\s+|TEACHER\s+)/, ''), p = norm(euSou());
-  if (!t || !p) return false;
-  return t === p || p.indexOf(t + ' ') === 0 || t.indexOf(p + ' ') === 0 || (t.indexOf(' ') < 0 && p.split(' ')[0] === t);
-}
+/* a régua é do kit desde 31/10/2026 (fiskMesmaPessoa, M15): a mesma da Minha aula e da Minha semana */
+function plEhMeu(it) { return fiskMesmaPessoa(it.professor, euSou()); }
 function plVaga(i) {
   return '<span class="pl-vaga ' + plClasse(i) + (i.publico === 'criancas' ? ' is-off' : '') + (plEhMeu(i) ? ' meu' : '') + '"' + (i.obs ? ' title="' + esc(i.obs) + '"' : '') + '>' +
     '<span class="pl-prof">' + esc(i.professor || '—') + '</span>' + (i.obs ? '<span class="pl-obs">' + esc(i.obs) + '</span>' : '') +
@@ -368,8 +366,8 @@ fiskInitUserMenu();
    de tutoria (#horarios), cada um mostrando só o seu painel. */
 var SO_HORARIOS = /(^|[#&])horarios\b/.test(location.hash.slice(1));
 if (SO_HORARIOS) {
-  document.title = 'Horários de tutoria, FISK';
-  $('h1Pag').textContent = 'Horários de tutoria'; $('subPag').textContent = 'O quadro do plantão de dúvidas das duas escolas';
+  document.title = 'Horários do Centro de Estudos, FISK';
+  $('h1Pag').textContent = 'Horários do Centro de Estudos'; $('subPag').textContent = 'O quadro de monitores das duas escolas';
   $('painelTopo').hidden = true;
   document.querySelector('#painelGrade h2').hidden = true;
 }
@@ -377,10 +375,10 @@ if (!sessao().token) {
   $('semSessao').hidden = false; $('painelTopo').hidden = true;
 } else if (SO_HORARIOS) {
   gradeInicia();
-  fiskRegistrarUso('Horários de tutoria');
+  fiskRegistrarUso('Centro de Estudos: horários', 'centro-estudos-horarios');
 } else {
   carregar(false);
-  fiskRegistrarUso('Frequência à Tutoria');
+  fiskRegistrarUso('Centro de Estudos: frequência', 'centro-estudos-frequencia');
 }
 </script>
 </body>

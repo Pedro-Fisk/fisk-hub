@@ -7,7 +7,7 @@
        Sem a lista do idioma (arquivo antigo em cache), fica a de português. Trocar o idioma no menu sorteia de novo. */
     window.hubFrase = function () {
       var el = document.getElementById('heroFrase'); if (!el || !window.FISK_FRASES) return;
-      var l = 'en'; try { l = typeof fiskIdioma === 'function' ? fiskIdioma() : (localStorage.getItem('fisk_lang') || 'en'); } catch (e) {}
+      var l = 'pt'; try { l = typeof fiskIdioma === 'function' ? fiskIdioma() : (localStorage.getItem('fisk_lang') || 'pt'); } catch (e) {}
       var chave = l === 'pt' || !FISK_FRASES['professor_' + l] ? 'professor' : 'professor_' + l;
       el.textContent = '✨ ' + FISK_FRASES.sorteia(chave); el.hidden = false;
     };
@@ -25,8 +25,8 @@
     ════════════════════════════════════════════════ */
     /* UMA chave só desde 09/10/2026: `fisk_lang`, lida e gravada pelo kit
        (fiskIdioma / fiskDefinirIdioma). A antiga `fisk-lang` desta página é
-       migrada lá dentro. O padrão continua inglês. */
-    let _lang = (typeof fiskIdioma === 'function') ? fiskIdioma() : 'en';
+       migrada lá dentro. O padrão é português desde 31/10/2026 (auditoria de 30/10). */
+    let _lang = (typeof fiskIdioma === 'function') ? fiskIdioma() : 'pt';
 
     const T = {
       pt: {
@@ -35,15 +35,10 @@
         'pg-tab-login':'Entrar','pg-tab-register':'Criar conta','pg-name':'Seu nome',
         'pg-name-ph':'Selecione seu nome…','pg-fullname':'Nome completo (opcional)',
         'pg-fullname-ph':'Ex.: Maria Fernanda Silva','pg-pass':'Senha','pg-pass2':'Confirmar senha',
-        'pg-help':'Sem usuário ou esqueceu a senha? Fale com a direção.','pg-logout':'Sair','pg-loading':'Carregando…','pg-loading-names':'Buscando os professores no servidor…','pg-entering':'Preparando o seu Hub…',
+        'pg-help':'Sem usuário ou esqueceu a senha? Fale com a direção.','pg-sou-sec':'Sou da secretaria','pg-sou-aluno':'Sou aluno','pg-logout':'Sair','pg-loading':'Carregando…','pg-loading-names':'Buscando os professores no servidor…','pg-entering':'Preparando o seu Hub…',
         'pg-pick-name':'Selecione seu nome.','pg-need-pass':'Digite sua senha.','pg-wait':'Aguarde…',
         'pg-short':'Senha muito curta (mínimo 4).','pg-nomatch':'As senhas não conferem.',
         'pg-err':'Erro de conexão. Tente de novo.','pg-hello':'Olá',
-        'md-title':'Radar da Turma','md-more':'ver o radar →','md-alunos':'Alunos',
-        'md-emdia':'Em dia','md-atras':'Atrasados','md-crit':'Críticos',
-        'md-faltas':'Faltas médias','md-nota':'Média de notas','md-turmas':'turmas',
-        'md-load':'analisando suas turmas…','md-falhou':'Não consegui ler {n} de {t} escolas suas: estes números estão incompletos. Recarregue para tentar de novo.','md-pick':'Escolha um professor no seletor do topo para ver o painel dele.',
-        'md-busca-t':'🎓 Acompanhamento do Aluno','md-busca-ph':'🔎 Buscar aluno por nome ou RAF…','md-busca-nada':'Nenhum aluno com esse nome ou RAF.',
         'card-planner-h2': 'Abridor de Planners físicos',
         'prat-aula': 'Em aula', 'prat-docs': 'Documentos', 'prat-outras': 'Outras ferramentas',
         'card-planner-p':  'Crie o PPT / Planner do aluno com as datas corretas',
@@ -92,7 +87,7 @@
         'card-ecounsel-h2': 'E-counseling',
         'card-ecounsel-p':  'Registre ocorrências e desenvolvimento do aluno',
         'card-tutoria-h2': 'Centro de Estudos',
-        'card-tutoria-p':  'Minha Tutoria, Frequência e Horários de tutoria: tudo do plantão de dúvidas num lugar só',
+        'card-tutoria-p':  'Atender, frequência e horários do Centro de Estudos (o Learning Center, o plantão de dúvidas) num lugar só',
         'card-calendario-h2': 'Minha semana',
         'sem-abrir': 'Abrir em tela cheia ↗',
         'card-calendario-p':  'Suas aulas, plantões, experimentais e aniversários da semana',
@@ -124,15 +119,10 @@
         'pg-tab-login':'Sign in','pg-tab-register':'Create account','pg-name':'Your name',
         'pg-name-ph':'Select your name…','pg-fullname':'Full name (optional)',
         'pg-fullname-ph':'e.g., Maria Fernanda Silva','pg-pass':'Password','pg-pass2':'Confirm password',
-        'pg-help':"No account or forgot your password? Talk to the office.",'pg-logout':'Log out','pg-loading':'Loading…','pg-loading-names':'Fetching the teachers from the server…','pg-entering':'Getting your Hub ready…',
+        'pg-help':"No account or forgot your password? Talk to the office.",'pg-sou-sec':'I work at the front office','pg-sou-aluno':'I am a student','pg-logout':'Log out','pg-loading':'Loading…','pg-loading-names':'Fetching the teachers from the server…','pg-entering':'Getting your Hub ready…',
         'pg-pick-name':'Select your name.','pg-need-pass':'Enter your password.','pg-wait':'Please wait…',
         'pg-short':'Password too short (min. 4).','pg-nomatch':"Passwords don't match.",
         'pg-err':'Connection error. Try again.','pg-hello':'Hi',
-        'md-title':'Class Radar','md-more':'see the radar →','md-alunos':'Students',
-        'md-emdia':'On track','md-atras':'Behind','md-crit':'Critical',
-        'md-faltas':'Avg. absences','md-nota':'Avg. grade','md-turmas':'classes',
-        'md-load':'analyzing your classes…','md-falhou':'Could not read {n} of your {t} schools: these numbers are incomplete. Reload to try again.','md-pick':'Pick a teacher in the selector above to see their panel.',
-        'md-busca-t':'🎓 Student Follow-up','md-busca-ph':'🔎 Search student by name or RAF…','md-busca-nada':'No student with that name or RAF.',
         'card-planner-h2': 'Printed Planner Opener',
         'prat-aula': 'In class', 'prat-docs': 'Documents', 'prat-outras': 'Other tools',
         'card-planner-p':  'Create student planners with the correct dates',
@@ -181,7 +171,7 @@
         'card-ecounsel-h2': 'E-counseling',
         'card-ecounsel-p':  'Log incidents and student development',
         'card-tutoria-h2': 'Learning Center',
-        'card-tutoria-p':  'My Tutoring, Tutoring Attendance and Tutoring Schedule, all in one place',
+        'card-tutoria-p':  'Attend, attendance and schedule of the Learning Center (the tutoring sessions), all in one place',
         'card-calendario-h2': 'My week',
         'sem-abrir': 'Open full screen ↗',
         'card-calendario-p':  'Your classes, tutoring shifts, trial classes and birthdays this week',
@@ -213,15 +203,10 @@
         'pg-tab-login':'Entrar','pg-tab-register':'Crear cuenta','pg-name':'Tu nombre',
         'pg-name-ph':'Selecciona tu nombre…','pg-fullname':'Nombre completo (opcional)',
         'pg-fullname-ph':'Ej.: María Fernanda Silva','pg-pass':'Contraseña','pg-pass2':'Confirmar contraseña',
-        'pg-help':'¿Sin usuario u olvidaste tu contraseña? Habla con la dirección.','pg-logout':'Salir','pg-loading':'Cargando…','pg-loading-names':'Buscando a los profesores en el servidor…','pg-entering':'Preparando tu Hub…',
+        'pg-help':'¿Sin usuario u olvidaste tu contraseña? Habla con la dirección.','pg-sou-sec':'Soy de la secretaría','pg-sou-aluno':'Soy alumno','pg-logout':'Salir','pg-loading':'Cargando…','pg-loading-names':'Buscando a los profesores en el servidor…','pg-entering':'Preparando tu Hub…',
         'pg-pick-name':'Selecciona tu nombre.','pg-need-pass':'Escribe tu contraseña.','pg-wait':'Espera…',
         'pg-short':'Contraseña muy corta (mín. 4).','pg-nomatch':'Las contraseñas no coinciden.',
         'pg-err':'Error de conexión. Inténtalo de nuevo.','pg-hello':'Hola',
-        'md-title':'Radar del Grupo','md-more':'ver el radar →','md-alunos':'Alumnos',
-        'md-emdia':'Al día','md-atras':'Atrasados','md-crit':'Críticos',
-        'md-faltas':'Faltas medias','md-nota':'Nota media','md-turmas':'grupos',
-        'md-load':'analizando tus grupos…','md-falhou':'No pude leer {n} de {t} escuelas tuyas: estos números están incompletos. Recarga para intentarlo de nuevo.','md-pick':'Elige un profesor en el selector de arriba para ver su panel.',
-        'md-busca-t':'🎓 Seguimiento del Alumno','md-busca-ph':'🔎 Buscar alumno por nombre o RAF…','md-busca-nada':'Ningún alumno con ese nombre o RAF.',
         'card-planner-h2': 'Abridor de Planners físicos',
         'prat-aula': 'En clase', 'prat-docs': 'Documentos', 'prat-outras': 'Otras herramientas',
         'card-planner-p':  'Crea planners del alumno con las fechas correctas',
@@ -270,7 +255,7 @@
         'card-ecounsel-h2': 'E-counseling',
         'card-ecounsel-p':  'Registra incidencias y el desarrollo del alumno',
         'card-tutoria-h2': 'Centro de Estudios',
-        'card-tutoria-p':  'Mi Tutoría, Asistencia y Horarios de tutoría: todo en un solo lugar',
+        'card-tutoria-p':  'Atender, asistencia y horarios del Centro de Estudios (el Learning Center, la tutoría) en un solo lugar',
         'card-calendario-h2': 'Mi semana',
         'sem-abrir': 'Abrir en pantalla completa ↗',
         'card-calendario-p':  'Tus clases, tutorías, clases de prueba y cumpleaños de la semana',
@@ -313,7 +298,6 @@
         var val = tr(el.dataset.i18nPh);
         if (val && typeof val === 'string') el.placeholder = val;
       });
-      if (typeof window.hwpRender === 'function') window.hwpRender();
       document.querySelectorAll('.lang-btn').forEach(function(btn) {
         btn.classList.toggle('is-active', btn.dataset.lang === lang);
       });
@@ -393,7 +377,7 @@
       /* ── Acesso master: diretor "veste a camisa" de um professor sem login ──
          _actingProf() = quem os dashboards devem mostrar: o professor escolhido
          no seletor (só p/ diretor) ou a própria conta (professor comum). */
-      var PROF_AWARE = ['planejador.html','2nd-chance.html','termo-atraso.html','visao-geral.html'];
+      var PROF_AWARE = ['2nd-chance.html','termo-atraso.html','visao-geral.html'];   /* planejador.html aposentado em 26/10/2026 */
       function actingSaved(){ try{ return JSON.parse(localStorage.getItem('fisk_actas')||'null'); }catch(e){ return null; } }
       window._actingProf = function(){
         var sv = saved(); if (!sv) return null;
@@ -401,42 +385,36 @@
         return sv;
       };
       // aponta os atalhos das ferramentas p/ o professor efetivo (pré-seleção; nunca trava)
-      /* O PILOTO DA TURMA DE HOJE (Pedro, 14/09/2026): a direção e o professor de teste. Para abrir para todos,
-         esvazie a trava (e a da própria turma-de-hoje.html, que tem a mesma lista). */
-      var TURMA_HOJE_PILOTO = ['CARLOS ALBERTO'];
       /* O CORRETOR DO SIMULADO MET (19/09/2026): nasceu só para a direção; aberto para todos os professores no mesmo
          dia, depois do teste do Pedro com folhas reais. `false` volta ao piloto (a mesma chave mora na corretor-met.html) */
       var CORRETOR_ABERTO = true;
       var CORRETOR_PILOTO = ['PEDRO (DIREÇÃO)'];
-      /* MY AVATAR DO PROFESSOR: `true` abre o card para todos os professores.
-         Com `false` (pedido do Pedro, 15/09/2026) o card fica cinza com "Em
-         breve" e só a direção entra. A mesma trava mora no avatar.html. */
-      var AVATAR_PROFS_ABERTO = false;
-      /* (15/10/2026, pedido do Pedro) ABERTO POR ESCOLA, no mesmo horário dos alunos: Caçapava já, Taubaté às 17h40 de
-         15/10. A escola é a coluna Escolas da _profs (a mesma da Turma de hoje). A mesma regra mora no avatar.html. */
-      var AVATAR_ABRE_EM = { 'CACAPAVA': Date.parse('2026-10-15T00:00:00-03:00'), 'TAUBATE': Date.parse('2026-10-15T17:40:00-03:00') };
-      function avatarProfAberto(sv){
-        var agora = Date.now();
-        return String((sv && (sv.escolas || sv.escola)) || '').split(',').some(function(e){ return agora >= (AVATAR_ABRE_EM[normPiloto(e).replace(/[^A-Z]/g, '')] || Infinity); });
-      }
+      /* MY AVATAR DO PROFESSOR: aberto a todos desde 15/10/2026 (por escola, no horário dos alunos). A trava por data
+         (AVATAR_ABRE_EM) saiu em 31/10/2026 (auditoria de 30/10, B8): ela escondia o card de quem está sem escola na _profs. */
       function normPiloto(v){ return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
-      /* O LANÇAMENTO (Pedro, 16/09/2026): quinta 17/09, 13h15 em Caçapava e 17h30 em Taubaté. A mesma regra na turma-de-hoje.html */
-      function turmaHojeAberta(sv){
-        var abreEm = { 'CACAPAVA': Date.parse('2026-09-17T13:15:00-03:00'), 'TAUBATE': Date.parse('2026-09-17T17:30:00-03:00') }, agora = Date.now();
-        return String((sv && (sv.escolas || sv.escola)) || '').split(',').some(function(e){ return agora >= (abreEm[normPiloto(e).replace(/[^A-Z]/g, '')] || Infinity); });
-      }
       function updateToolLinks(){
         var sv0 = saved(), th = document.querySelector('a.card-turmahoje');
-        if (th) th.style.display = (sv0 && (sv0.master || turmaHojeAberta(sv0) || TURMA_HOJE_PILOTO.some(function(n){ var x = normPiloto(sv0.name), y = normPiloto(n); return x === y || x.indexOf(y + ' ') === 0; }))) ? '' : 'none';
+        /* A MINHA AULA É DE TODOS desde 17/09/2026; a trava do lançamento (datas por escola e o piloto) saiu em
+           31/10/2026 (auditoria de 30/10, M5): ela escondia o card em silêncio de quem está sem escola na _profs.
+           Agora o card aparece sempre, e quem está sem escola lê o aviso nele, com a porta (a direção). */
+        if (th) {
+          th.style.display = sv0 ? '' : 'none';
+          var semEscola = !!(sv0 && !sv0.master && !String(sv0.escolas || sv0.escola || '').trim());
+          var av = th.querySelector('.card-sem-escola');
+          if (semEscola && !av) {
+            av = document.createElement('small'); av.className = 'card-sem-escola';
+            av.style.cssText = 'display:block;margin-top:.2rem;padding:.35rem .55rem;border-radius:8px;background:#fdf6e6;color:#7a5a12;font-size:.8rem;font-weight:700;line-height:1.35';
+            av.textContent = '⚠️ Sua conta está sem escola cadastrada: peça à direção para cadastrar sua escola. Até lá, escolha a escola e o professor na cascata.';
+            th.appendChild(av);
+          } else if (!semEscola && av) av.remove();
+        }
         var cmet = document.querySelector('a.card-corretor');
         if (cmet) cmet.style.display = (sv0 && (CORRETOR_ABERTO || sv0.master || sv0.director || CORRETOR_PILOTO.some(function(n){ return normPiloto(sv0.name) === normPiloto(n); }))) ? '' : 'none';
         var cnt = document.querySelector('a.card-noticias');
         if (cnt) cnt.style.display = (sv0 && sv0.master) ? '' : 'none';   /* fechado: só a direção (Noticias.js, NT_ABERTO) */
-        var lp = document.querySelector('a.card-lessonplan');
-        if (lp) lp.style.display = (th && th.style.display !== 'none') ? 'none' : '';   /* quem tem a Turma de hoje não precisa do Planejador */
         var avc = document.getElementById('card-avatar');
         if (avc){
-          var avAberto = !!(sv0 && (AVATAR_PROFS_ABERTO || sv0.master || avatarProfAberto(sv0)));
+          var avAberto = !!sv0;
           avc.classList.toggle('is-soon', !avAberto);
           avc.style.display = avAberto ? '' : 'none';   /* surpresa para os professores (Pedro, 17/09/2026): nem o "Em breve" aparece */
           avc.setAttribute('href', avAberto ? 'avatar.html' : '#');
@@ -476,7 +454,6 @@
             localStorage.removeItem('fisk_minidash');
           }catch(e){}
           updateToolLinks();
-          if (window._mdLoad) window._mdLoad();
         };
       }
 
@@ -500,7 +477,6 @@
         if (prof && prof.master) setupActAs();
         updateToolLinks();
         if (window._cmSync) window._cmSync(); // re-monta o link do Conversation Maker com o token novo
-        setTimeout(function(){ if (window._mdLoad) window._mdLoad(); }, 0);
         registrarHome();
         perfilVerifica(prof);
       }
@@ -555,7 +531,7 @@
 
       function registrarHome(){
         levaIdentidadeAoPortal();
-        if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Fisk Hub (início)');
+        if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Fisk Hub (início)', 'hub-inicio');
         avisoNovidade();
         cortinaDoAvatar();
         // campanha da direção, se houver alguma no ar para a equipe
@@ -572,10 +548,10 @@
          mostra o aviso e o Hub abre inteiro. Cortina que trava o professor no
          meio da aula é pior do que aviso não lido.
 
-         NOS TRÊS IDIOMAS do Hub, e não só em português: o padrão da casa é
-         INGLÊS (`fiskIdioma()`, padrão 'en'), então um aviso só em
-         português apareceria em outra língua que não a da tela para a maior
-         parte dos professores. Segue o `_lang` do momento em que abre.
+         NOS TRÊS IDIOMAS do Hub, e não só em português: o professor pode ter
+         escolhido `en` ou `es` no menu (`fiskIdioma()`; o padrão é `pt` desde
+         31/10/2026), e um aviso só em português apareceria em outra língua
+         que não a da tela. Segue o `_lang` do momento em que abre.
 
          ⚠️ A SENHA APARECE AQUI, e por isso ela não está escrita em texto no
          fonte: o Hub é servido pelo GitHub Pages e a página é pública, então
@@ -595,7 +571,7 @@
          desenho só escreve o que o aviso trouxer. */
       /* O MY AVATAR DO PROFESSOR (15/10/2026, pedido do Pedro: "faz uma cortina para os professores também"). Esta abre
          em CORTINA de verdade (as outras desta lista viraram recado do Buddy em 06/10), só para quem já tem o avatar
-         aberto (avatarProfAberto: Caçapava já, Taubaté às 17h40) e uma vez por professor. Ela também entra na lista, e o
+         aberto (desde 15/10/2026) e uma vez por professor. Ela também entra na lista, e o
          Buddy mostra o mesmo aviso: confirmar num lugar confirma no outro (a mesma chave do aparelho). */
       var AVISO_AVATAR = {
         id: 'my-avatar-prof-2026-10',
@@ -838,7 +814,6 @@
           var s = saved(); if (!s || !s.name || document.getElementById('av-mask')) return;
           var d = new Date(), hoje = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
           if (hoje < AVISO_AVATAR.desde || hoje > AVISO_AVATAR.ate || avisoVisto(AVISO_AVATAR.id, s.name)) return;
-          if (!(s.master || avatarProfAberto(s))) return;
           avisoMostra(AVISO_AVATAR, s);
         }catch(e){ /* aviso nunca pode segurar o Hub */ }
       }
@@ -1175,237 +1150,8 @@
       }
     })();
 
-    /* ════════════════════════════════════════════════
-       MINI-DASH DO PROFESSOR — resumo instantâneo das turmas do
-       professor logado no topo do Hub (mesma API/regras da página
-       Visão Geral). Cache de 30 min p/ não pesar a home.
-    ════════════════════════════════════════════════ */
-    (function miniDash(){
-      var API = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
-      var LIM = 4, TTL = 30 * 60 * 1000;
-      var sec = document.getElementById('miniDash'), box = document.getElementById('mdKpis');
-      /* HOME SÓ COM AS FERRAMENTAS (Pedro, 19/09/2026): o resumo da Visão Geral e a busca do Acompanhamento saíram
-         do topo; a Visão Geral e o Acompanhamento do Aluno são cards da grade. `true` religa o bloco. */
-      var MINIDASH_LIGADO = false;
-      if (!MINIDASH_LIGADO) { if (sec) sec.hidden = true; return; }
-      var dataCache = null;
-
-      function sess(){ try{ return JSON.parse(localStorage.getItem('fisk_prof')||'null'); }catch(e){ return null; } }
-      /* A CHAVE DO CARD NÃO VIVE MAIS AQUI. Este repositório é público: enquanto
-         ela estava neste arquivo, qualquer pessoa na internet lia nome, notas e
-         faltas de todas as turmas — e escrevia nota. Quem fala com o card agora é
-         o backend (action=card), que valida a sessão e só então carimba a chave.
-         Ver cardProxy_ no fisk-hub-backend. NUNCA reintroduzir a chave aqui. */
-      function tokenSessao() {
-        try { var s = JSON.parse(localStorage.getItem('fisk_prof') || 'null'); return (s && s.token) || ''; }
-        catch (e) { return ''; }
-      }
-      function comSessao(p) {
-        var o = { action: 'card', token: tokenSessao() };
-        Object.keys(p).forEach(function (k) { o[k] = p[k]; });
-        return o;
-      }
-      function api(p){
-        var P = comSessao(p);
-        var qs = Object.keys(P).map(function(k){ return k+'='+encodeURIComponent(P[k]); }).join('&');
-        return fiskFetch(API+'?'+qs)
-          .then(function(j){ if (j && j.erro) throw new Error(j.erro); return j; });
-      }
-      /* Todas as turmas do professor numa leitura só. Não passa pela ponte
-         `action=card`: quem lê o card aqui é o próprio backend, por openById. */
-      function panorama(escola, prof){
-        var qs = 'action=panoramaProf&token=' + encodeURIComponent(tokenSessao()) +
-                 '&escola=' + encodeURIComponent(escola) + '&prof=' + encodeURIComponent(prof);
-        return fiskFetch(API+'?'+qs)
-          .then(function(j){ if (!j || !j.ok) throw new Error((j && j.erro) || 'panorama falhou'); return j; });
-      }
-      /* "média (com todos os critérios do boletim): 8,2" — o \s* antigo esbarrava no parêntese e a média voltava null em
-         TODAS as células do formato novo (auditoria de 15/09/2026). Pega o número depois da palavra, com o que houver no meio. */
-      function mediaDaCelula_(s){
-        var linhas = String(s).split('\n'), re = /m[ée]dia[^0-9\n]{0,60}([0-9]+(?:[.,][0-9]+)?)/i, achou = null;
-        linhas.forEach(function(l){ var m = re.exec(l); if (m && (/^\s*m[ée]dia/i.test(l) || !achou)) achou = m; });
-        return achou;
-      }
-      function notaDe(c){
-        if (c == null || c === '') return null;
-        var s = String(c), m = mediaDaCelula_(s);
-        if (m) return parseFloat(m[1].replace(',', '.'));
-        var m2 = s.trim().match(/^([0-9]+(?:[.,][0-9]+)?)$/);
-        return m2 ? parseFloat(m2[1].replace(',', '.')) : null;
-      }
-
-      function agg(alunos, nTurmas){
-        var an = 0, emdia = 0, atras = 0, crit = 0, fs = [], ns = [];
-        alunos.forEach(function(a){
-          var at = (typeof a.aulasAtraso === 'number' && !isNaN(a.aulasAtraso)) ? a.aulasAtraso : null;
-          if (at != null){ an++; if (at >= LIM) crit++; else if (at >= 1) atras++; else emdia++; }
-          if (typeof a.pctFaltas === 'number' && !isNaN(a.pctFaltas)) fs.push(a.pctFaltas);
-          var n1 = notaDe(a.notasAv1), n2 = notaDe(a.notasAv2);
-          var n = (n1 != null && n2 != null) ? (n1+n2)/2 : (n2 != null ? n2 : n1);
-          if (n != null) ns.push(n);
-        });
-        return {
-          tot: alunos.length, turmas: nTurmas, an: an, emdia: emdia, atras: atras, crit: crit,
-          mf: fs.length ? fs.reduce(function(s,v){ return s+v; },0)/fs.length : null,
-          mn: ns.length ? ns.reduce(function(s,v){ return s+v; },0)/ns.length : null
-        };
-      }
-
-      function tile(v, l, cls){ return '<div class="md-kpi'+(cls?' '+cls:'')+'"><b>'+v+'</b><span>'+l+'</span></div>'; }
-
-      /* Sem turmas para resumir (conta da direção, secretaria, card fora do
-         ar) some com os KPIs e o botão da Visão Geral — mas NÃO com a seção,
-         porque a busca de aluno mora dentro dela e vale para todo mundo
-         logado. Antes daqui a seção inteira se escondia, e a direção, que é
-         justamente quem mais consulta aluno, ficava sem a busca. */
-      function semKpis(){
-        sec.hidden = false;
-        box.innerHTML = '';
-        var cta = sec.querySelector('.md-cta');
-        if (cta) cta.hidden = true;
-        sec.classList.add('md-so-busca');
-      }
-      function render(d){
-        box.innerHTML =
-          tile(d.tot, tr('md-alunos')) +
-          tile(d.an ? d.emdia : '-', tr('md-emdia'), 'emdia') +
-          tile(d.an ? d.atras : '-', tr('md-atras'), 'media') +
-          tile(d.an ? d.crit : '-', tr('md-crit'), 'alta') +
-          tile(d.mf == null ? '-' : Math.round(d.mf)+'%', tr('md-faltas')) +
-          tile(d.mn == null ? '-' : (Math.round(d.mn*10)/10).toFixed(1).replace('.',','), tr('md-nota'), 'roxa');
-        /* Turma que não respondeu sumia daqui em silêncio, e o professor lia um
-           número menor sem saber que faltava gente. Agora ela aparece. */
-        if (d.falharam){
-          box.insertAdjacentHTML('beforeend',
-            '<div class="md-status md-aviso">⚠️ ' +
-            tr('md-falhou').replace('{n}', d.falharam).replace('{t}', d.escolas || 1) + '</div>');
-        }
-      }
-
-      function load(){
-        var raw = sess();
-        var s = (window._actingProf ? window._actingProf() : raw);
-        if (raw && raw.master && (!s || !s.name)){ // diretor sem professor escolhido
-          sec.hidden = false;
-          box.innerHTML = '<div class="md-status">👆 '+tr('md-pick')+'</div>';
-          return;
-        }
-        if (!s || !s.name){ semKpis(); return; }
-        try{
-          var c = JSON.parse(localStorage.getItem('fisk_minidash')||'null');
-          if (c && c.prof === s.name && Date.now() - c.t < TTL){ dataCache = c.d; sec.hidden = false; render(c.d); return; }
-        }catch(e){}
-        sec.hidden = false;
-        box.innerHTML = '<div class="md-status">⏳ '+tr('md-load')+'</div>';
-        var escolas = String(s.escolas || s.escola || '').split(',').map(function(x){ return x.trim(); }).filter(Boolean);
-        if (!escolas.length){ semKpis(); return; }
-        /* UMA LEITURA POR ESCOLA. Antes eram 1 chamada para listar as turmas
-           mais 1 por turma (11, no caso do Leonardo): cada uma custava 6-7s
-           pela ponte do card, e o lote em paralelo estourava o tempo do Google
-           e derrubava quem estivesse em outra ferramenta no mesmo minuto. O
-           `panoramaProf` devolve todas as turmas do professor de uma vez,
-           lendo a aba inteira no servidor. */
-        var alunos = [], nTurmas = 0, falharam = 0;
-        (function proximaEscola(i){
-          if (i >= escolas.length){
-            if (!nTurmas && !alunos.length){ semKpis(); return; }  // conta da direção, sem turmas
-            var d = agg(alunos, nTurmas);
-            d.falharam = falharam;
-            d.escolas = escolas.length;
-            dataCache = d;
-            try{ localStorage.setItem('fisk_minidash', JSON.stringify({ prof:s.name, t:Date.now(), d:d })); }catch(e){}
-            render(d); return;
-          }
-          panorama(escolas[i], s.name)
-            .then(function(j){
-              nTurmas += (j.turmas || []).length;
-              /* Quem saiu não entra nos números: o professor conta a turma que
-                 ele tem hoje, e o card guarda o desistente na linha. */
-              (j.alunos || []).forEach(function(a){ if (a && a.nome && !a.saiu) alunos.push(a); });
-            })
-            .catch(function(){ falharam++; })
-            .then(function(){ proximaEscola(i+1); });
-        })(0);
-      }
-
-      /* ── Busca de aluno ──────────────────────────────────────────────────
-         Responde à pergunta de meio de aula: "o aluno fez mesmo a atividade
-         que disse que fez?". Só monta a lista; quem conta a história é o
-         Acompanhamento do Aluno (aluno.html). Usa o token da sessão — nenhuma chave aqui, que
-         este repositório é público. */
-      (function buscaAluno(){
-        var inp = document.getElementById('mdQ'), cx = document.getElementById('mdAchados'), tmr = null;
-        if (!inp) return;
-        function fecha(){ cx.hidden = true; cx.innerHTML = ''; }
-        var e = function(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); };
-        /* Duas fontes, e a ordem importa: primeiro os alunos DO PROFESSOR,
-           que já estão na memória e aparecem sem ida à rede; depois o resto
-           da escola, que vem do servidor e é anexado. Na prática o aluno
-           procurado quase sempre já está na primeira lista, e o campo passa a
-           responder enquanto se digita em vez de depois de digitar. */
-        var vistos = {};
-        function pinta(lista, meus, limpar){
-          if (limpar){ cx.innerHTML = ''; vistos = {}; }
-          var html = '';
-          lista.forEach(function(a){
-            if (!a || !a.raf || vistos[a.raf]) return;
-            vistos[a.raf] = true;
-            html += '<button type="button" class="md-achado" data-raf="'+e(a.raf)+'">' +
-                    '<b>'+e(a.name)+'</b>' + (meus ? '<i class="md-meu">sua turma</i>' : '') +
-                    '<span>'+e(a.turma||'')+'<br>'+e(a.raf)+'</span></button>';
-          });
-          if (html){ cx.hidden = false; cx.insertAdjacentHTML('beforeend', html); }
-          return Object.keys(vistos).length;
-        }
-        function busca(){
-          var q = inp.value.trim();
-          if (q.length < 2){ fecha(); return; }
-          var meusOk = false;
-          if (typeof fiskBuscaMeusAlunos === 'function'){
-            fiskBuscaMeusAlunos(q).then(function(l){
-              if (inp.value.trim() !== q) return;      // já digitou outra coisa
-              meusOk = true;
-              pinta(l, true, true);
-            });
-          }
-          fiskFetch(API, { action:'alunoBusca', token: tokenSessao(), q: q })
-            .then(function(res){
-              if (inp.value.trim() !== q) return;
-              var l = (res && res.alunos) || [];
-              var n = pinta(l, false, !meusOk);
-              cx.hidden = false;
-              if (!n) cx.innerHTML = '<div class="md-achado vazio">'+tr('md-busca-nada')+'</div>';
-            }).catch(function(){ if (!Object.keys(vistos).length) fecha(); });
-        }
-        /* 160ms, e não 320: metade do resultado agora vem da memória, então a
-           espera existe só para não disparar a busca do servidor a cada tecla. */
-        inp.addEventListener('input', function(){ clearTimeout(tmr); tmr = setTimeout(busca, 160); });
-        cx.addEventListener('click', function(ev){
-          var b = ev.target.closest('.md-achado'); if (!b || !b.dataset.raf) return;
-          /* Gaveta à direita, não navegação: a home é de onde o professor sai
-             para tudo, e trocá-la de página por causa de uma conferência de
-             dez segundos é caro. Se o kit estiver velho em cache, o caminho
-             antigo continua valendo. */
-          if (typeof fiskAcompanhamento === 'function'){
-            fecha();
-            fiskAcompanhamento(b.dataset.raf, { nome: (b.querySelector('b')||{}).textContent || '' });
-          } else {
-            location.href = 'aluno.html?raf=' + encodeURIComponent(b.dataset.raf);
-          }
-        });
-        document.addEventListener('click', function(ev){
-          if (!ev.target.closest('.md-busca')) fecha();
-        });
-      })();
-
-      window._mdLoad = load;
-      /* O seletor de idioma saiu do Hub em 23/09/2026, então não há mais
-         troca de idioma na tela para re-renderizar os rótulos dos KPIs. A
-         guarda `if (lt)` ficou de lição: este ponto já derrubou a carga do
-         mini-dash uma vez, quando o id apontava para um elemento inexistente
-         e o addEventListener estourava. */
-      if (document.body.classList.contains('prof-in')) load();
-    })();
+    /* O MINI-DASH DO PROFESSOR (resumo das turmas e busca de aluno no topo da home) estava DESLIGADO desde 19/09/2026
+       (home só com as ferramentas) e saiu do código em 31/10/2026 (auditoria de 30/10, B8); o git guarda (commit 7a9ef94). */
 
 /* ═══ bloco 3 ═══ */
   /* ══ O BUDDY DO PROFESSOR (06/10/2026) ════════════════════════════════════
@@ -1835,223 +1581,8 @@
      estiver lá, o painel mostra os Fisk Dólares em vez de inventar um 2,25
      local — uma segunda fonte do valor de um Fisk Dólar é como as duas
      acabam discordando. */
-  (function(){
-    var EP  = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
-    var NOMES = { g:'Gryffindor', r:'Ravenclaw', h:'Hufflepuff', s:'Slytherin' };
-    var IMG = 'https://portalfisk.com.br/assets/img/hogwarts/';
-    var SLUG = { g:'gryffindor', r:'ravenclaw', h:'hufflepuff', s:'slytherin' };
-    var TXT = {
-      pt: { colegas:  function(n){ return n === 0
-                        ? 'Você é o primeiro da equipe nesta casa.'
-                        : 'Você e mais ' + n + (n === 1 ? ' colega estão' : ' colegas estão') + ' nesta casa.'; },
-            rendeu:   function(m,med){ return 'Suas turmas renderam ' + m + ' de mana na temporada, o que vale ' + med + ' por aluno para a sua casa.'; },
-            semTurma: 'Ainda não encontrei turmas suas no card. Quando encontrar, o que os seus alunos ganharem passa a pontuar aqui.',
-            semNada:  'Suas turmas ainda não pontuaram nesta temporada. Cada exercício que um aluno seu faz no portal vira mana para a sua casa.',
-            todos:    'Contam todos os seus alunos, não só os que caíram na sua casa.',
-            geralT:   'A escola inteira',
-            cego:     'As casas estão pontuando em segredo: os nomes aparecem em 20/09. Até lá, o que vale é encher a poção da escola. 🤫',
-            subiu:    function(p){ return 'Boa! A sua casa subiu para o ' + p + ' lugar desde a sua última visita! 🎉'; },
-            caiu:     function(p){ return 'A sua casa está em ' + p + ' agora. Bora virar esse jogo com a sua turma! 💪'; },
-            fimSelo:  'Campeã da Taça!',
-            fimSua:   'A SUA casa venceu a Taça das Casas! 🏆🎉',
-            fimDela:  function(c){ return '' + c + ' venceu a Taça das Casas! 🏆'; },
-            fimObrig: 'A campanha acabou, mas a sua casa é sua para sempre: o brasão continua no menu e as cores continuam no Hub. Obrigado por puxar a sua turma! ✨',
-            geral:    function(m,n){ return 'Juntos, todos os alunos já somaram ' + m + ' de mana! Próxima meta: ' + n + '. 🚀'; },
-            geralMax: function(m){ return 'Juntos, todos os alunos já somaram ' + m + ' de mana! Passaram de todas as metas! 🚀'; },
-            ir:       'ver a minha casa →' },
-      en: { colegas:  function(n){ return n === 0
-                        ? 'You are the first of the team in this house.'
-                        : 'You and ' + n + ' other ' + (n === 1 ? 'colleague are' : 'colleagues are') + ' in this house.'; },
-            rendeu:   function(m,med){ return 'Your classes earned ' + m + ' mana this season, which is worth ' + med + ' per student for your house.'; },
-            semTurma: 'I could not find your classes in the card yet. Once I do, what your students earn will count here.',
-            semNada:  'Your classes have not scored yet this season. Every exercise a student of yours does turns into mana for your house.',
-            todos:    'Every student of yours counts, not only the ones sorted into your house.',
-            geralT:   'The whole school',
-            cego:     'The houses are scoring in secret: the names appear on 20/09. Until then, what counts is filling the school potion. 🤫',
-            subiu:    function(p){ return 'Nice! Your house has moved up to ' + p + ' place since your last visit! 🎉'; },
-            caiu:     function(p){ return 'Your house is ' + p + ' now. Let us turn this around with your classes! 💪'; },
-            fimSelo:  'House Cup champions!',
-            fimSua:   'YOUR house has won the House Cup! 🏆🎉',
-            fimDela:  function(c){ return '' + c + ' has won the House Cup! 🏆'; },
-            fimObrig: 'The campaign is over, but your house is yours forever: the crest stays in your menu and the colours stay in the Hub. Thanks for pushing your classes! ✨',
-            geral:    function(m,n){ return 'Together, every student has gathered ' + m + ' mana! Next goal: ' + n + '. 🚀'; },
-            geralMax: function(m){ return 'Together, every student has gathered ' + m + ' mana! They passed every goal! 🚀'; },
-            ir:       'see my house →' },
-      es: { colegas:  function(n){ return n === 0
-                        ? 'Eres el primero del equipo en esta casa.'
-                        : 'Tú y ' + n + (n === 1 ? ' colega están' : ' colegas están') + ' en esta casa.'; },
-            rendeu:   function(m,med){ return 'Tus grupos generaron ' + m + ' de maná en la temporada, que valen ' + med + ' por alumno para tu casa.'; },
-            semTurma: 'Todavía no encontré tus grupos en el card. Cuando los encuentre, lo que ganen tus alumnos contará aquí.',
-            semNada:  'Tus grupos aún no puntuaron en esta temporada. Cada ejercicio que hace un alumno tuyo se vuelve maná para tu casa.',
-            todos:    'Cuentan todos tus alumnos, no solo los que quedaron en tu casa.',
-            geralT:   'Toda la escuela',
-            cego:     'Las casas puntúan en secreto: los nombres aparecen el 20/09. Hasta entonces, lo que vale es llenar la poción de la escuela. 🤫',
-            subiu:    function(p){ return '¡Bien! ¡Tu casa subió al ' + p + ' lugar desde tu última visita! 🎉'; },
-            caiu:     function(p){ return 'Tu casa está en ' + p + ' ahora. ¡Vamos a darle la vuelta con tus grupos! 💪'; },
-            fimSelo:  '¡Campeona de la Copa!',
-            fimSua:   '¡TU casa ganó la Copa de las Casas! 🏆🎉',
-            fimDela:  function(c){ return '¡' + c + ' ganó la Copa de las Casas! 🏆'; },
-            fimObrig: 'La campaña terminó, pero tu casa es tuya para siempre: el escudo sigue en tu menú y los colores siguen en el Hub. ¡Gracias por impulsar a tus grupos! ✨',
-            geral:    function(m,n){ return '¡Juntos, todos los alumnos ya reunieron ' + m + ' de maná! Próxima meta: ' + n + '. 🚀'; },
-            geralMax: function(m){ return '¡Juntos, todos los alumnos ya reunieron ' + m + ' de maná! ¡Superaron todas las metas! 🚀'; },
-            ir:       'ver mi casa →' }
-    };
-    var dados = null, taca = null;
-
-    /* ⚠️ AS CORES DA BARRA NÃO SÃO AS `cor1` DAS CASAS (o vinho, o azul-noite,
-       o verde-masmorra): aquelas são cores de FUNDO, feitas para ter texto
-       branco em cima, e como barra fina sobre o painel escuro da casa elas
-       somem. Estas são as mesmas famílias, clareadas até se enxergarem. O
-       brasão ao lado é quem identifica a casa; a barra só precisa ser lida. */
-    var BARRA = { g:'#e0533f', r:'#4d86ee', h:'#ecb939', s:'#33b877' };
-
-    function fator(){ return (window.FiskMana && window.FiskMana.FATOR) || 1; }
-    /* o separador de milhar segue o IDIOMA da tela: 2.970 em português é
-       2,970 em inglês, e o número errado lê como outro número */
-    function num(n){
-      var loc = { pt:'pt-BR', en:'en-US', es:'es-ES' }[(typeof _lang !== 'undefined' && _lang) || 'pt'] || 'pt-BR';
-      return Number(n || 0).toLocaleString(loc);
-    }
-
-    function pinta(){
-      if (!dados || !dados.casa) return;
-      var t = TXT[(typeof _lang !== 'undefined' && TXT[_lang]) ? _lang : 'pt'];
-      var f = fator();
-      document.getElementById('hwpB').style.backgroundImage = 'url(' + IMG + SLUG[dados.casa] + '.webp)';
-      document.getElementById('hwpCasa').textContent = NOMES[dados.casa];
-      document.getElementById('hwpL1').textContent = t.colegas(dados.colegas || 0);
-      document.getElementById('hwpL2').textContent = !dados.elegiveis ? t.semTurma
-        : (!dados.fd ? t.semNada
-        : t.rendeu(num(Math.round(dados.fd * f)), num(Math.round(dados.media * f))));
-      /* a pergunta que todo professor faz ao ler o número: "só os da minha
-         casa?". A resposta fica na tela, e não numa conversa. */
-      document.getElementById('hwpL3').textContent = dados.elegiveis ? t.todos : '';
-      document.getElementById('hwpIr').textContent = t.ir;
-      document.getElementById('hwProf').hidden = false;
-      pintaTaca();
-    }
-    /* O PLACAR DAS QUATRO CASAS, o mesmo que o aluno vê na home dele: a
-       pontuação é a MÉDIA por membro (ver `hwTaca_` no Casas.js), e é por isso
-       que a casa maior não começa ganhando. A do professor fica marcada. */
-    function pintaTaca(){
-      if (!taca || !taca.casas || !dados || !dados.casa) return;
-      var lista = ['g','r','h','s'].map(function(k){
-        return { k:k, media: (taca.casas[k] && taca.casas[k].media) || 0 };
-      }).sort(function(a,b){ return b.media - a.media; });
-      var teto = Math.max(1, lista[0].media);
-      var zerado = lista[0].media === 0;
-      var f = fator();
-      var t = TXT[(typeof _lang !== 'undefined' && TXT[_lang]) ? _lang : 'pt'];
-
-      /* A BARRA DA COMUNIDADE, a mesma do portal do aluno: a Taça divide a
-         escola em quatro, e ela volta a juntá-la. O total inclui quem ainda
-         não fez a Cerimônia (é o `geral` do servidor, não a soma das casas).
-         ⚠️ A meta é um MARCO MÓVEL: meta chutada alta deixa a barra parada em
-         3% e meta baixa é batida na terça e nunca mais muda. */
-      var MARCOS = [5000,10000,25000,50000,100000,200000,350000,500000,750000,1000000];
-      var geral = '';
-      if (taca.geral) {
-        var tot = Math.round(Number(taca.geral.fd || 0) * f);
-        var meta = null;
-        for (var mi = 0; mi < MARCOS.length; mi++) { if (tot < MARCOS[mi]) { meta = MARCOS[mi]; break; } }
-        var pct = meta ? Math.min(100, Math.round(tot / meta * 100)) : 100;
-        /* o frasco e o MESMO SVG da mana (assets/mana.js do Portal), so que
-           grande: ele e desenhado em `1em`, entao quem manda no tamanho e o
-           `font-size` — nada de uma segunda copia do desenho por aqui */
-        var frasco = (window.FiskMana && window.FiskMana.SVG) || '';
-        geral = '<div class="hwt-geral">' +
-          '<div class="hwt-gt"><span class="hwt-gfrasco">' + frasco + '</span>' +
-            '<span>' + t.geralT + '</span><b>' + pct + '%</b></div>' +
-          '<span class="hwt-gbar"><i style="width:' + pct + '%"></i></span>' +
-          '<p>' + (meta ? t.geral(num(tot), num(meta)) : t.geralMax(num(tot))) + '</p>' +
-        '</div>';
-      }
-
-      /* A CERIMÔNIA DE FECHAMENTO e a VIRADA DE POSIÇÃO, as mesmas do portal
-         do aluno. Depois de 10/10 o placar deixa de ser disputa e vira
-         resultado; até lá, quando a casa do professor muda de lugar, ele
-         descobre na visita seguinte.
-         ⚠️ A virada só avisa depois de já ter visto uma vez: na primeira
-         abertura não há "antes", e anunciar a posição atual como novidade
-         seria inventar um movimento que não houve. */
-      var hoje = new Date().toISOString().slice(0,10);
-      var fim = hoje > (taca.ate || '2026-10-10');
-      /* ⚠️ AS DUAS PRIMEIRAS SEMANAS SÃO ÀS CEGAS, igual ao portal do aluno
-         (decisão do Pedro): a pontuação aparece, de quem ela é não. O
-         professor vê o mesmo que a turma dele — se ele soubesse antes, o
-         segredo duraria até a primeira aula. A DIREÇÃO continua vendo tudo,
-         pelo painel (`dirCasas`), que é onde a informação serve para decidir.
-         O destaque da casa dele e o aviso de virada saem junto: qualquer um
-         dos dois entrega a posição, que é o que está escondido. */
-      var aberto = fim || hoje >= '2026-09-20';
-      var minhaPos = 0;
-      lista.forEach(function(x,i){ if (x.k === dados.casa) minhaPos = i + 1; });
-
-      var aviso = '';
-      if (aberto && !fim && !zerado && minhaPos) {
-        var kp = 'hw_pos_PROF', antes = null;
-        try { antes = JSON.parse(localStorage.getItem(kp) || 'null'); } catch (e) {}
-        try { localStorage.setItem(kp, JSON.stringify({ casa: dados.casa, pos: minhaPos })); } catch (e) {}
-        if (antes && antes.casa === dados.casa && antes.pos && antes.pos !== minhaPos) {
-          var sobe = minhaPos < antes.pos;
-          aviso = '<p class="hwt-virada' + (sobe ? ' is-sobe' : '') + '">' +
-                  (sobe ? '▲ ' : '▼ ') +
-                  (sobe ? t.subiu(minhaPos + 'º') : t.caiu(minhaPos + 'º')) + '</p>';
-        }
-      }
-
-      var podio = '';
-      if (fim) {
-        var c1 = lista[0].k, eu1 = c1 === dados.casa;
-        podio = '<div class="hwt-fecho' + (eu1 ? ' is-minha' : '') + '" style="--c:' + BARRA[c1] + '">' +
-          '<img src="' + IMG + SLUG[c1] + '.webp" alt="" width="64" height="70" loading="lazy">' +
-          '<div><span class="hwt-fselo">' + t.fimSelo + '</span>' +
-          '<b>' + NOMES[c1] + '</b>' +
-          '<p>' + (eu1 ? t.fimSua : t.fimDela(NOMES[c1])) + '</p>' +
-          '<p class="hwt-fobs">' + t.fimObrig + '</p></div>' +
-        '</div>';
-      }
-
-      document.getElementById('hwpTaca').innerHTML = podio + (fim ? '' : geral + aviso) + lista.map(function(x,i){
-        var m = Math.round(x.media * f);
-        return '<div class="hwt-l' + (aberto && x.k === dados.casa ? ' is-minha' : '') +
-                 (aberto ? '' : ' is-oculta') +
-                 '" style="--c:' + (aberto ? BARRA[x.k] : 'rgba(255,255,255,.45)') + '">' +
-          '<span class="hwt-pos">' + (zerado ? '·' : (i+1) + 'º') + '</span>' +
-          (aberto
-            ? '<img class="hwt-b" src="' + IMG + SLUG[x.k] + '.webp" alt="" width="22" height="24" loading="lazy">'
-            : '<span class="hwt-b hwt-bx" aria-hidden="true">?</span>') +
-          '<span class="hwt-n">' + (aberto ? NOMES[x.k] : '???') + '</span>' +
-          '<span class="hwt-bar"><i style="width:' + Math.round(x.media / teto * 100) + '%"></i></span>' +
-          '<span class="hwt-p">' + num(m) + '</span>' +
-        '</div>';
-      }).join('') + (aberto ? '' : '<p class="hwt-cego">' + t.cego + '</p>');
-      document.getElementById('hwpTaca').hidden = false;
-    }
-
-    window.hwpRender = pinta;   // o applyLang chama isto ao trocar de idioma
-
-    var s = null;
-    try { s = JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) {}
-    if (!s || !s.token) return;
-    /* HOME SÓ COM AS FERRAMENTAS (Pedro, 19/09/2026): o painel da casa saiu do topo (aparecia vazio no acesso da
-       direção). A casa continua vestindo a faixa e no menu do professor. `true` religa o painel. */
-    var HWP_LIGADO = false;
-    if (!HWP_LIGADO) return;
-    fetch(EP, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action:'hwProf', token: s.token }) })
-      .then(fiskJson)
-      .then(function(j){ if (j && j.ok && j.casa) { dados = j; pinta(); } })
-      .catch(function(){});    // sem rede o painel não aparece, e está certo
-
-    /* O placar é público (APP_KEY, a mesma do portal do aluno): ele não fala
-       de ninguém em particular, é o resultado das quatro casas. */
-    fetch(EP, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action:'hwTaca', key:'fisk_0719bacbecc857f61d1e' }) })
-      .then(fiskJson)
-      .then(function(j){ if (j && j.ok) { taca = j; pintaTaca(); } })
-      .catch(function(){});
-  })();
+  /* O PAINEL DA CASA no topo da home (colegas, taça, placar) estava DESLIGADO desde 19/09/2026 e saiu do código em
+     31/10/2026 (auditoria de 30/10, B8); o git guarda (commit 7a9ef94). A casa continua vestindo a faixa (kit) e no menu. */
 
 /* ═══ bloco 5 ═══ */
   /* A CERIMÔNIA DE SELEÇÃO SAI SOZINHA DA HOME quando a campanha vence.
@@ -2104,7 +1635,7 @@
     PADRAO.forEach(function (sel) { entra(document.querySelector('main.grid ' + sel)); });
     if (!lista.length) { BOX.hidden = true; return; }
     BOX.hidden = false;
-    var l = typeof fiskIdioma === 'function' ? fiskIdioma() : 'en';
+    var l = typeof fiskIdioma === 'function' ? fiskIdioma() : 'pt';
     var rot = { pt: 'Ferramentas mais usadas por você', en: 'Your most used tools', es: 'Tus herramientas más usadas' }[l] || 'Your most used tools';
     BOX.innerHTML = '<span class="mu-rot">' + rot + '</span>' + lista.map(function (x) {
       return '<a class="mu-chip" href="' + x.h.replace(/"/g, '&quot;') + '">' + x.t.replace(/[<>&]/g, '') + '</a>';
@@ -2123,12 +1654,16 @@
   var s = null; try { s = JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) {}
   if (!s || !s.token) return;
   sec.hidden = false;
+  /* A CHAVE TEM DONO (auditoria de 30/10/2026, M7): `hub_semana_aberta` era de todo mundo que entrasse no aparelho,
+     então o professor que fechou a seção ontem a via aberta de novo se outro tivesse entrado. Fica por conta
+     (hub:semana:<conta>), e o prefixo hub: some no "Sair". */
+  var CH_SEMANA = 'hub:semana:' + String(s.name || '').replace(/[^A-Za-z0-9]/g, '').toUpperCase();
   /* abrir e fechar DESLIZANDO (Pedro, 27/10/2026): a altura vai de 0 à do conteúdo (e volta), com um esmaecer. O
      calendário tem altura fixa, então a altura final já é conhecida antes de ele carregar. Na abertura da página
      não anima. Ao fechar, os cantos do botão só se arredondam quando a seção terminou de subir. */
   var _anima = null;
   function abre(sim, animar) {
-    try { localStorage.setItem('hub_semana_aberta', sim ? '1' : '0'); } catch (e) {}
+    try { localStorage.setItem(CH_SEMANA, sim ? '1' : '0'); localStorage.removeItem('hub_semana_aberta'); } catch (e) {}
     if (sim && !corpo.querySelector('iframe')) {
       var f = document.createElement('iframe');
       f.src = 'calendario.html?embed=1'; f.title = 'Minha semana'; f.loading = jaViu ? 'lazy' : 'eager';   /* no dia do tour ele tem de carregar já */
@@ -2149,7 +1684,7 @@
     }
   }
   bt.addEventListener('click', function () { abre(corpo.hidden || corpo.style.height === '0px' ? true : false, true); });
-  var guardado = null; try { guardado = localStorage.getItem('hub_semana_aberta'); } catch (e) {}
+  var guardado = null; try { guardado = localStorage.getItem(CH_SEMANA); if (guardado === null) guardado = localStorage.getItem('hub_semana_aberta'); } catch (e) {}   /* a chave antiga vale até a primeira gravação */
   /* O TOUR DA MINHA SEMANA (26/10/2026, Pedro: "na próxima vez que o professor entra, já carregue mostrando o Minha
      Semana aberto, com aquele tour do portal do aluno"). Uma vez por aparelho (chave fisk_tour_hub_semana_v1): nessa
      vez a seção abre mesmo que tenha sido fechada. O motor é o tour.js do PORTAL, lido de lá (dado e código de outro
@@ -2177,7 +1712,7 @@
          ['🧪 Clase de prueba', 'Cuando la secretaría agende una <b>clase de prueba</b> en uno de tus grupos, aparece aquí, en la clase del día, con el nombre y la edad de quien viene.'],
          ['↗ Pantalla completa', '¿Lo quieres más grande? Abre <b>Mi semana</b> en pantalla completa aquí.']]
   };
-  function lingua() { var l = 'en'; try { l = (typeof fiskIdioma === 'function' ? fiskIdioma() : localStorage.getItem('fisk_lang')) || 'en'; } catch (e) {} return T[l] ? l : 'en'; }
+  function lingua() { var l = 'pt'; try { l = (typeof fiskIdioma === 'function' ? fiskIdioma() : localStorage.getItem('fisk_lang')) || 'pt'; } catch (e) {} return T[l] ? l : 'pt'; }
   /* uma "sombra" na página de fora, por cima de um elemento de dentro do calendário */
   function sombra(id, alvo) {
     var f = corpo.querySelector('iframe'), velho = document.getElementById(id); if (velho) velho.remove();
@@ -2240,7 +1775,7 @@
   var TXT = { pt: { prox: 'Sua próxima aula', agora: 'Em aula agora', ate: 'até', as: 'às', em: 'em', alunos: 'alunos', depois: 'depois mais N hoje', abrir: 'Abrir na Minha aula' },
               en: { prox: 'Your next class', agora: 'In class now', ate: 'until', as: 'at', em: 'in', alunos: 'students', depois: 'N more later today', abrir: 'Open in My Class' },
               es: { prox: 'Tu próxima clase', agora: 'En clase ahora', ate: 'hasta las', as: 'a las', em: 'en', alunos: 'alumnos', depois: 'después N más hoy', abrir: 'Abrir en Mi clase' } };
-  function idioma() { try { return typeof fiskIdioma === 'function' ? fiskIdioma() : 'en'; } catch (e) { return 'en'; } }
+  function idioma() { try { return typeof fiskIdioma === 'function' ? fiskIdioma() : 'pt'; } catch (e) { return 'pt'; } }
   function sess() { try { return JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) { return null; } }
   function nP(v) { return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
   function eu(s) { if (s.master) { try { var a = JSON.parse(localStorage.getItem('fisk_actas') || 'null'); if (a && a.name) return a.name; } catch (e) {} } return s.name || ''; }
@@ -2290,7 +1825,7 @@
   function fecha() { var m = card.querySelector('.bol-menu'); if (m) m.remove(); }
   card.addEventListener('click', function (ev) {
     if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button !== 0) return;
-    if (ev.target.closest('.bol-menu a')) { if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Boletins'); setTimeout(fecha, 50); return; }
+    if (ev.target.closest('.bol-menu a')) { if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Boletins', 'boletins'); setTimeout(fecha, 50); return; }
     ev.preventDefault();
     if (card.querySelector('.bol-menu')) { fecha(); return; }
     var m = document.createElement('div'); m.className = 'bol-menu'; m.setAttribute('role', 'menu');

@@ -612,3 +612,20 @@ body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ 
 .cv-resumo.cv-varios .cv-livro.empilha{margin-right:-10px;box-shadow:0 0 0 2px var(--surface,#fff),0 1px 4px rgba(0,0,0,.2)}
 .cv-resumo.cv-varios b{margin-left:14px}
 .al-cab .cv-livro.na-linha{margin-left:.35rem}
+
+/* ═══ CELULAR: ALVOS DE TOQUE E PISO DE TEXTO (auditoria de 30/10/2026, M10) ═══════════════════════════════════════
+   No toque (pointer: coarse) nada interativo fica abaixo de 44px: o "?" das dicas tinha 20px, as setas de reordenar
+   30px, os chips e botões de pílula uns 33px. E o texto corrido não desce de 14px (.875rem): os rótulos de .72 a .84rem
+   sobem ao piso. No mouse, tudo segue como era. */
+@media (pointer: coarse){
+  .dica{ min-width: 44px; min-height: 44px; width: auto; height: auto; font-size: .95rem; }
+  .al-cab .mover button{ min-width: 44px; height: 44px; font-size: 1.05rem; }
+  .chip, .btn-ghost, .btn-nav, .rt-btn, .obs .ec, .obs-toggle, .fila-info .btn-recarrega, .al .tirar, .fila-off button, .btn-ck-editar, .btn-ck{ min-height: 44px; }
+  .ksi{ min-height: 44px; }
+  .ck .prontos .chip{ min-height: 44px; }
+  .leg-det summary{ min-height: 44px; display: flex; align-items: center; }
+  .cascata label, .busca-al label, .al .visita, .al .tirar, .resumo, .pill, .aula .libera, .btn-ghost, .aula .t, .aula .t b, .it .pg, .aula .t .dt,
+  .sem-plano, .ck label.rot, .chip, .ck .prontos .chip, .ck .ped, .ck .aviso, .ck .registrado, .fila-info, .fila-info .btn-recarrega, .rt-data input, .rt-btn,
+  .al .plano-ativ, .al .atend .quando, .obs label, .obs .st, .obs .ec, .obs-toggle, .dica-tx, .aguia-topo .sub, .aula .it .pg, .aula .sug1 .pct,
+  .aula .ck-feito small, .btn-ck-editar, .aula.ks .t .dt, .ksi, .ksi .pct, .ks-mais, .pl-topo .rt-info, .pl-salvar .rt-data, .pt-nota label small, .status, .al-cab .livro{ font-size: .875rem; }
+}

@@ -672,6 +672,13 @@ body.theme-dark .cal-event-item{ background: rgba(255,255,255,.04); }
   }
   .icon svg{ width: 24px; height: 24px; }
 
+  /* AS PÁGINAS DE POUCOS CARDS (Answer Keys, Centro de Estudos, Boletins) não precisam do quadrado em duas colunas: com
+     três ou quatro cards, uma coluna cabe na primeira tela, e a chamada aparece inteira em vez de cortada em três
+     linhas de 11,5px (auditoria de 30/10/2026, M10: a descrição dos Answer Keys saía cortada). */
+  .boletins-grid{ grid-template-columns: 1fr; }
+  .boletins-grid .card{ aspect-ratio: auto; padding: 1.1rem 1rem; justify-content: flex-start; }
+  .boletins-grid .card p{ display: block; -webkit-line-clamp: unset; overflow: visible; font-size: .875rem; }
+
   .badge{
     top: 0.5rem;
     right: 0.5rem;

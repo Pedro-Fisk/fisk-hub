@@ -111,17 +111,27 @@
     .btn-sec{ flex:1 1 auto; }
     .fb .grupo{ padding:16px 16px; }
   }
+  /* MODO ESCURO (31/10/2026): a mesma chave fisk_theme das outras telas; as variáveis trocam, o resto segue */
+  body.theme-dark{ --pap:#1c1a1a; --chao:#121212; --txt:#eef1f7; --med:#aab4c8; --lin:#3a4660; }
+  body.theme-dark .linha.fala-prof{ background:#2a2d14; border-color:#4f5522; } body.theme-dark .linha.fala-prof .diz{ color:#e4ea9a; }
+  body.theme-dark .linha.fala-aluno{ background:#17213a; border-color:#2e4060; } body.theme-dark .linha.fala-aluno .diz{ color:#c7d6ff; }
+  body.theme-dark .fb .grupo.res{ background:var(--pap); } body.theme-dark .fb .res-bt{ background:#262323; color:var(--txt); }
+  body.theme-dark .fb .grupo.bom{ background:#13302a; border-color:#1f4a40; } body.theme-dark .fb .grupo.ruim{ background:#3a1a1a; border-color:#5a2a2a; }
+  body.theme-dark .fb .grupo.bom h2{ color:#8fd9c3; } body.theme-dark .fb .grupo.ruim h2{ color:#f5a3a3; }
+  body.theme-dark .fb textarea{ background:#262323; color:var(--txt); border-color:var(--lin); }
+  body.theme-dark .bloco-cab h1, body.theme-dark .fim h1{ color:#9fb4ff; }
 </style>
 </head>
 <body>
+<script>/* o tema salvo (fisk_theme, a mesma chave do Portal e da Secretaria) antes da 1ª pintura: sem piscar claro (auditoria de 30/10/2026, M11) */try{var _t=localStorage.getItem("fisk_theme");if(_t==="dark"||(!_t&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches))document.body.classList.add("theme-dark");}catch(e){}</script>
 <header>
   <a class="inicio" href="index.html" title="Fisk Hub" aria-label="Fisk Hub"><img src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava"></a>
   <span class="rot" id="rot">Checking</span>
   <span class="aluno" id="aluno"></span>
   <nav class="passos" id="passos" aria-label="Blocos"></nav>
-  <a class="fechar" href="#" onclick="window.close(); return false;">✕ Close</a>
+  <a class="fechar" href="#" onclick="window.close(); return false;">✕ Fechar</a>
 </header>
-<main id="main"><div class="erro">Loading the guide…</div></main>
+<main id="main"><div class="erro">Carregando o guia…</div></main>
 
 <script src="https://portalfisk.com.br/assets/planner-v2.js?v=f9e5851b94"></script><!-- ?v= = md5 do assets/planner-v2.js do portal-aluno-fisk (o mesmo do index.html do portal), conferido em 31/10/2026 -->
 <script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=5a600e1933"></script>
@@ -136,7 +146,7 @@
 <script src="https://portalfisk.com.br/assets/checking/guia-i2.js?v=56bd0516a9"></script>
 <script src="https://portalfisk.com.br/assets/checking/guia-i3.js?v=e326479afd"></script>
 <!-- o kit vem ANTES do script da página: o Salvar usa o fiskFetch (30/10/2026) -->
-<script src="assets/fisk-shared.js?v=475f40b4f9"></script>
+<script src="assets/fisk-shared.js?v=282254175d"></script>
 <script>
 var $ = function (id) { return document.getElementById(id); };
 var q = new URLSearchParams(location.search);
@@ -338,6 +348,6 @@ document.addEventListener('keydown', function (ev) {
 });
 </script>
 <!-- registro de uso (auditoria de 26/10/2026): a página não carregava o kit e era invisível no painel da direção -->
-<script>if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Guia do Checking');</script>
+<script>if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Guia do Checking', 'checking-guia');</script>
 </body>
 </html>

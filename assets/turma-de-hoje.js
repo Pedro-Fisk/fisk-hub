@@ -5,7 +5,7 @@
 /* ═══ bloco 1 ═══ */
 fiskInitThemeToggle('themeToggle');
 fiskInitUserMenu();
-fiskRegistrarUso("Turma de hoje");
+fiskRegistrarUso("Minha aula", "minha-aula");   /* o nome da tela e o id fixo do painel de uso (auditoria de 30/10/2026, M8/B7) */
 
 var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
 var $ = function (id) { return document.getElementById(id); };
@@ -43,15 +43,7 @@ function guardaAtendidos() { try { localStorage.setItem(chaveAtend(), JSON.strin
    mesma lição), com o que só a Turma de hoje sabe: dentro da faixa, quem terminou a lição e está pronto para o Checking
    sobe. Vale para a turma, os alunos trazidos pela busca e o plantão. Reordena só no clique, nunca sozinha. */
 var PRIO_NIVEL = { alta: 0, media: 1, emdia: 2, semdados: 3 };
-/* quem vê o botão enquanto está em teste: só a direção (Pedro, 15/09/2026: "tire do Carlos, eu só queria ver") */
-var PRIO_TESTE = ['CARLOS ALBERTO'];   /* Carlos liberado de novo em 16/09/2026 */
-function podeOrdenar() {
-  return true;   /* para todos os professores desde 16/09/2026 */
-  var s = sessao() || {};
-  if (s.master) return true;
-  var n = nPessoa(s.name);
-  return PRIO_TESTE.some(function (p) { var x = nPessoa(p); return x === n || n.indexOf(x + ' ') === 0; });
-}
+function podeOrdenar() { return true; }   /* para todos os professores desde 16/09/2026; o piloto (PRIO_TESTE) saiu em 31/10 (B8) */
 function prioDados(a) {
   var d = estado.dados[a.raf] || {}, situ = d.situacao || {};
   var atraso = typeof a.aulasAtraso === 'number' ? a.aulasAtraso : (typeof situ.atraso === 'number' ? situ.atraso : null);
@@ -654,18 +646,10 @@ function montarSelect(sel, ph, itens) {
     itens.map(function (i) { return '<option value="' + esc(i.v) + '">' + esc(i.t) + '</option>'; }).join('');
   sel.disabled = false;
 }
-/* O PILOTO (Pedro, 14/09/2026): a direção e o professor de teste. A mesma lista do card no index.html */
-var TURMA_HOJE_PILOTO = ['CARLOS ALBERTO'];
-function turmaHojeLiberada() {
-  var s = sessao() || {};
-  var n = function (v) { return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); };
-  /* O LANÇAMENTO (Pedro, 16/09/2026): quinta 17/09, 13h15 em Caçapava e 17h30 em Taubaté (a mesma regra do index.html) */
-  var abreEm = { 'CACAPAVA': Date.parse('2026-09-17T13:15:00-03:00'), 'TAUBATE': Date.parse('2026-09-17T17:30:00-03:00') }, agora = Date.now();
-  if (String(s.escolas || s.escola || '').split(',').some(function (e) { return agora >= (abreEm[n(e).replace(/[^A-Z]/g, '')] || Infinity); })) return true;
-  return !!(s.master || TURMA_HOJE_PILOTO.some(function (p) { return n(p) === n(s.name) || n(s.name).indexOf(n(p) + ' ') === 0; }));   /* "Carlos Alberto da Silva" também */
-}
+/* A MINHA AULA É DE TODOS desde 17/09/2026; a trava do lançamento (datas por escola e o piloto) saiu em 31/10/2026
+   (auditoria de 30/10, M5): quem estava sem escola na _profs via "em piloto" sem explicação. Sem escola, a cascata
+   abre do mesmo jeito e o status diz a causa e a porta. */
 function initCascata() {
-  if (!turmaHojeLiberada()) { status('🔒 A Minha aula está em piloto com um professor de teste. Em breve para todos.', true); return; }
   var selEscola = $('selEscola'), selProf = $('selProf'), selTurma = $('selTurma');
   /* quem entrou já diz a escola e o professor (pedido do Pedro, 13/09): a
      cascata se preenche sozinha e só a turma fica para escolher; e se o
@@ -673,6 +657,7 @@ function initCascata() {
   var s = sessao() || {};
   var eu = s.master ? (function () { try { return (JSON.parse(localStorage.getItem('fisk_actas') || 'null') || {}).name || ''; } catch (e) { return ''; } })() : (s.name || '');
   var minhas = Array.isArray(s.escolas) ? s.escolas : (s.escolas ? String(s.escolas).split(/[,;]/).map(function (x) { return x.trim(); }) : []);
+  if (!minhas.length && !s.master) status('⚠️ Sua conta está sem escola cadastrada: peça à direção para cadastrar sua escola. Até lá, escolha a escola, o professor e a turma aqui.', true);
   /* RÁPIDO (Pedro, 15/09/2026): as listas de escolas, professores e turmas ficam guardadas no aparelho e a cascata se
      monta na hora com elas; a leitura do card corre por trás e só troca as opções se algo mudou. A escola e o professor
      vêm de quem entrou; a turma, SÓ pelo horário: fora da aula nenhuma turma abre sozinha (a última vista não volta mais). */
@@ -737,7 +722,7 @@ function initCascata() {
     lista('turmas:' + escola + '|' + prof, { action: 'card', fn: 'turmas', escola: escola, prof: prof }, 'turmas', function (turmas, doCache) {
       if (selEscola.value !== escola || selProf.value !== prof) return;
       var antes = selTurma.value;
-      montarSelect(selTurma, 'Escolha a turma…', [{ v: PLANTAO, t: '🙋 Plantão de dúvidas (alunos da escola, pela busca)' }].concat(turmas.map(function (t) { return { v: t.linhaTitulo, t: t.titulo }; })));
+      montarSelect(selTurma, 'Escolha a turma…', [{ v: PLANTAO, t: '🙋 Centro de Estudos (alunos da escola, pela busca)' }].concat(turmas.map(function (t) { return { v: t.linhaTitulo, t: t.titulo }; })));
       if (antes && (antes === PLANTAO || turmas.some(function (t) { return String(t.linhaTitulo) === antes; }))) { selTurma.value = antes; return; }
       if (pedida && pedida.escola === escola && pedida.prof === prof) {
         var linhaPedida = pedida.linha; pedida = null;
@@ -749,10 +734,9 @@ function initCascata() {
       /* o horário do plantão escrito no card ("LC FIXO - 5ª 15h às 17h30") abre o plantão, não a lista daquela linha */
       /* a tabela das Learning Center sessions diz quem é monitor e quando (Pedro, 16/09/2026) */
       var lc = lcAgora(escola, prof);
-      if (lc) { status('🙋 Learning Center session (' + lc.inicio + (lc.fim ? '–' + lc.fim : '') + '): busque cada aluno pelo nome ou RAF.'); escolhe(selTurma, PLANTAO); return; }
+      if (lc) { status('🙋 Centro de Estudos (' + lc.inicio + (lc.fim ? '–' + lc.fim : '') + '): busque cada aluno pelo nome ou RAF.'); escolhe(selTurma, PLANTAO); return; }
       if (agora && ehPlantao(agora.titulo)) { status('🕒 Horário do plantão de dúvidas.'); escolhe(selTurma, PLANTAO); return; }
       if (agora) { status('🕒 Turma do horário de agora: ' + agora.titulo.split('\n')[0] + '. Troque acima se for outra.'); escolhe(selTurma, agora.linhaTitulo); return; }
-      if (ehMonitor(prof)) { status('🙋 Plantão de dúvidas: busque cada aluno pelo nome ou RAF.'); escolhe(selTurma, PLANTAO); return; }
       if (!doCache) status('Fora do horário de aula de ' + prof + ': escolha a turma acima.');
       else status('Fora do horário de aula de ' + prof + ': escolha a turma acima.');
     });
@@ -936,7 +920,6 @@ function statusSemRaf(semRaf) {
    os monitores da lista abaixo ela vem escolhida fora do horário de aula, e para qualquer um no horário de uma
    linha "LC"/"Plantão" do card. */
 var PLANTAO = '__plantao';
-var MONITORES = [];   /* nomes das contas dos monitores, como no login do Hub (ex.: 'NICOLE'); vazio até o Pedro dizer quem são */
 function nPessoa(v) { return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
 /* OS MONITORES SÃO A TABELA DO LEARNING CENTER (Pedro, 16/09/2026): a mesma grade que o aluno vê no portal
    (rota aberta plantaoList). Quem está na grade num horário é monitor naquele horário; a Turma de hoje abre
@@ -951,13 +934,8 @@ function carregaLC(escola) {
       try { localStorage.setItem('th:lc:' + escola, JSON.stringify(LC[escola])); } catch (e) {}
     }).catch(function () {});
 }
-function mesmaPessoa(tabela, prof) {
-  var t = nPessoa(tabela).replace(/^(PROF(A|ESSORA?)?\.?\s+|TEACHER\s+)/, ''), p = nPessoa(prof);
-  if (!t || !p) return false;
-  if (t === p || p.indexOf(t + ' ') === 0 || t.indexOf(p + ' ') === 0) return true;
-  /* a grade costuma trazer só o primeiro nome ("Nicole") */
-  return t.indexOf(' ') < 0 && p.split(' ')[0] === t;
-}
+/* a régua é do kit desde 31/10/2026 (fiskMesmaPessoa, M15): a mesma da Minha semana e dos Horários do Centro de Estudos */
+function mesmaPessoa(tabela, prof) { return fiskMesmaPessoa(tabela, prof); }
 function lcAgora(escola, prof) {
   var itens = LC[escola] || [], s = sessao() || {};
   var d = new Date(), dia = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'][d.getDay()], min = d.getHours() * 60 + d.getMinutes();
@@ -968,9 +946,7 @@ function lcAgora(escola, prof) {
     return min >= ini - 10 && min < fim;
   }) || null;
 }
-/* os monitores da grade também dão aula: fora do horário de LC eles caem na turma deles, e não no plantão */
-function ehMonitor(prof) { return ehMonitor0(prof); }
-function ehMonitor0(prof) { var s = sessao() || {}; return MONITORES.some(function (m) { var x = nPessoa(m); return x && (x === nPessoa(prof) || x === nPessoa(s.name) || nPessoa(s.name).indexOf(x + ' ') === 0); }); }
+/* os monitores são SÓ a grade do Centro de Estudos (lcAgora): a lista fixa MONITORES, vazia desde 16/09/2026, saiu em 31/10 (B8) */
 function ehPlantao(titulo) { return /\bLC\b|plant[aã]o|learning\s*center|centro de estudos/i.test(String(titulo || '')); }
 function carregarPlantao(escola, prof) {
   estado.escola = escola; estado.prof = prof; estado.turma = 'Plantão de dúvidas'; estado.plantao = true; estado.prioridade = false; estado.ontem = false;
@@ -978,7 +954,8 @@ function carregarPlantao(escola, prof) {
   estado.atendidos = lerAtendidos();
   juntaVisitantes(); aplicarFila();
   $('fila').hidden = true; $('legenda').hidden = false;
-  status('🙋 Plantão de dúvidas em ' + escola + ': busque cada aluno pelo nome ou RAF em "Trazer outro aluno". Eles entram na ordem em que chegam.');
+  status('🙋 Centro de Estudos em ' + escola + ': busque cada aluno pelo nome ou RAF em "Trazer outro aluno". Eles entram na ordem em que chegam.');
+  try { if (typeof fiskGlossarioCentro === 'function') fiskGlossarioCentro(document.querySelector('main')); } catch (e) {}   /* o glossário, uma vez (M8) */
   desenharTurma();
   try { $('qAluno').focus(); } catch (e) {}
 }
@@ -2147,7 +2124,7 @@ window.addEventListener('message', function (ev) {
 
 (function () {
   var s = sessao();
-  if (!s || !s.token) { $('status').className = 'status err'; $('status').innerHTML = '⚠️ Entre no Fisk Hub para abrir a turma. <a href="index.html" style="font-weight:800">Ir para o login →</a>'; return; }
+  if (!s || !s.token) { $('status').className = 'status err'; fiskExigirSessao($('status')); return; }   /* a mesma guarda das outras telas (B2) */
   if (!window.PlannerV2) { status('⚠️ Não consegui carregar a régua do Planner (portalfisk.com.br). Recarregue a página.', true); return; }
   initCascata();
 })();

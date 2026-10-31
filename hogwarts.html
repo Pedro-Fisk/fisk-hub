@@ -59,7 +59,7 @@
   <div class="hw-stage" id="hw-stage"></div>
 </div>
 
-<script src="assets/fisk-shared.js?v=475f40b4f9"></script>
+<script src="assets/fisk-shared.js?v=282254175d"></script>
 <script>
   /* A APP_KEY é pública por desenho: ela está em toda página de aluno e em
      todas as ferramentas. Só autoriza gravar; não lê dado de ninguém. */
@@ -96,7 +96,7 @@
 
   if (!window.FiskHogwarts) {
     $('hw-stage').innerHTML = '<p style="color:#f4ecd8;text-align:center;padding:3rem 1rem">' +
-      'The Sorting Ceremony is not answering right now. Please try again in a moment.</p>';
+      'A Cerimônia de Seleção não está respondendo agora. Tente de novo daqui a pouco.</p>';
     return;
   }
 
@@ -116,7 +116,7 @@
 })();
 
 /* registro de uso (auditoria de 26/10/2026: esta tela não aparecia no painel da direção) */
-if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Cerimônia de Seleção');
+if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Cerimônia de Seleção', 'hogwarts');
 </script>
 </body>
 </html>

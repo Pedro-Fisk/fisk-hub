@@ -278,7 +278,7 @@ async function fiskEnviarParaPasta(buttonEl, getOpts) {
        escrita negada (Pedro), e ao fechá-lo sobrava "não salvou". A causa e a porta ficam na página, ao lado do
        botão, e viajam em e.motivo para a linha de status de quem chamou. */
     e.motivo = fiskMotivoDePasta(e, opts && opts.tipo);
-    fiskAvisoDePasta(buttonEl, 'NÃO salvou: ' + e.motivo + '. O PDF continua no botão de baixar.');
+    fiskAvisoDePasta(buttonEl, 'NÃO salvou: ' + e.motivo + '. O PDF continua no botão de baixar.', { tentar: buttonEl });
     throw e;
   }
 }
@@ -631,10 +631,11 @@ var FISK_IDIOMAS = [
  * antiga apagada. Ela ganha da nova de propósito: era a da home, ou seja, a
  * língua que o professor de fato via na tela.
  *
- * O PADRÃO É `en`: é a língua em que o Hub abre para todo professor desde
- * 23/09/2026 (decisão do Pedro). Com padrão `pt`, a home mudaria de língua
- * sozinha para quem nunca escolheu nada. */
-var FISK_LANG_PADRAO = 'en';
+ * O PADRÃO VOLTOU A SER `pt` em 31/10/2026 (auditoria de 30/10, tema 8: o login
+ * estava em inglês e todas as ferramentas em português). O Hub inteiro fala
+ * português; `en` e `es` continuam no seletor do menu, e quem já escolheu
+ * mantém a escolha (a chave `fisk_lang` gravada vale antes do padrão). */
+var FISK_LANG_PADRAO = 'pt';
 function fiskIdiomaValido(l) { return l === 'pt' || l === 'en' || l === 'es'; }
 
 /** Idioma escolhido pelo professor: vale para todas as páginas. */
@@ -696,13 +697,16 @@ function fiskInitUserMenu(opts) {
     '<div class="fu-head"><b>' + fiskEsc(s.fullName || s.name) + '</b>' +
       (escolas ? '<span>' + fiskEsc(escolas.split(',').join(' + ')) + '</span>' : '') + '</div>' +
     '<a class="fu-item" href="' + base + 'index.html">🏠 Fisk Hub</a>' +
-    '<a class="fu-item" href="' + base + 'visao-geral.html">📊 Minhas turmas</a>' +
+    '<a class="fu-item" href="' + base + 'visao-geral.html">📊 Radar da Turma</a>' +
     /* O E-COUNSELING DE QUALQUER TELA (Pedro, 20/09/2026). Não é mais um
        atalho para uma página: é a busca pelo nome do aluno aqui dentro, e a
        gaveta abre por cima do que o professor estava fazendo. Vive no menu
        porque o menu é a única coisa que existe nas vinte telas. */
     '<button type="button" class="fu-item fu-csl">💬 E-counseling de um aluno</button>' +
     '<a class="fu-item" href="' + base + 'treinamentos.html">🎓 Treinamentos</a>' +
+    /* A GAMIFICAÇÃO DO PROFESSOR NUM LUGAR SÓ (auditoria de 30/10/2026, B6): casa, avatar, personagem, festa e
+       aniversário estavam em cinco camadas sem nada que explicasse de onde vinham. O item abre o fiskTrofeus. */
+    '<button type="button" class="fu-item fu-trofeus">🎮 Meus troféus e personagens</button>' +
     /* O IDIOMA VOLTOU AO MENU (Pedro, 09/10/2026), em toda página. Onde a
        página sabe traduzir (a home), troca na hora; nas outras a escolha
        fica guardada e vale quando ele voltar à home. */
@@ -748,6 +752,10 @@ function fiskInitUserMenu(opts) {
     fechar();
     fiskCounselingBusca();
   });
+  menu.querySelector('.fu-trofeus').addEventListener('click', function () {
+    fechar();
+    fiskTrofeus();
+  });
 
   menu.querySelector('.fu-sair').addEventListener('click', function () {
     if (typeof opts.onSair === 'function') { fechar(); opts.onSair(); return; }
@@ -757,6 +765,88 @@ function fiskInitUserMenu(opts) {
   });
 
   return wrap;
+}
+
+/* ══ MEUS TROFÉUS E PERSONAGENS (auditoria de 30/10/2026, B6) ═══════════════════════════════════════════════════════
+ * A gamificação do professor tem cinco camadas, cada uma nascida numa campanha: a casa (Cerimônia de Seleção, 09/2026),
+ * o My Avatar (15/10), o personagem do Fisk Worlds, a festa do avatar (27/10) e a semana de aniversário (28/10). Quem
+ * entrou depois via a faixa colorida e o item do menu sem saber de onde vieram. Esta tela reúne as cinco, com três
+ * linhas por camada e o link para onde cada uma se ganha. Só leitura: nada aqui grava. */
+function fiskTrofeus() {
+  var s = fiskSessao() || {};
+  var base = fiskHubBase();
+  var CASAS = { g: 'Grifinória (Gryffindor)', r: 'Corvinal (Ravenclaw)', h: 'Lufa-Lufa (Hufflepuff)', s: 'Sonserina (Slytherin)' };
+  var casa = null;
+  try {
+    var reg = JSON.parse(localStorage.getItem('hw_casa_' + ('PROF:' + String(s.name || '')).replace(/[^A-Za-z0-9]/g, '').toUpperCase()) || 'null');
+    if (reg && CASAS[reg.casa]) casa = CASAS[reg.casa];
+  } catch (e) {}
+  var temDados = !!document.querySelector('.fu-eq');
+  var camadas = [
+    { ico: '🏰', t: 'Sua casa', casa: true,
+      p: ['A Cerimônia de Seleção (campanha de setembro) pôs você numa das quatro casas.',
+          'É ela que pinta a faixa preta do topo com as cores e o brasão, em todas as telas do Hub.',
+          casa ? 'Você é da casa <b>' + fiskEsc(casa) + '</b>. Para ligar ou desligar as cores: 👤 → 🎨 Cores da minha casa.' : 'Você ainda não fez a Cerimônia, por isso a faixa do topo está preta.'],
+      a: { href: base + 'hogwarts.html', rot: casa ? 'Rever a Cerimônia' : 'Fazer a Cerimônia de Seleção' } },
+    { ico: '🧑‍🎨', t: 'My Avatar',
+      p: ['O boneco 3D que você monta peça por peça, o mesmo motor do My Avatar dos alunos.',
+          'Ele aparece nas comemorações do Hub e em datas especiais ganha peças novas (o Halloween, por exemplo).',
+          'Sem avatar montado, quem comemora por você é o Buddy.'],
+      a: { href: base + 'avatar.html', rot: 'Montar o meu avatar' } },
+    { ico: '🧙', t: 'Meu personagem do Fisk Worlds',
+      p: ['O Fisk Worlds é o jogo 3D do Portal do Aluno, em inglês e em espanhol.',
+          'Seu personagem é como você aparece lá dentro: o corpo é o mesmo para todos, a cor, o chapéu e o que segura são seus.',
+          'Para jogar, use a faixa Fisk Worlds da home do Hub.'],
+      a: { href: base + 'meu-personagem.html', rot: 'Montar o meu personagem' } },
+    { ico: '🎉', t: 'A festa do avatar',
+      p: ['Em alguns momentos o seu avatar sobe na tela e comemora com uma fanfarra curta.',
+          'Os grandes (um Checking registrado, um documento salvo na pasta) sobem sempre; os pequenos, na 3ª, 6ª, 9ª vez do dia, com a fitinha.',
+          'Não se ganha nem se perde: é o Hub reconhecendo o que você acabou de fazer. Quem pediu menos movimento vê o avatar parado.'] },
+    { ico: '🎂', t: 'Sua semana de aniversário',
+      p: ['Na semana do seu aniversário o Hub inteiro fica em festa: faixa, balões e um confete por dia.',
+          'No dia abre a cortina de parabéns em nome da escola, e o avatar comemora ao fechá-la.',
+          'Quem decide é a data que você preencheu em 🪪 Meus dados (no menu 👤). Sem data, nada aparece.'],
+      a: temDados ? { fn: function () { var b = document.querySelector('.fu-eq'); if (b) b.click(); }, rot: 'Conferir os meus dados' } : { href: base + 'index.html', rot: 'Preencher em Meus dados (na home)' } }
+  ];
+  var old = document.getElementById('fkTrofeus'); if (old) old.remove();
+  if (!document.getElementById('fkTrofeusCss')) {
+    var st = document.createElement('style'); st.id = 'fkTrofeusCss';
+    st.textContent = '#fkTrofeus{position:fixed;inset:0;z-index:9400;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(12,12,14,.5)}' +
+      '#fkTrofeus .tf-cx{background:#fff;color:#1d3349;border-radius:18px;max-width:640px;width:100%;max-height:calc(100vh - 32px);overflow:auto;box-shadow:0 24px 60px rgba(0,0,0,.35);padding:1.1rem 1.2rem 1.2rem;font-size:15px;line-height:1.5}' +
+      '#fkTrofeus h2{margin:0 0 .25rem;font-family:var(--font-heading,inherit);font-size:1.25rem;display:flex;align-items:center;gap:.5rem}' +
+      '#fkTrofeus .tf-sub{margin:0 0 .8rem;color:#5b6b7b;font-size:.92rem}' +
+      '#fkTrofeus .tf-x{margin-left:auto;border:0;background:none;font-size:1.2rem;cursor:pointer;color:inherit;min-width:44px;min-height:44px;border-radius:10px}' +
+      '#fkTrofeus .tf-x:hover{background:rgba(0,0,0,.06)}' +
+      '#fkTrofeus .tf-it{display:flex;gap:.8rem;padding:.75rem 0;border-top:1px solid #e5e9f0}' +
+      '#fkTrofeus .tf-ico{font-size:1.7rem;flex:0 0 2.2rem;text-align:center;line-height:1.2}' +
+      '#fkTrofeus .tf-it b.tf-t{display:block;font-size:1rem;margin-bottom:.15rem}' +
+      '#fkTrofeus .tf-it p{margin:0 0 .15rem;font-size:.92rem}' +
+      '#fkTrofeus .tf-a{display:inline-flex;align-items:center;min-height:44px;margin-top:.2rem;padding:0 .9rem;border-radius:999px;border:1.5px solid #1d3685;color:#1d3685;background:#fff;font:inherit;font-weight:800;font-size:.88rem;text-decoration:none;cursor:pointer}' +
+      '#fkTrofeus .tf-a:hover{background:#eef4ff}' +
+      '#fkTrofeus .tf-casa{display:inline-block;padding:.1rem .5rem;border-radius:999px;background:#eef4ff;font-weight:800}' +
+      'body.theme-dark #fkTrofeus .tf-cx{background:#1c1a1a;color:#f2efef}body.theme-dark #fkTrofeus .tf-sub{color:#b8c0c8}' +
+      'body.theme-dark #fkTrofeus .tf-it{border-color:#333}body.theme-dark #fkTrofeus .tf-a{background:#2a2626;color:#dbe6f3;border-color:#5b6b7b}' +
+      'body.theme-dark #fkTrofeus .tf-a:hover{background:#3a3535}body.theme-dark #fkTrofeus .tf-x:hover{background:rgba(255,255,255,.08)}';
+    document.head.appendChild(st);
+  }
+  var m = document.createElement('div'); m.id = 'fkTrofeus'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-label', 'Meus troféus e personagens');
+  var html = '<div class="tf-cx"><h2>🎮 Meus troféus e personagens<button type="button" class="tf-x" aria-label="Fechar">✕</button></h2>' +
+    '<p class="tf-sub">Cinco coisas que o Hub mostra sobre você, cada uma vinda de uma campanha. Nenhuma vale nota: é só a sua cara no sistema.</p>';
+  camadas.forEach(function (c, i) {
+    html += '<div class="tf-it"><div class="tf-ico">' + c.ico + '</div><div><b class="tf-t">' + c.t + '</b>' +
+      c.p.map(function (l) { return '<p>' + l + '</p>'; }).join('') +
+      (c.a ? (c.a.href ? '<a class="tf-a" href="' + c.a.href + '">' + c.a.rot + ' →</a>' : '<button type="button" class="tf-a" data-fn="' + i + '">' + c.a.rot + ' →</button>') : '') +
+      '</div></div>';
+  });
+  m.innerHTML = html + '</div>';
+  document.body.appendChild(m);
+  var fecha = function () { m.remove(); document.removeEventListener('keydown', esc); };
+  var esc = function (e) { if (e.key === 'Escape') fecha(); };
+  document.addEventListener('keydown', esc);
+  m.addEventListener('click', function (e) { if (e.target === m) fecha(); });
+  m.querySelector('.tf-x').addEventListener('click', fecha);
+  m.querySelectorAll('button[data-fn]').forEach(function (b) { b.addEventListener('click', function () { var c = camadas[+b.getAttribute('data-fn')]; fecha(); if (c && c.a && c.a.fn) c.a.fn(); }); });
+  return m;
 }
 
 function fiskEsc(s) {
@@ -782,14 +872,49 @@ var FISK_HUB_EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwD
 var FISK_PULSO_MIN = 5;    // de quanto em quanto tempo o pulso sai
 var FISK_PULSO_OCIO = 10;  // sem toque nenhum por este tempo, o pulso para
 
-function fiskRegistrarUso(ferramenta) {
+/* UM ID ESTÁVEL POR FERRAMENTA (auditoria de 30/10/2026, B7): o painel de uso da direção agrupa pelo texto, e a
+   ferramenta que muda de nome ("Turma de hoje" → "Minha aula") virava duas linhas. O `id` é um slug fixo que não muda
+   com o rótulo; o nome continua indo junto, legível. O backend que ainda não conhece o campo ignora e nada quebra.
+   A tabela está documentada no CLAUDE.md: id novo entra aqui E lá. */
+var FISK_FERRAMENTAS = {
+  'hub-inicio': 'Fisk Hub (início)', 'minha-aula': 'Minha aula', 'radar-turma': 'Radar da Turma', 'radar-aluno': 'Radar do Aluno',
+  'centro-estudos': 'Centro de Estudos', 'centro-estudos-frequencia': 'Centro de Estudos: frequência', 'centro-estudos-horarios': 'Centro de Estudos: horários',
+  'answer-keys': 'Answer Keys', '2nd-chance': '2nd Chance', 'termo-atraso': 'Termo de Atraso', 'buddy': 'Buddy auxiliar', 'buddy-ajustes': 'Ajustes do Buddy',
+  'calendario': 'Minha semana', 'counseling': 'E-counseling', 'treinamentos': 'Treinamentos', 'apps': 'Apps', 'avatar': 'My Avatar',
+  'personagem': 'Meu personagem', 'personagem-salvou': 'Meu personagem (salvou)', 'hogwarts': 'Cerimônia de Seleção', 'noticias': 'Notícias da turma',
+  'plano-curso': 'Plano de curso', 'checking-guia': 'Guia do Checking', 'raf-temporario': 'RAF temporário', 'corretor-met': 'Corretor do MET',
+  'central-pedidos': 'Central de Pedidos', 'boletins': 'Boletins', 'quick-practice': 'Quick Practice', 'treino-met': 'Treino MET', 'treino-siele': 'Treino SIELE'
+};
+/* O GLOSSÁRIO DO CENTRO DE ESTUDOS (auditoria de 30/10/2026, M8): o mesmo lugar tinha quatro nomes (Centro de Estudos,
+   Learning Center, plantão de dúvidas, tutoria). Fica UM nome nos rótulos, Centro de Estudos, e estas três linhas
+   aparecem na primeira abertura (uma vez por aparelho, chave fisk_glos_centro) para quem conhecia pelos outros. */
+function fiskGlossarioCentro(onde) {
+  try { if (localStorage.getItem('fisk_glos_centro') === '1') return null; } catch (e) {}
+  if (!onde) return null;
+  var box = document.createElement('div');
+  box.className = 'fk-glossario';
+  box.style.cssText = 'margin:.8rem auto;max-width:860px;padding:.7rem 1rem;border-radius:12px;border:1.5px solid #cddcf5;background:#eef4ff;color:#1f2d57;font-size:.9rem;line-height:1.5;position:relative';
+  box.innerHTML = '<b>Centro de Estudos = Learning Center = plantão de dúvidas.</b><br>' +
+    'É o mesmo lugar: o horário em que o aluno vem tirar dúvidas com um monitor, fora da aula.<br>' +
+    'A Frequência mostra quem veio; os Horários, o quadro; a Minha aula atende quem chega.' +
+    '<button type="button" aria-label="Entendi" style="position:absolute;top:.3rem;right:.4rem;border:0;background:none;font-size:1rem;cursor:pointer;color:inherit;min-width:44px;min-height:44px">✕</button>';
+  box.querySelector('button').addEventListener('click', function () { box.remove(); try { localStorage.setItem('fisk_glos_centro', '1'); } catch (e) {} });
+  if (document.body.classList.contains('theme-dark')) { box.style.background = '#16233a'; box.style.borderColor = '#2e4560'; box.style.color = '#dbe6f3'; }
+  onde.insertBefore(box, onde.firstChild);
+  return box;
+}
+function fiskIdDaFerramenta(nome) {
+  for (var k in FISK_FERRAMENTAS) if (FISK_FERRAMENTAS[k] === nome) return k;
+  return String(nome || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+function fiskRegistrarUso(ferramenta, id) {
   try {
     var s = fiskSessao();
     if (!s || !s.token || !ferramenta) return;
     fetch(FISK_HUB_EP, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'usoFerramenta', token: s.token, ferramenta: ferramenta })
+      body: JSON.stringify({ action: 'usoFerramenta', token: s.token, ferramenta: ferramenta, id: id || fiskIdDaFerramenta(ferramenta) })
     }).catch(function () {});
     fiskPulso(ferramenta);
   } catch (e) {}
@@ -866,7 +991,7 @@ function fiskPulso(ferramenta) {
  * sozinho na próxima tentativa e serve a todas as ferramentas, porque todas
  * salvam por aqui.
  */
-function fiskAvisoDePasta(buttonEl, texto) {
+function fiskAvisoDePasta(buttonEl, texto, opts) {
   try {
     var id = 'fisk-aviso-pasta';
     var box = document.getElementById(id);
@@ -875,10 +1000,19 @@ function fiskAvisoDePasta(buttonEl, texto) {
       box.id = id;
       box.style.cssText = 'margin-top:.6rem;padding:.6rem .75rem;border-radius:8px;' +
         'border:1px solid #e3c07a;background:#fdf6e6;color:#7a5a12;' +
-        'font-size:12.5px;line-height:1.45;font-weight:600;max-width:52ch';
+        'font-size:14px;line-height:1.45;font-weight:600;max-width:52ch';
       (buttonEl.parentNode || document.body).insertBefore(box, buttonEl.nextSibling);
     }
     box.textContent = '⚠️ ' + texto;
+    /* a porta (auditoria de 30/10/2026, M3): quando foi erro, um botão para tentar de novo ali mesmo, sem procurar o
+       botão original nem recarregar a página; tempo estourado e Drive instável resolvem-se assim na maioria das vezes */
+    if (opts && opts.tentar) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.textContent = '↻ Tentar de novo';
+      b.style.cssText = 'display:inline-block;margin-left:.6rem;min-height:36px;padding:0 .8rem;border-radius:999px;border:1.5px solid #b8890f;background:#fff;color:#6b4d0f;font:inherit;font-weight:800;cursor:pointer';
+      b.addEventListener('click', function () { box.hidden = true; opts.tentar.click(); });
+      box.appendChild(b);
+    }
     box.hidden = false;
   } catch (e) { /* aviso nunca pode derrubar o salvamento */ }
 }
@@ -1106,10 +1240,45 @@ function fiskAlunosDoProf() {
   return _fiskAlunos;
 }
 
-/** URL do Acompanhamento de um aluno, ou '' se ainda não sabemos o RAF dele. */
+/* ═══ "ESTA PESSOA DA GRADE É QUEM ESTÁ LOGADO?" (auditoria de 30/10/2026, M15) ═══════════════════════════════════
+ * A Minha aula, a Minha semana e os Horários do Centro de Estudos tinham cada um a sua régua para dizer se o nome
+ * escrito na grade de monitores ("Prof. Nicole", "Teacher Carlos", "Nicole") é o professor da sessão ("NICOLE",
+ * "CARLOS ALBERTO DA SILVA"). Três cópias discordavam sobre quais plantões eram dele. Fica UMA:
+ *   fiskMesmaPessoa(nomeDaGrade, nomeDaSessao) → true quando é a mesma pessoa.
+ * Regras: sem acento, sem "Prof./Professora/Teacher", maiúsculas; iguais, ou um começa com o outro mais espaço, ou
+ * a grade traz só o primeiro nome e ele bate com o primeiro da sessão. */
+function fiskNormPessoa(v) { return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
+function fiskMesmaPessoa(nomeDaGrade, nomeDaSessao) {
+  var t = fiskNormPessoa(nomeDaGrade).replace(/^(PROF(A|ESSORA?)?\.?\s+|TEACHER\s+)/, ''), p = fiskNormPessoa(nomeDaSessao);
+  if (!t || !p) return false;
+  if (t === p || p.indexOf(t + ' ') === 0 || t.indexOf(p + ' ') === 0) return true;
+  return t.indexOf(' ') < 0 && p.split(' ')[0] === t;
+}
+
+/* ═══ A IDENTIDADE DO ALUNO VAI NO FRAGMENTO (auditoria de 30/10/2026, B1) ═══════════════════════════════════════
+ * `counseling.html?aluno=NOME` e `aluno.html?raf=1234` deixavam o nome e o RAF no histórico e no Referer. Desde
+ * 31/10/2026 os links do Hub levam `#aluno=` e `#raf=` (o que o Portal do Aluno já faz, identidade-no-fragmento), e o
+ * fragmento é apagado da barra depois de lido, como o `#dirtok=` do Painel. A QUERY CONTINUA ACEITA por um tempo:
+ * links antigos (favoritos, o Painel da Direção que monta `aluno.html?raf=…#dirtok=`) seguem abrindo.
+ *   fiskParamUrl('raf') → o valor, do fragmento ou da query, ou ''. */
+function fiskParamUrl(nome, opts) {
+  var v = '';
+  try {
+    var m = new RegExp('[#&]' + nome + '=([^&]*)').exec(location.hash || '');
+    if (m) v = decodeURIComponent(m[1].replace(/\+/g, ' '));
+    else v = new URLSearchParams(location.search).get(nome) || '';
+    if (m && !(opts && opts.manter)) {
+      var resto = (location.hash || '').replace(/^#/, '').split('&').filter(function (p) { return p && p.indexOf(nome + '=') !== 0; }).join('&');
+      history.replaceState(null, '', location.pathname + location.search + (resto ? '#' + resto : ''));
+    }
+  } catch (e) {}
+  return v;
+}
+
+/** URL do Radar de um aluno, ou '' se ainda não sabemos o RAF dele. */
 function fiskLinkDossie(idx, nome) {
   var a = idx && idx[fiskChaveAluno(nome)];
-  return a ? (fiskHubBase() + 'aluno.html?raf=' + encodeURIComponent(a.raf)) : '';
+  return a ? (fiskHubBase() + 'aluno.html#raf=' + encodeURIComponent(a.raf)) : '';
 }
 
 /** Rótulo curto do estudo em casa, para as telas que listam alunos. */
@@ -1195,7 +1364,12 @@ function fiskGaveta_(cfg) {
       if (e.key === 'Escape' && g.classList.contains('on')) fecha();
     });
   }
-  g.querySelector('.fk-gaveta-frame').src = cfg.url;
+  var fr = g.querySelector('.fk-gaveta-frame');
+  /* a identidade vai no fragmento (B1): trocar só o #raf= num iframe NÃO recarrega a página de dentro, então, se o
+     que mudou foi só o fragmento, o iframe é recarregado à mão; de about:blank (o fechar zera) carrega normal */
+  var antes = String(fr.getAttribute('src') || '').split('#')[0], depois = String(cfg.url).split('#')[0];
+  fr.src = cfg.url;
+  if (antes && antes === depois) { try { fr.contentWindow.location.reload(); } catch (e) { fr.src = 'about:blank'; setTimeout(function () { fr.src = cfg.url; }, 0); } }
   g.querySelector('.fk-gaveta-full').href = cfg.urlCheia || cfg.url;
   g.querySelector('.fk-gaveta-nome').textContent = cfg.titulo || cfg.rotulo;
   g.classList.add('on');
@@ -1318,7 +1492,7 @@ function fiskCounselingAbrirDoc(ctx) {
   var s = fiskSessao() || {};
   var turma = String(ctx.turma || '').split('\n')[0];
   var ferramenta = fiskHubBase() + 'counseling.html?escola=' + encodeURIComponent(ctx.escola || '') + '&prof=' + encodeURIComponent(ctx.professor || '') +
-    '&turma=' + encodeURIComponent(turma) + '&aluno=' + encodeURIComponent(ctx.aluno) + (ctx.estagio ? '&estagio=' + encodeURIComponent(ctx.estagio) : '');
+    '&turma=' + encodeURIComponent(turma) + (ctx.estagio ? '&estagio=' + encodeURIComponent(ctx.estagio) : '') + '#aluno=' + encodeURIComponent(ctx.aluno);   /* o nome no fragmento (B1) */
   var w = window.open('', '_blank');
   if (!w) { location.href = ferramenta; return; }   /* pop-up bloqueado: abre na própria aba */
   try {
@@ -1341,15 +1515,15 @@ function fiskCounselingGaveta(ctx) {
     '&escola=' + encodeURIComponent(ctx.escola || '') +
     '&prof=' + encodeURIComponent(ctx.professor || '') +
     '&turma=' + encodeURIComponent(String(ctx.turma || '').split('\n')[0]) +
-    '&aluno=' + encodeURIComponent(ctx.aluno) +
     (ctx.estagio ? '&estagio=' + encodeURIComponent(ctx.estagio) : '') +
     (ctx.texto ? '&texto=' + encodeURIComponent(ctx.texto) : '');
+  var frag = '#aluno=' + encodeURIComponent(ctx.aluno);   /* o nome no fragmento (B1) */
   var base = fiskHubBase() + 'counseling.html?';
   return fiskGaveta_({
     id: 'fiskCounselingGaveta', rotulo: 'E-counseling',
     titulo: '💬 ' + ctx.aluno,
-    url: base + q,
-    urlCheia: base + q.replace('embed=1&', '')
+    url: base + q + frag,
+    urlCheia: base + q.replace('embed=1&', '') + frag
   });
 }
 
@@ -1422,12 +1596,13 @@ function fiskCounselingBusca() {
 function fiskAcompanhamento(raf, opts) {
   if (!raf) return;
   opts = opts || {};
-  var url = fiskHubBase() + 'aluno.html?raf=' + encodeURIComponent(raf) + '&embed=1' +
-            (opts.turma ? '&turma=' + encodeURIComponent(opts.turma) : '');
+  var q = 'embed=1' + (opts.turma ? '&turma=' + encodeURIComponent(opts.turma) : '');
+  var frag = '#raf=' + encodeURIComponent(raf);   /* o RAF no fragmento (B1) */
+  var base = fiskHubBase() + 'aluno.html?';
   return fiskGaveta_({
-    id: 'fiskAcompGaveta', rotulo: 'Acompanhamento do aluno',
-    titulo: opts.nome || 'Acompanhamento do Aluno',
-    url: url, urlCheia: url.replace('&embed=1', '')
+    id: 'fiskAcompGaveta', rotulo: 'Radar do Aluno',   /* o mesmo nome da página e do card (auditoria de 30/10/2026, M9) */
+    titulo: opts.nome || 'Radar do Aluno',
+    url: base + q + frag, urlCheia: base + q.replace('embed=1&', '').replace('embed=1', '') + frag
   });
 }
 
@@ -1649,7 +1824,8 @@ function fiskBuddyInfoGuarda(j) {
       fr.src = base + 'buddy.html?mini=1'; jan.appendChild(fr);
     }
     bt.addEventListener('click', function () { abre(!document.body.classList.contains('fk-buddy-aberto')); });
-    window.addEventListener('message', function (e) { if (e.data && e.data.fiskBuddy === 'fecha') abre(false); });
+    /* a origem é conferida dos dois lados (auditoria de 30/10/2026, B15): o buddy.html manda para location.origin e aqui só vale de lá */
+    window.addEventListener('message', function (e) { if (e.origin === location.origin && e.data && e.data.fiskBuddy === 'fecha') abre(false); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && document.body.classList.contains('fk-buddy-aberto')) abre(false); });
     if (fiskCacheLe('fisk_buddy_aberto', 6 * 3600000)) abre(true);   /* aberta numa ferramenta, aberta na próxima (6 h, o fio da conversa no servidor) */
     balaoAniversario(bt, abre);
@@ -1680,7 +1856,8 @@ function fiskBuddyInfoGuarda(j) {
       st.textContent = '#fkAnivBalao{position:fixed;z-index:9989;right:16px;bottom:88px;max-width:290px;background:#fff;border:2px solid #f5c542;border-radius:16px 16px 4px 16px;' +
         'padding:.7rem 2rem .7rem .85rem;font:inherit;font-size:.92rem;line-height:1.4;color:#3b2a00;box-shadow:0 10px 26px rgba(146,64,14,.22);cursor:pointer;animation:fkAniv .4s ease}' +
         '#fkAnivBalao button{position:absolute;top:.35rem;right:.4rem;border:0;background:none;font-size:1rem;cursor:pointer;color:#92400e}' +
-        'body.fk-buddy-aberto #fkAnivBalao{display:none}@keyframes fkAniv{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}' +
+        /* com o Buddy aberto o balão não some (B15): sai de trás da janela e fica à esquerda dela; no celular a janela ocupa a tela toda, aí sim some */
+        'body.fk-buddy-aberto #fkAnivBalao{right:452px;bottom:16px}@media (max-width:760px){body.fk-buddy-aberto #fkAnivBalao{display:none}}@keyframes fkAniv{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}' +
         'body.theme-dark #fkAnivBalao{background:#2b2513;color:#fde68a;border-color:#6d5a23}@media print{#fkAnivBalao{display:none}}';
       document.head.appendChild(st);
       var b = document.createElement('div'); b.id = 'fkAnivBalao'; b.setAttribute('role', 'status');

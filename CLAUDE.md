@@ -156,6 +156,55 @@ as cores, o padrão e o brasão da casa dele, nas dezessete páginas.
   do professor segue com a versão antiga por tempo indeterminado (até 31/10/2026
   o carimbo era de data, subido à mão nas trinta e uma páginas).
 
+## A identidade do aluno vai no fragmento (31/10/2026)
+
+B1 da auditoria de 30/10: `counseling.html` recebe o aluno em `#aluno=` e
+`aluno.html` o RAF em `#raf=` (o resto, escola/prof/turma/embed, fica na
+query). Quem lê é `fiskParamUrl('raf')` do kit, fragmento primeiro e query
+depois, e ele apaga o valor da barra depois de lido. **A query continua
+aceita** para links antigos (o Painel da Direção monta `aluno.html?raf=…#dirtok=`).
+Produtores: `fiskLinkDossie`, `fiskCounselingAbrirDoc`, `fiskCounselingGaveta`,
+`fiskAcompanhamento`, `calendario.html`, `visao-geral.html`, `aluno.html`.
+⚠️ Num iframe, trocar só o fragmento NÃO recarrega a página: o `fiskGaveta_`
+recarrega à mão quando só o `#` mudou.
+
+## O tema é UMA chave: `fisk_theme` (31/10/2026)
+
+`fisk_theme` (`dark`/`light`) é a chave que o Hub, o Portal do Aluno e a
+Secretaria leem, e é a única: `hw_tema` é outra coisa (as cores da casa). O
+`fiskInitThemeToggle` grava e lê; toda página de cara própria carrega a linha
+de pré-pintura logo depois do `<body>` (tema salvo, ou a preferência do
+sistema quando nada foi salvo), senão pisca clara no modo escuro (M11 da
+auditoria de 30/10). `treinamentos.html` é a exceção de desenho: escura por
+padrão (FISK EXPO) e clara só com `fisk_theme = light`, pela mesma chave.
+Página nova sem dark mode: variáveis próprias e um bloco `body.theme-dark`.
+
+## Um nome por ferramenta, um id por ferramenta (31/10/2026)
+
+Auditoria de 30/10 (M8, M9, B7): a tutoria tinha quatro nomes e o painel de uso
+da direção agrupa pelo texto, então ferramenta renomeada virava duas linhas.
+Regras: **Minha aula**, **Radar da Turma**, **Radar do Aluno** e **Centro de
+Estudos** (= Learning Center = plantão; o glossário de três linhas é o
+`fiskGlossarioCentro` do kit, uma vez por aparelho) em todo rótulo, e
+`fiskRegistrarUso(nome, id)` manda o `id` fixo além do nome. A tabela vive em
+`FISK_FERRAMENTAS` no `assets/fisk-shared.js`; id novo entra lá E aqui.
+
+| id | nome |
+|---|---|
+| `hub-inicio` | Fisk Hub (início) |
+| `minha-aula` | Minha aula (`turma-de-hoje.html`) |
+| `radar-turma` | Radar da Turma (`visao-geral.html`) |
+| `radar-aluno` | Radar do Aluno (`aluno.html`, também a gaveta) |
+| `centro-estudos` · `centro-estudos-frequencia` · `centro-estudos-horarios` | Centro de Estudos (hub, frequência, horários) |
+| `answer-keys` | Answer Keys (as quatro páginas) |
+| `2nd-chance` · `termo-atraso` · `counseling` | 2nd Chance · Termo de Atraso · E-counseling |
+| `buddy` · `buddy-ajustes` | Buddy auxiliar · Ajustes do Buddy |
+| `calendario` | Minha semana (`calendario.html`) |
+| `treinamentos` · `apps` · `noticias` · `plano-curso` · `checking-guia` | idem |
+| `avatar` · `personagem` · `personagem-salvou` · `hogwarts` | My Avatar · Meu personagem · Cerimônia de Seleção |
+| `raf-temporario` · `corretor-met` · `central-pedidos` · `boletins` | idem |
+| `quick-practice` · `treino-met` · `treino-siele` | atalhos sem card |
+
 ## O cabeçalho das páginas (09/10/2026)
 
 - **Canto esquerdo = UM voltar, com o nome do destino** (`← Hub`, `← Answer Keys`,
