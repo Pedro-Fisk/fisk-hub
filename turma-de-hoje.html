@@ -705,7 +705,7 @@ body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ 
 <script src="https://portalfisk.com.br/assets/checking/guia-i3.js?v=e326479afd"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="assets/fisk-shared.js?v=2026-10-31a"></script>
-<script src="assets/fisk-pre-aula.js?v=2026-10-30a"></script>
+<script src="assets/fisk-pre-aula.js?v=2026-10-31a"></script>
 <script>
 fiskInitThemeToggle('themeToggle');
 fiskInitUserMenu();
@@ -1134,7 +1134,7 @@ function atualizaSozinha() {
   if (_autoRodando || !podeAtualizar()) return;
   _autoRodando = true; _autoUlt = Date.now();
   var turma = estado.turma, pedido = _turmaPedido;
-  post({ action: 'plannerTurma', alunos: estado.alunos.map(function (a) { return { raf: a.raf, book: a.book, turma: turma }; }) }).then(function (r) {
+  return post({ action: 'plannerTurma', alunos: estado.alunos.map(function (a) { return { raf: a.raf, book: a.book, turma: turma }; }) }).then(function (r) {
     if (pedido !== _turmaPedido || estado.turma !== turma || !r || !r.alunos) return;
     var mudou = [];
     estado.alunos.forEach(function (a) {
@@ -1145,12 +1145,15 @@ function atualizaSozinha() {
     });
     if (!mudou.length) return;
     if (ptEstado) desenharTurma(); else mudou.forEach(redesenhar);
-  }).catch(function () {}).then(function () { _autoRodando = false; });
+  }).catch(function () { return false; }).then(function (r) { _autoRodando = false; return r; });   /* false = falhou: o poller abre o passo */
 }
 document.addEventListener('visibilitychange', function () {
   if (document.visibilityState === 'visible' && Date.now() - _autoUlt > 45000) atualizaSozinha();
 });
-setInterval(function () { if (document.visibilityState === 'visible' && Date.now() - _autoUlt > 85000) atualizaSozinha(); }, 30000);
+/* SÓ NA ABA VISÍVEL (auditoria de 30/10/2026): os três relógios que falam com o backend (a releitura de 90 s, as novidades
+   de 15 s e a fila das marcas) passam pelo fiskPollVisivel do kit: a aba escondida não pede nada, ao voltar pede na hora se
+   já venceu, e uma falha dobra o intervalo (até 8×) até a próxima resposta boa. */
+fiskPollVisivel(function () { if (Date.now() - _autoUlt > 85000) return atualizaSozinha(); }, 30000);
 /* AS BOLINHAS DO ALUNO EM ~20 s (27/10/2026, Pedro: "os alunos marcam bolinhas, mas demora para aparecer no planner do
    professor"). O aluno grava na hora; quem demorava era esta tela, que só relia a turma a cada 90 s. A cada 15 s ela
    pergunta à rota leve `plannerNovidades` (backend 775) quem teve o planner carimbado desde a última pergunta, e
@@ -1162,7 +1165,7 @@ function buscaNovidades() {
   if (_novRodando || !_novDesde || _autoRodando || !podeAtualizar()) return;
   _novRodando = true; _novUlt = Date.now();
   var turma = estado.turma, pedido = _turmaPedido;
-  post({ action: 'plannerNovidades', desde: _novDesde, alunos: estado.alunos.map(function (a) { return { raf: a.raf, book: a.book }; }) }).then(function (r) {
+  return post({ action: 'plannerNovidades', desde: _novDesde, alunos: estado.alunos.map(function (a) { return { raf: a.raf, book: a.book }; }) }).then(function (r) {
     if (pedido !== _turmaPedido || estado.turma !== turma || !r || !r.ok) return;
     if (!podeAtualizar()) return;   /* o professor tocou numa bolinha no meio: fica para a próxima, sem andar o relógio */
     _novDesde = (Number(r.agora) || Date.now()) - 15000;   /* folga: gravação que começou antes do `agora` pode chegar depois */
@@ -1175,9 +1178,9 @@ function buscaNovidades() {
     });
     if (!mudou.length) return;
     if (ptEstado) desenharTurma(); else mudou.forEach(redesenhar);
-  }).catch(function () {}).then(function () { _novRodando = false; });
+  }).catch(function () { return false; }).then(function (r) { _novRodando = false; return r; });
 }
-setInterval(function () { if (document.visibilityState === 'visible' && Date.now() - _novUlt > 15000) buscaNovidades(); }, 5000);
+fiskPollVisivel(function () { if (Date.now() - _novUlt > 15000) return buscaNovidades(); }, 5000);
 document.addEventListener('visibilitychange', function () {
   if (document.visibilityState === 'visible' && Date.now() - _novUlt > 5000) buscaNovidades();
 });
@@ -2378,7 +2381,7 @@ function filaDrena(avisar) {
   });
 }
 window.addEventListener('online', function () { filaDrena(false); });
-setInterval(function () { if (filaMinhas().length) filaDrena(false); }, 20000);
+fiskPollVisivel(function () { if (filaMinhas().length) filaDrena(false); }, 20000);
 document.addEventListener('DOMContentLoaded', function () { pintaFilaOff(); setTimeout(function () { filaDrena(false); }, 1500); });
 
 function confirmar(a, id, marca) {
