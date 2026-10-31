@@ -708,50 +708,6 @@
   <button type="button" id="avSino" class="av-sino" hidden aria-label="Abrir as novidades"><span class="ic" aria-hidden="true">📣</span><span class="n" id="avSinoN" hidden></span></button>
   <div class="av-fundo" id="avFundo" hidden></div>
 
-  <!-- ═══════════════════════════════════════
-       Calendário Institucional — FORA DO AR desde 03/08/2026
-
-       Retirado a pedido da direção: a base de eventos ainda está incompleta
-       (a marcação da planilha começou por agosto e não foi concluída), e um
-       calendário pela metade na página do professor é pior que calendário
-       nenhum — ele passa a impressão de que o mês está vazio.
-
-       Para trazer de volta quando a base estiver pronta: tire o `hidden`
-       daqui e o `return` do initCal, lá embaixo. Nada mais foi mexido — a
-       leitura do backend, a montagem da grade e as traduções continuam
-       inteiras no arquivo.
-  ════════════════════════════════════════ -->
-  <section class="cal-section" hidden>
-    <button class="cal-header-btn" id="calToggle" aria-expanded="true" onclick="toggleCal()">
-      <span class="cal-title-text">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <rect x="3" y="4" width="18" height="17" rx="2" stroke="currentColor" stroke-width="1.6"/>
-          <path d="M3 9h18M8 2v4M16 2v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-        </svg>
-        <span data-i18n="cal-title">Calendário Institucional</span>
-        <span style="font-size:0.65rem;font-weight:700;background:#f59e0b;color:#1a1a1a;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:middle;letter-spacing:0.02em;">BETA</span>
-      </span>
-      <svg class="cal-chevron" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </button>
-    <div class="cal-body is-open" id="calBody">
-      <div class="cal-inner">
-        <div class="cal-upcoming" id="calUpcoming" hidden></div>
-        <div class="cal-nav-row">
-          <button class="cal-nav-btn" onclick="changeMonth(-1)" id="calPrev" title="Mês anterior">&#8249;</button>
-          <span class="cal-month-nav-label" id="calMonthLabel"></span>
-          <button class="cal-nav-btn" onclick="changeMonth(1)" id="calNext" title="Próximo mês">&#8250;</button>
-        </div>
-        <div class="cal-grid" id="calGrid"></div>
-        <div class="cal-events-col">
-          <div class="cal-legend" id="calLegend"></div>
-          <div class="cal-event-list" id="calEventList"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <section class="links-section">
     <h2 class="links-title" data-i18n="links-title">Links Úteis</h2>
     <div class="links-row">
@@ -891,15 +847,6 @@
         'card-raftemp-h2': 'RAF temporário',
         'card-raftemp-p':  'Código para o aluno sem RAF entrar no portal',
         'soon':            'Em breve',
-        'cal-title':       'Calendário Institucional',
-        'cal-focus-head':  'Foco da semana',
-        'cal-focus-sub':   '· próximos 7 dias',
-        'cal-no-events':   'Nenhum evento para este mês.',
-        'cal-week-theme':  'Semana temática',
-        'cal-months':      ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
-        'cal-days':        ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
-        'cal-prev':        'Mês anterior',
-        'cal-next':        'Próximo mês',
         'evt-reuniao':     'Reunião',
         'evt-evento':      'Evento',
         'evt-simulado':    'Simulado',
@@ -989,15 +936,6 @@
         'card-raftemp-h2': 'Temporary RAF',
         'card-raftemp-p':  'A code so a student without a RAF can log in to the portal',
         'soon':            'Coming soon',
-        'cal-title':       'Institutional Calendar',
-        'cal-focus-head':  "Week's focus",
-        'cal-focus-sub':   '· next 7 days',
-        'cal-no-events':   'No events this month.',
-        'cal-week-theme':  'Theme week',
-        'cal-months':      ['January','February','March','April','May','June','July','August','September','October','November','December'],
-        'cal-days':        ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
-        'cal-prev':        'Previous month',
-        'cal-next':        'Next month',
         'evt-reuniao':     'Meeting',
         'evt-evento':      'Event',
         'evt-simulado':    'Mock Exam',
@@ -1087,15 +1025,6 @@
         'card-raftemp-h2': 'RAF temporal',
         'card-raftemp-p':  'Un código para que el alumno sin RAF entre al portal',
         'soon':            'Próximamente',
-        'cal-title':       'Calendario Institucional',
-        'cal-focus-head':  'Foco de la semana',
-        'cal-focus-sub':   '· próximos 7 días',
-        'cal-no-events':   'No hay eventos este mes.',
-        'cal-week-theme':  'Semana temática',
-        'cal-months':      ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
-        'cal-days':        ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'],
-        'cal-prev':        'Mes anterior',
-        'cal-next':        'Próximo mes',
         'evt-reuniao':     'Reunión',
         'evt-evento':      'Evento',
         'evt-simulado':    'Simulacro',
@@ -1136,368 +1065,10 @@
       document.querySelectorAll('.lang-btn').forEach(function(btn) {
         btn.classList.toggle('is-active', btn.dataset.lang === lang);
       });
-      var prev = document.getElementById('calPrev');
-      var next = document.getElementById('calNext');
-      if (prev) prev.title = tr('cal-prev');
-      if (next) next.title = tr('cal-next');
-      buildCalendar();
     }
 
-    /* ════════════════════════════════════════════════
-       CALENDÁRIO ESCOLAR
-       Fonte dos eventos: Google Sheets publicado na web (CSV).
-       Para ativar o fetch dinâmico, publique a aba em:
-         Arquivo → Compartilhar → Publicar na Web → CSV
-       e substitua SHEET_CSV_URL pela URL gerada.
-    ════════════════════════════════════════════════ */
-    /* A planilha usa layout visual com células mescladas — CSV não é parseável
-       automaticamente. Foi por isso que este calendário nasceu com a lista
-       transcrita à mão no FALLBACK_EVENTS logo abaixo.
-       Desde 08/2026 a fonte é o Calendário Institucional do Painel da Direção:
-       o backend guarda cada evento com tags de PÚBLICO (prof, sec, comercial,
-       gestão, sócios) e de UNIDADE, e aqui pedimos só os de público "prof".
-       O FALLBACK_EVENTS continua como rede de segurança para o dia em que o
-       Apps Script estiver fora do ar. */
-    const CAL_ENDPOINT = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
-
-    const EVENT_TYPES = {
-      reuniao:     { label: 'Reunião',           color: '#2563EB' },
-      evento:      { label: 'Evento',            color: '#EC4899' },
-      simulado:    { label: 'Simulado',          color: '#7C3AED' },
-      met:         { label: 'MET / Siele',       color: '#0EA5A0' },
-      /* os tipos do Calendário Institucional */
-      treinamento: { label: 'Treinamento',       color: '#7C3AED' },
-      exame:       { label: 'Exame / Simulado',  color: '#0EA5A0' },
-      familias:    { label: 'Alunos e famílias', color: '#16A34A' },
-      entrega:     { label: 'Entrega',           color: '#EA580C' },
-      ferias:      { label: 'Férias',            color: '#0891B2' },
-      feriado:     { label: 'Feriado',           color: '#6f6a6a' },
-      letivo:      { label: 'Marco letivo',      color: '#c9922e' },
-    };
-
-    /* Calendário escolar 2026 — extraído manualmente da planilha Fisk.
-       ATENÇÃO: lista incompleta — vários eventos pedagógicos da planilha não
-       foram transcritos (ex.: reunião de professores Kids/Teens e simulado TBT
-       em 21/08). O ideal é ligar a planilha ao vivo (ver SHEET_CSV_URL).
-       Removidos por não competirem ao professor: reuniões de secretaria
-       ("Reunião SEC"), comerciais / gestão comercial, Congresso de Diretores,
-       Gestão Pedagógica e Reunião Geral Online. Onde a data também tinha algo
-       relevante (treinamento, simulado, reunião de pais), manteve-se só essa parte. */
-    const FALLBACK_EVENTS = [
-      /* JULHO */
-      { date: '2026-07-27', title: 'Reunião de Professores Presencial (CPV 08h30 / TBT 14h)', type: 'reuniao' },
-      { date: '2026-07-29', title: 'Coquetel Fisk CPV 50 Anos', type: 'evento' },
-      /* AGOSTO */
-      { date: '2026-08-11', title: 'Treinamento Profes FOCUS Online 13h30', type: 'reuniao' },
-      { date: '2026-08-17', title: 'Simulado MET CPV 18h', type: 'met' },
-      { date: '2026-08-19', title: 'Simulado MET CPV 18h', type: 'met' },
-      { date: '2026-08-24', title: 'Reuniões de Pais CPV (Naty) 18h', type: 'reuniao' },
-      { date: '2026-08-26', title: 'Reuniões de Pais CPV (Pedro) 18h', type: 'reuniao' },
-      { date: '2026-08-31', title: 'Reuniões de Pais TBT (Naty)', type: 'reuniao' },
-      /* SETEMBRO */
-      { date: '2026-09-01', title: 'Início inscrições MET Oficial', type: 'met' },
-      { date: '2026-09-14', title: 'Simulado MET CPV 18h', type: 'met' },
-      /* OUTUBRO */
-      { date: '2026-10-01', title: 'Fim inscrições MET Oficial', type: 'met' },
-      { date: '2026-10-19', title: 'Simulado MET CPV 18h', type: 'met' },
-      { date: '2026-10-21', title: 'Simulado MET CPV 18h', type: 'met' },
-      /* NOVEMBRO */
-      { date: '2026-11-09', title: 'Simulado MET CPV 18h', type: 'met' },
-      { date: '2026-11-11', title: 'Simulado MET CPV 18h', type: 'met' },
-      { date: '2026-11-26', title: 'MET Oficial, prova', type: 'met' },
-    ];
-
-    /* Semanas temáticas — destacam a semana inteira (não um único dia).
-       start/end em AAAA-MM-DD (inclusive).
-       Vira `let` porque, quando o Calendário Institucional responde, esta
-       lista é substituída pelos eventos de vários dias que vierem de lá
-       (semana temática, congresso, semana de reuniões de pais). */
-    let WEEK_HIGHLIGHTS = [
-      { start: '2026-08-24', end: '2026-08-28', title: 'Semana de Aniversário do Buddy · Taubaté', color: '#EC4899' },
-      { start: '2026-08-31', end: '2026-09-04', title: 'Semana de Aniversário do Buddy · Caçapava', color: '#EC4899' },
-    ];
-
-    /* rgba a partir de hex (#rrggbb) para os fundos suaves das semanas. */
-    function hexToRgba(hex, a) {
-      const n = parseInt(hex.slice(1), 16);
-      return `rgba(${(n>>16)&255}, ${(n>>8)&255}, ${n&255}, ${a})`;
-    }
-
-    /* Busca no Calendário Institucional os eventos marcados para o público
-       "pedag" — o professor não vê reunião de secretaria, pauta comercial nem
-       férias de quem quer que seja, e ninguém precisa mais decidir isso na
-       mão: é o tag do evento que decide.
-       Traz o ano corrente e o seguinte, para dezembro não mostrar um
-       calendário que acaba no dia 31. */
-    async function fetchCalendario(ano) {
-      const json = await fiskFetch(CAL_ENDPOINT, { action: 'calList', publico: 'pedag', ano: String(ano) });
-      if (!json || !json.ok) throw new Error((json && json.error) || 'calList falhou');
-      return json.itens || [];
-    }
-
-    async function loadEvents() {
-      try {
-        const ano = new Date().getFullYear();
-        const lotes = await Promise.all([fetchCalendario(ano), fetchCalendario(ano + 1)]);
-        const itens = [].concat.apply([], lotes);
-        if (!itens.length) return FALLBACK_EVENTS;
-
-        /* Evento de vários dias vira faixa de semana; de um dia só vira ponto
-           no calendário. É a mesma separação que o Hub já fazia entre
-           WEEK_HIGHLIGHTS e a lista de eventos, só que agora vinda do dado. */
-        const cores = { tematica: '#EC4899', letivo: '#c9922e', ferias: '#0891B2' };
-        WEEK_HIGHLIGHTS = itens.filter(it => it.fim && it.fim !== it.inicio).map(it => ({
-          start: it.inicio, end: it.fim, title: it.titulo,
-          color: cores[it.tipo] || (EVENT_TYPES[it.tipo] || {}).color || '#EC4899'
-        }));
-        return itens.filter(it => !it.fim || it.fim === it.inicio).map(it => ({
-          date: it.inicio,
-          title: it.titulo + (it.hora ? ' · ' + it.hora : ''),
-          type: it.tipo
-        }));
-      } catch (e) {
-        /* servidor fora do ar: o professor continua vendo o calendário, com a
-           última lista que ficou escrita aqui */
-        return FALLBACK_EVENTS;
-      }
-    }
-
-    let _calEvents = [];
-    let _calYear   = new Date().getFullYear();
-    let _calMonth  = new Date().getMonth();
-
-    function buildCalendar() {
-      /* Fora do ar: além do initCal, o applyLang também chama esta função (a
-         cada troca de idioma), então sem esta guarda a grade continuava sendo
-         montada em memória para ninguém ver. Sai junto com o `hidden` da
-         seção quando o calendário voltar. */
-      if (document.querySelector('.cal-section[hidden]')) return;
-      const events = _calEvents;
-      const year   = _calYear;
-      const month  = _calMonth;
-      const today  = new Date();
-      const tY = today.getFullYear(), tM = today.getMonth(), tD = today.getDate();
-
-      /* Janela "próxima semana": de hoje até 7 dias à frente (comparação por dia). */
-      const weekStart = new Date(tY, tM, tD);
-      const weekEnd   = new Date(tY, tM, tD + 7);
-      const inNextWeek = (y, m, d) => {
-        const dt = new Date(y, m, d);
-        return dt >= weekStart && dt <= weekEnd;
-      };
-
-      const monthNames = tr('cal-months');
-      document.getElementById('calMonthLabel').textContent = monthNames[month] + ' ' + year;
-
-      const isPastMo   = year < tY || (year === tY && month < tM);
-      const isThisMo   = year === tY && month === tM;
-
-      const firstDay    = new Date(year, month, 1).getDay();
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-      /* Semanas temáticas que tocam o mês exibido / o dia consultado. */
-      const weekOf = (y, m, d) => {
-        const dt = new Date(y, m, d);
-        return WEEK_HIGHLIGHTS.find(w =>
-          dt >= new Date(w.start + 'T00:00:00') && dt <= new Date(w.end + 'T23:59:59'));
-      };
-      const monthStart = new Date(year, month, 1, 0, 0, 0);
-      const monthEnd   = new Date(year, month + 1, 0, 23, 59, 59);
-      const monthWeeks = WEEK_HIGHLIGHTS.filter(w =>
-        new Date(w.start + 'T12:00:00') <= monthEnd && new Date(w.end + 'T12:00:00') >= monthStart);
-
-      const eventsMap = {};
-      const monthEvents = [];
-      events.forEach(e => {
-        const d = new Date(e.date + 'T12:00:00');
-        if (d.getFullYear() === year && d.getMonth() === month) {
-          const day = d.getDate();
-          (eventsMap[day] = eventsMap[day] || []).push(e);
-          const past = isPastMo || (isThisMo && day < tD);
-          const upcoming = inNextWeek(year, month, day);
-          monthEvents.push({ ...e, day, past, upcoming });
-        }
-      });
-      monthEvents.sort((a, b) => a.day - b.day);
-
-      const dayNames = tr('cal-days');
-      let html = dayNames.map(n => `<div class="cal-day-header">${n}</div>`).join('');
-      for (let i = 0; i < firstDay; i++) html += '<div class="cal-cell cal-empty"></div>';
-      for (let d = 1; d <= daysInMonth; d++) {
-        const isToday = isThisMo && d === tD;
-        const isPast  = isPastMo || (isThisMo && d < tD);
-        const isUpcoming = !!(eventsMap[d] && inNextWeek(year, month, d));
-        const wk = weekOf(year, month, d);
-        const dots = (eventsMap[d] || []).map(e => {
-          const color = EVENT_TYPES[e.type]?.color || '#888';
-          return `<span class="cal-dot" style="background:${color}"></span>`;
-        }).join('');
-        const wkStyle = wk ? ` style="background:${hexToRgba(wk.color, 0.14)};box-shadow:inset 0 0 0 1px ${hexToRgba(wk.color, 0.35)}"` : '';
-        html += `<div class="cal-cell${isToday ? ' cal-today' : ''}${isPast ? ' cal-past' : ''}${isUpcoming ? ' cal-cell-upcoming' : ''}${wk ? ' cal-cell-week' : ''}"${wkStyle}>
-          <span class="cal-day-num">${d}</span>
-          ${dots ? `<div class="cal-dots">${dots}</div>` : ''}
-        </div>`;
-      }
-      document.getElementById('calGrid').innerHTML = html;
-
-      const usedTypes = [...new Set(monthEvents.map(e => e.type))];
-      const legendTypes = usedTypes.map(tp => {
-        const info = EVENT_TYPES[tp] || { label: tp, color: '#888' };
-        return `<span class="cal-legend-item">
-          <span class="cal-legend-dot" style="background:${info.color}"></span>${tr('evt-' + tp) || info.label}
-        </span>`;
-      });
-      if (monthWeeks.length) {
-        legendTypes.push(`<span class="cal-legend-item">
-          <span class="cal-legend-dot cal-legend-week" style="background:${hexToRgba(monthWeeks[0].color, 0.35)};border-color:${monthWeeks[0].color}"></span>${tr('cal-week-theme')}
-        </span>`);
-      }
-      document.getElementById('calLegend').innerHTML = legendTypes.join('');
-
-      const fmtDM = dt => String(dt.getDate()).padStart(2, '0') + '/' + String(dt.getMonth() + 1).padStart(2, '0');
-      const weekBanners = monthWeeks.map(w => {
-        const s = new Date(w.start + 'T12:00:00'), e = new Date(w.end + 'T12:00:00');
-        return `<div class="cal-week-banner" style="background:${hexToRgba(w.color, 0.12)};border-color:${hexToRgba(w.color, 0.45)}">
-          <span class="cal-week-ico">🎉</span>
-          <span class="cal-week-name">${w.title}</span>
-          <span class="cal-week-range" style="color:${w.color}">${fmtDM(s)}–${fmtDM(e)}</span>
-        </div>`;
-      }).join('');
-
-      const listEl = document.getElementById('calEventList');
-      if (monthEvents.length === 0 && !weekBanners) {
-        listEl.innerHTML = `<p class="cal-no-events">${tr('cal-no-events')}</p>`;
-      } else {
-        listEl.innerHTML = weekBanners + monthEvents.map(e => {
-          const info = EVENT_TYPES[e.type] || { label: e.type, color: '#888' };
-          const evtLabel = tr('evt-' + e.type) || info.label;
-          return `<div class="cal-event-item${e.past ? ' is-past' : ''}${e.upcoming ? ' is-upcoming' : ''}">
-            <span class="cal-event-dot" style="background:${info.color}"></span>
-            <span class="cal-event-day">${e.day}</span>
-            <span class="cal-event-title">${e.title}</span>
-            <span class="cal-event-type" style="color:${info.color}">${evtLabel}</span>
-          </div>`;
-        }).join('');
-      }
-
-      renderUpcoming();
-    }
-
-    /* Destaque "Foco da semana": lista os eventos dos próximos 7 dias
-       (a partir de hoje), independentemente do mês exibido, para o professor
-       ver de imediato o que vem pela frente. */
-    function renderUpcoming() {
-      const box = document.getElementById('calUpcoming');
-      if (!box) return;
-      const today = new Date();
-      const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      const end   = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
-      const weekdays = tr('cal-days').map(function(d){ return d.toLowerCase(); });
-
-      const upcoming = _calEvents
-        .map(e => ({ ...e, dt: new Date(e.date + 'T12:00:00') }))
-        .filter(e => { const d = new Date(e.dt.getFullYear(), e.dt.getMonth(), e.dt.getDate()); return d >= start && d <= end; })
-        .sort((a, b) => a.dt - b.dt);
-
-      /* Semanas temáticas que se sobrepõem aos próximos 7 dias. */
-      const upWeeks = WEEK_HIGHLIGHTS.filter(w =>
-        new Date(w.start + 'T12:00:00') <= end && new Date(w.end + 'T12:00:00') >= start);
-
-      if (upcoming.length === 0 && upWeeks.length === 0) { box.hidden = true; box.innerHTML = ''; return; }
-
-      box.hidden = false;
-      const fmtDM = dt => String(dt.getDate()).padStart(2, '0') + '/' + String(dt.getMonth() + 1).padStart(2, '0');
-      const weekItems = upWeeks.map(w => {
-        const s = new Date(w.start + 'T12:00:00'), e = new Date(w.end + 'T12:00:00');
-        return `<div class="cal-up-item cal-up-week" style="border-color:${hexToRgba(w.color, 0.5)};background:${hexToRgba(w.color, 0.1)}">
-          <span class="cal-up-ico">🎉</span>
-          <span class="cal-up-when" style="color:${w.color}">${fmtDM(s)}–${fmtDM(e)}</span>
-          <span class="cal-up-title">${w.title}</span>
-        </div>`;
-      }).join('');
-      const items = upcoming.map(e => {
-        const info = EVENT_TYPES[e.type] || { label: e.type, color: '#888' };
-        const dd = String(e.dt.getDate()).padStart(2, '0');
-        const mm = String(e.dt.getMonth() + 1).padStart(2, '0');
-        const wd = weekdays[e.dt.getDay()];
-        return `<div class="cal-up-item">
-          <span class="cal-event-dot" style="background:${info.color}"></span>
-          <span class="cal-up-when">${wd} ${dd}/${mm}</span>
-          <span class="cal-up-title">${e.title}</span>
-        </div>`;
-      }).join('');
-
-      box.innerHTML = `<div class="cal-up-head">
-          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
-            <circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.8"/>
-            <circle cx="12" cy="12" r="1.4" fill="currentColor"/>
-          </svg>
-          ${tr('cal-focus-head')} <span class="cal-up-sub">${tr('cal-focus-sub')}</span>
-        </div>
-        <div class="cal-up-list">${weekItems}${items}</div>`;
-    }
-
-    function changeMonth(delta) {
-      _calMonth += delta;
-      if (_calMonth > 11) { _calMonth = 0; _calYear++; }
-      if (_calMonth < 0)  { _calMonth = 11; _calYear--; }
-      buildCalendar();
-    }
-
-    /* Abre/fecha o painel animando até a altura EXATA do conteúdo (em vez de
-       um teto fixo de 1600px), para a transição de abrir e fechar ser suave
-       e sem "tempo morto". */
-    function setCalOpen(open, animate) {
-      const btn  = document.getElementById('calToggle');
-      const body = document.getElementById('calBody');
-      body.classList.toggle('is-open', open);
-      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-
-      if (!animate) {
-        body.style.maxHeight = open ? 'none' : '0px';
-        return;
-      }
-      if (open) {
-        body.style.maxHeight = body.scrollHeight + 'px';
-        const onEnd = (e) => {
-          if (e.propertyName !== 'max-height') return;
-          body.style.maxHeight = 'none';   // libera para trocar de mês sem cortar
-          body.removeEventListener('transitionend', onEnd);
-        };
-        body.addEventListener('transitionend', onEnd);
-      } else {
-        body.style.maxHeight = body.scrollHeight + 'px';  // sai de 'none' com altura fixa
-        void body.offsetHeight;                            // força reflow
-        requestAnimationFrame(() => { body.style.maxHeight = '0px'; });
-      }
-    }
-
-    function toggleCal() {
-      const open = !document.getElementById('calBody').classList.contains('is-open');
-      setCalOpen(open, true);
-      try { localStorage.setItem('cal-open', open ? '1' : '0'); } catch(e) {}
-      if (open) {
-        /* Ancora o título no topo: ele desliza suavemente para cima e o
-           calendário se desdobra para baixo, a partir dele. */
-        requestAnimationFrame(() => {
-          const btn = document.getElementById('calToggle');
-          const y = btn.getBoundingClientRect().top + window.scrollY - 12;
-          if (Math.abs(y - window.scrollY) > 4) window.scrollTo({ top: y, behavior: 'smooth' });
-        });
-      }
-    }
-
-    (function initCal() {
-      /* Fora do ar (ver o comentário na seção, lá em cima). O return evita
-         a chamada ao backend e o desenho de uma grade que ninguém vê. */
-      return;
-      /* eslint-disable no-unreachable */
-      let open = true;
-      try { if (localStorage.getItem('cal-open') === '0') open = false; } catch(e) {}
-      setCalOpen(open, false);
-      loadEvents().then(evts => { _calEvents = evts; buildCalendar(); });
-    })();
+    /* O CALENDÁRIO ANTIGO DA HOME SAIU em 31/10/2026 (auditoria de 30/10, A4): estava fora do ar desde 03/08 e ainda
+       chamava calList duas vezes por abertura. O calendário do professor é a Minha semana (calendario.html). Código no git. */
     /* O Conversation Maker fica em outro domínio (vercel.app) e não enxerga
        o localStorage daqui — o tema atual vai na URL, e o token de sessão do
        professor (SSO) vai no fragmento #proftok= (fragmento não chega a
@@ -2185,6 +1756,23 @@
       function post(body){
         return fiskFetch(EP, body);
       }
+      /* o pedido profHome, guardando no aparelho o que as outras páginas reaproveitam (buddyInfo, aniversariantes, calendário) */
+      window.fiskProfHomePede = function(token, post){
+        var p = post({ action:'profHome', token: token }).then(function(r){
+          if (!r || r.ok !== true || !r.perfil) return null;   /* rota desconhecida ou resposta estranha: chamadas antigas */
+          try {
+            if (r.buddy && typeof fiskBuddyInfoGuarda === 'function') fiskBuddyInfoGuarda(r.buddy);
+            if (r.aniversariantes && r.aniversariantes.ok) fiskCacheGuarda(FISK_ANIV_LISTA_CHAVE, r.aniversariantes.aniversariantes || []);
+            if (r.cal && r.cal.ok && Array.isArray(r.cal.itens)) {
+              var ano = String(new Date().getFullYear());   /* só o ano corrente: a Minha semana pede o seguinte à parte */
+              fiskCacheGuarda('hub:cal:pedag:' + ano, r.cal.itens.filter(function(it){ return String(it.inicio || '').indexOf(ano) === 0; }));
+            }
+          } catch (e) {}
+          return r;
+        }).catch(function(){ return null; });
+        p.quando = Date.now();
+        return p;
+      };
 
       function submit(){
         if (sub.disabled) return;   /* o Enter na senha mandava um segundo login, e cada login troca o token */
@@ -2305,7 +1893,15 @@
            trazia de volta para cá, a home abria normal e a ferramenta falhava outra vez, sem saída. Agora a home pergunta
            ao servidor por trás; só a recusa EXPLÍCITA da sessão desloga (erro de rede não tira ninguém). */
         if (s.token && !s.master && !s.viewingAs) {
-          post({ action:'profCheck', token: s.token }).then(function(res){
+          /* A ROTA DE ABERTURA ÚNICA (auditoria de 30/10/2026, A4): um pedido `profHome` traz o perfil (o que o profCheck
+             devolve), os avisos, os informes, os aniversariantes, o buddyInfo e o calendário, cada seção exatamente como a
+             rota isolada devolve. O mural, o atalho do Buddy e a bolinha do kit (window.__fiskProfHome) esperam por ele em
+             vez de pedir de novo. Sem `ok` ou com rota desconhecida (o backend pode subir depois do Hub), vira null e cada
+             um volta às chamadas antigas. */
+          window.__fiskProfHome = fiskProfHomePede(s.token, post);
+          window.__fiskProfHome.then(function(r){
+            return (r && r.perfil) ? r.perfil : post({ action:'profCheck', token: s.token });
+          }).then(function(res){
             if (res && res.ok === false && /sess[ãa]o/i.test(String(res.error || ''))) {
               try { localStorage.removeItem('fisk_prof'); localStorage.removeItem('fisk_actas'); sessionStorage.setItem('fisk_sessao_caiu', '1'); } catch (e) {}
               location.reload();
@@ -2804,8 +2400,8 @@
       });
     }
 
-    function carrega(){
-      var s = sess(); if (!s || !s.token) return;
+    function carrega(forcar){
+      var s = sess(); if (!s || !s.token) return Promise.resolve(false);
       $$('bdSub').textContent = tx('sub'); $$('bdNome').textContent = '📣 ' + tx('nome');
       var pedido = ++leitura;   /* duas leituras no ar: só a mais nova desenha */
       /* A VOLTA À HOME SEM CORTINA (Pedro, 26/10/2026: "parece que ele tem que carregar tudo toda vez"). A última resposta
@@ -2815,13 +2411,27 @@
       var chaveMural = 'hub:mural:' + eu();
       var guardado = fiskCacheLe(chaveMural, FISK_CACHE_DIA);
       if (guardado) desenhaMural(guardado, pedido);
-      var inf = post({ action: 'informesLer', como: como() }).catch(function(){ return null; });
-      var avs = post({ action: 'avisosLer', como: como() }).catch(function(){ return null; });
-      var ans = post({ action: 'aniversariantesProf', como: como() }).catch(function(){ return null; });
-      Promise.all([inf, avs, ans]).then(function(r){
+      /* um pedido só (profHome) quando é o professor na própria conta; a direção "vendo como" continua pelas três rotas,
+         que aceitam `como`. Se o profHome não vier (rota desconhecida, rede), caem as três chamadas antigas. */
+      return profHome(forcar).then(function(r){
+        if (r) return [r.informes || null, r.avisos || null, r.aniversariantes || null];
+        var inf = post({ action: 'informesLer', como: como() }).catch(function(){ return null; });
+        var avs = post({ action: 'avisosLer', como: como() }).catch(function(){ return null; });
+        var ans = post({ action: 'aniversariantesProf', como: como() }).catch(function(){ return null; });
+        return Promise.all([inf, avs, ans]);
+      }).then(function(r){
         if (r[0] && r[0].ok === true) fiskCacheGuarda(chaveMural, r);
         desenhaMural(r, pedido);
+        return !!(r[0] && r[0].ok === true);
       });
+    }
+    /* o profHome da abertura (window.__fiskProfHome, pedido antes da primeira pintura) serve uma vez; depois, um novo */
+    function profHome(forcar){
+      var s = sess(); if (!s || !s.token || s.master || s.viewingAs || typeof window.fiskProfHomePede !== 'function') return Promise.resolve(null);
+      var p = window.__fiskProfHome;
+      if (!forcar && p && p.quando && Date.now() - p.quando < 60000) return p;
+      p = window.__fiskProfHome = window.fiskProfHomePede(s.token, post);
+      return p;
     }
     function temMuralGuardado(){ return !!fiskCacheLe('hub:mural:' + eu(), FISK_CACHE_DIA); }
     function desenhaMural(r, pedido){
@@ -2920,8 +2530,10 @@
       }
       carrega();
       var n = 0, t = setInterval(function(){ if (noMenu() || ++n > 20) clearInterval(t); }, 300);
-      /* O BUDDY AUXILIAR, em piloto (06/10/2026): só quem está no piloto ganha o atalho no menu do nome */
-      post({ action: 'buddyInfo' }).then(function(j){
+      /* O BUDDY AUXILIAR, em piloto (06/10/2026): só quem está no piloto ganha o atalho no menu do nome. A resposta vem
+         do profHome ou do cache de 30 min da bolinha; só sem os dois é que pergunta ao servidor. */
+      var bg = fiskCacheLe(FISK_BUDDY_INFO_CHAVE, FISK_CACHE_30MIN);
+      (bg && bg.info ? Promise.resolve(bg.info) : profHome().then(function(r){ return (r && r.buddy) ? r.buddy : post({ action: 'buddyInfo' }); })).then(function(j){
         if (!j || !j.piloto) return;
         var k = 0, t2 = setInterval(function(){
           var menu = document.querySelector('.fisk-user-menu');
@@ -2951,7 +2563,7 @@
     })();
     window._avisosLiga = liga;
     if (document.body.classList.contains('prof-in')) liga();
-    setInterval(function(){ if (!document.hidden && document.body.classList.contains('prof-in')) carrega(); }, 180000);
+    fiskPollVisivel(function(){ if (document.body.classList.contains('prof-in')) return carrega(true); }, 180000);
     var sel = $$('profActAs');
     if (sel) sel.addEventListener('change', function(){ setTimeout(carrega, 50); });
   })();
