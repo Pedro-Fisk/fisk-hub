@@ -616,6 +616,7 @@ function limparEscolhasDoAlunoAnterior() {
   ultimoPDF = null;
   pares('btnDrive').forEach(function (b) { b.disabled = true; b.title = 'Gere o PDF primeiro'; });
   pares('btnLancar').forEach(function (b) { b.hidden = true; });
+  lancadoNoCard(0);
   pares('btnVerPasta').forEach(function (b) { b.hidden = true; b.removeAttribute('href'); });
   statusDoc('');
   var prev = document.getElementById('preview');
@@ -694,6 +695,17 @@ function registrarNoCounseling() {
    counseling só saía quando alguém refazia o "Lançar no card", e a falha dele não aparecia em lugar nenhum.
    Os botões continuam ali para REFAZER o que falhou. */
 var REG = {};
+/* "LANÇAR NO CARD" SÓ UMA VEZ (auditoria de 30/10/2026, M2): o registrarDoc escreve na célula do card e o backend diz que
+   repetir não é seguro; o botão ficava lá e um segundo clique escrevia a nota outra vez. Depois do ✓ ele fica
+   desabilitado com a hora; só volta a valer para refazer o que falhou, e para o PDF seguinte. */
+function lancadoNoCard(quando) {
+  var hora = quando ? new Date(quando).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '';
+  pares('btnLancar').forEach(function (b) {
+    b.disabled = !!quando;
+    b.textContent = quando ? '✓ Lançado no card às ' + hora : '📤 Lançar no card';
+    b.title = quando ? 'Já está anotado no card (às ' + hora + '). Gere outro PDF para lançar de novo.' : '';
+  });
+}
 function regMostra() {
   var txt = ['pasta', 'card', 'counseling'].map(function (k) { return REG[k]; }).filter(Boolean).join('   ·   ');
   statusDoc(txt, REG.falhou ? '#b8860b' : '#1e8f4e');
@@ -710,6 +722,7 @@ function registrarTudo() {
   if (modoLivre || !alunoSel || alunoSel.linhaCard == null || !ultimoPDF) return;
   var fProf = document.getElementById('fProf');
   REG = { pasta: '📁 Pasta: ⏳', card: '📇 Card: ⏳', counseling: '💬 Counseling: ⏳' }; regMostra();
+  lancadoNoCard(0);   /* PDF novo: a anotação dele ainda não foi feita */
   var btn = pares('btnDrive')[0];
   if (btn && typeof fiskEnviarParaPasta === 'function') {
     fiskEnviarParaPasta(btn, {
@@ -724,8 +737,8 @@ function registrarTudo() {
   } else { REG.pasta = '📁 Pasta: ⚠️ não salvou (recarregue a página)'; REG.falhou = 1; }
   api({ fn: 'registrarDoc', escola: payload.escola, prof: payload.aba, professor: payload.aba,
         linhaCard: alunoSel.linhaCard, idx: alunoSel.ultimaPresencaIdx, tipo: 'termo' })
-    .then(function () { REG.card = '📇 Card: ✓ anotado na aula mais próxima de hoje'; })
-    .catch(function (e) { REG.card = '📇 Card: ⚠️ ' + (e && e.message || 'não anotou'); REG.falhou = 1; })
+    .then(function () { REG.card = '📇 Card: ✓ anotado na aula mais próxima de hoje'; lancadoNoCard(Date.now()); })
+    .catch(function (e) { REG.card = '📇 Card: ⚠️ ' + (e && e.message || 'não anotou'); REG.falhou = 1; lancadoNoCard(0); })
     .then(regMostra);
   registrarNoCounseling().then(function (j) {
     REG.counseling = '💬 Counseling: ' + regCounselingTxt(j);
@@ -742,10 +755,11 @@ function lancarNoCard() {
      NENHUMA turma tem aula dada (conferido no card em 31/07/2026), e era
      justamente quando o professor precisava emitir o documento. */
   statusDoc('⏳ Registrando no card…');
+  pares('btnLancar').forEach(function (b) { b.disabled = true; });
   api({ fn: 'registrarDoc', escola: payload.escola, prof: payload.aba, professor: payload.aba,
         linhaCard: alunoSel.linhaCard, idx: alunoSel.ultimaPresencaIdx, tipo: 'termo' })
-    .then(function () { statusDoc(msgRegistro(), '#1e8f4e'); try { if (typeof fiskFesta === 'function') fiskFesta('📄', true); } catch (e) {} registrarNoCounseling().then(function (j) { statusDoc(msgRegistro() + '   ·   💬 Counseling: ' + regCounselingTxt(j), j && j.ok ? '#1e8f4e' : '#b8860b'); }); })
-    .catch(function (e) { statusDoc('⚠️ ' + e.message, '#c0392b'); });
+    .then(function () { statusDoc(msgRegistro(), '#1e8f4e'); try { if (typeof fiskFesta === 'function') fiskFesta('📄', true); } catch (e) {} lancadoNoCard(Date.now()); registrarNoCounseling().then(function (j) { statusDoc(msgRegistro() + '   ·   💬 Counseling: ' + regCounselingTxt(j), j && j.ok ? '#1e8f4e' : '#b8860b'); }); })
+    .catch(function (e) { statusDoc('⚠️ ' + e.message, '#c0392b'); lancadoNoCard(0); });   /* falhou: o botão volta para refazer */
 }
 pares('btnDrive').forEach(function (btn) { btn.addEventListener('click', function () {
   if (!ultimoPDF) { alert('Gere o PDF primeiro.'); return; }

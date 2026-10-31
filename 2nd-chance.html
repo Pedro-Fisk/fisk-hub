@@ -812,6 +812,17 @@ function registrarNoCounseling() {
    E-counseling, com uma linha de resultado por destino. Antes eram dois botões depois do PDF (pasta e card), e a
    falha do counseling não aparecia. Os botões continuam para REFAZER o que falhou. */
 var REG = {};
+/* "LANÇAR NO CARD" SÓ UMA VEZ (auditoria de 30/10/2026, M2): o registrarDoc escreve na célula do card e o backend diz que
+   repetir não é seguro; o botão ficava lá e um segundo clique escrevia a nota outra vez. Depois do ✓ ele fica
+   desabilitado com a hora; só volta a valer para refazer o que falhou, e para o PDF seguinte. */
+function lancadoNoCard(quando) {
+  var hora = quando ? new Date(quando).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '';
+  pares('btnLancar').forEach(function (b) {
+    b.disabled = !!quando;
+    b.textContent = quando ? '✓ Lançado no card às ' + hora : '📤 Lançar no card';
+    b.title = quando ? 'Já está anotado no card (às ' + hora + '). Gere outro PDF para lançar de novo.' : '';
+  });
+}
 function regMostra() {
   var txt = ['pasta', 'card', 'counseling'].map(function (k) { return REG[k]; }).filter(Boolean).join('   ·   ');
   statusDoc(txt, REG.falhou ? 'err' : 'ok');
@@ -828,6 +839,7 @@ function registrarTudo() {
   if (!ultimoPDF || !alunoSel || alunoSel.linhaCard == null || !turma || !turma.escola) return;
   var prof = ($('fProf').value || turma.professor || turma.aba || '').trim();
   REG = { pasta: '📁 Pasta: ⏳', card: '📇 Card: ⏳', counseling: '💬 Counseling: ⏳' }; regMostra();
+  lancadoNoCard(0);   /* PDF novo: a anotação dele ainda não foi feita */
   var btn = pares('btnDrive')[0];
   if (btn && typeof fiskEnviarParaPasta === 'function') {
     fiskEnviarParaPasta(btn, {
@@ -840,8 +852,8 @@ function registrarTudo() {
   } else { REG.pasta = '📁 Pasta: ⚠️ não salvou (recarregue a página)'; REG.falhou = 1; }
   api({ fn: 'registrarDoc', escola: turma.escola, prof: turma.aba || turma.professor || '',
         linhaCard: alunoSel.linhaCard, idx: alunoSel.idx, tipo: '2nd', professor: prof })
-    .then(function () { REG.card = '📇 Card: ✓ anotado na aula mais próxima de hoje'; })
-    .catch(function (e) { REG.card = '📇 Card: ⚠️ ' + (e && e.message || 'não anotou'); REG.falhou = 1; })
+    .then(function () { REG.card = '📇 Card: ✓ anotado na aula mais próxima de hoje'; lancadoNoCard(Date.now()); })
+    .catch(function (e) { REG.card = '📇 Card: ⚠️ ' + (e && e.message || 'não anotou'); REG.falhou = 1; lancadoNoCard(0); })
     .then(regMostra);
   registrarNoCounseling().then(function (j) {
     REG.counseling = '💬 Counseling: ' + regCounselingTxt(j);
@@ -868,10 +880,12 @@ function lancarNoCard() {
     professor: ($('fProf').value || turma.professor || turma.aba || '').trim()
   }).then(function () {
     statusDoc('✓ Lançado no card.', 'ok'); try { if (typeof fiskFesta === 'function') fiskFesta('📄', true); } catch (e) {} 
+    lancadoNoCard(Date.now());   /* fica desabilitado: lançar de novo escreveria a nota outra vez */
     registrarNoCounseling().then(function (j) { statusDoc('✓ Lançado no card.   ·   💬 Counseling: ' + regCounselingTxt(j), j && j.ok ? 'ok' : 'err'); });
   }).catch(function (e) {
     statusDoc('⚠️ ' + e.message, 'err');
-  }).finally(function () { btns.forEach(function (b) { b.disabled = false; }); });
+    btns.forEach(function (b) { b.disabled = false; });   /* falhou: o botão volta para refazer */
+  });
 }
 
 pares('btnPDF').forEach(function (b) { b.addEventListener('click', gerarPDF); });
