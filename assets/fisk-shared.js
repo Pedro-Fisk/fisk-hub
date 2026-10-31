@@ -704,6 +704,9 @@ function fiskInitUserMenu(opts) {
        porque o menu é a única coisa que existe nas vinte telas. */
     '<button type="button" class="fu-item fu-csl">💬 E-counseling de um aluno</button>' +
     '<a class="fu-item" href="' + base + 'treinamentos.html">🎓 Treinamentos</a>' +
+    /* A GAMIFICAÇÃO DO PROFESSOR NUM LUGAR SÓ (auditoria de 30/10/2026, B6): casa, avatar, personagem, festa e
+       aniversário estavam em cinco camadas sem nada que explicasse de onde vinham. O item abre o fiskTrofeus. */
+    '<button type="button" class="fu-item fu-trofeus">🎮 Meus troféus e personagens</button>' +
     /* O IDIOMA VOLTOU AO MENU (Pedro, 09/10/2026), em toda página. Onde a
        página sabe traduzir (a home), troca na hora; nas outras a escolha
        fica guardada e vale quando ele voltar à home. */
@@ -749,6 +752,10 @@ function fiskInitUserMenu(opts) {
     fechar();
     fiskCounselingBusca();
   });
+  menu.querySelector('.fu-trofeus').addEventListener('click', function () {
+    fechar();
+    fiskTrofeus();
+  });
 
   menu.querySelector('.fu-sair').addEventListener('click', function () {
     if (typeof opts.onSair === 'function') { fechar(); opts.onSair(); return; }
@@ -758,6 +765,88 @@ function fiskInitUserMenu(opts) {
   });
 
   return wrap;
+}
+
+/* ══ MEUS TROFÉUS E PERSONAGENS (auditoria de 30/10/2026, B6) ═══════════════════════════════════════════════════════
+ * A gamificação do professor tem cinco camadas, cada uma nascida numa campanha: a casa (Cerimônia de Seleção, 09/2026),
+ * o My Avatar (15/10), o personagem do Fisk Worlds, a festa do avatar (27/10) e a semana de aniversário (28/10). Quem
+ * entrou depois via a faixa colorida e o item do menu sem saber de onde vieram. Esta tela reúne as cinco, com três
+ * linhas por camada e o link para onde cada uma se ganha. Só leitura: nada aqui grava. */
+function fiskTrofeus() {
+  var s = fiskSessao() || {};
+  var base = fiskHubBase();
+  var CASAS = { g: 'Grifinória (Gryffindor)', r: 'Corvinal (Ravenclaw)', h: 'Lufa-Lufa (Hufflepuff)', s: 'Sonserina (Slytherin)' };
+  var casa = null;
+  try {
+    var reg = JSON.parse(localStorage.getItem('hw_casa_' + ('PROF:' + String(s.name || '')).replace(/[^A-Za-z0-9]/g, '').toUpperCase()) || 'null');
+    if (reg && CASAS[reg.casa]) casa = CASAS[reg.casa];
+  } catch (e) {}
+  var temDados = !!document.querySelector('.fu-eq');
+  var camadas = [
+    { ico: '🏰', t: 'Sua casa', casa: true,
+      p: ['A Cerimônia de Seleção (campanha de setembro) pôs você numa das quatro casas.',
+          'É ela que pinta a faixa preta do topo com as cores e o brasão, em todas as telas do Hub.',
+          casa ? 'Você é da casa <b>' + fiskEsc(casa) + '</b>. Para ligar ou desligar as cores: 👤 → 🎨 Cores da minha casa.' : 'Você ainda não fez a Cerimônia, por isso a faixa do topo está preta.'],
+      a: { href: base + 'hogwarts.html', rot: casa ? 'Rever a Cerimônia' : 'Fazer a Cerimônia de Seleção' } },
+    { ico: '🧑‍🎨', t: 'My Avatar',
+      p: ['O boneco 3D que você monta peça por peça, o mesmo motor do My Avatar dos alunos.',
+          'Ele aparece nas comemorações do Hub e em datas especiais ganha peças novas (o Halloween, por exemplo).',
+          'Sem avatar montado, quem comemora por você é o Buddy.'],
+      a: { href: base + 'avatar.html', rot: 'Montar o meu avatar' } },
+    { ico: '🧙', t: 'Meu personagem do Fisk Worlds',
+      p: ['O Fisk Worlds é o jogo 3D do Portal do Aluno, em inglês e em espanhol.',
+          'Seu personagem é como você aparece lá dentro: o corpo é o mesmo para todos, a cor, o chapéu e o que segura são seus.',
+          'Para jogar, use a faixa Fisk Worlds da home do Hub.'],
+      a: { href: base + 'meu-personagem.html', rot: 'Montar o meu personagem' } },
+    { ico: '🎉', t: 'A festa do avatar',
+      p: ['Em alguns momentos o seu avatar sobe na tela e comemora com uma fanfarra curta.',
+          'Os grandes (um Checking registrado, um documento salvo na pasta) sobem sempre; os pequenos, na 3ª, 6ª, 9ª vez do dia, com a fitinha.',
+          'Não se ganha nem se perde: é o Hub reconhecendo o que você acabou de fazer. Quem pediu menos movimento vê o avatar parado.'] },
+    { ico: '🎂', t: 'Sua semana de aniversário',
+      p: ['Na semana do seu aniversário o Hub inteiro fica em festa: faixa, balões e um confete por dia.',
+          'No dia abre a cortina de parabéns em nome da escola, e o avatar comemora ao fechá-la.',
+          'Quem decide é a data que você preencheu em 🪪 Meus dados (no menu 👤). Sem data, nada aparece.'],
+      a: temDados ? { fn: function () { var b = document.querySelector('.fu-eq'); if (b) b.click(); }, rot: 'Conferir os meus dados' } : { href: base + 'index.html', rot: 'Preencher em Meus dados (na home)' } }
+  ];
+  var old = document.getElementById('fkTrofeus'); if (old) old.remove();
+  if (!document.getElementById('fkTrofeusCss')) {
+    var st = document.createElement('style'); st.id = 'fkTrofeusCss';
+    st.textContent = '#fkTrofeus{position:fixed;inset:0;z-index:9400;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(12,12,14,.5)}' +
+      '#fkTrofeus .tf-cx{background:#fff;color:#1d3349;border-radius:18px;max-width:640px;width:100%;max-height:calc(100vh - 32px);overflow:auto;box-shadow:0 24px 60px rgba(0,0,0,.35);padding:1.1rem 1.2rem 1.2rem;font-size:15px;line-height:1.5}' +
+      '#fkTrofeus h2{margin:0 0 .25rem;font-family:var(--font-heading,inherit);font-size:1.25rem;display:flex;align-items:center;gap:.5rem}' +
+      '#fkTrofeus .tf-sub{margin:0 0 .8rem;color:#5b6b7b;font-size:.92rem}' +
+      '#fkTrofeus .tf-x{margin-left:auto;border:0;background:none;font-size:1.2rem;cursor:pointer;color:inherit;min-width:44px;min-height:44px;border-radius:10px}' +
+      '#fkTrofeus .tf-x:hover{background:rgba(0,0,0,.06)}' +
+      '#fkTrofeus .tf-it{display:flex;gap:.8rem;padding:.75rem 0;border-top:1px solid #e5e9f0}' +
+      '#fkTrofeus .tf-ico{font-size:1.7rem;flex:0 0 2.2rem;text-align:center;line-height:1.2}' +
+      '#fkTrofeus .tf-it b.tf-t{display:block;font-size:1rem;margin-bottom:.15rem}' +
+      '#fkTrofeus .tf-it p{margin:0 0 .15rem;font-size:.92rem}' +
+      '#fkTrofeus .tf-a{display:inline-flex;align-items:center;min-height:44px;margin-top:.2rem;padding:0 .9rem;border-radius:999px;border:1.5px solid #1d3685;color:#1d3685;background:#fff;font:inherit;font-weight:800;font-size:.88rem;text-decoration:none;cursor:pointer}' +
+      '#fkTrofeus .tf-a:hover{background:#eef4ff}' +
+      '#fkTrofeus .tf-casa{display:inline-block;padding:.1rem .5rem;border-radius:999px;background:#eef4ff;font-weight:800}' +
+      'body.theme-dark #fkTrofeus .tf-cx{background:#1c1a1a;color:#f2efef}body.theme-dark #fkTrofeus .tf-sub{color:#b8c0c8}' +
+      'body.theme-dark #fkTrofeus .tf-it{border-color:#333}body.theme-dark #fkTrofeus .tf-a{background:#2a2626;color:#dbe6f3;border-color:#5b6b7b}' +
+      'body.theme-dark #fkTrofeus .tf-a:hover{background:#3a3535}body.theme-dark #fkTrofeus .tf-x:hover{background:rgba(255,255,255,.08)}';
+    document.head.appendChild(st);
+  }
+  var m = document.createElement('div'); m.id = 'fkTrofeus'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-label', 'Meus troféus e personagens');
+  var html = '<div class="tf-cx"><h2>🎮 Meus troféus e personagens<button type="button" class="tf-x" aria-label="Fechar">✕</button></h2>' +
+    '<p class="tf-sub">Cinco coisas que o Hub mostra sobre você, cada uma vinda de uma campanha. Nenhuma vale nota: é só a sua cara no sistema.</p>';
+  camadas.forEach(function (c, i) {
+    html += '<div class="tf-it"><div class="tf-ico">' + c.ico + '</div><div><b class="tf-t">' + c.t + '</b>' +
+      c.p.map(function (l) { return '<p>' + l + '</p>'; }).join('') +
+      (c.a ? (c.a.href ? '<a class="tf-a" href="' + c.a.href + '">' + c.a.rot + ' →</a>' : '<button type="button" class="tf-a" data-fn="' + i + '">' + c.a.rot + ' →</button>') : '') +
+      '</div></div>';
+  });
+  m.innerHTML = html + '</div>';
+  document.body.appendChild(m);
+  var fecha = function () { m.remove(); document.removeEventListener('keydown', esc); };
+  var esc = function (e) { if (e.key === 'Escape') fecha(); };
+  document.addEventListener('keydown', esc);
+  m.addEventListener('click', function (e) { if (e.target === m) fecha(); });
+  m.querySelector('.tf-x').addEventListener('click', fecha);
+  m.querySelectorAll('button[data-fn]').forEach(function (b) { b.addEventListener('click', function () { var c = camadas[+b.getAttribute('data-fn')]; fecha(); if (c && c.a && c.a.fn) c.a.fn(); }); });
+  return m;
 }
 
 function fiskEsc(s) {
