@@ -654,18 +654,10 @@ function montarSelect(sel, ph, itens) {
     itens.map(function (i) { return '<option value="' + esc(i.v) + '">' + esc(i.t) + '</option>'; }).join('');
   sel.disabled = false;
 }
-/* O PILOTO (Pedro, 14/09/2026): a direção e o professor de teste. A mesma lista do card no index.html */
-var TURMA_HOJE_PILOTO = ['CARLOS ALBERTO'];
-function turmaHojeLiberada() {
-  var s = sessao() || {};
-  var n = function (v) { return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); };
-  /* O LANÇAMENTO (Pedro, 16/09/2026): quinta 17/09, 13h15 em Caçapava e 17h30 em Taubaté (a mesma regra do index.html) */
-  var abreEm = { 'CACAPAVA': Date.parse('2026-09-17T13:15:00-03:00'), 'TAUBATE': Date.parse('2026-09-17T17:30:00-03:00') }, agora = Date.now();
-  if (String(s.escolas || s.escola || '').split(',').some(function (e) { return agora >= (abreEm[n(e).replace(/[^A-Z]/g, '')] || Infinity); })) return true;
-  return !!(s.master || TURMA_HOJE_PILOTO.some(function (p) { return n(p) === n(s.name) || n(s.name).indexOf(n(p) + ' ') === 0; }));   /* "Carlos Alberto da Silva" também */
-}
+/* A MINHA AULA É DE TODOS desde 17/09/2026; a trava do lançamento (datas por escola e o piloto) saiu em 31/10/2026
+   (auditoria de 30/10, M5): quem estava sem escola na _profs via "em piloto" sem explicação. Sem escola, a cascata
+   abre do mesmo jeito e o status diz a causa e a porta. */
 function initCascata() {
-  if (!turmaHojeLiberada()) { status('🔒 A Minha aula está em piloto com um professor de teste. Em breve para todos.', true); return; }
   var selEscola = $('selEscola'), selProf = $('selProf'), selTurma = $('selTurma');
   /* quem entrou já diz a escola e o professor (pedido do Pedro, 13/09): a
      cascata se preenche sozinha e só a turma fica para escolher; e se o
@@ -673,6 +665,7 @@ function initCascata() {
   var s = sessao() || {};
   var eu = s.master ? (function () { try { return (JSON.parse(localStorage.getItem('fisk_actas') || 'null') || {}).name || ''; } catch (e) { return ''; } })() : (s.name || '');
   var minhas = Array.isArray(s.escolas) ? s.escolas : (s.escolas ? String(s.escolas).split(/[,;]/).map(function (x) { return x.trim(); }) : []);
+  if (!minhas.length && !s.master) status('⚠️ Sua conta está sem escola cadastrada: peça à direção para cadastrar sua escola. Até lá, escolha a escola, o professor e a turma aqui.', true);
   /* RÁPIDO (Pedro, 15/09/2026): as listas de escolas, professores e turmas ficam guardadas no aparelho e a cascata se
      monta na hora com elas; a leitura do card corre por trás e só troca as opções se algo mudou. A escola e o professor
      vêm de quem entrou; a turma, SÓ pelo horário: fora da aula nenhuma turma abre sozinha (a última vista não volta mais). */

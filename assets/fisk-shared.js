@@ -278,7 +278,7 @@ async function fiskEnviarParaPasta(buttonEl, getOpts) {
        escrita negada (Pedro), e ao fechá-lo sobrava "não salvou". A causa e a porta ficam na página, ao lado do
        botão, e viajam em e.motivo para a linha de status de quem chamou. */
     e.motivo = fiskMotivoDePasta(e, opts && opts.tipo);
-    fiskAvisoDePasta(buttonEl, 'NÃO salvou: ' + e.motivo + '. O PDF continua no botão de baixar.');
+    fiskAvisoDePasta(buttonEl, 'NÃO salvou: ' + e.motivo + '. O PDF continua no botão de baixar.', { tentar: buttonEl });
     throw e;
   }
 }
@@ -991,7 +991,7 @@ function fiskPulso(ferramenta) {
  * sozinho na próxima tentativa e serve a todas as ferramentas, porque todas
  * salvam por aqui.
  */
-function fiskAvisoDePasta(buttonEl, texto) {
+function fiskAvisoDePasta(buttonEl, texto, opts) {
   try {
     var id = 'fisk-aviso-pasta';
     var box = document.getElementById(id);
@@ -1000,10 +1000,19 @@ function fiskAvisoDePasta(buttonEl, texto) {
       box.id = id;
       box.style.cssText = 'margin-top:.6rem;padding:.6rem .75rem;border-radius:8px;' +
         'border:1px solid #e3c07a;background:#fdf6e6;color:#7a5a12;' +
-        'font-size:12.5px;line-height:1.45;font-weight:600;max-width:52ch';
+        'font-size:14px;line-height:1.45;font-weight:600;max-width:52ch';
       (buttonEl.parentNode || document.body).insertBefore(box, buttonEl.nextSibling);
     }
     box.textContent = '⚠️ ' + texto;
+    /* a porta (auditoria de 30/10/2026, M3): quando foi erro, um botão para tentar de novo ali mesmo, sem procurar o
+       botão original nem recarregar a página; tempo estourado e Drive instável resolvem-se assim na maioria das vezes */
+    if (opts && opts.tentar) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.textContent = '↻ Tentar de novo';
+      b.style.cssText = 'display:inline-block;margin-left:.6rem;min-height:36px;padding:0 .8rem;border-radius:999px;border:1.5px solid #b8890f;background:#fff;color:#6b4d0f;font:inherit;font-weight:800;cursor:pointer';
+      b.addEventListener('click', function () { box.hidden = true; opts.tentar.click(); });
+      box.appendChild(b);
+    }
     box.hidden = false;
   } catch (e) { /* aviso nunca pode derrubar o salvamento */ }
 }

@@ -401,9 +401,6 @@
         return sv;
       };
       // aponta os atalhos das ferramentas p/ o professor efetivo (pré-seleção; nunca trava)
-      /* O PILOTO DA TURMA DE HOJE (Pedro, 14/09/2026): a direção e o professor de teste. Para abrir para todos,
-         esvazie a trava (e a da própria turma-de-hoje.html, que tem a mesma lista). */
-      var TURMA_HOJE_PILOTO = ['CARLOS ALBERTO'];
       /* O CORRETOR DO SIMULADO MET (19/09/2026): nasceu só para a direção; aberto para todos os professores no mesmo
          dia, depois do teste do Pedro com folhas reais. `false` volta ao piloto (a mesma chave mora na corretor-met.html) */
       var CORRETOR_ABERTO = true;
@@ -420,14 +417,22 @@
         return String((sv && (sv.escolas || sv.escola)) || '').split(',').some(function(e){ return agora >= (AVATAR_ABRE_EM[normPiloto(e).replace(/[^A-Z]/g, '')] || Infinity); });
       }
       function normPiloto(v){ return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
-      /* O LANÇAMENTO (Pedro, 16/09/2026): quinta 17/09, 13h15 em Caçapava e 17h30 em Taubaté. A mesma regra na turma-de-hoje.html */
-      function turmaHojeAberta(sv){
-        var abreEm = { 'CACAPAVA': Date.parse('2026-09-17T13:15:00-03:00'), 'TAUBATE': Date.parse('2026-09-17T17:30:00-03:00') }, agora = Date.now();
-        return String((sv && (sv.escolas || sv.escola)) || '').split(',').some(function(e){ return agora >= (abreEm[normPiloto(e).replace(/[^A-Z]/g, '')] || Infinity); });
-      }
       function updateToolLinks(){
         var sv0 = saved(), th = document.querySelector('a.card-turmahoje');
-        if (th) th.style.display = (sv0 && (sv0.master || turmaHojeAberta(sv0) || TURMA_HOJE_PILOTO.some(function(n){ var x = normPiloto(sv0.name), y = normPiloto(n); return x === y || x.indexOf(y + ' ') === 0; }))) ? '' : 'none';
+        /* A MINHA AULA É DE TODOS desde 17/09/2026; a trava do lançamento (datas por escola e o piloto) saiu em
+           31/10/2026 (auditoria de 30/10, M5): ela escondia o card em silêncio de quem está sem escola na _profs.
+           Agora o card aparece sempre, e quem está sem escola lê o aviso nele, com a porta (a direção). */
+        if (th) {
+          th.style.display = sv0 ? '' : 'none';
+          var semEscola = !!(sv0 && !sv0.master && !String(sv0.escolas || sv0.escola || '').trim());
+          var av = th.querySelector('.card-sem-escola');
+          if (semEscola && !av) {
+            av = document.createElement('small'); av.className = 'card-sem-escola';
+            av.style.cssText = 'display:block;margin-top:.2rem;padding:.35rem .55rem;border-radius:8px;background:#fdf6e6;color:#7a5a12;font-size:.8rem;font-weight:700;line-height:1.35';
+            av.textContent = '⚠️ Sua conta está sem escola cadastrada: peça à direção para cadastrar sua escola. Até lá, escolha a escola e o professor na cascata.';
+            th.appendChild(av);
+          } else if (!semEscola && av) av.remove();
+        }
         var cmet = document.querySelector('a.card-corretor');
         if (cmet) cmet.style.display = (sv0 && (CORRETOR_ABERTO || sv0.master || sv0.director || CORRETOR_PILOTO.some(function(n){ return normPiloto(sv0.name) === normPiloto(n); }))) ? '' : 'none';
         var cnt = document.querySelector('a.card-noticias');
