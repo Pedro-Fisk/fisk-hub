@@ -1,0 +1,151 @@
+/* index.html: o CSS que morava inline no <head>; extraído em 31/10/2026 (auditoria de 30/10, M6).
+   O navegador guarda em cache pelo ?v= (scripts/bump-version.js). */
+    /* ===== Porteira de acesso do Fisk Hub ===== */
+    #profGate{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;
+      justify-content:flex-start;padding:24px 16px;overflow:auto;background:#eef2f9;}
+    body.theme-dark #profGate{background:#0b1220;}
+    body.prof-in #profGate{display:none;}
+    #profGate .pg-top{width:100%;display:flex;justify-content:flex-end;max-width:440px;margin:0 auto 8px;}
+    .pg-card{width:100%;max-width:440px;margin:auto;background:#fff;border-radius:20px;
+      box-shadow:0 12px 40px rgba(16,24,40,.12);padding:32px 28px;text-align:center;}
+    body.theme-dark .pg-card{background:#141c2b;box-shadow:0 12px 40px rgba(0,0,0,.5);}
+    .pg-logo{height:44px;width:auto;margin:0 auto 14px;display:block;}
+    .pg-title{font-size:1.7rem;margin:0 0 4px;color:#101828;font-weight:800;}
+    body.theme-dark .pg-title{color:#f4f6fb;}
+    .pg-sub{margin:0 0 20px;color:#667085;font-size:.95rem;}
+    body.theme-dark .pg-sub{color:#98a2b3;}
+    .pg-tabs{display:flex;gap:8px;background:#f2f4f7;border-radius:12px;padding:4px;margin-bottom:20px;}
+    body.theme-dark .pg-tabs{background:#1f2937;}
+    .pg-tab{flex:1;border:0;background:transparent;padding:10px;border-radius:9px;font-weight:700;
+      cursor:pointer;color:#667085;font-size:.95rem;}
+    .pg-tab.is-active{background:#fff;color:#2563EB;box-shadow:0 1px 3px rgba(16,24,40,.1);}
+    body.theme-dark .pg-tab{color:#98a2b3;}
+    body.theme-dark .pg-tab.is-active{background:#0b1220;color:#6ea8ff;}
+    .pg-label{display:block;text-align:left;font-size:.82rem;font-weight:600;color:#475467;
+      margin:12px 2px 6px;}
+    body.theme-dark .pg-label{color:#98a2b3;}
+    .pg-input{width:100%;box-sizing:border-box;padding:13px 14px;border:1.5px solid #d0d5dd;border-radius:12px;
+      font-size:1rem;background:#fff;color:#101828;font-family:inherit;}
+    .pg-input:focus{outline:none;border-color:#2563EB;box-shadow:0 0 0 3px rgba(37,99,235,.15);}
+    body.theme-dark .pg-input{background:#0b1220;border-color:#344054;color:#f4f6fb;}
+    .pg-btn{width:100%;margin-top:20px;padding:14px;border:0;border-radius:12px;background:#2563EB;color:#fff;
+      font-size:1.05rem;font-weight:800;cursor:pointer;font-family:inherit;transition:background .15s;}
+    .pg-btn:hover{background:#1d4ed8;}
+    .pg-btn:disabled{opacity:.6;cursor:default;}
+    .pg-msg{min-height:1.2em;margin:12px 0 0;font-size:.9rem;color:#d92d20;font-weight:600;}
+    .pg-help{margin:16px 0 0;font-size:.82rem;color:#98a2b3;}
+    .prof-bar{position:fixed;top:12px;left:12px;z-index:60;display:flex;align-items:center;gap:8px;
+      background:rgba(255,255,255,.9);border:1px solid #e4e7ec;border-radius:999px;padding:6px 12px;
+      font-size:.85rem;color:#344054;box-shadow:0 2px 8px rgba(16,24,40,.08);backdrop-filter:blur(6px);}
+    body.theme-dark .prof-bar{background:rgba(20,28,43,.9);border-color:#344054;color:#e4e7ec;}
+    .prof-bar button{border:0;background:transparent;color:#2563EB;font-weight:700;cursor:pointer;font-size:.85rem;font-family:inherit;}
+    body.theme-dark .prof-bar button{color:#6ea8ff;}
+    body.prof-out .prof-bar{display:none;}
+    .prof-bar.is-oculta{display:none;}
+    /* NO CELULAR A BARRA ENTRA NO FLUXO (09/10/2026): fixa, ela ia de x12 a
+       x320 e cobria o nome, o tema e o topo do logo da direção e da visita.
+       Vira uma faixa acima do cabeçalho, que quebra linha se precisar. */
+    @media (max-width:640px){
+      .prof-bar{position:static;flex-wrap:wrap;justify-content:center;border-radius:0;border-width:0 0 1px;
+        padding:8px 12px;box-shadow:none;backdrop-filter:none;}
+      .prof-bar #profBarName{min-width:0;overflow-wrap:anywhere;text-align:center;}
+      .prof-actas{max-width:100%;}
+    }
+    /* visão da direção "como professor": barra âmbar para não confundir com a sessão real */
+    .prof-bar.is-visita{background:#fff7e6;border-color:#f0c477;color:#7a5300;}
+    .prof-bar.is-visita button{color:#a05a00;}
+    body.theme-dark .prof-bar.is-visita{background:#3a2e12;border-color:#5c4a1e;color:#f0c477;}
+    body.theme-dark .prof-bar.is-visita button{color:#f0c477;}
+    .prof-actas{border:1px solid #7C3AED;background:#f1eafd;color:#4c1d95;border-radius:999px;
+      padding:4px 10px;font-size:.8rem;font-weight:700;font-family:inherit;cursor:pointer;max-width:230px;}
+    body.theme-dark .prof-actas{background:#2a1b45;border-color:#7C3AED;color:#d7c4fb;}
+    /* o subtexto da Minha aula em branco, sobre o azul (Pedro, 17/09/2026) */
+  .card.card-turmahoje p{ color:#fff; opacity:.92 }
+  .mais-usadas{ max-width:1180px; margin:0 auto .9rem; display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; padding:0 1rem; }
+  .mais-usadas .mu-rot{ font-weight:800; font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ui, #1d3685); opacity:.75; }
+  .mais-usadas .mu-chip{ border:1.5px solid var(--ui-bd, #d6deea); background:var(--white, #fff); color:var(--ui, #1d3685); border-radius:999px; padding:.4rem .9rem; font-weight:800; font-size:.86rem; text-decoration:none; }
+  .mais-usadas .mu-chip:hover{ border-color:var(--ui, #1d3685); }
+  /* carregando: os nomes do login e a entrada no Hub (Pedro, 23/10/2026: "não tem nenhuma evidência visual") */
+  @keyframes hubGiro{to{transform:rotate(360deg)}}
+  @keyframes hubBrilho{0%{background-position:-200px 0}100%{background-position:calc(200px + 100%) 0}}
+  .hub-roda{display:inline-block;width:16px;height:16px;border:2.5px solid rgba(37,99,235,.25);border-top-color:#2563eb;border-radius:50%;animation:hubGiro .8s linear infinite;vertical-align:-3px}
+  .pg-input.carregando{background-image:linear-gradient(90deg,transparent 0,rgba(37,99,235,.12) 50%,transparent 100%);background-repeat:no-repeat;background-size:200px 100%;animation:hubBrilho 1.2s ease-in-out infinite}
+  .pg-carrega{display:flex;align-items:center;gap:.5rem;font-size:.85rem;opacity:.75;margin:.35rem 0 .2rem}
+  .pg-carrega[hidden]{display:none}
+  #hubEntrando{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:var(--bg,#f4f6fb)}
+  #hubEntrando[hidden]{display:none}
+  body.theme-dark #hubEntrando{background:#171414;color:#f2efef}   /* o --bg não existe no tema: no escuro era quase branco sobre quase branco */
+  #hubEntrando .cx{text-align:center}
+  #hubEntrando .hub-roda{width:42px;height:42px;border-width:4px;margin-bottom:1rem}
+  #hubEntrando p{font-weight:700;margin:0}
+  .an-prox{ margin:.7rem 0 .25rem; font-size:.78rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; opacity:.6; }
+  .an-it.prox{ opacity:.8; }
+  /* o aniversário desta semana que já passou fica em cinza (Pedro, 27/10/2026) */
+  .an-it.passou b, .an-it.passou small{ color:var(--gray,#8a8f98); }
+  .an-it.passou .an-bolo{ filter:grayscale(1); opacity:.55; }
+  /* ── FISK WORLDS / FISK MUNDO (26/10/2026) ── a mesma faixa da home do aluno no portal, uma por curso */
+  .fwh{width:100%;margin:0 0 1.4rem;display:grid;grid-template-columns:1.45fr 1fr 1.15fr;gap:.9rem}
+  .fwh[hidden]{display:none}
+  .fwh-f{position:relative;display:flex;align-items:center;gap:.7rem;min-height:84px;padding:.7rem .9rem;border-radius:16px;color:#fff;text-decoration:none;overflow:hidden;min-width:0;
+    background:linear-gradient(90deg,#0d3a24 0%,rgba(13,58,36,.85) 32%,rgba(13,58,36,.2) 62%,rgba(13,58,36,0) 82%),
+      #1d5b3a url(https://portalfisk.com.br/worlds/img/carga-v2-paisagem-1280.webp) 70% 40%/cover no-repeat;
+    box-shadow:0 4px 0 #062014;transition:transform .14s ease, box-shadow .14s ease}
+  .fwh-f:hover{transform:translateY(-2px);box-shadow:0 6px 0 #062014}
+  .fwh-t{display:flex;flex-direction:column;gap:.1rem;min-width:0}
+  .fwh-tag{align-self:flex-start;font-size:.6rem;font-weight:800;letter-spacing:.08em;background:#f6c343;color:#1b1605;border-radius:6px;padding:.12rem .45rem;margin-bottom:.2rem;white-space:nowrap}
+  .fwh-t b{display:flex;align-items:center;gap:.4rem;font-size:1.2rem;font-weight:800;line-height:1.1;text-shadow:0 2px 0 rgba(0,0,0,.25)}
+  .fwh-band{flex:none;width:22px;height:15px;border-radius:3px;box-shadow:0 0 0 1px rgba(255,255,255,.55)}
+  .fwh-t small{font-size:.8rem;font-weight:700;color:#d8f5df;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fwh-go{margin-left:auto;flex:none;background:#fff;color:#14532d;border-radius:999px;padding:.45rem .85rem;font-weight:800;font-size:.88rem;white-space:nowrap;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+  /* o convite para montar o personagem (26/10/2026): roxo de mago */
+  .fwh-p{display:flex;align-items:center;gap:.7rem;min-height:84px;padding:.7rem .9rem;border-radius:16px;color:#fff;text-decoration:none;min-width:0;
+    background:linear-gradient(110deg,#2d2466,#4b3d94 60%,#6453b5);box-shadow:0 4px 0 #1b1540;transition:transform .14s ease, box-shadow .14s ease}
+  .fwh-p:hover{transform:translateY(-2px);box-shadow:0 6px 0 #1b1540}
+  .fwh-p .ic{flex:none;font-size:1.8rem;line-height:1}
+  .fwh-p .fwh-t b{font-size:1.02rem;line-height:1.15}
+  .fwh-p .fwh-go{color:#2d2466}
+  /* telas médias: os dois jogos lado a lado e o personagem embaixo, na largura toda; celular: um embaixo do outro */
+  @media (max-width:1100px){ .fwh{grid-template-columns:1.3fr 1fr} .fwh-p{grid-column:1/-1;min-height:64px} }
+  @media (max-width:560px){ .fwh{grid-template-columns:1fr;gap:.7rem} .fwh-f{min-height:72px} .fwh-t b{font-size:1.1rem} }
+
+  /* BOLETINS SEM PÁGINA NO MEIO (27/10/2026, Pedro: "um menu pequeno com 3 botões, na home mesmo") */
+  .card-boletim{position:relative}
+  .bol-menu{position:absolute;left:.6rem;right:.6rem;bottom:.6rem;z-index:5;display:flex;flex-direction:column;gap:.35rem;padding:.5rem;border-radius:14px;
+    background:var(--white,#fff);border:1.5px solid var(--surface-border-color,#dfe6ef);box-shadow:0 12px 30px rgba(0,0,0,.18);animation:bolIn .16s ease-out}
+  @keyframes bolIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .bol-menu a{display:flex;align-items:center;gap:.5rem;padding:.55rem .7rem;border-radius:10px;font-weight:800;font-size:.9rem;text-decoration:none;color:var(--ui-dark,#223e5a);background:var(--ui-soft,#e9eff5)}
+  .bol-menu a:hover{filter:brightness(.96)}
+  body.theme-dark .bol-menu{background:#1e1c1c;border-color:#3a3535}
+  /* a MESMA cara do card Minha aula (style.css, .card-turmahoje): azul-marinho, borda azul e o brilho verde-limão que
+     pulsa, para o professor ver que os dois são a mesma ferramenta (Pedro, 27/10/2026) */
+  .prox-aula{display:flex;align-items:center;gap:.8rem;margin:0 0 1rem;padding:.75rem 1rem;border-radius:14px;text-decoration:none;color:#fff;
+    background:linear-gradient(145deg,#1d3685 0%,#142a6b 100%);border:2px solid #3b5bc4;
+    box-shadow:0 0 0 2px rgba(212,233,9,.55), 0 0 26px 6px rgba(59,91,196,.55);animation:hubThGlow 2.8s ease-in-out infinite;transition:transform .14s ease}
+  .prox-aula[hidden]{display:none}
+  .prox-aula:hover{transform:translateY(-2px)}
+  .prox-aula .ic{font-size:1.5rem;flex:none}
+  .prox-aula .tx{display:flex;flex-direction:column;min-width:0}
+  .prox-aula .tx small{font-size:.74rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
+  .prox-aula .tx b{font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .prox-aula .tx span{font-size:.84rem;opacity:.9}
+  .prox-aula .go{margin-left:auto;flex:none;background:#d4e909;color:#142a6b;border-radius:999px;padding:.45rem .9rem;font-weight:800;font-size:.86rem;white-space:nowrap}
+  .prox-aula .tx small{color:#d4e909;opacity:1}
+  .prox-aula:hover{box-shadow:0 0 0 2px #d4e909, 0 0 34px 10px rgba(59,91,196,.7)}
+  @media (prefers-reduced-motion:reduce){ .prox-aula{animation:none} }
+  @media (max-width:560px){ .prox-aula .go{padding:.45rem .7rem} .prox-aula .go span{display:none} }
+  /* ── MINHA SEMANA na home (26/10/2026, Pedro): seção recolhível embaixo de "Outras ferramentas" ── */
+  .sem-home{margin:0 0 1.6rem}
+  .sem-home-btn{width:100%;display:flex;align-items:center;gap:.6rem;font-family:var(--font-heading);font-weight:800;font-size:1.05rem;color:var(--ui-dark,#223e5a);
+    background:var(--white);border:2px solid var(--surface-border-color);border-radius:var(--surface-radius);padding:.85rem 1.1rem;cursor:pointer;text-align:left}
+  .sem-home-btn:hover{border-color:#0e7490}
+  .sem-home-btn[aria-expanded="true"]{border-radius:var(--surface-radius) var(--surface-radius) 0 0;border-bottom-color:transparent}
+  .sem-home-btn small{font-family:var(--font-body);font-weight:600;font-size:.82rem;color:var(--gray)}
+  .sem-home-btn .chev{margin-left:auto;transition:transform .2s}
+  .sem-home-btn[aria-expanded="true"] .chev{transform:rotate(180deg)}
+  /* o cinza da Minha semana (colunas-cartão) vai até a borda do card, também embaixo do "Abrir em tela cheia" (Pedro, 27/10/2026) */
+  .sem-home-corpo{border:2px solid var(--surface-border-color);border-top:0;border-radius:0 0 var(--surface-radius) var(--surface-radius);overflow:hidden;background:#f1f3f6}
+  body.theme-dark .sem-home-corpo{background:#151313}
+  .sem-home-corpo.anima{transition:height .38s cubic-bezier(.22,.9,.24,1), opacity .3s ease}
+  @media (prefers-reduced-motion:reduce){ .sem-home-corpo.anima{transition:none} }
+  .sem-home-corpo iframe{display:block;width:100%;height:min(760px,82vh);border:0;background:transparent}
+  .sem-home-corpo .abrir{display:block;text-align:right;font-size:.82rem;font-weight:700;padding:.45rem .9rem;color:var(--ui,#3c6e98)}

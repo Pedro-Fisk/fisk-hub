@@ -9,7 +9,8 @@ Google Apps Script.
 
 | | |
 |---|---|
-| `index.html` | home do Hub: login do professor, cards das ferramentas |
+| `index.html` | home do Hub: login do professor, cards das ferramentas. **Desde 31/10/2026 o CSS e o JS moram em `assets/index.css` e `assets/index.js`** (o HTML caiu de 240 KB para 42 KB e o navegador guarda os dois em cache pelo `?v=`); no HTML ficam só os dois scripts de pré-pintura (tema e porteira) |
+| `turma-de-hoje.html` | a Minha aula. **Idem: `assets/turma-de-hoje.css` e `assets/turma-de-hoje.js`** (273 KB → 7 KB de HTML). Os blocos `<script>` de antes viraram seções "═══ bloco N" no `.js`, na mesma ordem; as declarações de topo continuam globais |
 | `planejador.html` | **aposentado em 26/10/2026**: só encaminha para a `turma-de-hoje.html` levando o `#t=escola\|prof\|linha` (o link da célula e a barra lateral do card apontam para ele). Código antigo no git, commit `90da348` |
 | `2nd-chance.html`, `termo-atraso.html` | documentos em PDF do aluno, com "Salvar na pasta do aluno" |
 | `boletins.html` | atalho para ferramentas que vivem em **outros repositórios** |
@@ -86,7 +87,8 @@ Duas URLs de Apps Script, de propósito diferentes:
 
 ## Convenções de código
 
-- JS no estilo `var`/ES5 do repo, inline no `.html`; sem framework, sem bundler.
+- JS no estilo `var`/ES5 do repo, inline no `.html` (exceto a home e a Minha aula, que têm o JS em `assets/`); sem framework, sem bundler.
+- **Todo `?v=` de asset local é o md5 do arquivo** (10 caracteres), gravado por `node scripts/bump-version.js`. Não suba carimbo à mão.
 - PDFs sempre via **pdf-lib** pelo CDN.
 - `assets/fisk-shared.js` é carregado localmente aqui, mas outros repos o
   consomem pelo jsDelivr numa **tag fixa** — mudar a assinatura de um helper
@@ -98,11 +100,20 @@ Duas URLs de Apps Script, de propósito diferentes:
 ```bash
 # sintaxe de bloco <script> inline alterado
 node -e "new Function(require('fs').readFileSync('/dev/stdin','utf8'))" < bloco.js
+# sintaxe dos assets (index.js, turma-de-hoje.js, fisk-shared.js...)
+node --check assets/index.js
+
+# mexeu em QUALQUER .js/.css local? recalcula o ?v= de todas as páginas pelo md5 do arquivo
+node scripts/bump-version.js
+# e antes do push: acusa (e sai com 1) se algum ?v= não bate com o arquivo em disco
+node scripts/conferir-publicacao.js
 
 # leitura do card nas duas escolas (roda em Node, não toca em nada remoto)
 # mora no outro repositório, junto do código que ele testa
 node ../fisk-hub-backend/scripts/testes/secretaria/painel-secretaria.test.js
 ```
+
+`scripts/bump-version.js` varre as páginas `.html` da raiz e, em cada `href`/`src` local (sem `http`) que já leva `?v=`, grava o md5 do arquivo; `--ver` só mostra, `--todos` carimba também os `.js`/`.css` locais ainda sem `?v=`. Referências externas (portal, CDN) não são tocadas. `scripts/conferir-publicacao.js` é o mesmo varredor sem gravar: lista os divergentes e falha, para rodar antes do push.
 
 O `conversation_maker/` é a exceção: Python, com `requirements.txt` próprio.
 
@@ -140,8 +151,10 @@ as cores, o padrão e o brasão da casa dele, nas dezessete páginas.
   idioma, e guarda a MESMA chave `hw_tema` do Portal: é preferência da pessoa,
   não da página. A barra fixa do canto não serve — ela fica escondida para
   professor comum.
-- ⚠️ **Mexeu no `fisk-shared.js`? Suba o `?v=` nas dezessete páginas**, senão
-  o navegador do professor segue com a versão antiga por tempo indeterminado.
+- ⚠️ **Mexeu no `fisk-shared.js` (ou em qualquer asset local)? `node scripts/bump-version.js`**
+  recalcula o `?v=` de todas as páginas pelo md5 do arquivo, senão o navegador
+  do professor segue com a versão antiga por tempo indeterminado (até 31/10/2026
+  o carimbo era de data, subido à mão nas trinta e uma páginas).
 
 ## O cabeçalho das páginas (09/10/2026)
 
