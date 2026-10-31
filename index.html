@@ -807,7 +807,7 @@
       el.addEventListener('click', function () { el.style.opacity = '0'; setTimeout(function () { window.hubFrase(); el.style.opacity = ''; }, 300); });
     })();
   </script>
-  <script src="assets/fisk-shared.js?v=2026-10-30b"></script>
+  <script src="assets/fisk-shared.js?v=2026-10-31a"></script>
   <script src="assets/fisk-pre-aula.js?v=2026-10-30a"></script>
   <script>
     fiskInitThemeToggle('themeToggle');
@@ -2809,20 +2809,21 @@
       $$('bdSub').textContent = tx('sub'); $$('bdNome').textContent = '📣 ' + tx('nome');
       var pedido = ++leitura;   /* duas leituras no ar: só a mais nova desenha */
       /* A VOLTA À HOME SEM CORTINA (Pedro, 26/10/2026: "parece que ele tem que carregar tudo toda vez"). A última resposta
-         do mural fica guardada na aba (sessionStorage): na volta de uma ferramenta o mural se desenha na hora com ela e a
-         leitura nova corre por trás, redesenhando só se algo mudou (a assinatura agora inclui o "ciente"). */
+         do mural fica guardada no aparelho (localStorage com dono e validade de um dia, fiskCacheGuarda; até 31/10/2026 era
+         sessionStorage, que a aba nova de cada ferramenta não herda): na volta de uma ferramenta o mural se desenha na hora
+         com ela e a leitura nova corre por trás, redesenhando só se algo mudou (a assinatura agora inclui o "ciente"). */
       var chaveMural = 'hub:mural:' + eu();
-      var guardado = null; try { guardado = JSON.parse(sessionStorage.getItem(chaveMural) || 'null'); } catch (e) {}
+      var guardado = fiskCacheLe(chaveMural, FISK_CACHE_DIA);
       if (guardado) desenhaMural(guardado, pedido);
       var inf = post({ action: 'informesLer', como: como() }).catch(function(){ return null; });
       var avs = post({ action: 'avisosLer', como: como() }).catch(function(){ return null; });
       var ans = post({ action: 'aniversariantesProf', como: como() }).catch(function(){ return null; });
       Promise.all([inf, avs, ans]).then(function(r){
-        if (r[0] && r[0].ok === true) { try { sessionStorage.setItem(chaveMural, JSON.stringify(r)); } catch (e) {} }
+        if (r[0] && r[0].ok === true) fiskCacheGuarda(chaveMural, r);
         desenhaMural(r, pedido);
       });
     }
-    function temMuralGuardado(){ try { return !!sessionStorage.getItem('hub:mural:' + eu()); } catch (e) { return false; } }
+    function temMuralGuardado(){ return !!fiskCacheLe('hub:mural:' + eu(), FISK_CACHE_DIA); }
     function desenhaMural(r, pedido){
         if (r[2] && r[2].ok) aniv = r[2].aniversariantes || [];
         if (pedido !== leitura) return;
