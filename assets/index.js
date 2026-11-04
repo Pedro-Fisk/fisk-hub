@@ -1513,6 +1513,62 @@
     fundo.addEventListener('click', function(){ abre(false); });
     document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !LARGO.matches) abre(false); });
 
+    /* O CAFEZINHO DA ENTRADA (Pedro, 04/11/2026): uma das quatro xícaras, sorteada a cada entrada e nunca a mesma da vez
+       anterior (hub_xicara no aparelho), e as frases no idioma do Hub, a primeira fixa e as outras em ordem sorteada.
+       Devolve a função que para o giro das frases. */
+    var HUB_BALAO = 'assets/fisk-logo-balao-360.png';
+    var HUB_XICARAS = [
+      /* 1. caneca vermelha com pires */
+      '<svg width="200" height="190" viewBox="0 0 200 190"><g class="vapor"><path d="M78 62 q-10 -14 0 -28 q10 -14 0 -28"/><path d="M100 62 q-10 -14 0 -28 q10 -14 0 -28"/><path d="M122 62 q-10 -14 0 -28 q10 -14 0 -28"/></g>' +
+      '<ellipse cx="100" cy="172" rx="82" ry="12" fill="#eef1f5"/><ellipse cx="100" cy="166" rx="74" ry="11" fill="#fff" stroke="#d6dde5" stroke-width="2"/><g class="balanca">' +
+      '<path d="M150 96 q34 0 34 26 q0 26 -38 28" fill="none" stroke="#c4161c" stroke-width="12" stroke-linecap="round"/><path d="M44 74 h112 v62 q0 30 -30 30 h-52 q-30 0 -30 -30z" fill="#d81f26"/>' +
+      '<path d="M52 80 v52 q0 14 8 20" fill="none" stroke="#ff6b70" stroke-width="5" stroke-linecap="round" opacity=".55"/><ellipse cx="100" cy="74" rx="56" ry="9" fill="#b3141a"/>' +
+      '<ellipse cx="100" cy="75" rx="50" ry="6" fill="#6b3a1f"/><image href="' + HUB_BALAO + '" x="64" y="96" width="72" height="36"/></g></svg>',
+      /* 2. xícara de porcelana */
+      '<svg width="200" height="190" viewBox="0 0 200 190"><g class="vapor"><path d="M84 70 q-10 -14 0 -28 q10 -14 0 -28"/><path d="M100 70 q-10 -14 0 -28 q10 -14 0 -28"/><path d="M116 70 q-10 -14 0 -28 q10 -14 0 -28"/></g>' +
+      '<ellipse cx="100" cy="166" rx="86" ry="14" fill="#fff" stroke="#d81f26" stroke-width="2.5"/><ellipse cx="100" cy="164" rx="40" ry="6" fill="#f1f3f6"/><g class="balanca">' +
+      '<path d="M152 100 q30 -4 28 20 q-2 20 -34 22" fill="none" stroke="#dfe4ea" stroke-width="9" stroke-linecap="round"/>' +
+      '<path d="M40 82 h120 q-2 50 -26 70 q-8 8 -22 8 h-24 q-14 0 -22 -8 q-24 -20 -26 -70z" fill="#fff" stroke="#dfe4ea" stroke-width="2.5"/><path d="M44 92 h112" stroke="#d81f26" stroke-width="3"/>' +
+      '<ellipse cx="100" cy="82" rx="60" ry="9" fill="#fff" stroke="#d81f26" stroke-width="2.5"/><ellipse cx="100" cy="83" rx="54" ry="6" fill="#7a4626"/>' +
+      '<image href="' + HUB_BALAO + '" x="70" y="104" width="60" height="30"/></g></svg>',
+      /* 3. copo para viagem */
+      '<svg width="200" height="200" viewBox="0 0 200 200"><g class="vapor"><path d="M92 40 q-10 -12 0 -24 q10 -12 0 -24"/><path d="M110 40 q-10 -12 0 -24 q10 -12 0 -24"/></g>' +
+      '<ellipse cx="100" cy="188" rx="46" ry="7" fill="#eef1f5"/><g class="balanca"><path d="M58 62 h84 l-10 120 q-1 6 -7 6 h-50 q-6 0 -7 -6z" fill="#fff" stroke="#dfe4ea" stroke-width="2.5"/>' +
+      '<path d="M62 100 h76 l-4 46 h-68z" fill="#d81f26"/><path d="M52 48 h96 q4 0 4 4 v8 q0 4 -4 4 h-96 q-4 0 -4 -4 v-8 q0 -4 4 -4z" fill="#2b4d70"/>' +
+      '<path d="M66 40 h68 q6 0 8 8 h-84 q2 -8 8 -8z" fill="#3d6b93"/><rect x="108" y="42" width="14" height="4" rx="2" fill="#1d3349"/>' +
+      '<image href="' + HUB_BALAO + '" x="70" y="106" width="60" height="30"/></g></svg>',
+      /* 4. vista de cima, com o coração de espuma girando */
+      '<svg width="220" height="250" viewBox="0 0 220 250"><circle cx="110" cy="110" r="96" fill="#fff" stroke="#dfe4ea" stroke-width="3"/><circle cx="110" cy="110" r="80" fill="#f4f6f9"/>' +
+      '<path d="M182 92 q30 0 30 18 q0 18 -30 18" fill="none" stroke="#d81f26" stroke-width="12" stroke-linecap="round"/><circle cx="110" cy="110" r="66" fill="#d81f26"/>' +
+      '<circle cx="110" cy="110" r="57" fill="#7a4626"/><circle cx="110" cy="110" r="57" fill="none" stroke="#a8693f" stroke-width="5"/><g class="gira">' +
+      '<path d="M110 140 c-30 -18 -40 -34 -30 -46 c8 -10 22 -8 30 4 c8 -12 22 -14 30 -4 c10 12 0 28 -30 46z" fill="#f7e6d2"/>' +
+      '<path d="M110 128 c-16 -10 -22 -20 -16 -26 c5 -5 12 -3 16 4 c4 -7 11 -9 16 -4 c6 6 0 16 -16 26z" fill="#e9caa6"/></g>' +
+      '<image href="' + HUB_BALAO + '" x="74" y="212" width="72" height="36"/></svg>'
+    ];
+    var HUB_FRASES = {
+      pt: ['☕ Passando um cafezinho…', '🎓 Preparando o seu Hub…', '📒 Abrindo o seu planner…', '🙋 Chamando a turma pelo nome…', '🧑‍🏫 Arrumando a sala de aula…',
+           '📝 Separando as atividades de hoje…', '✏️ Apontando os lápis…', '📊 Atualizando o radar da turma…', '🔔 Conferindo os recados…', '🗓️ Virando a página da semana…'],
+      en: ['☕ Brewing a fresh coffee…', '🎓 Getting your Hub ready…', '📒 Opening your planner…', '🙋 Calling the roll…', '🧑‍🏫 Tidying up the classroom…',
+           '📝 Sorting out today’s activities…', '✏️ Sharpening the pencils…', '📊 Updating the class radar…', '🔔 Checking your messages…', '🗓️ Turning the week’s page…'],
+      es: ['☕ Preparando un cafecito…', '🎓 Preparando tu Hub…', '📒 Abriendo tu planner…', '🙋 Pasando lista…', '🧑‍🏫 Ordenando el aula…',
+           '📝 Separando las actividades de hoy…', '✏️ Afilando los lápices…', '📊 Actualizando el radar del grupo…', '🔔 Revisando los avisos…', '🗓️ Pasando la página de la semana…']
+    };
+    function hubCafezinho(){
+      var cx = $$('hubXicara'), fr = $$('hubEnFrase'); if (!cx || !fr) return function(){};
+      var ult = -1; try { ult = Number(localStorage.getItem('hub_xicara')); } catch (e) {}
+      var n = Math.floor(Math.random() * (HUB_XICARAS.length - 1)); if (n >= ult && ult >= 0) n++;
+      if (n >= HUB_XICARAS.length) n = 0;
+      try { localStorage.setItem('hub_xicara', String(n)); } catch (e) {}
+      cx.innerHTML = HUB_XICARAS[n];
+      var l = 'pt'; try { l = (typeof fiskIdioma === 'function' ? fiskIdioma() : localStorage.getItem('fisk_lang')) || 'pt'; } catch (e) {}
+      var F = HUB_FRASES[l] || HUB_FRASES.pt, resto = F.slice(1).sort(function(){ return Math.random() - .5; }), k = 0;
+      fr.textContent = F[0]; fr.classList.remove('sai');
+      var giro = setInterval(function(){
+        fr.classList.add('sai');
+        setTimeout(function(){ fr.textContent = resto[k++ % resto.length]; fr.classList.remove('sai'); }, 450);
+      }, 3200);
+      return function(){ clearInterval(giro); };
+    }
     function liga(){
       var s = sess(); if (!s || !s.token) { cx.hidden = true; sino.hidden = true; return; }
       cx.hidden = false; sino.hidden = false;
@@ -1522,7 +1578,8 @@
       if (ov && temMuralGuardado()) eqCampanha();   /* volta de uma ferramenta: o mural guardado aparece na hora, sem cortina */
       else if (ov) {
         ov.hidden = false;
-        var some = function(){ if (ov.hidden) return; ov.hidden = true; document.removeEventListener('hub-mural-pronto', some); eqCampanha(); };
+        var paraCafe = hubCafezinho();
+        var some = function(){ if (ov.hidden) return; ov.hidden = true; paraCafe(); document.removeEventListener('hub-mural-pronto', some); eqCampanha(); };
         document.addEventListener('hub-mural-pronto', some);
         setTimeout(some, 12000);
       }

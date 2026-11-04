@@ -76,12 +76,23 @@
   .pg-input.carregando{background-image:linear-gradient(90deg,transparent 0,rgba(37,99,235,.12) 50%,transparent 100%);background-repeat:no-repeat;background-size:200px 100%;animation:hubBrilho 1.2s ease-in-out infinite}
   .pg-carrega{display:flex;align-items:center;gap:.5rem;font-size:.85rem;opacity:.75;margin:.35rem 0 .2rem}
   .pg-carrega[hidden]{display:none}
-  #hubEntrando{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:var(--bg,#f4f6fb)}
+  /* O CAFEZINHO (Pedro, 04/11/2026): fundo branco, uma das 4 xícaras sorteada a cada entrada (nunca a mesma da vez anterior),
+     vapor subindo e frases com emoji trocando a cada 3,2 s. As xícaras são SVG no index.js (HUB_XICARAS). */
+  #hubEntrando{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:#fff;color:#1d3349}
   #hubEntrando[hidden]{display:none}
   body.theme-dark #hubEntrando{background:#171414;color:#f2efef}   /* o --bg não existe no tema: no escuro era quase branco sobre quase branco */
-  #hubEntrando .cx{text-align:center}
-  #hubEntrando .hub-roda{width:42px;height:42px;border-width:4px;margin-bottom:1rem}
-  #hubEntrando p{font-weight:700;margin:0}
+  #hubEntrando .cx{text-align:center;padding:1rem}
+  #hubEntrando svg{display:block;margin:0 auto;overflow:visible}
+  #hubEntrando p{font-family:var(--font-heading);font-weight:600;font-size:1.05rem;margin:1rem 0 0;min-height:1.6em;transition:opacity .45s,transform .45s}
+  #hubEntrando p.sai{opacity:0;transform:translateY(8px)}
+  #hubEntrando .vapor path{fill:none;stroke:#cdd5de;stroke-width:5;stroke-linecap:round;stroke-dasharray:60;stroke-dashoffset:60;animation:hubVapor 2.6s ease-in-out infinite}
+  #hubEntrando .vapor path:nth-child(2){animation-delay:.8s} #hubEntrando .vapor path:nth-child(3){animation-delay:1.6s}
+  body.theme-dark #hubEntrando .vapor path{stroke:#5d5656}
+  #hubEntrando .balanca{animation:hubBalanca 3.2s ease-in-out infinite;transform-origin:50% 100%;transform-box:fill-box}
+  #hubEntrando .gira{animation:hubGiro 9s linear infinite;transform-origin:110px 110px}
+  @keyframes hubVapor{0%{stroke-dashoffset:60;opacity:0;transform:translateY(8px)}35%{opacity:.9}100%{stroke-dashoffset:-60;opacity:0;transform:translateY(-14px)}}
+  @keyframes hubBalanca{0%,100%{transform:rotate(0)}50%{transform:rotate(-2.5deg)}}
+  @media (prefers-reduced-motion:reduce){#hubEntrando .balanca,#hubEntrando .gira{animation:none} #hubEntrando .vapor path{animation-duration:5s}}
   .an-prox{ margin:.7rem 0 .25rem; font-size:.78rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; opacity:.6; }
   .an-it.prox{ opacity:.8; }
   /* o aniversário desta semana que já passou fica em cinza (Pedro, 27/10/2026) */
