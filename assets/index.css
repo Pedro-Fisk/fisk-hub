@@ -4,6 +4,18 @@
     #profGate{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;
       justify-content:flex-start;padding:24px 16px;overflow:auto;background:#eef2f9;}
     body.theme-dark #profGate{background:#0b1220;}
+    /* O FUNDO DO LOGIN (Pedro, 04/11/2026): a colagem azul-escura e vermelha (artes do Hub e telas do aluno, dados
+       fictícios), gerada no portal-aluno-fisk por scripts/login-colagem/gerar.sh (equipe.html?p=prof) e COPIADA para cá.
+       O véu cinza baixa brilho e contraste para o cartão sobressair; no tema escuro ele é mais forte. */
+    #profGate{--veu:linear-gradient(rgba(36,38,48,.34),rgba(36,38,48,.34));
+      background:var(--veu),#16294a url("login-prof-pc.jpg") center/cover no-repeat;
+      background-image:var(--veu),image-set(url("login-prof-pc.webp") type("image/webp"),url("login-prof-pc.jpg") type("image/jpeg"));}
+    body.theme-dark #profGate{--veu:linear-gradient(rgba(8,12,20,.6),rgba(8,12,20,.6));background-color:#0b1220;}
+    @media (max-width:760px),(orientation:portrait) and (max-width:1100px){
+      #profGate{background-image:var(--veu),url("login-prof-cel.jpg");
+        background-image:var(--veu),image-set(url("login-prof-cel.webp") type("image/webp"),url("login-prof-cel.jpg") type("image/jpeg"));}
+    }
+    #profGate .pg-card{box-shadow:0 16px 40px rgba(0,0,0,.32),0 2px 6px rgba(0,0,0,.12);}
     body.prof-in #profGate{display:none;}
     #profGate .pg-top{width:100%;display:flex;justify-content:flex-end;max-width:440px;margin:0 auto 8px;}
     .pg-card{width:100%;max-width:440px;margin:auto;background:#fff;border-radius:20px;
