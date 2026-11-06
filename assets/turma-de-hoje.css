@@ -492,10 +492,10 @@ body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ 
   .pt-tipo.video{ background: #ffe4ec; color: #be123c; }
   .pt-extras{ margin-top: .6rem; background: var(--lc-bg); border-radius: 16px; padding: .6rem .8rem .25rem; }
   .pt-extras > .tit{ color: var(--lc-tx); font-weight: 900; font-size: 1rem; display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; }
-  .pt-extras > .tit small{ font-weight: 700; font-size: .8rem; opacity: .8; }
   .pt-extras .pt-it{ border-top-color: var(--lc-soft); font-size: .98rem; }
   .pt-extras > .tit + .pt-it{ border-top: 0; }
-  .pt-games .t{ white-space: pre-line; line-height: 1.45; }
+  .pt-extras .t, .pt-atras .t{ white-space: pre-line; }
+  .pt-tipo.digital{ background: #e0f2fe; color: #0369a1; }
   .pt-tick{ width: 30px; height: 30px; flex: 0 0 30px; border-radius: 50%; border: 2.5px solid var(--lc, #9fb0c8); background: #fff; cursor: pointer; display: grid; place-items: center; font-weight: 900; color: #fff; font-size: .95rem; padding: 0; transition: transform .12s ease, background .15s ease; }
   .pt-tick:hover{ transform: scale(1.08); }
   .pt-tick.on{ background: var(--lc, #10b981); border-color: var(--lc, #10b981); }

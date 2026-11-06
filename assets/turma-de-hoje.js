@@ -2448,7 +2448,7 @@ function ptTick(livro, k, semana) {
     (ptEstado.carregou ? '' : ' disabled') + ' aria-label="' + (m ? 'Desmarcar' : 'Marcar como feito') + '">' + (m ? '✓' : '') + '</button>';
 }
 function ptQuando(livro, k) { var m = ptMarca(livro, k); return m && m.d ? '<span class="pt-quando">' + (m.d === diaAlvoTH() ? 'hoje' : ptDataBr(m.d)) + '</span>' : ''; }
-var PT_TIPO = { te: 'TE', sb: 'SB', md: 'MD', video: 'VÍDEO', app: 'APP', outro: '' };   /* sem HW: desde out/2026 a tarefa é feita em aula */
+var PT_TIPO = { te: 'TE', sb: 'SB', md: 'MD', video: 'VÍDEO', app: 'APP', digital: 'DIGITAL', extra: 'EXTRA', outro: '' };   /* sem HW: desde out/2026 a tarefa é feita em aula */
 /* a cor de cada livro: a mesma do card do estágio no Modo Kids do portal (KIDS.livros); teens com as deles */
 var PT_CORES = [[/magic\s*way\s*yellow/i, '#EAB308'], [/magic\s*way\s*blue/i, '#2563EB'], [/magic\s*way\s*red/i, '#DC2626'], [/magic\s*way\s*green/i, '#16A34A'],
   [/hello\s*a\b/i, '#EC4899'], [/hello\s*b\b/i, '#A855F7'], [/slide/i, '#F97316'], [/see.?saw/i, '#0EA5A0'], [/merry/i, '#E11D48'], [/maze/i, '#6366F1'],
@@ -2529,10 +2529,9 @@ function ptDesenha() {
     if (!L || (!L.itens.length && !(L.games || []).length)) corpo = '<div class="pt-nada">' + (s.geral ? esc(s.geral) : 'Sem atividade de livro nesta semana.') + '</div>';
     else {
       var item = function (it) { return '<div class="pt-it">' + ptTick(nome, it.k, s.de) + '<span class="t">' + (PT_TIPO[it.tipo] ? '<span class="pt-tipo ' + esc(it.tipo) + '">' + PT_TIPO[it.tipo] + '</span>' : '') + esc(it.t) + ptQuando(nome, it.k) + '</span></div>'; };
-      var extras = L.itens.filter(ptEhExtra), games = (L.games || []).filter(function (g) { return String(g).trim().replace(/^-$/, ''); });
-      corpo += L.itens.filter(function (it) { return !ptEhExtra(it); }).map(item).join('');
-      if (extras.length || games.length) corpo += '<div class="pt-extras"><div class="tit">🎲 Games e extras<small>se der tempo · sem tique não vira atrasada</small></div>' + extras.map(item).join('') +
-        (games.length ? '<div class="pt-it pt-games">' + ptTick(nome, 'games:' + s.de, s.de) + '<span class="t">' + esc(games.join('\n')) + ptQuando(nome, 'games:' + s.de) + '</span></div>' : '') + '</div>';
+      var ex = ptExtras(L, s.de);
+      corpo += ex.obrig.map(item).join('');
+      if (ex.extras.length) corpo += '<div class="pt-extras"><div class="tit">🎲 Games e extras</div>' + ex.extras.map(function (it) { return item(it.tipo === 'extra' ? { k: it.k, t: it.t, tipo: '' } : it); }).join('') + '</div>';
     }
     var vigente = ptLicaoVigente(b, nome, sw.i);
     corpo = ptAtrasadas(b, nome, livro, sw, vigente) + corpo;
@@ -2562,13 +2561,34 @@ function ptDesenha() {
    TOPO do cartão da semana que está na tela, em vermelho e com a semana de onde veio, para o professor não ter de
    voltar semana a semana caçando bolinha perdida. Tiquei hoje: ela fica à vista, marcada, até o fim do dia. Só a partir
    do primeiro tique do livro (antes disso a turma não usava o plano aqui, e acusar o semestre inteiro seria só ruído).
-   Se a atrasada é de outra lição, os áudios e vídeos DAQUELA lição vêm junto. Games e extras não atrasam. */
-/* O QUE É EXTRA (professora via Pedro, 06/11/2026): turma kids tem até três livros na mesma sala, não dá tempo de
-   fazer os games de todos e quase nunca há computador para a Cyber Mission. Então o APP (Cyber Mission, Buddy's app) e
-   o game solto que o plano põe na lista do livro saem da lista obrigatória: aparecem só na semana prevista, embaixo,
-   junto com os Games e extras, e sem tique não viram atrasadas nem pendência de tutoria. Worksheet, SB, TE, MD e o
-   resto continuam obrigatórios. */
-function ptEhExtra(it) { return !!it && (it.tipo === 'app' || (it.tipo === 'outro' && /\bgames?\b/i.test(it.t || ''))); }
+   Se a atrasada é de outra lição, os áudios e vídeos DAQUELA lição vêm junto. */
+/* OS EXTRAS (Pedro, 06/11/2026): os Games e extras do plano e o game solto da lista do livro ficam num bloco embaixo,
+   e o que é CONCRETO (recortar, colar, montar, jogar na sala) é para fazer: sem tique, vira atrasada como o resto. Só o
+   que é DIGITAL (Cyber Mission, app, link, Wordwall, Baamboozle...) aparece apenas na semana prevista e não atrasa nem
+   vira pendência de tutoria: quase nunca há computador na sala. O texto de games vem do plano em linhas soltas; cada
+   pedaço (separado por " | " ou " + ") vai para o lado concreto (tique "games:<semana>", o mesmo de antes) ou para o
+   digital (tique "gamesd:<semana>"). */
+var PT_DIGITAL = /cyber|\bapps?\b|aplicativo|digital|\blinks?\b|https?:\/\/|www\.|\.com\b|\.net\b|online|\bsite\b|comput|tablet|celular|wordwall|kahoot|quizlet|gartic|baa?mboo?zle|youtube|qr ?code/i;
+function ptEhDigital(it) { return !!it && (it.tipo === 'app' || it.tipo === 'digital' || (it.tipo === 'outro' && PT_DIGITAL.test(it.t || ''))); }
+function ptExtras(L, de) {
+  var obrig = [], extras = [], conc = [], dig = [], linhas = [];
+  (L.itens || []).forEach(function (it) {
+    if (ptEhDigital(it)) extras.push(it);
+    else if (it.tipo === 'outro' && /\bgames?\b/i.test(it.t || '')) extras.push(it);
+    else obrig.push(it);
+  });
+  (L.games || []).forEach(function (g) {
+    g = String(g || '').trim(); if (!g || /^[-–.]+$/.test(g)) return;
+    if (linhas.length && /:\s*$/.test(linhas[linhas.length - 1])) linhas[linhas.length - 1] += ' ' + g; else linhas.push(g);
+  });
+  linhas.forEach(function (g) {
+    if (/^no extra/i.test(g)) return;
+    g.split(/\s+[|+]\s+/).forEach(function (pd) { pd = pd.trim(); if (pd) (PT_DIGITAL.test(pd) ? dig : conc).push(pd); });
+  });
+  var lista = conc.length ? [{ k: 'games:' + de, tipo: 'extra', t: conc.join('\n') }] : [];
+  if (dig.length) extras.push({ k: 'gamesd:' + de, tipo: 'digital', t: dig.join('\n') });
+  return { obrig: obrig, extras: lista.concat(extras.filter(function (it) { return !ptEhDigital(it); }), extras.filter(ptEhDigital)) };
+}
 function ptAtrasadas(b, nome, livro, sw, vigente) {
   if (!ptEstado.carregou) return '';
   var desde = '', hoje = diaAlvoTH(), lista = [], lics = [];
@@ -2577,8 +2597,9 @@ function ptAtrasadas(b, nome, livro, sw, vigente) {
   (b.semanas || []).slice(0, sw.i).forEach(function (sp, i) {
     var Lp = (sp.livros || {})[nome]; if (sp.de < desde || sp.ate < PT_INICIO || !Lp || sp.de >= sw.s.de) return;
     var aberta = false;
-    Lp.itens.forEach(function (it) {
-      if (ptEhExtra(it)) return;
+    var ex = ptExtras(Lp, sp.de);
+    ex.obrig.concat(ex.extras).forEach(function (it) {
+      if (ptEhDigital(it)) return;
       var m = ptMarca(nome, it.k);
       if (!m) aberta = true;
       if (!m || (m.d === hoje && m.s === sp.de)) lista.push({ s: sp, it: it });
@@ -2630,7 +2651,7 @@ function tutPendCaixa(a) {
   tp.faltas.forEach(function (f) {
     var lics = [], itens = '';
     f.itens.forEach(function (x) {
-      var d = tutItemDoPlano(P, x.livro, x.item); if (!d || ptEhExtra(d.it)) return;
+      var d = tutItemDoPlano(P, x.livro, x.item); if (!d || ptEhDigital(d.it)) return;
       if (!x.feito) abertas++;
       var lic = ptLicaoVigente(d.b, x.livro, d.i); if (lic && lics.indexOf(lic) < 0) lics.push(lic);
       itens += '<div class="pt-it" style="' + ptCorVars(ptCor(x.livro)) + '"><button type="button" class="pt-tick' + (x.feito ? ' on' : '') + '" data-tpd="' + esc(f.data) + '" data-tpl="' + esc(x.livro) + '" data-tpk="' + esc(x.item) + '" aria-label="' + (x.feito ? 'Desmarcar' : 'Feito na tutoria') + '">' + (x.feito ? '✓' : '') + '</button><span class="t">' +
