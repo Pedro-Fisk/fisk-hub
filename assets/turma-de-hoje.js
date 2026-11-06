@@ -2270,14 +2270,14 @@ function presencaKids(a, quieto, jaMarcado) {
   });
 }
 /* o dia e o mês do aniversário: a célula de DATA chega do backend em ISO (aaaa-mm-dd, sem ambiguidade); a de TEXTO
-   segue o cabeçalho dos dois cards, "Data de Nascimento (MM/DD/AAAA)", e só vira dia/mês quando o primeiro número
-   passa de 12. Devolve 'mm-dd' ou ''. */
+   é DIA/MÊS, a convenção da escola (Pedro, 06/11/2026; o cabeçalho dos cards virou "DD/MM/AAAA"), e só vira mês/dia
+   quando o segundo número passa de 12. Devolve 'mm-dd' ou ''. */
 function nascMesDia(a) {
   var pes = pessoaisDe(a) || {}, iso = String(pes.nascimento || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (iso) return iso[2] + '-' + iso[3];
   var m = String(pes.nascimentoTxt || pes.nascimento || '').match(/(\d{1,2})\/(\d{1,2})/); if (!m) return '';
-  var x = Number(m[1]), y = Number(m[2]), mes = x, dia = y;
-  if (x > 12 && y <= 12) { mes = y; dia = x; }
+  var x = Number(m[1]), y = Number(m[2]), dia = x, mes = y;
+  if (y > 12 && x <= 12) { mes = x; dia = y; }
   if (mes < 1 || mes > 12 || dia < 1 || dia > 31) return '';
   return ('0' + mes).slice(-2) + '-' + ('0' + dia).slice(-2);
 }
