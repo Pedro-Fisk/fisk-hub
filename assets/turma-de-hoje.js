@@ -2356,6 +2356,17 @@ var PLANO_TURMA_ABRE = Date.parse('2026-10-29T13:00:00-03:00');
 /* O COMEÇO (Pedro, 27/10/2026): o que o plano previa ANTES desta data não é atraso de ninguém, as turmas ainda não
    usavam o plano. Semana que terminou antes fica em cinza e não alimenta as atrasadas. */
 var PT_INICIO = '2026-10-27';
+/* O LANÇAMENTO (Pedro, 06/11/2026): o plano só abriu de verdade para as duas turmas do piloto (as de cima). Para as
+   outras, o lançamento oficial é a reunião de professores da quinta, 12/11/2026: tudo o que o plano previa até ali
+   conta como feito. A semana que começou antes de 12/11 (a do lançamento inclusive) não alimenta as atrasadas, e a que
+   terminou antes fica em cinza. As duas do piloto seguem com o começo de 27/10. */
+var PT_LANCA = '2026-11-12';
+function ptEhPiloto() {
+  return !!ptEstado && PLANO_TURMA_PILOTO.some(function (p) { return normNome(p.escola) === normNome(ptEstado.escola) && p.turma.test(String(ptEstado.turma || '').trim()); });
+}
+function ptInicioTurma() { return ptEhPiloto() ? PT_INICIO : PT_LANCA; }
+/* a semana não gera atrasada: no piloto, a que terminou antes de 27/10; nas outras, a que começou antes de 12/11 */
+function ptSemanaSemAtraso(sp) { return ptEhPiloto() ? sp.ate < PT_INICIO : sp.de < PT_LANCA; }
 var ptEstado = null;
 var ptCarregando = null;
 function ptCarregaDados() {
@@ -2540,8 +2551,9 @@ function ptDesenha() {
     var mover = nL > 1 ? '<span class="mover"><button type="button" data-ptmv="-1" data-ptlv="' + esc(livro) + '"' + (iL === 0 ? ' disabled' : '') + ' aria-label="Subir ' + esc(livro) + '" title="Fazer antes">↑</button>' +
       '<button type="button" data-ptmv="1" data-ptlv="' + esc(livro) + '"' + (iL === nL - 1 ? ' disabled' : '') + ' aria-label="Descer ' + esc(livro) + '" title="Fazer depois">↓</button>' +
       '<span class="alca" title="Segure e arraste para mudar a ordem" aria-hidden="true">⠿</span></span>' : '';
-    var antes = s.ate < PT_INICIO;
-    if (antes && L && L.itens.length) corpo = '<div class="pt-antes-nota">Semana anterior a ' + ptDataBr(PT_INICIO) + ', quando o plano começou a ser usado: o que ficou sem tique aqui não conta como atrasado.</div>' + corpo;
+    var inicio = ptInicioTurma(), antes = s.ate < inicio;
+    if (antes && L && L.itens.length) corpo = '<div class="pt-antes-nota">Semana anterior a ' + ptDataBr(inicio) + ', quando o plano começou a ser usado: o que ficou sem tique aqui não conta como atrasado.</div>' + corpo;
+    else if (L && L.itens.length && ptSemanaSemAtraso(s)) corpo = '<div class="pt-antes-nota">Semana do lançamento do plano (' + ptDataBr(PT_LANCA) + '): o que ficar sem tique aqui não conta como atrasado.</div>' + corpo;
     html += '<div class="pt-livro' + (antes ? ' pt-antes' : '') + '" draggable="' + (nL > 1) + '" data-ptlivro="' + esc(livro) + '" style="' + ptCorVars(cor) + '"><div class="topo"' + (lum > 0.6 ? ' style="color:#3a2e00"' : '') + '><h3>' + esc(livro) + '</h3>' + (L && L.licao ? '<span class="lic"' + (L.licaoInferida ? ' title="Lição deduzida pelas páginas do livro (o plano traz só as páginas)"' : '') + '>' + esc(L.licao) + '</span>' : '') + mover + '</div>' +
       '<div class="quem">' + ptEstado.porLivro[livro].map(function (a) { return '<span>' + esc(ptPrimeiro(a.nome)) + '</span>'; }).join('') + '</div>' +
       '<div class="corpo">' + corpo + ptBotoesMaterial(livro, vigente) + '</div></div>';
@@ -2595,7 +2607,7 @@ function ptAtrasadas(b, nome, livro, sw, vigente) {
   Object.keys(ptEstado.marcas).forEach(function (ch) { var m = ptEstado.marcas[ch]; if (ch.indexOf(nome + '|') === 0 && m.s && (!desde || m.s < desde)) desde = m.s; });
   if (!desde) return '';
   (b.semanas || []).slice(0, sw.i).forEach(function (sp, i) {
-    var Lp = (sp.livros || {})[nome]; if (sp.de < desde || sp.ate < PT_INICIO || !Lp || sp.de >= sw.s.de) return;
+    var Lp = (sp.livros || {})[nome]; if (sp.de < desde || ptSemanaSemAtraso(sp) || !Lp || sp.de >= sw.s.de) return;
     var aberta = false;
     var ex = ptExtras(Lp, sp.de);
     ex.obrig.concat(ex.extras).forEach(function (it) {
