@@ -1,0 +1,68 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>teste agenda</title></head><body>
+<script>
+/* banco de prova da Minha semana (não versionado). ?cel=1 = janela de 390 px; ?portal=1 = finge o Portal da Secretaria
+   (página-mãe com a janela em modo secretaria e a sessão entregue por postMessage) */
+var Q = location.search;
+if (/[?&]cel=1/.test(Q)) { document.write('<style>body{margin:0;background:#888}</style><iframe src="' + location.pathname + Q.replace(/&?cel=1/, '') + '" style="border:0;width:390px;height:1250px;display:block"></iframe>'); throw 'cel'; }
+if (/[?&]portal=1/.test(Q)) {
+  document.write('<h3 style="font-family:sans-serif;margin:8px">Portal da Secretaria (de mentira)</h3><iframe id="fr" src="' + location.pathname + Q.replace(/&?portal=1/, '') + '&embed=1&sec=1" style="border:1px solid #ccc;width:100%;height:1100px"></iframe>');
+  window.addEventListener('message', function (ev) {
+    if (ev.data && ev.data.fisk === 'semanaPronta') document.getElementById('fr').contentWindow.postMessage({ fisk: 'semanaSessao', token: 'sectok', quem: { name: 'Tamires', escolas: 'Taubaté' } }, location.origin);
+  });
+  throw 'portal';
+}
+localStorage.setItem('fisk_prof', JSON.stringify({ token: 'tok', name: 'Teste', escolas: 'Caçapava' }));
+localStorage.removeItem('fisk_actas');
+var _tema = (/[?&]tema=(dark|light)/.exec(Q) || [])[1]; if (_tema) localStorage.setItem('fisk_theme', _tema);
+var linhas = JSON.parse(localStorage.getItem('agMock') || '[]');
+if (!linhas.length && /[?&]exemplo=1/.test(Q)) linhas = [
+  ['Id','Dono','Data','DataFim','Ini','Fim','DiaInteiro','Titulo','Descricao','Cor','Lembrete','RRule','Exdates','Serie','Criado','Atualizado','Para','Local','Turmas'],
+  ['ag1','Teste','2026-10-28','2026-10-28','10:00','11:30','','Reunião de pais','','#33b679','15','','','','','','','',''],
+  ['ag2','Teste','2026-10-30','2026-10-30','','','1','Conselho de classe','','#8e24aa','','','','','','','','',''],
+  ['ag3','Teste','2026-10-29','2026-10-29','09:00','10:00','','Atendimento à família','','','','FREQ=WEEKLY','','','','','','',''],
+  ['ag4','Teste','2026-10-31','2026-10-31','11:00','12:00','','Planejar provas','','#f4511e','','','','','','','','',''],
+  ['ag5','Teste','2026-10-27','2026-10-27','10:00','11:00','','Planejar a semana','','#33b679','','FREQ=WEEKLY','','','','','','',''],
+  ['ag6','Tamires','2026-10-30','2026-10-30','18:30','19:30','','Reunião de pais','','#e67c73','','','','','','','Teste','EUA','']];
+var sh = { getMaxRows: function () { return 1000; }, getLastRow: function () { return linhas.length; }, getLastColumn: function () { return 19; },
+  getRange: function (r, c, nr, nc) { return { setNumberFormat: function () { return this; }, setFontWeight: function () { return this; },
+    setValues: function (v) { v.forEach(function (l, i) { linhas[r - 1 + i] = l.slice(); }); guarda(); return this; },
+    getValues: function () { return linhas.slice(r - 1, r - 1 + nr).map(function (l) { return l.slice(c - 1, c - 1 + nc); }); } }; },
+  setFrozenRows: function () {}, appendRow: function (l) { linhas.push(l.slice()); guarda(); }, deleteRow: function (n) { linhas.splice(n - 1, 1); guarda(); } };
+function guarda() { localStorage.setItem('agMock', JSON.stringify(linhas)); }
+var SpreadsheetApp = { getActiveSpreadsheet: function () { return { getSheetByName: function () { if (!linhas.length) linhas.push(AG_CAB.slice()); return sh; }, insertSheet: function () { return sh; } }; } };
+var LockService = { getScriptLock: function () { return { waitLock: function () {}, releaseLock: function () {} }; } };
+var Session = { getScriptTimeZone: function () { return 'America/Sao_Paulo'; } }, Utilities = {};
+var PROFS = ['', '', 'Teste', 'Tamires', 'Leonardo'];
+function normNome(v) { return String(v == null ? '' : v).trim().toUpperCase(); }
+function profResolveLinha_(t) { return t === 'tok' ? 2 : 0; }
+function secQuem_(r) { return r.token === 'sectok' ? 'TAMIRES' : ''; }
+function acharProfLinha_(n) { return PROFS.map(normNome).indexOf(normNome(n)) > 1 ? PROFS.map(normNome).indexOf(normNome(n)) : 0; }
+function getProfs() { return { getRange: function (l) { return { getValue: function () { return PROFS[l]; } }; } }; }
+var _f = window.fetch;
+window.fetch = function (url, op) {
+  if (String(url).indexOf('script.google.com') < 0) return _f.apply(this, arguments);
+  var q = {}; String(url).split('?')[1] && String(url).split('?')[1].split('&').forEach(function (p) { var kv = p.split('='); q[kv[0]] = decodeURIComponent(kv[1] || ''); });
+  if (op && op.body) q = JSON.parse(op.body);
+  var r = { ok: true };
+  if (q.action === 'profList') r = { profs: [{ name: 'Teste', escolas: 'Caçapava' }, { name: 'Leonardo', escolas: 'Taubaté' }, { name: 'Tamires', cargo: 'Secretária' }] };
+  else if (q.action === 'card') r = { profs: ['Teste', 'Leonardo'] };
+  else if (q.action === 'panoramaProf') r = { turmas: [{ turma: 'ADVANCED - 2ª/4ª 17h30 às 18h45', linhaTitulo: 5 }, { turma: 'TRANSITIONS 1 - 3ª/5ª 14h às 15h15', linhaTitulo: 20 },
+      { turma: 'INMEDIATO 2 - 2ª/4ª 19h às 20h15', linhaTitulo: 30 }, { turma: 'FLUENCY 1 - SÁB 8h às 10h30', linhaTitulo: 40 }, { turma: 'TEENS CONNECT 1 - 3ª/5ª 16h às 17h15', linhaTitulo: 50 }],
+    alunos: [{ nome: 'Ana Lima', turma: 'ADVANCED - 2ª/4ª 17h30 às 18h45', book: 'Advanced' }, { nome: 'Rui Paz', turma: 'TRANSITIONS 1 - 3ª/5ª 14h às 15h15', book: 'Transitions 1' },
+      { nome: 'Lia Reis', turma: 'INMEDIATO 2 - 2ª/4ª 19h às 20h15', book: 'Inmediato 2' }, { nome: 'Caio Luz', turma: 'FLUENCY 1 - SÁB 8h às 10h30', book: 'Fluency 1' }, { nome: 'Bia Melo', turma: 'TEENS CONNECT 1 - 3ª/5ª 16h às 17h15', book: 'Teens Connect 1' }] };
+  else if (q.action === 'calList') r = { ok: true, itens: [{ tipo: 'feriado', titulo: 'Finados', inicio: '2026-11-02', fim: '2026-11-02' }] };
+  else if (q.action === 'agendaListar') r = agendaListar_(q);
+  else if (q.action === 'agendaSalvar') r = agendaSalvar_(q);
+  else if (q.action === 'agendaExcluir') r = agendaExcluir_(q);
+  else if (/List|Experimentais|aniversariantes/.test(q.action || '')) r = { ok: true, itens: [], aniversariantes: [] };
+  return new Promise(function (ok) { setTimeout(function () { ok(new Response(JSON.stringify(r), { headers: { 'Content-Type': 'application/json' } })); }, 200); });
+};
+document.write('<script src="agenda-backend-copia.js"><\/script>');
+</script>
+<script>
+_f('../calendario.html' + location.search).then(function (r) { return r.text(); }).then(function (t) {
+  /* ?demo=1: a cena do material de divulgação (o arrasto na quinta, das 15h às 16h30, com o balão aberto) */
+  if (/[?&]demo=1/.test(location.search)) t = t.replace('</body>', '<script>setTimeout(function(){ var c = document.querySelectorAll("#grade .g-col")[4]; if (!c || celular()) return; var top = c.getBoundingClientRect().top + scrollY; var a = agArrastoCriar(c, top + agY(15*60) + 2); a.move(0, top + agY(16*60+30)); a.solta(); document.getElementById("balTit").value = "Atendimento à família"; document.getElementById("balLocal").value = "Sala Canadá"; }, 2600);<\/script></body>');
+  document.open(); document.write(t.replace('<head>', '<head><base href="../">')); document.close();
+});
+</script></body></html>

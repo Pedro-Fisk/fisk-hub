@@ -1,0 +1,2190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<script>localStorage.setItem("fisk_prof", JSON.stringify({ token: "bancada-local", name: "Claudinei Aparecido dos Santos", escolas: "Caçapava" }));</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minha aula, FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css?v=2026-08-04c">
+<link rel="stylesheet" href="assets/casa-tema.css?v=9">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+<!-- ═══════════════════════════════════════════════════════════════════════
+     TURMA DE HOJE (13/09/2026): o lado do professor no Planner Digital.
+
+     A decisão 14 do Pedro: uma página com a aula do planner em que cada um
+     dos alunos da turma está, no celular também, ticando. Esta é a versão
+     mínima: a turma vinda do card (cascata escola → professor → turma, a
+     mesma do Planejador), cada aluno na lição e aula em que o card o coloca,
+     as três metades do planner (o que o aluno marcou, o que a plataforma
+     provou, o que o professor confirmou) e o registro do Checking em poucos
+     toques: o critério em que foi melhor, os que precisam melhorar, a nota
+     (só o professor vê), os pedidos e um bilhete.
+
+     O GABARITO NÃO MORA AQUI. O plano do Essentials 1 e a régua das marcas
+     (`estadoEtapa`, a mesma que desenha a lição para o aluno) vêm do Portal
+     do Aluno, carregados de portalfisk.com.br: o professor enxerga exatamente
+     o que o aluno enxerga, e uma régua só não discorda dela mesma. Livro sem
+     gabarito v2 ainda (todos menos o Essentials 1) mostra só a posição e o
+     registro do Checking.
+
+     O que ESCREVE: a rota `plannerProf` (token da sessão do Hub; o `quem` do
+     registro sai da sessão no servidor, nunca daqui). O que LÊ: `plannerTurma`
+     (a turma inteira numa leitura por aba) e `panoramaProf` (os alunos da
+     turma com RAF, vindos do card).
+     ═══════════════════════════════════════════════════════════════════════ -->
+<style>
+  body{ padding-bottom: 4rem; }
+  .painel{ background: var(--white); border: 1px solid var(--surface-border-color); border-radius: var(--surface-radius); box-shadow: var(--surface-shadow); padding: 1rem 1.2rem; margin: 1.4rem auto 1rem; max-width: 1500px; }
+  .cascata{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: .6rem; }
+  .cascata label{ display: block; font-size: .74rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--gray); margin-bottom: .25rem; }
+  .cascata select{ width: 100%; padding: .55rem .7rem; border: 1.5px solid var(--ui-bd); border-radius: 10px; font-family: var(--font-body); font-size: .92rem; background: var(--white); color: var(--black); }
+  .status{ font-size: .88rem; color: var(--gray); padding: .5rem 0 0; }
+  .status.err{ color: var(--red-dark); font-weight: 700; }
+  .busca-al{ position: relative; margin-top: .7rem; }
+  .busca-al label{ display: block; font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--gray); margin-bottom: .25rem; }
+  .busca-al input{ width: 100%; font: inherit; font-size: 1rem; padding: .6rem .8rem; border: 2px solid #c9d4e8; border-radius: 10px; background: #fff; color: #14161c; }
+  .busca-al input:focus{ outline: none; border-color: #1d3685; }
+  .achados-al{ position: absolute; left: 0; right: 0; top: 100%; z-index: 30; background: #fff; border: 1px solid #c9d4e8; border-radius: 10px; margin-top: .25rem; max-height: 320px; overflow: auto; box-shadow: 0 8px 24px rgba(20,22,28,.15); }
+  .achados-al button{ display: flex; width: 100%; gap: .6rem; align-items: baseline; text-align: left; background: none; border: 0; border-bottom: 1px solid #eef1f6; padding: .6rem .8rem; font: inherit; color: #14161c; cursor: pointer; }
+  .achados-al button:hover, .achados-al button:focus-visible{ background: #eef3fb; outline: none; }
+  .achados-al small{ color: var(--gray); }
+  .achados-al .vazio{ padding: .6rem .8rem; color: var(--gray); }
+  .pill.prio-btn{ margin-left:auto; background:#1d3685; color:#fff; border:0; cursor:pointer; font: inherit; font-weight:800; }
+  .pill.prio{ font-weight:800; }
+  .pill.prio.nv-alta{ background:#fde2e2; color:#a11a1a; } .pill.prio.nv-media{ background:#fff1d6; color:#8a5300; } .pill.prio.nv-emdia{ background:#e3f5e8; color:#1f6b35; } .pill.prio.nv-semdados{ background:#eef1f6; color:#555; }
+  .al-cab .pill{ max-width: 100%; white-space: normal; }
+  .pill.sem-at{ background:#fdeaea; color:#a11a1a; border:1px solid #f0b4b4; font-weight:800; }
+  .pill.outro-prof{ background: #fff4e0; color: #8a4b00; border: 1px solid #f3c77a; }
+  .al.visitante{ outline: 3px dashed #7c3aed; outline-offset: -3px; }
+  .al .visita{ font-size: .78rem; font-weight: 800; color: #7c3aed; background: #f1ebff; border-radius: 99px; padding: .15rem .6rem; }
+  .al .tirar{ font: inherit; font-size: .8rem; border: 1px solid #c9d4e8; background: #fff; border-radius: 99px; padding: .15rem .6rem; cursor: pointer; }
+  .resumo{ display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin: .2rem 0 .6rem; font-size: .84rem; color: var(--gray); }
+  .resumo b{ color: var(--black); }
+
+  /* o aluno */
+  .al{ background: var(--white); border: 1px solid var(--surface-border-color); border-radius: var(--surface-radius); box-shadow: var(--surface-shadow); margin: 0 auto .8rem; max-width: 1500px; overflow: hidden; }
+  .al-cab{ display: flex; align-items: center; gap: .7rem; padding: .75rem 1rem; flex-wrap: wrap; }
+  .al-cab .mover{ display: inline-flex; gap: .2rem; align-items: center; order: 99; margin-left: auto; }   /* no canto direito do cartão (Pedro, 19/09/2026) */
+  .al-cab .mover button{ border: 1.5px solid var(--ui-line, #d6deea); background: #fff; color: #1d3685; border-radius: 8px; min-width: 30px; height: 30px; font-weight: 900; cursor: pointer; font-family: inherit; line-height: 1; }
+  .al-cab .mover .arrasta{ cursor: grab; touch-action: none; font-size: 1.05rem; }
+  .al-cab .mover button:hover{ border-color: #1d3685; background: #f3f6fc; }
+  .al.arrastando{ position: relative; z-index: 50; box-shadow: 0 22px 44px rgba(20,22,28,.28); opacity: .96; transition: none; }
+  .al.arrastando .al-cab .mover .arrasta{ cursor: grabbing; }
+  body.theme-dark .al-cab .mover button{ background: #172232; color: #dbe6f3; border-color: #2e4560; }
+  .al-cab .nome{ font-family: var(--font-heading); font-weight: 700; font-size: 1.02rem; }
+  .al-cab .livro{ font-size: .8rem; color: var(--gray); }
+  .pill{ display: inline-flex; align-items: center; gap: .3rem; font-size: .74rem; font-weight: 800; padding: .2rem .6rem; border-radius: 99px; white-space: nowrap; background: var(--ui-soft); color: var(--ui-ink); }
+  .pill.pos{ background: #e4f3f1; color: #155a48; }
+  .pill.atras{ background: #fdf6e6; color: #6b4d0f; }
+  .pill.chk{ background: #d4e909; color: #3f4703; }
+  .pill.chk.falta{ background: var(--gray-light); color: var(--gray); }
+  .al-cab .acoes{ margin-left: auto; display: flex; gap: .4rem; }
+  .btn{ font-family: var(--font-body); font-weight: 800; border-radius: 999px; border: 0; cursor: pointer; }
+  /* o Checking é coisa à parte: o botão é do verde-amarelo da plataforma, não o verde de abrir */
+  .btn-ck{ background: #d4e909; color: #3f4703; padding: .5rem .95rem; font-size: .84rem; box-shadow: 0 3px 0 #a8b907; }
+  .aula .btn-ck{ width: 100%; margin-top: .5rem; }
+  .aula .libera{ font-size: .74rem; color: var(--gray); margin: .35rem 0 0; line-height: 1.3; }
+  .btn-ck:disabled{ opacity: .5; cursor: default; box-shadow: none; }
+  .btn-ghost{ background: var(--white); border: 1.5px solid var(--ui-bd); color: var(--ui-ink); padding: .45rem .9rem; font-size: .82rem; }
+
+  /* as três aulas */
+  .aulas{ display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: .6rem; padding: 0 1rem .9rem; }
+  .aula{ border: 1px solid var(--ui-line); border-radius: 12px; padding: .55rem .65rem; background: #f8fafc; }
+  .aula.atual{ border: 2px solid var(--ui); background: var(--white); }
+  .nav-lic{ display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; padding: 0 1rem .5rem; }
+  .janela-lic{ overflow-y: auto; overscroll-behavior: contain; scroll-snap-type: y mandatory; margin: 0 1rem .9rem; border-radius: 12px; }
+  .janela-lic:focus-visible{ outline: 3px solid var(--ui); outline-offset: 2px; }
+  .passo-lic{ scroll-snap-align: start; display: flex; flex-direction: column; gap: .4rem; padding: .3rem 0 .5rem; }
+  .passo-lic .aulas{ padding: 0; }
+  .rot-lic{ font-weight: 800; font-size: .85rem; letter-spacing: .02em; color: var(--mar, #1d3685); }
+  .passo-lic.atual .rot-lic{ color: var(--ui); }
+  @media (prefers-reduced-motion: reduce){ .janela-lic{ scroll-behavior: auto; } }
+  .nav-lic .setas{ display: inline-flex; gap: 8px; }
+  .btn-seta{ width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--mar, #1d3685); background: var(--white); color: var(--mar, #1d3685); font-size: 18px; font-weight: 900; cursor: pointer; font-family: inherit; }
+  .btn-seta:disabled{ opacity: .3; cursor: default; }
+  .btn-seta:focus-visible{ outline: 3px solid var(--ui); outline-offset: 2px; }
+  .nav-lic .vendo{ flex: 1 1 auto; font-size: .92rem; }
+  .nav-lic .vendo em{ font-style: normal; color: var(--ui); font-weight: 700; }
+  .btn-nav{ border: 2px solid var(--mar, #1d3685); background: var(--white); color: var(--mar, #1d3685); border-radius: 999px; padding: .3rem .8rem; font: inherit; font-weight: 800; font-size: .88rem; cursor: pointer; }
+  .btn-nav:disabled{ opacity: .3; cursor: default; }
+  .btn-nav.volta{ background: var(--mar, #1d3685); color: #fff; }
+  .btn-nav:focus-visible{ outline: 3px solid var(--ui); outline-offset: 2px; }
+  .aula .t{ display: flex; align-items: baseline; gap: .5rem; font-size: .74rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--gray); margin-bottom: .35rem; }
+  .aula .t b{ color: var(--ui-ink); font-size: .84rem; letter-spacing: 0; text-transform: none; font-family: var(--font-heading); }
+  .aula .t .agora{ margin-left: auto; background: var(--ui); color: #fff; border-radius: 99px; padding: .05rem .5rem; font-size: .68rem; }
+  .it{ display: flex; align-items: center; gap: .7rem; padding: .35rem .45rem; border-radius: 14px; font-size: .95rem; font-weight: 700; color: var(--ui-ink); border: 0; background: transparent; width: 100%; text-align: left; font-family: inherit; cursor: default; }
+  .it.pode{ cursor: pointer; }
+  .it.pode:hover{ background: var(--ui-soft); }
+  .it.feito{ color: var(--gray); }
+  .it.feito .tx{ text-decoration: line-through; }
+  /* quem confirmou e quando: miúdo, numa linha só, PENDURADO embaixo do nome
+     e fora do fluxo. Dentro do texto ele quebrava a linha e a caixa da aula
+     crescia a cada toque do professor (Pedro, 14/09/2026). O risco não
+     herda o risco do nome, porque texto posicionado não recebe decoração. */
+  .it .tx{ position: relative; flex: 1 1 auto; min-width: 0; }
+  .it .quem{ position: absolute; left: 0; right: 0; top: 100%; margin-top: 1px; font-size: .6rem; line-height: 1; color: var(--gray); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* com a assinatura, o nome sobe um pouco para o par ficar no meio da linha (a altura não muda) */
+  .it .tx.com-quem{ transform: translateY(-.3rem); }
+  .it .pg{ margin-left: auto; font-weight: 600; font-size: .74rem; color: var(--gray); white-space: nowrap; }
+  /* a bolinha: as cores das mãos estão no GABARITO DAS MARCAS, no fim deste estilo */
+  .mk{ flex: 0 0 38px; width: 38px; height: 38px; border-radius: 50%; border: 3px solid #1d3685; background: #fff; }
+  .pill.aguia{ background:#fff; border:1.5px solid #1d3685; color:#1d3685; text-decoration:none; cursor:pointer; font-family: inherit; }
+  /* o triângulo ocupa a caixa inteira, como a bolinha: com folga de 4,5 dentro
+     dos 30 do desenho ele saía com dois terços da largura dela e parecia
+     menor (Pedro, 14/09/2026). Os mesmos pontos do planner-v2.js do portal. */
+  .mk.tri{ border-radius: 0; width: 38px; height: 34px; border: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,2 28.5,25.5 1.5,25.5' fill='%23fff' stroke='%23d91e9e' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
+  .mk.tri.on{ background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,3 27.5,24.5 2.5,24.5' fill='%23d91e9e' stroke='%23d91e9e' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
+  .legenda{ font-size: .95rem; color: var(--gray); display: flex; flex-wrap: wrap; gap: 1.1rem; padding: .5rem 0 0; align-items: center; }
+  .legenda i{ display: inline-block; vertical-align: middle; margin-right: .25rem; }
+  /* MINHA AULA ENXUTA (Pedro, 19/09/2026): a legenda abre num toque; o resto da lista está no comentário do cartão */
+  .leg-det summary{ cursor: pointer; font-weight: 800; color: var(--ui); list-style: none; }
+  .leg-det summary::-webkit-details-marker{ display: none; }
+  .pl-mais{ position: relative; }
+  .pl-mais > summary{ list-style: none; cursor: pointer; height: 100%; display: flex; align-items: center; }
+  .pl-mais > summary::-webkit-details-marker{ display: none; }
+  .pl-mais-menu{ position: absolute; right: 0; top: calc(100% + 6px); z-index: 20; display: flex; flex-direction: column; gap: 6px; background: var(--white, #fff); border: 1px solid var(--ui-bd, #d6deea); border-radius: 12px; padding: 8px; box-shadow: 0 8px 22px rgba(15,31,78,.15); white-space: nowrap; }
+  .leg-det[open] .leg-itens{ display: flex; flex-wrap: wrap; gap: 1.1rem; padding-top: .4rem; }
+  .aula .t .dt{ margin-left: auto; text-transform: none; letter-spacing: 0; font-size: .72rem; font-weight: 800; background: #eef2fa; color: var(--gray); border-radius: 999px; padding: .1rem .5rem; }
+  .aula .t .dt.dada{ background: #e4f3f1; color: #155a48; } .aula .t .dt.falta, .aula .t .dt.tarde{ background: #fde8e8; color: #b91c1c; } .aula .t .dt.semdata{ opacity: .6; }
+  .it .capa{ width: 44px; height: 28px; object-fit: cover; border-radius: 5px; flex: 0 0 44px; border: 1px solid var(--ui-line); }
+  .sem-plano{ padding: 0 1rem .9rem; font-size: .84rem; color: var(--gray); }
+
+  /* o registro do Checking */
+  .ck{ border-top: 1px solid var(--ui-line); background: #fbfce6; padding: .9rem 1rem 1rem; }
+  .ck h4{ margin: 0 0 .5rem; font-family: var(--font-heading); font-size: .98rem; }
+  .ck .lin{ display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-bottom: .55rem; }
+  .ck label.rot{ font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--gray); width: 100%; }
+  .chip{ font-family: var(--font-body); font-weight: 800; font-size: .8rem; padding: .45rem .9rem; border-radius: 99px; border: 1.5px solid var(--ui-bd); background: var(--white); color: var(--ui-ink); cursor: pointer; }
+  .ck .lin.crit{ gap: .6rem; padding: .6rem .7rem; border-radius: 14px; }
+  /* verde para o que foi bem, vermelho-claro para o que precisa melhorar: o
+     professor bate o olho e sabe de que lado está (pedido do Pedro, 13/09) */
+  .ck .lin.crit.bom{ background: #e4f3f1; border: 1px solid #cfe6e1; }
+  .ck .lin.crit.bom label.rot{ color: #155a48; }
+  .ck .lin.crit.ruim{ background: #fde2e2; border: 1px solid #f5b8b8; }
+  .ck .lin.crit.ruim label.rot{ color: #8a1c1c; }
+  .ck .lin.crit.ruim .chip.on{ background: #d81f26; border-color: #d81f26; }
+  .ck .lin.crit .chip{ padding: .5rem 1rem; }
+  .ck .notas{ display: flex; flex-wrap: wrap; gap: .35rem; }
+  .ck .notas .chip{ min-width: 2.6rem; text-align: center; padding: .45rem .5rem; }
+  .chip.on{ background: #1d3685; color: #fff; border-color: #1d3685; }
+  .chip.on.melhor{ background: var(--green); border-color: var(--green); }
+  .chip.on.pior{ background: #d91e9e; border-color: #d91e9e; }
+  .ck select, .ck input[type=text], .ck textarea{ font-family: var(--font-body); font-size: .88rem; padding: .45rem .6rem; border: 1.5px solid var(--ui-bd); border-radius: 10px; background: var(--white); color: var(--black); }
+  .ck textarea{ width: 100%; min-height: 64px; resize: vertical; }
+  .ck input[type=text]{ flex: 1 1 200px; }
+  .ck .pedidos{ display: flex; flex-wrap: wrap; gap: .35rem; }
+  .ck .prontos{ display: flex; flex-wrap: wrap; gap: .3rem; width: 100%; }
+  .ck .prontos .chip{ font-size: .76rem; padding: .28rem .6rem; }
+  /* o pronto que a dimensão marcada em "precisa melhorar" pede */
+  .ck .prontos .chip.sug:not(.on){ border-color: #d91e9e; box-shadow: inset 0 0 0 1px #d91e9e; }
+  .ck .prontos .chip.sug::after{ content: ' ●'; color: #d91e9e; }
+  .ck .prontos .chip.sug.on::after{ color: #fff; }
+  .ck .ped{ background: var(--ui-soft); border-radius: 99px; padding: .25rem .6rem; font-size: .8rem; font-weight: 700; display: inline-flex; gap: .35rem; align-items: center; }
+  .ck .ped button{ border: 0; background: none; cursor: pointer; font-weight: 900; color: var(--gray); padding: 0; }
+  .ck .fim{ display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; margin-top: .4rem; }
+  .ck .aviso{ font-size: .8rem; color: var(--gray); }
+  .ck .ok{ color: #155a48; font-weight: 800; }
+  .ck .registrado{ font-size: .84rem; color: #155a48; font-weight: 700; margin-bottom: .5rem; }
+  /* o guia do Checking: o roteiro da mesa, bloco a bloco */
+  .guia{ margin: 0 0 .9rem; border: 1px solid #cfe6e1; background: #f2faf8; border-radius: 14px; overflow: hidden; }
+  .guia summary{ cursor: pointer; padding: .7rem .9rem; font-family: var(--font-heading); font-weight: 700; font-size: .95rem; list-style: none; display: flex; align-items: center; gap: .6rem; }
+  .guia summary::-webkit-details-marker{ display: none; }
+  .guia summary .tempo{ margin-left: auto; font-size: .76rem; color: var(--gray); font-weight: 600; }
+  .guia .bl{ border-top: 1px solid #cfe6e1; padding: .7rem .9rem .8rem; }
+  .guia .bl h5{ margin: 0 0 .2rem; font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: #155a48; display: flex; align-items: center; gap: .5rem; }
+  .guia .bl h5 .min{ font-weight: 600; color: var(--gray); text-transform: none; letter-spacing: 0; }
+  .guia .bl .o{ font-size: .78rem; color: var(--gray); margin: 0 0 .5rem; }
+  .guia table{ width: 100%; border-collapse: collapse; }
+  .guia td{ vertical-align: top; padding: .35rem .4rem .35rem 0; border-top: 1px dashed #cfe6e1; }
+  .guia tr:first-child td{ border-top: 0; }
+  /* as duas vozes do guia, com as cores do planner: verde-oliva o professor, azul-marinho o aluno */
+  .guia td.diz{ width: 55%; font-family: var(--font-body); font-weight: 500; font-size: 1.02rem; line-height: 1.3; }
+  .guia td.nota{ font-size: .8rem; color: var(--gray); line-height: 1.35; }
+  .guia tr.prof td.diz{ color: #4b5503; border-left: 4px solid #a8b907; padding-left: .55rem; }
+  .guia tr.aluno td.diz{ color: #1d3685; border-left: 4px solid #1d3685; padding-left: 1.4rem; }
+  .guia .vozes{ display: flex; gap: .9rem; font-size: .74rem; font-weight: 700; color: var(--gray); margin: 0 .9rem .5rem; }
+  .guia .vozes i{ display: inline-block; width: .7rem; height: .7rem; border-radius: 3px; margin-right: .3rem; vertical-align: -1px; }
+  .guia .feito-btn{ display: block; width: 100%; margin-top: .6rem; border: 0; border-radius: 14px; padding: .8rem 1rem; font-family: var(--font-body); font-weight: 900; font-size: 1.05rem; background: #d4e909; color: #3f4703; box-shadow: 0 4px 0 #a8b907; cursor: pointer; }
+  .guia .bl.feito{ opacity: .55; }
+  .guia .bl.feito .feito-btn{ background: #e4f3f1; color: #155a48; box-shadow: none; }
+  .guia .tela-grande{ display: block; margin: .6rem .9rem .8rem; text-align: center; border-radius: 14px; padding: .8rem 1rem; font-weight: 900; font-size: 1rem; background: #1d3685; color: #fff; text-decoration: none; box-shadow: 0 4px 0 #0f2260; }
+  body.theme-dark .guia td.diz{ color: #dbe6f3; }
+  body.theme-dark .guia{ background: #172232; border-color: #2e4560; }
+  body.theme-dark .guia .en{ color: #dbe6f3; }
+  /* a fila do Planejador e o atendimento */
+  .fila-info{ max-width: 1500px; margin: 0 auto .8rem; display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; font-size: .84rem; color: var(--gray); background: #e4f3f1; border: 1px solid #cfe6e1; border-radius: 12px; padding: .55rem .9rem; }
+  .fila-info b{ color: #155a48; }
+  .fila-info a{ margin-left: auto; font-weight: 800; color: #155a48; }
+  .fila-info .btn-recarrega{ border: 1.5px solid #155a48; background: #fff; color: #155a48; border-radius: 999px; padding: .25rem .75rem; font-family: var(--font-body); font-weight: 800; font-size: .8rem; cursor: pointer; }
+  .fila-info .btn-recarrega:disabled{ opacity: .6; cursor: default; }
+  .fila-info.sem .btn-recarrega{ border-color: var(--ui-bd); color: var(--ui-ink); }
+  .fila-info.sem{ background: var(--ui-soft); border-color: var(--ui-line); }
+  .fila-info.sem b{ color: var(--ui-ink); }
+  .fila-info.roteiro{ flex-direction: column; align-items: stretch; }
+  .rt-ontem{ background:#fff4c2; color:#6b4e00; border-radius:8px; padding:.15rem .5rem }
+  .prio-grande{ width: 100%; border: 0; border-radius: 14px; background: #1d3685; color: #fff; font-family: var(--font-body); font-weight: 800; font-size: 1.05rem; padding: .8rem 1rem; cursor: pointer; box-shadow: 0 4px 0 #0f2260; }
+  .prio-grande:focus-visible, .rt-btn:focus-visible{ outline: 3px solid #d4e909; outline-offset: 2px; }
+  .rt-linha{ display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+  .rt-info{ margin-right: auto; }
+  .rt-data{ display: inline-flex; align-items: center; gap: .35rem; font-weight: 700; color: var(--ui-ink); }
+  .rt-data input{ font-family: var(--font-body); font-size: .85rem; border: 1.5px solid var(--ui-line); border-radius: 8px; padding: .2rem .4rem; }
+  .rt-btn{ border: 1.5px solid #155a48; background: #fff; color: #155a48; border-radius: 999px; padding: .3rem .8rem; font-family: var(--font-body); font-weight: 800; font-size: .82rem; cursor: pointer; }
+  .rt-btn.forte{ background: #31a889; border-color: #31a889; color: #fff; }
+  .rt-btn:disabled{ opacity: .7; cursor: default; }
+  .pill.nv-alta{ background: #fde2e2; color: #8a1c1c; }
+  .pill.nv-media{ background: #fdf6e6; color: #6b4d0f; }
+  .pill.nv-emdia{ background: #e4f3f1; color: #155a48; }
+  .pill.fora{ background: var(--gray-light); color: var(--gray); }
+  .al .plano-ativ{ padding: 0 1rem .6rem; font-size: .84rem; color: var(--ui-ink); }
+  .al .plano-ativ i{ color: var(--gray); }
+  .al .atend{ padding: .6rem 1rem .9rem; display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; border-top: 1px solid var(--ui-line); }
+  /* o .btn do kit é inline-flex sem justify: na largura toda o texto encostava à esquerda */
+  .btn-atend{ background: var(--green); color: #fff; padding: .7rem 1rem; font-size: .92rem; box-shadow: 0 3px 0 var(--green-dark); width: 100%; justify-content: center; }
+  .al .atend .quando{ width: 100%; text-align: center; }
+  .al.atendido{ opacity: .72; }
+  .al.faltou{ opacity: .5; filter: grayscale(1); }
+  .al.faltou .al-corpo{ display: none; }
+  .al .atend .btn-atend{ width: auto; flex: 1 1 auto; }
+  .btn-falta{ background: #fff; color: var(--gray); border: 2px solid var(--gray-light); box-shadow: none; padding: .62rem 1.1rem; font-size: .92rem; flex: 0 0 auto; }
+  .al.faltou .btn-falta{ background: var(--gray-light); }
+  .al.atendido .btn-atend{ background: var(--gray-light); color: var(--gray); box-shadow: none; }
+  .al .atend .quando{ font-size: .8rem; color: #155a48; font-weight: 700; }
+  .it.salvando{ opacity: .5; }
+  /* a anotação livre do professor, à direita de cada aluno; some com um toque
+     quando a tela vai para a TV (dado sensível) */
+  .al-corpo{ display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 0; }
+  .al-corpo > .esq{ min-width: 0; }
+  .obs{ border-left: 1px solid var(--ui-line); background: #fffbea; padding: .8rem .9rem; display: flex; flex-direction: column; gap: .5rem; }
+  .obs label{ font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #7a5b00; }
+  .obs textarea{ width: 100%; min-height: 110px; resize: vertical; font-family: var(--font-body); font-size: .88rem; padding: .55rem .65rem; border: 1.5px solid #e8d48a; border-radius: 10px; background: #fff; color: var(--black); }
+  .obs .st{ font-size: .74rem; color: var(--gray); min-height: 1em; }
+  .obs .ec{ font-size: .78rem; border: 1.5px dashed var(--ui-bd); background: transparent; color: var(--gray); border-radius: 999px; padding: .4rem .8rem; font-family: var(--font-body); font-weight: 800; cursor: not-allowed; }
+  /* esconder as anotações BORRA a caixa e não mexe na largura das aulas:
+     a tela mudando de proporção na TV era um susto (Pedro, 14/09/2026) */
+  body.sem-obs .obs > *{ filter: blur(7px); pointer-events: none; user-select: none; }
+  body.sem-obs .obs{ position: relative; }
+  body.sem-obs .obs::after{ content: '🙈 anotações escondidas'; position: absolute; inset: 0; display: grid; place-items: center; font-size: .82rem; font-weight: 800; color: var(--gray); }
+  .obs-toggle{ margin-left: auto; border: 1.5px solid var(--ui-bd); background: var(--white); color: var(--ui-ink); border-radius: 999px; padding: .35rem .8rem; font-family: var(--font-body); font-weight: 800; font-size: .8rem; cursor: pointer; }
+  body.theme-dark .obs{ background: #26301a; border-color: #2e4560; }
+  body.theme-dark .obs textarea{ background: #101a28; color: #dbe6f3; border-color: #4a5a3a; }
+  @media (max-width: 760px){ .al-corpo{ grid-template-columns: 1fr; } .obs{ border-left: 0; border-top: 1px solid var(--ui-line); } }
+  /* A INTERNET DA SALA (19/09/2026): marca feita sem rede não se perde. Ela fica na fila do aparelho, o aviso
+     amarelo diz quantas estão esperando, e o envio tenta sozinho quando a rede volta. */
+  /* AJUDA NA PRÓPRIA TELA (19/09/2026): um "?" ao lado do bloco, com duas linhas. O guia em PDF ninguém abre no meio da aula. */
+  .dica{ border: 1.5px solid var(--ui-bd, #d6deea); background: var(--white, #fff); color: var(--ui, #1d3685); width: 20px; height: 20px; border-radius: 50%; font: 800 .72rem/1 var(--font-body); cursor: pointer; padding: 0; flex: 0 0 auto; }
+  .dica:hover{ border-color: var(--ui, #1d3685); }
+  .dica-tx{ background: #eef4ff; border: 1.5px solid #cddcf5; border-radius: 10px; padding: .5rem .8rem; font-size: .85rem; font-weight: 600; color: #1f2d57; margin: .4rem 0; max-width: 62ch; }
+  body.theme-dark .dica-tx{ background: #16233a; border-color: #2e4560; color: #dbe6f3; }
+  .fila-off[hidden]{ display: none; }   /* o display:flex abaixo ganharia do hidden */
+  .fila-off{ max-width: 1500px; margin: 0 auto .6rem; background: #fff4d6; border: 1.5px solid #e5b62b; color: #4a3a10; border-radius: 12px; padding: .6rem .9rem; font-weight: 800; display: flex; gap: .8rem; align-items: center; flex-wrap: wrap; }
+  .fila-off button{ border: 1.5px solid #b8890f; background: #fff; color: #6b4d0f; border-radius: 999px; padding: .35rem .9rem; font: inherit; font-size: .85rem; cursor: pointer; }
+  .toast{ position: fixed; left: 50%; bottom: 1.4rem; transform: translateX(-50%); background: #1d3685; color: #fff; padding: .7rem 1.1rem; border-radius: 999px; font-weight: 800; font-size: .9rem; box-shadow: 0 8px 24px rgba(0,0,0,.25); z-index: 150; }
+  /* o planner completo abre POR CIMA da turma, com os dados que ela já tem
+     (Pedro, 14/09/2026): acima do menu do professor (60), abaixo do aviso
+     (150), para o "📇 Card: L3" e o "não salvou" aparecerem sobre ele */
+  body.com-aguia{ overflow: hidden; }
+  .aguia-ov{ position: fixed; inset: 0; z-index: 100; background: #eef1f7; overflow: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+  .aguia-topo{ position: sticky; top: 0; z-index: 3; background: #1d3685; color: #fff; display: flex; align-items: center; gap: .75rem; padding: .6rem 1rem; flex-wrap: wrap; }
+  .aguia-topo .voltar{ background: #fff; color: #1d3685; border: 0; border-radius: 999px; padding: .5rem 1rem; font-family: var(--font-body); font-weight: 900; font-size: .9rem; cursor: pointer; box-shadow: 0 2px 0 #0f2260; }
+  .aguia-topo h2{ margin: 0; color: #fff; font-family: var(--font-heading); font-size: 1rem; font-weight: 700; }
+  .aguia-topo .sub{ opacity: .85; font-size: .84rem; }
+  body.theme-dark .aguia-ov{ background: #0f1724; }
+  @media print{
+    body.com-aguia > *:not(.aguia-ov){ display: none !important; }
+    body.com-aguia{ overflow: visible; }
+    .aguia-ov{ position: static; overflow: visible; background: #fff; }
+    .aguia-topo{ display: none; }
+  }
+
+  body.theme-dark .painel, body.theme-dark .al{ background: #172232; border-color: #2e4560; }
+  body.theme-dark .aula{ background: #101a28; border-color: #2e4560; }
+  body.theme-dark .aula.atual{ background: #172232; }
+  body.theme-dark .it{ color: #dbe6f3; }
+  body.theme-dark .ck{ background: #1b2436; }
+  body.theme-dark .chip, body.theme-dark .cascata select, body.theme-dark .ck select, body.theme-dark .ck input, body.theme-dark .ck textarea{ background: #101a28; color: #dbe6f3; border-color: #3a5170; }
+  body.theme-dark .chip.on{ color: #fff; }
+  body.theme-dark .ck .ped{ background: #26364d; color: #dbe6f3; }
+  body.theme-dark .resumo b, body.theme-dark .aula .t b{ color: #dbe6f3; }
+  @media (max-width: 640px){ .al-cab .acoes{ margin-left: 0; width: 100%; } }
+  /* ── A CÉLULA DA AULA NO DESENHO DO PLANNER COMPLETO (Pedro, 14/09/2026):
+     faixa azul-marinho com o nome da aula e a data numa pílula branca, corpo
+     azul-claro, bolinha de 30, página à direita e a Exploration em
+     verde-amarelo. As duas visões leem como uma coisa só; a aula de agora
+     ganha o anel verde-amarelo que a lição atual tem no planner completo. ── */
+  .aulas{ gap: .7rem; }
+  /* as cores vêm do plano do livro (--pil, --mar, --ac, --acTxt, calculadas em corDoEstagio como no planner completo); o azul é a reserva */
+  .aula, body.theme-dark .aula, body.theme-dark .aula.atual{ background: var(--pil, #dce6f2); border: 2px solid var(--mar, #1d3685); border-radius: 12px; padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+  .aula.atual, body.theme-dark .aula.atual{ background: var(--pil, #dce6f2); border-color: var(--mar, #1d3685); box-shadow: 0 0 0 3px var(--ac, #d4e909); }
+  .aula .t{ margin: 0; background: var(--mar, #1d3685); color: rgba(255,255,255,.78); padding: .5rem .75rem; align-items: center; font-size: .72rem; }
+  .aula .t b, body.theme-dark .aula .t b{ color: #fff; font-size: 1.05rem; }
+  .aula .t .dt, .aula .t .agora{ margin-left: auto; background: #fff; color: var(--mar, #1d3685); border-radius: 999px; padding: .15rem .6rem; font-size: .74rem; font-weight: 800; text-transform: none; letter-spacing: 0; white-space: nowrap; opacity: 1; }
+  .aula .t .dt.dada{ background: #fff; color: var(--mar, #1d3685); }
+  .aula .t .dt.falta, .aula .t .dt.tarde{ background: #ffd9d9; color: #b91c1c; }
+  .aula .t .agora{ background: var(--ac, #d4e909); color: var(--acTxt, #3a3400); }
+  .aula .lista{ padding: .45rem .55rem .65rem; display: flex; flex-direction: column; gap: 1px; flex: 1; }
+  .aula .it, body.theme-dark .aula .it{ color: #0f1f4e; font-size: .97rem; padding: .3rem .5rem; border-radius: 9px; min-height: 42px; }
+  .aula .it.pode:hover{ background: rgba(255,255,255,.65); }
+  .aula .it.xp{ background: var(--ac, #d4e909); color: var(--acTxt, #3a3400); }
+  .aula .it.feito{ color: #0f1f4e; }
+  .it.breve{ opacity: .45; filter: grayscale(1); cursor: default; }
+  .aula .it.feito .tx{ opacity: .6; }
+  .aula .it .pg{ font-weight: 700; opacity: .7; font-size: .78rem; color: inherit; }
+  .aula .it .quem{ color: #54648d; }
+  .mk{ flex: 0 0 30px; width: 30px; height: 30px; }
+  .mk.tri{ width: 30px; height: 27px; flex-basis: 30px; }
+  .mk.cheia-a{ background: #1d3685; }
+  .mk.quad{ border-radius: 8px; }
+  .aula .btn-ck{ margin-top: auto; }
+  .aula .it + .btn-ck{ margin-top: .6rem; }
+  .aula .libera{ color: #54648d; }
+  .aula .sug1{ margin: .5rem .55rem .55rem; background: #e4f3f1; border: 1px solid #cfe6e1; border-radius: 10px; padding: .35rem .55rem; display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+  .aula .sug1 .st{ flex-basis: 100%; font-size: .66rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #155a48; }
+  .aula .sug1 .nm{ font-weight: 800; color: #0f1f4e; font-size: .92rem; }
+  .aula .sug1.ok .nm{ text-decoration: line-through; opacity: .7; }
+  .aula .sug1 .pct{ margin-left: auto; background: #fff; border-radius: 999px; padding: 0 .5rem; font-weight: 800; color: #155a48; font-size: .78rem; }
+  /* CHECKING FEITO É VERDE (Pedro, 19/09/2026): antes o bloco pegava a cor do estágio, a mesma do botão de
+     registrar, e de longe os dois liam igual. Agora feito = verde, a fazer = o amarelo do botão. */
+  .aula .ck-feito{ margin-top: auto; display: flex; align-items: center; gap: .65rem; background: #e3f4ec; color: #14532d; border: 1.5px solid #34a06f; border-radius: 10px; padding: .5rem .7rem; }
+  .aula .it + .ck-feito{ margin-top: .6rem; }
+  .aula.ck-ok .t{ background: #14532d; }   /* o cabeçalho da aula do Checking feito também fica verde */
+  .aula .ck-feito .mk{ border-color: #14532d; background: #34a06f; }
+  .aula .btn-ck{ background: var(--ac, #d4e909); color: var(--acTxt, #3f4703); }
+  .al-cab .livro.cor{ background: var(--tab); color: #fff; border-radius: 999px; padding: .1rem .6rem; font-weight: 800; }
+  .aula .ck-feito b{ display: block; font-family: var(--font-heading); font-size: .95rem; line-height: 1.2; }
+  .aula .ck-feito small{ display: block; font-size: .76rem; font-weight: 700; opacity: .85; line-height: 1.3; }
+  .btn-ck-editar{ width: 100%; margin-top: .45rem; justify-content: center; background: #f2f5f9; color: #54648d; border: 1.5px solid #c3ccdb; padding: .38rem .9rem; font-size: .8rem; box-shadow: none; }
+  /* ── O QUADRO DO KEEP STUDYING (Pedro, 14/09/2026): a célula verde da
+     coluna do planner completo, numa linha própria embaixo das aulas. Como
+     quarta coluna ele espremia as aulas (a coluna delas não passa de 1198 px,
+     por causa da anotação) e os nomes quebravam em duas linhas. ── */
+  /* compacto (Pedro, 14/09/2026): colunas iguais, uma linha por item (o nome
+     longo corta com reticências e aparece inteiro no title), a contagem ao
+     lado do título e o "também fez" numa linha só com o rótulo */
+  .al .aula.ks, body.theme-dark .al .aula.ks{ margin: -.25rem 1rem .9rem; background: #e4f3f1; border-color: #cfe6e1; }
+  .aula.ks .t{ background: transparent; color: #155a48; padding: .45rem .8rem 0; }
+  .aula.ks .t .dt{ margin-left: .5rem; background: #fff; color: #155a48; padding: .05rem .5rem; font-size: .7rem; }
+  .aula.ks .lista{ padding: .15rem .45rem .45rem; }
+  .ks-sug{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: .9rem; row-gap: 0; }
+  /* colunas pelo número de itens, para não sobrar um órfão na segunda linha: 5 e 6 em três, 7 e 8 em quatro */
+  .ks-sug.c1{ grid-template-columns: minmax(0, 1fr); } .ks-sug.c2{ grid-template-columns: repeat(2, minmax(0, 1fr)); } .ks-sug.c3{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (max-width: 1200px){ .ks-sug.c3, .ks-sug.c4{ grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 640px){ .ks-sug.c2, .ks-sug.c3, .ks-sug.c4{ grid-template-columns: minmax(0, 1fr); } }
+  .ksi{ display: flex; align-items: center; gap: .4rem; min-height: 30px; padding: .1rem .35rem; font-size: .86rem; font-weight: 700; color: #0f1f4e; min-width: 0; }
+  .ksi .ic{ flex: 0 0 20px; text-align: center; font-size: .95rem; }
+  .ksi .nm{ flex: 0 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ksi.feito .nm{ text-decoration: line-through; opacity: .6; }
+  .ksi .pct{ flex: 0 0 auto; background: #fff; color: #155a48; border-radius: 999px; padding: 0 .45rem; font-size: .76rem; font-weight: 800; white-space: nowrap; }
+  .ks-mais{ margin: .3rem .35rem 0; border-top: 1px dashed #9fcfc4; padding-top: .35rem; font-size: .76rem; color: #155a48; display: flex; flex-wrap: wrap; align-items: center; gap: .25rem .3rem; }
+  .ks-sug:empty + .ks-mais{ margin-top: 0; border-top: 0; padding-top: 0; }
+  .ks-mais b{ font-size: .64rem; text-transform: uppercase; letter-spacing: .06em; margin-right: .3rem; }
+  .ks-mais span{ background: #fff; border-radius: 999px; padding: .05rem .5rem; font-weight: 800; color: #0f1f4e; }
+  .ks-mais span i{ font-style: normal; color: #155a48; }
+  .btn-ck-editar:hover{ background: #e7ecf4; color: #1d3685; border-color: #9fb0c9; }
+  /* a nota do Checking é só do professor: com as anotações escondidas (tela na TV), ela borra junto */
+  body.sem-obs .nota-priv{ filter: blur(5px); user-select: none; }
+  /* e no planner completo por cima da turma: a nota do Checking (.pv2-priv) e a tabela das provas (Pedro, 14/09/2026: a TV mostrava) */
+  body.sem-obs .aguia-ov .pv2-priv, body.sem-obs .aguia-ov .notas table{ filter: blur(6px); user-select: none; pointer-events: none; }
+  .aguia-topo .obs-toggle{ margin-left: auto; background: rgba(255,255,255,.15); color: #fff; border: 0; }
+  /* ── O GABARITO DAS MARCAS (aprovado pelo Pedro, 14/09/2026), o mesmo do
+     planner-v2.js: azul-marinho = o aluno (com ✓ branco quando o portal
+     comprovou); verde escuro #a8b907, na borda e no recheio = o professor.
+     Sem listras. ── */
+  .mk{ --prof: #a8b907; }
+  .mk.l-a, .mk.l-plat{ background: linear-gradient(90deg,#1d3685 50%,#fff 50%); }
+  .mk.r-plat{ background: linear-gradient(90deg,#fff 50%,#1d3685 50%); }
+  .mk.l-a.r-plat{ background: #1d3685; }
+  .mk.r-prof{ background: linear-gradient(90deg,#fff 50%,var(--prof) 50%); }
+  .mk.l-a.r-prof, .mk.l-plat.r-prof{ background: linear-gradient(90deg,#1d3685 50%,var(--prof) 50%); }
+  .mk.l-prof{ background: linear-gradient(90deg,var(--prof) 50%,#fff 50%); }
+  .mk.cheia-prof{ background: var(--prof); border-color: var(--prof); }
+  /* feita antes do Planner (o corte de 15/09/2026): cinza até alguém mexer */
+  .mk.ant{ background: #aeb5c2 !important; border-color: #aeb5c2 !important; }
+  .mk.tri.ant{ background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 27'%3E%3Cpolygon points='15,3 27.5,24.5 2.5,24.5' fill='%23aeb5c2' stroke='%23aeb5c2' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat !important; }
+  .mk.dep-prof{ border-color: var(--prof); }
+  .mk.plat{ background: #1d3685 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/64% no-repeat; border-color: #1d3685; }
+  .aula .it.xp .mk.dep-prof, .aula .it.xp .mk.cheia-prof{ border-color: #3a3400; }
+
+/* painel do Planejador e cards mais baixos (Pedro, 17/09/2026) */
+.fila-info.roteiro, .fila-info.roteiro.sem{ gap: .65rem; padding: .75rem .9rem; background: #fff; border: 1px solid var(--ui-line, #d6deea); border-radius: 16px; box-shadow: 0 2px 10px rgba(15,31,78,.06); }
+.pl-topo{ display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .7rem; }
+.pl-tit{ font-family: var(--font-heading); font-weight: 900; font-size: 1rem; color: #1d3685; letter-spacing: .01em; }
+.fila-info .pl-rec{ margin-left: auto; }
+.pl-topo .rt-info{ flex-basis: 100%; font-size: .82rem; color: #54648d; }
+.pl-topo .rt-info b{ color: #155a48; }
+.fila-info.sem .pl-topo .rt-info b{ color: #1d3685; }
+.fila-info .pl-rec{ border: 0; background: #eef2fa; color: #1d3685; padding: .3rem .75rem; }
+.fila-info .pl-rec:hover{ background: #dfe7f5; }
+.pl-acoes{ display: flex; flex-wrap: wrap; align-items: stretch; gap: .5rem; }
+.pl-acoes .prio-grande{ width: auto; flex: 1 1 220px; font-size: .95rem; padding: .55rem 1rem; border-radius: 12px; box-shadow: 0 3px 0 #0f2260; }
+.pl-acoes .prio-grande.on{ background: #fff; color: #1d3685; box-shadow: inset 0 0 0 2px #1d3685; }
+.pl-salvar{ display: flex; align-items: stretch; border: 1.5px solid #31a889; border-radius: 12px; overflow: hidden; background: #f3fbf9; }
+.pl-salvar .rt-data{ padding: 0 .5rem 0 .75rem; font-size: .8rem; color: #155a48; }
+.pl-salvar .rt-data input{ border: 0; background: transparent; font-weight: 800; color: #155a48; padding: .2rem 0; }
+.pl-salvar .rt-btn{ border: 0; border-radius: 0; padding: .45rem 1rem; }
+.pl-saidas{ display: flex; flex-wrap: wrap; gap: .4rem; }
+.pl-saidas .rt-btn{ border: 1px solid var(--ui-line, #d6deea); color: #1d3685; border-radius: 12px; padding: .45rem .8rem; font-weight: 700; }
+.pl-saidas .rt-btn:hover{ border-color: #1d3685; background: #f5f8fd; }
+body.theme-dark .fila-info.roteiro{ background: #172232; border-color: #2e4560; }
+body.theme-dark .pl-tit, body.theme-dark .pl-saidas .rt-btn{ color: #dbe6f3; }
+body.theme-dark .pl-saidas .rt-btn{ background: #101a28; border-color: #2e4560; }
+body.theme-dark .pl-salvar{ background: #10261f; }
+.aula .t{ padding: .35rem .7rem; }
+.aula .t b, body.theme-dark .aula .t b{ font-size: .98rem; }
+.aula .lista{ padding: .3rem .45rem .45rem; gap: 0; }
+.aula .it, body.theme-dark .aula .it{ min-height: 34px; padding: .15rem .45rem; font-size: .92rem; line-height: 1.25; }
+.aula .it .mk{ flex-basis: 26px; width: 26px; height: 26px; }
+.aula .it .mk.tri{ height: 23px; }
+.aula .btn-ck, .aula .ck-feito{ padding-top: .4rem; padding-bottom: .4rem; }
+.aula .it + .btn-ck, .aula .it + .ck-feito{ margin-top: .4rem; }
+</style>
+</head>
+<body>
+<script>try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
+
+<header class="hero">
+  <a class="back-link" href="index.html">&larr; Voltar ao Hub</a>
+  <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
+  <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+  <h1>Minha aula</h1>
+</header>
+
+<main>
+  <div class="painel">
+    <div class="cascata">
+      <div><label for="selEscola">Escola</label><select id="selEscola" disabled><option value="" disabled selected>Carregando…</option></select></div>
+      <div><label for="selProf">Professor(a)</label><select id="selProf" disabled><option value="" disabled selected>Professor(a)…</option></select></div>
+      <div><label for="selTurma">Turma</label><select id="selTurma" disabled><option value="" disabled selected>Turma…</option></select></div>
+    </div>
+    <div class="status" id="status">Escolha a turma. Os alunos e a posição de cada um vêm do card.</div>
+    <!-- outro aluno (Pedro, 15/09/2026): turmas juntadas por falta; o aluno buscado entra embaixo, sem tirar os da turma -->
+    <div class="busca-al">
+      <label for="qAluno">🔎 Trazer outro aluno</label>
+      <input id="qAluno" type="search" autocomplete="off" placeholder="Nome completo ou RAF de qualquer aluno da escola">
+      <div id="achadosAluno" class="achados-al" hidden></div>
+    </div>
+    <div class="legenda" id="legenda" hidden>
+      <details class="leg-det"><summary>? Legenda das marcas</summary><div class="leg-itens"><span><i class="mk l-a" style="width:18px;height:18px;border-width:2px"></i> o aluno marcou</span>
+      <span><i class="mk r-prof" style="width:18px;height:18px;border-width:2px"></i> você confirmou</span>
+      <span><i class="mk cheia-prof" style="width:18px;height:18px;border-width:2px"></i> o professor marcou</span>
+      <span><i class="mk quad plat" style="width:18px;height:18px;border-width:2px;border-radius:5px"></i> o portal comprovou</span>
+      <span><i class="mk tri" style="width:18px;height:16px"></i> tarefa: só o aluno marca</span></div></details>
+      <button type="button" class="obs-toggle" id="obsToggle">🙈 Esconder as anotações (tela na TV)</button>
+    </div>
+  </div>
+  <div id="fila-off" class="fila-off" hidden></div>
+  <div id="resumo" class="resumo" style="max-width:1500px;margin:0 auto .6rem" hidden></div>
+  <div id="fila" class="fila-info" hidden></div>
+  <div id="alunos"></div>
+</main>
+
+<!-- O gabarito e a régua vêm do Portal do Aluno: uma fonte só -->
+<script src="https://portalfisk.com.br/assets/planner-v2.js?v=20260919a"></script>
+<!-- o guia do Checking, lição a lição: a base comum e um arquivo por livro (Essentials, Transitions e Fluency 1 e 2, In Focus, Inmediato 1 a 3) -->
+<script src="https://portalfisk.com.br/assets/checking/guia-base.js?v=376d37037e"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-e1.js?v=9630e2ddde"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-e2.js?v=d46def0a40"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-t1.js?v=e9a53aa8f8"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-t2.js?v=9f51eeedb5"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-f1.js?v=168dda2a8e"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-f2.js?v=793d94a10f"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-if.js?v=bf2cd2ef09"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-i1.js?v=551896a136"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-i2.js?v=56bd0516a9"></script>
+<script src="https://portalfisk.com.br/assets/checking/guia-i3.js?v=e326479afd"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="/assets/fisk-shared.js?v=2026-09-07a"></script>
+<script>
+fiskInitThemeToggle('themeToggle');
+fiskInitUserMenu();
+fiskRegistrarUso("Turma de hoje");
+
+var EP = 'https://script.google.com/macros/s/AKfycbw13tpIVD3Ji9XhWW1VwDSw8qAZOmtMGPV0FI1rlHpEQ7HABumVpi_aMWQXfo7dwkd1/exec';
+var $ = function (id) { return document.getElementById(id); };
+var CRITERIOS = [['vocabulary', '🔤 Vocabulário'], ['fluency', '💬 Fluência'], ['structure', '🧱 Estrutura'], ['pronunciation', '🗣️ Pronúncia'], ['listening', '👂 Compreensão auditiva']];
+/* Os dez gabaritos v2 moram no portal e descem sob demanda, pelo livro: nenhum
+   professor precisa dos outros nove. 'Essentials 1' → plano-essentials-1.v2.js
+   → window.PLANO_ESSENTIALS_1 (13/09/2026). */
+var PLANO_V = '20260918a';
+function livroId(b) { var s = String(b || '').trim().toLowerCase(); if (/focus\s*review|review\s*focus/.test(s)) return 'in-focus-review'; if (/^(grammar\s*)?review\b/.test(s)) return 'review'; if (/pathways/.test(s)) return 'pathways'; return s.replace(/\s+/g, '-'); }   /* os dois Reviews (15/09/2026): o card escreve o nome de vários jeitos */
+function planoGlobal(book) { return 'PLANO_' + livroId(book).toUpperCase().replace(/-/g, '_'); }
+var planoCarregando = {};
+function carregaPlano(book) {
+  var id = livroId(book);
+  if (!id || window[planoGlobal(book)]) return Promise.resolve(window[planoGlobal(book)] || null);
+  if (!planoCarregando[id]) planoCarregando[id] = new Promise(function (res) {
+    var sc = document.createElement('script');
+    sc.src = 'https://portalfisk.com.br/assets/plano-' + id + '.v2.js?v=' + PLANO_V;
+    sc.onload = function () { res(window[planoGlobal(book)] || null); };
+    sc.onerror = function () { res(null); };
+    document.head.appendChild(sc);
+  });
+  return planoCarregando[id];
+}
+var estado = { escola: '', prof: '', turma: '', alunos: [], dados: {}, aberto: '', plano: null, atendidos: {}, visitantes: [] };
+/* ── a fila do Planejador e o "aluno atendido" ──
+   A ordem vem do que o professor salvou no Planejador (planejamentoLe); quem
+   não está na fila vai para o fim, marcado. "Aluno atendido" manda o cartão
+   para baixo e o próximo sobe; fica no aparelho, por turma e dia. */
+function normNome(s) { return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toLowerCase(); }
+function chaveAtend() { var d = new Date(); if (estado.ontem) d.setDate(d.getDate() - 1); return 'th:atend:' + estado.escola + '|' + estado.prof + '|' + estado.turma + '|' + d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+function lerAtendidos() { try { return JSON.parse(localStorage.getItem(chaveAtend()) || '{}'); } catch (e) { return {}; } }
+function guardaAtendidos() { try { localStorage.setItem(chaveAtend(), JSON.stringify(estado.atendidos)); } catch (e) {} }
+/* ── ORDEM DE PRIORIDADE NA HORA (Pedro, 15/09/2026, teste da direção) ──
+   A mesma régua do Planejador (planejador.html: nível só pelo atraso, 4+ alta, 1-3 média; faltas desempatam; blocos de
+   mesma lição), com o que só a Turma de hoje sabe: dentro da faixa, quem terminou a lição e está pronto para o Checking
+   sobe. Vale para a turma, os alunos trazidos pela busca e o plantão. Reordena só no clique, nunca sozinha. */
+var PRIO_NIVEL = { alta: 0, media: 1, emdia: 2, semdados: 3 };
+/* quem vê o botão enquanto está em teste: só a direção (Pedro, 15/09/2026: "tire do Carlos, eu só queria ver") */
+var PRIO_TESTE = ['CARLOS ALBERTO'];   /* Carlos liberado de novo em 16/09/2026 */
+function podeOrdenar() {
+  return true;   /* para todos os professores desde 16/09/2026 */
+  var s = sessao() || {};
+  if (s.master) return true;
+  var n = nPessoa(s.name);
+  return PRIO_TESTE.some(function (p) { var x = nPessoa(p); return x === n || n.indexOf(x + ' ') === 0; });
+}
+function prioDados(a) {
+  var d = estado.dados[a.raf] || {}, situ = d.situacao || {};
+  var atraso = typeof a.aulasAtraso === 'number' ? a.aulasAtraso : (typeof situ.atraso === 'number' ? situ.atraso : null);
+  var cels = (situ.cels || []).filter(function (c) { return c.s === 'dada' || c.s === 'falta'; });
+  var pct = typeof a.pctFaltas === 'number' ? a.pctFaltas : (cels.length ? Math.round(cels.filter(function (c) { return c.s === 'falta'; }).length / cels.length * 100) : 0);
+  var nivel = atraso == null ? 'semdados' : atraso >= 4 ? 'alta' : atraso >= 1 ? 'media' : 'emdia';
+  var plano = planoDe(a.book), pronto = false, expl = false, licao = null;
+  try {
+    var ctx = ctxDe(a), pos = posicaoDe(a, plano, ctx);
+    licao = /^L\d+$/.test(pos.id || '') ? +pos.id.slice(1) : null;
+    if (plano) {
+      var ee = PlannerV2.estadoEtapa(plano, pos.id, ctx), reg = (ctx.planner.plano.checking || {})[pos.id];
+      if (ee && ee.aulas.some(function (au) { return au.checking; }) && !(reg && reg.feito)) {
+        pronto = ee.aulas.every(function (au) { return au.checking || au.itens.every(function (it) { return it.breve || (it.quem === 'aluno' ? (it.a || it.plat) : true); }); });
+      }
+      /* ESPERANDO A EXPLANATION (Pedro, 15/09/2026): as duas coisas que só o professor faz na mesa são a
+         Exploration/Explanation e o Checking. Se o próximo item da lição é a explicação e ela ainda não foi dada,
+         o aluno está parado esperando por ele. */
+      if (ee) {
+        var espera = null;
+        ee.aulas.forEach(function (au) {
+          au.itens.forEach(function (it) {
+            if (espera || it.breve) return;
+            var feito = it.quem === 'aluno' ? (it.a || it.plat) : it.feito;
+            if (!feito) espera = it;
+          });
+        });
+        expl = !!(espera && (espera.marca === 'expl' || /^(xa|xb|xp)/.test(String(espera.code || ''))));
+      }
+    }
+  } catch (e) {}
+  return { atraso: atraso, pct: pct, nivel: nivel, pronto: pronto, expl: expl, licao: licao, book: String(a.book || '').trim().toLowerCase() };
+}
+function ordenarPorPrioridade() {
+  var lista = estado.alunos.map(function (a, i) { a._prio = prioDados(a); if (a._orig == null) a._orig = i; return a; });   /* a ordem original é gravada UMA vez */
+  lista.sort(function (x, y) {
+    var ax = fimDe(x), ay = fimDe(y);
+    if (ax !== ay) return ax - ay;
+    var px = x._prio, py = y._prio;
+    return (PRIO_NIVEL[px.nivel] - PRIO_NIVEL[py.nivel]) || ((py.atraso || 0) - (px.atraso || 0)) || (((py.pronto || py.expl) ? 1 : 0) - ((px.pronto || px.expl) ? 1 : 0)) || (py.pct - px.pct) || String(x.nome).localeCompare(String(y.nome), 'pt-BR');
+  });
+  /* blocos: quem está no mesmo livro e a uma lição de distância sobe para logo depois do mais urgente */
+  var out = [], usado = lista.map(function () { return false; });
+  for (var i = 0; i < lista.length; i++) {
+    if (usado[i]) continue; out.push(lista[i]); usado[i] = true;
+    var b = lista[i]._prio; if (b.licao == null || fimDe(lista[i])) continue;
+    for (var j = i + 1; j < lista.length; j++) {
+      var c = lista[j]._prio;
+      if (usado[j] || c.licao == null || c.book !== b.book || Math.abs(c.licao - b.licao) > 1 || fimDe(lista[j])) continue;
+      out.push(lista[j]); usado[j] = true;
+    }
+  }
+  out.forEach(function (a, k) { a._rank = fimDe(a) ? null : k + 1; });
+  estado.alunos = out;
+}
+function alternaPrioridade() {
+  var antes = {}; document.querySelectorAll('#alunos .al').forEach(function (c) { antes[c.dataset.raf] = c.getBoundingClientRect().top; });
+  if (estado.prioridade) {
+    estado.prioridade = false;
+    estado.alunos.forEach(function (a) { a._rank = null; });
+    estado.alunos.sort(function (x, y) { return (x._orig == null ? 9999 : x._orig) - (y._orig == null ? 9999 : y._orig); });
+    estado.alunos.forEach(function (a) { delete a._orig; });
+    aplicarFila();
+  } else {
+    estado.prioridade = true;
+    ordenarPorPrioridade();
+  }
+  desenharTurma(); pintaFila();
+  /* FLIP bem calmo (Pedro, 16/09/2026): cada cartão é "pego com a mão": levanta, inclina 2 a 3 graus, caminha devagar
+     até o lugar novo e é pousado. Os cartões saem um depois do outro, para o professor enxergar a redistribuição.
+     No fim, o som e um confete. Quem pediu menos movimento no sistema vê a troca direta. */
+  var lento = !window.matchMedia || !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var cards = [].slice.call(document.querySelectorAll('#alunos .al'));
+  var moventes = [];
+  cards.forEach(function (c) {
+    var t0 = antes[c.dataset.raf]; if (t0 == null) return;
+    var dy = t0 - c.getBoundingClientRect().top; if (Math.abs(dy) < 1) return;
+    moventes.push({ c: c, dy: dy });
+  });
+  var fim = function () { if (estado.prioridade && moventes.length) { somDeConquista(); confeteDaFila(); } };
+  var total = 0;
+  if (lento && moventes.length && document.body.animate) {
+    var DUR = 3200, PASSO = 140;
+    moventes.forEach(function (m, k) {
+      var ang = (m.dy > 0 ? -1 : 1) * (2 + (k % 3) * 0.5);   /* quem sobe inclina para um lado, quem desce para o outro */
+      var sombra0 = '0 0 0 rgba(20,22,28,0)', sombra1 = '0 18px 36px rgba(20,22,28,.22)';
+      m.c.style.position = 'relative'; m.c.style.zIndex = String(5 + Math.round(Math.abs(m.dy) / 40));
+      var atraso = Math.min(k * PASSO, 1800);
+      total = Math.max(total, atraso + DUR);
+      var an = m.c.animate([
+        { transform: 'translateY(' + m.dy + 'px) rotate(0deg) scale(1)', boxShadow: sombra0, offset: 0 },
+        { transform: 'translateY(' + m.dy + 'px) rotate(' + ang + 'deg) scale(1.03)', boxShadow: sombra1, offset: 0.16 },
+        { transform: 'translateY(0px) rotate(' + ang + 'deg) scale(1.03)', boxShadow: sombra1, offset: 0.84 },
+        { transform: 'translateY(0px) rotate(0deg) scale(1)', boxShadow: sombra0, offset: 1 }
+      ], { duration: DUR, delay: atraso, easing: 'cubic-bezier(.45,.05,.35,1)', fill: 'backwards' });
+      an.onfinish = function () { m.c.style.position = ''; m.c.style.zIndex = ''; };
+    });
+    setTimeout(fim, total + 60);
+  } else fim();
+  var pri = document.querySelector('#alunos .al');
+  if (pri && estado.prioridade) setTimeout(function () { var y = pri.getBoundingClientRect().top + window.scrollY - 90; window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' }); }, lento ? total + 100 : 0);
+}
+/* confete curto que cai por cima da fila quando ela termina de se organizar */
+function confeteDaFila() {
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var cores = ['#1d3685', '#d4e909', '#31a889', '#e11d74', '#f59e0b', '#6d28d9'];
+  var caixa = document.createElement('div');
+  caixa.style.cssText = 'position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:999';
+  document.body.appendChild(caixa);
+  var larg = window.innerWidth;
+  for (var i = 0; i < 90; i++) {
+    var p = document.createElement('i');
+    var w = 6 + Math.random() * 6;
+    p.style.cssText = 'position:absolute;top:-20px;left:' + (Math.random() * larg) + 'px;width:' + w + 'px;height:' + (w * 0.45) + 'px;border-radius:2px;background:' + cores[i % cores.length];
+    caixa.appendChild(p);
+    var dx = (Math.random() - 0.5) * 220, gira = (Math.random() - 0.5) * 1080;
+    p.animate([
+      { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
+      { transform: 'translate(' + dx + 'px,' + (window.innerHeight * 0.85) + 'px) rotate(' + gira + 'deg)', opacity: 1, offset: 0.8 },
+      { transform: 'translate(' + (dx * 1.2) + 'px,' + (window.innerHeight + 30) + 'px) rotate(' + (gira * 1.2) + 'deg)', opacity: 0 }
+    ], { duration: 2200 + Math.random() * 1400, delay: Math.random() * 500, easing: 'cubic-bezier(.2,.6,.4,1)', fill: 'backwards' });
+  }
+  setTimeout(function () { caixa.remove(); }, 4300);
+}
+/* um arpejo curto de três notas quando a fila termina de se organizar (sem arquivo de áudio: o navegador sintetiza) */
+function somDeConquista() {
+  try {
+    var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    var ac = somDeConquista._ac || (somDeConquista._ac = new AC());
+    if (ac.state === 'suspended') ac.resume();
+    var t0 = ac.currentTime + 0.02;
+    [[659.25, 0], [830.61, 0.11], [987.77, 0.22]].forEach(function (par) {
+      var o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'triangle'; o.frequency.value = par[0];
+      g.gain.setValueAtTime(0.0001, t0 + par[1]);
+      g.gain.exponentialRampToValueAtTime(0.13, t0 + par[1] + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + par[1] + 0.42);
+      o.connect(g); g.connect(ac.destination); o.start(t0 + par[1]); o.stop(t0 + par[1] + 0.45);
+    });
+  } catch (e) {}
+}
+/* A FALTA NA TURMA DE HOJE (Pedro, 16/09/2026): "Faltou" deixa o cartão cinza, manda para o fim da lista (depois
+   dos atendidos) e escreve "a" na célula de hoje do card, só se ela estava vazia ou com o placeholder. O que a
+   secretaria ou o professor já lançaram à mão no card manda. No plantão não há botão: lá não é aula. */
+function hojeIsoTH() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+/* A AULA DE ONTEM (Pedro, 17/09/2026): quem não conseguiu preencher na aula lança até o fim do dia seguinte. O
+   servidor só aceita ontem, só se o aluno não tem aula hoje, só em célula vazia, e registra o lançamento tardio. */
+function ontemIsoTH() { var d = new Date(); d.setDate(d.getDate() - 1); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+function diaAlvoTH() { return estado.ontem ? ontemIsoTH() : hojeIsoTH(); }
+function rotDiaTH() { return estado.ontem ? 'de ontem (' + ontemIsoTH().split('-').reverse().slice(0, 2).join('/') + ')' : 'de hoje'; }
+function alternaOntem() {
+  estado.ontem = !estado.ontem;
+  estado.faltas = {};
+  try { estado.atendidos = JSON.parse(localStorage.getItem(chaveAtend()) || '{}') || {}; } catch (e) { estado.atendidos = {}; }
+  if (estado.prioridade) ordenarPorPrioridade(); else aplicarFila();
+  desenharTurma(); pintaFila();
+  toast(estado.ontem ? '📅 Lançando a aula ' + rotDiaTH() + '. O que você marcar agora vai para a célula de ontem do card.' : '📅 De volta à aula de hoje.');
+}
+function faltouHoje(a) {
+  if (estado.plantao) return false;
+  var f = (estado.faltas || {})[a.raf];
+  if (f === false) return false;
+  if (f) return true;
+  var cels = ((estado.dados[a.raf] || {}).situacao || {}).cels || [], h = diaAlvoTH();
+  return cels.some(function (c) { return c && c.d === h && c.s === 'falta'; });
+}
+function fimDe(a) { return faltouHoje(a) ? 2 : (estado.atendidos[a.raf] ? 1 : 0); }
+function marcarFalta(a) {
+  estado.faltas = estado.faltas || {};
+  var desfazer = faltouHoje(a);
+  var antes = estado.faltas[a.raf];
+  estado.faltas[a.raf] = !desfazer;
+  reordenaComAnimacao(a);
+  post({ action: 'plannerFalta', raf: a.raf, book: a.book, desfazer: desfazer }).then(function (r) {
+    var c = r.card || {};
+    if (c.escreveu != null) toast(desfazer ? '📇 Card: falta ' + rotDiaTH() + ' desfeita.' : '📇 Card: "a" (falta) na aula ' + rotDiaTH() + '.');
+    else if (c.jaEstava) toast('📇 O card já tinha "' + c.jaEstava + '" na aula ' + rotDiaTH() + ' e não foi alterado.');
+    else if (c.motivo) toast('📇 Card não alterado: ' + c.motivo + '.');
+  }).catch(function (e) {
+    if (antes === undefined) delete estado.faltas[a.raf]; else estado.faltas[a.raf] = antes;
+    reordenaComAnimacao(a);
+    toast('⚠️ Não salvou a falta (' + e.message + '). Tente de novo.');
+  });
+}
+function aplicarFila() {
+  var plano = estado.plano, pos = {};
+  if (plano && Array.isArray(plano.ordem)) plano.ordem.forEach(function (o, i) { pos[normNome(o.nome)] = { i: i, o: o }; });
+  estado.alunos.forEach(function (a) { var p = pos[normNome(a.nome)]; a._plan = p ? p.o : null; if (a.visitante) return; a._pos = p ? p.i : 999; });   /* quem veio pela busca fica na ordem em que chegou, depois da turma */
+  estado.alunos.sort(function (x, y) {
+    var ax = fimDe(x), ay = fimDe(y);
+    if (ax !== ay) return ax - ay;
+    if (ax === 1) return (estado.atendidos[x.raf] || 0) - (estado.atendidos[y.raf] || 0);
+    return x._pos - y._pos;
+  });
+}
+/* ── O PLANEJADOR DENTRO DA TURMA DE HOJE (Pedro e Natália, 16/09/2026) ──
+   O Planejador deixa de ser uma tela à parte. Aqui mesmo o professor ordena (por prioridade ou atendendo), escolhe
+   a data da aula e SALVA o roteiro (a mesma aba `_planejamento`: no dia da aula a turma abre nessa ordem), copia a
+   ordem simples e grava o PDF na pasta da turma. A "atividade do dia" saiu: o planner já diz onde o aluno está. */
+function dataRoteiroPadrao() { var p = estado.plano; if (p && p.data && p.data >= hojeIsoTH()) return p.data; return hojeIsoTH(); }
+function pintaFila() {
+  var f = $('fila'); var plano = estado.plano;
+  var nAt = Object.keys(estado.atendidos).length;
+  f.className = 'fila-info roteiro' + (plano && plano.ordem && plano.ordem.length ? '' : ' sem');
+  var info;
+  if (plano && plano.ordem && plano.ordem.length) {
+    var na = estado.alunos.filter(function (a) { return a._plan; }).length;
+    var d = plano.data ? plano.data.split('-').reverse().join('/') : '';
+    info = '📋 <b>Ordem salva' + (plano.hoje ? ' para hoje' : ' em ' + esc(d)) + '</b>' + ' · ' + na + ' de ' + estado.alunos.length + ' na ordem';
+  } else info = '📋 <b>Sem ordem salva.</b> Os alunos estão na ordem do card.';
+  if (estado.ontem) info = '<span class="rt-ontem">📅 <b>Lançando a aula de ontem (' + esc(ontemIsoTH().split('-').reverse().slice(0, 2).join('/')) + ')</b> · presença e falta vão para a célula de ontem do card, só se estiver vazia</span> · ' + info;
+  if (nAt) info += ' · <b>' + nAt + ' atendido' + (nAt === 1 ? '' : 's') + '</b>';
+  var prio = estado.alunos.length > 1 ? '<button type="button" class="prio-grande" data-prio>' + (estado.prioridade ? '↺ Voltar à ordem ' + (estado.plantao ? 'de chegada' : 'da turma') : '⚡ Ordenar por prioridade') + '</button>' : '';
+  /* painel do Planejador (Pedro, 17/09): título e situação em cima; ordenar, data + salvar, e as saídas agrupadas.
+     O "Lançar a aula de ontem" saiu da tela até algum professor pedir (o servidor continua aceitando). */
+  f.innerHTML = '<div class="pl-topo"><span class="pl-tit">Planejador</span>' +
+    '<button type="button" class="btn-recarrega pl-rec" data-recarrega title="Lê de novo o roteiro, as anotações e as marcas dos alunos">↻ Recarregar</button><span class="rt-info">' + info + '</span></div>' +
+    '<div class="pl-acoes">' + prio.replace('class="prio-grande"', 'class="prio-grande' + (estado.prioridade ? ' on' : '') + '"') +
+    (estado.plantao ? '' : '<div class="pl-salvar"><label class="rt-data">Aula de <input type="date" data-rtdata value="' + dataRoteiroPadrao() + '"></label>' +
+      '<button type="button" class="rt-btn forte" data-rtsalva title="Guarda esta ordem para a aula da data escolhida">Salvar ordem</button></div>' +
+      '<details class="pl-saidas pl-mais"><summary class="rt-btn">⋯ Mais</summary><div class="pl-mais-menu"><button type="button" class="rt-btn" data-rtcopia>📋 Copiar ordem</button>' +
+      '<button type="button" class="rt-btn" data-rtpdf title="Grava o PDF da ordem na pasta da turma">💾 Salvar PDF na pasta da turma</button></div></details>') +
+    '</div>';
+  var topo = f.querySelector('.pl-topo');
+  if (topo) topo.insertAdjacentElement('afterend', poeDica(topo, 'O Planejador decide a ORDEM dos alunos nesta tela: por prioridade, ou a que você arrastar. "Salvar ordem" guarda essa fila para a aula do dia.'));
+  var bp = f.querySelector('[data-prio]');
+  if (bp) { bp.title = 'Atraso de conteúdo primeiro (4+ aulas = alta, 1 a 3 = média); dentro da faixa, quem espera a Exploration ou o Checking; faltas desempatam; mesma lição fica junta; atendidos e faltas no fim'; bp.addEventListener('click', function () { alternaPrioridade(); }); }
+  f.querySelector('[data-recarrega]').addEventListener('click', function () { recarregarFila(this); });
+  var bo = f.querySelector('[data-ontem]'); if (bo) bo.addEventListener('click', alternaOntem);
+  var bs = f.querySelector('[data-rtsalva]'); if (bs) bs.addEventListener('click', function () { salvarRoteiro(this); });
+  var bc = f.querySelector('[data-rtcopia]'); if (bc) bc.addEventListener('click', function () { copiarRoteiro(this); });
+  var bd = f.querySelector('[data-rtpdf]'); if (bd) bd.addEventListener('click', function () { pdfRoteiro(this); });
+  f.hidden = false;
+}
+function dataRoteiro() { var i = document.querySelector('[data-rtdata]'); return (i && i.value) || hojeIsoTH(); }
+function ordemRoteiro() {
+  return estado.alunos.filter(function (a) { return !faltouHoje(a); }).map(function (a) {
+    var pr = null; try { pr = prioDados(a); } catch (e) {}
+    return { nome: String(a.nome || '').replace(/\s*\([^)]*\)/g, '').trim(), raf: a.raf, nivel: (pr && pr.nivel) || (a._plan && a._plan.nivel) || '', nota: ((estado.dados[a.raf] || {}).planner || {}).obs || '', a: a };
+  });
+}
+function salvarRoteiro(bt) {
+  var ordem = ordemRoteiro(); if (!ordem.length) return;
+  var data = dataRoteiro(), velho = bt.textContent;
+  bt.disabled = true; bt.textContent = 'Salvando…';
+  return post({ action: 'planejamentoSalva', escola: estado.escola, prof: estado.prof, turma: estado.turma, data: data,
+    ordem: ordem.map(function (o) { return { nome: o.nome, nivel: o.nivel, atividade: '', nota: '' }; }) })
+    .then(function (r) {
+      bt.textContent = '✓ Ordem salva para ' + String(r.data || data).split('-').reverse().slice(0, 2).join('/');
+      if ((r.data || data) === hojeIsoTH()) estado.plano = { data: r.data || data, hoje: true, quem: r.quem || '', ordem: ordem.map(function (o) { return { nome: o.nome, nivel: o.nivel }; }) };
+      setTimeout(function () { bt.disabled = false; bt.textContent = velho; if ((r.data || data) === hojeIsoTH()) { aplicarFila(); pintaFila(); desenharTurma(); } }, 2200);
+      return r;
+    }).catch(function (e) { bt.disabled = false; bt.textContent = velho; toast('⚠️ Não salvou a ordem (' + e.message + ').'); });
+}
+function textoRoteiro() {
+  var d = dataRoteiro().split('-').reverse().join('/');
+  return 'Roteiro · ' + String(estado.turma || '').split('\n')[0] + ' · ' + d + '\n' + ordemRoteiro().map(function (o, i) { return (i + 1) + '. ' + o.nome; }).join('\n');
+}
+function copiarRoteiro(bt) {
+  var txt = textoRoteiro(), velho = bt.textContent;
+  var ok = function () { bt.textContent = '✓ Copiado'; setTimeout(function () { bt.textContent = velho; }, 1800); };
+  (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(txt) : Promise.reject()).then(ok).catch(function () {
+    var ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select();
+    var foi = false; try { foi = document.execCommand('copy'); } catch (e) {} ta.remove();
+    if (foi) ok(); else window.prompt('Copie o roteiro:', txt);
+  });
+}
+function tituloNomeTH(n) { return String(n || '').toLowerCase().replace(/(^|[\s'’-])([a-zà-ÿ])/g, function (m, sep, c) { return sep + c.toUpperCase(); }).trim().replace(/\.+$/, ''); }
+async function montarPdfRoteiro() {
+  var PDF = PDFLib, W = 540, H = 780, M = 26, CW = W - 2 * M;
+  var doc = await PDF.PDFDocument.create();
+  var helv = await doc.embedFont(PDF.StandardFonts.Helvetica), bold = await doc.embedFont(PDF.StandardFonts.HelveticaBold), ital = await doc.embedFont(PDF.StandardFonts.HelveticaOblique);
+  var PILL_L = PDF.rgb(0.855, 0.925, 0.98), BD = PDF.rgb(0.169, 0.302, 0.439), DARK = PDF.rgb(0.133, 0.243, 0.353), SOFT = PDF.rgb(0.949, 0.965, 0.98),
+      INK = PDF.rgb(0.12, 0.12, 0.12), GRAY = PDF.rgb(0.42, 0.46, 0.5), WHITE = PDF.rgb(1, 1, 1);
+  var PRICO = { alta: PDF.rgb(0.75, 0.22, 0.17), media: PDF.rgb(0.72, 0.53, 0.04), emdia: PDF.rgb(0.15, 0.53, 0.43) };
+  var page, y;
+  function um(t) { return String(t == null ? '' : t).replace(/\s+/g, ' ').trim().replace(/[^\x20-\x7e\xa0-\xff]/g, ''); }
+  function fit(t, f, s, max) { t = um(t); while (t.length > 1 && f.widthOfTextAtSize(t, s) > max) t = t.slice(0, -2) + '…'; return t; }
+  function wrap(t, f, s, max) { var out = [], a = ''; um(t).split(' ').forEach(function (w) { var tt = a ? a + ' ' + w : w; if (f.widthOfTextAtSize(tt, s) > max) { if (a) out.push(a); a = w; } else a = tt; }); if (a) out.push(a); return out; }
+  function caixa(x, top, w, h, o) { page.drawRectangle(Object.assign({ x: x, y: top - h, width: w, height: h }, o)); }
+  function nova(primeira) {
+    page = doc.addPage([W, H]); y = H - M;
+    if (primeira) {
+      caixa(M, y, CW, 26, { color: PILL_L, borderColor: BD, borderWidth: 1 });
+      var t = 'ROTEIRO DE ATENDIMENTO'; page.drawText(t, { x: (W - bold.widthOfTextAtSize(t, 12.5)) / 2, y: y - 17, size: 12.5, font: bold, color: DARK }); y -= 36;
+      [['Professor(a): ', tituloNomeTH(estado.prof)], ['Turma: ', String(estado.turma || '').split('\n')[0]], ['Data da aula: ', dataRoteiro().split('-').reverse().join('/')]].forEach(function (c) {
+        page.drawText(c[0], { x: M, y: y - 10, size: 9.5, font: bold, color: INK });
+        page.drawText(fit(c[1], helv, 9.5, CW - 90), { x: M + bold.widthOfTextAtSize(c[0], 9.5), y: y - 10, size: 9.5, font: helv, color: INK }); y -= 15;
+      });
+      y -= 8;
+    }
+    caixa(M, y, CW, 15, { color: PILL_L, borderColor: BD, borderWidth: 1 });
+    page.drawText('#', { x: M + 7, y: y - 10.5, size: 8, font: bold, color: DARK });
+    page.drawText('ALUNO', { x: M + 30, y: y - 10.5, size: 8, font: bold, color: DARK });
+    page.drawText('ONDE ESTÁ NO PLANNER', { x: M + 232, y: y - 10.5, size: 8, font: bold, color: DARK });
+    y -= 18;
+  }
+  nova(true);
+  ordemRoteiro().forEach(function (o, i) {
+    var a = o.a, plano = planoDe(a.book), onde = '';
+    try { var ps = posicaoDe(a, plano, ctxDe(a)); onde = (a.book ? a.book + ' · ' : '') + ps.rot + (ps.tema ? ' · ' + ps.tema : ''); } catch (e) {}
+    var atras = Number(a.aulasAtraso) || 0; if (atras > 0) onde += ' · ' + atras + ' aula' + (atras === 1 ? '' : 's') + ' atrás';
+    var L = wrap(onde, helv, 8, CW - 238), N = o.nota ? wrap(o.nota, ital, 7.5, CW - 238) : [];
+    var h = Math.max(24, 12 + L.length * 10 + N.length * 9 + 4);
+    if (y - h < M + 8) nova(false);
+    if (i % 2 === 1) caixa(M, y, CW, h, { color: SOFT });
+    caixa(M + 3, y - (h - 17) / 2, 17, 17, { color: PRICO[o.nivel] || GRAY });
+    var rs = String(i + 1); page.drawText(rs, { x: M + 3 + (17 - bold.widthOfTextAtSize(rs, 9)) / 2, y: y - (h - 17) / 2 - 12, size: 9, font: bold, color: WHITE });
+    page.drawText(fit(o.nome, bold, 9.5, 196), { x: M + 30, y: y - 14, size: 9.5, font: bold, color: INK });
+    var yy = y - 14;
+    L.forEach(function (l) { page.drawText(l, { x: M + 232, y: yy, size: 8, font: helv, color: INK }); yy -= 10; });
+    N.forEach(function (l) { page.drawText(l, { x: M + 232, y: yy, size: 7.5, font: ital, color: GRAY }); yy -= 9; });
+    y -= h + 3;
+  });
+  return await doc.save();
+}
+function pdfRoteiro(bt) {
+  if (!window.PDFLib) { toast('⚠️ A biblioteca de PDF não carregou. Recarregue a página.'); return; }
+  if (typeof fiskEnviarParaPasta !== 'function') { toast('⚠️ O envio ao Drive não carregou. Recarregue a página.'); return; }
+  var prof = tituloNomeTH(estado.prof), dm = dataRoteiro().split('-').reverse().slice(0, 2).join('.');
+  fiskEnviarParaPasta(bt, async function () {
+    var bytes = await montarPdfRoteiro();
+    return { token: token(), tipo: 'turma', escola: estado.escola, professor: estado.prof, turma: estado.turma,
+      filename: 'Plano de aula do dia ' + dm + (prof ? ' - Prof ' + prof : '') + '.pdf', bytes: bytes,
+      substituiPrefixo: 'Plano de aula do dia ', substituiSufixo: prof ? (' - Prof ' + prof + '.pdf') : '.pdf' };
+  }).catch(function () {});
+}
+/* ── recarregar a fila (Pedro, 14/09/2026) ──
+   O professor abre a Turma, percebe que não fez o plano, monta a fila no
+   Planejador (outra aba) e volta: a ordem, as anotações e as marcas são lidas
+   de novo sem recarregar a página (os atendidos ficam). Pelo botão, ou
+   sozinho ao voltar para esta aba depois de ter aberto o Planejador por aqui. */
+function recarregarFila(bt) {
+  if (!estado.alunos.length || estado.recarregando) return;
+  if (bt && estado.aberto && !window.confirm('Há um Checking aberto: recarregar descarta o que ainda não foi registrado. Continuar?')) return;
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur();   /* a anotação em digitação salva antes */
+  estado.recarregando = true;
+  if (bt) { bt.disabled = true; bt.textContent = '↻ Recarregando…'; }
+  var turma = estado.turma, escola = estado.escola, prof = estado.prof;
+  Promise.all([
+    post({ action: 'plannerTurma', alunos: estado.alunos.map(function (a) { return { raf: a.raf, book: a.book, turma: turma }; }) }),
+    post({ action: 'planejamentoLe', escola: escola, prof: prof, turma: turma }).catch(function () { return { plano: null }; })
+  ]).then(function (rs) {
+    if (estado.turma !== turma || estado.escola !== escola) return;
+    estado.dados = rs[0].alunos || estado.dados;
+    estado.recursos = rs[0].recursos || estado.recursos;
+    estado.plano = rs[1] && rs[1].plano || null;
+    estado.atendidos = lerAtendidos();
+    aplicarFila(); pintaFila(); desenharTurma();
+    if (aguia.ov) desenhaAguia();
+    toast(estado.plano ? '✓ Fila do Planejador e anotações atualizadas' : 'Ainda não há fila salva no Planejador para esta turma');
+  }).catch(function (e) {
+    if (bt) { bt.disabled = false; bt.textContent = '↻ Recarregar'; }
+    toast('⚠️ Não recarreguei: ' + e.message);
+  }).then(function () { estado.recarregando = false; });
+}
+document.addEventListener('visibilitychange', function () {
+  if (document.visibilityState !== 'visible' || !estado.foiAoPlanejador) return;
+  estado.foiAoPlanejador = false;
+  if (estado.aberto || aguia.ov) return;   /* não mexe na tela com um Checking ou o planner completo abertos */
+  recarregarFila(null);
+});
+/* O cartão DESCE à vista (Pedro, 14/09/2026): antes a lista era redesenhada e
+   o cartão sumia do lugar de uma vez. Agora cada cartão guarda onde estava,
+   a lista é redesenhada na ordem nova, e todos deslizam da posição antiga
+   para a nova (FLIP): o atendido desce por cima, com sombra, e os outros
+   sobem. Quem pediu menos movimento no sistema vê a troca direta. */
+function atender(a) {
+  if (estado.atendidos[a.raf]) delete estado.atendidos[a.raf]; else estado.atendidos[a.raf] = Date.now();
+  guardaAtendidos();
+  reordenaComAnimacao(a, true);
+}
+function reordenaComAnimacao(a, foiAtender) {
+  var antes = {};
+  document.querySelectorAll('#alunos .al').forEach(function (el) { antes[el.dataset.raf] = el.getBoundingClientRect().top; });
+  if (estado.prioridade) ordenarPorPrioridade(); else aplicarFila(); desenharTurma(); pintaFila();
+  var quieto = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var cartoes = Array.prototype.slice.call(document.querySelectorAll('#alunos .al'));
+  var maior = 0;
+  if (!quieto) {
+    cartoes.forEach(function (el) {
+      var t0 = antes[el.dataset.raf]; if (t0 == null) return;
+      var dy = t0 - el.getBoundingClientRect().top; if (Math.abs(dy) < 1) return;
+      maior = Math.max(maior, Math.abs(dy));
+      el.style.transition = 'none'; el.style.transform = 'translateY(' + dy + 'px)';
+      if (el.dataset.raf === a.raf) { el.style.position = 'relative'; el.style.zIndex = '3'; el.style.boxShadow = '0 22px 48px rgba(15,31,78,.28)'; }
+    });
+    void document.body.offsetHeight;   /* o navegador pinta a posição antiga antes de soltar */
+    var dur = Math.min(1500, 650 + maior / 8);
+    cartoes.forEach(function (el) {
+      if (!el.style.transform) return;
+      el.style.transition = 'transform ' + dur + 'ms cubic-bezier(.3,.7,.25,1), box-shadow ' + dur + 'ms ease';
+      el.style.transform = '';
+      if (el.dataset.raf === a.raf) el.style.boxShadow = '';
+    });
+    setTimeout(function () { cartoes.forEach(function (el) { el.style.transition = ''; el.style.position = ''; el.style.zIndex = ''; el.style.boxShadow = ''; }); }, dur + 60);
+  }
+  /* depois que ele desceu, o próximo da fila fica à vista */
+  if (estado.atendidos[a.raf] || faltouHoje(a)) setTimeout(function () {
+    var prox = document.querySelector('#alunos .al:not(.atendido):not(.faltou)');
+    if (prox) { var r = prox.getBoundingClientRect(); if (r.top < 0 || r.top > window.innerHeight * .6) prox.scrollIntoView({ block: 'start', behavior: quieto ? 'auto' : 'smooth' }); }
+  }, quieto ? 0 : Math.min(1500, 650 + maior / 8) + 80);
+}
+
+function sessao() { try { return JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) { return null; } }
+function token() { var s = sessao(); return (s && s.token) || ''; }
+function status(msg, err) { var el = $('status'); el.textContent = msg || ''; el.className = 'status' + (err ? ' err' : ''); el.hidden = !msg; }
+function get(params) {
+  params.token = token();
+  var qs = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
+  return fetch(EP + '?' + qs).then(fiskJson).then(function (j) { if (j && (j.erro || j.error)) throw new Error(j.erro || j.error); return j; });
+}
+function post(body) {
+  body.token = token();
+  if (body.action === 'plannerProf' && estado.plantao) body.semCard = true;
+  if ((body.action === 'plannerProf' || body.action === 'plannerFalta') && estado.ontem && !estado.plantao) body.data = ontemIsoTH();
+  if (body.action === 'plannerFalta' && !body.quem) body.quem = (sessao() || {}).name || estado.prof || '';   /* plantão não é aula: o card não muda (Pedro, 16/09/2026) */
+  return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
+    .then(fiskJson).then(function (j) { if (!j || j.ok === false) throw new Error((j && (j.erro || j.error)) || 'Não consegui.'); return j; });
+}
+/* o "?" e o texto que ele abre: o texto nasce escondido e aparece só quando alguém pergunta */
+function poeDica(onde, texto) {
+  var b = document.createElement('button'); b.type = 'button'; b.className = 'dica'; b.textContent = '?';
+  b.setAttribute('aria-label', 'O que é isto'); b.title = texto;
+  var tx = document.createElement('div'); tx.className = 'dica-tx'; tx.textContent = texto; tx.hidden = true;
+  b.addEventListener('click', function (ev) { ev.preventDefault(); ev.stopPropagation(); tx.hidden = !tx.hidden; });
+  onde.appendChild(b);
+  return tx;
+}
+function toast(msg) { var t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 3200); }
+function esc(s) { return fiskEsc(String(s == null ? '' : s)); }
+function planoDe(book) { return window[planoGlobal(book)] || null; }
+
+/* ── a cascata, a mesma do Planejador ── */
+function montarSelect(sel, ph, itens) {
+  sel.innerHTML = '<option value="" disabled selected>' + ph + '</option>' +
+    itens.map(function (i) { return '<option value="' + esc(i.v) + '">' + esc(i.t) + '</option>'; }).join('');
+  sel.disabled = false;
+}
+/* O PILOTO (Pedro, 14/09/2026): a direção e o professor de teste. A mesma lista do card no index.html */
+var TURMA_HOJE_PILOTO = ['CARLOS ALBERTO'];
+function turmaHojeLiberada() {
+  var s = sessao() || {};
+  var n = function (v) { return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); };
+  /* O LANÇAMENTO (Pedro, 16/09/2026): quinta 17/09, 13h15 em Caçapava e 17h30 em Taubaté (a mesma regra do index.html) */
+  var abreEm = { 'CACAPAVA': Date.parse('2026-09-17T13:15:00-03:00'), 'TAUBATE': Date.parse('2026-09-17T17:30:00-03:00') }, agora = Date.now();
+  if (String(s.escolas || s.escola || '').split(',').some(function (e) { return agora >= (abreEm[n(e).replace(/[^A-Z]/g, '')] || Infinity); })) return true;
+  return !!(s.master || TURMA_HOJE_PILOTO.some(function (p) { return n(p) === n(s.name) || n(s.name).indexOf(n(p) + ' ') === 0; }));   /* "Carlos Alberto da Silva" também */
+}
+function initCascata() {
+  if (!turmaHojeLiberada()) { status('🔒 A Minha aula está em piloto com um professor de teste. Em breve para todos.', true); return; }
+  var selEscola = $('selEscola'), selProf = $('selProf'), selTurma = $('selTurma');
+  /* quem entrou já diz a escola e o professor (pedido do Pedro, 13/09): a
+     cascata se preenche sozinha e só a turma fica para escolher; e se o
+     relógio bate com o horário de uma turma, ela já vem escolhida */
+  var s = sessao() || {};
+  var eu = s.master ? (function () { try { return (JSON.parse(localStorage.getItem('fisk_actas') || 'null') || {}).name || ''; } catch (e) { return ''; } })() : (s.name || '');
+  var minhas = Array.isArray(s.escolas) ? s.escolas : (s.escolas ? String(s.escolas).split(/[,;]/).map(function (x) { return x.trim(); }) : []);
+  /* RÁPIDO (Pedro, 15/09/2026): as listas de escolas, professores e turmas ficam guardadas no aparelho e a cascata se
+     monta na hora com elas; a leitura do card corre por trás e só troca as opções se algo mudou. A escola e o professor
+     vêm de quem entrou; a turma, SÓ pelo horário: fora da aula nenhuma turma abre sozinha (a última vista não volta mais). */
+  var LISTA_V = 'th:lista:';
+  function lista(chave, params, campo, pinta) {
+    var guardada = null;
+    try { guardada = JSON.parse(localStorage.getItem(LISTA_V + chave) || 'null'); } catch (e) {}
+    if (guardada && guardada.length) pinta(guardada, true);
+    get(params).then(function (j) {
+      var nova = j[campo] || [];
+      try { localStorage.setItem(LISTA_V + chave, JSON.stringify(nova)); } catch (e) {}
+      if (!guardada || JSON.stringify(guardada) !== JSON.stringify(nova)) pinta(nova, false);
+    }).catch(function (e) { if (!guardada) erro(e); });
+  }
+  function escolhe(sel, valor) {
+    if (!valor || !Array.prototype.some.call(sel.options, function (o) { return o.value === String(valor); })) return false;
+    if (sel.value === String(valor)) return true;
+    sel.value = String(valor); sel.dispatchEvent(new Event('change')); return true;
+  }
+  selEscola.addEventListener('change', function () {
+    if (!selEscola.value) return;
+    var escola = selEscola.value;
+    carregaLC(escola);
+    /* aluno trazido pela busca é da OUTRA escola: some junto com a troca (auditoria de 15/09/2026) */
+    if (estado.escola && estado.escola !== escola && estado.visitantes.length) { estado.visitantes = []; estado.alunos = estado.alunos.filter(function (a) { return !a.visitante; }); }
+    selProf.innerHTML = '<option value="" disabled selected>Carregando…</option>'; selProf.disabled = true;
+    selTurma.innerHTML = '<option value="" disabled selected>Turma…</option>'; selTurma.disabled = true;
+    lista('profs:' + escola, { action: 'card', fn: 'profs', escola: escola }, 'profs', function (profs) {
+      if (selEscola.value !== escola) return;
+      var antes = selProf.value;
+      montarSelect(selProf, 'Escolha o professor(a)…', profs.map(function (p) { return { v: p, t: p }; }));
+      if (antes && profs.indexOf(antes) > -1) { selProf.value = antes; return; }
+      var meu = profs.find(function (p) { return eu && p.toLowerCase() === eu.toLowerCase(); }) || profs.find(function (p) { return eu && p.toLowerCase().indexOf(eu.toLowerCase().split(' ')[0]) === 0; });
+      var ult = fiskUltimaTurma();
+      escolhe(selProf, meu || (ult && ult.escola === escola && ult.prof));
+    });
+  });
+  selProf.addEventListener('change', function () {
+    if (!selProf.value) return;
+    var escola = selEscola.value, prof = selProf.value;
+    selTurma.innerHTML = '<option value="" disabled selected>Carregando…</option>'; selTurma.disabled = true;
+    lista('turmas:' + escola + '|' + prof, { action: 'card', fn: 'turmas', escola: escola, prof: prof }, 'turmas', function (turmas, doCache) {
+      if (selEscola.value !== escola || selProf.value !== prof) return;
+      var antes = selTurma.value;
+      montarSelect(selTurma, 'Escolha a turma…', [{ v: PLANTAO, t: '🙋 Plantão de dúvidas (alunos da escola, pela busca)' }].concat(turmas.map(function (t) { return { v: t.linhaTitulo, t: t.titulo }; })));
+      if (antes && (antes === PLANTAO || turmas.some(function (t) { return String(t.linhaTitulo) === antes; }))) { selTurma.value = antes; return; }
+      var agora = turmaDoHorario(turmas);
+      /* o horário do plantão escrito no card ("LC FIXO - 5ª 15h às 17h30") abre o plantão, não a lista daquela linha */
+      /* a tabela das Learning Center sessions diz quem é monitor e quando (Pedro, 16/09/2026) */
+      var lc = lcAgora(escola, prof);
+      if (lc) { status('🙋 Learning Center session (' + lc.inicio + (lc.fim ? '–' + lc.fim : '') + '): busque cada aluno pelo nome ou RAF.'); escolhe(selTurma, PLANTAO); return; }
+      if (agora && ehPlantao(agora.titulo)) { status('🕒 Horário do plantão de dúvidas.'); escolhe(selTurma, PLANTAO); return; }
+      if (agora) { status('🕒 Turma do horário de agora: ' + agora.titulo.split('\n')[0] + '. Troque acima se for outra.'); escolhe(selTurma, agora.linhaTitulo); return; }
+      if (ehMonitor(prof)) { status('🙋 Plantão de dúvidas: busque cada aluno pelo nome ou RAF.'); escolhe(selTurma, PLANTAO); return; }
+      if (!doCache) status('Fora do horário de aula de ' + prof + ': escolha a turma acima.');
+      else status('Fora do horário de aula de ' + prof + ': escolha a turma acima.');
+    });
+  });
+  selTurma.addEventListener('change', function () {
+    if (!selTurma.value) return;
+    var titulo = selTurma.options[selTurma.selectedIndex].text;
+    if (selTurma.value === PLANTAO) { carregarPlantao(selEscola.value, selProf.value); return; }
+    fiskLembrarTurma(selEscola.value, selProf.value, selTurma.value, titulo);
+    carregarTurma(selEscola.value, selProf.value, selTurma.value, titulo);
+  });  /* a primeira lista vem DEPOIS dos três listeners: do cache ela escolhe na hora, e o change precisa de quem ouvir */
+  lista('escolas', { action: 'card', fn: 'escolas' }, 'escolas', function (escolas) {
+    var antes = selEscola.value;
+    montarSelect(selEscola, 'Escolha a escola…', escolas.map(function (e) { return { v: e, t: e }; }));
+    var minha = escolas.find(function (e) { return minhas.some(function (m) { return m && e.toLowerCase().indexOf(m.toLowerCase()) > -1; }); }) || (escolas.length === 1 ? escolas[0] : '');
+    if (antes && escolas.indexOf(antes) > -1) { selEscola.value = antes; return; }
+    var ult = fiskUltimaTurma();
+    escolhe(selEscola, minha || (ult && ult.escola));
+  });
+
+}
+/* O HORÁRIO DA TURMA, lido do título do card (Pedro, 15/09/2026: abrir sozinho a turma da aula de agora).
+   Os títulos são escritos à mão e variam: "ADVANCED - 2ª/4ª 17h30 às 18h45", "Básico (+18) - 4ª 18h45/21h15",
+   "Teens Connect 2 - Sáb - 10:30 ás 13:00", "Acadêmico Essentials 1- 2/4ª 17h30 as 18h45", "INTER/ADV - 5º 8h30 às 11h",
+   "Basic (+18) - Sábado 08h/10h30", "Teens Elementary 2 Acad - 5ª 08h30 às 11". Devolve {dias:[0-6], ini, fim} em minutos, ou null. */
+function horarioDaTurma(titulo) {
+  var t = String(titulo || '').split(/\n/)[0].replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ').trim();
+  var mT = /(\d{1,2})\s*(?:[h:]|hr)\s*(\d{2})?/i.exec(t);
+  if (!mT) return null;
+  var antes = t.slice(0, mT.index), depois = t.slice(mT.index);
+  var PAL = { 'dom': 0, 'seg': 1, 'segunda': 1, 'ter': 2, 'terca': 2, 'qua': 3, 'quarta': 3, 'qui': 4, 'quinta': 4, 'sex': 5, 'sexta': 5, 'sab': 6, 'sabado': 6 };
+  var pedacos = antes.split(/\s[-–]\s?|[-–]\s|\s[-–]/).map(function (p) { return p.trim(); }).filter(Boolean);
+  var dias = [];
+  for (var i = pedacos.length - 1; i >= 0 && !dias.length; i--) {
+    var p = pedacos[i].normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    (p.match(/[a-z]+/g) || []).forEach(function (w) { if (w in PAL && dias.indexOf(PAL[w]) < 0) dias.push(PAL[w]); });
+    if (/[ªº°]|\d[aA]?\s*(\/|e\s)\s*\d/.test(pedacos[i])) (pedacos[i].match(/[2-7](?=\s*(?:[ªº°aA]|\/|e\s|$))/g) || []).forEach(function (d) { var n = (+d) - 1; if (dias.indexOf(n) < 0) dias.push(n); });
+  }
+  if (!dias.length) return null;
+  var horas = [], re = /(\d{1,2})\s*(?:(?:[h:]|hr)\s*(\d{2})?h?|(?=\s*$))/gi, m;
+  while ((m = re.exec(depois)) && horas.length < 2) { var h = +m[1], mi = +(m[2] || 0); if (h <= 23 && mi < 60) horas.push(h * 60 + mi); }
+  if (!horas.length) return null;
+  var ini = horas[0], fim = horas[1] && horas[1] > ini ? horas[1] : ini + (dias.length > 1 ? 75 : 150);
+  return { dias: dias.sort(), ini: ini, fim: fim };
+}
+/* A turma da aula de AGORA: a que está acontecendo (do início ao fim), ou a que começa nos próximos 20 minutos.
+   Em aulas seguidas (17h30 às 18h45 e 18h45 às 20h) vale a que já começou. Fora do horário, nenhuma. */
+function turmaDoHorario(turmas) {
+  var d = new Date(), dia = d.getDay(), min = d.getHours() * 60 + d.getMinutes(), logo = null;
+  for (var i = 0; i < turmas.length; i++) {
+    var h = horarioDaTurma(turmas[i].titulo);
+    if (!h || h.dias.indexOf(dia) < 0) continue;
+    if (min >= h.ini && min < h.fim) return turmas[i];
+    if (!logo && min >= h.ini - 20 && min < h.ini) logo = turmas[i];
+  }
+  return logo;
+}
+function erro(e) {
+  var msg = (e && e.message) || 'erro';
+  if (/sess[ãa]o/i.test(msg)) {
+    $('status').className = 'status err'; $('status').hidden = false;
+    $('status').innerHTML = '⚠️ ' + esc(msg) + ' <a href="index.html" style="font-weight:800">Entrar de novo →</a>';
+    return;
+  }
+  status('⚠️ ' + msg, true);
+}
+
+/* ── a turma: os alunos do card (com RAF) e o planner de cada um ── */
+function carregarTurma(escola, prof, linha, titulo) {
+  estado.escola = escola; estado.prof = prof; estado.turma = titulo; estado.plantao = false; estado.prioridade = false; estado.ontem = false;
+  $('alunos').innerHTML = ''; $('resumo').hidden = true; $('legenda').hidden = true;
+  status('🔄 Lendo a turma no card…');
+  /* o panorama é rota de GET no backend (doGet); por POST ele cai na guarda
+     genérica de chave e volta "chave inválida" */
+  get({ action: 'panoramaProf', escola: escola, prof: prof }).then(function (j) {
+    var turmaPan = (j.turmas || []).find(function (t) { return String(t.linhaTitulo) === String(linha); });
+    var nomeTurma = turmaPan ? turmaPan.turma : titulo;
+    var alunos = (j.alunos || []).filter(function (a) { return !a.saiu && (a.turma === nomeTurma || a.turma === titulo); });
+    if (!alunos.length) { status('Nenhum aluno ativo nesta turma no card.'); return; }
+    var semRaf = alunos.filter(function (a) { return !a.raf; });
+    estado.alunos = alunos.filter(function (a) { return a.raf; });
+    status('🔄 ' + estado.alunos.length + ' alunos. Lendo o planner de cada um…');
+    estado.turma = nomeTurma; estado.atendidos = lerAtendidos();
+    var livros = {}; estado.alunos.forEach(function (a) { if (a.book) livros[livroId(a.book)] = a.book; });
+    /* telefone, aniversário e as células de avaliação (o Gerador de Boletins
+       escreve lá) vêm da mesma leitura da turma que o Planejador usa; corre
+       por fora e só o planner completo espera por ela */
+    estado.pessoais = null;
+    get({ action: 'card', fn: 'turma', escola: escola, prof: prof, linha: linha }).then(function (j) {
+      if (estado.escola !== escola || estado.prof !== prof) return;
+      estado.pessoais = (j && j.alunos) || [];
+      if (aguia.ov) desenhaAguia();
+    }).catch(function (e) { console.warn('card fn=turma', e); estado.pessoais = []; });
+    return Promise.all([
+      post({ action: 'plannerTurma', alunos: estado.alunos.map(function (a) { return { raf: a.raf, book: a.book, turma: nomeTurma }; }) }),
+      post({ action: 'planejamentoLe', escola: escola, prof: prof, turma: nomeTurma }).catch(function () { return { plano: null }; }),
+      Promise.all(Object.keys(livros).map(function (k) { return carregaPlano(livros[k]); }))
+    ]).then(function (rs) {
+        /* o visitante fica na tela ao trocar de turma: o planner dele NÃO pode ser apagado pela leitura da turma nova
+           (auditoria de 15/09/2026: o cartão voltava para a Introduction e a marca ia para a lição errada) */
+        var antes = estado.dados || {};
+        estado.dados = rs[0].alunos || {};
+        estado.visitantes.forEach(function (v) { if (!estado.dados[v.raf] && antes[v.raf]) estado.dados[v.raf] = antes[v.raf]; });
+        estado.recursos = rs[0].recursos || [];
+        estado.plano = rs[1] && rs[1].plano || null;
+        aplicarFila();
+        status(semRaf.length ? semRaf.length + ' aluno(s) sem RAF no card ficaram de fora.' : '');
+        $('legenda').hidden = false;
+        pintaFila();
+        juntaVisitantes();
+        desenharTurma();
+      });
+  }).catch(erro);
+}
+
+/* ── OUTRO ALUNO NA TURMA (Pedro, 15/09/2026) ──
+   Turmas juntadas por falta: o professor busca por nome ou RAF (a mesma busca do Dossiê, `alunoBusca`, na lista de
+   matrículas) e o aluno entra no FIM da lista, com borda roxa, sem tirar ninguém da turma. Fica enquanto a tela
+   estiver aberta, inclusive se trocar de turma; "Tirar da tela" só esconde (nada é apagado). */
+/* O PLANTÃO DE DÚVIDAS (Pedro, 15/09/2026). O monitor atende alunos de todas as turmas da unidade: não há lista
+   do card, a tela abre vazia e cada aluno entra pela busca, NA ORDEM em que foi chamado; "Aluno atendido" desce
+   para o fim, como na turma. A opção existe para todo professor (quem cobre o plantão um dia também usa); para
+   os monitores da lista abaixo ela vem escolhida fora do horário de aula, e para qualquer um no horário de uma
+   linha "LC"/"Plantão" do card. */
+var PLANTAO = '__plantao';
+var MONITORES = [];   /* nomes das contas dos monitores, como no login do Hub (ex.: 'NICOLE'); vazio até o Pedro dizer quem são */
+function nPessoa(v) { return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
+/* OS MONITORES SÃO A TABELA DO LEARNING CENTER (Pedro, 16/09/2026): a mesma grade que o aluno vê no portal
+   (rota aberta plantaoList). Quem está na grade num horário é monitor naquele horário; a Turma de hoje abre
+   no plantão. A grade fica guardada no aparelho e é relida a cada visita. */
+var LC = {};
+function carregaLC(escola) {
+  try { var c = JSON.parse(localStorage.getItem('th:lc:' + escola) || 'null'); if (c) LC[escola] = c; } catch (e) {}
+  fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'plantaoList', unidade: escola }) })
+    .then(fiskJson).then(function (j) {
+      if (!j || !j.ok) return;
+      LC[escola] = j.itens || [];
+      try { localStorage.setItem('th:lc:' + escola, JSON.stringify(LC[escola])); } catch (e) {}
+    }).catch(function () {});
+}
+function mesmaPessoa(tabela, prof) {
+  var t = nPessoa(tabela).replace(/^(PROF(A|ESSORA?)?\.?\s+|TEACHER\s+)/, ''), p = nPessoa(prof);
+  if (!t || !p) return false;
+  if (t === p || p.indexOf(t + ' ') === 0 || t.indexOf(p + ' ') === 0) return true;
+  /* a grade costuma trazer só o primeiro nome ("Nicole") */
+  return t.indexOf(' ') < 0 && p.split(' ')[0] === t;
+}
+function lcAgora(escola, prof) {
+  var itens = LC[escola] || [], s = sessao() || {};
+  var d = new Date(), dia = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'][d.getDay()], min = d.getHours() * 60 + d.getMinutes();
+  var mm = function (h) { var m = /^(\d{1,2}):(\d{2})/.exec(String(h || '')); return m ? (+m[1]) * 60 + (+m[2]) : null; };
+  return itens.find(function (it) {
+    if (it.dia !== dia || !(mesmaPessoa(it.professor, prof) || mesmaPessoa(it.professor, s.name))) return false;
+    var ini = mm(it.inicio), fim = mm(it.fim); if (ini == null) return false; if (fim == null) fim = ini + 75;
+    return min >= ini - 10 && min < fim;
+  }) || null;
+}
+/* os monitores da grade também dão aula: fora do horário de LC eles caem na turma deles, e não no plantão */
+function ehMonitor(prof) { return ehMonitor0(prof); }
+function ehMonitor0(prof) { var s = sessao() || {}; return MONITORES.some(function (m) { var x = nPessoa(m); return x && (x === nPessoa(prof) || x === nPessoa(s.name) || nPessoa(s.name).indexOf(x + ' ') === 0); }); }
+function ehPlantao(titulo) { return /\bLC\b|plant[aã]o|learning\s*center|centro de estudos/i.test(String(titulo || '')); }
+function carregarPlantao(escola, prof) {
+  estado.escola = escola; estado.prof = prof; estado.turma = 'Plantão de dúvidas'; estado.plantao = true; estado.prioridade = false; estado.ontem = false;
+  estado.alunos = []; estado.dados = estado.dados || {}; estado.plano = null; estado.pessoais = [];
+  estado.atendidos = lerAtendidos();
+  juntaVisitantes(); aplicarFila();
+  $('fila').hidden = true; $('legenda').hidden = false;
+  status('🙋 Plantão de dúvidas em ' + escola + ': busque cada aluno pelo nome ou RAF em "Trazer outro aluno". Eles entram na ordem em que chegam.');
+  desenharTurma();
+  try { $('qAluno').focus(); } catch (e) {}
+}
+function juntaVisitantes() {
+  estado.visitantes.forEach(function (v) {
+    if (!estado.alunos.some(function (a) { return a.raf === v.raf; })) estado.alunos.push(v);
+  });
+}
+function trazerAluno(al) {
+  $('achadosAluno').hidden = true; $('qAluno').value = '';
+  var rafN = function (v) { return String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); };
+  var ja = estado.alunos.some(function (a) { return rafN(a.raf) === rafN(al.raf); });
+  if (ja) { var c = document.querySelector('.al[data-raf="' + al.raf + '"]'); if (c) { c.scrollIntoView({ behavior: 'smooth', block: 'start' }); } toast(al.name + ' já está na tela.'); return; }
+  if (!al.book) { toast('⚠️ ' + al.name + ' está sem livro na lista de matrículas.'); return; }
+  var v = { nome: al.name, raf: al.raf, book: al.book, turma: al.turma, visitante: true, _pos: 1000 + estado.visitantes.length };
+  status('🔄 Lendo o planner de ' + al.name + '…');
+  estado.dados = estado.dados || {};
+  Promise.all([
+    post({ action: 'plannerTurma', alunos: [{ raf: al.raf, book: al.book, turma: al.turma }] }),
+    carregaPlano(al.book)
+  ]).then(function (rs) {
+    Object.assign(estado.dados, rs[0].alunos || {});
+    if (!estado.recursos || !estado.recursos.length) estado.recursos = rs[0].recursos || [];
+    estado.visitantes.push(v); estado.alunos.push(v);
+    status('');
+    $('legenda').hidden = false;
+    desenharTurma();
+    var c = document.querySelector('.al[data-raf="' + al.raf + '"]'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }).catch(function (e) { status(''); toast('⚠️ Não consegui abrir o planner de ' + al.name + ' (' + e.message + ').'); });
+}
+function tirarVisitante(raf) {
+  estado.visitantes = estado.visitantes.filter(function (v) { return v.raf !== raf; });
+  estado.alunos = estado.alunos.filter(function (a) { return !(a.visitante && a.raf === raf); });
+  desenharTurma();
+}
+(function () {
+  var q = $('qAluno'), box = $('achadosAluno'), timer = null, ultima = '';
+  function mostra(lista, termo) {
+    if (q.value.trim() !== termo) return;
+    box.hidden = false;
+    if (!lista.length) { box.innerHTML = '<div class="vazio">Nenhum aluno com esse nome ou RAF.</div>'; return; }
+    box.innerHTML = lista.map(function (a, i) {
+      return '<button type="button" data-i="' + i + '"><b>' + esc(a.name) + '</b><small>' + esc(a.raf) + ' · ' + esc(a.book || 'sem livro') + (a.turma ? ' · ' + esc(a.turma) : '') + '</small></button>';
+    }).join('');
+    box._lista = lista;
+  }
+  q.addEventListener('input', function () {
+    clearTimeout(timer);
+    var termo = q.value.trim();
+    if (termo.length < 3) { box.hidden = true; return; }
+    timer = setTimeout(function () {
+      ultima = termo;
+      box.hidden = false; box.innerHTML = '<div class="vazio">Procurando…</div>';
+      post({ action: 'alunoBusca', q: termo }).then(function (r) { mostra(r.alunos || [], termo); })
+        .catch(function (e) { if (q.value.trim() === termo) box.innerHTML = '<div class="vazio">⚠️ ' + esc(e.message) + '</div>'; });
+    }, 300);
+  });
+  box.addEventListener('click', function (ev) {
+    var b = ev.target.closest('button[data-i]'); if (!b) return;
+    trazerAluno(box._lista[+b.dataset.i]);
+  });
+  q.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape') { box.hidden = true; }
+    if (ev.key === 'Enter' && box._lista && box._lista.length === 1 && !box.hidden) { ev.preventDefault(); trazerAluno(box._lista[0]); }
+  });
+  document.addEventListener('click', function (ev) { if (!ev.target.closest('.busca-al')) box.hidden = true; });
+})();
+
+function ctxDe(a) {
+  var d = estado.dados[a.raf] || { planner: { itens: {}, checking: {} }, feitos: [], atividades: {}, evidencia: [], situacao: null };
+  return {
+    raf: a.raf, book: a.book,
+    salvar: function () {},   /* com `salvar` a régua lê as marcas do servidor, não do aparelho */
+    planner: { feitos: d.feitos || [], atividades: d.atividades || {}, evidencia: d.evidencia || [], plano: d.planner || { itens: {}, checking: {} }, simulados: d.simulados || [] },
+    cels: (d.situacao && d.situacao.cels) || [],
+    situacao: d.situacao || { ultimaLicao: a.ultimaLicao || '', licaoPrevista: a.licaoPrevista || '' }
+  };
+}
+function posicaoDe(a, plano, ctx) {
+  if (plano) { var p = PlannerV2.posicao(plano, ctx); return { id: p.etapa.id, rot: p.etapa.rot, tema: p.etapa.tema }; }
+  var cod = String((ctx.situacao && ctx.situacao.ultimaLicao) || a.ultimaLicao || '').toUpperCase();
+  return { id: cod, rot: cod ? (/^L\d+$/.test(cod) ? 'Lesson ' + cod.slice(1) : cod) : 'sem posição', tema: '' };
+}
+function licoesDoLivro(plano) {
+  if (plano) return plano.etapas.filter(function (e) { return e.aulas.some(function (au) { return au.checking; }); }).map(function (e) { return { v: e.id, t: e.rot + (e.tema ? ' · ' + e.tema : '') }; });
+  var out = []; for (var i = 1; i <= 12; i++) out.push({ v: 'L' + i, t: 'Lesson ' + i }); return out;
+}
+
+function desenharTurma() {
+  var caixa = $('alunos'); caixa.innerHTML = '';
+  var nCk = 0;
+  estado.alunos.forEach(function (a) { var cc = cartaoAluno(a); cc.dataset.raf = cc.dataset.raf || a.raf; caixa.appendChild(cc); var ck = (estado.dados[a.raf] || {}).planner; if (ck && ck.checking && Object.keys(ck.checking).some(function (k) { return ck.checking[k].feito; })) nCk++; });
+  $('resumo').hidden = false;
+  $('resumo').innerHTML = '<b>' + estado.alunos.length + '</b> alunos · <b>' + nCk + '</b> com Checking';   /* a turma já está no menu de cima */
+  /* o botão de prioridade mora na barra do roteiro (pintaFila), grande e numa linha só dele (16/09/2026) */
+  ligaArrastar(caixa);
+}
+/* ── ARRASTAR A ORDEM (pedido dos professores, 18/09/2026) ──
+   Voltou o que o Planejador tinha: o professor segura a alça ⠿ do cartão e arrasta para onde quiser, antes ou depois
+   de "Ordenar por prioridade" (a ferramenta sugere, o professor decide). Como os cartões são altos, há também ↑ ↓.
+   A ordem nova vale na hora; "Salvar ordem" guarda para a data escolhida, como sempre. */
+function aplicaOrdemDaTela(caixa) {
+  var pos = {}; caixa.querySelectorAll(':scope > .al').forEach(function (c, i) { pos[c.dataset.raf] = i; });
+  estado.alunos.sort(function (x, y) { return (pos[x.raf] == null ? 999 : pos[x.raf]) - (pos[y.raf] == null ? 999 : pos[y.raf]); });
+  if (estado.prioridade) estado.alunos.forEach(function (a, k) { a._rank = fimDe(a) ? null : k + 1; });
+  estado.ordemManual = true;
+  desenharTurma(); pintaFila();
+  toast('↕️ Ordem alterada. Toque em "Salvar ordem" para guardar para a aula.');
+}
+function ligaArrastar(caixa) {
+  caixa.querySelectorAll(':scope > .al').forEach(function (card) {
+    var sobe = card.querySelector('.mover .sobe'), desce = card.querySelector('.mover .desce'), alca = card.querySelector('.mover .arrasta');
+    if (sobe) sobe.addEventListener('click', function () { var p = card.previousElementSibling; if (p && p.classList.contains('al')) { caixa.insertBefore(card, p); aplicaOrdemDaTela(caixa); var n = caixa.querySelector('.al[data-raf="' + card.dataset.raf + '"]'); if (n) n.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } });
+    if (desce) desce.addEventListener('click', function () { var nx = card.nextElementSibling; if (nx && nx.classList.contains('al')) { caixa.insertBefore(nx, card); aplicaOrdemDaTela(caixa); var n = caixa.querySelector('.al[data-raf="' + card.dataset.raf + '"]'); if (n) n.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } });
+    if (!alca) return;
+    alca.addEventListener('pointerdown', function (ev) {
+      ev.preventDefault();
+      var y0 = ev.clientY, moveu = false, rolagem = null, ultimoY = ev.clientY;
+      try { alca.setPointerCapture(ev.pointerId); } catch (e) {}
+      card.classList.add('arrastando');
+      function troca(y) {
+        var r = card.getBoundingClientRect(), meio = r.top + r.height / 2;
+        var p = card.previousElementSibling, nx = card.nextElementSibling;
+        if (p && p.classList.contains('al')) { var rp = p.getBoundingClientRect(); if (meio < rp.top + Math.min(rp.height / 2, 160)) { caixa.insertBefore(card, p); y0 -= rp.height + 16; moveu = true; } }
+        if (nx && nx.classList.contains('al')) { var rn = nx.getBoundingClientRect(); if (r.bottom > rn.top + Math.min(rn.height / 2, 160)) { caixa.insertBefore(nx, card); y0 += rn.height + 16; moveu = true; } }
+        card.style.transform = 'translateY(' + (y - y0) + 'px) rotate(1deg)';
+      }
+      function mexe(e) {
+        ultimoY = e.clientY; troca(e.clientY);
+        var borda = 70, h = window.innerHeight;
+        clearInterval(rolagem); rolagem = null;
+        if (e.clientY < borda || e.clientY > h - borda) {
+          var dir = e.clientY < borda ? -1 : 1;
+          rolagem = setInterval(function () { window.scrollBy(0, dir * 18); y0 -= dir * 18; troca(ultimoY); }, 16);
+        }
+      }
+      function solta() {
+        clearInterval(rolagem);
+        alca.removeEventListener('pointermove', mexe); alca.removeEventListener('pointerup', solta); alca.removeEventListener('pointercancel', solta);
+        card.classList.remove('arrastando'); card.style.transform = '';
+        if (moveu) aplicaOrdemDaTela(caixa);
+      }
+      alca.addEventListener('pointermove', mexe); alca.addEventListener('pointerup', solta); alca.addEventListener('pointercancel', solta);
+    });
+  });
+}
+
+/* AS CORES DO ESTÁGIO (Pedro, 14/09/2026: "cada estágio terá uma cor diferente"):
+   a mesma conta do planoCompleto do planner-v2.js. A cor do livro vira o corpo
+   da célula quando é clara, ou a faixa do título quando é escura; o acento
+   pinta a Exploration, o Checking e a aula de agora; a aba pinta o livro. */
+function lumCor(hex) { var n = parseInt(String(hex || '#1d3685').slice(1), 16); return (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255; }
+function corDoEstagio(plano) {
+  var cor = plano.cor || '#1d3685', tab = plano.corTab || '#912d99', ac = plano.acento || '#d4e909';
+  return '--tab:' + tab + ';--ac:' + ac + ';--acTxt:' + (lumCor(ac) > 0.6 ? '#3a3400' : '#fff') + ';--pil:' + (lumCor(cor) < 0.55 ? '#dce6f2' : cor) + ';--mar:' + (lumCor(cor) < 0.55 ? cor : '#1d3685');
+}
+/* AULA COM OUTRO PROFESSOR (Pedro, 15/09/2026): turma juntada, substituição, reposição. As marcas guardam quem
+   marcou e quando; se nos últimos 30 dias alguém que não é você marcou algo deste aluno, o cartão avisa
+   "aula com Fulano em dd.mm" (a mais recente de cada um). O corte ("Antes do Planner") não conta. */
+/* SEM ATENDIMENTO (Pedro, 15/09/2026): quantas aulas o aluno teve desde a última vez que UM PROFESSOR tocou no
+   planner dele (marca, ou Checking registrado). O corte do lançamento não conta como atendimento. Conta pelas aulas
+   dadas no card, não por dias: duas semanas de férias não viram abandono. */
+function semAtendimento(a) {
+  var d = estado.dados[a.raf] || {}, pl = d.planner || {}, ultimo = 0;
+  Object.keys(pl.itens || {}).forEach(function (id) {
+    var it = pl.itens[id] || {};
+    if (it.ant === 1) return;
+    [[it.pq, it.pt], [it.aq, it.at]].forEach(function (par) {
+      if (par[0] && String(par[0]).trim() && String(par[0]).trim().toUpperCase() !== 'ANTES DO PLANNER') ultimo = Math.max(ultimo, Number(par[1]) || 0);
+    });
+  });
+  Object.keys(pl.checking || {}).forEach(function (k) { ultimo = Math.max(ultimo, Number((pl.checking[k] || {}).quando) || 0); });
+  var cels = ((d.situacao || {}).cels || []).filter(function (c) { return c.s === 'dada' && c.d; });
+  if (!cels.length) return null;
+  /* sem NENHUM atendimento registrado o aviso não vale: no dia do lançamento ninguém tem marca, e a turma inteira
+     abriria com alerta vermelho (auditoria de 15/09/2026). A conta começa no primeiro atendimento. */
+  if (!ultimo) return null;
+  var iso = new Date(ultimo); iso = iso.getFullYear() + '-' + ('0' + (iso.getMonth() + 1)).slice(-2) + '-' + ('0' + iso.getDate()).slice(-2);
+  var depois = cels.filter(function (c) { return c.d > iso; }).length;
+  return depois ? { aulas: depois, desde: iso } : null;
+}
+function avisoAtendimento(a) {
+  var s = semAtendimento(a); if (!s || s.aulas < 2) return '';
+  var pri = String(a.nome || '').trim().split(/\s+/)[0];
+  var txt = pri + ' não recebe atendimento há ' + s.aulas + ' aula' + (s.aulas === 1 ? '' : 's');
+  return '<span class="pill sem-at" title="Nenhuma marca de professor nem Checking no planner deste aluno desde então">⚠️ ' + esc(txt) + '</span>';
+}
+function prioMotivo(p) {
+  var partes = [p.nivel === 'alta' ? 'prioridade alta' : p.nivel === 'media' ? 'prioridade média' : p.nivel === 'emdia' ? 'em dia' : 'sem dados'];
+  if (p.atraso) partes.push(p.atraso + ' aula' + (p.atraso === 1 ? '' : 's') + ' atrás');
+  if (p.pronto) partes.push('pronto para o Checking');
+  if (p.expl) partes.push('esperando a Exploration');
+  if (p.pct >= 30) partes.push(p.pct + '% faltas');
+  return partes.join(' · ');
+}
+function outrosProfs(a) {
+  var s = sessao() || {};
+  var eu = s.master ? (function () { try { return (JSON.parse(localStorage.getItem('fisk_actas') || 'null') || {}).name || ''; } catch (e) { return ''; } })() : (s.name || '');
+  var n = function (v) { return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); };
+  var meu = n(eu), meuPri = meu.split(' ')[0];
+  var itens = (((estado.dados[a.raf] || {}).planner || {}).itens) || {};
+  var limite = Date.now() - 30 * 864e5, por = {};
+  Object.keys(itens).forEach(function (id) {
+    var it = itens[id] || {};
+    [[it.pq, it.pt], [it.aq, it.at]].forEach(function (par) {
+      var quem = n(par[0]), t = Number(par[1]) || 0;
+      if (!quem || !t || t < limite || it.ant === 1 || quem === 'ANTES DO PLANNER') return;
+      /* só o nome INTEIRO conta como "sou eu": dois Carlos na escola escondiam o aviso um do outro (auditoria de 15/09/2026).
+         Quando a sessão tem um nome de uma palavra só, o primeiro nome ainda serve. */
+      if (meu && (quem === meu || (meu.indexOf(' ') < 0 && quem.split(' ')[0] === meuPri))) return;
+      if (!por[quem] || por[quem].t < t) { var pn = String(par[0]).trim().split(/\s+/)[0]; por[quem] = { t: t, nome: pn.charAt(0).toUpperCase() + pn.slice(1).toLowerCase() }; }
+    });
+  });
+  var lista = Object.keys(por).map(function (k) { return por[k]; }).sort(function (x, y) { return y.t - x.t; });
+  if (!lista.length) return '';
+  var dd = function (t) { var d = new Date(t); return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2); };
+  return '<span class="pill outro-prof" title="Marcas feitas por outro professor nos últimos 30 dias">👥 aula com ' + lista.slice(0, 2).map(function (x) { return esc(x.nome) + ' em ' + dd(x.t); }).join(' · ') + '</span>';
+}
+/* A JANELA DAS LIÇÕES (Pedro, 19/09/2026: "as 3 aulas rolando num scroll vertical, igual à visão do aluno"):
+   todas as lições do livro empilhadas, cada uma com as suas três aulas; a janela mostra uma por vez, encaixa
+   ao rolar e abre na lição do aluno. ▲ e ▼ lado a lado descem e sobem uma lição. Sem cadeado: é o professor.
+   A lição vista fica guardada, para a janela não voltar ao início quando o cartão se redesenha após uma marca. */
+function trilhaDeLicoes(a, plano, ctx, reg, ir) {
+  var box = document.createElement('div'); box.className = 'trilha-lic';
+  var nav = document.createElement('div'); nav.className = 'nav-lic';
+  var setas = document.createElement('span'); setas.className = 'setas';
+  var sobe = document.createElement('button'), desce = document.createElement('button');
+  [[sobe, '▲', 'Lição anterior'], [desce, '▼', 'Próxima lição']].forEach(function (x) { x[0].type = 'button'; x[0].className = 'btn-seta'; x[0].textContent = x[1]; x[0].setAttribute('aria-label', x[2]); setas.appendChild(x[0]); });
+  var vendo = document.createElement('span'); vendo.className = 'vendo';
+  var volta = document.createElement('button'); volta.type = 'button'; volta.className = 'btn-nav volta'; volta.textContent = '📍 Voltar à atual'; volta.hidden = true;
+  nav.appendChild(setas); nav.appendChild(vendo); nav.appendChild(volta);
+  nav.appendChild(poeDica(nav, 'As setas mostram outra lição do livro: dá para explicar e marcar a lição seguinte sem esperar o card mudar. Para o aluno nada fica bloqueado por aqui.'));
+  var jan = document.createElement('div'); jan.className = 'janela-lic'; jan.tabIndex = 0; jan.setAttribute('aria-label', 'Lições de ' + a.nome + ', role para ver as outras');
+  var passos = [];
+  plano.etapas.forEach(function (e, i) {
+    var g = gradeDaLicao(a, plano, e.id, ctx, reg, i === ir);
+    if (!g) return;
+    var ps = document.createElement('div'); ps.className = 'passo-lic' + (i === ir ? ' atual' : ''); ps.dataset.i = i;
+    ps.appendChild(g);   /* sem rótulo: a linha das setas diz a lição que está na janela */ jan.appendChild(ps); passos.push(ps);
+  });
+  box.appendChild(nav); box.appendChild(jan);
+  var vista = function () {
+    var t = jan.scrollTop, melhor = passos[0];
+    passos.forEach(function (p) { if (Math.abs(p.offsetTop - jan.offsetTop - t) < Math.abs(melhor.offsetTop - jan.offsetTop - t)) melhor = p; });
+    return melhor;
+  };
+  var marca = function () {
+    var p = vista(); if (!p) return;
+    var i = +p.dataset.i, e = plano.etapas[i];
+    estado.verLic = estado.verLic || {}; estado.verLic[a.raf] = e.id;
+    vendo.innerHTML = (i === ir ? 'Lição atual: ' : 'Vendo: ') + '<b>' + esc(e.rot) + '</b>' + (e.tema && e.tema !== e.rot ? ' · ' + esc(e.tema) : '') + (i > ir ? ' <em>(à frente)</em>' : i < ir ? ' <em>(anterior)</em>' : '');
+    volta.hidden = i === ir;
+    var k = passos.indexOf(p); sobe.disabled = k <= 0; desce.disabled = k >= passos.length - 1;
+  };
+  var vai = function (p, suave) { if (p) jan.scrollTo({ top: p.offsetTop - jan.offsetTop, behavior: suave ? 'smooth' : 'auto' }); };
+  sobe.addEventListener('click', function () { vai(passos[passos.indexOf(vista()) - 1], true); });
+  desce.addEventListener('click', function () { vai(passos[passos.indexOf(vista()) + 1], true); });
+  volta.addEventListener('click', function () { vai(passos.filter(function (p) { return +p.dataset.i === ir; })[0], true); });
+  var t0; jan.addEventListener('scroll', function () { clearTimeout(t0); t0 = setTimeout(marca, 80); }, { passive: true });
+  /* a altura: a da maior lição, para o encaixe ser sempre de uma lição inteira; depois abre na guardada ou na atual */
+  var ajusta = function () {
+    if (!jan.isConnected) { requestAnimationFrame(ajusta); return; }
+    passos.forEach(function (p) { p.style.minHeight = ''; });
+    var h = Math.max.apply(null, passos.map(function (p) { return p.offsetHeight; }));
+    passos.forEach(function (p) { p.style.minHeight = h + 'px'; });
+    jan.style.height = h + 'px';
+    var guardada = (estado.verLic || {})[a.raf];
+    var alvo = passos.filter(function (p) { return plano.etapas[+p.dataset.i].id === guardada; })[0] || passos.filter(function (p) { return +p.dataset.i === ir; })[0] || passos[0];
+    vai(alvo, false); marca();
+  };
+  requestAnimationFrame(ajusta);
+  return box;
+}
+/* as três aulas de UMA lição (a grade), para qualquer lição do livro: a Minha aula empilha várias numa
+   janela que rola na vertical, como o carrossel do aluno (Pedro, 19/09/2026) */
+function gradeDaLicao(a, plano, etapaId, ctx, reg, ehAtual) {
+  var est = PlannerV2.estadoEtapa(plano, etapaId, ctx);
+  if (!est) return null;
+  var ckL = reg[etapaId];
+  /* "agora" e o contorno da aula atual só na lição em que o aluno está: nas outras, o estadoEtapa também marca uma */
+  var grade = document.createElement('div'); grade.className = 'aulas';
+  var datas = datasDasAulas(plano, etapaId, ctx);
+  var ksTudo = PlannerV2.keepStudying ? PlannerV2.keepStudying(plano, etapaId, ctx, { hist: (estado.dados[a.raf] || {}).hist, recuo: 21 }) : null;
+  var ksSug = ksTudo && ksTudo.sugeridos;
+  est.aulas.forEach(function (au, ai) {
+    var col = document.createElement('div'); col.className = 'aula' + ((ehAtual && au.atual) ? ' atual' : '');
+    col.innerHTML = '<div class="t">Class ' + au.n + ' <b>' + esc(au.papel) + '</b>' + pilulaData(datas[ai], (ehAtual && au.atual)) + '</div>';
+    var lista = document.createElement('div'); lista.className = 'lista'; col.appendChild(lista);
+    au.itens.forEach(function (it) { if (!it.breve) lista.appendChild(linhaItem(a, it)); });   /* o Pre-Checking desligado não aparece */
+    /* o Checking mora na aula em que acontece (pedido do Pedro, 13/09) */
+    if (au.checking) {
+      /* o Checking REALIZADO aparece na aula como estado, e não só como o
+         botão "Editar" (Pedro, 14/09/2026): o verde-amarelo do CHECK do
+         planner completo, a bolinha verde de quem marcou, o
+         critério melhor, o dia e o professor. Editar vira botão de contorno. */
+      var ckFeito = !!(ckL && ckL.feito);
+      if (ckFeito) col.classList.add('ck-ok');   /* a aula inteira muda de cor quando o Checking já foi feito */
+      if (ckFeito) {
+        var quando = ckL.quando ? (function (d) { return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2); })(new Date(ckL.quando)) : '';
+            var bons = (ckL.melhores && ckL.melhores.length ? ckL.melhores : (ckL.melhor ? [ckL.melhor] : []));
+            var melhor = bons.map(function (v) { var c = CRITERIOS.find(function (x) { return x[0] === v; }); return c ? c[1].replace(/^\S+\s/, '').toLowerCase() : ''; }).filter(Boolean).join(', ');
+        var partes = [melhor ? 'melhor em ' + esc(melhor) : '', esc(quando), ckL.quem ? esc(String(ckL.quem).trim().split(/\s+/)[0]) : ''].filter(Boolean);
+        var feitoBox = document.createElement('div'); feitoBox.className = 'ck-feito';
+        feitoBox.innerHTML = '<span class="mk cheia-prof"></span><span class="ck-tx"><b>✓ Checking realizado</b>' + (partes.length ? '<small>' + partes.join(' · ') + '</small>' : '') + '</span>';
+        lista.appendChild(feitoBox);
+      }
+      var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'btn ' + (ckFeito ? 'btn-ck-editar' : 'btn-ck'); bt.dataset.ck = etapaId;
+      bt.textContent = ckFeito ? 'Editar Checking' : 'Registrar Checking';
+      lista.appendChild(bt);
+      if (ehAtual) lista.appendChild(poeDica(lista, 'O Checking é a conversa do fim da lição: você marca em que o aluno foi melhor, o que ele precisa melhorar e deixa pedidos. Registrar libera a próxima lição no portal dele e paga F$ 250.'));
+      var prox = plano.etapas[plano.etapas.indexOf(plano.etapas.find(function (e) { return e.id === etapaId; })) + 1];
+      if (prox) { var lb = document.createElement('p'); lb.className = 'libera'; lb.textContent = (ckL && ckL.feito ? 'Checking registrado: ' + prox.rot + ' liberada para o aluno.' : 'Ao registrar, a ' + prox.rot + ' é liberada para o aluno.'); lista.appendChild(lb); }
+    }
+    /* UMA SUGESTÃO POR AULA (17/09/2026): o mesmo bloco verde que o aluno vê */
+    var sug1 = (ksSug || []).filter(function (x) { return x.aula === ai; })[0];
+    if (sug1) {
+      var sb = document.createElement('div'); sb.className = 'sug1' + (sug1.feito ? ' ok' : '');
+      sb.dataset.id = sug1.id; sb.dataset.tool = sug1.tool;
+      sb.innerHTML = '<span class="st">Extra</span><span class="nm">' + sug1.icone + ' ' + esc(sug1.nm) + '</span>' +
+        (sug1.feito ? '<span class="pct">' + (typeof sug1.pct === 'number' ? Math.round(sug1.pct) + '%' : '✓') + '</span>' : '');
+      col.appendChild(sb);
+    }
+    grade.appendChild(col);
+  });
+  return grade;
+}
+function cartaoAluno(a) {
+  var plano = planoDe(a.book);
+  var ctx = ctxDe(a);
+  var pos = posicaoDe(a, plano, ctx), posReal = pos;
+  /* a lição real do aluno no livro: a janela das lições abre nela */
+  var idxReal = plano ? plano.etapas.findIndex(function (e) { return e.id === posReal.id; }) : -1;
+  var reg = ctx.planner.plano.checking || {};
+  var ckAtual = reg[pos.id];
+  var card = document.createElement('section'); card.className = 'al'; card.dataset.raf = a.raf;
+  if (plano) card.style.cssText = corDoEstagio(plano);   /* cada estágio com a sua cor, a mesma do planner completo */
+  var cab = document.createElement('div'); cab.className = 'al-cab';
+  var atras = Number(a.aulasAtraso) || 0;
+  var plan = a._plan;
+  var nivelRot = { alta: 'prioridade alta', media: 'prioridade média', emdia: 'em dia', semdados: 'sem dados' };
+  if (estado.atendidos[a.raf]) card.classList.add('atendido');
+  if (faltouHoje(a)) card.classList.add('faltou');
+  if (a.visitante) card.classList.add('visitante');
+  cab.innerHTML = '<span class="mover"><button type="button" class="arrasta" aria-label="Arrastar ' + esc(a.nome) + ' para outra posição" title="Segure e arraste para mudar a ordem">⠿</button><button type="button" class="sobe" aria-label="Subir ' + esc(a.nome) + '" title="Subir uma posição">↑</button><button type="button" class="desce" aria-label="Descer ' + esc(a.nome) + '" title="Descer uma posição">↓</button></span><span class="nome">' + esc(a.nome) + '</span>' + (a.visitante ? '<span class="visita" title="Aluno trazido pela busca">' + (estado.plantao ? 'plantão' : 'de outra turma') + (a.turma ? ' · ' + esc(String(a.turma).split('\n')[0]) : '') + '</span><button type="button" class="tirar" data-tirar="' + esc(a.raf) + '">Tirar da tela</button>' : '') + '<span class="livro' + (plano ? ' cor' : '') + '">' + esc(a.book || '') + '</span>' +
+    (estado.prioridade ? '' : plan ? '<span class="pill nv-' + esc(plan.nivel || 'emdia') + '">' + esc(nivelRot[plan.nivel] || plan.nivel || '') + '</span>' : (estado.plano ? '<span class="pill fora">fora do roteiro</span>' : '')) +
+    (estado.prioridade && a._rank ? '<span class="pill prio nv-' + esc(a._prio.nivel) + '" title="' + esc(prioMotivo(a._prio)) + '">⚡ ' + a._rank + 'º · ' + esc(prioMotivo(a._prio)) + '</span>' : '') +
+    avisoAtendimento(a) +
+    outrosProfs(a) +
+    (plano ? '' : '<span class="pill pos">📍 ' + esc(posReal.rot) + '</span>') +   /* com planner, a linha das setas já diz a lição */
+    (atras > 0 ? '<span class="pill atras">' + atras + ' aula' + (atras === 1 ? '' : 's') + ' atrás do plano</span>' : '') +
+    (ckAtual && ckAtual.feito ? '<span class="pill chk">✓ Checking ' + esc(pos.id) + '</span>' : '') +   /* pendente: o botão Registrar Checking já diz */
+    (plano ? '' : '<span class="acoes"><button type="button" class="btn btn-ck" data-ck>' + (ckAtual && ckAtual.feito ? 'Editar Checking' : 'Registrar Checking') + '</button></span>') +
+    (plano ? '<button type="button" class="pill aguia" data-aba title="O plano de curso inteiro, numa aba nova do navegador">🦅 Ver planner completo ↗</button>' : '');
+  card.appendChild(cab);
+  var btTirar = cab.querySelector('[data-tirar]'); if (btTirar) btTirar.addEventListener('click', function () { tirarVisitante(a.raf); });
+  /* o planner completo abre sempre numa aba nova (Pedro, 16/09/2026) */
+  var btAba = cab.querySelector('[data-aba]');
+  if (btAba) btAba.addEventListener('click', function () { abrirEmOutraAba(a); });
+  var corpo = document.createElement('div'); corpo.className = 'al-corpo';
+  var esq = document.createElement('div'); esq.className = 'esq';
+  corpo.appendChild(esq); corpo.appendChild(caixaObs(a));
+  card.appendChild(corpo);
+  /* daqui para baixo, tudo o que é da lição entra na coluna da esquerda */
+  var cardReal = card; card = { appendChild: function (n) { esq.appendChild(n); }, querySelectorAll: function (q) { return cardReal.querySelectorAll(q); }, classList: cardReal.classList, dataset: cardReal.dataset, querySelector: function (q) { return cardReal.querySelector(q); } };
+  /* a nota da foto da fila só aparece enquanto a anotação do servidor está
+     vazia: desde 14/09/2026 as duas são o mesmo campo, e o Planejador grava lá */
+  var obsSrv = ((estado.dados[a.raf] || {}).planner || {}).obs || '';
+  var notaFila = plan && plan.nota && !obsSrv ? plan.nota : '';
+  if (false && plan && (plan.atividade || notaFila)) {   /* a atividade do dia saiu com o Planejador (16/09/2026) */
+    var pa = document.createElement('div'); pa.className = 'plano-ativ';
+    pa.innerHTML = (plan.atividade ? '🎯 ' + esc(plan.atividade) : '') + (notaFila ? ' <i>· ' + esc(notaFila) + '</i>' : '');
+    card.appendChild(pa);
+  }
+
+  if (plano) {
+    var est = PlannerV2.estadoEtapa(plano, pos.id, ctx);
+    if (est) {
+      card.appendChild(trilhaDeLicoes(a, plano, ctx, reg, idxReal));
+      var ks = quadroKS(a, plano, pos, ctx); if (ks) card.appendChild(ks);
+    }
+  } else {
+    var sp = document.createElement('div'); sp.className = 'sem-plano';
+    sp.textContent = 'O gabarito do ' + (a.book || 'livro') + ' ainda não foi transcrito: por enquanto só o Checking é registrado aqui.';
+    card.appendChild(sp);
+  }
+  /* aluno atendido: vai para o fim da fila e o próximo sobe */
+  var at = document.createElement('div'); at.className = 'atend';
+  var ba = document.createElement('button'); ba.type = 'button'; ba.className = 'btn btn-atend';
+  ba.textContent = estado.atendidos[a.raf] ? '↺ Desfazer atendido' : '✓ Aluno atendido';
+  ba.addEventListener('click', function () { atender(a); });
+  at.appendChild(ba);
+  if (!estado.plantao) {
+    var bf = document.createElement('button'); bf.type = 'button'; bf.className = 'btn btn-falta';
+    bf.textContent = faltouHoje(a) ? '↺ Desfazer falta' : '✗ Faltou';
+    bf.title = 'Lança "a" na aula de hoje do card, se a célula ainda estiver vazia ou só com o placeholder';
+    bf.addEventListener('click', function () { marcarFalta(a); });
+    at.appendChild(bf);
+  }
+  if (estado.atendidos[a.raf]) { var q = document.createElement('span'); q.className = 'quando'; var dt = new Date(estado.atendidos[a.raf]); q.textContent = 'Atendido às ' + ('0' + dt.getHours()).slice(-2) + ':' + ('0' + dt.getMinutes()).slice(-2); at.appendChild(q); }
+  card.appendChild(at);
+  cardReal.querySelectorAll('[data-ck]').forEach(function (b) { b.addEventListener('click', function () { var e = plano && plano.etapas.find(function (x) { return x.id === b.dataset.ck; }); abrirChecking(cardReal, a, plano, e ? { id: e.id, rot: e.rot, tema: e.tema } : pos); }); });
+  if (estado.aberto === a.raf) abrirChecking(cardReal, a, plano, pos);
+  return cardReal;
+}
+
+/* ── o quadro do Keep Studying (Pedro, 14/09/2026: "junta atividades feitas e
+   keep studying num quadro só") ──
+   Eram duas linhas soltas embaixo das aulas, e o professor não via a diferença
+   entre elas. Agora é uma célula só, no verde da coluna do planner completo:
+   em cima o que o gabarito sugere para a lição, com ✓ e a melhor
+   nota; embaixo o que MAIS o aluno fez no portal desde a primeira aula dela
+   (sem aula dada no card, nos últimos 21 dias). O que já está ticado em cima
+   não se repete embaixo. A conta é do PlannerV2.keepStudying, a mesma do
+   planner completo, para as duas telas nunca discordarem. */
+function quadroKS(a, plano, pos, ctx) {
+  if (!PlannerV2.keepStudying) return null;   /* planner-v2.js de antes do quadro, preso num cache */
+  var ks = PlannerV2.keepStudying(plano, pos.id, ctx, { hist: (estado.dados[a.raf] || {}).hist, recuo: 21 });
+  var o = ks && ks.outros, mostraMais = !!(o && (o.grupos.length || !o.total));
+  /* AS SUGESTÕES SAÍRAM DAQUI (17/09/2026): cada uma mora na sua aula. Aqui fica o que ele fez ALÉM delas. */
+  if (!mostraMais) return null;
+  var cel = document.createElement('div'); cel.className = 'aula ks';
+  cel.innerHTML = '<div class="t" title="O que o aluno fez no portal além da prática sugerida de cada aula">Também fez no portal</div>';
+  var lista = document.createElement('div'); lista.className = 'lista';
+  if (mostraMais) {
+    var desde = o.recuo ? 'nos últimos ' + o.recuo + ' dias' : 'desde ' + o.ini.split('-').reverse().slice(0, 2).join('.');
+    var mais = document.createElement('div'); mais.className = 'ks-mais';
+    mais.innerHTML = o.total
+      ? '<b>' + desde + '</b>' + o.grupos.map(function (g) {
+          return '<span' + (g.ids && g.ids.length ? ' title="' + esc(g.ids.join(', ')) + '"' : '') + '>' + g.icone + ' ' + esc(g.rot.pt) + ' ×' + g.n + (g.best !== null ? ' <i>' + Math.round(g.best) + '%</i>' : '') + '</span>';
+        }).join('')
+      : '<b>Nada no portal ' + desde + '</b>';
+    lista.appendChild(mais);
+  }
+  cel.appendChild(lista);
+  return cel;
+}
+/* a data de cada aula, do card: a mesma régua do planner do aluno (datasDaEtapa) */
+function datasDasAulas(plano, etapaId, ctx) {
+  var etapa = plano.etapas.find(function (e) { return e.id === etapaId; }); if (!etapa) return [];
+  var cels = (ctx.cels || []).filter(function (c) { return c && c.c && (PlannerV2.temCel ? PlannerV2.temCel(etapa.celulas, c.c) : etapa.celulas.indexOf(c.c) > -1) && (c.s === 'dada' || c.s === 'plano' || c.s === 'falta'); });
+  return etapa.aulas.map(function (a, i) { return cels[i] || null; });
+}
+function pilulaData(d, atual) {
+  var hoje = new Date(); var iso = hoje.getFullYear() + '-' + ('0' + (hoje.getMonth() + 1)).slice(-2) + '-' + ('0' + hoje.getDate()).slice(-2);
+  if (!d || !d.d) return atual ? '<span class="agora">agora</span>' : '';   /* "sem data" é o normal da aula futura */
+  var p = d.d.split('-'), rot = p[2] + '.' + p[1];
+  if (d.d === iso) return '<span class="agora">hoje · ' + rot + '</span>';
+  if (d.s === 'dada') return '<span class="dt dada">' + rot + ' · dada</span>';
+  if (d.s === 'falta') return '<span class="dt falta">' + rot + ' · falta</span>';
+  return '<span class="dt' + (d.d < iso ? ' tarde' : '') + '">' + rot + (d.d < iso ? ' · prevista' : '') + '</span>';
+}
+/* ── a anotação livre do professor (pedido do Pedro, 13/09) ──
+   Fica na linha do planner do aluno (`obs`), só o professor lê. Salva ao
+   parar de escrever (1,2 s) e ao sair do campo. O botão do e-counseling é
+   promessa: fica visível e desligado até a integração existir. */
+var obsTimer = {};
+function caixaObs(a) {
+  var box = document.createElement('div'); box.className = 'obs';
+  var d = estado.dados[a.raf] || {}; var atual = (d.planner && d.planner.obs) || '';
+  box.innerHTML = '<label>📝 Anotações · só professores</label>' +
+    '<textarea maxlength="600" placeholder="Ex.: aniversário na próxima aula; conversar com a família; pediu mais exercícios de listening…"></textarea>' +
+    '<div class="st"></div>' +
+    '';   /* o botão do e-counseling volta quando existir */
+  var ta = box.querySelector('textarea'), st = box.querySelector('.st');
+  ta.value = atual;
+  function salvar() {
+    var v = ta.value.trim();
+    if (v === ((estado.dados[a.raf] || {}).planner || {}).obs && v !== '') return;
+    if (!v && !atual) return;
+    st.textContent = 'Salvando…';
+    post({ action: 'plannerProf', raf: a.raf, book: a.book, patch: { obs: v } }).then(function (r) {
+      if (r.planner) estado.dados[a.raf] = Object.assign(estado.dados[a.raf] || {}, { planner: r.planner });
+      atual = v; st.textContent = v ? '✓ Salvo' : '✓ Apagado';
+    }).catch(function (e) { st.textContent = '⚠️ Não salvou: ' + e.message; });
+  }
+  ta.addEventListener('input', function () { st.textContent = ''; clearTimeout(obsTimer[a.raf]); obsTimer[a.raf] = setTimeout(salvar, 1200); });
+  ta.addEventListener('blur', function () { clearTimeout(obsTimer[a.raf]); salvar(); });
+  return box;
+}
+
+function linhaItem(a, it) {
+  /* a marca e o toque vêm da régua do portal (PlannerV2.marcaClasses e
+     toqueProf, 14/09/2026): o professor vê a mesma bolinha que o aluno, e o
+     toque anda em três tempos: a metade dele → a bolinha inteira, com a do
+     aluno em nome dele → vazia. Video Activity, QR Code, tarefa e o que a
+     plataforma já provou não têm toque. */
+  var classes = it.classes || [], toque = it.toque || null;
+  var feito = it.quem === 'aluno' ? (it.a || it.plat) : it.feito;
+  var b = document.createElement('button'); b.type = 'button'; b.dataset.id = it.id;   /* o id do gabarito: a sincronia com o papel e as outras vistas é conferida por ele */
+  b.className = 'it' + (toque ? ' pode' : '') + (feito ? ' feito' : '') + (it.marca === 'expl' || /^(bi|pi|po|qi)$/.test(it.code || '') ? ' xp' : '') + (it.breve ? ' breve' : '');
+  if (it.breve) b.disabled = true;   /* o Pre-Checking desligado (Pedro, 14/09/2026): cinza, "soon" */
+  var mk = '<span class="mk ' + classes.join(' ') + '"></span>';
+  var qd = it.pt ? (function (d) { return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2); })(new Date(it.pt)) : '';
+  var capa = '';
+  if (it.code === 'va') { var ep = (String(it.nm).match(/(\d+)/) || [])[1] || '1'; capa = '<img class="capa" alt="" src="https://portalfisk.com.br/assets/img/videobook/' + livroId(a.book) + '/' + ep + '-cover.jpg" onerror="this.remove()">'; }
+  /* só o primeiro nome na linha miúda; o nome inteiro fica no title */
+  var quem = it.ant === 1 ? '<span class="quem" title="Aula dada antes do lançamento do Planner (pelo card)">antes do Planner</span>' : it.pq ? '<span class="quem" title="' + esc('Confirmado por ' + it.pq + (qd ? ' em ' + qd : '')) + '">✓ ' + esc(String(it.pq).trim().split(/\s+/)[0]) + (qd ? ' · ' + qd : '') + '</span>' : '';
+  b.innerHTML = mk + capa + '<span class="tx' + (quem ? ' com-quem' : '') + '">' + esc(it.nm) + (it.breve ? ' · soon' : '') + quem + '</span>' + (it.pg ? '<span class="pg">' + esc(it.pg) + '</span>' : '');
+  b.title = toque ? 'Toque: a sua metade, depois a bolinha inteira, depois vazia'
+    : (it.marca === 'tri' ? 'A tarefa é só do aluno' : (it.marca === 'aluno' ? 'Só o aluno marca: o professor não tem como ver' : (it.plat || it.marca === 'plataforma' ? 'A plataforma preenche' : '')));
+  if (toque) b.addEventListener('click', function () { confirmar(a, it.id, toque); });
+  return b;
+}
+
+/* ── a metade do professor: um toque, um POST; a resposta é o planner fundido ── */
+var salvando = {};
+/* as marcas ainda a caminho, por aluno: a resposta de UMA gravação traz o
+   planner inteiro do servidor, e sem isto ela apagava da tela a bolinha
+   clicada logo depois, que ainda não tinha chegado lá (Pedro, 14/09/2026) */
+var pendentes = {};
+function aplicaPendentes(raf, planner) {
+  var p = pendentes[raf] || {};
+  planner.itens = planner.itens || {};
+  Object.keys(p).forEach(function (id) {
+    var marca = p[id], it = Object.assign({}, planner.itens[id] || {});
+    delete it.ant; if ('p' in marca) { if (marca.p) { it.p = 1; it.pq = it.pq || (sessao() || {}).name || 'você'; it.pt = it.pt || Date.now(); } else { delete it.p; delete it.pq; delete it.pt; } }
+    if ('a' in marca) { if (marca.a) { it.a = 1; it.aq = it.aq || (sessao() || {}).name || 'você'; it.at = it.at || Date.now(); } else { delete it.a; delete it.at; delete it.aq; } }
+    if (it.p || it.a) planner.itens[id] = it; else delete planner.itens[id];
+  });
+  return planner;
+}
+/* Um toque, um POST. A trava é por ITEM (não por aluno): o Apps Script pode
+   levar até 30 s numa fila de gravações, e a trava por aluno fazia os toques
+   seguintes morrerem em silêncio ("toca e nada acontece", Claudinei,
+   13/09/2026). Passou de 1,5 s, avisa que está gravando; passou de 25 s,
+   desiste e avisa. Tudo vai para o console também. */
+/* OTIMISTA (pedido do Pedro, 13/09): a bolinha muda na hora, e o servidor
+   confirma por trás. Se o servidor recusar ou demorar mais de 25 s, a marca
+   volta e o professor é avisado. Toques seguidos no mesmo item vão em fila. */
+/* ── a fila de quando a internet cai ──────────────────────────────────────
+   Antes, marca que não salvou voltava atrás e o professor tinha que tocar de
+   novo depois da aula. Agora, quando o erro é de REDE (e só nesse caso), a
+   marca fica na tela e o pedido espera no aparelho. A fila é enviada quando a
+   rede volta, a cada 20 s e ao abrir a página. Erro do servidor continua
+   desfazendo a marca: ali o problema não é esperar. */
+var FILA_K = 'th:fila:v1';
+function filaLe() { try { return JSON.parse(localStorage.getItem(FILA_K) || '[]'); } catch (e) { return []; } }
+function filaGrava(f) { try { localStorage.setItem(FILA_K, JSON.stringify(f.slice(-300))); } catch (e) {} pintaFilaOff(); }
+function ehDeRede(e) {
+  if (!navigator.onLine) return true;
+  var m = String((e && e.message) || e || '');
+  return /failed to fetch|load failed|networkerror|network request|demorou demais|conexão|connection/i.test(m);
+}
+function filaEnfileira(item) { var f = filaLe(); f.push(item); filaGrava(f); }
+function pintaFilaOff() {
+  var el = $('fila-off'); if (!el) return;
+  var f = filaLe();
+  if (!f.length) { el.hidden = true; el.innerHTML = ''; return; }
+  el.hidden = false;
+  el.innerHTML = '<span>⏳ ' + f.length + ' marca' + (f.length === 1 ? '' : 's') + ' esperando a internet. Elas estão guardadas neste aparelho e vão sozinhas quando a rede voltar.</span>' +
+    '<button type="button" data-fila-agora>Tentar agora</button>';
+  el.querySelector('[data-fila-agora]').addEventListener('click', function () { filaDrena(true); });
+}
+var filaEnviando = false;
+function filaDrena(avisar) {
+  if (filaEnviando) return;
+  var f = filaLe(); if (!f.length) return;
+  filaEnviando = true;
+  var item = f[0];
+  post({ action: 'plannerProf', raf: item.raf, book: item.book, patch: item.patch }).then(function () {
+    var g = filaLe(); g.shift(); filaGrava(g);
+    filaEnviando = false;
+    if (g.length) filaDrena(avisar); else toast('✓ Marcas guardadas enviadas.');
+  }).catch(function (e) {
+    filaEnviando = false;
+    if (!ehDeRede(e)) { var g = filaLe(); g.shift(); filaGrava(g); toast('⚠️ Uma marca guardada não foi aceita: ' + e.message); }
+    else if (avisar) toast('⚠️ Ainda sem internet. As marcas continuam guardadas.');
+  });
+}
+window.addEventListener('online', function () { filaDrena(false); });
+setInterval(function () { if (filaLe().length) filaDrena(false); }, 20000);
+document.addEventListener('DOMContentLoaded', function () { pintaFilaOff(); setTimeout(function () { filaDrena(false); }, 1500); });
+
+function confirmar(a, id, marca) {
+  var d = estado.dados[a.raf] = estado.dados[a.raf] || { planner: { itens: {}, checking: {} } };
+  d.planner = d.planner || { itens: {}, checking: {} }; d.planner.itens = d.planner.itens || {};
+  var antes = JSON.stringify(d.planner.itens[id] || null);
+  var it = d.planner.itens[id] = Object.assign({}, d.planner.itens[id] || {});
+  delete it.ant; if ('p' in marca) { if (marca.p) { it.p = 1; it.pq = (sessao() || {}).name || 'você'; it.pt = Date.now(); } else { delete it.p; delete it.pq; delete it.pt; } }
+  if ('a' in marca) { if (marca.a) { it.a = 1; it.aq = (sessao() || {}).name || 'você'; it.at = Date.now(); } else { delete it.a; delete it.at; delete it.aq; } }
+  if (!it.p && !it.a) delete d.planner.itens[id];
+  redesenhar(a);   /* já com a marca nova */
+  var patch = { itens: {} }; patch.itens[id] = marca;
+  pendentes[a.raf] = pendentes[a.raf] || {}; pendentes[a.raf][id] = marca;
+  var k = a.raf + '|' + id;
+  var anterior = salvando[k] || Promise.resolve();
+  salvando[k] = anterior.then(function () {
+    var pedido = post({ action: 'plannerProf', raf: a.raf, book: a.book, patch: patch });
+    var limite = new Promise(function (_, rej) { setTimeout(function () { rej(new Error('o servidor demorou demais')); }, 25000); });
+    return Promise.race([pedido, limite]);
+  }).then(function (r) {
+    console.log('plannerProf', id, marca, r);
+    if (pendentes[a.raf] && pendentes[a.raf][id] === marca) delete pendentes[a.raf][id];
+    if (r.planner) { estado.dados[a.raf].planner = aplicaNotasPendentes(a.raf, aplicaPendentes(a.raf, r.planner)); redesenhar(a); }
+    if (r.card && r.card.escreveu) toast('📇 Card: ' + r.card.escreveu + ' na aula ' + rotDiaTH() + '.');
+    else if (estado.ontem && r.card && r.card.motivo) toast('📇 Card não alterado: ' + r.card.motivo + '.');
+  }).catch(function (e) {
+    if (pendentes[a.raf] && pendentes[a.raf][id] === marca) delete pendentes[a.raf][id];
+    console.error('plannerProf falhou', id, e);
+    if (ehDeRede(e)) {   /* rede caiu: a marca fica na tela e o pedido espera no aparelho */
+      filaEnfileira({ raf: a.raf, book: a.book, patch: patch, quando: Date.now() });
+      toast('📴 Sem internet: guardei a marca e envio quando a rede voltar.');
+      return;
+    }
+    var v = JSON.parse(antes); if (v) estado.dados[a.raf].planner.itens[id] = v; else delete estado.dados[a.raf].planner.itens[id];
+    redesenhar(a);
+    toast('⚠️ Não salvou (' + e.message + '). A marca voltou; tente de novo.');
+  });
+}
+function redesenhar(a) {
+  var velho = document.querySelector('.al[data-raf="' + a.raf + '"]');
+  var novo = cartaoAluno(a);
+  if (velho) velho.replaceWith(novo); else $('alunos').appendChild(novo);
+  if (aguia.raf === a.raf) desenhaAguia();
+}
+
+/* ── o planner completo POR CIMA da turma (pedido do Pedro, 14/09/2026) ──
+   Antes ele abria o plano-curso.html numa aba nova, e o "← Turma de hoje" de
+   lá recarregava a turma inteira: a cascata, o panorama do card e o planner
+   de cada aluno, dezenas de segundos. Aqui ele abre sobre a própria turma,
+   com os dados que ela já leu. Abrir e voltar são instantâneos, sem cache
+   para envelhecer: a marca feita lá passa pelo mesmo `confirmar` e já está no
+   cartão do aluno quando a camada fecha. O Voltar do navegador e o Esc
+   também fecham. */
+var aguia = { raf: '', ov: null };
+function abrirAguia(a) {
+  if (!planoDe(a.book) || !window.PlannerV2) return;
+  if (aguia.ov) fecharAguia();
+  var ov = document.createElement('div'); ov.className = 'aguia-ov';
+  ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-label', 'Planner completo de ' + a.nome);
+  ov.innerHTML = '<div class="aguia-topo"><button type="button" class="voltar" data-voltar>← Voltar à turma</button>' +
+    '<h2>🦅 Planner completo</h2><span class="sub">' + esc(a.nome) + ' · ' + esc(a.book || '') + ' · ' + esc(a.raf) + '</span>' +
+    '<button type="button" class="obs-toggle" data-obs-toggle></button></div><div class="aguia-corpo"></div>';   /* sem Imprimir (Pedro, 14/09/2026); o esconder da TV também aqui, porque a camada cobre o botão da página */
+  document.body.appendChild(ov); document.body.classList.add('com-aguia');
+  aguia.raf = a.raf; aguia.ov = ov;
+  ov.querySelector('[data-voltar]').addEventListener('click', voltarDaAguia);
+  var tgl = ov.querySelector('[data-obs-toggle]');
+  function pintaTgl() { tgl.textContent = document.body.classList.contains('sem-obs') ? '👁️ Mostrar notas' : '🙈 Esconder notas (TV)'; }
+  pintaTgl();
+  tgl.addEventListener('click', function () { var b = $('obsToggle'); if (b) b.click(); else document.body.classList.toggle('sem-obs'); pintaTgl(); });
+  desenhaAguia();
+  try { history.pushState({ aguia: a.raf }, ''); } catch (e) {}
+  ov.querySelector('[data-voltar]').focus({ preventScroll: true });
+}
+function desenhaAguia() {
+  if (!aguia.ov) return;
+  var a = estado.alunos.find(function (x) { return x.raf === aguia.raf; });
+  if (!a) { fecharAguia(); return; }
+  var y = aguia.ov.scrollTop;
+  var pes = pessoaisDe(a) || {};
+  PlannerV2.planoCompleto(aguia.ov.querySelector('.aguia-corpo'), planoDe(a.book), ctxDe(a), {
+    nome: a.nome, raf: a.raf, prof: estado.prof, turma: estado.turma, escola: estado.escola,
+    hist: (estado.dados[a.raf] || {}).hist || [],
+    /* a coluna do nome no card carrega anotação da secretaria, "(Bolsista)", "(Tem asma)": nunca sai daqui */
+    aluno: { nome: String(pes.nome || a.nome || '').replace(/\s*\([^)]*\)/g, '').trim(), nascimento: pes.nascimentoTxt || pes.nascimento || '', telefone: pes.telAluno || '', respNome: pes.respNome || '', respTel: pes.respTel || '' },
+    notas: notasDe(a, pes),
+    /* as refações só viram campo quando o servidor guarda notas (recurso 'notas') */
+    aoNota: (estado.recursos || []).indexOf('notas') > -1 ? function (t, crit, k, v) { salvaNota(a, t, crit, k, v); } : null,
+    /* a metade do professor, inclusive em aula antiga: o mesmo toque da turma */
+    aoClicar: function (it, st) { var marca = PlannerV2.toqueProf(it, st); if (marca) confirmar(a, it.id, marca); }
+  });
+  aguia.ov.scrollTop = y;
+}
+/* O PLANNER COMPLETO EM OUTRA ABA (Pedro, 15/09/2026). A página avulsa (plano-curso.html) lê o planner do servidor;
+   o que só a leitura da turma do card tem (telefone, aniversário, as células das provas) vai pelo localStorage,
+   que as duas abas dividem, e nunca pela URL. */
+function abrirEmOutraAba(a) {
+  var pes = pessoaisDe(a) || {};
+  try { localStorage.setItem('pc:' + a.raf, JSON.stringify({ t: Date.now(), nome: String(pes.nome || a.nome || '').replace(/\s*\([^)]*\)/g, '').trim(), nascimento: pes.nascimentoTxt || pes.nascimento || '', telefone: pes.telAluno || '', respNome: pes.respNome || '', respTel: pes.respTel || '', notasAv1: pes.notasAv1 || '', notasAv2: pes.notasAv2 || '' })); } catch (e) {}
+  var q = new URLSearchParams({ raf: a.raf, book: a.book || '', prof: estado.prof || '', turma: estado.turma || '', escola: estado.escola || '' });
+  if (estado.plantao) q.set('plantao', '1');
+  window.open('plano-curso.html?' + q.toString(), '_blank');
+}
+/* o aluno na leitura da turma do card: pelo RAF quando ela traz, senão pelo
+   nome sem as anotações entre parênteses da secretaria */
+function pessoaisDe(a) {
+  var lista = estado.pessoais || [];
+  var alvoRaf = String(a.raf || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  var porRaf = lista.find(function (x) { return x.raf && String(x.raf).toUpperCase().replace(/[^A-Z0-9]/g, '') === alvoRaf; });
+  if (porRaf) return porRaf;
+  var nome = function (n) { return normNome(String(n || '').replace(/\([^)]*\)/g, '')); };
+  var alvo = nome(a.nome);
+  return lista.find(function (x) { return nome(x.nome) === alvo; }) || null;
+}
+/* A célula de avaliação do card, nos dois formatos que o Gerador de Boletins
+   escreve (boletim-fisk/card-sync.js). O atual: "prova de escuta: 9 / prova de
+   escrita: 5,5 / média (com todos os critérios do boletim): 8,2". O antigo:
+   "[EST] … · média 8,2" e a última linha "A9 B5,5 C8 D8 E9 F10 G9 H10", onde
+   Oral = média de C, D, E e Participação = média de F, G, H, a mesma conta do
+   boletim. Célula preenchida = boletim criado, mesmo sem número legível. */
+/* a média da célula (auditoria de 15/09/2026): a busca solta pegava a PRIMEIRA aparição da palavra, e uma observação
+   da secretaria ("média baixa: conversar com a mãe 2 vezes") virava a nota. A linha que COMEÇA com "média" manda. */
+function mediaDaCelula(t) {
+  var linhas = String(t || '').split('\n'), re = /m[ée]dia[^0-9\n]{0,60}([0-9]+(?:[.,][0-9]+)?)/i, achou = null;
+  linhas.forEach(function (l) { var m = re.exec(l); if (m && (/^\s*m[ée]dia/i.test(l) || !achou)) achou = m; });
+  return achou;
+}
+function notasDaCelula(txt) {
+  var t = String(txt || '').trim(); if (!t) return null;
+  var num = function (x) { return x == null ? null : Number(String(x).replace(',', '.')); };
+  var o = { card: true, cardCrit: {}, l: null, w: null, o: null, p: null, media: null };
+  var mE = t.match(/prova de escuta:\s*([0-9]+(?:[.,][0-9]+)?)/i), mW = t.match(/prova de escrita:\s*([0-9]+(?:[.,][0-9]+)?)/i), mM = mediaDaCelula(t);
+  if (mE) { o.l = num(mE[1]); o.cardCrit.l = 1; }
+  if (mW) { o.w = num(mW[1]); o.cardCrit.w = 1; }
+  if (mM) { o.media = num(mM[1]); o.cardCrit.media = 1; }
+  /* a data do lançamento: "Lançamento de nota - dd/mm/aaaa" (a linha "Report Card N · created on" do planner) */
+  var mD = t.match(/(\d{2})\/(\d{2})\/\d{4}/); if (mD) o.data = mD[1] + '/' + mD[2];
+  if (!mE && !mW) {
+    /* a linha das letras pode não ser a última (observação escrita depois do lançamento): vale a que tiver mais letras */
+    var linhas = t.split('\n'), re = /(?:^|\s)([A-H])\s*([0-9]+(?:[.,][0-9]+)?)/g, m, L = {}, melhor = '', nMelhor = 0;
+    linhas.forEach(function (l) { var n = (l.match(/(?:^|\s)[A-H]\s*[0-9]/g) || []).length; if (n > nMelhor) { nMelhor = n; melhor = l; } });
+    while ((m = re.exec(melhor))) L[m[1]] = num(m[2]);
+    var med = function (xs) { return xs.every(function (x) { return x != null; }) ? xs.reduce(function (s, x) { return s + x; }, 0) / xs.length : null; };
+    if (L.A != null) { o.l = L.A; o.cardCrit.l = 1; }
+    if (L.B != null) { o.w = L.B; o.cardCrit.w = 1; }
+    var or = med([L.C, L.D, L.E]), pa = med([L.F, L.G, L.H]);
+    if (or != null) { o.o = or; o.cardCrit.o = 1; }
+    if (pa != null) { o.p = pa; o.cardCrit.p = 1; }
+  }
+  return o;
+}
+/* as notas do cabeçalho: a 1ª coluna de cada prova vem do card; as refações
+   (e o que o card não tem) vêm do planner, digitadas pelo professor */
+function notasDe(a, pes) {
+  var guardadas = (((estado.dados[a.raf] || {}).planner || {}).notas) || {};
+  var out = {};
+  [['T1', pes && pes.notasAv1], ['T2', pes && pes.notasAv2]].forEach(function (par) {
+    var t = par[0], c = notasDaCelula(par[1]), g = guardadas[t] || {};
+    var n = { card: !!c, data: c && c.data || null, cardCrit: c ? c.cardCrit : {}, media: [c ? c.media : null, null, null], corrigida: {}, cardOrig: {} };
+    ['l', 'w', 'o', 'p'].forEach(function (k) {
+      var arr = [null, null, null];
+      [0, 1, 2].forEach(function (i) { var v = g[k] && g[k][i]; if (typeof v === 'number') arr[i] = v; });
+      /* a 1ª coluna vem do card, a não ser que o professor tenha corrigido (15/09/2026) */
+      if (c && c.cardCrit[k]) { if (arr[0] != null && arr[0] !== c[k]) { n.corrigida[k] = 1; n.cardOrig[k] = c[k]; } else arr[0] = c[k]; }
+      n[k] = arr;
+    });
+    out[t] = n;
+  });
+  return out;
+}
+var pendNotas = {};
+function aplicaNotasPendentes(raf, planner) {
+  var p = pendNotas[raf] || {};
+  Object.keys(p).forEach(function (chave) {
+    var q = chave.split('|'), t = q[0], crit = q[1], k = +q[2];
+    planner.notas = planner.notas || {}; planner.notas[t] = planner.notas[t] || {};
+    var arr = (planner.notas[t][crit] || [null, null, null]).slice(); arr[k] = p[chave]; planner.notas[t][crit] = arr;
+  });
+  return planner;
+}
+function salvaNota(a, t, crit, k, v) {
+  var d = estado.dados[a.raf] = estado.dados[a.raf] || { planner: { itens: {}, checking: {} } };
+  d.planner = d.planner || { itens: {}, checking: {} };
+  var chave = t + '|' + crit + '|' + k;
+  pendNotas[a.raf] = pendNotas[a.raf] || {}; pendNotas[a.raf][chave] = v;
+  aplicaNotasPendentes(a.raf, d.planner);
+  desenhaAguia();
+  var patch = { notas: {} }; patch.notas[t] = {}; patch.notas[t][crit] = {}; patch.notas[t][crit][k] = v;
+  post({ action: 'plannerProf', raf: a.raf, book: a.book, patch: patch }).then(function (r) {
+    if (pendNotas[a.raf] && pendNotas[a.raf][chave] === v) delete pendNotas[a.raf][chave];
+    if (r.planner) { estado.dados[a.raf].planner = aplicaPendentes(a.raf, aplicaNotasPendentes(a.raf, r.planner)); }
+  }).catch(function (e) {
+    if (pendNotas[a.raf]) delete pendNotas[a.raf][chave];
+    toast('⚠️ A nota não salvou (' + e.message + '). Digite de novo.');
+    desenhaAguia();
+  });
+}
+function fecharAguia() {
+  if (!aguia.ov) return;
+  var raf = aguia.raf;
+  aguia.ov.remove(); aguia.ov = null; aguia.raf = '';
+  document.body.classList.remove('com-aguia');
+  var bt = document.querySelector('.al[data-raf="' + raf + '"] [data-aguia]');
+  if (bt) bt.focus({ preventScroll: true });
+}
+function voltarDaAguia() {
+  if (history.state && history.state.aguia) history.back();   /* o popstate fecha */
+  else fecharAguia();
+}
+window.addEventListener('popstate', function () { if (aguia.ov) fecharAguia(); });
+document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && aguia.ov) voltarDaAguia(); });
+
+/* ── o guia do Checking: o roteiro da mesa, bloco a bloco (GUIA_CHECKING_E1) ── */
+function guiaDe(book) {
+  /* o guia do livro: Essentials 1 → GUIA_CHECKING_E1, Essentials 2 → E2 (14/09/2026) */
+  var m = String(book || '').toLowerCase().replace(/\s+/g, ' ').trim().match(/^(essentials|transitions|fluency) ([12])$/);
+  if (/^in focus(?!\s*review)/.test(String(book || '').toLowerCase().trim())) return window.GUIA_CHECKING_IF || null;
+  var mEs = String(book || '').toLowerCase().trim().match(/inmediato\s*([123])/);
+  if (mEs) return window['GUIA_CHECKING_I' + mEs[1]] || null;
+  return (m && window['GUIA_CHECKING_' + m[1].charAt(0).toUpperCase() + m[2]]) || null;
+}
+function guiaHTML(book, licaoId, nome, raf) {
+  var g = guiaDe(book); if (!g) return '';
+  var l = g.licoes.find(function (x) { return x.id === licaoId; }); if (!l) return '';
+  var primeiro = String(nome || '').split(' ')[0];
+  function bloco(k) {
+    var r = g.ROTEIRO.find(function (x) { return x.k === k; }) || {};
+    var linhas = g.linhasDe ? g.linhasDe(l, k) : [];
+    var corpo = '<table>' + linhas.map(function (ln) {
+      return '<tr class="' + (ln.quem === 'A' ? 'aluno' : 'prof') + '"><td class="diz">' + esc(ln.diz) + '</td><td class="nota">' + esc(ln.nota) + '</td></tr>';
+    }).join('') + '</table>';
+    return '<div class="bl"><h5>' + (r.ic ? r.ic + ' ' : '') + esc(r.t || k) + '</h5><p class="o">' + esc(r.o || '') + '</p>' + corpo +
+      '<button type="button" class="feito-btn">' + (g.idioma === 'es' ? '✓ Hecho' : '✓ Done') + '</button></div>';
+  }
+  var grande = 'checking-guia.html?book=' + encodeURIComponent(book) + '&licao=' + encodeURIComponent(licaoId) + '&aluno=' + encodeURIComponent(nome || '') + '&raf=' + encodeURIComponent(raf || '');
+  return '<details class="guia" open><summary>📋 Guia do Checking · ' + esc(l.rot) + ' · ' + esc(l.tema) + '<span class="tempo">com ' + esc(primeiro) + '</span></summary>' +
+    '<div class="vozes"><span><i style="background:#a8b907"></i>' + (g.idioma === 'es' ? 'Dice el profesor' : 'Teacher says') + '</span><span><i style="background:#1d3685"></i>' + (g.idioma === 'es' ? 'Dice el alumno' : 'Student says') + '</span></div>' +
+    '<a class="tela-grande" href="' + grande + '" target="_blank" rel="noopener">🖥️ Abrir em tela grande, para fazer junto com ' + esc(primeiro) + '</a>' +
+    g.ROTEIRO.map(function (r) { return bloco(r.k); }).join('') + '</details>';
+}
+
+/* ── o Checking ── */
+function abrirChecking(card, a, plano, pos) {
+  var jaAberto = card.querySelector('.ck');
+  if (jaAberto) { jaAberto.remove(); estado.aberto = ''; return; }
+  document.querySelectorAll('.ck').forEach(function (x) { x.remove(); });
+  estado.aberto = a.raf;
+  var reg = ((estado.dados[a.raf] || {}).planner || {}).checking || {};
+  var licoes = licoesDoLivro(plano);
+  var licao = (licoes.some(function (l) { return l.v === pos.id; }) ? pos.id : (licoes[0] || {}).v) || 'L1';
+  var ck = document.createElement('div'); ck.className = 'ck';
+  ck.innerHTML =
+    '<h4>Checking de ' + esc(a.nome) + '</h4>' +
+    '<div data-guia></div>' +
+    '<div class="registrado" data-reg hidden></div>' +
+    '<div class="lin"><label class="rot">Lição</label><select data-licao>' + licoes.map(function (l) { return '<option value="' + esc(l.v) + '"' + (l.v === licao ? ' selected' : '') + '>' + esc(l.t) + '</option>'; }).join('') + '</select></div>' +
+    '<div class="lin crit bom"><label class="rot">👍 Em que foi melhor (quantos quiser; o aluno vê)</label><span data-melhor>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</span></div>' +
+    '<div class="lin crit ruim"><label class="rot">👎 O que precisa melhorar (o aluno vê como pedidos)</label><span data-melhorar>' + CRITERIOS.map(function (c) { return '<button type="button" class="chip" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join('') + '</span></div>' +
+    '<div class="lin"><label class="rot">Pedidos para o aluno (até 8): toque nos prontos, que chegam com o botão do material, ou escreva. O que combina com o que precisa melhorar ganha ● e, se não depende do ponto, entra sozinho; na estrutura, escolha o vídeo e o Quick Practice do ponto fraco</label><span class="prontos" data-prontos></span><span class="pedidos" data-pedidos></span><input type="text" data-novo placeholder="Ou escreva um pedido e aperte Enter" maxlength="80"></div>' +
+    '<div class="lin"><label class="rot">Bilhete (até 400 letras; o aluno lê no planner)</label><textarea data-bilhete maxlength="400" placeholder="Good job on pronunciation. Study Do / Does before Lesson 4."></textarea></div>' +
+    '<div class="fim"><button type="button" class="btn btn-ck" data-salvar>Registrar Checking</button><button type="button" class="btn btn-ghost" data-fechar>Fechar</button><span class="aviso" data-aviso>O registro paga F$ 250 ao aluno, uma vez por lição.</span></div>';
+  card.appendChild(ck);
+  var f = {
+    licao: ck.querySelector('[data-licao]'), melhor: ck.querySelector('[data-melhor]'), melhorar: ck.querySelector('[data-melhorar]'),
+    pedidos: ck.querySelector('[data-pedidos]'), novo: ck.querySelector('[data-novo]'),
+    bilhete: ck.querySelector('[data-bilhete]'), reg: ck.querySelector('[data-reg]'), aviso: ck.querySelector('[data-aviso]'), salvar: ck.querySelector('[data-salvar]'),
+    prontos: ck.querySelector('[data-prontos]')
+  };
+  var pedidos = [];
+  /* a ligação dimensão → pedido (PlannerV2.pedidosSugeridos): o que entrou
+     sozinho sai sozinho quando a dimensão é desmarcada; o que o professor
+     tirou à mão não volta */
+  var autoPed = [], recusados = [];
+  function dimensoesMarcadas() { return Array.prototype.map.call(f.melhorar.querySelectorAll('.chip.on'), function (c) { return c.dataset.v; }); }
+  function nomeCrit(v) { var c = CRITERIOS.find(function (x) { return x[0] === v; }); return c ? c[1] : v; }
+  function sugestoes(aplicar) {
+    if (!(plano && window.PlannerV2 && PlannerV2.pedidosSugeridos)) return;
+    var s = PlannerV2.pedidosSugeridos(plano, f.licao.value, dimensoesMarcadas(), recusados);
+    if (aplicar) {
+      autoPed = autoPed.filter(function (id) {
+        if (s.auto.indexOf(id) > -1) return true;
+        var i = pedidos.indexOf(id); if (i > -1) pedidos.splice(i, 1);
+        return false;
+      });
+      s.auto.forEach(function (id) { if (pedidos.indexOf(id) < 0 && recusados.indexOf(id) < 0 && pedidos.length < 8) { pedidos.push(id); autoPed.push(id); } });
+    }
+    f.prontos.querySelectorAll('.chip').forEach(function (c) {
+      var d = s.destaque[c.dataset.id];
+      c.classList.toggle('sug', !!d);
+      c.title = d ? 'Sugerido para ' + d.map(nomeCrit).join(', ') : '';
+    });
+    if (aplicar) pintaPedidos();
+  }
+  /* os pedidos prontos da lição: o id viaja, o aluno recebe a frase com o
+     botão do material (PlannerV2.pedidosDa, a mesma lista que o portal usa) */
+  function prontos() { return (plano && window.PlannerV2 && PlannerV2.pedidosDa) ? PlannerV2.pedidosDa(plano, f.licao.value) : []; }
+  function rotuloDe(p) { var c = prontos().find(function (x) { return x.id === p; }); return c ? c.pt : p; }
+  function pintaPedidos() {
+    f.pedidos.innerHTML = pedidos.map(function (p, i) { return '<span class="ped">' + esc(rotuloDe(p)) + '<button type="button" data-i="' + i + '" aria-label="tirar">×</button></span>'; }).join('');
+    f.pedidos.querySelectorAll('button').forEach(function (b) { b.addEventListener('click', function () { var id = pedidos.splice(+b.dataset.i, 1)[0]; var ia = autoPed.indexOf(id); if (ia > -1) { autoPed.splice(ia, 1); recusados.push(id); } pintaPedidos(); }); });
+    f.prontos.querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('on', pedidos.indexOf(c.dataset.id) > -1); });
+  }
+  function pintaProntos() {
+    var lista = prontos();
+    f.prontos.innerHTML = lista.map(function (c) { return '<button type="button" class="chip" data-id="' + esc(c.id) + '">' + (c.tipo === 'extra' ? '★ ' : (c.code === 'ex' ? '▶ ' : '🎧 ')) + esc(c.pt) + '</button>'; }).join('');
+    f.prontos.querySelectorAll('.chip').forEach(function (c) { c.addEventListener('click', function () {
+      var i = pedidos.indexOf(c.dataset.id);
+      if (i > -1) { pedidos.splice(i, 1); var ia = autoPed.indexOf(c.dataset.id); if (ia > -1) { autoPed.splice(ia, 1); recusados.push(c.dataset.id); } }
+      else if (pedidos.length < 8) { pedidos.push(c.dataset.id); recusados = recusados.filter(function (x) { return x !== c.dataset.id; }); }
+      pintaPedidos();
+    }); });
+  }
+  function carregaLicao() {
+    var r = reg[f.licao.value] || {};
+    ck.querySelector('[data-guia]').innerHTML = guiaHTML(a.book, f.licao.value, a.nome, a.raf);
+    ck.querySelectorAll('[data-guia] .feito-btn').forEach(function (bt) { bt.addEventListener('click', function () { var bl = bt.closest('.bl'); bl.classList.toggle('feito'); var esG = (guiaDe(a.book) || {}).idioma === 'es'; bt.textContent = bl.classList.contains('feito') ? (esG ? '✓ Hecho · deshacer' : '✓ Done · undo') : (esG ? '✓ Hecho' : '✓ Done'); }); });
+    pintaProntos();
+    /* VÁRIOS ELOGIOS (Pedro, 19/09/2026): era um critério só; `melhores` é a lista e `melhor` continua com o primeiro, para os registros antigos e para quem lê o campo velho */
+    var jaBons = (r.melhores && r.melhores.length ? r.melhores : (r.melhor ? [r.melhor] : []));
+    f.melhor.querySelectorAll('.chip').forEach(function (c) { var on = jaBons.indexOf(c.dataset.v) > -1; c.classList.toggle('on', on); c.classList.toggle('melhor', on); });
+    f.melhorar.querySelectorAll('.chip').forEach(function (c) { var on = (r.melhorar || []).indexOf(c.dataset.v) > -1; c.classList.toggle('on', on); c.classList.toggle('pior', on); });
+    pedidos = (r.pedidos || []).slice(); autoPed = []; recusados = []; pintaPedidos(); sugestoes(false);
+    f.bilhete.value = r.bilhete || '';
+    f.reg.hidden = !r.feito;
+    if (r.feito) f.reg.textContent = '✓ Registrado' + (r.quem ? ' por ' + r.quem : '') + (r.quando ? ' em ' + new Date(r.quando).toLocaleDateString('pt-BR') : '') + '. Editar aqui atualiza o registro.';
+    f.salvar.textContent = r.feito ? 'Salvar alterações' : 'Registrar Checking';
+  }
+  f.licao.addEventListener('change', carregaLicao);
+  f.melhor.querySelectorAll('.chip').forEach(function (c) { c.addEventListener('click', function () {
+    var on = !c.classList.contains('on');
+    c.classList.toggle('on', on); c.classList.toggle('melhor', on);
+    if (on) { var m = f.melhorar.querySelector('.chip[data-v="' + c.dataset.v + '"]'); if (m) m.classList.remove('on', 'pior'); }
+    sugestoes(true);
+  }); });
+  f.melhorar.querySelectorAll('.chip').forEach(function (c) { c.addEventListener('click', function () {
+    var on = !c.classList.contains('on'); c.classList.toggle('on', on); c.classList.toggle('pior', on);
+    if (on) { var m = f.melhor.querySelector('.chip[data-v="' + c.dataset.v + '"]'); if (m) m.classList.remove('on', 'melhor'); }
+    sugestoes(true);
+  }); });
+  f.novo.addEventListener('keydown', function (ev) {
+    if (ev.key !== 'Enter') return; ev.preventDefault();
+    var v = f.novo.value.trim(); if (!v || pedidos.length >= 8) return;
+    pedidos.push(v.slice(0, 80)); f.novo.value = ''; pintaPedidos();
+  });
+  ck.querySelector('[data-fechar]').addEventListener('click', function () { ck.remove(); estado.aberto = ''; });
+  f.salvar.addEventListener('click', function () {
+    var melhores = Array.prototype.map.call(f.melhor.querySelectorAll('.chip.on'), function (c) { return c.dataset.v; }); var melhorar = Array.prototype.map.call(f.melhorar.querySelectorAll('.chip.on'), function (c) { return c.dataset.v; });
+    if (f.novo.value.trim() && pedidos.length < 8) { pedidos.push(f.novo.value.trim().slice(0, 80)); f.novo.value = ''; }
+    var checking = { licao: f.licao.value, feito: 1, melhores: melhores, melhor: melhores[0] || null, melhorar: melhorar, pedidos: pedidos.slice(), bilhete: f.bilhete.value.trim() };
+    /* A NOTA SAIU (pedido dos professores, 19/09/2026): o Checking registrado é que libera a próxima lição */
+    f.salvar.disabled = true; f.aviso.textContent = 'Registrando…'; f.aviso.className = 'aviso';
+    post({ action: 'plannerProf', raf: a.raf, book: a.book, patch: { checking: checking } }).then(function (r) {
+      if (r.planner) estado.dados[a.raf] = Object.assign(estado.dados[a.raf] || {}, { planner: r.planner });
+      var fd = r.fd;
+      toast(fd && fd.credito > 0 ? '✓ Checking ' + checking.licao + ' registrado · F$ ' + fd.credito + ' para ' + a.nome.split(' ')[0]
+           : (fd && fd.jaPago ? '✓ Checking ' + checking.licao + ' atualizado (já tinha sido pago)'
+           : (fd && fd.espelho ? '✓ Checking ' + checking.licao + ' registrado (aluno em piloto: sem F$)' : '✓ Checking ' + checking.licao + ' registrado')));
+      estado.aberto = '';
+      redesenhar(a);
+    }).catch(function (e) { f.salvar.disabled = false; f.aviso.textContent = '⚠️ ' + e.message; f.aviso.className = 'aviso err'; });
+  });
+  carregaLicao();
+  ck.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
+/* esconder as anotações quando a tela vai para a TV; a escolha fica no aparelho */
+(function () {
+  var b = $('obsToggle'); if (!b) return;
+  function pinta() { var off = document.body.classList.contains('sem-obs'); b.textContent = off ? '👁️ Mostrar as anotações' : '🙈 Esconder as anotações (tela na TV)'; }
+  try { if (localStorage.getItem('th:obs') === 'off') document.body.classList.add('sem-obs'); } catch (e) {}
+  pinta();
+  b.addEventListener('click', function () { document.body.classList.toggle('sem-obs'); try { localStorage.setItem('th:obs', document.body.classList.contains('sem-obs') ? 'off' : 'on'); } catch (e) {} pinta(); });
+})();
+/* a tela grande salvou o feedback: atualiza o aluno aqui sem recarregar */
+window.addEventListener('message', function (ev) {
+  var d = ev.data || {};
+  if (d.tipo !== 'checking' || !d.raf || !d.planner) return;
+  var a = estado.alunos.find(function (x) { return x.raf === d.raf; });
+  if (!a) return;
+  estado.dados[a.raf] = Object.assign(estado.dados[a.raf] || {}, { planner: d.planner });
+  estado.aberto = '';
+  redesenhar(a);
+  toast('✓ Feedback de ' + a.nome.split(' ')[0] + ' registrado pela tela grande. Falta só a nota.');
+});
+
+(function () {
+  var s = sessao();
+  if (!s || !s.token) { $('status').className = 'status err'; $('status').innerHTML = '⚠️ Entre no Fisk Hub para abrir a turma. <a href="index.html" style="font-weight:800">Ir para o login →</a>'; return; }
+  if (!window.PlannerV2) { status('⚠️ Não consegui carregar a régua do Planner (portalfisk.com.br). Recarregue a página.', true); return; }
+  initCascata();
+})();
+</script>
+<script src="/temp/th-falta-stub.js"></script>
+</body>
+</html>

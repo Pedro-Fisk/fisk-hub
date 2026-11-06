@@ -888,7 +888,9 @@ body.theme-dark .bd-cuidado{ background:#3a2f14; color:#f5d78e; }
    sumia: 100% de uma linha vazia é zero. Por isso o piso. */
 /* navegador antigo (o notebook da sala, 04/11) não entende max() e jogava fora a regra inteira: com height:0 os dois
    cards viravam só o cabeçalho, por cima da prateleira de baixo. O min-height simples antes é o piso dele. */
-.prat-grid .tt-card{ grid-column:span 2; max-height:none; height:0; min-height:232px; min-height:max(100%, 232px); }
+/* 06/11: o Safari (iPad, iPhone e Mac) resolvia o piso em % da linha como zero e os cards encolhiam até o
+   cabeçalho, por cima da prateleira de baixo. Agora a altura é fixa, sem % nem height:0: vale em qualquer navegador. */
+.prat-grid .tt-card{ grid-column:span 2; max-height:none; height:260px; min-height:0; }
 @media (max-width: 640px){ .prat-grid .tt-card{ height:auto; min-height:0; max-height:270px; } }
 .tt-card{ flex:0 1 auto; min-height:0; display:flex; flex-direction:column; background:var(--white); border:2px solid var(--surface-border-color,#a8bfd2);
   border-radius:16px; overflow:hidden; box-shadow:var(--surface-shadow, 0 4px 14px rgba(15,31,78,.08)); max-height:38vh; }
