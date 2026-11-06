@@ -2528,10 +2528,11 @@ function ptDesenha() {
     var L = (s.livros || {})[nome] || null, corpo = '';
     if (!L || (!L.itens.length && !(L.games || []).length)) corpo = '<div class="pt-nada">' + (s.geral ? esc(s.geral) : 'Sem atividade de livro nesta semana.') + '</div>';
     else {
-      L.itens.forEach(function (it) {
-        corpo += '<div class="pt-it">' + ptTick(nome, it.k, s.de) + '<span class="t">' + (PT_TIPO[it.tipo] ? '<span class="pt-tipo ' + esc(it.tipo) + '">' + PT_TIPO[it.tipo] + '</span>' : '') + esc(it.t) + ptQuando(nome, it.k) + '</span></div>';
-      });
-      if ((L.games || []).length) corpo += '<div class="pt-games">' + ptTick(nome, 'games:' + s.de, s.de) + '<span class="t"><b>🎲 Games e extras</b>' + esc(L.games.join('\n')) + ptQuando(nome, 'games:' + s.de) + '</span></div>';
+      var item = function (it) { return '<div class="pt-it">' + ptTick(nome, it.k, s.de) + '<span class="t">' + (PT_TIPO[it.tipo] ? '<span class="pt-tipo ' + esc(it.tipo) + '">' + PT_TIPO[it.tipo] + '</span>' : '') + esc(it.t) + ptQuando(nome, it.k) + '</span></div>'; };
+      var extras = L.itens.filter(ptEhExtra), games = (L.games || []).filter(function (g) { return String(g).trim().replace(/^-$/, ''); });
+      corpo += L.itens.filter(function (it) { return !ptEhExtra(it); }).map(item).join('');
+      if (extras.length || games.length) corpo += '<div class="pt-extras"><div class="tit">🎲 Games e extras<small>se der tempo · sem tique não vira atrasada</small></div>' + extras.map(item).join('') +
+        (games.length ? '<div class="pt-it pt-games">' + ptTick(nome, 'games:' + s.de, s.de) + '<span class="t">' + esc(games.join('\n')) + ptQuando(nome, 'games:' + s.de) + '</span></div>' : '') + '</div>';
     }
     var vigente = ptLicaoVigente(b, nome, sw.i);
     corpo = ptAtrasadas(b, nome, livro, sw, vigente) + corpo;
@@ -2562,6 +2563,12 @@ function ptDesenha() {
    voltar semana a semana caçando bolinha perdida. Tiquei hoje: ela fica à vista, marcada, até o fim do dia. Só a partir
    do primeiro tique do livro (antes disso a turma não usava o plano aqui, e acusar o semestre inteiro seria só ruído).
    Se a atrasada é de outra lição, os áudios e vídeos DAQUELA lição vêm junto. Games e extras não atrasam. */
+/* O QUE É EXTRA (professora via Pedro, 06/11/2026): turma kids tem até três livros na mesma sala, não dá tempo de
+   fazer os games de todos e quase nunca há computador para a Cyber Mission. Então o APP (Cyber Mission, Buddy's app) e
+   o game solto que o plano põe na lista do livro saem da lista obrigatória: aparecem só na semana prevista, embaixo,
+   junto com os Games e extras, e sem tique não viram atrasadas nem pendência de tutoria. Worksheet, SB, TE, MD e o
+   resto continuam obrigatórios. */
+function ptEhExtra(it) { return !!it && (it.tipo === 'app' || (it.tipo === 'outro' && /\bgames?\b/i.test(it.t || ''))); }
 function ptAtrasadas(b, nome, livro, sw, vigente) {
   if (!ptEstado.carregou) return '';
   var desde = '', hoje = diaAlvoTH(), lista = [], lics = [];
@@ -2571,6 +2578,7 @@ function ptAtrasadas(b, nome, livro, sw, vigente) {
     var Lp = (sp.livros || {})[nome]; if (sp.de < desde || sp.ate < PT_INICIO || !Lp || sp.de >= sw.s.de) return;
     var aberta = false;
     Lp.itens.forEach(function (it) {
+      if (ptEhExtra(it)) return;
       var m = ptMarca(nome, it.k);
       if (!m) aberta = true;
       if (!m || (m.d === hoje && m.s === sp.de)) lista.push({ s: sp, it: it });
@@ -2622,7 +2630,7 @@ function tutPendCaixa(a) {
   tp.faltas.forEach(function (f) {
     var lics = [], itens = '';
     f.itens.forEach(function (x) {
-      var d = tutItemDoPlano(P, x.livro, x.item); if (!d) return;
+      var d = tutItemDoPlano(P, x.livro, x.item); if (!d || ptEhExtra(d.it)) return;
       if (!x.feito) abertas++;
       var lic = ptLicaoVigente(d.b, x.livro, d.i); if (lic && lics.indexOf(lic) < 0) lics.push(lic);
       itens += '<div class="pt-it" style="' + ptCorVars(ptCor(x.livro)) + '"><button type="button" class="pt-tick' + (x.feito ? ' on' : '') + '" data-tpd="' + esc(f.data) + '" data-tpl="' + esc(x.livro) + '" data-tpk="' + esc(x.item) + '" aria-label="' + (x.feito ? 'Desmarcar' : 'Feito na tutoria') + '">' + (x.feito ? '✓' : '') + '</button><span class="t">' +
