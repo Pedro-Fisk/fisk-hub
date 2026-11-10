@@ -1432,6 +1432,81 @@
       return p;
     }
     function temMuralGuardado(){ return !!fiskCacheLe('hub:mural:' + eu(), FISK_CACHE_DIA); }
+    /* A EXPERIMENTAL QUE VIROU MATRÍCULA (Pedro, 09/11/2026: "uma grande animação quando o professor receber a notícia de
+       que uma aula experimental dele foi convertida em matrícula"). O aviso 'exp_fechou' chega pelo sino (o backend o
+       grava quando a secretaria marca "fechou" ou lança a matrícula a partir da experimental). A festa toma a tela inteira
+       uma vez por aviso, neste aparelho (localStorage), e nunca para a direção "vendo como". Com o "menos movimento" do
+       sistema ligado, a mesma festa fica parada: sem raios girando e com pouco confete. */
+    function festaExpFechou(lista){
+      var fila = (lista || []).filter(function(a){ try { return !localStorage.getItem('hub:expfesta:' + a.id); } catch(e) { return true; } });
+      if (!fila.length || document.getElementById('hubExpFesta')) return;
+      var a = fila[0], nome = String(a.titulo || '').replace(/^.*?:\s*/, '').replace(/!$/, '') || 'Aluno novo';
+      var suave = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+      if (!document.getElementById('hubExpFestaCss')) {
+        var st = document.createElement('style'); st.id = 'hubExpFestaCss';
+        st.textContent =
+          '#hubExpFesta{position:fixed;inset:0;z-index:10070;display:flex;align-items:center;justify-content:center;padding:16px;background:radial-gradient(circle at 50% 40%,#2b4fb8 0%,#14245e 55%,#0a1437 100%);overflow:hidden;animation:hef-in .5s ease-out both}' +
+          '#hubExpFesta .raios{position:absolute;left:50%;top:42%;width:220vmax;height:220vmax;margin:-110vmax 0 0 -110vmax;background:repeating-conic-gradient(rgba(255,255,255,.07) 0 9deg,transparent 9deg 18deg);animation:hef-gira 40s linear infinite;pointer-events:none}' +
+          '#hubExpFesta .c{position:relative;max-width:560px;width:100%;text-align:center;color:#fff}' +
+          '#hubExpFesta .trofeu{font-size:clamp(84px,22vw,150px);line-height:1;display:inline-block;filter:drop-shadow(0 12px 30px rgba(0,0,0,.35));animation:hef-pula 1.1s cubic-bezier(.2,.8,.3,1.3) both,hef-balanca 2.6s ease-in-out 1.1s infinite}' +
+          '#hubExpFesta .selo{display:inline-block;margin:18px 0 6px;background:#d4e909;color:#14245e;font-weight:900;letter-spacing:.08em;text-transform:uppercase;font-size:.8rem;padding:.35rem .8rem;border-radius:999px;animation:hef-sobe .5s .5s ease-out both}' +
+          '#hubExpFesta h2{margin:.35rem 0 .2rem;font-size:clamp(1.5rem,5.5vw,2.3rem);line-height:1.15;font-weight:900;animation:hef-sobe .5s .65s ease-out both}' +
+          '#hubExpFesta .nome{font-size:clamp(2rem,9vw,3.6rem);font-weight:900;line-height:1.05;margin:.3rem 0 .6rem;background:linear-gradient(90deg,#fde68a,#d4e909,#86efac,#fde68a);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:hef-sobe .6s .85s ease-out both,hef-brilho 4s linear 1.4s infinite;overflow-wrap:anywhere}' +
+          '#hubExpFesta p.t{margin:0 auto 1.4rem;max-width:30rem;font-size:1.02rem;line-height:1.5;color:#dbe4ff;animation:hef-sobe .5s 1.05s ease-out both}' +
+          '#hubExpFesta button{font:inherit;font-weight:900;font-size:1.05rem;border:0;border-radius:999px;padding:.85rem 1.6rem;background:#d4e909;color:#14245e;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.3);animation:hef-sobe .5s 1.25s ease-out both}' +
+          '#hubExpFesta button:focus-visible{outline:3px solid #fff;outline-offset:3px}' +
+          '#hubExpFesta canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}' +
+          '@keyframes hef-in{from{opacity:0}to{opacity:1}}@keyframes hef-gira{to{transform:rotate(360deg)}}' +
+          '@keyframes hef-pula{0%{transform:scale(.2) translateY(60px);opacity:0}60%{transform:scale(1.15) translateY(-10px);opacity:1}100%{transform:scale(1) translateY(0)}}' +
+          '@keyframes hef-balanca{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}' +
+          '@keyframes hef-sobe{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}@keyframes hef-brilho{to{background-position:300% 0}}' +
+          '@media (prefers-reduced-motion: reduce){#hubExpFesta .raios,#hubExpFesta .trofeu,#hubExpFesta .nome{animation:none}#hubExpFesta *{animation-duration:.01s!important;animation-delay:0s!important}}';
+        document.head.appendChild(st);
+      }
+      var d = document.createElement('div'); d.id = 'hubExpFesta'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-labelledby', 'hubExpFestaTit');
+      d.innerHTML = '<div class="raios" aria-hidden="true"></div><canvas aria-hidden="true"></canvas><div class="c"><div class="trofeu" aria-hidden="true">🏆</div><br>' +
+        '<span class="selo">Aula experimental</span><h2 id="hubExpFestaTit">A sua aula virou matrícula!</h2>' +
+        '<div class="nome">' + esc(nome) + '</div>' + (a.texto ? '<p class="t">' + esc(a.texto) + '</p>' : '') +
+        '<button type="button">Comemorar! 🎉' + (fila.length > 1 ? ' (mais ' + (fila.length - 1) + ')' : '') + '</button></div>';
+      document.body.appendChild(d);
+      var cv = d.querySelector('canvas'), ctx = cv.getContext('2d'), W = cv.width = innerWidth, H = cv.height = innerHeight, vivo = true;
+      var cores = ['#d4e909', '#fde68a', '#f472b6', '#60a5fa', '#34d399', '#fb923c', '#ffffff', '#a78bfa'], P = [];
+      function chuva(n){ for (var i = 0; i < n; i++) P.push({ x: Math.random() * W, y: -20 - Math.random() * H * .6, vx: (Math.random() - .5) * 2.5, vy: 1.5 + Math.random() * 3.5, g: .03, r: Math.random() * 6, vr: (Math.random() - .5) * .25, w: 6 + Math.random() * 7, h: 8 + Math.random() * 8, c: cores[i % cores.length], vida: 1e9 }); }
+      function fogo(x, y){ var c = cores[Math.floor(Math.random() * cores.length)]; for (var i = 0; i < 70; i++) { var ang = Math.random() * Math.PI * 2, v = 2 + Math.random() * 5.5; P.push({ x: x, y: y, vx: Math.cos(ang) * v, vy: Math.sin(ang) * v, g: .06, r: 0, vr: 0, w: 4, h: 4, c: c, vida: 70 + Math.random() * 30, fogo: true }); } }
+      chuva(suave ? 40 : 220);
+      var tiros = suave ? [] : [300, 900, 1500, 2300, 3200, 4300].map(function(ms){ return setTimeout(function(){ if (vivo) fogo(W * (.15 + Math.random() * .7), H * (.12 + Math.random() * .35)); }, ms); });
+      (function passo(){
+        if (!vivo) return; ctx.clearRect(0, 0, W, H);
+        P = P.filter(function(p){ return p.y < H + 30 && p.vida > 0; });
+        P.forEach(function(p){ p.vx *= p.fogo ? .97 : 1; p.x += p.vx; p.y += p.vy; p.vy += p.g; p.r += p.vr; p.vida--;
+          ctx.save(); ctx.globalAlpha = p.fogo ? Math.max(0, Math.min(1, p.vida / 40)) : 1; ctx.fillStyle = p.c; ctx.translate(p.x, p.y); ctx.rotate(p.r);
+          if (p.fogo) { ctx.beginPath(); ctx.arc(0, 0, 2.4, 0, Math.PI * 2); ctx.fill(); } else ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * .6); ctx.restore(); });
+        if (!suave && P.length < 60 && Math.random() < .2) chuva(12);
+        requestAnimationFrame(passo);
+      })();
+      /* a fanfarra: curta e alegre (o professor pode estar em sala; é uma vez só) */
+      var tocou = false;
+      function fanfarra(){ try { var AC = window.AudioContext || window.webkitAudioContext; if (!AC || tocou) return; var ac = new AC(); if (ac.state !== 'running') { ac.close(); return; } tocou = true; var t0 = ac.currentTime + .05;
+        [[523.25, 0], [659.25, .12], [783.99, .24], [1046.5, .4], [783.99, .62], [1046.5, .74]].forEach(function(n){ var o = ac.createOscillator(), g = ac.createGain(); o.type = 'triangle'; o.frequency.value = n[0];
+          g.gain.setValueAtTime(.0001, t0 + n[1]); g.gain.exponentialRampToValueAtTime(.08, t0 + n[1] + .03); g.gain.exponentialRampToValueAtTime(.0001, t0 + n[1] + (n[1] > .7 ? .9 : .35));
+          o.connect(g); g.connect(ac.destination); o.start(t0 + n[1]); o.stop(t0 + n[1] + 1); });
+        setTimeout(function(){ try { ac.close(); } catch(e) {} }, 2500); } catch(e) {} }
+      /* o navegador pode barrar o som antes do primeiro toque na página: aí a fanfarra toca no clique do "Comemorar" */
+      fanfarra();
+      var bt = d.querySelector('button'); try { bt.focus(); } catch(e) {}
+      function fecha(){
+        if (!tocou) { fanfarra(); if (tocou) { setTimeout(fechaJa, 900); return; } }
+        fechaJa();
+      }
+      function fechaJa(){
+        vivo = false; tiros.forEach(clearTimeout); d.remove(); document.removeEventListener('keydown', tecla);
+        try { localStorage.setItem('hub:expfesta:' + a.id, String(Date.now())); } catch(e) {}
+        try { if (window.FiskAvatarFesta) FiskAvatarFesta.viva({ selo: '🏆', som: false }); } catch(e) {}
+        if (fila.length > 1) setTimeout(function(){ festaExpFechou(fila.slice(1)); }, 500);
+      }
+      function tecla(e){ if (e.key === 'Escape') fecha(); }
+      bt.addEventListener('click', fecha); document.addEventListener('keydown', tecla);
+    }
     function desenhaMural(r, pedido){
         if (r[2] && r[2].ok) aniv = r[2].aniversariantes || [];
         if (pedido !== leitura) return;
@@ -1442,12 +1517,13 @@
         /* O RETORNO DA SECRETARIA (22/10/2026): "foi impresso", "foi enviado à família", "não será impresso". O servidor
            gravava esses avisos desde 20/10 e o mural não os mostrava (só a tutoria). Entram como recado, com o "Ciente"
            marcando o aviso como lido e o link para os pedidos. */
-        var pedidos = (ja && ja.ok ? ja.avisos || [] : []).filter(function(a){ return (a.tipo === 'impressao' || a.tipo === 'transferencia' || a.tipo === 'matricula' || a.tipo === 'experimental') && a.quando >= corte; }).map(function(a){
+        var pedidos = (ja && ja.ok ? ja.avisos || [] : []).filter(function(a){ return (a.tipo === 'impressao' || a.tipo === 'transferencia' || a.tipo === 'matricula' || a.tipo === 'experimental' || a.tipo === 'exp_fechou') && a.quando >= corte; }).map(function(a){
           /* transferência de aluno entre turmas, aluno novo matriculado pelo portal e aula experimental na turma (Portal da Secretaria, 23/10/2026): recado sem link */
           return { id: 'av|' + a.id, avId: a.id, aviso: true, quando: a.quando, tag: 'sec', titulo: esc(a.titulo),
                    html: a.texto ? '<p>' + texto(a.texto) + '</p>' : '', anexos: [], link: a.tipo === 'impressao' ? { href: 'imprimir.html#meus', rot: '📬 Ver meus pedidos' } : null, ciente: !!a.lido };
         });
         tutoria(); aniversarios();
+        if (ja && ja.ok && !como()) festaExpFechou((ja.avisos || []).filter(function(a){ return a.tipo === 'exp_fechou' && !a.lido && a.quando >= corte; }));
         try { document.dispatchEvent(new Event('hub-mural-pronto')); } catch (e) {}
         /* os informes não vieram (rede, sessão) e a conversa já está na tela: fica como estava */
         if ((!ji || ji.ok !== true) && assinatura) { conta(); return; }

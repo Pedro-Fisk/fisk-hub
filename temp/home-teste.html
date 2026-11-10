@@ -1,0 +1,8 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>teste home</title></head><body><script>
+/* banco de prova da home do Hub (não versionado): o servidor nunca responde, então a sessão de mentira não cai */
+localStorage.setItem('fisk_prof', JSON.stringify({ token: 'tok', name: 'Teste', escolas: 'Caçapava' }));
+localStorage.setItem('fisk_tour_hub_semana_v1', '1'); localStorage.setItem('hub_semana_aberta', '0');
+var _f = window.fetch;
+window.fetch = function (url) { if (String(url).indexOf('script.google.com') > -1) return new Promise(function () {}); return _f.apply(this, arguments); };
+_f('../index.html').then(function (r) { return r.text(); }).then(function (t) { document.open(); document.write(t.replace('<head>', '<head><base href="../">')); document.close(); });
+</script></body></html>
