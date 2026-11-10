@@ -1,0 +1,23 @@
+/* TROCA DE PERFIL NOS LOGINS DA EQUIPE (06/11/2026, pedido do Pedro)
+   Os três botões de baixo dos logins da equipe são IGUAIS em todo lugar: mesmos textos, mesma ordem, mesmo desenho,
+   mesmos destinos. Moram em três telas e dois repositórios:
+     · Fisk Hub (professor) ........ fisk-hub/index.html            → fisk-hub/assets/perfis-login.css
+     · Portal da Secretaria ........ portal-aluno-fisk/secretaria.html → portal-aluno-fisk/assets/perfis-login.css
+     · Painel da Direção ........... portal-aluno-fisk/diretor.html   → o mesmo arquivo acima
+   ⚠️ Este arquivo existe em DUPLICATA, byte a byte, nos dois repositórios (o Hub não carrega CSS do portal, de outra
+   origem). Mudou um, copie para o outro. O HTML do bloco também é o mesmo nas três telas; muda só qual botão leva
+   aria-current="page" (o da tela onde a pessoa está, que aparece marcado e não é clicável).
+   O Portal do Aluno (e o da família e o Kids) NÃO tem estes botões: aluno não troca de perfil.
+   Cores fixas de propósito, e não as variáveis de cada página: o --border e o --text da secretaria e do Hub diferem,
+   e a ideia é o botão ser o mesmo. Azul do padrão do Hub (--ui #2b4d70); no escuro, o azul claro do mesmo padrão. */
+.perfis-login{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem;margin:1rem 0 0;padding:0;font-family:inherit}
+.perfis-login a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15rem;min-height:56px;
+  padding:.45rem .3rem;border:1.5px solid #d3dce6;border-radius:14px;background:transparent;color:#1d3349;text-decoration:none;
+  font-weight:800;font-size:.76rem;line-height:1.2;text-align:center;transition:border-color .15s,background .15s}
+.perfis-login a .pl-ico{font-size:1.15rem;line-height:1}
+.perfis-login a:hover{border-color:#2b4d70;background:#e9eff5;color:#223e5a;text-decoration:none}
+.perfis-login a:focus-visible{outline:2px solid #2b4d70;outline-offset:2px}
+.perfis-login a[aria-current="page"]{border-color:#9db6cb;background:#e9eff5;color:#223e5a;pointer-events:none;cursor:default}
+body.theme-dark .perfis-login a{border-color:#3a5a78;color:#cfe0ee}
+body.theme-dark .perfis-login a:hover,
+body.theme-dark .perfis-login a[aria-current="page"]{border-color:#5b90c0;background:#16283a;color:#cfe0ee}

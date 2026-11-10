@@ -22,7 +22,8 @@
 <script>/* aplica o tema salvo antes da primeira pintura, para o modo escuro persistir entre as páginas sem piscar */try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
 <script>/* porteira do professor: decide antes da 1ª pintura se mostra o login ou o hub (sem flash) */try{document.body.classList.add(localStorage.getItem("fisk_prof")?"prof-in":"prof-out");}catch(e){document.body.classList.add("prof-out");}</script>
 
-  <link rel="stylesheet" href="assets/index.css?v=03fafc27ad">
+  <link rel="stylesheet" href="assets/index.css?v=fce605fede">
+  <link rel="stylesheet" href="assets/perfis-login.css?v=619a050111">
 
   <div id="profGate">
     <!-- ⚠️ O SELETOR DE IDIOMA SAIU DESTA TELA DE LOGIN EM 23/09/2026 (pedido
@@ -55,8 +56,8 @@
       <button type="button" id="pgSubmit" class="pg-btn">Entrar</button>
       <p id="pgMsg" class="pg-msg"></p>
       <p class="pg-help" data-i18n="pg-help">Sem usuário ou esqueceu a senha? Fale com a direção.</p>
-      <!-- LINKS CRUZADOS DOS TRÊS LOGINS (auditoria de 30/10/2026, Onda 4): quem caiu na porta errada acha a certa aqui -->
-      <p class="pg-cross"><a href="https://portalfisk.com.br/secretaria.html" data-i18n="pg-sou-sec">Sou da secretaria</a> · <a href="https://portalfisk.com.br" data-i18n="pg-sou-aluno">Sou aluno</a></p>
+      <!-- TROCA DE PERFIL (06/11/2026): o MESMO bloco nos três logins da equipe (Hub, secretaria, direção); ver assets/perfis-login.css -->
+      <nav class="perfis-login" aria-label="Trocar de perfil"><a href="https://pedro-fisk.github.io/fisk-hub/" aria-current="page"><span class="pl-ico" aria-hidden="true">🎓</span><span data-i18n="pl-prof">Sou professor</span></a><a href="https://portalfisk.com.br/secretaria.html"><span class="pl-ico" aria-hidden="true">🗂️</span><span data-i18n="pl-sec">Sou da secretaria</span></a><a href="https://portalfisk.com.br/diretor.html"><span class="pl-ico" aria-hidden="true">🧭</span><span data-i18n="pl-dir">Sou direção</span></a></nav>
     </div>
   </div>
 
@@ -577,6 +578,6 @@
   
   <script src="assets/fisk-shared.js?v=282254175d"></script>
   <script src="assets/fisk-pre-aula.js?v=43e6e651bf"></script>
-  <script src="assets/index.js?v=0c6e3c5165"></script>
+  <script src="assets/index.js?v=07af5b9915"></script>
 </body>
 </html>
