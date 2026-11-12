@@ -35,7 +35,8 @@ var estado = { escola: '', prof: '', turma: '', alunos: [], dados: {}, aberto: '
    não está na fila vai para o fim, marcado. "Aluno atendido" manda o cartão
    para baixo e o próximo sobe; fica no aparelho, por turma e dia. */
 function normNome(s) { return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toLowerCase(); }
-function chaveAtend() { var d = new Date(); if (estado.ontem) d.setDate(d.getDate() - 1); return 'th:atend:' + estado.escola + '|' + estado.prof + '|' + estado.turma + '|' + d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+/* a chave é do DIA DA AULA (hoje, ontem ou o dia escolhido na chamada kids), no formato de sempre (sem zero à esquerda) */
+function chaveAtend() { var p = diaAlvoTH().split('-'); return 'th:atend:' + estado.escola + '|' + estado.prof + '|' + estado.turma + '|' + Number(p[0]) + '-' + Number(p[1]) + '-' + Number(p[2]); }
 function lerAtendidos() { try { return JSON.parse(localStorage.getItem(chaveAtend()) || '{}'); } catch (e) { return {}; } }
 function guardaAtendidos() { try { localStorage.setItem(chaveAtend(), JSON.stringify(estado.atendidos)); } catch (e) {} }
 /* ── ORDEM DE PRIORIDADE NA HORA (Pedro, 15/09/2026, teste da direção) ──
@@ -192,8 +193,37 @@ function hojeIsoTH() { var d = new Date(); return d.getFullYear() + '-' + ('0' +
 /* A AULA DE ONTEM (Pedro, 17/09/2026): quem não conseguiu preencher na aula lança até o fim do dia seguinte. O
    servidor só aceita ontem, só se o aluno não tem aula hoje, só em célula vazia, e registra o lançamento tardio. */
 function ontemIsoTH() { var d = new Date(); d.setDate(d.getDate() - 1); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
-function diaAlvoTH() { return estado.ontem ? ontemIsoTH() : hojeIsoTH(); }
-function rotDiaTH() { return estado.ontem ? 'de ontem (' + ontemIsoTH().split('-').reverse().slice(0, 2).join('/') + ')' : 'de hoje'; }
+/* estado.dia: a aula de outro dia escolhida na chamada das turmas kids e teens (aaaa-mm-dd; '' = hoje) */
+function diaAlvoTH() { return estado.dia || (estado.ontem ? ontemIsoTH() : hojeIsoTH()); }
+function rotDiaTH() {
+  if (estado.dia) return 'de ' + estado.dia.split('-').reverse().slice(0, 2).join('/');
+  return estado.ontem ? 'de ontem (' + ontemIsoTH().split('-').reverse().slice(0, 2).join('/') + ')' : 'de hoje';
+}
+/* KIDS E TEENS LANÇAM DEPOIS (Pedro, 12/11/2026): "os professores pediram muito que pudessem preencher as informações
+   de aula depois da aula ou até outro dia; para turmas infantis essa regra não se aplicaria". A chamada das turmas do
+   plano escolhe o dia da aula, de hoje até DIAS_DEPOIS_KIDS para trás (o mesmo PLANO_DIAS_DEPOIS do servidor, que
+   confere). Presença, falta e o plano da semana passam a ser os daquele dia; o card só recebe em célula vazia ou com
+   placeholder, como sempre, e a direção vê o que entrou depois na _lancadoDepois. */
+var DIAS_DEPOIS_KIDS = 7;
+function diasDaChamadaKids() {
+  var out = [], sem = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+  for (var i = 0; i <= DIAS_DEPOIS_KIDS; i++) {
+    var d = new Date(); d.setDate(d.getDate() - i);
+    var iso = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+    var br = ('0' + d.getDate()).slice(-2) + '/' + ('0' + (d.getMonth() + 1)).slice(-2);
+    out.push({ iso: iso, rot: i === 0 ? 'Hoje (' + br + ')' : (i === 1 ? 'Ontem (' + br + ')' : sem[d.getDay()] + ' ' + br) });
+  }
+  return out;
+}
+function trocaDiaKids(iso) {
+  if (Object.keys(pendCard()).length) { toast('Antes de trocar o dia, envie as presenças que ainda não foram para o card.'); desenharTurma(); return; }
+  estado.dia = iso === hojeIsoTH() ? '' : iso;
+  estado.faltas = {};
+  estado.atendidos = lerAtendidos() || {};
+  desenharTurma();
+  if (ptEstado) { try { ptDesenha(); ptDesenhaAniv(); } catch (e) {} }   /* o plano e os aniversários da semana DAQUELE dia */
+  toast(estado.dia ? '📅 Lançando a aula ' + rotDiaTH() + '. Presença e falta vão para a célula desse dia no card, se estiver vazia ou com o placeholder.' : '📅 De volta à aula de hoje.');
+}
 function alternaOntem() {
   estado.ontem = !estado.ontem;
   estado.faltas = {};
@@ -575,6 +605,8 @@ function post(body, opcoes) {
   body.token = token();
   if (body.action === 'plannerProf' && estado.plantao) body.semCard = true;
   if ((body.action === 'plannerProf' || body.action === 'plannerFalta') && estado.ontem && !estado.plantao) body.data = ontemIsoTH();
+  /* a turma do plano: o servidor só aceita outro dia com `plano` (até PLANO_DIAS_DEPOIS dias) */
+  if ((body.action === 'plannerFalta' || body.action === 'plannerPresenca') && ptEstado && !estado.plantao) { body.plano = 1; if (estado.dia) body.data = estado.dia; }
   if (body.action === 'plannerFalta' && !body.quem) body.quem = (sessao() || {}).name || estado.prof || '';   /* plantão não é aula: o card não muda (Pedro, 16/09/2026) */
   return fiskFetch(EP, body, opcoes)
     .then(function (j) { if (!j || j.ok === false) throw new Error((j && (j.erro || j.error)) || 'Não consegui.'); return j; })
@@ -819,7 +851,7 @@ function carregarTurma(escola, prof, linha, titulo) {
   preTrava(false);
   var guardado = window.FiskPreAula ? FiskPreAula.le(escola, prof, linha) : null;
   planoTurmaDesmonta();
-  estado.escola = escola; estado.prof = prof; estado.turma = titulo; estado.plantao = false; estado.prioridade = false; estado.ontem = false;
+  estado.escola = escola; estado.prof = prof; estado.turma = titulo; estado.plantao = false; estado.prioridade = false; estado.ontem = false; estado.dia = '';
   $('alunos').innerHTML = ''; $('resumo').hidden = true; $('legenda').hidden = true;
   esperaFim();
   if (guardado) { guardado.vivo = true; preMostraTurma(guardado, meu, escola); }
@@ -2137,7 +2169,9 @@ function desenharChamadaKids(caixa) {
   var lista = estado.alunos.slice().sort(function (x, y) { return normNome(x.nome) < normNome(y.nome) ? -1 : 1; });
   var nVeio = lista.filter(function (a) { return estado.atendidos[a.raf]; }).length, nFalta = lista.filter(faltouHoje).length;
   var cab = document.createElement('div'); cab.className = 'ak-cab';
-  cab.innerHTML = '🙋 Presenças dos alunos <span class="cont">' + lista.length + ' alunos</span><span class="cont v">✓ ' + nVeio + ' vieram</span><span class="cont f">✗ ' + nFalta + ' faltaram</span>';
+  cab.innerHTML = '🙋 Presenças dos alunos <span class="cont">' + lista.length + ' alunos</span><span class="cont v">✓ ' + nVeio + ' vieram</span><span class="cont f">✗ ' + nFalta + ' faltaram</span>' +
+    '<label class="ak-dia">📅 Aula de <select>' + diasDaChamadaKids().map(function (o) { return '<option value="' + o.iso + '"' + (o.iso === diaAlvoTH() ? ' selected' : '') + '>' + o.rot + '</option>'; }).join('') + '</select></label>';
+  cab.querySelector('.ak-dia select').addEventListener('change', function () { trocaDiaKids(this.value); });
   /* "marcar todos" (Pedro, 27/10/2026): marca Veio em quem ainda não tem nem Veio nem Faltou; depois é só desmarcar
      quem não veio. A tela muda na hora; o card é escrito um aluno por vez, para não disputar a planilha. */
   var semMarca = lista.filter(function (a) { return !estado.atendidos[a.raf] && !faltouHoje(a); });
@@ -2148,6 +2182,12 @@ function desenharChamadaKids(caixa) {
     cab.appendChild(bt);
   }
   caixa.appendChild(cab);
+  if (estado.dia) {
+    var av = document.createElement('div'); av.className = 'ak-pend ak-depois';
+    av.innerHTML = '<span>📅 Você está lançando a aula ' + esc(rotDiaTH()) + '. O que marcar aqui vai para a célula desse dia no card.</span><button type="button">Voltar para hoje</button>';
+    av.querySelector('button').addEventListener('click', function () { trocaDiaKids(hojeIsoTH()); });
+    caixa.appendChild(av);
+  }
   var nPend = Object.keys(pendCard()).length;
   if (nPend) {
     var fx = document.createElement('div'); fx.className = 'ak-pend';
@@ -2178,8 +2218,11 @@ function desenharChamadaKids(caixa) {
     });
     el.querySelector('.ak-falta').addEventListener('click', function () {
       tiraPendente(a);   /* nada no card para desfazer: o "a" vai direto */
-      if (!estado.atendidos[a.raf]) { marcarFalta(a); return; }
-      presencaKids(a).then(function () { marcarFalta(a); });   /* veio e depois faltou: devolve o placeholder antes do "a" */
+      /* veio (e a presença já foi ao card) e depois faltou: o servidor devolve o placeholder e escreve o "a" num pedido
+         só (12/11/2026). Antes eram dois, e o "desfazer" dependia do cache: quando ele tinha perdido a presença, a
+         falta não sobrepunha e o aluno ficava com presença. */
+      if (estado.atendidos[a.raf]) { delete estado.atendidos[a.raf]; guardaAtendidos(); }
+      marcarFalta(a);
     });
     el.querySelector('.ak-nota').addEventListener('click', function () { if (!nota.firstChild) montaNotaKids(nota, a); nota.hidden = !nota.hidden; if (!nota.hidden) { var ta = nota.querySelector('textarea'); if (ta) ta.focus(); } });
     caixa.appendChild(el);

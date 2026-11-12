@@ -534,6 +534,12 @@ body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ 
   .ak-cab .cont.f{ background: #fee2e2; color: #b91c1c; }
   .ak-cab .ak-todos{ font-family: var(--font-body); font-size: .92rem; font-weight: 900; padding: .3rem .9rem; border-radius: 99px; border: 2px solid #10b981; background: #10b981; color: #fff; cursor: pointer; }
   .ak-cab .ak-todos:hover{ background: #059669; border-color: #059669; }
+  .ak-cab .ak-dia{ font-size: .88rem; font-weight: 800; display: inline-flex; align-items: center; gap: .35rem; }
+  .ak-cab .ak-dia select{ font: inherit; font-weight: 800; padding: .25rem .5rem; border-radius: 10px; border: 2px solid #cbd5e1; background: #fff; color: inherit; }
+  body.theme-dark .ak-cab .ak-dia select{ background: #1f2937; border-color: #475569; }
+  .ak-pend.ak-depois{ background: #e0f2fe; color: #075985; }
+  .ak-pend.ak-depois button{ background: #0284c7; }
+  body.theme-dark .ak-pend.ak-depois{ background: #0c2a3d; color: #7dd3fc; }
   .ak-pend{ display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .5rem .8rem; margin: -.3rem 0 .8rem; padding: .6rem 1rem; border-radius: 14px;
     background: #fffbeb; border: 2px dashed #f59e0b; color: #92400e; font-weight: 700; text-align: center; }
   .ak-pend button{ border: 0; border-radius: 99px; padding: .35rem .95rem; font-weight: 900; font-family: inherit; background: #f59e0b; color: #fff; cursor: pointer; }
