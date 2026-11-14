@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revisão das evidências, FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css?v=d6b8607281">
+<link rel="stylesheet" href="assets/casa-tema.css?v=1e1bb28a31">
+<meta name="theme-color" content="#161414">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+<script src="assets/fisk-shared.js?v=282254175d"></script>
+<style>
+  [hidden]{ display: none !important; }
+  main{ max-width: 1180px; margin: 0 auto; padding: 1.4rem 1rem 3rem; width: 100%; box-sizing: border-box; }
+  .painel{ background: var(--white); border: 2px solid var(--surface-border-color); border-radius: var(--surface-radius);
+           box-shadow: var(--surface-shadow); padding: 1.2rem 1.3rem; margin-bottom: 1rem; }
+  .painel h2{ margin: 0 0 .6rem; font-family: var(--font-heading); font-weight: 700; font-size: 1.1rem; color: var(--ui-dark, #223e5a); }
+  .aviso{ font-size: .9rem; color: var(--gray); margin: 0 0 .5rem; line-height: 1.45; }
+  .faixa-fechado{ display: flex; gap: .7rem; align-items: center; background: #fff7e6; border: 1.5px solid #f0c674; color: #6b4a0b;
+    border-radius: 12px; padding: .7rem .9rem; margin-bottom: 1rem; font-size: .92rem; line-height: 1.4; }
+  body.theme-dark .faixa-fechado{ background: #2a2412; border-color: #6b5a2a; color: #f3dfae; }
+
+  .abas{ display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .abas button{ font-family: inherit; font-weight: 800; font-size: .92rem; border: 0; background: var(--ui-soft, #e9eff5); color: var(--ui, #2b4d70);
+    padding: .6rem 1rem; border-radius: 999px; cursor: pointer; min-height: 44px; }
+  .abas button[aria-selected="true"]{ background: var(--ui, #2b4d70); color: #fff; }
+
+  .grade{ display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 1rem; align-items: start; }
+  @media (max-width: 820px){ .grade{ grid-template-columns: minmax(0, 1fr); } }
+  .fila{ display: flex; flex-direction: column; gap: .5rem; }
+  .it{ text-align: left; font-family: inherit; background: var(--white); border: 1.5px solid var(--surface-border-color, #e1e8ef); border-radius: 14px;
+    padding: .7rem; display: flex; gap: .75rem; align-items: center; cursor: pointer; color: inherit; width: 100%; }
+  .it[aria-current="true"]{ border: 2px solid var(--ui, #2b4d70); }
+  .it .th{ width: 52px; height: 52px; border-radius: 10px; overflow: hidden; background: var(--ui-soft, #e9eff5); flex: none; }
+  .it .th img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+  .it b{ display: block; font-size: .92rem; }
+  .it small{ font-size: .78rem; color: var(--gray); line-height: 1.35; display: block; }
+
+  .det{ display: flex; flex-direction: column; gap: .9rem; }
+  .det .cab{ display: flex; justify-content: space-between; align-items: baseline; gap: .6rem; flex-wrap: wrap; }
+  .det .cab h2{ margin: 0; }
+  .det .cab span{ font-size: .85rem; color: var(--gray); }
+  .alerta{ display: flex; gap: .6rem; background: #fff7e6; border: 1.5px solid #f0c674; color: #6b4a0b; border-radius: 12px; padding: .7rem .85rem; font-size: .9rem; line-height: 1.45; }
+  body.theme-dark .alerta{ background: #2a2412; border-color: #6b5a2a; color: #f3dfae; }
+  .fotos{ display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: .6rem; }
+  .foto{ position: relative; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden; background: var(--ui-soft, #e9eff5); border: 2.5px solid transparent; cursor: zoom-in; }
+  .foto img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+  .foto.capa{ border-color: var(--ui, #2b4d70); }
+  .foto .selo{ position: absolute; left: 6px; bottom: 6px; background: var(--ui, #2b4d70); color: #fff; font-size: .7rem; font-weight: 800; border-radius: 999px; padding: 2px 8px; }
+  .foto .tira{ position: absolute; right: 6px; top: 6px; width: 32px; height: 32px; border-radius: 50%; border: 0; background: rgba(22,20,20,.7); color: #fff; font-size: 1rem; cursor: pointer; }
+  .foto .faz-capa{ position: absolute; left: 6px; top: 6px; font-family: inherit; font-size: .7rem; font-weight: 800; border: 0; border-radius: 999px; padding: 4px 8px; background: rgba(255,255,255,.92); color: var(--ui-dark, #223e5a); cursor: pointer; }
+  .rot{ font-size: .78rem; font-weight: 800; letter-spacing: .03em; color: var(--gray); text-transform: uppercase; }
+  .contou{ font-size: .95rem; color: var(--gray); font-style: italic; margin: .2rem 0 0; }
+  input[type=text], textarea, select{ font-family: inherit; font-size: 1rem; color: var(--black); background: var(--white);
+    border: 1.5px solid var(--ui-bd, #9db6cb); border-radius: 10px; padding: .65rem .75rem; box-sizing: border-box; width: 100%; }
+  textarea{ resize: vertical; line-height: 1.55; }
+  .campo{ display: flex; flex-direction: column; gap: .35rem; }
+  .acoes{ display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; border-top: 1.5px solid var(--ui-soft, #e9eff5); padding-top: .9rem; }
+  .bt{ font-family: var(--font-heading); font-weight: 700; font-size: 1rem; border-radius: 12px; padding: .8rem 1.3rem; cursor: pointer; min-height: 48px; }
+  .bt.pub{ color: #fff; background: #1d7a55; border: 0; }
+  .bt.dev{ color: #9b1c22; background: var(--white); border: 1.5px solid #e9a3a6; }
+  .bt.sec{ color: var(--ui, #2b4d70); background: var(--white); border: 1.5px solid var(--ui-bd, #9db6cb); }
+  .bt:disabled{ opacity: .55; cursor: default; }
+  .devolve{ display: flex; flex-direction: column; gap: .5rem; background: #fdf1f1; border: 1.5px solid #e9a3a6; border-radius: 12px; padding: .8rem; }
+  body.theme-dark .devolve{ background: #3a1d1f; border-color: #6b2e31; }
+  .st{ font-size: .88rem; color: var(--gray); margin: 0; }
+  .st.err{ color: var(--red); font-weight: 700; }
+
+  .mods{ display: flex; flex-direction: column; gap: .8rem; }
+  .mod{ border: 1.5px solid var(--surface-border-color, #e1e8ef); border-radius: 14px; padding: .9rem; display: grid; grid-template-columns: minmax(0, 1fr) 200px; gap: .6rem; }
+  .mod textarea{ grid-column: 1 / -1; }
+  .mod .linha{ grid-column: 1 / -1; display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+  @media (max-width: 640px){ .mod{ grid-template-columns: minmax(0, 1fr); } }
+
+  .luz{ position: fixed; inset: 0; background: rgba(15,14,14,.94); z-index: 50; display: flex; flex-direction: column; }
+  .luz .topo{ display: flex; align-items: center; padding: 1rem 1.2rem; color: #fff; }
+  .luz .topo button{ margin-left: auto; width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.35); background: none; color: #fff; font-size: 1.2rem; cursor: pointer; }
+  .luz .palco{ flex: 1; display: flex; align-items: center; justify-content: center; padding: 0 1rem 1.5rem; min-height: 0; }
+  .luz .palco img{ max-width: min(1000px, 100%); max-height: 100%; border-radius: 8px; object-fit: contain; }
+</style>
+</head>
+<body>
+<script>try{var _t=localStorage.getItem("fisk_theme");if(_t==="dark"||(!_t&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches))document.body.classList.add("theme-dark");}catch(e){}</script>
+
+<header class="hero">
+  <a class="back-link" href="noticias.html" title="Voltar ao Enviar evidências">&larr; Evidências</a>
+  <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
+  <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+  <h1>Revisão das evidências</h1>
+  <p>Coordenação · nada chega às famílias sem passar por aqui</p>
+</header>
+
+<main>
+  <section class="painel" id="semSessao" hidden>
+    <h2>🔒 Entre no Fisk Hub primeiro</h2>
+    <p class="aviso">Volte à página inicial do Hub, entre com seu usuário e abra esta página de novo.</p>
+  </section>
+  <section class="painel" id="naoPode" hidden>
+    <h2>Só a coordenação</h2>
+    <p class="aviso">Esta página é da coordenação e da direção. Para enviar fotos da sua turma, use o <a href="noticias.html">Enviar evidências</a>.</p>
+  </section>
+
+  <div id="app" hidden>
+    <div class="faixa-fechado" id="faixaFechado" hidden>🔒 <span><b>Em teste, só a direção.</b> Professores e famílias ainda não veem nada daqui.</span></div>
+    <div class="abas" role="tablist" aria-label="Seções">
+      <button type="button" role="tab" id="abaFila" aria-selected="true">Para revisar</button>
+      <button type="button" role="tab" id="abaPub" aria-selected="false">Publicadas</button>
+      <button type="button" role="tab" id="abaMod" aria-selected="false">Modelos de recado</button>
+    </div>
+
+    <div class="grade" id="telaLista">
+      <aside class="fila" id="fila"><p class="aviso">Carregando…</p></aside>
+      <section class="painel det" id="det"><p class="aviso">Escolha uma evidência na lista.</p></section>
+    </div>
+
+    <section class="painel" id="telaMod" hidden>
+      <h2>Modelos de recado da escola</h2>
+      <p class="aviso">Os professores escolhem um destes no celular e completam as partes entre [colchetes]. Nada sai para as famílias com colchete aberto.</p>
+      <div class="mods" id="mods"></div>
+    </section>
+  </div>
+</main>
+
+<div class="luz" id="luz" hidden role="dialog" aria-modal="true" aria-label="Foto ampliada">
+  <div class="topo"><button type="button" id="luzFecha" aria-label="Fechar">✕</button></div>
+  <div class="palco"><img id="luzImg" alt=""></div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════════════════════════════════════════════════
+ * REVISÃO DAS EVIDÊNCIAS (Pedro, 14/11/2026): "Coordenação revisa antes". O professor envia pelo Enviar evidências
+ * (noticias.html); a evidência chega aqui com Status 'revisao' e só vai às famílias se a coordenação publicar. Ela pode
+ * tirar foto, trocar a capa e corrigir o título e o recado aqui mesmo; devolver exige o motivo, que o professor lê no
+ * celular. A aba Modelos de recado é onde a coordenação escreve os modelos que o professor usa.
+ * Servidor: fisk-hub-backend/Noticias.js (evidFila, evidRevisar, evidModelos*). Desenho: quadro 8 do "Campo de evidências".
+ * Revisor = direção ou Cargo com "coordena" na _profs. Fechado (NT_ABERTO) enquanto o Pedro não liberar.
+ * ════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
+var EP = FISK_HUB_EP;
+var est = { aba: 'revisao', itens: [], sel: null, edit: null, modelos: [], grupos: [] };
+var cacheFoto = {};
+function $(id) { return document.getElementById(id); }
+function esc(s) { return fiskEsc(String(s == null ? '' : s)); }
+function token() { return (fiskSessao() || {}).token || ''; }
+function nP(v) { return String(v || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
+function st(id, msg, err) { var el = $(id); if (!el) return; el.textContent = msg || ''; el.className = 'st' + (err ? ' err' : ''); }
+function get(params) {
+  params.token = token();
+  var qs = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
+  return fetch(EP + '?' + qs).then(fiskJson).then(function (j) { if (j && (j.erro || j.error)) throw new Error(j.erro || j.error); return j; });
+}
+function post(body) {
+  body.token = token();
+  return fetch(EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
+    .then(fiskJson).then(function (j) { if (!j || j.ok === false) throw new Error((j && (j.erro || j.error)) || 'Não consegui.'); return j; });
+}
+function foto(fid, tam) {
+  var k = fid + '|' + tam;
+  if (!cacheFoto[k]) cacheFoto[k] = post({ action: 'noticiaFoto', foto: fid, tam: tam }).then(function (r) { return 'data:' + (r.mime || 'image/jpeg') + ';base64,' + r.b64; })
+    .catch(function (e) { delete cacheFoto[k]; throw e; });
+  return cacheFoto[k];
+}
+function poeFoto(el, fid, tam) { foto(fid, tam).then(function (src) { var im = document.createElement('img'); im.alt = ''; im.src = src; el.insertBefore(im, el.firstChild); }).catch(function () {}); }
+function dataCurta(iso) { return iso ? iso.slice(8, 10) + '/' + iso.slice(5, 7) : ''; }
+var COLCHETE = /\[[^\]]*\]/;
+
+/* ── as abas ── */
+function abre(aba) {
+  est.aba = aba;
+  $('abaFila').setAttribute('aria-selected', String(aba === 'revisao'));
+  $('abaPub').setAttribute('aria-selected', String(aba === 'publicada'));
+  $('abaMod').setAttribute('aria-selected', String(aba === 'modelos'));
+  $('telaLista').hidden = aba === 'modelos'; $('telaMod').hidden = aba !== 'modelos';
+  if (aba === 'modelos') carregaModelos(); else carregaFila();
+}
+$('abaFila').onclick = function () { abre('revisao'); };
+$('abaPub').onclick = function () { abre('publicada'); };
+$('abaMod').onclick = function () { abre('modelos'); };
+
+/* ── a fila ── */
+function carregaFila() {
+  var aba = est.aba;
+  $('fila').innerHTML = '<p class="aviso">Carregando…</p>'; $('det').innerHTML = '<p class="aviso">Escolha uma evidência na lista.</p>';
+  post({ action: 'evidFila', estado: aba }).then(function (r) {
+    if (est.aba !== aba) return;
+    est.itens = r.itens || []; est.sel = null;
+    $('abaFila').textContent = 'Para revisar' + (aba === 'revisao' ? ' · ' + est.itens.length : '');
+    pintaFila();
+    if (est.itens.length && window.matchMedia('(min-width: 821px)').matches) escolhe(est.itens[0]);
+  }).catch(function (e) { $('fila').innerHTML = '<p class="aviso">' + esc(e.message) + '</p>'; });
+}
+function pintaFila() {
+  var f = $('fila'); f.innerHTML = '';
+  if (!est.itens.length) {
+    f.innerHTML = '<p class="aviso">' + (est.aba === 'revisao' ? 'Nada esperando revisão. 🎉' : 'Nenhuma publicada nos últimos 60 dias.') + '</p>';
+    $('det').innerHTML = '<p class="aviso">' + (est.aba === 'revisao' ? 'Quando um professor enviar, a evidência aparece aqui.' : '') + '</p>';
+    return;
+  }
+  est.itens.forEach(function (n) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'it';
+    if (est.sel && est.sel.id === n.id) b.setAttribute('aria-current', 'true');
+    var th = document.createElement('span'); th.className = 'th'; if (n.capa || n.fotos[0]) poeFoto(th, n.capa || n.fotos[0], 'mini');
+    b.appendChild(th);
+    var tx = document.createElement('span');
+    tx.innerHTML = '<b>' + esc(n.titulo || 'Sem título') + '</b><small>' + esc(n.autor) + ' · ' + esc(n.turma) + '<br>' + esc(n.escola) + ' · ' + esc(dataCurta(n.data)) + ' · ' + n.fotos.length + ' foto' + (n.fotos.length === 1 ? '' : 's') + '</small>';
+    b.appendChild(tx);
+    b.onclick = function () { escolhe(n); if (!window.matchMedia('(min-width: 821px)').matches) $('det').scrollIntoView({ behavior: 'smooth' }); };
+    f.appendChild(b);
+  });
+  if (est.aba === 'revisao') {
+    var p = document.createElement('p'); p.className = 'aviso'; p.textContent = 'A aula mais recente aparece primeiro: é a que a família está esperando.'; f.appendChild(p);
+  }
+}
+
+/* ── o detalhe ── */
+function escolhe(n) {
+  est.sel = n;
+  est.edit = { fotos: n.fotos.slice(), capa: n.capa && n.fotos.indexOf(n.capa) > -1 ? n.capa : n.fotos[0], devolvendo: false };
+  pintaFila(); pintaDet();
+  semImagem(n);
+}
+function pintaDet() {
+  var n = est.sel, e = est.edit, d = $('det'), revisa = est.aba === 'revisao';
+  d.innerHTML =
+    '<div class="cab"><h2>' + esc(n.titulo || 'Sem título') + '</h2><span>' + esc(n.autor) + ' · ' + esc(n.turma) + ' · ' + esc(n.escola) + '</span></div>' +
+    '<div class="alerta" id="alSem" hidden></div>' +
+    '<div class="fotos" id="dFotos"></div>' +
+    (n.frase ? '<div><span class="rot">O que o professor contou</span><p class="contou">"' + esc(n.frase) + '"</p></div>' : '') +
+    '<div class="campo"><label class="rot" for="dTit">Título</label><input type="text" id="dTit" maxlength="80"' + (revisa ? '' : ' readonly') + '></div>' +
+    '<div class="campo"><label class="rot" for="dTxt">O recado que as famílias vão ler' + (revisa ? ' (pode corrigir aqui)' : '') + '</label><textarea id="dTxt" rows="5" maxlength="1500"' + (revisa ? '' : ' readonly') + '></textarea></div>' +
+    (revisa ?
+      '<div class="acoes"><button type="button" class="bt pub" id="btPublica">Publicar para as famílias</button>' +
+      '<button type="button" class="bt dev" id="btDevolve">Devolver para ajuste</button></div>' +
+      '<div class="devolve" id="caixaDev" hidden><label class="rot" for="dMot">Motivo (o professor lê no celular)</label>' +
+      '<textarea id="dMot" rows="2" maxlength="300" placeholder="Ex.: Tire a foto 3, o aluno sem autorização aparece no fundo."></textarea>' +
+      '<div class="acoes" style="border:0;padding:0"><button type="button" class="bt dev" id="btDevConf">Devolver ao professor</button><button type="button" class="bt sec" id="btDevCanc">Cancelar</button></div></div>' +
+      '<p class="st" id="stDet"></p>'
+    : '<p class="aviso">Publicada' + (n.data ? ' (enviada em ' + esc(dataCurta(n.data)) + ')' : '') + '. Para tirar do ar, o professor exclui pelo Enviar evidências.</p>');
+  $('dTit').value = n.titulo; $('dTxt').value = n.texto;
+  pintaFotosDet();
+  if (!revisa) return;
+  $('btPublica').onclick = publica;
+  $('btDevolve').onclick = function () { $('caixaDev').hidden = false; $('dMot').focus(); };
+  $('btDevCanc').onclick = function () { $('caixaDev').hidden = true; };
+  $('btDevConf').onclick = devolve;
+}
+function pintaFotosDet() {
+  var n = est.sel, e = est.edit, box = $('dFotos'), revisa = est.aba === 'revisao';
+  box.innerHTML = '';
+  var lista = revisa ? n.fotos : e.fotos;
+  lista.forEach(function (fid, i) {
+    var fora = e.fotos.indexOf(fid) < 0;
+    var c = document.createElement('div'); c.className = 'foto' + (fid === e.capa && !fora ? ' capa' : '');
+    if (fora) c.style.opacity = '.35';
+    poeFoto(c, fid, 'mini');
+    c.onclick = function () { abreLuz(fid); };
+    if (fid === e.capa && !fora) { var s = document.createElement('span'); s.className = 'selo'; s.textContent = 'capa'; c.appendChild(s); }
+    if (revisa) {
+      var x = document.createElement('button'); x.type = 'button'; x.className = 'tira';
+      x.textContent = fora ? '↺' : '×'; x.setAttribute('aria-label', fora ? 'Devolver a foto ' + (i + 1) : 'Tirar a foto ' + (i + 1));
+      x.onclick = function (ev) {
+        ev.stopPropagation();
+        if (fora) e.fotos = n.fotos.filter(function (f) { return f === fid || e.fotos.indexOf(f) > -1; });
+        else e.fotos = e.fotos.filter(function (f) { return f !== fid; });
+        if (e.fotos.indexOf(e.capa) < 0) e.capa = e.fotos[0] || '';
+        pintaFotosDet();
+      };
+      c.appendChild(x);
+      if (!fora && fid !== e.capa) {
+        var k = document.createElement('button'); k.type = 'button'; k.className = 'faz-capa'; k.textContent = 'capa';
+        k.setAttribute('aria-label', 'Usar a foto ' + (i + 1) + ' como capa');
+        k.onclick = function (ev) { ev.stopPropagation(); e.capa = fid; pintaFotosDet(); };
+        c.appendChild(k);
+      }
+    }
+    box.appendChild(c);
+  });
+}
+/* quem da turma não autorizou imagem: os RAFs vêm do panorama do professor, a lista vem do servidor */
+function semImagem(n) {
+  get({ action: 'panoramaProf', escola: n.escola, prof: n.prof }).then(function (pj) {
+    var rafs = (pj.alunos || []).filter(function (a) { return a && !a.saiu && nP(String(a.turma || '').split('\n')[0]) === nP(n.turma); }).map(function (a) { return a.raf; });
+    return post({ action: 'noticiasListar', escola: n.escola, turma: n.turma, rafs: rafs });
+  }).then(function (r) {
+    var sem = r.semImagem || [], el = $('alSem');
+    if (!el || est.sel !== n || !sem.length) return;
+    el.hidden = false;
+    el.innerHTML = '⚠️ <span><b>Sem autorização de imagem nesta turma:</b> ' + esc(sem.join(', ')) + '. Confira cada foto antes de publicar.</span>';
+  }).catch(function () {});
+}
+function decide(decisao, motivo) {
+  var n = est.sel, e = est.edit;
+  var body = { action: 'evidRevisar', id: n.id, decisao: decisao, motivo: motivo || '', titulo: $('dTit').value.trim(), texto: $('dTxt').value.trim(), fotos: e.fotos, capa: e.capa };
+  Array.prototype.forEach.call(document.querySelectorAll('#det .bt'), function (b) { b.disabled = true; });
+  st('stDet', decisao === 'publicar' ? 'Publicando…' : 'Devolvendo…');
+  return post(body).then(function () {
+    est.itens = est.itens.filter(function (x) { return x.id !== n.id; });
+    $('abaFila').textContent = 'Para revisar · ' + est.itens.length;
+    est.sel = null; pintaFila();
+    $('det').innerHTML = '<p class="aviso">' + (decisao === 'publicar' ? '✓ Publicada. As famílias da turma já veem no Portal da Família.' : '✓ Devolvida. O professor vê o motivo no celular.') + '</p>';
+    if (est.itens.length && window.matchMedia('(min-width: 821px)').matches) setTimeout(function () { if (!est.sel) escolhe(est.itens[0]); }, 1200);
+  }).catch(function (err) {
+    st('stDet', err.message, true);
+    Array.prototype.forEach.call(document.querySelectorAll('#det .bt'), function (b) { b.disabled = false; });
+  });
+}
+function publica() {
+  if (!est.edit.fotos.length) { st('stDet', 'Fica pelo menos uma foto para publicar.', true); return; }
+  if (COLCHETE.test($('dTxt').value + ' ' + $('dTit').value)) { st('stDet', 'O recado ainda tem parte entre [colchetes]. Complete ou devolva.', true); return; }
+  if (!$('dTit').value.trim() || !$('dTxt').value.trim()) { st('stDet', 'Falta o título ou o recado.', true); return; }
+  decide('publicar');
+}
+function devolve() {
+  var m = $('dMot').value.trim();
+  if (m.length < 5) { st('stDet', 'Escreva o motivo para o professor.', true); $('dMot').focus(); return; }
+  decide('devolver', m);
+}
+
+/* ── a foto ampliada ── */
+function abreLuz(fid) { $('luz').hidden = false; $('luzImg').removeAttribute('src'); foto(fid, 'grande').then(function (src) { $('luzImg').src = src; }).catch(function () {}); $('luzFecha').focus(); }
+$('luzFecha').onclick = function () { $('luz').hidden = true; };
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('luz').hidden) $('luz').hidden = true; });
+
+/* ── os modelos ── */
+function carregaModelos() {
+  $('mods').innerHTML = '<p class="aviso">Carregando…</p>';
+  post({ action: 'evidModelos' }).then(function (r) { est.modelos = r.modelos || []; est.grupos = r.grupos || []; pintaModelos(); })
+    .catch(function (e) { $('mods').innerHTML = '<p class="aviso">' + esc(e.message) + '</p>'; });
+}
+function formModelo(m) {
+  var id = m ? m.id : 'novo', d = document.createElement('div'); d.className = 'mod';
+  d.innerHTML = '<input type="text" maxlength="60" aria-label="Nome do modelo" placeholder="Nome do modelo (ex.: Música em sala)">' +
+    '<select aria-label="Grupo">' + est.grupos.map(function (g) { return '<option>' + esc(g) + '</option>'; }).join('') + '</select>' +
+    '<textarea rows="3" maxlength="1200" aria-label="Texto do modelo" placeholder="Hoje a turma [o que fizeram]... Use [colchetes] no que o professor deve completar."></textarea>' +
+    '<div class="linha"><button type="button" class="bt sec" data-salva>' + (m ? 'Salvar' : 'Criar o modelo') + '</button>' +
+    (m ? '<button type="button" class="bt dev" data-tira>Tirar da lista</button>' : '') + '<p class="st"></p></div>';
+  var tit = d.querySelector('input'), gr = d.querySelector('select'), tx = d.querySelector('textarea'), s = d.querySelector('.st');
+  tit.value = m ? m.titulo : ''; gr.value = m ? m.grupo : (est.grupos[0] || 'Geral'); tx.value = m ? m.texto : '';
+  d.querySelector('[data-salva]').onclick = function () {
+    s.className = 'st'; s.textContent = 'Salvando…';
+    post({ action: 'evidModeloSalvar', id: m ? m.id : '', titulo: tit.value.trim(), texto: tx.value.trim(), grupo: gr.value })
+      .then(function () { s.textContent = '✓ Salvo.'; if (!m) carregaModelos(); }).catch(function (e) { s.className = 'st err'; s.textContent = e.message; });
+  };
+  if (m) d.querySelector('[data-tira]').onclick = function () {
+    if (!confirm('Tirar o modelo "' + m.titulo + '" da lista dos professores?')) return;
+    post({ action: 'evidModeloExcluir', id: m.id }).then(carregaModelos).catch(function (e) { s.className = 'st err'; s.textContent = e.message; });
+  };
+  return d;
+}
+function pintaModelos() {
+  var box = $('mods'); box.innerHTML = '';
+  var h = document.createElement('h2'); h.textContent = 'Novo modelo'; h.style.margin = '0'; box.appendChild(h);
+  box.appendChild(formModelo(null));
+  var h2 = document.createElement('h2'); h2.textContent = 'Na lista dos professores (' + est.modelos.length + ')'; h2.style.margin = '.6rem 0 0'; box.appendChild(h2);
+  est.modelos.forEach(function (m) { box.appendChild(formModelo(m)); });
+}
+
+fiskInitThemeToggle('themeToggle');
+fiskInitUserMenu();
+if (!token()) {
+  $('semSessao').hidden = false;
+} else {
+  post({ action: 'noticiasEstado' }).then(function (r) {
+    if (!r.revisor) { $('naoPode').hidden = false; return; }
+    $('app').hidden = false; $('faixaFechado').hidden = !!r.aberto;
+    abre('revisao');
+    fiskRegistrarUso('Revisão das evidências', 'noticias');
+  }).catch(function (e) {
+    if (/sess[ãa]o/i.test(e.message)) $('semSessao').hidden = false;
+    else { $('naoPode').hidden = false; $('naoPode').querySelector('.aviso').textContent = e.message; }
+  });
+}
+</script>
+</body>
+</html>
