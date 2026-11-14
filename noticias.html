@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Notícias da turma, FISK</title>
+<title>Enviar evidências, FISK</title>
 <link rel="stylesheet" href="assets/fisk-shared.css?v=d6b8607281">
 <link rel="stylesheet" href="assets/casa-tema.css?v=1e1bb28a31">
 <meta name="theme-color" content="#161414">
@@ -27,7 +27,8 @@
   .abas button[aria-pressed="true"]{ background: var(--ui, #2b4d70); color: #fff; }
   select, input[type=text], textarea{ font-family: inherit; font-size: 1rem; color: var(--black); background: var(--white);
     border: 1.5px solid var(--ui-bd, #9db6cb); border-radius: 10px; padding: .65rem .75rem; box-sizing: border-box; }
-  .barra select{ font-weight: 700; min-height: 42px; }
+  .barra select{ font-weight: 700; min-height: 42px; max-width: 100%; text-overflow: ellipsis; }
+  @media (max-width: 640px){ .barra select#turma{ flex: 1 1 100%; } }
 
   .colunas{ display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: flex-start; }
   .col-form{ flex: 999 1 560px; min-width: 0; }
@@ -58,8 +59,6 @@
   .mini-acoes{ display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; justify-content: space-between; }
   .pilula{ font-family: inherit; font-weight: 800; font-size: .85rem; color: var(--ui, #2b4d70); background: var(--white); border: 1.5px solid var(--ui-bd, #9db6cb);
     border-radius: 999px; padding: .4rem .85rem; cursor: pointer; }
-  .confere{ display: flex; gap: .6rem; align-items: flex-start; font-size: .9rem; line-height: 1.45; margin: 0 0 1rem; cursor: pointer; }
-  .confere input{ width: 20px; height: 20px; flex: none; margin-top: 1px; }
   .rodape{ display: flex; gap: .7rem; flex-wrap: wrap; align-items: center; border-top: 1.5px solid var(--ui-soft, #e9eff5); padding-top: 1rem; }
   .btn-pub{ font-family: var(--font-heading); font-weight: 700; font-size: 1.02rem; color: #fff; background: var(--ui, #2b4d70); border: 0; border-radius: 12px; padding: .85rem 1.5rem; cursor: pointer; }
   .btn-pub:disabled{ opacity: .55; cursor: default; }
@@ -94,7 +93,36 @@
   .lista-pub .tx b{ display: block; color: var(--black); font-size: .92rem; }
   .lista-pub button{ font-family: inherit; font-weight: 800; font-size: .82rem; background: none; border: 0; color: var(--ui, #2b4d70); cursor: pointer; padding: .3rem; }
   .lista-pub button.apaga{ color: var(--red); }
+  .lista-pub .bts{ display: flex; gap: .2rem; flex: none; }
+  .lista-pub button{ min-height: 40px; }
+  @media (max-width: 640px){ .lista-pub .it{ flex-wrap: wrap; } .lista-pub .bts{ width: 100%; padding-left: calc(48px + .7rem); } }
 
+  .btn-rev{ font-family: var(--font-heading); font-weight: 700; font-size: .92rem; color: #fff; background: #1d7a55; border-radius: 999px; padding: .55rem 1rem; text-decoration: none; min-height: 42px; box-sizing: border-box; display: inline-flex; align-items: center; }
+  .abas-recado{ display: flex; background: var(--ui-soft, #e9eff5); border-radius: 12px; padding: 4px; gap: 4px; }
+  .abas-recado button{ flex: 1; min-height: 44px; font-family: inherit; font-weight: 800; font-size: .9rem; color: var(--ui, #2b4d70); background: transparent; border: 0; border-radius: 9px; cursor: pointer; }
+  .abas-recado button[aria-selected="true"]{ background: var(--ui, #2b4d70); color: #fff; }
+  #painelContar, #painelModelos{ display: flex; flex-direction: column; gap: .5rem; }
+  #painelContar[hidden], #painelModelos[hidden]{ display: none; }
+  .btn-ia{ align-self: flex-start; }
+  .chips{ display: flex; gap: .4rem; flex-wrap: wrap; }
+  .chips button{ font-family: inherit; font-weight: 800; font-size: .8rem; color: var(--ui, #2b4d70); background: var(--ui-soft, #e9eff5); border: 0; border-radius: 999px; padding: .45rem .8rem; min-height: 36px; cursor: pointer; }
+  .chips button[aria-pressed="true"]{ background: var(--ui, #2b4d70); color: #fff; }
+  .modelos{ display: flex; flex-direction: column; gap: .5rem; }
+  .modelo{ border: 1.5px solid var(--ui-soft, #e1e8ef); border-radius: 12px; padding: .75rem; display: flex; flex-direction: column; gap: .35rem; }
+  .modelo b{ font-size: .95rem; }
+  .modelo p{ margin: 0; font-size: .88rem; line-height: 1.5; color: var(--gray); }
+  .modelo .acoes{ display: flex; gap: .5rem; margin-top: .2rem; }
+  .selo-st{ display: inline-block; margin-top: 3px; font-size: .7rem; font-weight: 800; border-radius: 999px; padding: 2px 8px; }
+  .selo-st.revisao{ color: #7a5208; background: #fff1d1; }
+  .selo-st.devolvida{ color: #9b1c22; background: #fde4e5; }
+  .selo-st.publicada{ color: #1d6b4c; background: #ddf3e8; }
+  .lista-pub .motivo{ display: block; margin-top: 3px; color: var(--black); font-style: italic; }
+  .faixa-devolvida{ background: #fde4e5; border: 1.5px solid #e9a3a6; color: #7a1a1e; border-radius: 12px; padding: .7rem .85rem; font-size: .9rem; line-height: 1.45; margin-bottom: 1rem; }
+  .dica-envio{ font-size: .82rem; color: var(--gray); margin: .7rem 0 0; line-height: 1.45; }
+  body.theme-dark .faixa-devolvida{ background: #3a1d1f; border-color: #6b2e31; color: #f5c9cb; }
+  body.theme-dark .selo-st.revisao{ background: #3a2f12; color: #f3dfae; }
+  body.theme-dark .selo-st.devolvida{ background: #3a1d1f; color: #f5c9cb; }
+  body.theme-dark .selo-st.publicada{ background: #15392a; color: #bfe9d3; }
   .luz{ position: fixed; inset: 0; background: rgba(15,14,14,.94); z-index: 50; display: flex; flex-direction: column; }
   .luz .topo{ display: flex; align-items: center; gap: 1rem; padding: 1rem 1.2rem; color: #fff; }
   .luz .topo b{ font-family: var(--font-heading); }
@@ -112,8 +140,8 @@
   <a class="back-link" href="index.html" title="Voltar ao Fisk Hub">&larr; Hub</a>
   <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
   <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
-  <h1>Notícias da turma</h1>
-  <p>As fotos da aula vão para o Canto da Família, só para os responsáveis da turma</p>
+  <h1>Enviar evidências</h1>
+  <p>As fotos da aula vão para as famílias da turma, depois da conferência da coordenação</p>
 </header>
 
 <main>
@@ -123,63 +151,81 @@
   </section>
   <section class="painel" id="fechado" hidden>
     <h2>Em breve</h2>
-    <p class="aviso">As Notícias da turma ainda estão em preparação pela direção.</p>
+    <p class="aviso">O Enviar evidências ainda está em preparação pela direção.</p>
   </section>
 
   <div id="app" hidden>
-    <div class="faixa-fechado" id="faixaFechado" hidden>🔒 <span><b>Só a direção vê esta ferramenta.</b> Nada daqui aparece para professores nem famílias até a publicação oficial ser autorizada.</span></div>
+    <div class="faixa-fechado" id="faixaFechado" hidden>🔒 <span><b>Só a direção vê esta ferramenta.</b> Nada daqui aparece para professores nem famílias até o lançamento ser autorizado.</span></div>
 
     <div class="barra">
       <span class="abas" role="group" aria-label="Modo">
-        <button type="button" id="abaPub" aria-pressed="true">Publicar</button>
+        <button type="button" id="abaPub" aria-pressed="true">Enviar</button>
         <button type="button" id="abaVer" aria-pressed="false">Ver como a família</button>
       </span>
       <select id="verComo" hidden aria-label="Turmas de qual professor"></select>
       <select id="turma" aria-label="Turma"><option value="">Carregando as turmas…</option></select>
+      <a class="btn-rev" id="btRevisar" href="revisao-evidencias.html" hidden>Revisar evidências</a>
     </div>
     <p class="st" id="stTurmas"></p>
 
     <div class="colunas" id="telaPub">
       <section class="painel col-form">
-        <h2 id="tituloForm">Nova notícia</h2>
+        <h2 id="tituloForm">Nova evidência</h2>
+        <div class="faixa-devolvida" id="faixaDevolvida" hidden></div>
 
         <div class="campo">
-          <div class="rot-linha"><span class="rot">1. Fotos</span><span class="dica" id="contaFotos">até 10 · reduzidas aqui antes de subir · toque numa foto para ela ser a capa</span></div>
+          <div class="rot-linha"><span class="rot">1. Fotos</span><span class="dica" id="contaFotos">até 10</span></div>
           <div class="fotos" id="fotos">
-            <button type="button" class="add" id="btAdd"><span>＋</span>Adicionar fotos</button>
+            <button type="button" class="add" id="btCamera"><span aria-hidden="true">📷</span>Tirar foto</button>
+            <button type="button" class="add" id="btAdd"><span aria-hidden="true">🖼️</span>Da galeria</button>
           </div>
+          <input type="file" id="arqCamera" accept="image/*" capture="environment" hidden>
           <input type="file" id="arq" accept="image/*" multiple hidden>
+          <span class="dica">Toque numa foto para ela ser a capa. Elas encolhem aqui antes de subir, para não gastar seu 4G.</span>
           <div class="alerta" id="alertaImagem" hidden></div>
         </div>
 
         <div class="campo">
-          <label for="frase">2. O que aconteceu na aula (uma frase basta)</label>
-          <div class="linha-frase">
-            <textarea id="frase" rows="2" maxlength="600" placeholder="Hoje foi dia de brincadeira com o bambolê"></textarea>
-            <button type="button" class="btn-ia" id="btIA">✨ Melhorar texto</button>
+          <span class="rot">2. O recado para as famílias</span>
+          <div class="abas-recado" role="tablist" aria-label="Como escrever o recado">
+            <button type="button" role="tab" id="abaContar" aria-selected="true">Contar a aula</button>
+            <button type="button" role="tab" id="abaModelos" aria-selected="false">Modelos da escola</button>
+          </div>
+          <div id="painelContar">
+            <label for="frase" class="dica">Conte do seu jeito o que aconteceu. Pode digitar ou falar pelo microfone do teclado.</label>
+            <div class="linha-frase">
+              <textarea id="frase" rows="3" maxlength="1000" placeholder="hoje brincamos de bambolê, eles pulavam quando eu falava a cor"></textarea>
+            </div>
+            <button type="button" class="btn-ia" id="btIA">✨ Transformar em recado</button>
+          </div>
+          <div id="painelModelos" hidden>
+            <div class="chips" id="chipsModelos" role="group" aria-label="Filtrar modelos"></div>
+            <div class="modelos" id="listaModelos"><p class="aviso">Carregando os modelos…</p></div>
+            <span class="dica">Os modelos são escritos pela coordenação. "Usar este" põe o texto no recado; complete as partes entre [colchetes].</span>
           </div>
         </div>
 
         <div class="campo">
-          <label for="titulo">3. Título curto</label>
-          <input type="text" id="titulo" maxlength="80" placeholder="Dia do bambolê">
+          <label for="titulo">Título curto</label>
+          <input type="text" id="titulo" maxlength="80" placeholder="Bambolê das cores">
         </div>
 
         <div class="campo">
-          <label for="texto">4. Texto para a família</label>
-          <textarea id="texto" rows="5" maxlength="1500" placeholder="Escreva aqui, ou use o “Melhorar texto” a partir da sua frase."></textarea>
+          <label for="texto">Recado pronto</label>
+          <textarea id="texto" rows="5" maxlength="1500" placeholder="O recado aparece aqui. Você pode mudar o que quiser."></textarea>
+          <div class="alerta" id="alertaColchete" hidden>✏️ <span>Ainda há parte entre [colchetes] para completar.</span></div>
           <div class="mini-acoes">
-            <span class="dica">Revise antes de publicar. O texto não cita nomes de alunos nem conta o que você não escreveu.</span>
-            <span><button type="button" class="pilula" id="btOutro">Gerar outro</button> <button type="button" class="pilula" id="btMinha">Usar a minha frase</button></span>
+            <span class="dica">O recado nunca cita nome de aluno nem conta o que não aconteceu.</span>
+            <span><button type="button" class="pilula" id="btOutro">Gerar outro</button> <button type="button" class="pilula" id="btMinha">Usar o meu texto</button></span>
           </div>
         </div>
 
-        <label class="confere"><input type="checkbox" id="confere"> Conferi foto por foto: nenhum aluno sem autorização de imagem aparece, nenhuma criança está numa situação constrangedora e o texto não cita nomes.</label>
         <div class="rodape">
-          <button type="button" class="btn-pub" id="btPub">Publicar nas Notícias da turma</button>
+          <button type="button" class="btn-pub" id="btPub">Enviar para a coordenação</button>
           <button type="button" class="pilula" id="btCancela" hidden>Cancelar a edição</button>
           <p class="st" id="stPub"></p>
         </div>
+        <p class="dica-envio">A coordenação confere as fotos e o recado antes de chegar às famílias. A situação aparece em "Enviadas nesta turma". Só os pais desta turma veem, por 60 dias, e a escola guarda a cópia.</p>
       </section>
 
       <aside class="col-lado">
@@ -188,7 +234,7 @@
           <div class="portal"><div id="previa"></div></div>
         </section>
         <section class="painel">
-          <h2>Já publicadas nesta turma</h2>
+          <h2>Enviadas nesta turma</h2>
           <div class="lista-pub" id="listaPub"><p class="aviso">Escolha a turma.</p></div>
         </section>
       </aside>
@@ -196,7 +242,7 @@
 
     <section class="painel" id="telaVer" hidden>
       <div class="portal">
-        <div class="cab-portal"><b>Notícias da turma</b><span id="cabTurma"></span></div>
+        <div class="cab-portal"><b>Fotos da turma</b><span id="cabTurma"></span></div>
         <div class="mural" id="mural"></div>
         <p class="aviso" style="text-align:center;margin-top:1rem" id="rodapeMural"></p>
       </div>
@@ -221,10 +267,15 @@
  * quem não pode. O "Ver como a família" é a prévia do que o Canto da Família vai mostrar; o Portal ainda não lê nada.
  * As fotos são reduzidas AQUI (1600 px e uma miniatura de 480 px) e sobem uma de cada vez; o servidor guarda numa pasta
  * privada e devolve os bytes só com a sessão, nunca por link.
+ * ENVIAR EVIDÊNCIAS (14/11/2026): o card ganhou este nome e a tela foi pensada para o celular. Nada sai direto para as
+ * famílias: a evidência vai para a coordenação (revisao-evidencias.html), que publica ou devolve com o motivo. O recado
+ * nasce do que o professor CONTOU (a IA arruma) ou de um modelo da escola; nada sai com [colchete] aberto.
+ * Desenho: quadros 6 a 8 do "Campo de evidências".
  * ════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
 var EP = FISK_HUB_EP;
 var MAX_FOTOS = 10;
-var est = { turmas: [], turma: null, fotos: [], capa: '', editando: '', lista: [], frase: '' };
+var est = { turmas: [], turma: null, fotos: [], capa: '', editando: '', lista: [], frase: '', modelos: [], grupo: '' };
+var COLCHETE = /\[[^\]]*\]/;
 var cacheFoto = {};
 function $(id) { return document.getElementById(id); }
 function esc(s) { return fiskEsc(String(s == null ? '' : s)); }
@@ -282,11 +333,23 @@ function carregaTurmas() {
       sel.innerHTML = '<option value="">' + (sessao().master && !como() ? 'Escolha um professor ao lado' : 'Nenhuma turma no card') + '</option>';
       est.turma = null; pintaTudo(); return;
     }
+    var hoje = turmaDeAgora(est.turmas);
     sel.innerHTML = est.turmas.map(function (t, i) {
-      return '<option value="' + i + '">' + esc(t.titulo) + ' · ' + esc(t.escola) + ' · ' + t.alunos.length + ' alunos</option>';
+      return '<option value="' + i + '"' + (i === hoje ? ' selected' : '') + '>' + esc(t.titulo) + ' · ' + esc(t.escola) + ' · ' + t.alunos.length + ' alunos</option>';
     }).join('');
-    escolheTurma(0);
+    escolheTurma(hoje);
   }).catch(function (e) { sel.innerHTML = '<option value="">Não consegui ler as turmas</option>'; st('stTurmas', e.message, true); });
+}
+/* abre na turma da aula de agora: o dia da semana no nome da turma e o horário mais perto (sem achar, a primeira) */
+var DIAS_TURMA = [/\bDOM/, /\bSEG/, /\bTER/, /\bQUA/, /\bQUI/, /\bSEX/, /\bS[AÁ]B/];
+function turmaDeAgora(lista) {
+  var d = new Date(), rx = DIAS_TURMA[d.getDay()], agora = d.getHours() * 60 + d.getMinutes(), melhor = 0, dist = 1e9;
+  lista.forEach(function (t, i) {
+    var nome = nP(t.titulo); if (!rx.test(nome)) return;
+    var m = /(\d{1,2})\s*H\s*(\d{2})?/.exec(nome), min = m ? (+m[1]) * 60 + (+(m[2] || 0)) : 12 * 60;
+    var dd = Math.abs(min - agora); if (dd < dist) { dist = dd; melhor = i; }
+  });
+  return melhor;
 }
 function escolheTurma(i) {
   est.turma = est.turmas[i] || null;
@@ -351,31 +414,37 @@ function pintaTudo() {
   var t = est.turma;
   /* a prévia: o que está no formulário agora */
   var local = {}; est.fotos.forEach(function (f) { if (f.id) local[f.id] = f.mini; });
-  var prev = { data: hojeIso(), autor: sessao().name || '', titulo: $('titulo').value.trim() || 'Título da notícia',
-               texto: $('texto').value.trim() || 'O texto para a família aparece aqui.', fotos: est.fotos.filter(function (f) { return f.id; }).map(function (f) { return f.id; }),
+  var prev = { data: hojeIso(), autor: sessao().name || '', titulo: $('titulo').value.trim() || 'Título curto',
+               texto: $('texto').value.trim() || 'O recado para as famílias aparece aqui.', fotos: est.fotos.filter(function (f) { return f.id; }).map(function (f) { return f.id; }),
                capa: est.capa, local: local };
   $('previa').innerHTML = ''; $('previa').appendChild(cartao(prev));
   /* a lista do professor */
   var lp = $('listaPub'); lp.innerHTML = '';
   if (!t) lp.innerHTML = '<p class="aviso">Escolha a turma.</p>';
-  else if (!est.lista.length) lp.innerHTML = '<p class="aviso">Nenhuma notícia publicada nos últimos ' + (est.dias || 60) + ' dias.</p>';
+  else if (!est.lista.length) lp.innerHTML = '<p class="aviso">Nenhuma evidência enviada nos últimos ' + (est.dias || 60) + ' dias.</p>';
   est.lista.forEach(function (n) {
     var it = document.createElement('div'); it.className = 'it';
     var th = document.createElement('div'); th.className = 'th'; if (n.capa || n.fotos[0]) poeFoto(th, n.capa || n.fotos[0], 'mini');
     it.appendChild(th);
     var tx = document.createElement('div'); tx.className = 'tx';
-    tx.innerHTML = '<b>' + esc(n.data.slice(8, 10) + '/' + n.data.slice(5, 7)) + ' · ' + esc(n.titulo) + '</b>' + n.fotos.length + ' foto' + (n.fotos.length === 1 ? '' : 's') + ' · ' + esc(n.autor);
+    var ROT = { revisao: 'Com a coordenação', devolvida: 'Voltou para ajuste', publicada: 'Publicada' };
+    tx.innerHTML = '<b>' + esc(n.data.slice(8, 10) + '/' + n.data.slice(5, 7)) + ' · ' + esc(n.titulo) + '</b>' + n.fotos.length + ' foto' + (n.fotos.length === 1 ? '' : 's') + ' · ' + esc(n.autor) +
+      '<br><span class="selo-st ' + esc(n.status) + '">' + esc(ROT[n.status] || n.status) + '</span>' +
+      (n.status === 'devolvida' && n.motivo ? '<span class="motivo">"' + esc(n.motivo) + '"</span>' : '');
     it.appendChild(tx);
-    var ed = document.createElement('button'); ed.type = 'button'; ed.textContent = 'Editar'; ed.onclick = function () { editar(n); }; it.appendChild(ed);
-    var ap = document.createElement('button'); ap.type = 'button'; ap.className = 'apaga'; ap.textContent = 'Excluir'; ap.onclick = function () { excluir(n); }; it.appendChild(ap);
+    var bts = document.createElement('span'); bts.className = 'bts'; it.appendChild(bts);
+    var ed = document.createElement('button'); ed.type = 'button'; ed.textContent = n.status === 'devolvida' ? 'Ajustar' : 'Editar'; ed.onclick = function () { editar(n); }; bts.appendChild(ed);
+    var ap = document.createElement('button'); ap.type = 'button'; ap.className = 'apaga'; ap.textContent = 'Excluir'; ap.onclick = function () { excluir(n); }; bts.appendChild(ap);
     lp.appendChild(it);
   });
   /* o mural da família */
   var mu = $('mural'); mu.innerHTML = '';
   $('cabTurma').textContent = t ? t.titulo + ' · ' + t.escola : '';
-  if (t && !est.lista.length) mu.innerHTML = '<p class="aviso">Ainda não há notícias desta turma.</p>';
-  est.lista.forEach(function (n) { mu.appendChild(cartao(n)); });
-  $('rodapeMural').textContent = 'Cada notícia fica aqui por ' + (est.dias || 60) + ' dias. A escola guarda a cópia.';
+  var pubs = est.lista.filter(function (n) { return n.status === 'publicada'; });
+  if (t && !pubs.length) mu.innerHTML = '<p class="aviso">Nenhuma evidência desta turma foi publicada ainda.</p>';
+  pubs.forEach(function (n) { mu.appendChild(cartao(n)); });
+  $('rodapeMural').textContent = 'Só os pais desta turma veem. Cada publicação fica aqui por ' + (est.dias || 60) + ' dias, e a escola guarda a cópia.';
+  $('alertaColchete').hidden = !COLCHETE.test($('texto').value + ' ' + $('titulo').value);
 }
 
 /* ── as fotos: reduzir aqui, subir uma de cada vez ── */
@@ -405,10 +474,10 @@ function pintaFotos() {
     x.onclick = function (ev) { ev.stopPropagation(); est.fotos.splice(est.fotos.indexOf(f), 1); if (est.capa === f.id) est.capa = (est.fotos.filter(function (y) { return y.id; })[0] || {}).id || ''; pintaFotos(); pintaTudo(); };
     d.appendChild(x);
     d.onclick = function () { if (f.id) { est.capa = f.id; pintaFotos(); pintaTudo(); } };
-    box.insertBefore(d, $('btAdd'));
+    box.insertBefore(d, $('btCamera'));
   });
-  $('btAdd').hidden = est.fotos.length >= MAX_FOTOS;
-  $('contaFotos').textContent = est.fotos.length + ' de ' + MAX_FOTOS + ' · reduzidas aqui antes de subir · toque numa foto para ela ser a capa';
+  $('btAdd').hidden = $('btCamera').hidden = est.fotos.length >= MAX_FOTOS;
+  $('contaFotos').textContent = est.fotos.length + ' de ' + MAX_FOTOS;
 }
 var _fila = Promise.resolve();
 function adicionaFotos(lista) {
@@ -426,21 +495,23 @@ function adicionaFotos(lista) {
       }).catch(function (e) { f.erro = true; pintaFotos(); st('stPub', e.message, true); });
     });
   });
-  if (lista.length > vagas) st('stPub', 'Cabem ' + MAX_FOTOS + ' fotos por notícia. As outras ficaram de fora.', true);
+  if (lista.length > vagas) st('stPub', 'Cabem ' + MAX_FOTOS + ' fotos por evidência. As outras ficaram de fora.', true);
   pintaFotos();
 }
 
 /* ── o texto ── */
 function melhora() {
   var frase = $('frase').value.trim(), bt = $('btIA');
-  if (frase.length < 8) { st('stPub', 'Escreva uma frase sobre a aula primeiro.', true); $('frase').focus(); return; }
+  if (frase.length < 8) { st('stPub', 'Conte primeiro o que aconteceu na aula.', true); $('frase').focus(); return; }
   /* nome de aluno não sai daqui para a IA (servidor nos EUA): a frase com um nome da turma é barrada antes */
   var nomes = nomesNaFrase(frase);
-  if (nomes.length) { st('stPub', 'Tire o nome de aluno da frase antes (' + nomes.join(', ') + '). Escreva "a turma" ou "as crianças".', true); $('frase').focus(); return; }
+  if (nomes.length) { st('stPub', 'Tire o nome de aluno do texto antes (' + nomes.join(', ') + '). Escreva "a turma" ou "as crianças".', true); $('frase').focus(); return; }
   bt.disabled = true; bt.textContent = '✨ Escrevendo…'; st('stPub', '');
   post({ action: 'noticiaTexto', frase: frase, livro: (est.turma || {}).livro || '' }).then(function (r) {
-    $('texto').value = r.texto; est.frase = frase; pintaTudo();
-  }).catch(function (e) { st('stPub', e.message, true); }).then(function () { bt.disabled = false; bt.textContent = '✨ Melhorar texto'; });
+    $('texto').value = r.texto; est.frase = frase;
+    if (r.titulo && (!$('titulo').value.trim() || $('titulo').dataset.ia === '1')) { $('titulo').value = r.titulo; $('titulo').dataset.ia = '1'; }
+    pintaTudo();
+  }).catch(function (e) { st('stPub', e.message, true); }).then(function () { bt.disabled = false; bt.textContent = '✨ Transformar em recado'; });
 }
 
 function semAcento(s) { return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
@@ -458,8 +529,9 @@ function nomesNaFrase(frase) {
 /* ── publicar, editar, excluir ── */
 function limpaForm() {
   est.fotos = []; est.capa = ''; est.editando = ''; est.frase = '';
-  $('frase').value = ''; $('titulo').value = ''; $('texto').value = ''; $('confere').checked = false;
-  $('tituloForm').textContent = 'Nova notícia'; $('btPub').textContent = 'Publicar nas Notícias da turma'; $('btCancela').hidden = true;
+  $('frase').value = ''; $('titulo').value = ''; $('texto').value = ''; $('titulo').dataset.ia = '';
+  $('tituloForm').textContent = 'Nova evidência'; $('btPub').textContent = 'Enviar para a coordenação'; $('btCancela').hidden = true;
+  $('faixaDevolvida').hidden = true;
   st('stPub', ''); pintaFotos(); pintaTudo();
 }
 function publicar() {
@@ -468,15 +540,15 @@ function publicar() {
   if (est.fotos.some(function (f) { return !f.id && !f.erro; })) { st('stPub', 'Espere as fotos terminarem de subir.', true); return; }
   var ids = est.fotos.filter(function (f) { return f.id; }).map(function (f) { return f.id; });
   if (!ids.length) { st('stPub', 'Mande pelo menos uma foto.', true); return; }
-  if (!$('titulo').value.trim()) { st('stPub', 'Dê um título curto à notícia.', true); $('titulo').focus(); return; }
-  if (!$('texto').value.trim()) { st('stPub', 'Falta o texto para a família.', true); $('texto').focus(); return; }
+  if (!$('texto').value.trim()) { st('stPub', 'Falta o recado para as famílias.', true); $('texto').focus(); return; }
+  if (!$('titulo').value.trim()) { st('stPub', 'Dê um título curto.', true); $('titulo').focus(); return; }
+  if (COLCHETE.test($('texto').value + ' ' + $('titulo').value)) { st('stPub', 'Complete as partes entre [colchetes] antes de enviar.', true); $('texto').focus(); return; }
   var nomes = nomesNaFrase($('texto').value + ' ' + $('titulo').value);
   if (nomes.length) { st('stPub', 'O texto cita nome de aluno (' + nomes.join(', ') + '). Tire antes de publicar.', true); $('texto').focus(); return; }
-  if (!$('confere').checked) { st('stPub', 'Marque a conferência das fotos antes de publicar.', true); $('confere').focus(); return; }
-  bt.disabled = true; st('stPub', 'Publicando…');
+  bt.disabled = true; st('stPub', 'Enviando…');
   post({ action: 'noticiaSalvar', id: est.editando || '', escola: t.escola, prof: t.prof, turma: t.titulo, titulo: $('titulo').value.trim(),
          texto: $('texto').value.trim(), frase: $('frase').value.trim(), fotos: ids, capa: est.capa }).then(function () {
-    var era = est.editando; limpaForm(); st('stPub', era ? '✓ Notícia atualizada.' : '✓ Publicada. Só a direção vê enquanto a ferramenta não for liberada.');
+    limpaForm(); st('stPub', '✓ Enviada para a coordenação. Quando for publicada, a situação muda aqui embaixo.');
     carregaLista();
   }).catch(function (e) { st('stPub', e.message, true); }).then(function () { bt.disabled = false; });
 }
@@ -484,12 +556,15 @@ function editar(n) {
   est.editando = n.id; est.capa = n.capa || n.fotos[0];
   est.fotos = n.fotos.map(function (fid) { return { id: fid, mini: '' }; });
   $('frase').value = n.frase || ''; $('titulo').value = n.titulo; $('texto').value = n.texto;
-  $('tituloForm').textContent = 'Editando: ' + n.titulo; $('btPub').textContent = 'Salvar a notícia'; $('btCancela').hidden = false;
+  $('tituloForm').textContent = 'Editando: ' + n.titulo; $('btPub').textContent = 'Enviar de novo para a coordenação'; $('btCancela').hidden = false;
+  $('faixaDevolvida').hidden = n.status !== 'devolvida';
+  if (n.status === 'devolvida') $('faixaDevolvida').innerHTML = '<b>A coordenação pediu um ajuste:</b> ' + esc(n.motivo || '');
+  else if (n.status === 'publicada') st('stPub', 'Esta já está publicada. Se mudar, ela sai das famílias até a coordenação conferir de novo.');
   est.fotos.forEach(function (f) { foto(f.id, 'mini').then(function (src) { f.mini = src; pintaFotos(); pintaTudo(); }).catch(function () {}); });
   pintaFotos(); pintaTudo(); window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 function excluir(n) {
-  if (!confirm('Excluir a notícia "' + n.titulo + '"? As fotos vão para a lixeira do Drive.')) return;
+  if (!confirm('Excluir a evidência "' + n.titulo + '"? Ela sai das famílias e as fotos vão para a lixeira do Drive.')) return;
   post({ action: 'noticiaExcluir', id: n.id }).then(function () { if (est.editando === n.id) limpaForm(); carregaLista(); })
     .catch(function (e) { alert(e.message); });
 }
@@ -533,6 +608,45 @@ function montaVerComo() {
   });
 }
 
+/* ── os modelos da escola ── */
+function carregaModelos() {
+  post({ action: 'evidModelos' }).then(function (r) { est.modelos = r.modelos || []; pintaModelos(); })
+    .catch(function (e) { $('listaModelos').innerHTML = '<p class="aviso">' + esc(e.message) + '</p>'; });
+}
+function pintaModelos() {
+  var grupos = []; est.modelos.forEach(function (m) { if (grupos.indexOf(m.grupo) < 0) grupos.push(m.grupo); });
+  $('chipsModelos').innerHTML = [''].concat(grupos).map(function (gp) {
+    return '<button type="button" data-g="' + esc(gp) + '" aria-pressed="' + (gp === est.grupo) + '">' + esc(gp || 'Todos') + '</button>';
+  }).join('');
+  var ms = est.modelos.filter(function (m) { return !est.grupo || m.grupo === est.grupo; });
+  $('listaModelos').innerHTML = ms.length ? ms.map(function (m) {
+    return '<div class="modelo"><b>' + esc(m.titulo) + '</b><p>' + esc(m.texto) + '</p><div class="acoes">' +
+      '<button type="button" class="btn-pub" style="font-size:.85rem;padding:.5rem 1rem" data-usa="' + esc(m.id) + '">Usar este</button>' +
+      '<button type="button" class="pilula" data-copia="' + esc(m.id) + '">Copiar</button></div></div>';
+  }).join('') : '<p class="aviso">Nenhum modelo neste grupo.</p>';
+}
+$('chipsModelos').addEventListener('click', function (e) { var b = e.target.closest('[data-g]'); if (!b) return; est.grupo = b.getAttribute('data-g'); pintaModelos(); });
+$('listaModelos').addEventListener('click', function (e) {
+  var u = e.target.closest('[data-usa]'), c = e.target.closest('[data-copia]');
+  if (!u && !c) return;
+  var id = u ? u.getAttribute('data-usa') : c.getAttribute('data-copia');
+  var m = est.modelos.find(function (x) { return x.id === id; });
+  if (!m) return;
+  if (c) { (navigator.clipboard ? navigator.clipboard.writeText(m.texto) : Promise.reject()).then(function () { c.textContent = '✓ Copiado'; setTimeout(function () { c.textContent = 'Copiar'; }, 1600); }).catch(function () {}); return; }
+  if ($('texto').value.trim() && !confirm('Trocar o recado que já está escrito por este modelo?')) return;
+  $('texto').value = m.texto;
+  if (!$('titulo').value.trim() || $('titulo').dataset.ia === '1') { $('titulo').value = m.titulo; $('titulo').dataset.ia = '1'; }
+  pintaTudo();
+  var i = m.texto.indexOf('['); $('texto').focus(); if (i > -1) $('texto').setSelectionRange(i, m.texto.indexOf(']', i) + 1);
+});
+function abaRecado(modelos) {
+  $('abaContar').setAttribute('aria-selected', String(!modelos)); $('abaModelos').setAttribute('aria-selected', String(!!modelos));
+  $('painelContar').hidden = !!modelos; $('painelModelos').hidden = !modelos;
+}
+$('abaContar').onclick = function () { abaRecado(false); };
+$('abaModelos').onclick = function () { abaRecado(true); };
+$('titulo').addEventListener('input', function () { this.dataset.ia = ''; });
+
 function modo(ver) {
   $('abaPub').setAttribute('aria-pressed', ver ? 'false' : 'true'); $('abaVer').setAttribute('aria-pressed', ver ? 'true' : 'false');
   $('telaPub').hidden = ver; $('telaVer').hidden = !ver;
@@ -541,6 +655,8 @@ $('abaPub').onclick = function () { modo(false); };
 $('abaVer').onclick = function () { modo(true); };
 $('turma').addEventListener('change', function () { if (this.value !== '') escolheTurma(+this.value); });
 $('btAdd').onclick = function () { $('arq').click(); };
+$('btCamera').onclick = function () { $('arqCamera').click(); };
+$('arqCamera').addEventListener('change', function () { if (this.files && this.files.length) adicionaFotos(this.files); this.value = ''; });
 $('arq').addEventListener('change', function () { if (this.files && this.files.length) adicionaFotos(this.files); this.value = ''; });
 $('btIA').onclick = melhora;
 $('btOutro').onclick = melhora;
@@ -558,9 +674,10 @@ if (!token()) {
     if (!r.pode) { $('fechado').hidden = false; return; }
     MAX_FOTOS = r.maxFotos || MAX_FOTOS;
     $('app').hidden = false; $('faixaFechado').hidden = !!r.aberto;
+    if (r.revisor) { $('btRevisar').hidden = false; $('btRevisar').textContent = 'Revisar evidências' + (r.fila ? ' (' + r.fila + ')' : ''); }
     if (sessao().master) montaVerComo();
-    pintaFotos(); pintaTudo(); carregaTurmas();
-    fiskRegistrarUso('Notícias da turma', 'noticias');
+    pintaFotos(); pintaTudo(); carregaTurmas(); carregaModelos();
+    fiskRegistrarUso('Enviar evidências', 'noticias');
   }).catch(function (e) {
     if (/sess[ãa]o/i.test(e.message)) $('semSessao').hidden = false;
     else { $('fechado').hidden = false; $('fechado').querySelector('.aviso').textContent = e.message; }
