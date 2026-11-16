@@ -1195,10 +1195,10 @@
             ola:'Oi, {n}.', novo1:'Tem 1 recado novo para você.', novoN:'Tem {q} recados novos para você.',
             nada:'Nenhuma novidade sem ler.',
             antigos:'Ver os {q} já lidos', antigo1:'Ver o recado já lido', esconder:'Esconder os já lidos',
-            ciente:'Li e estou ciente', tDir:'Direção', tSec:'Secretaria', tNov:'Novidade', nome:'Novidades', tAniv:'Aniversário', anTit:'🎂 Aniversariantes da semana', anSub:'de segunda a domingo', anVazio:'Nenhum aluno seu faz aniversário nesta semana.', anRec:'🎂 Aniversariantes desta semana', anHoje:'é hoje!', anProx:'Semana que vem', anProxVazio:'Ninguém na semana que vem.',
+            ciente:'Li e estou ciente', urg:'Informe urgente', urgErro:'Não consegui registrar. Confira a internet e tente de novo.', tDir:'Direção', tSec:'Secretaria', tNov:'Novidade', nome:'Central de Informes', tAniv:'Aniversário', anTit:'🎂 Aniversariantes da semana', anSub:'de segunda a domingo', anVazio:'Nenhum aluno seu faz aniversário nesta semana.', anRec:'🎂 Aniversariantes desta semana', anHoje:'é hoje!', anProx:'Semana que vem', anProxVazio:'Ninguém na semana que vem.',
             ttTit:'🙋 Quem veio à tutoria', ttSub:'nas últimas 2 semanas', ttVazio:'Nenhum aluno seu por enquanto.',
             ttLink:'Ver a frequência completa →', vi:'Vi', veio:' foi à tutoria',
-            falar:'Ver as novidades', saiu:'As novidades saíram da tela. Para ver de novo, clique no seu nome, lá em cima, e em "Ver as novidades".' },
+            falar:'Ver a Central de Informes', saiu:'As novidades saíram da tela. Para ver de novo, clique no seu nome, lá em cima, e em "Ver as novidades".' },
       en: { sub:'from the direction and the office',
             oi1:'Hi, {n}! I’m Buddy 🐻',
             oi2:'I’m your assistant here in the Hub. Notices from the direction and the office reach you through me, and I’ll also tell you when a tool has something new.',
@@ -1206,10 +1206,10 @@
             ola:'Hi, {n}.', novo1:'You have 1 new notice.', novoN:'You have {q} new notices.',
             nada:'Nothing new to read.',
             antigos:'See the {q} already read', antigo1:'See the notice already read', esconder:'Hide the ones already read',
-            ciente:'Read and acknowledged', tDir:'Direction', tSec:'Office', tNov:'What’s new', nome:'What’s new', tAniv:'Birthday', anTit:'🎂 Birthdays this week', anSub:'Monday to Sunday', anVazio:'None of your students has a birthday this week.', anRec:'🎂 Birthdays this week', anHoje:'today!', anProx:'Next week', anProxVazio:'No one next week.',
+            ciente:'Read and acknowledged', urg:'Urgent notice', urgErro:'Could not save. Check the connection and try again.', tDir:'Direction', tSec:'Office', tNov:'What’s new', nome:'Notice Center', tAniv:'Birthday', anTit:'🎂 Birthdays this week', anSub:'Monday to Sunday', anVazio:'None of your students has a birthday this week.', anRec:'🎂 Birthdays this week', anHoje:'today!', anProx:'Next week', anProxVazio:'No one next week.',
             ttTit:'🙋 Who came to tutoring', ttSub:'in the last 2 weeks', ttVazio:'None of your students so far.',
             ttLink:'See the full attendance →', vi:'Seen', veio:' foi à tutoria',
-            falar:'See what’s new', saiu:'The news panel left the screen. To see it again, click your name at the top and choose "See what’s new".' },
+            falar:'Open the Notice Center', saiu:'The news panel left the screen. To see it again, click your name at the top and choose "See what’s new".' },
       es: { sub:'de la dirección y la secretaría',
             oi1:'¡Hola, {n}! Soy Buddy 🐻',
             oi2:'Soy tu auxiliar aquí en el Hub. Por mí llegan los avisos de la dirección y de la secretaría, y también te cuento cuando haya novedad en las herramientas.',
@@ -1217,10 +1217,10 @@
             ola:'Hola, {n}.', novo1:'Tienes 1 aviso nuevo.', novoN:'Tienes {q} avisos nuevos.',
             nada:'Ninguna novedad sin leer.',
             antigos:'Ver los {q} ya leídos', antigo1:'Ver el aviso ya leído', esconder:'Ocultar los ya leídos',
-            ciente:'Leído y enterado', tDir:'Dirección', tSec:'Secretaría', tNov:'Novedad', nome:'Novedades', tAniv:'Cumpleaños', anTit:'🎂 Cumpleaños de la semana', anSub:'de lunes a domingo', anVazio:'Ningún alumno tuyo cumple años esta semana.', anRec:'🎂 Cumpleaños de esta semana', anHoje:'¡es hoy!', anProx:'La próxima semana', anProxVazio:'Nadie la próxima semana.',
+            ciente:'Leído y enterado', urg:'Aviso urgente', urgErro:'No pude registrar. Revisa la conexión e inténtalo de nuevo.', tDir:'Dirección', tSec:'Secretaría', tNov:'Novedad', nome:'Central de Informes', tAniv:'Cumpleaños', anTit:'🎂 Cumpleaños de la semana', anSub:'de lunes a domingo', anVazio:'Ningún alumno tuyo cumple años esta semana.', anRec:'🎂 Cumpleaños de esta semana', anHoje:'¡es hoy!', anProx:'La próxima semana', anProxVazio:'Nadie la próxima semana.',
             ttTit:'🙋 Quién fue a la tutoría', ttSub:'en las últimas 2 semanas', ttVazio:'Ningún alumno tuyo por ahora.',
             ttLink:'Ver la asistencia completa →', vi:'Visto', veio:' foi à tutoria',
-            falar:'Ver las novedades', saiu:'Las novedades salieron de la pantalla. Para verlas de nuevo, haz clic en tu nombre, arriba, y en "Ver las novedades".' }
+            falar:'Ver la Central de Informes', saiu:'Las novedades salieron de la pantalla. Para verlas de nuevo, haz clic en tu nombre, arriba, y en "Ver las novedades".' }
     };
     function lang(){ return (typeof _lang !== 'undefined' && TX[_lang]) ? _lang : 'pt'; }
     function tx(k, v){ var t = TX[lang()][k] || TX.pt[k] || ''; if (v) Object.keys(v).forEach(function(x){ t = t.replace('{' + x + '}', v[x]); }); return t; }
@@ -1274,7 +1274,39 @@
     }
     function doInforme(i){
       return { id: i.id, quando: i.quando, tag: i.origem === 'direcao' ? 'dir' : 'sec', titulo: esc(i.titulo), html: i.texto ? '<p>' + texto(i.texto) + '</p>' : '',
-               anexos: i.anexos || [], link: null, ciente: !!i.ciente, autor: i.autor };
+               anexos: i.anexos || [], link: null, ciente: !!i.ciente, autor: i.autor, urgente: !!i.urgente };
+    }
+    /* O INFORME URGENTE (Pedro, 16/11/2026): a secretaria ou a direção marca "urgente" e ele abre em tela cheia, por cima
+       do Hub, até o professor marcar "Li e estou ciente". Um de cada vez; a direção vendo o Hub de um professor (como) só
+       lê, sem a cortina. */
+    var URG_VISTO = {};
+    function urgentes(lista){
+      if (como() || document.querySelector('.urg-cortina')) return;
+      var u = lista.filter(function(i){ return i.urgente && !i.ciente && !URG_VISTO[i.id]; })[0];
+      if (!u) return;
+      URG_VISTO[u.id] = 1;
+      var ov = document.createElement('div'); ov.className = 'urg-cortina'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true');
+      var anexos = (u.anexos || []).map(function(a){
+        return a.imagem ? '<a class="bd-img" href="' + esc(a.url) + '" target="_blank" rel="noopener"><img alt="' + esc(a.nome) + '" src="' + esc(a.mini) + '"></a>'
+                        : '<a class="bd-arq" href="' + esc(a.url) + '" target="_blank" rel="noopener">📎 ' + esc(a.nome) + '</a>';
+      }).join('');
+      ov.innerHTML = '<div class="urg-card"><p class="urg-faixa">🚨 ' + esc(tx('urg')) + '</p>' +
+        '<p class="urg-de"><span class="bd-tag t-' + (u.origem === 'direcao' ? 'dir' : 'sec') + '">' + esc(tx(u.origem === 'direcao' ? 'tDir' : 'tSec')) + '</span> ' + ddmm(u.quando) + '</p>' +
+        '<h2 class="urg-tit">' + esc(u.titulo) + '</h2>' + (u.texto ? '<div class="urg-tx bd-tx"><p>' + texto(u.texto) + '</p></div>' : '') + anexos +
+        '<button type="button" class="urg-ok">✅ ' + esc(tx('ciente')) + '</button><p class="urg-erro" hidden></p></div>';
+      document.body.appendChild(ov);
+      var bt = ov.querySelector('.urg-ok'); bt.focus();
+      bt.addEventListener('click', function(){
+        bt.disabled = true;
+        post({ action: 'informeCiente', id: u.id }).then(function(j){
+          if (!j || !j.ok) throw new Error('x');
+          u.ciente = true; ov.remove();
+          msgs.forEach(function(m){ if (m.id === u.id) m.ciente = true; });
+          var b = chat.querySelector('[data-id="' + u.id + '"]');
+          if (b) { b.classList.add('lido'); var c = b.querySelector('input'); if (c) c.checked = true; }
+          conta(); urgentes(lista);
+        }).catch(function(){ bt.disabled = false; var e = ov.querySelector('.urg-erro'); e.hidden = false; e.textContent = tx('urgErro'); });
+      });
     }
 
     /* ── a bolha de um recado ── */
@@ -1289,7 +1321,7 @@
           : '<a class="bd-arq" href="' + esc(a.url) + '" target="_blank" rel="noopener">📎 ' + esc(a.nome) + '</a>';
       }).join('');
       d.innerHTML =
-        '<div class="bd-topo"><span class="bd-tag t-' + m.tag + '">' + esc(m.tag === 'nov' && m.selo ? m.selo : tx(ROT[m.tag])) + '</span><small>' + ddmm(m.quando) + '</small></div>' +
+        '<div class="bd-topo"><span class="bd-tag t-' + m.tag + '">' + esc(m.tag === 'nov' && m.selo ? m.selo : tx(ROT[m.tag])) + '</span>' + (m.urgente ? '<span class="bd-tag t-urg">' + esc(tx('urg')) + '</span>' : '') + '<small>' + ddmm(m.quando) + '</small></div>' +
         (m.titulo ? '<b class="bd-t">' + m.titulo + '</b>' : '') +
         '<div class="bd-tx">' + m.html + '</div>' + anexos +
         (m.link ? '<a class="bd-ir" href="' + esc(m.link.href) + '">' + m.link.rot + '</a>' : '') +
@@ -1542,6 +1574,7 @@
           if (pedido !== leitura) return;
           var todas = fixas.concat(((ji && ji.informes) || []).map(doInforme), pedidos, recadoAniv());
           todas.sort(function(a, b){ return a.quando - b.quando; });
+          urgentes((ji && ji.informes) || []);
           /* só refaz a conversa quando chegou ou saiu recado: reler a cada 3 minutos não pode redigitar tudo */
           var ass = lang() + '|' + eu() + '|' + todas.map(function(m){ return m.id + (m.ciente ? '+' : ''); }).join(',');
           if (ass === assinatura) { conta(); return; }
