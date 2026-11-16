@@ -380,9 +380,10 @@
       <p data-i18n="card-av-p">Monte o seu avatar e conheça a loja dos alunos. Eles veem o seu avatar na aba Turma.</p>
     </a>
 
-    <!-- ENVIAR EVIDÊNCIAS (nasceu Notícias da turma em 27/10/2026; nome novo em 14/11): FECHADO. Só a direção vê o card até o Pedro autorizar a publicação oficial
-         (o servidor também barra: NT_ABERTO no Noticias.js). updateToolLinks decide. -->
+    <!-- ENVIAR EVIDÊNCIAS (nasceu Notícias da turma em 27/10/2026; nome novo em 14/11): "Em breve" para os professores desde 16/11
+         (Pedro): o card aparece cinza e sem link; só a direção entra (o servidor também barra: NT_ABERTO no Noticias.js). updateToolLinks decide. -->
     <a class="card card-noticias" href="noticias.html" style="display:none">
+      <span class="badge" data-i18n="soon" hidden>Em breve</span>
       <div class="icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/>
@@ -391,7 +392,7 @@
         </svg>
       </div>
       <h2>Enviar evidências</h2>
-      <p>Fotos da aula com um recado para as famílias, conferidas pela coordenação (só a direção vê, em teste)</p>
+      <p>Fotos da aula com um recado para as famílias, conferidas pela coordenação</p>
     </a>
 
     <!-- O corretor do simulado MET (19/09/2026): aberto para todos os professores (CORRETOR_ABERTO, no script);
@@ -578,6 +579,6 @@
   
   <script src="assets/fisk-shared.js?v=282254175d"></script>
   <script src="assets/fisk-pre-aula.js?v=43e6e651bf"></script>
-  <script src="assets/index.js?v=5b4ecddc7d"></script>
+  <script src="assets/index.js?v=a96d39f8a5"></script>
 </body>
 </html>

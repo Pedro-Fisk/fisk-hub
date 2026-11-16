@@ -411,7 +411,17 @@
         var cmet = document.querySelector('a.card-corretor');
         if (cmet) cmet.style.display = (sv0 && (CORRETOR_ABERTO || sv0.master || sv0.director || CORRETOR_PILOTO.some(function(n){ return normPiloto(sv0.name) === normPiloto(n); }))) ? '' : 'none';
         var cnt = document.querySelector('a.card-noticias');
-        if (cnt) cnt.style.display = sv0 ? '' : 'none';   /* aberto aos professores em 16/11/2026 (Noticias.js, NT_ABERTO) */
+        if (cnt){
+          /* "Em breve" para os professores (Pedro, 16/11/2026): o card aparece cinza, sem link; só a direção entra.
+             O servidor também barra (NT_ABERTO, Noticias.js). */
+          var ntAberto = !!(sv0 && sv0.master);
+          cnt.style.display = sv0 ? '' : 'none';
+          cnt.classList.toggle('is-soon', !ntAberto);
+          cnt.setAttribute('href', ntAberto ? 'noticias.html' : '#');
+          if (ntAberto){ cnt.removeAttribute('aria-disabled'); cnt.removeAttribute('tabindex'); }
+          else { cnt.setAttribute('aria-disabled', 'true'); cnt.setAttribute('tabindex', '-1'); }
+          var ntb = cnt.querySelector('.badge'); if (ntb) ntb.hidden = ntAberto;
+        }
         var avc = document.getElementById('card-avatar');
         if (avc){
           var avAberto = !!sv0;
