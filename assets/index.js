@@ -1330,7 +1330,8 @@
       /* HÁ NOVIDADE SEM LER: O MURAL ABRE SOZINHO (Pedro, 06/10/2026). O Carlos abriu o Hub com o mural minimizado
          e não viu que ele existia. Uma vez por carregamento; quem tirou o mural da tela (✕) continua sem ele, e
          quem não tem nada por ler fica como deixou. */
-      if (n && !abriuSozinho && LARGO.matches && document.body.classList.contains('bd-recolhido') && !document.body.classList.contains('bd-fora')) { abriuSozinho = true; abre(true); }
+      /* no computador o mural já está sempre aberto; no celular ele abre sozinho uma vez por entrada se há o que ler */
+      if (n && !abriuSozinho && !LARGO.matches) { abriuSozinho = true; abre(true); }
       ttN.hidden = !tut.length; ttN.textContent = String(tut.length);
     }
     /* O MURAL (Pedro, 06/10/2026). A coluna deixou de ser o Buddy: é o radar de novidades da escola, uma circular.
@@ -1548,40 +1549,20 @@
         });
     }
 
-    /* MINIMIZAR VIRA A BOLINHA (Pedro, 06/10/2026, terceira volta). O "—" guarda a janela e o Buddy passa a ser a
-       bolinha do canto de baixo, à direita, com o número de recados sem ler; clicar nela reabre. No computador o
-       LUGAR da coluna continua reservado enquanto ele está minimizado, para as ferramentas não mudarem de lugar
-       (a primeira versão tirava a coluna e os cards corriam; a segunda deixava um retângulo, que ele não quis).
-       A escolha fica no aparelho. No celular a coluna nasce fora da tela e a bolinha abre o painel. */
+    /* O MURAL NÃO SAI MAIS DA TELA (Pedro, 16/11/2026). As secretárias reclamaram que os professores não viam os
+       informes: quem tinha apertado o "—" (minimizar, 06/10) ou o "✕" (tirar da tela, 06/10) ficava sem o mural até
+       achar o "Ver as novidades" no menu do próprio nome. Os dois botões saíram, e a escolha antiga gravada no aparelho
+       é apagada. No computador a coluna fica sempre aberta, à direita. No celular a coluna continua sendo painel (não
+       cabe ao lado), mas a bolinha 📣 fica sempre no canto e o painel abre sozinho na entrada quando há recado sem ler. */
     var LARGO = window.matchMedia ? window.matchMedia('(min-width: 1181px)') : { matches: true };
-    try { if (localStorage.getItem('fisk_buddy_recolhido') === '1') document.body.classList.add('bd-recolhido'); } catch(e) {}
-    function botao(){ $$('avFecha').textContent = '—'; }
+    try { localStorage.removeItem('fisk_buddy_recolhido'); localStorage.removeItem('fisk_buddy_fora'); } catch(e) {}
+    document.body.classList.remove('bd-recolhido', 'bd-fora');
     function abre(sim){
-      if (LARGO.matches) {
-        document.body.classList.toggle('bd-recolhido', !sim);
-        try { localStorage.setItem('fisk_buddy_recolhido', sim ? '0' : '1'); } catch(e) {}
-        return;
-      }
+      if (LARGO.matches) return;
       document.body.classList.toggle('av-aberto', !!sim); fundo.hidden = !sim;
     }
-    sino.addEventListener('click', function(){ abre(LARGO.matches ? true : !document.body.classList.contains('av-aberto')); });
-    $$('avFecha').addEventListener('click', function(ev){ ev.stopPropagation(); abre(false); });
-    botao();
-    /* O BUDDY SAI DA TELA (Pedro, 06/10/2026): há professor que se distrai com ele ali. O ✕ tira a coluna e o
-       Buddy do canto de vez, e a escolha fica no aparelho; quem quiser de volta chama pelo menu do próprio nome,
-       em "Falar com o Buddy". Os recados continuam chegando e esperando: tirar da tela não é dar ciência. */
-    try { if (localStorage.getItem('fisk_buddy_fora') === '1') document.body.classList.add('bd-fora'); } catch(e) {}
-    function some(sim){
-      document.body.classList.toggle('bd-fora', !!sim);
-      try { localStorage.setItem('fisk_buddy_fora', sim ? '1' : '0'); } catch(e) {}
-      if (sim) { document.body.classList.remove('av-aberto'); fundo.hidden = true; }
-    }
-    function recado(t){
-      var d = document.createElement('div'); d.className = 'bd-toast'; d.textContent = t; document.body.appendChild(d);
-      setTimeout(function(){ d.remove(); }, 6500);
-    }
-    $$('avSome').addEventListener('click', function(ev){ ev.stopPropagation(); some(true); recado(tx('saiu')); });
-    function chama(){ some(false); abre(true); }
+    sino.addEventListener('click', function(){ abre(!document.body.classList.contains('av-aberto')); });
+    function chama(){ abre(true); }
     /* o item do menu do professor: o menu nasce no login, então espera por ele */
     function noMenu(){
       var menu = document.querySelector('.fisk-user-menu'); if (!menu) return false;
