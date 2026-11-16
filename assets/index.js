@@ -411,7 +411,7 @@
         var cmet = document.querySelector('a.card-corretor');
         if (cmet) cmet.style.display = (sv0 && (CORRETOR_ABERTO || sv0.master || sv0.director || CORRETOR_PILOTO.some(function(n){ return normPiloto(sv0.name) === normPiloto(n); }))) ? '' : 'none';
         var cnt = document.querySelector('a.card-noticias');
-        if (cnt) cnt.style.display = (sv0 && sv0.master) ? '' : 'none';   /* fechado: só a direção (Noticias.js, NT_ABERTO) */
+        if (cnt) cnt.style.display = sv0 ? '' : 'none';   /* aberto aos professores em 16/11/2026 (Noticias.js, NT_ABERTO) */
         var avc = document.getElementById('card-avatar');
         if (avc){
           var avAberto = !!sv0;
