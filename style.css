@@ -842,6 +842,19 @@ body.theme-dark .bd-chat{ background-color:#1f2937; background-image:url("data:i
 .bd-tag.t-sec{ background:#dbeafe; color:#1e3a8a; }
 .bd-tag.t-nov{ background:#ede9fe; color:#5b21b6; }
 .bd-tag.t-aniv{ background:#fef3c7; color:#92400e; }
+.bd-tag.t-urg{ background:#dc2626; color:#fff; }
+/* o informe urgente em tela cheia (16/11/2026): só fecha com a ciência */
+.urg-cortina{ position:fixed; inset:0; z-index:2000; background:rgba(15,23,42,.72); display:flex; align-items:center; justify-content:center; padding:16px; }
+.urg-card{ background:#fff; color:#1d2b3a; border-radius:20px; max-width:600px; width:100%; max-height:calc(100vh - 32px); overflow:auto; padding:1.4rem 1.4rem 1.2rem;
+  box-shadow:0 30px 80px rgba(0,0,0,.45); border-top:8px solid #dc2626; }
+.urg-faixa{ display:inline-block; margin:0 0 .6rem; background:#dc2626; color:#fff; font-weight:800; font-size:.82rem; letter-spacing:.04em; text-transform:uppercase; padding:.25rem .75rem; border-radius:99px; }
+.urg-de{ margin:0 0 .4rem; font-size:.85rem; color:#64748b; }
+.urg-tit{ font-family:var(--font-heading); font-size:1.4rem; line-height:1.25; margin:0 0 .6rem; color:#16243a; }
+.urg-tx{ font-size:1rem; line-height:1.55; white-space:pre-wrap; margin-bottom:.6rem; }
+.urg-ok{ display:block; width:100%; margin-top:.8rem; border:0; border-radius:12px; background:#16a34a; color:#fff; font-family:var(--font-body); font-weight:800; font-size:1.05rem; padding:.85rem 1rem; cursor:pointer; }
+.urg-ok:disabled{ opacity:.6; cursor:wait; }
+.urg-erro{ color:#b42318; font-size:.88rem; margin:.5rem 0 0; }
+body.theme-dark .urg-card{ background:#1f2937; color:#e6edf6; } body.theme-dark .urg-tit{ color:#f1f5fb; }
 /* aniversariantes da semana (23/10/2026): o cartão da home e o recado do mural */
 .an-card .tt-cab span{ color:#92400e; }
 .an-it .an-bolo{ font-style:normal; font-size:1.15rem; line-height:1.3; }
