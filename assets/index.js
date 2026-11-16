@@ -1195,10 +1195,10 @@
             ola:'Oi, {n}.', novo1:'Tem 1 recado novo para você.', novoN:'Tem {q} recados novos para você.',
             nada:'Nenhuma novidade sem ler.',
             antigos:'Ver os {q} já lidos', antigo1:'Ver o recado já lido', esconder:'Esconder os já lidos',
-            ciente:'Li e estou ciente', tDir:'Direção', tSec:'Secretaria', tNov:'Novidade', nome:'Novidades', tAniv:'Aniversário', anTit:'🎂 Aniversariantes da semana', anSub:'de segunda a domingo', anVazio:'Nenhum aluno seu faz aniversário nesta semana.', anRec:'🎂 Aniversariantes desta semana', anHoje:'é hoje!', anProx:'Semana que vem', anProxVazio:'Ninguém na semana que vem.',
+            ciente:'Li e estou ciente', tDir:'Direção', tSec:'Secretaria', tNov:'Novidade', nome:'Central de Informes', tAniv:'Aniversário', anTit:'🎂 Aniversariantes da semana', anSub:'de segunda a domingo', anVazio:'Nenhum aluno seu faz aniversário nesta semana.', anRec:'🎂 Aniversariantes desta semana', anHoje:'é hoje!', anProx:'Semana que vem', anProxVazio:'Ninguém na semana que vem.',
             ttTit:'🙋 Quem veio à tutoria', ttSub:'nas últimas 2 semanas', ttVazio:'Nenhum aluno seu por enquanto.',
             ttLink:'Ver a frequência completa →', vi:'Vi', veio:' foi à tutoria',
-            falar:'Ver as novidades', saiu:'As novidades saíram da tela. Para ver de novo, clique no seu nome, lá em cima, e em "Ver as novidades".' },
+            falar:'Ver a Central de Informes', saiu:'As novidades saíram da tela. Para ver de novo, clique no seu nome, lá em cima, e em "Ver as novidades".' },
       en: { sub:'from the direction and the office',
             oi1:'Hi, {n}! I’m Buddy 🐻',
             oi2:'I’m your assistant here in the Hub. Notices from the direction and the office reach you through me, and I’ll also tell you when a tool has something new.',
@@ -1206,10 +1206,10 @@
             ola:'Hi, {n}.', novo1:'You have 1 new notice.', novoN:'You have {q} new notices.',
             nada:'Nothing new to read.',
             antigos:'See the {q} already read', antigo1:'See the notice already read', esconder:'Hide the ones already read',
-            ciente:'Read and acknowledged', tDir:'Direction', tSec:'Office', tNov:'What’s new', nome:'What’s new', tAniv:'Birthday', anTit:'🎂 Birthdays this week', anSub:'Monday to Sunday', anVazio:'None of your students has a birthday this week.', anRec:'🎂 Birthdays this week', anHoje:'today!', anProx:'Next week', anProxVazio:'No one next week.',
+            ciente:'Read and acknowledged', tDir:'Direction', tSec:'Office', tNov:'What’s new', nome:'Notice Center', tAniv:'Birthday', anTit:'🎂 Birthdays this week', anSub:'Monday to Sunday', anVazio:'None of your students has a birthday this week.', anRec:'🎂 Birthdays this week', anHoje:'today!', anProx:'Next week', anProxVazio:'No one next week.',
             ttTit:'🙋 Who came to tutoring', ttSub:'in the last 2 weeks', ttVazio:'None of your students so far.',
             ttLink:'See the full attendance →', vi:'Seen', veio:' foi à tutoria',
-            falar:'See what’s new', saiu:'The news panel left the screen. To see it again, click your name at the top and choose "See what’s new".' },
+            falar:'Open the Notice Center', saiu:'The news panel left the screen. To see it again, click your name at the top and choose "See what’s new".' },
       es: { sub:'de la dirección y la secretaría',
             oi1:'¡Hola, {n}! Soy Buddy 🐻',
             oi2:'Soy tu auxiliar aquí en el Hub. Por mí llegan los avisos de la dirección y de la secretaría, y también te cuento cuando haya novedad en las herramientas.',
@@ -1217,10 +1217,10 @@
             ola:'Hola, {n}.', novo1:'Tienes 1 aviso nuevo.', novoN:'Tienes {q} avisos nuevos.',
             nada:'Ninguna novedad sin leer.',
             antigos:'Ver los {q} ya leídos', antigo1:'Ver el aviso ya leído', esconder:'Ocultar los ya leídos',
-            ciente:'Leído y enterado', tDir:'Dirección', tSec:'Secretaría', tNov:'Novedad', nome:'Novedades', tAniv:'Cumpleaños', anTit:'🎂 Cumpleaños de la semana', anSub:'de lunes a domingo', anVazio:'Ningún alumno tuyo cumple años esta semana.', anRec:'🎂 Cumpleaños de esta semana', anHoje:'¡es hoy!', anProx:'La próxima semana', anProxVazio:'Nadie la próxima semana.',
+            ciente:'Leído y enterado', tDir:'Dirección', tSec:'Secretaría', tNov:'Novedad', nome:'Central de Informes', tAniv:'Cumpleaños', anTit:'🎂 Cumpleaños de la semana', anSub:'de lunes a domingo', anVazio:'Ningún alumno tuyo cumple años esta semana.', anRec:'🎂 Cumpleaños de esta semana', anHoje:'¡es hoy!', anProx:'La próxima semana', anProxVazio:'Nadie la próxima semana.',
             ttTit:'🙋 Quién fue a la tutoría', ttSub:'en las últimas 2 semanas', ttVazio:'Ningún alumno tuyo por ahora.',
             ttLink:'Ver la asistencia completa →', vi:'Visto', veio:' foi à tutoria',
-            falar:'Ver las novedades', saiu:'Las novedades salieron de la pantalla. Para verlas de nuevo, haz clic en tu nombre, arriba, y en "Ver las novedades".' }
+            falar:'Ver la Central de Informes', saiu:'Las novedades salieron de la pantalla. Para verlas de nuevo, haz clic en tu nombre, arriba, y en "Ver las novedades".' }
     };
     function lang(){ return (typeof _lang !== 'undefined' && TX[_lang]) ? _lang : 'pt'; }
     function tx(k, v){ var t = TX[lang()][k] || TX.pt[k] || ''; if (v) Object.keys(v).forEach(function(x){ t = t.replace('{' + x + '}', v[x]); }); return t; }
