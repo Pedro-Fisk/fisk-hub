@@ -91,11 +91,38 @@
     <button type="button" id="avInternaOk" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,.6);padding:.45rem .8rem;border-radius:999px;cursor:pointer;font:inherit;font-size:.85rem;white-space:nowrap">Já respondi</button>
   </div>
   <script>
-  (function(){var K='av_interna_2026_ok',b=document.getElementById('avInterna');if(!b)return;
-    try{if(localStorage.getItem(K))return;}catch(e){}
-    b.hidden=false;b.style.display='flex';
-    document.getElementById('avInternaOk').onclick=function(){try{localStorage.setItem(K,'1');}catch(e){}b.hidden=true;b.style.display='none';};
-  })();
+  (function(){var K='av_interna_2026_ok',S='av_interna_cortina',b=document.getElementById('avInterna');if(!b)return;
+  try{if(localStorage.getItem(K))return;}catch(e){}
+  b.hidden=false;b.style.display='flex';
+  function respondeu(){try{localStorage.setItem(K,'1');}catch(e){}b.hidden=true;b.style.display='none';var c=document.getElementById('avCortina');if(c)c.remove();}
+  document.getElementById('avInternaOk').onclick=respondeu;
+  /* A CORTINA (Pedro, 17/11/2026): uma vez por sessão, quando a tela inicial aparece depois do login */
+  function cortina(){try{if(sessionStorage.getItem(S))return;sessionStorage.setItem(S,'1');}catch(e){}
+    var c=document.createElement('div');c.id='avCortina';c.setAttribute('role','dialog');c.setAttribute('aria-modal','true');c.setAttribute('aria-label','Pesquisa de avaliação interna');
+    c.style.cssText='position:fixed;inset:0;z-index:2147483000;background:rgba(6,40,29,.62);display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px)';
+    c.innerHTML='<div style="max-width:26rem;width:100%;background:#fff;color:#14322a;border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35);font-family:inherit;text-align:center">'
+      +'<div style="background:linear-gradient(135deg,#14b07f,#0a7552);color:#fff;padding:1.6rem 1.2rem 1.3rem"><div style="font-size:2.6rem;line-height:1">📝</div><h2 style="margin:.5rem 0 0;font-size:1.35rem;color:#fff">Pesquisa de avaliação interna</h2></div>'
+      +'<div style="padding:1.2rem 1.3rem 1.4rem"><p style="margin:0 0 1.1rem;line-height:1.45">Sua opinião ajuda a escola a melhorar. São poucos minutos. Responda com sinceridade!</p>'
+      +'<a id="avCResp" href="https://forms.gle/DzqpfuTNU4asF8ta6" target="_blank" rel="noopener" style="display:block;background:#0f9a6e;color:#fff;font-weight:700;padding:.8rem 1rem;border-radius:999px;text-decoration:none;margin-bottom:.6rem">Responder agora ↗</a>'
+      +'<div style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap"><button type="button" id="avCDepois" style="background:none;border:1px solid #c9d8d2;color:#14322a;padding:.5rem .9rem;border-radius:999px;cursor:pointer;font:inherit;font-size:.9rem">Depois</button>'
+      +'<button type="button" id="avCJa" style="background:none;border:1px solid #c9d8d2;color:#0a7552;padding:.5rem .9rem;border-radius:999px;cursor:pointer;font:inherit;font-size:.9rem">Já respondi</button></div></div></div>';
+    document.body.appendChild(c);
+    function fecha(){c.remove();document.removeEventListener('keydown',esc);}
+    function esc(e){if(e.key==='Escape')fecha();}
+    document.addEventListener('keydown',esc);
+    c.onclick=function(e){if(e.target===c)fecha();};
+    document.getElementById('avCDepois').onclick=fecha;
+    document.getElementById('avCResp').addEventListener('click',function(){setTimeout(fecha,300);});
+    document.getElementById('avCJa').onclick=respondeu;
+  }
+  /* espera a tela inicial de verdade: a faixa visível e nenhuma porteira de login por cima */
+  var t=setInterval(function(){
+    try{if(localStorage.getItem(K)){clearInterval(t);return;}}catch(e){}
+    var g=document.getElementById('profGate');
+    var gateAberta=g&&getComputedStyle(g).display!=='none'&&!g.hidden;
+    if(b.offsetParent!==null&&!gateAberta&&!document.body.classList.contains('prof-out')){clearInterval(t);setTimeout(cortina,1200);}
+  },700);
+})();
   </script>
 
   <!-- o mini-dash do topo (resumo das turmas e busca de aluno) saiu em 31/10/2026: estava desligado desde 19/09 (B8) -->
