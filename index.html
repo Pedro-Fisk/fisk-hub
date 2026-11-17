@@ -82,6 +82,22 @@
     <p class="hero-frase" id="heroFrase" hidden title="Clique para outra frase" style="font-style:italic;opacity:.92;max-width:44rem;margin:.55rem auto 0;cursor:pointer;transition:opacity .3s"></p>
   </header>
 
+  <!-- PESQUISA DE AVALIAÇÃO INTERNA (Pedro, 17/11/2026): a mesma faixa no Portal da Secretaria e no Hub do professor.
+       "Já respondi" esconde só neste aparelho (localStorage). Para tirar do ar, apague este bloco nos dois. -->
+  <div id="avInterna" hidden style="max-width:60rem;margin:0 auto 1rem;padding:.85rem 1rem;border-radius:14px;background:linear-gradient(135deg,#14b07f,#0a7552);color:#fff;display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1rem;box-shadow:0 4px 14px rgba(10,117,82,.25)">
+    <span aria-hidden="true" style="font-size:1.6rem;line-height:1">📝</span>
+    <span style="flex:1 1 16rem;min-width:0"><b style="display:block;font-size:1.02rem">Pesquisa de avaliação interna</b><span style="opacity:.92;font-size:.9rem">Sua opinião ajuda a escola a melhorar. Leva poucos minutos.</span></span>
+    <a href="https://forms.gle/DzqpfuTNU4asF8ta6" target="_blank" rel="noopener" style="background:#fff;color:#0a7552;font-weight:700;padding:.5rem 1rem;border-radius:999px;text-decoration:none;white-space:nowrap">Responder ↗</a>
+    <button type="button" id="avInternaOk" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,.6);padding:.45rem .8rem;border-radius:999px;cursor:pointer;font:inherit;font-size:.85rem;white-space:nowrap">Já respondi</button>
+  </div>
+  <script>
+  (function(){var K='av_interna_2026_ok',b=document.getElementById('avInterna');if(!b)return;
+    try{if(localStorage.getItem(K))return;}catch(e){}
+    b.hidden=false;b.style.display='flex';
+    document.getElementById('avInternaOk').onclick=function(){try{localStorage.setItem(K,'1');}catch(e){}b.hidden=true;b.style.display='none';};
+  })();
+  </script>
+
   <!-- o mini-dash do topo (resumo das turmas e busca de aluno) saiu em 31/10/2026: estava desligado desde 19/09 (B8) -->
 
   <!-- ══ A SUA CASA (campanha de 09/2026) ══════════════════════════════════
