@@ -83,10 +83,11 @@
   </header>
 
   <!-- PESQUISA DE AVALIAÇÃO INTERNA (Pedro, 17/11/2026): a mesma faixa no Portal da Secretaria e no Hub do professor.
-       "Já respondi" esconde só neste aparelho (localStorage). Para tirar do ar, apague este bloco nos dois. -->
+       "Já respondi" esconde só neste aparelho (localStorage).
+           Aviso de janela anônima (18/11): o Forms guarda rascunho na conta Google logada, e a conta da secretaria é compartilhada. Para tirar do ar, apague este bloco nos dois. -->
   <div id="avInterna" hidden style="max-width:60rem;margin:0 auto 1rem;padding:.85rem 1rem;border-radius:14px;background:linear-gradient(135deg,#14b07f,#0a7552);color:#fff;display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1rem;box-shadow:0 4px 14px rgba(10,117,82,.25)">
     <span aria-hidden="true" style="font-size:1.6rem;line-height:1">📝</span>
-    <span style="flex:1 1 16rem;min-width:0"><b style="display:block;font-size:1.02rem">Pesquisa de avaliação interna</b><span style="opacity:.92;font-size:.9rem">Sua opinião ajuda a escola a melhorar. Leva poucos minutos.</span></span>
+    <span style="flex:1 1 16rem;min-width:0"><b style="display:block;font-size:1.02rem">Pesquisa de avaliação interna</b><span style="opacity:.92;font-size:.9rem">Sua opinião ajuda a escola a melhorar. Leva poucos minutos.</span><span style="display:block;opacity:.92;font-size:.82rem;margin-top:.2rem">🕶️ No computador da escola, abra em <b>janela anônima</b> (Ctrl+Shift+N) ou responda pelo celular.</span></span>
     <a href="https://forms.gle/DzqpfuTNU4asF8ta6" target="_blank" rel="noopener" style="background:#fff;color:#0a7552;font-weight:700;padding:.5rem 1rem;border-radius:999px;text-decoration:none;white-space:nowrap">Responder ↗</a>
     <button type="button" id="avInternaOk" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,.6);padding:.45rem .8rem;border-radius:999px;cursor:pointer;font:inherit;font-size:.85rem;white-space:nowrap">Já respondi</button>
   </div>
@@ -103,6 +104,7 @@
     c.innerHTML='<div style="max-width:26rem;width:100%;background:#fff;color:#14322a;border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35);font-family:inherit;text-align:center">'
       +'<div style="background:linear-gradient(135deg,#14b07f,#0a7552);color:#fff;padding:1.6rem 1.2rem 1.3rem"><div style="font-size:2.6rem;line-height:1">📝</div><h2 style="margin:.5rem 0 0;font-size:1.35rem;color:#fff">Pesquisa de avaliação interna</h2></div>'
       +'<div style="padding:1.2rem 1.3rem 1.4rem"><p style="margin:0 0 1.1rem;line-height:1.45">Sua opinião ajuda a escola a melhorar. São poucos minutos. Responda com sinceridade!</p>'
+      +'<p style="margin:0 0 1.1rem;padding:.6rem .8rem;border-radius:12px;background:#eef8f3;color:#14322a;font-size:.86rem;line-height:1.4">🕶️ No computador da escola, abra em <b>janela anônima</b> (Ctrl+Shift+N) ou responda pelo celular. Assim ninguém vê as suas respostas.</p>'
       +'<a id="avCResp" href="https://forms.gle/DzqpfuTNU4asF8ta6" target="_blank" rel="noopener" style="display:block;background:#0f9a6e;color:#fff;font-weight:700;padding:.8rem 1rem;border-radius:999px;text-decoration:none;margin-bottom:.6rem">Responder agora ↗</a>'
       +'<div style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap"><button type="button" id="avCDepois" style="background:none;border:1px solid #c9d8d2;color:#14322a;padding:.5rem .9rem;border-radius:999px;cursor:pointer;font:inherit;font-size:.9rem">Depois</button>'
       +'<button type="button" id="avCJa" style="background:none;border:1px solid #c9d8d2;color:#0a7552;padding:.5rem .9rem;border-radius:999px;cursor:pointer;font:inherit;font-size:.9rem">Já respondi</button></div></div></div>';
