@@ -894,7 +894,7 @@ var FISK_FERRAMENTAS = {
   'calendario': 'Minha semana', 'counseling': 'E-counseling', 'treinamentos': 'Treinamentos', 'apps': 'Apps', 'avatar': 'My Avatar',
   'personagem': 'Meu personagem', 'personagem-salvou': 'Meu personagem (salvou)', 'hogwarts': 'Cerimônia de Seleção', 'noticias': 'Notícias da turma',
   'plano-curso': 'Plano de curso', 'checking-guia': 'Guia do Checking', 'raf-temporario': 'RAF temporário', 'corretor-met': 'Corretor do MET',
-  'central-pedidos': 'Central de Pedidos', 'boletins': 'Boletins', 'quick-practice': 'Quick Practice', 'treino-met': 'Treino MET', 'treino-siele': 'Treino SIELE'
+  'central-pedidos': 'Central de Pedidos', 'informativo-tv': 'Informativo na TV', 'boletins': 'Boletins', 'quick-practice': 'Quick Practice', 'treino-met': 'Treino MET', 'treino-siele': 'Treino SIELE'
 };
 /* O GLOSSÁRIO DO CENTRO DE ESTUDOS (auditoria de 30/10/2026, M8): o mesmo lugar tinha quatro nomes (Centro de Estudos,
    Learning Center, plantão de dúvidas, tutoria). Fica UM nome nos rótulos, Centro de Estudos, e estas três linhas

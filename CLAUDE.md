@@ -203,6 +203,7 @@ Estudos** (= Learning Center = plantão; o glossário de três linhas é o
 | `treinamentos` · `apps` · `noticias` · `plano-curso` · `checking-guia` | idem |
 | `avatar` · `personagem` · `personagem-salvou` · `hogwarts` | My Avatar · Meu personagem · Cerimônia de Seleção |
 | `raf-temporario` · `corretor-met` · `central-pedidos` · `boletins` | idem |
+| `informativo-tv` | Informativo na TV (`informativo-tv.html`, o PDF do mês passando sozinho na TV da sala) |
 | `quick-practice` · `treino-met` · `treino-siele` | atalhos sem card |
 
 ## O cabeçalho das páginas (09/10/2026)
