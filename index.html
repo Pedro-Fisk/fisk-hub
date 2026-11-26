@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="assets/fisk-shared.css?v=f12a68d93f">
   <!-- a casa do professor veste a faixa do topo (campanha de 09/2026) -->
   <link rel="stylesheet" href="assets/casa-tema.css?v=1e1bb28a31">
-<link rel="stylesheet" href="style.css?v=cbeeb8d9c6">
+<link rel="stylesheet" href="style.css?v=01a96e9b3c">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 </head>
@@ -155,7 +155,7 @@
   <!-- SUA PRÓXIMA AULA (26/10/2026, aprovada pelo Pedro): a próxima aula de hoje, lida do que a Minha semana guardou no
        aparelho (cal:turmas:<nome>), sem chamada nova ao servidor. Some sem dado, fora de dia de aula e em feriado. -->
   <a class="prox-aula" id="proxAula" hidden></a>
-  <nav id="maisUsadas" class="mais-usadas" hidden aria-label="Suas ferramentas mais usadas"></nav>
+  <!-- a faixa "Ferramentas mais usadas por você" saiu em 26/11/2026 (Pedro); o bloco 6 do index.js segue contando os cliques -->
   <!-- AS PRATELEIRAS (Pedro, 06/10/2026): as ferramentas do professor divididas em três, como as do aluno no
        portal. `main.grid` continua sendo o contêiner (o "Mais usadas" e os atalhos procuram `main.grid a.card`);
        quem desenha a grade agora é cada `.prat-grid`. Card novo entra na prateleira dele; sem lugar óbvio, em
@@ -527,6 +527,7 @@
       <div class="bd-cab">
         <div class="bd-nome"><b id="bdNome">📣 Central de Informes</b></div>
         <span class="bd-n" id="bdN" hidden></span>
+        <button type="button" class="bd-min" id="bdMin" aria-expanded="true" aria-label="Minimizar a Central de Informes" title="Minimizar">_</button>
         <!-- SEM — E SEM ✕ (Pedro, 16/11/2026): as secretárias reclamaram que os professores não viam os informes; o mural
              fica sempre na tela (no celular, a bolinha 📣 fica sempre no canto). -->
       </div>
@@ -585,6 +586,6 @@
   
   <script src="assets/fisk-shared.js?v=4bf85aa648"></script>
   <script src="assets/fisk-pre-aula.js?v=43e6e651bf"></script>
-  <script src="assets/index.js?v=d0d44a9db8"></script>
+  <script src="assets/index.js?v=f82754a967"></script>
 </body>
 </html>

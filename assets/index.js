@@ -1272,6 +1272,25 @@
       });
       fim = true; pronto();
     }
+    /* O AVISO CURTO NA TELA (Pedro, 26/11/2026): o backend 981 já grava curto, e os avisos antigos de aluno novo e de
+       transferência (gravados longos antes) também aparecem curtos: "Aluno novo na turma de 4ª 13h45: Nome" e
+       "Começa em 03/02." A turma vira dia e hora pelo fiskHorarioDaTurma do kit; sem horário legível, fica como veio. */
+    var AV_DIAS = ['Dom', '2ª', '3ª', '4ª', '5ª', '6ª', 'Sáb'];
+    function turmaCurta(t){
+      var h = null; try { h = typeof fiskHorarioDaTurma === 'function' ? fiskHorarioDaTurma(t) : null; } catch (e) {}
+      if (!h || !h.dias || !h.dias.length) return '';
+      var hh = Math.floor(h.ini / 60), mm = h.ini % 60;
+      return h.dias.map(function(d){ return AV_DIAS[d]; }).join('/') + ' ' + hh + 'h' + (mm ? ('0' + mm).slice(-2) : '');
+    }
+    function avisoCurto(a){
+      var t = String(a.titulo || ''), x = String(a.texto || ''), m;
+      if ((a.tipo === 'matricula' || a.tipo === 'transferencia') && !/^Aluno novo na turma de (\d|Dom|Sáb)/.test(t) && (m = /^Aluno novo na turma (.+): ([^:]+)$/.exec(t))) {
+        var c = turmaCurta(m[1]); if (c) t = 'Aluno novo na turma de ' + c + ': ' + m[2];
+      }
+      if (a.tipo === 'matricula' && (m = /^Começa em (\d{2}\/\d{2})(?:\/\d{4})?/.exec(x))) x = 'Começa em ' + m[1] + '.' + (/A pasta ainda não foi criada/.test(x) ? ' A pasta ainda não foi criada.' : '');
+      if (a.tipo === 'transferencia' && (m = /^Veio da turma (.+?) \(([^)]+)\), transferido/.exec(x))) { var c2 = turmaCurta(m[1]); x = 'Veio da turma de ' + (c2 || m[1]) + ' (' + m[2] + ').'; }
+      return { titulo: t, texto: x };
+    }
     function doInforme(i){
       return { id: i.id, quando: i.quando, tag: i.origem === 'direcao' ? 'dir' : 'sec', titulo: esc(i.titulo), html: i.texto ? '<p>' + texto(i.texto) + '</p>' : '',
                anexos: i.anexos || [], link: null, ciente: !!i.ciente, autor: i.autor, urgente: !!i.urgente };
@@ -1358,12 +1377,37 @@
       var it = document.querySelector('.fu-buddy .fu-n2'); if (it) { it.hidden = !naoLidos; it.textContent = b.textContent; }
     }
     var abriuSozinho = false;
+    /* MINIMIZAR (Pedro, 26/11/2026: o botão "_" no topo). Fica só a faixa roxa, com o número; vale para este aparelho.
+       Para não repetir o problema de 16/11 (professor que não via os informes), ela ABRE SOZINHA quando chega um
+       recado novo, além dos que já estavam por ler na hora de minimizar. */
+    var MIN_K = 'hub_central_min';
+    function minLe(){ try { return JSON.parse(localStorage.getItem(MIN_K) || 'null'); } catch (e) { return null; } }
+    function minAplica(min){
+      var a = document.getElementById('avisos'), b = document.getElementById('bdMin'); if (!a || !b) return;
+      a.classList.toggle('minimizada', min); b.textContent = min ? '▢' : '_';
+      b.setAttribute('aria-expanded', String(!min)); b.title = min ? 'Abrir a Central de Informes' : 'Minimizar';
+      b.setAttribute('aria-label', min ? 'Abrir a Central de Informes' : 'Minimizar a Central de Informes');
+    }
+    function minVerifica(n){
+      var m = minLe();
+      if (m && n > (m.n || 0)) { try { localStorage.removeItem(MIN_K); } catch (e) {} minAplica(false); return; }
+      if (m) minAplica(true);
+    }
+    (function(){
+      var b = document.getElementById('bdMin'); if (!b) return;
+      if (minLe()) minAplica(true);
+      b.addEventListener('click', function(){
+        var vai = !document.getElementById('avisos').classList.contains('minimizada');
+        try { if (vai) localStorage.setItem(MIN_K, JSON.stringify({ n: naoLidos, em: Date.now() })); else localStorage.removeItem(MIN_K); } catch (e) {}
+        minAplica(vai);
+      });
+    })();
     function conta(){
       /* o número do Buddy conta só o que pede ciência; a tutoria é informação, não pendência */
       var n = msgs.filter(function(m){ return !m.ciente; }).length;
       sinoN.hidden = !n; sinoN.textContent = n > 9 ? '9+' : String(n);
       $$('bdN').hidden = !n; $$('bdN').textContent = sinoN.textContent;
-      naoLidos = n; noNome();
+      naoLidos = n; noNome(); minVerifica(n);
       /* HÁ NOVIDADE SEM LER: O MURAL ABRE SOZINHO (Pedro, 06/10/2026). O Carlos abriu o Hub com o mural minimizado
          e não viu que ele existia. Uma vez por carregamento; quem tirou o mural da tela (✕) continua sem ele, e
          quem não tem nada por ler fica como deixou. */
@@ -1570,9 +1614,10 @@
            marcando o aviso como lido e o link para os pedidos. */
         var pedidos = (ja && ja.ok ? ja.avisos || [] : []).filter(function(a){ return (a.tipo === 'impressao' || a.tipo === 'transferencia' || a.tipo === 'matricula' || a.tipo === 'experimental' || a.tipo === 'exp_fechou') && a.quando >= corte; }).map(function(a){
           /* transferência de aluno entre turmas, aluno novo matriculado pelo portal e aula experimental na turma (Portal da Secretaria, 23/10/2026): recado sem link */
-          return { id: 'av|' + a.id, avId: a.id, aviso: true, quando: a.quando, tag: 'sec', titulo: esc(a.titulo),
+          var cu = avisoCurto(a);
+          return { id: 'av|' + a.id, avId: a.id, aviso: true, quando: a.quando, tag: 'sec', titulo: esc(cu.titulo),
                    ic: { impressao: '🖨️', transferencia: '🔁', matricula: '🎒', experimental: '🧪', exp_fechou: '🎉' }[a.tipo] || '',
-                   html: a.texto ? '<p>' + texto(a.texto) + '</p>' : '', anexos: [], link: a.tipo === 'impressao' ? { href: 'imprimir.html#meus', rot: '📬 Ver meus pedidos' } : null, ciente: !!a.lido };
+                   html: cu.texto ? '<p>' + texto(cu.texto) + '</p>' : '', anexos: [], link: a.tipo === 'impressao' ? { href: 'imprimir.html#meus', rot: '📬 Ver meus pedidos' } : null, ciente: !!a.lido };
         });
         tutoria(); aniversarios();
         if (ja && ja.ok && !como()) festaExpFechou((ja.avisos || []).filter(function(a){ return a.tipo === 'exp_fechou' && !a.lido && a.quando >= corte; }));
