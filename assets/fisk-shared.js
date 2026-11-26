@@ -887,6 +887,54 @@ var FISK_PULSO_OCIO = 10;  // sem toque nenhum por este tempo, o pulso para
    ferramenta que muda de nome ("Turma de hoje" → "Minha aula") virava duas linhas. O `id` é um slug fixo que não muda
    com o rótulo; o nome continua indo junto, legível. O backend que ainda não conhece o campo ignora e nada quebra.
    A tabela está documentada no CLAUDE.md: id novo entra aqui E lá. */
+/* ── O INFORMATIVO DO MÊS (Pedro, 26/11/2026; backend Informativo.js) ──────────────────────────────────────────
+   Usado pela página da TV (informativo-tv.html) e pela home, que já baixa o PDF durante a tela de carregamento: quando o
+   carrossel abre, o arquivo já está no aparelho. O PDF fica no Cache Storage com a data do envio na chave; a pergunta ao
+   servidor é só a data (soInfo), e o arquivo só desce de novo quando a secretaria trocar. */
+var FISK_INFV_ESCOLAS = ['Caçapava', 'Taubaté'], FISK_INFV_CACHE = 'fisk-informativo-v1', _fiskInfvVoando = {};
+function fiskInfvNP(v) { return String(v || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
+function fiskInfvNormEscola(e) { var n = fiskInfvNP(e); return FISK_INFV_ESCOLAS.filter(function (x) { return fiskInfvNP(x) === n; })[0] || ''; }
+/** A escola pela aula: a turma de agora, senão a próxima de hoje (grade da Minha semana, cal:turmas:<nome>); sem aula,
+    a escola do professor se for uma só. Devolve { escola, porque } ou null (duas escolas e nenhuma aula: ele escolhe). */
+function fiskInfvEscolaDaAula(s, forcada) {
+  if (forcada && fiskInfvNormEscola(forcada)) return { escola: fiskInfvNormEscola(forcada), porque: '' };
+  if (!s) return null;
+  var nome = s.name || '';
+  if (s.master) { try { var a = JSON.parse(localStorage.getItem('fisk_actas') || 'null'); if (a && a.name) nome = a.name; } catch (e) {} }
+  var g = null; try { g = JSON.parse(localStorage.getItem('cal:turmas:' + fiskInfvNP(nome)) || 'null'); } catch (e) {}
+  var turmas = (g && g.t) || [], d = new Date(), wd = d.getDay(), min = d.getHours() * 60 + d.getMinutes();
+  var hoje = turmas.filter(function (t) { return t.h && t.h.dias.indexOf(wd) > -1 && t.h.fim > min; }).sort(function (x, y) { return x.h.ini - y.h.ini; });
+  if (hoje[0] && fiskInfvNormEscola(hoje[0].escola)) return { escola: fiskInfvNormEscola(hoje[0].escola), porque: hoje[0].h.ini <= min ? 'pela aula de agora' : 'pela sua próxima aula de hoje' };
+  var minhas = String(s.escolas || s.escola || '').split(/[,;]/).map(fiskInfvNormEscola).filter(String);
+  return minhas.length === 1 ? { escola: minhas[0], porque: '' } : null;
+}
+/** O PDF do informativo da escola: { vazio } ou { nome, quando, bytes (Uint8Array) }. Guardado no aparelho por data. */
+function fiskInfvObter(escola) {
+  if (_fiskInfvVoando[escola]) return _fiskInfvVoando[escola];
+  var s = (typeof fiskSessao === 'function' && fiskSessao()) || {}, info;
+  var pede = function (so) { return fiskFetch(FISK_HUB_EP, { action: 'informativoLer', token: s.token || '', escola: escola, soInfo: so ? 1 : 0 }, { timeoutMs: 90000 })
+    .then(function (j) { if (!j || !j.ok) throw new Error((j && (j.error || j.erro)) || 'não veio'); return j; }); };
+  var b64 = function (d) { return Uint8Array.from(atob(d), function (c) { return c.charCodeAt(0); }); };
+  var pre = location.origin + '/__informativo/' + encodeURIComponent(fiskInfvNP(escola)) + '/';
+  var p = !window.caches ? pede(false).then(function (j) { if (!j.vazio) j.bytes = b64(j.dados); return j; }) : pede(true).then(function (j) {
+    info = j; if (j.vazio) return j;
+    var k = pre + j.quando;
+    return caches.open(FISK_INFV_CACHE).then(function (c) {
+      return c.match(k).then(function (r) {
+        if (r) return r.arrayBuffer().then(function (ab) { info.bytes = new Uint8Array(ab); return info; });
+        return pede(false).then(function (full) {
+          info.bytes = b64(full.dados);
+          c.keys().then(function (ks) { ks.forEach(function (q) { if (q.url.indexOf(pre) === 0 && q.url !== k) c.delete(q); }); }).catch(function () {});
+          return c.put(k, new Response(info.bytes, { headers: { 'Content-Type': 'application/pdf' } })).then(function () { return info; }, function () { return info; });
+        });
+      });
+    }).catch(function () { return pede(false).then(function (full) { info.bytes = b64(full.dados); return info; }); });
+  });
+  _fiskInfvVoando[escola] = p;
+  p.catch(function () { delete _fiskInfvVoando[escola]; });
+  return p;
+}
+
 var FISK_FERRAMENTAS = {
   'hub-inicio': 'Fisk Hub (início)', 'minha-aula': 'Minha aula', 'radar-turma': 'Radar da Turma', 'radar-aluno': 'Radar do Aluno',
   'centro-estudos': 'Centro de Estudos', 'centro-estudos-frequencia': 'Centro de Estudos: frequência', 'centro-estudos-horarios': 'Centro de Estudos: horários',
@@ -894,7 +942,7 @@ var FISK_FERRAMENTAS = {
   'calendario': 'Minha semana', 'counseling': 'E-counseling', 'treinamentos': 'Treinamentos', 'apps': 'Apps', 'avatar': 'My Avatar',
   'personagem': 'Meu personagem', 'personagem-salvou': 'Meu personagem (salvou)', 'hogwarts': 'Cerimônia de Seleção', 'noticias': 'Notícias da turma',
   'plano-curso': 'Plano de curso', 'checking-guia': 'Guia do Checking', 'raf-temporario': 'RAF temporário', 'corretor-met': 'Corretor do MET',
-  'central-pedidos': 'Central de Pedidos', 'boletins': 'Boletins', 'quick-practice': 'Quick Practice', 'treino-met': 'Treino MET', 'treino-siele': 'Treino SIELE'
+  'central-pedidos': 'Central de Pedidos', 'informativo-tv': 'Informativo na TV', 'boletins': 'Boletins', 'quick-practice': 'Quick Practice', 'treino-met': 'Treino MET', 'treino-siele': 'Treino SIELE'
 };
 /* O GLOSSÁRIO DO CENTRO DE ESTUDOS (auditoria de 30/10/2026, M8): o mesmo lugar tinha quatro nomes (Centro de Estudos,
    Learning Center, plantão de dúvidas, tutoria). Fica UM nome nos rótulos, Centro de Estudos, e estas três linhas

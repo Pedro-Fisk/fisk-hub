@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="assets/fisk-shared.css?v=f12a68d93f">
   <!-- a casa do professor veste a faixa do topo (campanha de 09/2026) -->
   <link rel="stylesheet" href="assets/casa-tema.css?v=1e1bb28a31">
-<link rel="stylesheet" href="style.css?v=01a96e9b3c">
+<link rel="stylesheet" href="style.css?v=3cd4c02515">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 </head>
@@ -22,7 +22,7 @@
 <script>/* aplica o tema salvo antes da primeira pintura, para o modo escuro persistir entre as páginas sem piscar */try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
 <script>/* porteira do professor: decide antes da 1ª pintura se mostra o login ou o hub (sem flash) */try{document.body.classList.add(localStorage.getItem("fisk_prof")?"prof-in":"prof-out");}catch(e){document.body.classList.add("prof-out");}</script>
 
-  <link rel="stylesheet" href="assets/index.css?v=6474f30c81">
+  <link rel="stylesheet" href="assets/index.css?v=105309cfd5">
   <link rel="stylesheet" href="assets/perfis-login.css?v=619a050111">
 
   <div id="profGate">
@@ -152,6 +152,16 @@
   },700);
 })();
   </script>
+  <!-- O INFORMATIVO DO MÊS NO TOPO (Pedro, 26/11/2026): o mesmo carrossel da TV (informativo-tv.html?embed=1), passando
+       sozinho; abre e fecha como a Minha semana. Some sem informativo enviado. Por enquanto só para a direção vendo o Hub
+       (INFV_SO_DIRECAO no index.js), como o card da prateleira. -->
+  <section class="sem-home infv-home" id="infvHome" hidden>
+    <button type="button" class="sem-home-btn" id="infvBtn" aria-expanded="false" aria-controls="infvCorpo">
+      <span aria-hidden="true">📺</span><span><span data-i18n="infv-t">Informativo do mês</span><br><small data-i18n="infv-s">Passando sozinho. Para a TV da sala, use "Abrir na TV".</small></span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="sem-home-corpo infv-corpo" id="infvCorpo" hidden></div>
+  </section>
   <!-- SUA PRÓXIMA AULA (26/10/2026, aprovada pelo Pedro): a próxima aula de hoje, lida do que a Minha semana guardou no
        aparelho (cal:turmas:<nome>), sem chamada nova ao servidor. Some sem dado, fora de dia de aula e em feriado. -->
   <a class="prox-aula" id="proxAula" hidden></a>
@@ -189,6 +199,20 @@
       </div>
       <h2 data-i18n="card-conv-h2">Conversation Maker</h2>
       <p data-i18n="card-conv-p">Crie conversações completas em powerpoint, prontas para usar</p>
+    </a>
+
+    <!-- O INFORMATIVO DO MÊS NA TV (26/11/2026): o PDF da escola passando sozinho, slide por slide, numa aba própria
+         para o professor arrastar à TV da sala (informativo-tv.html) -->
+    <a class="card card-infv" href="informativo-tv.html" target="_blank" rel="noopener" style="display:none">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2.5" y="4.5" width="19" height="12.5" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8 20.5h8M12 17v3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M10.2 8.3v5.4l4.6-2.7-4.6-2.7z" fill="currentColor"/>
+        </svg>
+      </div>
+      <h2 data-i18n="card-infv-h2">Informativo do mês na TV</h2>
+      <p data-i18n="card-infv-p">O informativo da escola passando sozinho, slide por slide, para deixar na TV da sala</p>
     </a>
 
     <!-- O professor precisa ver a plataforma pelos olhos do aluno: é assim que
@@ -585,8 +609,8 @@
   <script src="https://portalfisk.com.br/assets/equipe-cortina.js?v=2026-10-24a"></script>
   <script src="https://portalfisk.com.br/assets/frases-equipe.js?v=2026-10-27a"></script>
   
-  <script src="assets/fisk-shared.js?v=4bf85aa648"></script>
+  <script src="assets/fisk-shared.js?v=803bfcd9c1"></script>
   <script src="assets/fisk-pre-aula.js?v=43e6e651bf"></script>
-  <script src="assets/index.js?v=678231264d"></script>
+  <script src="assets/index.js?v=f2ecaf728c"></script>
 </body>
 </html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informativo do mês na TV, FISK</title>
+<meta name="theme-color" content="#000000">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=f12a68d93f">
+<script src="assets/fisk-shared.js?v=803bfcd9c1"></script>
+<style>
+  /* O INFORMATIVO DO MÊS NA TV (Pedro, 26/11/2026). O professor abre, arrasta a aba para a tela estendida da TV e
+     clica em "Começar na tela cheia" (o navegador não deixa nenhum site abrir já em tela cheia: é uma trava de
+     segurança de todos). Cada slide fica um tempo, entra por um esmaecido cruzado e se aproxima devagar enquanto está
+     na tela; no último volta ao primeiro. A tela não apaga (Wake Lock). Backend: fisk-hub-backend/Informativo.js. */
+  html, body{ margin: 0; height: 100%; background: #000; color: #fff; overflow: hidden; font-family: var(--font-body); }
+  [hidden]{ display: none !important; }
+  #palco{ position: fixed; inset: 0; background: #000; }
+  .slide{ position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0;
+          transition: opacity var(--fade, 1.2s) ease-in-out; will-change: opacity, transform; }
+  .slide.on{ opacity: 1; }
+  .slide canvas{ display: block; max-width: 100%; max-height: 100%; transform: scale(1); transform-origin: 50% 50%; }
+  .slide.on.anda canvas{ transition: transform var(--dur, 12s) linear; transform: scale(1.045); }
+  body.calmo .slide.on.anda canvas{ transition: none; transform: none; }
+  body.esconde-cursor, body.esconde-cursor *{ cursor: none !important; }
+
+  /* a barrinha, que aparece ao mexer o mouse */
+  #barra{ position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); display: flex; align-items: center; gap: .55rem; padding: .5rem .7rem;
+          background: rgba(15,15,20,.78); border: 1px solid rgba(255,255,255,.16); border-radius: 16px; backdrop-filter: blur(8px);
+          opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 5; font-size: .9rem; white-space: nowrap; }
+  body.mostra #barra{ opacity: 1; pointer-events: auto; }
+  #barra button, #barra select{ font: inherit; font-weight: 800; color: #fff; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+          border-radius: 10px; padding: .4rem .7rem; cursor: pointer; }
+  #barra button:hover{ background: rgba(255,255,255,.2); }
+  #barra select option{ color: #111; }
+  #barra .n{ min-width: 6.5rem; text-align: center; font-weight: 800; opacity: .85; }
+  #barra .sep{ width: 1px; align-self: stretch; background: rgba(255,255,255,.18); }
+  #prog{ position: fixed; left: 0; bottom: 0; height: 4px; width: 0; background: linear-gradient(90deg, #16a34a, #4ade80); z-index: 4; opacity: .85; }
+
+  /* a abertura: escolher a escola (só quando não dá para saber pela aula) e começar */
+  #capa{ position: fixed; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+         background: radial-gradient(120% 120% at 50% 0%, #1c2433 0%, #0b0e14 70%); }
+  .cx{ max-width: 560px; width: 100%; text-align: center; }
+  .cx img{ height: 46px; margin-bottom: 1.1rem; }
+  .cx h1{ font-family: var(--font-heading); font-size: 1.9rem; margin: 0 0 .4rem; }
+  .cx p{ margin: .3rem 0; color: #cbd5e1; line-height: 1.5; }
+  .cx .esc{ display: inline-block; margin: .6rem 0 0; background: rgba(255,255,255,.1); border-radius: 99px; padding: .3rem .9rem; font-weight: 800; }
+  .cx .esc button{ background: none; border: 0; color: #93c5fd; font: inherit; font-weight: 800; cursor: pointer; text-decoration: underline; margin-left: .3rem; }
+  .comeca{ display: inline-flex; align-items: center; gap: .6rem; margin-top: 1.5rem; font: 900 1.25rem var(--font-heading); color: #fff;
+           background: linear-gradient(120deg, #22c55e, #15803d); border: 0; border-radius: 18px; padding: 1rem 1.8rem; cursor: pointer;
+           box-shadow: 0 14px 34px rgba(22,163,74,.4);   /* verde (Pedro, 26/11/2026): botão de ação é verde, não vermelho */ transition: transform .15s; }
+  .comeca:hover{ transform: translateY(-2px); }
+  .comeca:disabled{ opacity: .5; cursor: default; transform: none; }
+  .sem-cheia{ display: block; margin: .9rem auto 0; background: none; border: 0; color: #94a3b8; font: inherit; font-weight: 700; cursor: pointer; text-decoration: underline; }
+  .dica{ margin-top: 1.4rem !important; font-size: .88rem; color: #94a3b8 !important; }
+  .dica kbd{ background: rgba(255,255,255,.12); border-radius: 6px; padding: .05rem .4rem; font-weight: 800; color: #e2e8f0; }
+  .escolas{ display: flex; gap: .8rem; justify-content: center; margin-top: 1.2rem; flex-wrap: wrap; }
+  .escolas button{ font: 900 1.05rem var(--font-heading); color: #fff; background: rgba(255,255,255,.1); border: 2px solid rgba(255,255,255,.25);
+                   border-radius: 14px; padding: .8rem 1.5rem; cursor: pointer; }
+  .escolas button:hover{ border-color: #fff; }
+  .espera{ display: inline-flex; align-items: center; gap: .6rem; margin-top: 1.2rem; color: #cbd5e1; font-weight: 700; }
+  .espera i{ width: 18px; height: 18px; border-radius: 50%; border: 3px solid rgba(255,255,255,.25); border-top-color: #fff; animation: gira .8s linear infinite; }
+  @keyframes gira{ to{ transform: rotate(360deg); } }
+  .erro{ color: #fca5a5 !important; font-weight: 700; }
+  @media (prefers-reduced-motion: reduce){ .espera i{ animation: none; } }
+  /* embutido na home do Hub */
+  body.embed{ background: #0b0e14; }
+  body.embed #bSair{ display: none; }
+  body.embed #barra{ bottom: 10px; font-size: .78rem; padding: .35rem .5rem; gap: .4rem; }
+  body.embed #barra button, body.embed #barra select{ padding: .3rem .55rem; }
+  body.embed .cx img{ height: 30px; margin-bottom: .6rem; } body.embed .cx h1{ font-size: 1.25rem; }
+  body.embed .cx p{ font-size: .9rem; }
+</style>
+</head>
+<body>
+<div id="palco" aria-live="off"></div>
+<div id="prog"></div>
+<div id="barra" role="toolbar" aria-label="Controles do informativo">
+  <button type="button" id="bAnt" title="Slide anterior (←)">⏮</button>
+  <button type="button" id="bPausa" title="Pausar (espaço)">⏸</button>
+  <button type="button" id="bProx" title="Próximo slide (→)">⏭</button>
+  <span class="n" id="bN">1 de 1</span>
+  <span class="sep"></span>
+  <label style="display:flex;align-items:center;gap:.35rem">⏱ <select id="bTempo" aria-label="Tempo de cada slide">
+    <option value="10">10 s</option><option value="12">12 s</option><option value="15">15 s</option><option value="20">20 s</option></select></label>
+  <button type="button" id="bCheia" title="Tela cheia (F)">⛶ Tela cheia</button>
+  <button type="button" id="bSair" title="Fechar (Esc)">✕</button>
+</div>
+
+<div id="capa">
+  <div class="cx">
+    <img src="assets/fisk-logo.png" alt="FISK">
+    <h1>📺 Informativo do mês</h1>
+    <div id="capaCorpo"><div class="espera"><i></i> Carregando…</div></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js"></script>
+<script>
+(function () {
+  var EP = FISK_HUB_EP, ESCOLAS = ['Caçapava', 'Taubaté'];
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return fiskEsc(String(s == null ? '' : s)); };
+  var CALMO = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* EMBUTIDO NA HOME (Pedro, 26/11/2026): ?embed=1 é o carrossel do topo do Hub. Começa a passar sozinho, sem abertura,
+     sem pedir a tela acesa; o botão da barra vira "Abrir na TV" (esta página inteira numa aba nova). */
+  var EMBED = /[?&]embed=1/.test(location.search);
+  if (EMBED) document.body.classList.add('embed');
+  if (CALMO) document.body.classList.add('calmo');
+  function sess() { try { return JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) { return null; } }
+  function nP(v) { return String(v || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
+  function eu(s) { if (s.master) { try { var a = JSON.parse(localStorage.getItem('fisk_actas') || 'null'); if (a && a.name) return a.name; } catch (e) {} } return s.name || ''; }
+  function normEscola(e) { var n = nP(e); return ESCOLAS.filter(function (x) { return nP(x) === n; })[0] || ''; }
+
+  /* A ESCOLA PELA AULA (Pedro, 26/11/2026): a turma em que o professor está agora, senão a próxima de hoje (a mesma
+     grade que a "Sua próxima aula" da home lê, guardada pela Minha semana). Sem aula hoje: a escola dele, se for uma
+     só; se forem duas, ele escolhe. ?escola= no endereço vence tudo. */
+  function escolaDaAula(s) { return fiskInfvEscolaDaAula(s, new URLSearchParams(location.search).get('escola')); }   /* no kit (fisk-shared.js) */
+
+
+  var PAGINAS = [], vez = 0, timer = 0, progT = 0, pausado = false, DUR = 12, escolaAtual = '', nomeAtual = '', pdfDoc = null, wake = null;
+  try { DUR = Number(localStorage.getItem('hub_infv_tempo')) || 12; } catch (e) {}
+  $('bTempo').value = String(DUR);
+
+  function capa(html) { $('capaCorpo').innerHTML = html; $('capa').hidden = false; }
+  function escolher() {
+    capa('<p>Você dá aula nas duas escolas e não há aula sua agora. De qual escola é o informativo?</p><div class="escolas">' +
+      ESCOLAS.map(function (e) { return '<button type="button" data-esc="' + esc(e) + '">' + esc(e) + '</button>'; }).join('') + '</div>');
+  }
+  $('capa').addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-esc]'); if (b) { carregar(b.getAttribute('data-esc'), ''); return; }
+    if (ev.target.closest('#trocarEsc')) { escolher(); return; }
+    if (ev.target.closest('#comeca')) { comecar(true); return; }
+    if (ev.target.closest('#semCheia')) { comecar(false); return; }
+  });
+
+  function carregar(escola, porque) {
+    escolaAtual = escola;
+    capa('<div class="espera"><i></i> Buscando o informativo de ' + esc(escola) + '…</div>');
+    obterPdf(escola).then(function (j) {
+      if (j.vazio) {
+        if (EMBED) { try { parent.postMessage({ fiskInfv: 'vazio' }, location.origin); } catch (e) {} }
+        capa('<p>O informativo de <b>' + esc(escola) + '</b> deste mês ainda não foi enviado.</p><p class="dica">A secretaria envia em <b>Portal da Secretaria › Rotinas pedagógicas › Informativo do mês</b>.</p>' + trocarLink()); return;
+      }
+      nomeAtual = j.nome || 'Informativo';
+      return montar(j.bytes).then(function () {
+        if (EMBED) { comecar(false); return; }   /* na home não há abertura: já começa a passar */
+        capa('<p><b>' + esc(nomeAtual.replace(/\.pdf$/i, '')) + '</b></p>' +
+          '<span class="esc">🏫 ' + esc(escola) + (porque ? ' <small style="opacity:.75;font-weight:600">(' + esc(porque) + ')</small>' : '') + '<button type="button" id="trocarEsc">trocar</button></span>' +
+          '<p class="dica">1. Arraste esta aba para a tela da TV.<br>2. Clique no botão abaixo. Os ' + PAGINAS.length + ' slides passam sozinhos, em loop.</p>' +
+          '<button type="button" class="comeca" id="comeca">▶ Começar na tela cheia</button>' +
+          '<button type="button" class="sem-cheia" id="semCheia">começar sem tela cheia</button>' +
+          '<p class="dica">Durante a exibição: <kbd>F</kbd> tela cheia · <kbd>espaço</kbd> pausa · <kbd>←</kbd> <kbd>→</kbd> troca o slide · <kbd>Esc</kbd> sai</p>');
+      });
+    }).catch(function (e) { capa('<p class="erro">Não consegui abrir o informativo (' + esc(e.message) + ').</p>' + trocarLink()); });
+  }
+  /* O PDF GUARDADO NO APARELHO: fiskInfvObter, no kit (a home já o baixa durante a tela de carregamento) */
+  function obterPdf(escola) { return fiskInfvObter(escola); }
+  function trocarLink() { return ESCOLAS.length > 1 ? '<p><button type="button" class="sem-cheia" id="trocarEsc">ver o de outra escola</button></p>' : ''; }
+
+  /* cada página do PDF vira um canvas do tamanho da tela (nítido na TV: a escala segue os pixels reais) */
+  function montar(bytes) {
+    if (!window.pdfjsLib) return Promise.reject(new Error('o leitor de PDF não carregou; confira a internet'));
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.worker.min.js';
+    return pdfjsLib.getDocument({ data: bytes }).promise.then(function (doc) { pdfDoc = doc; return desenharTodas(); });
+  }
+  function desenharTodas() {
+    var W = window.innerWidth, H = window.innerHeight, dpr = Math.min(window.devicePixelRatio || 1, 2.5), palco = $('palco'), novas = [];
+    var cadeia = Promise.resolve();
+    for (var i = 1; i <= pdfDoc.numPages; i++) (function (n) {
+      cadeia = cadeia.then(function () { return pdfDoc.getPage(n); }).then(function (pg) {
+        var v1 = pg.getViewport({ scale: 1 }), esc = Math.min(W / v1.width, H / v1.height), vp = pg.getViewport({ scale: esc * dpr });
+        var c = document.createElement('canvas'); c.width = Math.floor(vp.width); c.height = Math.floor(vp.height);
+        c.style.width = Math.floor(vp.width / dpr) + 'px'; c.style.height = Math.floor(vp.height / dpr) + 'px';
+        return pg.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise.then(function () {
+          var d = document.createElement('div'); d.className = 'slide'; d.appendChild(c); novas.push(d);
+        });
+      });
+    })(i);
+    return cadeia.then(function () {
+      palco.innerHTML = ''; novas.forEach(function (d) { palco.appendChild(d); }); PAGINAS = novas;
+      if (vez >= PAGINAS.length) vez = 0;
+    });
+  }
+
+  function mostra(i) {
+    if (!PAGINAS.length) return;
+    vez = (i + PAGINAS.length) % PAGINAS.length;
+    PAGINAS.forEach(function (d, k) { d.classList.toggle('on', k === vez); if (k !== vez) d.classList.remove('anda'); });
+    var atual = PAGINAS[vez];
+    document.documentElement.style.setProperty('--dur', (DUR + 1.5) + 's');
+    void atual.offsetWidth; atual.classList.add('anda');
+    $('bN').textContent = (vez + 1) + ' de ' + PAGINAS.length;
+    agenda();
+  }
+  function agenda() {
+    clearTimeout(timer); clearInterval(progT);
+    var p = $('prog'); p.style.width = '0';
+    if (pausado || PAGINAS.length < 2) return;
+    var t0 = Date.now();
+    progT = setInterval(function () { p.style.width = Math.min(100, (Date.now() - t0) / (DUR * 10)) + '%'; }, 200);
+    timer = setTimeout(function () { mostra(vez + 1); }, DUR * 1000);
+  }
+  function pausa(sim) { pausado = sim; $('bPausa').textContent = sim ? '▶' : '⏸'; $('bPausa').title = sim ? 'Continuar (espaço)' : 'Pausar (espaço)'; agenda(); }
+
+  /* a tela não apaga enquanto o informativo roda */
+  function pedeAcordado() { try { if (navigator.wakeLock && document.visibilityState === 'visible') navigator.wakeLock.request('screen').then(function (w) { wake = w; }).catch(function () {}); } catch (e) {} }
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && $('capa').hidden) pedeAcordado(); });
+
+  function cheia() { var el = document.documentElement; if (!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen().catch(function () {}); else if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen(); }
+  function comecar(telaCheia) {
+    $('capa').hidden = true;
+    if (telaCheia) cheia();
+    if (!EMBED) pedeAcordado();
+    mostra(0); acorda();
+    if (!EMBED) { try { if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Informativo na TV', 'informativo-tv'); } catch (e) {} }
+  }
+
+  /* a barra e o cursor aparecem ao mexer o mouse e somem depois de 3 s parados */
+  var someT = 0;
+  function acorda() {
+    document.body.classList.add('mostra'); document.body.classList.remove('esconde-cursor');
+    clearTimeout(someT); someT = setTimeout(function () { if (!$('capa').hidden) return; document.body.classList.remove('mostra'); document.body.classList.add('esconde-cursor'); }, 3000);
+  }
+  ['mousemove', 'mousedown', 'touchstart'].forEach(function (ev) { document.addEventListener(ev, function () { if ($('capa').hidden) acorda(); }, { passive: true }); });
+  $('bAnt').addEventListener('click', function () { mostra(vez - 1); });
+  $('bProx').addEventListener('click', function () { mostra(vez + 1); });
+  $('bPausa').addEventListener('click', function () { pausa(!pausado); });
+  if (EMBED) { $('bCheia').textContent = '📺 Abrir na TV'; $('bCheia').title = 'Abrir numa aba própria, para arrastar à TV'; }
+  $('bCheia').addEventListener('click', function () { if (EMBED) { window.open('informativo-tv.html?escola=' + encodeURIComponent(escolaAtual), '_blank', 'noopener'); return; } cheia(); });
+  $('bSair').addEventListener('click', function () { if (document.fullscreenElement) document.exitFullscreen(); window.close(); setTimeout(function () { location.href = 'index.html'; }, 150); });
+  $('bTempo').addEventListener('change', function () { DUR = Number(this.value) || 12; try { localStorage.setItem('hub_infv_tempo', String(DUR)); } catch (e) {} mostra(vez); });
+  document.addEventListener('keydown', function (e) {
+    if (!$('capa').hidden) return;
+    if (e.key === 'f' || e.key === 'F') { cheia(); }
+    else if (e.key === ' ') { e.preventDefault(); pausa(!pausado); }
+    else if (e.key === 'ArrowRight') mostra(vez + 1);
+    else if (e.key === 'ArrowLeft') mostra(vez - 1);
+    else return;
+    acorda();
+  });
+  /* trocou de tela (arrastou para a TV, entrou na tela cheia): redesenha no tamanho novo, para continuar nítido */
+  var rT = 0;
+  window.addEventListener('resize', function () { clearTimeout(rT); rT = setTimeout(function () { if (pdfDoc) desenharTodas().then(function () { if ($('capa').hidden) mostra(vez); }); }, 400); });
+
+  var s = sess();
+  if (!s || !s.token) { capa('<p>Entre no Fisk Hub primeiro e abra o informativo de novo.</p><p><a href="index.html" style="color:#93c5fd;font-weight:800">Ir para o Hub</a></p>'); return; }
+  var e = escolaDaAula(s);
+  if (e) carregar(e.escola, e.porque); else escolher();
+})();
+</script>
+</body>
+</html>

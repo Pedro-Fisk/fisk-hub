@@ -201,3 +201,7 @@
   main.grid a.card p, .bd-tx, .bd-tx p, .bd-tx li, #avInterna > span > span:not(:last-child), .link-chip, .tt-card .av-vazio, .tt-it, .an-it, .tt-card a{ font-size:var(--fs-tx) !important; }
   .bd-tag, .bd-capa small, .bd-topo small, .bd-ck, .tt-cab small, .fwh-tag, #avInterna > span > span:last-child{ font-size:var(--fs-mini) !important; }
 }
+
+/* o informativo do mês no topo da home (26/11/2026): o carrossel em 16:9, no escuro da TV */
+.infv-corpo{background:#0b0e14}
+.infv-corpo iframe{display:block;width:100%;height:auto;aspect-ratio:16/9;border:0;background:#0b0e14}
