@@ -606,7 +606,7 @@ function post(body, opcoes) {
   if (body.action === 'plannerProf' && estado.plantao) body.semCard = true;
   if ((body.action === 'plannerProf' || body.action === 'plannerFalta') && estado.ontem && !estado.plantao) body.data = ontemIsoTH();
   /* a turma do plano: o servidor só aceita outro dia com `plano` (até PLANO_DIAS_DEPOIS dias) */
-  if ((body.action === 'plannerFalta' || body.action === 'plannerPresenca') && ptEstado && !estado.plantao) { body.plano = 1; if (estado.dia) body.data = estado.dia; }
+  if ((body.action === 'plannerFalta' || body.action === 'plannerPresenca' || body.action === 'plannerPresencaLote') && ptEstado && !estado.plantao) { body.plano = 1; if (estado.dia && !body.data) body.data = estado.dia; }
   if (body.action === 'plannerFalta' && !body.quem) body.quem = (sessao() || {}).name || estado.prof || '';   /* plantão não é aula: o card não muda (Pedro, 16/09/2026) */
   return fiskFetch(EP, body, opcoes)
     .then(function (j) { if (!j || j.ok === false) throw new Error((j && (j.erro || j.error)) || 'Não consegui.'); return j; })
@@ -2191,7 +2191,7 @@ function desenharChamadaKids(caixa) {
   var nPend = Object.keys(pendCard()).length;
   if (nPend) {
     var fx = document.createElement('div'); fx.className = 'ak-pend';
-    fx.innerHTML = '<span>⏳ ' + nPend + ' presença' + (nPend > 1 ? 's' : '') + ' ainda não ' + (nPend > 1 ? 'foram' : 'foi') + ' para o card. Desmarque quem não veio; o envio é automático depois de 3 minutos sem mexer na chamada.</span>' +
+    fx.innerHTML = '<span>⏳ ' + nPend + ' presença' + (nPend > 1 ? 's' : '') + ' ainda não ' + (nPend > 1 ? 'foram' : 'foi') + ' para o card. Desmarque quem não veio; o envio é automático em menos de um minuto sem mexer na chamada (ou ao sair da tela).</span>' +
       '<button type="button"' + (envioCard.rodando ? ' disabled' : '') + '>' + (envioCard.rodando ? 'Enviando…' : '📇 Enviar ao card agora') + '</button>';
     fx.querySelector('button').addEventListener('click', enviarPendentesCard);
     caixa.appendChild(fx);
@@ -2205,7 +2205,7 @@ function desenharChamadaKids(caixa) {
     var el = document.createElement('section'); el.className = 'al al-kids' + (veio ? ' veio' : '') + (faltou ? ' faltou' : '') + (aniv ? ' aniv' : ''); el.dataset.raf = a.raf;
     el.setAttribute('style', ptCorVars(ptCor(a.book)));
     el.innerHTML = '<div class="ak-lin"><span class="ak-av" aria-hidden="true">' + esc(nome.charAt(0)) + '</span>' +
-      '<span class="ak-id"><span class="nome">' + (aniv ? '🎂 ' : '') + esc(nome) + '</span>' + (aniv ? ' <span class="ak-aniv' + (anivEhHoje(a) ? ' hoje' : '') + '">🎉 ' + (anivEhHoje(a) ? 'Aniversário HOJE!' : 'Aniversário ' + esc(aniv)) + '</span>' : '') + '<br><span class="livro">' + esc(a.book || '') + '</span>' + rafTag(a) + '</span>' +
+      '<span class="ak-id"><span class="nome">' + (aniv ? '🎂 ' : '') + esc(nome) + '</span>' + (veio && pendCard()[a.raf] ? ' <span class="ak-indo" title="Marcado aqui, ainda não está no card">⏳ indo para o card</span>' : '') + (aniv ? ' <span class="ak-aniv' + (anivEhHoje(a) ? ' hoje' : '') + '">🎉 ' + (anivEhHoje(a) ? 'Aniversário HOJE!' : 'Aniversário ' + esc(aniv)) + '</span>' : '') + '<br><span class="livro">' + esc(a.book || '') + '</span>' + rafTag(a) + '</span>' +
       '<span class="ak-bts"><button type="button" class="ak-veio' + (veio ? ' on' : '') + '"><span class="bx">' + (veio ? '✓' : '') + '</span>Veio</button>' +
       '<button type="button" class="ak-falta' + (faltou ? ' on' : '') + '">✗ Faltou</button></span></div>' +
       '<button type="button" class="ak-nota' + (obs ? ' tem' : '') + '">📝 Anotações sobre o aluno' + (obs ? ' · tem anotação' : '') + '</button>';
@@ -2231,10 +2231,10 @@ function desenharChamadaKids(caixa) {
 /* O "VEIO" ESCREVE NO CARD (Pedro, 23/10/2026, pedido das secretárias): as turmas kids e teens deixaram o "p" e o "."
    e têm placeholder (".L7") nas aulas futuras. Marcar que o aluno veio tira o ponto do placeholder de hoje ("L7");
    célula vazia recebe a lição da semana do plano. Desmarcar devolve o que estava (plannerPresenca no backend). */
-function licaoDeHoje(a) {
+function licaoDeHoje(a, dia) {
   if (!ptEstado) return '';
   var b = ptBlocoDe(ptEstado.P, a.book); if (!b) return '';
-  var nome = ptLivroNoPlano(b, a.book), i = ptIndiceSemana(b, diaAlvoTH());
+  var nome = ptLivroNoPlano(b, a.book), i = ptIndiceSemana(b, dia || diaAlvoTH());
   var L = ((b.semanas[i] || {}).livros || {})[nome] || {};
   var adv = String(L.licao || '').match(/^\s*Adv\s*(\d)/i); if (adv) return 'Adv' + adv[1];
   var n = ptLicaoVigente(b, nome, i); return n ? 'L' + n : '';
@@ -2242,10 +2242,19 @@ function licaoDeHoje(a) {
 /* O "MARCAR TODOS" SÓ VAI AO CARD NO FIM (Pedro, 27/10/2026): o professor marca todos e depois desmarca quem faltou.
    Gravar na hora deixava a presença no card antes da falta chegar, e a falta não sobrescreve presença. Então a leva
    fica pendente (na tela e no localStorage, ao lado dos atendidos): desmarcar só tira da tela, Faltou lança o "a"
-   direto, e o card recebe as presenças pelo botão ou sozinho depois de 3 minutos sem mexer na chamada.
-   O Veio de um aluno só continua gravando na hora. */
-var ENVIO_CARD_MS = 3 * 60 * 1000;
+   direto, e o card recebe as presenças pelo botão ou sozinho depois de um tempo sem mexer na chamada.
+   O Veio de um aluno só continua gravando na hora.
+   A LEVA NUM PEDIDO SÓ (26/11/2026, caso Nicole): a leva ia um aluno por vez, ~8 s cada, e morria quando a aba
+   fechava ou o celular travava; a tela seguia mostrando "Veio" e a chave é do dia, então nada reenviava. Provado na
+   _presencaTH × card (6 de 8 em 17/11, 2 de 7 em 24/11). Agora: a chamada inteira vai num pedido só
+   (plannerPresencaLote), a espera caiu de 3 min para 45 s, a página escondida ou fechando manda na hora (keepalive),
+   o aluno pendente mostra ⏳ e, ao abrir a turma, o que ficou no aparelho de até 7 dias atrás vai para o card. */
+var ENVIO_CARD_MS = 45 * 1000;
 var envioCard = { timer: 0, rodando: false };
+function chavePend(dia) {
+  var p = String(dia || diaAlvoTH()).split('-');
+  return 'th:atend:' + estado.escola + '|' + estado.prof + '|' + estado.turma + '|' + Number(p[0]) + '-' + Number(p[1]) + '-' + Number(p[2]);
+}
 function pendCard() {
   var k = chaveAtend() + ':pend';
   if (estado._pendK !== k) { estado._pendK = k; try { estado.pendCard = JSON.parse(localStorage.getItem(k) || '{}') || {}; } catch (e) { estado.pendCard = {}; } }
@@ -2265,18 +2274,68 @@ function presencaTodosKids(lista) {
   var p = pendCard();
   lista.forEach(function (a) { estado.atendidos[a.raf] = Date.now(); p[a.raf] = 1; });
   guardaAtendidos(); guardaPendCard(); agendaEnvioCard(); desenharTurma();
-  toast('✓ ' + lista.length + ' alunos marcados. Desmarque quem não veio; o card recebe as presenças depois.');
+  toast('✓ ' + lista.length + ' alunos marcados. Desmarque quem não veio; o card recebe as presenças em seguida.');
 }
-function enviarPendentesCard() {
+/* um pedido com a chamada inteira; keepalive: a página está escondendo ou fechando, o navegador termina o envio */
+function postLote(itens, dia, keepalive) {
+  var body = { action: 'plannerPresencaLote', itens: itens, quem: (sessao() || {}).name || estado.prof || '', token: token() };
+  if (ptEstado && !estado.plantao) body.plano = 1;
+  if (dia && dia !== hojeIsoTH()) body.data = dia;
+  var pr = keepalive
+    ? fetch(EP, { method: 'POST', keepalive: true, headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) }).then(fiskJson)
+    : fiskFetch(EP, body, { timeoutMs: 120000 });
+  return pr.then(function (j) {
+    if (!j || j.ok === false) { var e = new Error((j && (j.erro || j.error)) || 'Não consegui.'); if (/desconhecida/.test(e.message)) e.semLote = true; throw e; }
+    return j.itens || [];
+  });
+}
+/* o que voltou do lote: tira da leva quem o card respondeu (escreveu, já estava, ou recusou com motivo) e junta os
+   recusados num aviso só; quem deu erro de escrita fica pendente para a próxima tentativa */
+function aplicaRespostaLote(p, itens, porRaf) {
+  var recusados = [], escritos = 0;
+  itens.forEach(function (x) {
+    var c = x.card || {}, raf = Object.keys(p).filter(function (r) { return normRaf(r) === normRaf(x.raf); })[0];
+    if (!raf || c.erro) return;
+    delete p[raf];
+    if (c.escreveu) escritos++;
+    else if (c.ok === false && c.motivo) recusados.push({ a: porRaf[raf], motivo: c.motivo });
+  });
+  return { escritos: escritos, recusados: recusados };
+}
+function normRaf(r) { return String(r || '').replace(/[^A-Za-z0-9]/g, '').toUpperCase(); }
+function avisaRecusados(recusados, dia) {
+  if (!recusados.length) return;
+  var nomes = recusados.map(function (x) { return (String((x.a || {}).nome || '').trim().split(/\s+/)[0] || 'aluno') + ' (' + String(x.motivo).replace(/:\s*lance (no|direto no) card\.?$/i, '') + ')'; });
+  toast('📇 ' + recusados.length + (recusados.length > 1 ? ' presenças NÃO foram' : ' presença NÃO foi') + ' para o card' + (dia ? ' (aula de ' + dia.split('-').reverse().slice(0, 2).join('/') + ')' : '') + ': ' + nomes.join('; ') + '. Lance no card.', 9000);
+}
+function enviarPendentesCard(opcoes) {
+  opcoes = opcoes || {};
   if (envioCard.rodando) return;
   clearTimeout(envioCard.timer); envioCard.timer = 0;
-  var p = pendCard(), porRaf = {};
+  var p = pendCard(), porRaf = {}, dia = diaAlvoTH();
   estado.alunos.forEach(function (a) { porRaf[a.raf] = a; });
   var fila = Object.keys(p).map(function (r) { return porRaf[r]; }).filter(function (a) { return a && estado.atendidos[a.raf] && !faltouHoje(a); });
   Object.keys(p).forEach(function (r) { if (!porRaf[r] || !estado.atendidos[r]) delete p[r]; });   /* trocou de turma ou já saiu */
   guardaPendCard();
   if (!fila.length) { desenharTurma(); return; }
-  envioCard.rodando = true; desenharTurma();
+  envioCard.rodando = true; if (!opcoes.keepalive) desenharTurma();
+  var itens = fila.map(function (a) { return { raf: a.raf, book: a.book, lic: licaoDeHoje(a, dia) }; });
+  postLote(itens, dia, opcoes.keepalive).then(function (volta) {
+    var r = aplicaRespostaLote(p, volta, porRaf); guardaPendCard();
+    envioCard.rodando = false; desenharTurma();
+    var sobrou = Object.keys(p).length;
+    if (r.recusados.length) avisaRecusados(r.recusados);
+    else if (sobrou) { toast('⚠️ ' + sobrou + ' presença' + (sobrou > 1 ? 's não foram' : ' não foi') + ' para o card. Tente "Enviar ao card agora" de novo.'); agendaEnvioCard(); }
+    else toast('📇 Card atualizado com as presenças.');
+  }).catch(function (e) {
+    if (e && e.semLote) return enviarUmAUm(fila, p);   /* servidor ainda sem a rota em lote */
+    envioCard.rodando = false; desenharTurma();
+    toast('⚠️ As presenças não foram para o card (' + e.message + '). Elas continuam guardadas: tente "Enviar ao card agora".');
+    agendaEnvioCard();
+  });
+}
+/* o caminho antigo, um aluno por vez, só para o caso de o servidor ainda não ter o lote */
+function enviarUmAUm(fila, p) {
   var falhas = 0;
   fila.reduce(function (pr, a) {
     return pr.then(function () {
@@ -2289,9 +2348,36 @@ function enviarPendentesCard() {
     else toast('📇 Card atualizado com as presenças.');
   });
 }
+/* a página escondendo (trocou de app, travou o celular) ou fechando: manda já, sem esperar */
+function enviaAoSair() { if (estado.turma && !envioCard.rodando && Object.keys(pendCard()).length) enviarPendentesCard({ keepalive: true }); }
+document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') enviaAoSair(); });
+window.addEventListener('pagehide', enviaAoSair);
 window.addEventListener('beforeunload', function (e) {
-  if (estado.turma && Object.keys(pendCard()).length) { e.preventDefault(); e.returnValue = ''; }
+  if (estado.turma && Object.keys(pendCard()).length) { enviaAoSair(); e.preventDefault(); e.returnValue = ''; }
 });
+/* O QUE FICOU NO APARELHO (26/11/2026): ao abrir a turma do plano, a leva de uma aula de até DIAS_DEPOIS_KIDS dias
+   atrás que nunca chegou ao card vai agora, na célula daquele dia (o servidor confere a data e só escreve em célula
+   vazia ou com placeholder). A de hoje segue o caminho de sempre. */
+function reenviaPendentesAntigos() {
+  if (!ptEstado || estado.plantao) return;
+  var hojeK = chaveAtend(), porRaf = {};
+  estado.alunos.forEach(function (a) { porRaf[a.raf] = a; });
+  diasDaChamadaKids().slice(1).reduce(function (pr, o) {
+    return pr.then(function () {
+      var k = chavePend(o.iso); if (k === hojeK) return;
+      var p, at;
+      try { p = JSON.parse(localStorage.getItem(k + ':pend') || '{}') || {}; at = JSON.parse(localStorage.getItem(k) || '{}') || {}; } catch (e) { return; }
+      var fila = Object.keys(p).filter(function (r) { return porRaf[r] && at[r]; }).map(function (r) { return porRaf[r]; });
+      if (!fila.length) { if (Object.keys(p).length) localStorage.removeItem(k + ':pend'); return; }
+      return postLote(fila.map(function (a) { return { raf: a.raf, book: a.book, lic: licaoDeHoje(a, o.iso) }; }), o.iso).then(function (volta) {
+        var r = aplicaRespostaLote(p, volta, porRaf);
+        if (Object.keys(p).length) localStorage.setItem(k + ':pend', JSON.stringify(p)); else localStorage.removeItem(k + ':pend');
+        if (r.escritos) toast('📇 ' + r.escritos + (r.escritos > 1 ? ' presenças' : ' presença') + ' da aula de ' + o.iso.split('-').reverse().slice(0, 2).join('/') + ' que tinham ficado no aparelho foram para o card.', 6000);
+        avisaRecusados(r.recusados, o.iso);
+      }).catch(function () {});
+    });
+  }, Promise.resolve());
+}
 /* quieto: sem o aviso de sucesso e com o erro devolvido (o "marcar todos" avisa uma vez no fim);
    jaMarcado: a tela já mostra Veio, falta só o card */
 function presencaKids(a, quieto, jaMarcado) {
@@ -2445,6 +2531,7 @@ function planoTurmaMonta(escola, turma) {
     document.body.classList.add('pt-ativo');
     $('legenda').hidden = true;
     ptDesenha(); pintaFila(); desenharTurma();
+    reenviaPendentesAntigos();
     post({ action: 'planoTurmaLe', escola: escola, turma: turma }).then(function (r) {
       if (!ptEstado || ptEstado.turma !== turma) return;
       ptEstado.marcas = r.marcas || {}; ptEstado.nota = r.nota || null; ptEstado.carregou = true;
