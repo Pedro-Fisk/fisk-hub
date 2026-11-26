@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#000000">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/fisk-shared.css?v=f12a68d93f">
-<script src="assets/fisk-shared.js?v=d47b3f7b75"></script>
+<script src="assets/fisk-shared.js?v=803bfcd9c1"></script>
 <style>
   /* O INFORMATIVO DO MÊS NA TV (Pedro, 26/11/2026). O professor abre, arrasta a aba para a tela estendida da TV e
      clica em "Começar na tela cheia" (o navegador não deixa nenhum site abrir já em tela cheia: é uma trava de
@@ -116,16 +116,8 @@
   /* A ESCOLA PELA AULA (Pedro, 26/11/2026): a turma em que o professor está agora, senão a próxima de hoje (a mesma
      grade que a "Sua próxima aula" da home lê, guardada pela Minha semana). Sem aula hoje: a escola dele, se for uma
      só; se forem duas, ele escolhe. ?escola= no endereço vence tudo. */
-  function escolaDaAula(s) {
-    var q = new URLSearchParams(location.search).get('escola'); if (q && normEscola(q)) return { escola: normEscola(q), porque: '' };
-    var g = null; try { g = JSON.parse(localStorage.getItem('cal:turmas:' + nP(eu(s))) || 'null'); } catch (e) {}
-    var turmas = (g && g.t) || [], d = new Date(), wd = d.getDay(), min = d.getHours() * 60 + d.getMinutes();
-    var hoje = turmas.filter(function (t) { return t.h && t.h.dias.indexOf(wd) > -1 && t.h.fim > min; }).sort(function (a, b) { return a.h.ini - b.h.ini; });
-    if (hoje[0] && normEscola(hoje[0].escola)) return { escola: normEscola(hoje[0].escola), porque: hoje[0].h.ini <= min ? 'pela aula de agora' : 'pela sua próxima aula de hoje' };
-    var minhas = String(s.escolas || s.escola || '').split(/[,;]/).map(normEscola).filter(String);
-    if (minhas.length === 1) return { escola: minhas[0], porque: '' };
-    return null;
-  }
+  function escolaDaAula(s) { return fiskInfvEscolaDaAula(s, new URLSearchParams(location.search).get('escola')); }   /* no kit (fisk-shared.js) */
+
 
   var PAGINAS = [], vez = 0, timer = 0, progT = 0, pausado = false, DUR = 12, escolaAtual = '', nomeAtual = '', pdfDoc = null, wake = null;
   try { DUR = Number(localStorage.getItem('hub_infv_tempo')) || 12; } catch (e) {}
@@ -163,33 +155,8 @@
       });
     }).catch(function (e) { capa('<p class="erro">Não consegui abrir o informativo (' + esc(e.message) + ').</p>' + trocarLink()); });
   }
-  /* O PDF GUARDADO NO APARELHO (26/11/2026): primeiro pergunta só a data (soInfo); se o aparelho já tem o PDF daquela
-     data, usa o guardado (Cache Storage); senão baixa e guarda, apagando o da data anterior da mesma escola. */
-  var CACHE_NOME = 'fisk-informativo-v1';
-  function chaveCache(escola, quando) { return location.origin + '/__informativo/' + encodeURIComponent(nP(escola)) + '/' + quando; }
-  function obterPdf(escola) {
-    var s = sess(), info;
-    var pede = function (so) { return fiskFetch(EP, { action: 'informativoLer', token: s.token, escola: escola, soInfo: so ? 1 : 0 }, { timeoutMs: 90000 })
-      .then(function (j) { if (!j || !j.ok) throw new Error((j && (j.error || j.erro)) || 'não veio'); return j; }); };
-    var b64 = function (d) { return Uint8Array.from(atob(d), function (c) { return c.charCodeAt(0); }); };
-    if (!window.caches) return pede(false).then(function (j) { if (j.vazio) return j; j.bytes = b64(j.dados); return j; });
-    return pede(true).then(function (j) {
-      info = j; if (j.vazio) return j;
-      var k = chaveCache(escola, j.quando);
-      return caches.open(CACHE_NOME).then(function (c) {
-        return c.match(k).then(function (r) {
-          if (r) return r.arrayBuffer().then(function (ab) { info.bytes = new Uint8Array(ab); return info; });
-          return pede(false).then(function (full) {
-            info.bytes = b64(full.dados);
-            var pre = location.origin + '/__informativo/' + encodeURIComponent(nP(escola)) + '/';
-            c.keys().then(function (ks) { ks.forEach(function (q) { if (q.url.indexOf(pre) === 0 && q.url !== k) c.delete(q); }); }).catch(function () {});
-            c.put(k, new Response(info.bytes, { headers: { 'Content-Type': 'application/pdf' } })).catch(function () {});
-            return info;
-          });
-        });
-      }).catch(function () { return pede(false).then(function (full) { info.bytes = b64(full.dados); return info; }); });
-    });
-  }
+  /* O PDF GUARDADO NO APARELHO: fiskInfvObter, no kit (a home já o baixa durante a tela de carregamento) */
+  function obterPdf(escola) { return fiskInfvObter(escola); }
   function trocarLink() { return ESCOLAS.length > 1 ? '<p><button type="button" class="sem-cheia" id="trocarEsc">ver o de outra escola</button></p>' : ''; }
 
   /* cada página do PDF vira um canvas do tamanho da tela (nítido na TV: a escala segue os pixels reais) */

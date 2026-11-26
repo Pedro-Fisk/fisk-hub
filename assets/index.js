@@ -2084,12 +2084,20 @@
   if (!sec || !bt || !corpo) return;
   sec.hidden = false;
   var CH = 'hub:infv:' + String(s.name || '').replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+  /* JÁ NA TELA DE CARREGAMENTO (Pedro, 26/11/2026): o PDF começa a descer agora, enquanto a caneca gira; o carrossel só
+     nasce quando ele está guardado no aparelho, e então abre sem espera. Sem a escola pela aula (duas escolas e nenhuma
+     aula hoje), o próprio carrossel pergunta. Sem informativo enviado, o bloco some antes de aparecer vazio. */
+  var e0 = typeof fiskInfvEscolaDaAula === 'function' ? fiskInfvEscolaDaAula(s) : null;
+  var pronto = (e0 && typeof fiskInfvObter === 'function') ? fiskInfvObter(e0.escola).then(function (j) { if (j && j.vazio) sec.hidden = true; return j; }, function () { return null; }) : Promise.resolve(null);
   function abre(sim) {
     try { localStorage.setItem(CH, sim ? '1' : '0'); } catch (e) {}
     if (sim && !corpo.querySelector('iframe')) {
-      var f = document.createElement('iframe');
-      f.src = 'informativo-tv.html?embed=1'; f.title = 'Informativo do mês'; f.allow = 'fullscreen';
-      corpo.appendChild(f);
+      pronto.then(function (j) {
+        if ((j && j.vazio) || corpo.querySelector('iframe') || bt.getAttribute('aria-expanded') !== 'true') return;
+        var f = document.createElement('iframe');
+        f.src = 'informativo-tv.html?embed=1'; f.title = 'Informativo do mês'; f.allow = 'fullscreen';
+        corpo.appendChild(f);
+      });
     }
     bt.setAttribute('aria-expanded', sim ? 'true' : 'false'); corpo.hidden = !sim;
   }
