@@ -1653,15 +1653,50 @@
       es: ['☕ Preparando un cafecito…', '🎓 Preparando tu Hub…', '📒 Abriendo tu planner…', '🙋 Pasando lista…', '🧑‍🏫 Ordenando el aula…',
            '📝 Separando las actividades de hoy…', '✏️ Afilando los lápices…', '📊 Actualizando el radar del grupo…', '🔔 Revisando los avisos…', '🗓️ Pasando la página de la semana…']
     };
+    /* O CHOCOLATE QUENTE DE NATAL (25/11/2026, pedido do Pedro): de 01 a 25/12 a entrada é de Natal, para professores como
+       para alunos e secretárias. Duas canecas que se revezam (hub_xicara_natal), noite verde com neve e frases de Natal.
+       No dia 26 voltam as xícaras de sempre. A data é a do aparelho. */
+    var HUB_NATAL = [
+      /* 1. caneca vermelha de chocolate quente, com marshmallows e a bengala doce */
+      '<svg width="200" height="200" viewBox="0 0 200 200"><g class="vapor"><path d="M80 58 q-10 -14 0 -28 q10 -14 0 -28"/><path d="M104 58 q-10 -14 0 -28 q10 -14 0 -28"/></g>' +
+      '<ellipse cx="100" cy="182" rx="70" ry="9" fill="rgba(0,0,0,.25)"/><g class="balanca">' +
+      '<path d="M150 98 q34 0 34 26 q0 26 -38 28" fill="none" stroke="#a50f1f" stroke-width="12" stroke-linecap="round"/><path d="M44 72 h112 v66 q0 32 -30 32 h-52 q-30 0 -30 -32z" fill="#d81f26"/>' +
+      '<path d="M44 104 h112 v14 h-112z" fill="#fff"/><path d="M58 111 l6 -5 l6 5 l6 -5 l6 5 l6 -5 l6 5 l6 -5 l6 5 l6 -5 l6 5 l6 -5 l6 5 l6 -5 l6 5" fill="none" stroke="#1f8a4c" stroke-width="3"/>' +
+      '<ellipse cx="100" cy="72" rx="56" ry="9" fill="#a50f1f"/><ellipse cx="100" cy="73" rx="50" ry="6" fill="#5a3218"/>' +
+      '<rect x="74" y="62" width="14" height="12" rx="3" fill="#fff"/><rect x="92" y="60" width="14" height="12" rx="3" fill="#fbeff0"/><rect x="108" y="64" width="12" height="10" rx="3" fill="#fff"/>' +
+      '<path d="M124 76 v-50 q0 -14 12 -14 q12 0 12 12" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/><path d="M124 76 v-50 q0 -14 12 -14 q12 0 12 12" fill="none" stroke="#e0303a" stroke-width="8" stroke-linecap="round" stroke-dasharray="7 7"/>' +
+      '<image href="' + HUB_BALAO + '" x="66" y="128" width="68" height="34"/></g></svg>',
+      /* 2. caneca verde com o gorro do Papai Noel */
+      '<svg width="200" height="210" viewBox="0 0 200 210"><g class="vapor"><path d="M70 74 q-10 -14 0 -28 q10 -14 0 -28"/><path d="M92 74 q-10 -14 0 -28 q10 -14 0 -28"/></g>' +
+      '<ellipse cx="100" cy="194" rx="70" ry="9" fill="rgba(0,0,0,.25)"/><g class="balanca">' +
+      '<path d="M150 112 q34 0 34 26 q0 26 -38 28" fill="none" stroke="#146b3a" stroke-width="12" stroke-linecap="round"/><path d="M44 86 h112 v64 q0 32 -30 32 h-52 q-30 0 -30 -32z" fill="#1f8a4c"/>' +
+      '<g fill="#fff" opacity=".85"><circle cx="62" cy="120" r="3"/><circle cx="138" cy="112" r="3"/><circle cx="70" cy="158" r="2.5"/><circle cx="132" cy="160" r="2.5"/></g>' +
+      '<path d="M96 74 q22 -46 66 -40 q-6 18 -22 40z" fill="#d81f26"/><circle cx="162" cy="34" r="10" fill="#fff"/>' +
+      '<rect x="40" y="70" width="120" height="18" rx="9" fill="#fff"/>' +
+      '<image href="' + HUB_BALAO + '" x="66" y="122" width="68" height="34"/></g></svg>'
+    ];
+    var HUB_FRASES_NATAL = {
+      pt: ['☕ Preparando um chocolate quente…', '🎄 Enfeitando a sala de aula…', '🎁 Embrulhando os presentes da turma…', '⭐ Colocando a estrela no topo…', '🔔 Tocando os sininhos…',
+           '🍪 Assando os biscoitos de Natal…', '✨ Acendendo o pisca-pisca…', '❄️ Espalhando neve pelo Hub…', '🦌 Chamando as renas para a aula…', '💌 Escrevendo os cartões de boas festas…'],
+      en: ['☕ Making a hot chocolate…', '🎄 Decorating the classroom…', '🎁 Wrapping the class presents…', '⭐ Putting the star on top…', '🔔 Ringing the jingle bells…',
+           '🍪 Baking the Christmas cookies…', '✨ Turning on the fairy lights…', '❄️ Letting it snow on the Hub…', '🦌 Calling the reindeer to class…', '💌 Writing the holiday cards…'],
+      es: ['☕ Preparando un chocolate caliente…', '🎄 Decorando el aula…', '🎁 Envolviendo los regalos del grupo…', '⭐ Poniendo la estrella arriba…', '🔔 Tocando las campanitas…',
+           '🍪 Horneando las galletas de Navidad…', '✨ Encendiendo las lucecitas…', '❄️ Haciendo nevar en el Hub…', '🦌 Llamando a los renos a clase…', '💌 Escribiendo las tarjetas de fiestas…']
+    };
+    function hubNatal(){ var d = new Date(), md = ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); return md >= '12-01' && md <= '12-25'; }
     function hubCafezinho(){
       var cx = $$('hubXicara'), fr = $$('hubEnFrase'); if (!cx || !fr) return function(){};
-      var ult = -1; try { ult = Number(localStorage.getItem('hub_xicara')); } catch (e) {}
-      var n = Math.floor(Math.random() * (HUB_XICARAS.length - 1)); if (n >= ult && ult >= 0) n++;
-      if (n >= HUB_XICARAS.length) n = 0;
-      try { localStorage.setItem('hub_xicara', String(n)); } catch (e) {}
-      cx.innerHTML = HUB_XICARAS[n];
+      var natal = hubNatal(), XIC = natal ? HUB_NATAL : HUB_XICARAS, CHAVE = natal ? 'hub_xicara_natal' : 'hub_xicara';
+      var ov = $$('hubEntrando'), neve = $$('hubNeve');
+      if (ov) ov.classList.toggle('natal', natal);
+      if (neve) { var h = ''; if (natal) for (var q = 0; q < 28; q++) h += '<i style="left:' + Math.round(Math.random() * 100) + '%;animation-delay:' + (-Math.random() * 5).toFixed(1) + 's;animation-duration:' + (4 + Math.random() * 3).toFixed(1) + 's"></i>'; neve.innerHTML = h; }
+      var ult = -1; try { ult = Number(localStorage.getItem(CHAVE)); } catch (e) {}
+      var n = Math.floor(Math.random() * (XIC.length - 1)); if (n >= ult && ult >= 0) n++;
+      if (n >= XIC.length) n = 0;
+      try { localStorage.setItem(CHAVE, String(n)); } catch (e) {}
+      cx.innerHTML = XIC[n];
       var l = 'pt'; try { l = (typeof fiskIdioma === 'function' ? fiskIdioma() : localStorage.getItem('fisk_lang')) || 'pt'; } catch (e) {}
-      var F = HUB_FRASES[l] || HUB_FRASES.pt, resto = F.slice(1).sort(function(){ return Math.random() - .5; }), k = 0;
+      var FF = natal ? HUB_FRASES_NATAL : HUB_FRASES, F = FF[l] || FF.pt, resto = F.slice(1).sort(function(){ return Math.random() - .5; }), k = 0;
       fr.textContent = F[0]; fr.classList.remove('sai');
       var giro = setInterval(function(){
         fr.classList.add('sai');
