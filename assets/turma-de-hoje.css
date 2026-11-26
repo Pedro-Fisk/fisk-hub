@@ -537,6 +537,8 @@ body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ 
   .ak-cab .ak-dia{ font-size: .88rem; font-weight: 800; display: inline-flex; align-items: center; gap: .35rem; }
   .ak-cab .ak-dia select{ font: inherit; font-weight: 800; padding: .25rem .5rem; border-radius: 10px; border: 2px solid #cbd5e1; background: #fff; color: inherit; }
   body.theme-dark .ak-cab .ak-dia select{ background: #1f2937; border-color: #475569; }
+  .ak-indo{ display: inline-block; font-size: .72rem; font-weight: 800; color: #a15c00; background: #fdf1df; border-radius: 99px; padding: .05rem .5rem; white-space: nowrap; }
+  body.theme-dark .ak-indo{ background: #382a14; color: #f2b45c; }
   .ak-pend.ak-depois{ background: #e0f2fe; color: #075985; }
   .ak-pend.ak-depois button{ background: #0284c7; }
   body.theme-dark .ak-pend.ak-depois{ background: #0c2a3d; color: #7dd3fc; }
