@@ -93,6 +93,15 @@ h1, h2, h3, .btn, .btn-generate, .modal-title{ font-family: var(--font-heading);
   border-bottom: 6px solid var(--red);
 }
 
+/* O BANNER DE NATAL (Pedro, 26/11/2026): de 01 a 25/12 (classe posta pelo fisk-shared.js). Vence as cores da casa
+   (casa-tema.css) no período: a imagem já traz a bengala doce no pé, então a faixa vermelha e os enfeites da casa saem. */
+html.hub-natal .hero,
+html.hub-natal body[data-casa] .hero{ background: #0b2a1f url("natal-hero.jpg") center bottom / cover no-repeat !important; border-bottom: 0 !important; }
+html.hub-natal .hero::before,
+html.hub-natal .hero::after{ display: none !important; }
+html.hub-natal .hero p{ color: #ffe28a; text-shadow: 0 1px 6px rgba(0,0,0,.45); }
+html.hub-natal .hero h1{ text-shadow: 0 2px 12px rgba(0,0,0,.4); }
+
 .hero-logo{
   display: inline-block;
   height: 40px;   /* a mesma medida do Portal do Aluno (portal.css) */

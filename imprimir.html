@@ -5,11 +5,11 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Central de Pedidos, FISK</title>
-<link rel="stylesheet" href="assets/fisk-shared.css?v=d6b8607281">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=f12a68d93f">
 <link rel="stylesheet" href="assets/casa-tema.css?v=1e1bb28a31">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
-<script src="assets/fisk-shared.js?v=282254175d"></script>
+<script src="assets/fisk-shared.js?v=4bf85aa648"></script>
 <style>
   /* Central de Impressões, lado do professor (20/10/2026). Backend: fisk-hub-backend/Impressoes.js */
   :root{ --blue:var(--ui,#2b4d70); --blue-ink:var(--ui-ink,#1d3349); --blue-soft:var(--ui-soft,#e9eff5); --blue-bd:var(--ui-bd,#9db6cb); }
@@ -73,10 +73,14 @@
   .sel input{width:18px;height:18px;accent-color:var(--green,#32a889);cursor:pointer;margin:0}
   .ped.marcado{background:rgba(50,168,137,.07);border-radius:10px}
   .lote-topo{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:.1rem 0 .4rem;font-size:.82rem;color:var(--gray)}
-  .lote-barra{position:sticky;bottom:.6rem;z-index:5;background:var(--white);border:2px solid var(--green,#32a889);border-radius:14px;
-              box-shadow:0 6px 20px rgba(0,0,0,.12);padding:.7rem .85rem;margin-top:.8rem}
+  .lote-barra{position:sticky;bottom:1.4rem;z-index:5;background:#f0faf6;border:2.5px solid var(--green,#32a889);border-radius:18px;
+              box-shadow:0 12px 32px rgba(15,60,45,.22);padding:1rem 1.25rem;margin:1.2rem 0 .4rem}
+  body.theme-dark .lote-barra{background:#13261f}
+  .lote-barra .btn-cor,.lote-barra .btn-breve{font-size:.92rem;padding:.6rem 1.15rem}
   .lote-barra .linha{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
-  .lote-barra .qtos{font-family:var(--font-heading);font-weight:700;margin-right:auto}
+  .lote-barra .qtos{font-family:var(--font-heading);font-weight:700;font-size:1.15rem;margin-right:auto}
+  .btn-breve{background:transparent;color:var(--gray);border:1.5px dashed var(--surface-border-color,#c9d2dc);border-radius:99px;font-weight:700;font-size:.78rem;
+             padding:.36rem .8rem;cursor:not-allowed;font-family:var(--font-body);opacity:.85}
   .lote-res{list-style:none;margin:.6rem 0 0;padding:0;font-size:.82rem;max-height:220px;overflow:auto}
   .lote-res li{padding:.2rem 0;border-top:1px dashed var(--surface-border-color)}
   .lote-res li:first-child{border-top:0}
@@ -137,7 +141,7 @@
       <div class="linha">
         <span class="qtos" id="loteQtos"></span>
         <button type="button" class="btn-cor" id="loteImprimir">🖨️ Imprimir todos</button>
-        <button type="button" class="btn-cor btn-zap" id="loteEnviar">💬 Enviar todos à família</button>
+        <button type="button" class="btn-breve" id="loteEnviar" disabled title="Em breve o documento vai direto para o Portal da Família">👨‍👩‍👧 Enviar para Portal da Família - Em breve</button>
       </div>
       <div class="form-ped" id="loteForm" hidden style="margin-top:.6rem"></div>
       <ul class="lote-res" id="loteRes" hidden></ul>
@@ -359,7 +363,7 @@ function docsDesenhar() {
       '<div class="chips">' + chips + '</div></div>' +
       '<div class="acoes">' + (vivo ? '<button type="button" class="btn-leve" data-d="abrir" data-id="' + id + '">Abrir PDF</button>' +
         '<button type="button" class="btn-cor" data-d="imprimir" data-id="' + id + '">🖨️ Imprimir</button>' +
-        (d.tipo !== 'planner' ? '<button type="button" class="btn-cor btn-zap" data-d="enviar" data-id="' + id + '">💬 Enviar à família</button>' : '') : '') + '</div></div>';
+        (d.tipo !== 'planner' ? '<button type="button" class="btn-breve" disabled title="Em breve o documento vai direto para o Portal da Família">👨‍👩‍👧 Enviar para Portal da Família - Em breve</button>' : '') : '') + '</div></div>';
   }).join('');
   loteAtualiza();
 }
@@ -400,9 +404,7 @@ function loteAtualiza() {
   $('loteBarra').hidden = !n && $('loteRes').hidden;
   $('loteQtos').textContent = n ? n + (n > 1 ? ' documentos marcados' : ' documento marcado') : 'Nenhum documento marcado';
   $('loteImprimir').disabled = !n;
-  var paraFamilia = M.filter(function (d) { return d.tipo !== 'planner'; }).length;
-  $('loteEnviar').disabled = !paraFamilia;
-  $('loteEnviar').title = n && !paraFamilia ? 'Planner físico é só para imprimir' : '';
+  $('loteEnviar').disabled = true;   /* envio pelo WhatsApp saiu (Pedro, 26/11/2026): vai virar o Portal da Família */
 }
 $('loteTodos').addEventListener('click', function () { VISIVEIS.forEach(function (d) { if (!d.apagado) MARCADOS[d.id] = 1; }); docsDesenhar(); });
 $('loteNenhum').addEventListener('click', function () { MARCADOS = {}; $('loteForm').hidden = true; $('loteRes').hidden = true; docsDesenhar(); });

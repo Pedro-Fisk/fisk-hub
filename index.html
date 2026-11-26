@@ -10,10 +10,10 @@
      regra nova de estilo simplesmente não aparece na tela dele — foi o que
      aconteceu no teste da busca de aluno, com o campo saindo sem formatação.
      MEXEU no style.css ou no kit? Suba a data aqui. -->
-<link rel="stylesheet" href="assets/fisk-shared.css?v=d6b8607281">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=f12a68d93f">
   <!-- a casa do professor veste a faixa do topo (campanha de 09/2026) -->
   <link rel="stylesheet" href="assets/casa-tema.css?v=1e1bb28a31">
-<link rel="stylesheet" href="style.css?v=477a50d0fd">
+<link rel="stylesheet" href="style.css?v=cbeeb8d9c6">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 </head>
@@ -82,10 +82,36 @@
     <p class="hero-frase" id="heroFrase" hidden title="Clique para outra frase" style="font-style:italic;opacity:.92;max-width:44rem;margin:.55rem auto 0;cursor:pointer;transition:opacity .3s"></p>
   </header>
 
+
+  <!-- o mini-dash do topo (resumo das turmas e busca de aluno) saiu em 31/10/2026: estava desligado desde 19/09 (B8) -->
+
+  <!-- ══ A SUA CASA (campanha de 09/2026) ══════════════════════════════════
+       Aparece só para quem já fez a Cerimônia, e some sozinho quando a
+       campanha acabar (o script no fim do arquivo, junto do card).
+       ⚠️ Os colegas saem SEM NOME, e é decisão do Pedro: quantos estão na
+       mesma casa, nunca quem. -->
+  <section class="hwp" id="hwProf" hidden>
+    <div class="hwp-b" id="hwpB" aria-hidden="true"></div>
+    <div class="hwp-c">
+      <b class="hwp-casa" id="hwpCasa"></b>
+      <p class="hwp-l1" id="hwpL1"></p>
+      <p class="hwp-l2" id="hwpL2"></p>
+      <p class="hwp-l3" id="hwpL3"></p>
+    </div>
+    <a class="hwp-ir" id="hwpIr" href="hogwarts.html"></a>
+    <!-- o placar das quatro casas, o MESMO que o aluno vê na home dele -->
+    <div class="hwp-taca" id="hwpTaca" hidden></div>
+  </section>
+
+  <!-- MAIS USADAS (19/09/2026): a home tem muita ferramenta e o professor usa quatro ou cinco por dia. A faixa é
+       montada pelo próprio aparelho, contando os cliques nos cards; nada sai daqui e nada é escondido da grade. -->
+  <div class="home-cols">
+  <div class="home-esq">
   <!-- PESQUISA DE AVALIAÇÃO INTERNA (Pedro, 17/11/2026): a mesma faixa no Portal da Secretaria e no Hub do professor.
        "Já respondi" esconde só neste aparelho (localStorage).
-           Aviso de janela anônima (18/11): o Forms guarda rascunho na conta Google logada, e a conta da secretaria é compartilhada. Para tirar do ar, apague este bloco nos dois. -->
-  <div id="avInterna" hidden style="max-width:60rem;margin:0 auto 1rem;padding:.85rem 1rem;border-radius:14px;background:linear-gradient(135deg,#14b07f,#0a7552);color:#fff;display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1rem;box-shadow:0 4px 14px rgba(10,117,82,.25)">
+           Aviso de janela anônima (18/11): o Forms guarda rascunho na conta Google logada, e a conta da secretaria é compartilhada. Para tirar do ar, apague este bloco nos dois.
+       Desde 26/11 (Pedro) mora no topo da coluna das ferramentas: a largura delas e o respiro do .home-cols, longe do banner. -->
+  <div id="avInterna" hidden style="margin:0 0 1.4rem;padding:.85rem 1rem;border-radius:14px;background:linear-gradient(135deg,#14b07f,#0a7552);color:#fff;display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1rem;box-shadow:0 4px 14px rgba(10,117,82,.25)">
     <span aria-hidden="true" style="font-size:1.6rem;line-height:1">📝</span>
     <span style="flex:1 1 16rem;min-width:0"><b style="display:block;font-size:1.02rem">Pesquisa de avaliação interna</b><span style="opacity:.92;font-size:.9rem">Sua opinião ajuda a escola a melhorar. Leva poucos minutos.</span><span style="display:block;opacity:.92;font-size:.82rem;margin-top:.2rem">🕶️ No computador da escola, abra em <b>janela anônima</b> (Ctrl+Shift+N) ou responda pelo celular.</span></span>
     <a href="https://forms.gle/DzqpfuTNU4asF8ta6" target="_blank" rel="noopener" style="background:#fff;color:#0a7552;font-weight:700;padding:.5rem 1rem;border-radius:999px;text-decoration:none;white-space:nowrap">Responder ↗</a>
@@ -126,54 +152,9 @@
   },700);
 })();
   </script>
-
-  <!-- o mini-dash do topo (resumo das turmas e busca de aluno) saiu em 31/10/2026: estava desligado desde 19/09 (B8) -->
-
-  <!-- ══ A SUA CASA (campanha de 09/2026) ══════════════════════════════════
-       Aparece só para quem já fez a Cerimônia, e some sozinho quando a
-       campanha acabar (o script no fim do arquivo, junto do card).
-       ⚠️ Os colegas saem SEM NOME, e é decisão do Pedro: quantos estão na
-       mesma casa, nunca quem. -->
-  <section class="hwp" id="hwProf" hidden>
-    <div class="hwp-b" id="hwpB" aria-hidden="true"></div>
-    <div class="hwp-c">
-      <b class="hwp-casa" id="hwpCasa"></b>
-      <p class="hwp-l1" id="hwpL1"></p>
-      <p class="hwp-l2" id="hwpL2"></p>
-      <p class="hwp-l3" id="hwpL3"></p>
-    </div>
-    <a class="hwp-ir" id="hwpIr" href="hogwarts.html"></a>
-    <!-- o placar das quatro casas, o MESMO que o aluno vê na home dele -->
-    <div class="hwp-taca" id="hwpTaca" hidden></div>
-  </section>
-
-  <!-- MAIS USADAS (19/09/2026): a home tem muita ferramenta e o professor usa quatro ou cinco por dia. A faixa é
-       montada pelo próprio aparelho, contando os cliques nos cards; nada sai daqui e nada é escondido da grade. -->
-  <div class="home-cols">
-  <div class="home-esq">
   <!-- SUA PRÓXIMA AULA (26/10/2026, aprovada pelo Pedro): a próxima aula de hoje, lida do que a Minha semana guardou no
        aparelho (cal:turmas:<nome>), sem chamada nova ao servidor. Some sem dado, fora de dia de aula e em feriado. -->
   <a class="prox-aula" id="proxAula" hidden></a>
-  <!-- FISK WORLDS (26/10/2026): o jogo do Portal do Aluno, para o professor jogar também, e o convite para montar o
-       personagem. Desde 26/10 à noite (Pedro) as três peças ficam numa linha só, na largura da coluna das ferramentas:
-       o inglês primeiro e maior (com o subtítulo), o espanhol menor e sem subtítulo, o personagem por último; uma
-       bandeirinha ao lado de cada jogo. Nasce escondida; `levaIdentidadeAoPortal` acende com o link do portal. -->
-  <section class="fwh" id="fwHub" hidden>
-    <a class="fwh-f fwh-en" id="fw-hub-en" href="https://portalfisk.com.br/#raf=0000-000&curso=en&ir=worlds">
-      <span class="fwh-t"><span class="fwh-tag" data-i18n="fw-tag">JOGO 3D · INGLÊS</span><b>Fisk Worlds <svg class="fwh-band" viewBox="0 0 30 20" aria-label="EUA"><rect width="30" height="20" fill="#b22234"/><g fill="#fff"><rect y="1.54" width="30" height="1.54"/><rect y="4.62" width="30" height="1.54"/><rect y="7.69" width="30" height="1.54"/><rect y="10.77" width="30" height="1.54"/><rect y="13.85" width="30" height="1.54"/><rect y="16.92" width="30" height="1.54"/></g><rect width="13" height="10.77" fill="#3c3b6e"/></svg></b><small data-i18n="fw-d">Explore o bosque, ajude os moradores e ache segredos</small></span>
-      <span class="fwh-go"><span data-i18n="fw-jogar">Jogar</span> ▶</span>
-    </a>
-    <a class="fwh-f fwh-es" id="fw-hub-es" href="https://portalfisk.com.br/#raf=0000-000&curso=es&ir=worlds">
-      <span class="fwh-t"><span class="fwh-tag" data-i18n="fw-tag-es">JOGO 3D · ESPANHOL</span><b>Fisk Mundo <svg class="fwh-band" viewBox="0 0 30 20" aria-label="Espanha"><rect width="30" height="20" fill="#aa151b"/><rect y="5" width="30" height="10" fill="#f1bf00"/></svg></b></span>
-      <span class="fwh-go">Jugar ▶</span>   <!-- em espanhol em qualquer idioma do Hub: o jogo é em espanhol (Pedro, 27/10/2026) -->
-    </a>
-    <!-- MEU PERSONAGEM (26/10/2026): o professor monta o mago ou a bruxa com que entra no jogo em 2027 -->
-    <a class="fwh-p" href="meu-personagem.html">
-      <span class="ic" aria-hidden="true">🧙</span>
-      <span class="fwh-t"><span class="fwh-tag" data-i18n="fwp-tag">NOVO · PARA PROFESSORES</span><b data-i18n="fwp-t">Meu personagem do Fisk Worlds</b></span>
-      <span class="fwh-go">✨</span>
-    </a>
-  </section>
   <nav id="maisUsadas" class="mais-usadas" hidden aria-label="Suas ferramentas mais usadas"></nav>
   <!-- AS PRATELEIRAS (Pedro, 06/10/2026): as ferramentas do professor divididas em três, como as do aluno no
        portal. `main.grid` continua sendo o contêiner (o "Mais usadas" e os atalhos procuram `main.grid a.card`);
@@ -287,7 +268,7 @@
          ferramenta completa, para o professor bater o olho. Ocupa duas casas da grade e rola por dentro. Não é
          <a class="card">: não entra no "Mais usadas" nem nos atalhos. Quem preenche é o script do Buddy. -->
     <div class="tt-card" id="ttCard" hidden>
-      <div class="tt-cab"><span id="ttTit">🙋 Quem veio à tutoria<small>nas últimas 2 semanas</small></span><b id="ttN" hidden></b></div>
+      <div class="tt-cab"><span id="ttTit">🙋 Quem veio ao Centro de Estudos<small>nas últimas 2 semanas</small></span><b id="ttN" hidden></b></div>
       <div class="tt-lista" id="ttLista"></div>
       <a class="av-rodape" id="ttLink" href="tutoria.html">Ver a frequência completa →</a>
     </div>
@@ -408,6 +389,26 @@
     </section>
     <section class="prat" id="prat-outras">
       <h2 class="prat-t"><span aria-hidden="true">🧰</span> <span data-i18n="prat-outras">Outras ferramentas</span></h2>
+  <!-- FISK WORLDS (26/10/2026): o jogo do Portal do Aluno, para o professor jogar também, e o convite para montar o
+       personagem. Desde 26/10 à noite (Pedro) as três peças ficam numa linha só, na largura da coluna das ferramentas:
+       o inglês primeiro e maior (com o subtítulo), o espanhol menor e sem subtítulo, o personagem por último; uma
+       bandeirinha ao lado de cada jogo. Desde 26/11 (Pedro) a linha mora em "Outras ferramentas", não mais no topo. Nasce escondida; `levaIdentidadeAoPortal` acende com o link do portal. -->
+  <section class="fwh" id="fwHub" hidden>
+    <a class="fwh-f fwh-en" id="fw-hub-en" href="https://portalfisk.com.br/#raf=0000-000&curso=en&ir=worlds">
+      <span class="fwh-t"><span class="fwh-tag" data-i18n="fw-tag">JOGO 3D · INGLÊS</span><b>Fisk Worlds <svg class="fwh-band" viewBox="0 0 30 20" aria-label="EUA"><rect width="30" height="20" fill="#b22234"/><g fill="#fff"><rect y="1.54" width="30" height="1.54"/><rect y="4.62" width="30" height="1.54"/><rect y="7.69" width="30" height="1.54"/><rect y="10.77" width="30" height="1.54"/><rect y="13.85" width="30" height="1.54"/><rect y="16.92" width="30" height="1.54"/></g><rect width="13" height="10.77" fill="#3c3b6e"/></svg></b><small data-i18n="fw-d">Explore o bosque, ajude os moradores e ache segredos</small></span>
+      <span class="fwh-go"><span data-i18n="fw-jogar">Jogar</span> ▶</span>
+    </a>
+    <a class="fwh-f fwh-es" id="fw-hub-es" href="https://portalfisk.com.br/#raf=0000-000&curso=es&ir=worlds">
+      <span class="fwh-t"><span class="fwh-tag" data-i18n="fw-tag-es">JOGO 3D · ESPANHOL</span><b>Fisk Mundo <svg class="fwh-band" viewBox="0 0 30 20" aria-label="Espanha"><rect width="30" height="20" fill="#aa151b"/><rect y="5" width="30" height="10" fill="#f1bf00"/></svg></b></span>
+      <span class="fwh-go">Jugar ▶</span>   <!-- em espanhol em qualquer idioma do Hub: o jogo é em espanhol (Pedro, 27/10/2026) -->
+    </a>
+    <!-- MEU PERSONAGEM (26/10/2026): o professor monta o mago ou a bruxa com que entra no jogo em 2027 -->
+    <a class="fwh-p" href="meu-personagem.html">
+      <span class="ic" aria-hidden="true">🧙</span>
+      <span class="fwh-t"><span class="fwh-tag" data-i18n="fwp-tag">NOVO · PARA PROFESSORES</span><b data-i18n="fwp-t">Meu personagem do Fisk Worlds</b></span>
+      <span class="fwh-go">✨</span>
+    </a>
+  </section>
       <div class="prat-grid">
 
     <!-- MY AVATAR DO PROFESSOR (volta em 15/10/2026, com o lançamento aos alunos; em "Outras ferramentas" desde 26/10, Pedro): o card saiu da home em 16/09 e a regra
@@ -474,53 +475,9 @@
       <p data-i18n="card-answerkeys-p">Gabaritos das provas dos estágios, do Essentials ao In Focus e Espanhol</p>
     </a>
 
-    <!-- Os aplicativos que a franqueadora publica nas lojas: qual serve a qual
-         estágio, e o link para baixar nas duas plataformas. Fica ANTES dos
-         cards "Em breve" porque já funciona. -->
-    <a class="card card-apps" href="apps.html">
-      <div class="icon">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="6.5" y="2.5" width="11" height="19" rx="2.2" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M10.5 5.2h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-          <circle cx="12" cy="18.6" r="1" fill="currentColor"/>
-          <rect x="9" y="8" width="2.6" height="2.6" rx="0.7" stroke="currentColor" stroke-width="1.3"/>
-          <rect x="12.9" y="8" width="2.6" height="2.6" rx="0.7" stroke="currentColor" stroke-width="1.3"/>
-          <rect x="9" y="11.9" width="2.6" height="2.6" rx="0.7" stroke="currentColor" stroke-width="1.3"/>
-          <rect x="12.9" y="11.9" width="2.6" height="2.6" rx="0.7" stroke="currentColor" stroke-width="1.3"/>
-        </svg>
-      </div>
-      <h2 data-i18n="card-apps-h2">Aplicativos da Fisk</h2>
-      <p data-i18n="card-apps-p">Qual app serve a qual estágio, e o link para baixar no Android e no iPhone</p>
-    </a>
-
-    <a class="card card-overview" href="visao-geral.html">
-      <div class="icon">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M4 20h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          <rect x="5.5" y="11" width="3.4" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
-          <rect x="10.5" y="6.5" width="3.4" height="10.5" rx="1" stroke="currentColor" stroke-width="1.5"/>
-          <rect x="15.5" y="13" width="3.4" height="4" rx="1" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M6 8.5l4-3 4 1.5 4-3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/>
-        </svg>
-      </div>
-      <h2 data-i18n="card-overview-h2">Radar da Turma</h2>
-      <p data-i18n="card-overview-p">As cinco habilidades de cada aluno num relance, e onde focar com a turma</p>
-    </a>
-
-    <!-- ACOMPANHAMENTO DO ALUNO (19/09/2026): era a busca no topo da home; virou card quando a home ficou só com as
-         ferramentas. A página tem a busca própria (aluno.html). -->
-    <a class="card card-acomp" href="aluno.html">
-      <div class="icon">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="10" cy="8" r="3.5" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M3.5 20c0-3.6 2.9-6 6.5-6 1.4 0 2.7.4 3.7 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          <circle cx="17" cy="16.5" r="3" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M19.2 18.7l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <h2 data-i18n="card-acomp-h2">Radar do Aluno</h2>
-      <p data-i18n="card-acomp-p">Busque um aluno e veja o radar dele, onde focar e o que fez no portal</p>
-    </a>
+    <!-- Radar da Turma e Radar do Aluno SAÍRAM da home em 26/11/2026 (Pedro): 7 e ~20 aberturas no mês, quase todas do
+         Radar do Aluno pela gaveta de outras ferramentas. As páginas (visao-geral.html, aluno.html) continuam no ar: a
+         gaveta e os links do counseling usam o aluno.html. Os Aplicativos da Fisk viraram chip em "Links Úteis". -->
 
     <!-- ══ A CERIMÔNIA DE SELEÇÃO (campanha, 06/09 a 10/10/2026) ═══════════
          O mesmo quiz do Portal do Aluno, e a mesma casa guardada na mesma aba
@@ -568,7 +525,7 @@
   <aside class="avisos" id="avisos" hidden aria-label="Central de Informes: da direção e da secretaria">
     <div class="bd-janela">
       <div class="bd-cab">
-        <div class="bd-nome"><b id="bdNome">📣 Central de Informes</b><small id="bdSub">da direção e da secretaria</small></div>
+        <div class="bd-nome"><b id="bdNome">📣 Central de Informes</b></div>
         <span class="bd-n" id="bdN" hidden></span>
         <!-- SEM — E SEM ✕ (Pedro, 16/11/2026): as secretárias reclamaram que os professores não viam os informes; o mural
              fica sempre na tela (no celular, a bolinha 📣 fica sempre no canto). -->
@@ -586,6 +543,10 @@
     <div class="links-row">
       <a class="link-chip" href="https://sgf.fisk.com.br:154/SGFPROF/" target="_blank" rel="noopener">
         <span data-i18n="link-sgf">Portal do Professor (SGF)</span>
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6h9v9M18 6L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a class="link-chip" href="apps.html">
+        <span data-i18n="card-apps-h2">Aplicativos da Fisk</span>
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6h9v9M18 6L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
       <a class="link-chip" href="https://expo.fisk.com.br/" target="_blank" rel="noopener">
@@ -622,8 +583,8 @@
   <script src="https://portalfisk.com.br/assets/equipe-cortina.js?v=2026-10-24a"></script>
   <script src="https://portalfisk.com.br/assets/frases-equipe.js?v=2026-10-27a"></script>
   
-  <script src="assets/fisk-shared.js?v=282254175d"></script>
+  <script src="assets/fisk-shared.js?v=4bf85aa648"></script>
   <script src="assets/fisk-pre-aula.js?v=43e6e651bf"></script>
-  <script src="assets/index.js?v=026a739c52"></script>
+  <script src="assets/index.js?v=d0d44a9db8"></script>
 </body>
 </html>

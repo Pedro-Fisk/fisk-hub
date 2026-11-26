@@ -782,7 +782,7 @@ body.theme-dark .md-achado .md-meu{background:#1d3a31;color:#7fd3b6}
 .home-esq .mais-usadas{ max-width:none; margin:0 0 1.4rem; padding:0; }
 /* AS FERRAMENTAS SÃO O PRINCIPAL (Pedro, 06/10/2026): a coluna do Buddy é estreita o bastante para sobrarem
    quatro cards QUADRADOS por linha num monitor comum. Com 440px ela espremia os cards em retângulos em pé. */
-.avisos{ flex:0 0 420px; width:420px; margin:0 0 2rem; position:sticky; top:1rem;
+.avisos{ flex:0 0 504px; width:504px;   /* 420 → 504 (+20%), Pedro 26/11/2026 */  margin:0 0 2rem; position:sticky; top:1rem;
   max-height:calc(100vh - 2rem); display:flex; flex-direction:column; gap:.9rem; }
 /* as prateleiras: a grade é de cada uma, e o card não estica quando a prateleira tem poucos */
 main.grid.prats{ display:block; max-width:none; margin:0; padding:0 0 3rem; }
@@ -790,7 +790,7 @@ main.grid.prats{ display:block; max-width:none; margin:0; padding:0 0 3rem; }
 .prat-t{ display:flex; align-items:center; gap:.5rem; margin:0 0 .9rem; padding-bottom:.45rem; border-bottom:2px solid var(--surface-border-color,#a8bfd2);
   font-family:var(--font-heading); font-size:1.15rem; font-weight:800; color:var(--ui-dark,#223e5a); }
 body.theme-dark .prat-t{ color:#e4e7ec; border-bottom-color:#344054; }
-.prat-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(215px, 1fr)); gap:1.25rem; }
+.prat-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr));   /* 215 → 190 com a Central de Informes mais larga (26/11/2026): seguem 4 por linha no notebook */ gap:1.25rem; }
 /* o card é QUADRADO: o título e o texto encolhem um pouco para caber, e o card só cresce se o texto não couber */
 .prat-grid .card{ aspect-ratio:1 / 1; min-height:auto; padding:1.1rem 1.15rem; gap:.5rem; justify-content:flex-start; }
 .prat-grid .card .icon{ width:52px; height:52px; border-radius:12px; }
@@ -971,4 +971,31 @@ body.theme-dark .bd-chat{ background:#17202e; background-image:none; }
 .bd-antigos{ align-self:stretch; border-radius:10px; background:transparent; border-style:dashed; }
 .bd-ir{ background:var(--ui,#2b4d70); }
 .av-sino{ background:var(--ui-dark,#223e5a); box-shadow:0 8px 22px rgba(15,31,78,.3); width:56px; height:56px; }
+/* ── AS CAPAS ILUSTRADAS (Pedro, 26/11/2026: "feia, triste"; mock 1 aprovado) ──
+   Cabeçalho em degradê, cada recado com uma capa colorida pelo tipo e a ilustração dele, e o corpo em branco embaixo.
+   O recado lido desbota a capa, para o novo saltar aos olhos. */
+.bd-janela{ border:0; box-shadow:0 12px 32px rgba(30,41,59,.14); border-radius:22px; }
+.bd-cab{ background:linear-gradient(120deg,#2563eb,#7c3aed); padding:1rem 1.15rem; }
+.bd-nome b{ font-size:1.25rem; }
+.bd-chat{ background:#f1f5f9; gap:1rem; padding:1rem; }
+body.theme-dark .bd-chat{ background:#111827; }
+.bd-rec{ flex:none; padding:0; overflow:hidden; border-radius:18px; border:1px solid #e2e8f0; box-shadow:0 2px 8px rgba(15,23,42,.06); }
+.bd-rec.lido{ background:#fff; box-shadow:none; }
+body.theme-dark .bd-rec, body.theme-dark .bd-rec.lido{ background:#1f2937; border-color:#334155; }
+.bd-capa{ position:relative; overflow:hidden; display:flex; align-items:center; gap:.75rem; min-height:84px; padding:.7rem 1.05rem; color:#fff;
+  background:linear-gradient(120deg,#0ea5e9,#2563eb); transition:filter .2s, opacity .2s; }
+.bd-capa::after{ content:""; position:absolute; right:-34px; bottom:-46px; width:150px; height:150px; border-radius:50%; background:rgba(255,255,255,.13); pointer-events:none; }
+.bd-capa.c-dir{ background:linear-gradient(120deg,#f97316,#dc2626); }
+.bd-capa.c-nov{ background:linear-gradient(120deg,#8b5cf6,#6d28d9); }
+.bd-capa.c-aniv{ background:linear-gradient(120deg,#f59e0b,#ea580c); }
+.bd-capa.c-urg{ background:linear-gradient(120deg,#ef4444,#991b1b); }
+.bd-em{ font-size:2.6rem; line-height:1; filter:drop-shadow(0 4px 8px rgba(0,0,0,.2)); position:relative; z-index:1; }
+.bd-capa .bd-tag{ background:rgba(255,255,255,.22); color:#fff; letter-spacing:.07em; position:relative; z-index:1; }
+.bd-capa .bd-tag.t-urg{ background:#fff; color:#b91c1c; }
+.bd-capa small{ margin-left:auto; align-self:flex-start; font-weight:800; font-size:.8rem; color:#fff; opacity:.92; position:relative; z-index:1; }
+.bd-corpo{ padding:.85rem 1.05rem .8rem; }
+.bd-corpo .bd-t{ font-size:1.08rem; line-height:1.3; }
+.bd-rec.lido .bd-capa{ filter:saturate(.25); opacity:.7; min-height:64px; }
+.bd-rec.lido .bd-em{ font-size:2rem; }
+@media (prefers-reduced-motion: reduce){ .bd-capa{ transition:none; } }
 .av-sino .ic{ font-size:1.5rem; line-height:56px; display:block; text-align:center; }

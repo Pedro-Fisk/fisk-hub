@@ -634,12 +634,12 @@
         pt: { selo:'Novidade',
               t:'Agora dá para ver quem foi à tutoria 🙋',
               p1:'O Hub tem uma ferramenta nova, <b>Frequência à Tutoria</b>: os alunos seus que foram ao plantão de dúvidas nos últimos 14 dias, com o dia, o monitor e o que foi feito. É o espelho do Diário de Bordo, sem precisar abrir a planilha.',
-              p2:'Eles também aparecem na prateleira <b>Em aula</b>, no card <b>Quem veio à tutoria</b>, para você bater o olho.',
+              p2:'Eles também aparecem na prateleira <b>Em aula</b>, no card <b>Quem veio ao Centro de Estudos</b>, para você bater o olho.',
               btnLink:'Abrir a Frequência à Tutoria 🙋', btn:'Entendi 👍' },
         en: { selo:'What’s new',
               t:'Now you can see who came to tutoring 🙋',
               p1:'The Hub has a new tool, <b>Tutoring Attendance</b>: your students who came to the Learning Center in the last 14 days, with the day, the monitor and what was done. It mirrors the logbook, with no spreadsheet to open.',
-              p2:'They also show up on the <b>In class</b> shelf, in the <b>Who came to tutoring</b> card, for a quick look.',
+              p2:'They also show up on the <b>In class</b> shelf, in the <b>Who came to Learning Center</b> card, for a quick look.',
               btnLink:'Open Tutoring Attendance 🙋', btn:'Got it 👍' },
         es: { selo:'Novedad',
               t:'Ya puedes ver quién fue a la tutoría 🙋',
@@ -1196,7 +1196,7 @@
             nada:'Nenhuma novidade sem ler.',
             antigos:'Ver os {q} já lidos', antigo1:'Ver o recado já lido', esconder:'Esconder os já lidos',
             ciente:'Li e estou ciente', urg:'Informe urgente', urgErro:'Não consegui registrar. Confira a internet e tente de novo.', tDir:'Direção', tSec:'Secretaria', tNov:'Novidade', nome:'Central de Informes', tAniv:'Aniversário', anTit:'🎂 Aniversariantes da semana', anSub:'de segunda a domingo', anVazio:'Nenhum aluno seu faz aniversário nesta semana.', anRec:'🎂 Aniversariantes desta semana', anHoje:'é hoje!', anProx:'Semana que vem', anProxVazio:'Ninguém na semana que vem.',
-            ttTit:'🙋 Quem veio à tutoria', ttSub:'nas últimas 2 semanas', ttVazio:'Nenhum aluno seu por enquanto.',
+            ttTit:'🙋 Quem veio ao Centro de Estudos', ttSub:'nas últimas 2 semanas', ttVazio:'Nenhum aluno seu por enquanto.',
             ttLink:'Ver a frequência completa →', vi:'Vi', veio:' foi à tutoria',
             falar:'Ver a Central de Informes', saiu:'As novidades saíram da tela. Para ver de novo, clique no seu nome, lá em cima, e em "Ver as novidades".' },
       en: { sub:'from the direction and the office',
@@ -1207,7 +1207,7 @@
             nada:'Nothing new to read.',
             antigos:'See the {q} already read', antigo1:'See the notice already read', esconder:'Hide the ones already read',
             ciente:'Read and acknowledged', urg:'Urgent notice', urgErro:'Could not save. Check the connection and try again.', tDir:'Direction', tSec:'Office', tNov:'What’s new', nome:'Notice Center', tAniv:'Birthday', anTit:'🎂 Birthdays this week', anSub:'Monday to Sunday', anVazio:'None of your students has a birthday this week.', anRec:'🎂 Birthdays this week', anHoje:'today!', anProx:'Next week', anProxVazio:'No one next week.',
-            ttTit:'🙋 Who came to tutoring', ttSub:'in the last 2 weeks', ttVazio:'None of your students so far.',
+            ttTit:'🙋 Who came to Learning Center', ttSub:'in the last 2 weeks', ttVazio:'None of your students so far.',
             ttLink:'See the full attendance →', vi:'Seen', veio:' foi à tutoria',
             falar:'Open the Notice Center', saiu:'The news panel left the screen. To see it again, click your name at the top and choose "See what’s new".' },
       es: { sub:'de la dirección y la secretaría',
@@ -1218,7 +1218,7 @@
             nada:'Ninguna novedad sin leer.',
             antigos:'Ver los {q} ya leídos', antigo1:'Ver el aviso ya leído', esconder:'Ocultar los ya leídos',
             ciente:'Leído y enterado', urg:'Aviso urgente', urgErro:'No pude registrar. Revisa la conexión e inténtalo de nuevo.', tDir:'Dirección', tSec:'Secretaría', tNov:'Novedad', nome:'Central de Informes', tAniv:'Cumpleaños', anTit:'🎂 Cumpleaños de la semana', anSub:'de lunes a domingo', anVazio:'Ningún alumno tuyo cumple años esta semana.', anRec:'🎂 Cumpleaños de esta semana', anHoje:'¡es hoy!', anProx:'La próxima semana', anProxVazio:'Nadie la próxima semana.',
-            ttTit:'🙋 Quién fue a la tutoría', ttSub:'en las últimas 2 semanas', ttVazio:'Ningún alumno tuyo por ahora.',
+            ttTit:'🙋 Quién fue al Centro de Estudios', ttSub:'en las últimas 2 semanas', ttVazio:'Ningún alumno tuyo por ahora.',
             ttLink:'Ver la asistencia completa →', vi:'Visto', veio:' foi à tutoria',
             falar:'Ver la Central de Informes', saiu:'Las novedades salieron de la pantalla. Para verlas de nuevo, haz clic en tu nombre, arriba, y en "Ver las novedades".' }
     };
@@ -1320,12 +1320,17 @@
           ? '<a class="bd-img" href="' + esc(a.url) + '" target="_blank" rel="noopener"><img alt="' + esc(a.nome) + '" loading="lazy" src="' + esc(a.mini) + '"></a>'
           : '<a class="bd-arq" href="' + esc(a.url) + '" target="_blank" rel="noopener">📎 ' + esc(a.nome) + '</a>';
       }).join('');
+      /* AS CAPAS ILUSTRADAS (Pedro, 26/11/2026, mock 1 aprovado): cada recado abre com uma capa na cor do tipo e a
+         ilustração dele; o corpo fica embaixo, em branco. Lido, a capa desbota (CSS .lido). */
+      var IC = { dir: '🧑‍🏫', sec: '🎒', nov: '✨', aniv: '🎂' }, ic = m.urgente ? '🚨' : (m.ic || IC[m.tag] || '📣');
       d.innerHTML =
-        '<div class="bd-topo"><span class="bd-tag t-' + m.tag + '">' + esc(m.tag === 'nov' && m.selo ? m.selo : tx(ROT[m.tag])) + '</span>' + (m.urgente ? '<span class="bd-tag t-urg">' + esc(tx('urg')) + '</span>' : '') + '<small>' + ddmm(m.quando) + '</small></div>' +
+        '<div class="bd-capa c-' + (m.urgente ? 'urg' : m.tag) + '"><span class="bd-em" aria-hidden="true">' + ic + '</span>' +
+          '<span class="bd-tag t-' + m.tag + '">' + esc(m.tag === 'nov' && m.selo ? m.selo : tx(ROT[m.tag])) + '</span>' + (m.urgente ? '<span class="bd-tag t-urg">' + esc(tx('urg')) + '</span>' : '') + '<small>' + ddmm(m.quando) + '</small></div>' +
+        '<div class="bd-corpo">' +
         (m.titulo ? '<b class="bd-t">' + m.titulo + '</b>' : '') +
         '<div class="bd-tx">' + m.html + '</div>' + anexos +
         (m.link ? '<a class="bd-ir" href="' + esc(m.link.href) + '">' + m.link.rot + '</a>' : '') +
-        '<label class="bd-ck"><input type="checkbox"' + (m.ciente ? ' checked' : '') + (como() ? ' disabled' : '') + '> ' + esc(tx('ciente')) + '</label>';
+        '<label class="bd-ck"><input type="checkbox"' + (m.ciente ? ' checked' : '') + (como() ? ' disabled' : '') + '> ' + esc(tx('ciente')) + '</label></div>';
       d.querySelector('input').addEventListener('change', function(ev){
         var marcou = ev.target.checked;
         m.ciente = marcou; d.classList.toggle('lido', marcou); conta();
@@ -1416,6 +1421,8 @@
         '<p class="an-prox">' + esc(tx('anProx')) + '</p>' + (prox.length ? prox.map(item).join('') : '<p class="av-vazio">' + esc(tx('anProxVazio')) + '</p>');
     }
     function recadoAniv(){
+      /* SAIU DA CENTRAL DE INFORMES (Pedro, 26/11/2026): os aniversariantes já têm o card próprio na prateleira "Em aula" */
+      return [];
       var aniv = anivDesta();
       if (!aniv.length) return [];
       var chave = 'fisk_aniv_ciente:' + segundaISO() + ':' + (eu() || '');
@@ -1443,7 +1450,8 @@
 
     function carrega(forcar){
       var s = sess(); if (!s || !s.token) return Promise.resolve(false);
-      $$('bdSub').textContent = tx('sub'); $$('bdNome').textContent = '📣 ' + tx('nome');
+      var bdS = $$('bdSub'); if (bdS) bdS.textContent = tx('sub');   /* o subtítulo saiu da tela em 26/11/2026 (Pedro) */
+      $$('bdNome').textContent = '📣 ' + tx('nome');
       var pedido = ++leitura;   /* duas leituras no ar: só a mais nova desenha */
       /* A VOLTA À HOME SEM CORTINA (Pedro, 26/10/2026: "parece que ele tem que carregar tudo toda vez"). A última resposta
          do mural fica guardada no aparelho (localStorage com dono e validade de um dia, fiskCacheGuarda; até 31/10/2026 era
@@ -1563,6 +1571,7 @@
         var pedidos = (ja && ja.ok ? ja.avisos || [] : []).filter(function(a){ return (a.tipo === 'impressao' || a.tipo === 'transferencia' || a.tipo === 'matricula' || a.tipo === 'experimental' || a.tipo === 'exp_fechou') && a.quando >= corte; }).map(function(a){
           /* transferência de aluno entre turmas, aluno novo matriculado pelo portal e aula experimental na turma (Portal da Secretaria, 23/10/2026): recado sem link */
           return { id: 'av|' + a.id, avId: a.id, aviso: true, quando: a.quando, tag: 'sec', titulo: esc(a.titulo),
+                   ic: { impressao: '🖨️', transferencia: '🔁', matricula: '🎒', experimental: '🧪', exp_fechou: '🎉' }[a.tipo] || '',
                    html: a.texto ? '<p>' + texto(a.texto) + '</p>' : '', anexos: [], link: a.tipo === 'impressao' ? { href: 'imprimir.html#meus', rot: '📬 Ver meus pedidos' } : null, ciente: !!a.lido };
         });
         tutoria(); aniversarios();

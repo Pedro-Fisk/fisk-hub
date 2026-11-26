@@ -5,6 +5,18 @@
    ferramentas do Hub. Sem dependências externas.
    ============================================================ */
 
+/* ── O BANNER DE NATAL (Pedro, 26/11/2026) ─────────────────────────────────
+   De 01 a 25/12 (as mesmas datas da entrada de Natal do Hub, hubNatal no index.js) o .hero de toda página do Hub veste
+   a imagem de Natal (assets/natal-hero.jpg, feita pelo Pedro). A classe vai no <html>, que já existe quando este
+   arquivo carrega no <head>, para o banner não piscar preto antes. O desenho mora no fisk-shared.css (html.hub-natal).
+   Para ver antes da data: ?natal=1 ou #natal=1 no endereço. A data é a do aparelho. */
+(function () {
+  try {
+    var d = new Date(), md = ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+    if ((md >= '12-01' && md <= '12-25') || /[?&#]natal=1\b/.test(location.href)) document.documentElement.classList.add('hub-natal');
+  } catch (e) {}
+})();
+
 /* ── Resposta do servidor que NÃO é JSON ──────────────────────────────────
  * O Apps Script responde uma PÁGINA HTML (<!DOCTYPE …>) toda vez que a
  * execução não chega ao fim por conta dele: tempo estourado, cota do dia,
@@ -830,8 +842,7 @@ function fiskTrofeus() {
     document.head.appendChild(st);
   }
   var m = document.createElement('div'); m.id = 'fkTrofeus'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-label', 'Meus troféus e personagens');
-  var html = '<div class="tf-cx"><h2>🎮 Meus troféus e personagens<button type="button" class="tf-x" aria-label="Fechar">✕</button></h2>' +
-    '<p class="tf-sub">Cinco coisas que o Hub mostra sobre você, cada uma vinda de uma campanha. Nenhuma vale nota: é só a sua cara no sistema.</p>';
+  var html = '<div class="tf-cx"><h2>🎮 Meus troféus e personagens<button type="button" class="tf-x" aria-label="Fechar">✕</button></h2>';   /* o subtítulo saiu (Pedro, 26/11/2026) */
   camadas.forEach(function (c, i) {
     html += '<div class="tf-it"><div class="tf-ico">' + c.ico + '</div><div><b class="tf-t">' + c.t + '</b>' +
       c.p.map(function (l) { return '<p>' + l + '</p>'; }).join('') +
