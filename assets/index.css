@@ -102,6 +102,15 @@
   @keyframes hubVapor{0%{stroke-dashoffset:60;opacity:0;transform:translateY(8px)}35%{opacity:.9}100%{stroke-dashoffset:-60;opacity:0;transform:translateY(-14px)}}
   @keyframes hubBalanca{0%,100%{transform:rotate(0)}50%{transform:rotate(-2.5deg)}}
   @media (prefers-reduced-motion:reduce){#hubEntrando .balanca,#hubEntrando .gira{animation:none} #hubEntrando .vapor path{animation-duration:5s}}
+  /* (25/11/2026) a entrada de NATAL, de 01 a 25/12 (classe `natal` posta pelo index.js): noite verde com neve caindo e a
+     frase dourada; nos dois temas, porque a noite já é escura */
+  #hubEntrando .hub-neve{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+  #hubEntrando .hub-neve i{position:absolute;top:-10px;width:6px;height:6px;border-radius:50%;background:#fff;opacity:.85;animation:hubNeva 5s linear infinite}
+  @keyframes hubNeva{to{transform:translateY(110vh)}}
+  #hubEntrando.natal,body.theme-dark #hubEntrando.natal{background:radial-gradient(120% 90% at 50% 0%,#1f5a3a 0%,#0f2a22 60%,#0a1d17 100%);color:#ffe28a}
+  #hubEntrando.natal .cx{position:relative;z-index:1}
+  #hubEntrando.natal .vapor path{stroke:rgba(255,255,255,.55)}
+  @media (prefers-reduced-motion:reduce){#hubEntrando .hub-neve i{animation-duration:9s}}
   .an-prox{ margin:.7rem 0 .25rem; font-size:.78rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; opacity:.6; }
   .an-it.prox{ opacity:.8; }
   /* o aniversário desta semana que já passou fica em cinza (Pedro, 27/10/2026) */
