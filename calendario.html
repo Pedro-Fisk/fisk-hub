@@ -150,6 +150,30 @@
   .couns{ font-family: inherit; font-weight: 800; font-size: .74rem; border: 1.5px solid var(--cal-linha); background: var(--white); color: var(--ui-dark, #223e5a);
           border-radius: 99px; padding: .3rem .7rem; cursor: pointer; white-space: nowrap; flex: none; }
   .couns:hover{ border-color: var(--ui, #3c6e98); background: var(--ui-soft, #e9eff5); }
+  /* a anotação direto para o counseling (Pedro, 26/11/2026) */
+  .gav .al{ flex-wrap: wrap; }
+  .gav .al .anot{ flex: 1 1 100%; display: flex; gap: .45rem; align-items: center; margin-top: .1rem; }
+  .gav .al .anot input{ flex: 1; min-width: 0; border: 1.5px solid var(--cal-linha); border-radius: 10px; padding: .45rem .65rem; font: inherit; font-size: .86rem;
+                        background: var(--white); color: inherit; }
+  .gav .al .anot input:focus{ outline: none; border-color: var(--g-cor, var(--ui, #3c6e98)); }
+  .gav .al .anot .vai{ font-family: inherit; font-weight: 800; font-size: .76rem; border: 0; border-radius: 99px; padding: .45rem .85rem; cursor: pointer; white-space: nowrap;
+                       background: var(--g-cor, var(--ui, #3c6e98)); color: #fff; }
+  .gav .al .anot .vai:disabled{ opacity: .45; cursor: default; }
+  .gav .al .anot-ok{ flex: 1 1 100%; font-size: .78rem; font-weight: 700; color: #15803d; }
+  .gav .al .anot-ok.erro{ color: #b91c1c; }
+  .gav .al .anot-ok a{ color: inherit; }
+  /* o radar da turma dentro da gaveta (Pedro, 26/11/2026: "obrigar" o professor a ver o radar) */
+  .gav .rg-cx{ display: grid; grid-template-columns: 170px 1fr; gap: .4rem 1.1rem; align-items: center; }
+  .gav .rg-cx svg{ width: 170px; height: auto; display: block; }
+  .gav .rg-eixo{ display: grid; grid-template-columns: 8.4rem 1fr 2.6rem; align-items: center; gap: .5rem; font-size: .84rem; padding: .16rem 0; }
+  .gav .rg-eixo .bar{ height: .5rem; border-radius: 99px; background: var(--cal-linha); overflow: hidden; }
+  .gav .rg-eixo .bar i{ display: block; height: 100%; border-radius: 99px; }
+  .gav .rg-eixo b{ text-align: right; font-size: .84rem; }
+  .gav .rg-foco{ margin: .7rem 0 0; padding: .6rem .8rem; border-radius: 12px; background: #fff7ed; color: #7c2d12; font-size: .88rem; line-height: 1.45; }
+  body.theme-dark .gav .rg-foco{ background: #3a2412; color: #fed7aa; }
+  .gav .rg-mais{ display: inline-block; margin-top: .55rem; font-size: .82rem; font-weight: 800; color: var(--g-cor, var(--ui, #3c6e98)); }
+  .gav .rg-esp{ color: var(--gray); font-size: .86rem; }
+  @media (max-width: 520px){ .gav .rg-cx{ grid-template-columns: 1fr; } .gav .rg-cx svg{ margin: 0 auto; } }
   .gav .pe{ position: sticky; bottom: 0; padding: .8rem 1.5rem 1rem; background: linear-gradient(to top, var(--white) 70%, transparent); }
   .abrir-aula{ display: block; text-align: center; padding: .85rem 1rem; border-radius: 14px; font-weight: 900; text-decoration: none;
                background: var(--g-cor, var(--ui, #3c6e98)); color: #fff; box-shadow: 0 6px 18px rgba(0,0,0,.18); }
@@ -637,8 +661,11 @@ function abreGaveta(k) {
       return '<li class="al"><span class="nm" title="' + nome + '">' + nome + '</span>' +   /* sem o radar de cada aluno (Pedro, 26/10/2026): demorava e ninguém abria */
         (a.book ? '<span class="lv">' + esc(a.book) + '</span>' : '') +
         (Number(a.aulasAtraso) >= 4 ? '<span class="atr">' + a.aulasAtraso + ' aulas atrás</span>' : '') +
-        '<span class="esp"></span><button type="button" class="couns" data-couns="' + k + '|' + t.alunos.indexOf(a) + '" title="Abrir o e-counseling de ' + nome + '">💬 counseling</button></li>';
-    }).join('') + '</ul></div>';
+        /* a anotação vai direto para o counseling (Pedro, 26/11/2026): no lugar do botão que só abria o documento */
+        '<div class="anot"><input type="text" maxlength="600" data-anot="' + k + '|' + t.alunos.indexOf(a) + '" placeholder="Anotação sobre ' + esc(String(nome).split(' ')[0]) + '…" aria-label="Anotação para o counseling de ' + nome + '">' +
+        '<button type="button" class="vai" data-anotvai="' + k + '|' + t.alunos.indexOf(a) + '" disabled>📝 Anotar no counseling</button></div></li>';
+    }).join('') + '</ul></div>' +
+      '<div class="bloco"><b class="tit">📊 Radar da turma</b><div id="gavRadar"><p class="rg-esp">Montando o radar da turma…</p></div></div>';
     pe = '<a class="abrir-aula" href="turma-de-hoje.html#t=' + encodeURIComponent(t.escola + '|' + t.prof + '|' + t.linha) + '">Abrir na Minha aula →</a>';
   } else if (e.lc) {
     h += '<div class="bloco"><b class="tit">🙋 Plantão de dúvidas</b><p class="aviso">' + esc(e.lc.publico || '') + (e.lc.obs ? ' · ' + esc(e.lc.obs) : '') + '</p></div>';
@@ -648,6 +675,63 @@ function abreGaveta(k) {
   $('gavCorpo').innerHTML = h;
   document.querySelector('#gav .caixa').style.setProperty('--g-cor', e.cor || '#3c6e98');
   gavAbre();
+  if (e.turma) radarNaGaveta(e.turma);
+}
+/* ── O RADAR DA TURMA NA GAVETA (Pedro, 26/11/2026) ──
+   A mesma leitura do Radar da Turma (visao-geral.html, rota radarTurma), só desta turma: a média de cada uma das cinco
+   habilidades, o desenho e onde focar. Fica guardado por turma enquanto a página está aberta. Eixo sem dado não entra
+   na média (é quem ainda não praticou, não quem foi mal). */
+var RG_EIXOS = [{ id: 'L', nome: 'Listening', ic: '🎧' }, { id: 'R', nome: 'Reading', ic: '📖' }, { id: 'S', nome: 'Speaking', ic: '🎤' },
+                { id: 'W', nome: 'Writing', ic: '✍️' }, { id: 'G', nome: 'Structure', ic: '🧩' }];
+var RG_DOMINIO = 70, RG_CACHE = {};
+function rgCor(v) { return v == null ? '#94a3b8' : v >= RG_DOMINIO ? '#16a34a' : v >= 50 ? '#d97706' : '#e11d48'; }
+function rgPto(i, v, R) { var a = (-90 + i * 72) * Math.PI / 180, r = R * v / 100; return [r * Math.cos(a), r * Math.sin(a)]; }
+function rgPoli(vals, R) { return vals.map(function (v, i) { return rgPto(i, v, R).map(function (n) { return n.toFixed(1); }).join(','); }).join(' '); }
+function rgSVG(med) {
+  var R = 62, vals = RG_EIXOS.map(function (e) { return med[e.id] == null ? RG_DOMINIO : med[e.id]; });
+  var s = '<svg viewBox="-82 -78 164 160" role="img" aria-label="Radar da turma">';
+  [100, 50].forEach(function (r) { s += '<polygon points="' + rgPoli([r, r, r, r, r], R) + '" fill="none" stroke="currentColor" stroke-opacity="' + (r === 100 ? '.25' : '.12') + '"/>'; });
+  RG_EIXOS.forEach(function (e, i) { var p = rgPto(i, 100, R); s += '<line x1="0" y1="0" x2="' + p[0].toFixed(1) + '" y2="' + p[1].toFixed(1) + '" stroke="currentColor" stroke-opacity=".12"/>'; });
+  s += '<polygon points="' + rgPoli([70, 70, 70, 70, 70], R) + '" fill="none" stroke="currentColor" stroke-opacity=".45" stroke-dasharray="3 3"/>';
+  s += '<polygon points="' + rgPoli(vals, R) + '" fill="rgba(59,130,246,.22)" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round"/>';
+  RG_EIXOS.forEach(function (e, i) {
+    var p = rgPto(i, vals[i], R), q = rgPto(i, 100, R + 11), vazio = med[e.id] == null;
+    s += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="3.6" fill="' + (vazio ? '#fff' : rgCor(med[e.id])) + '" stroke="' + rgCor(med[e.id]) + '" stroke-width="1.6"/>';
+    s += '<text x="' + q[0].toFixed(1) + '" y="' + (q[1] + 4).toFixed(1) + '" text-anchor="middle" font-size="12">' + e.ic + '</text>';
+  });
+  return s + '</svg>';
+}
+function radarNaGaveta(t) {
+  var cx = $('gavRadar'); if (!cx) return;
+  var chave = t.escola + '|' + t.prof + '|' + t.linha;
+  var rafs = t.alunos.map(function (a) { return a.raf; }).filter(Boolean);
+  if (!rafs.length) { cx.innerHTML = '<p class="rg-esp">Os alunos desta turma ainda não têm RAF no card.</p>'; return; }
+  var pr = RG_CACHE[chave] || (RG_CACHE[chave] = post({ action: 'radarTurma', rafs: rafs.slice(0, 60) }).then(function (j) { return j.alunos || []; }));
+  pr.then(function (rs) {
+    if ($('gavRadar') !== cx) return;   /* a gaveta já é de outra aula */
+    var med = {}, n = {}, comDado = 0;
+    rs.forEach(function (r) {
+      var teve = false;
+      RG_EIXOS.forEach(function (e) { var v = r.eixos && r.eixos[e.id]; if (v && v.agora != null && !v.pouca) { med[e.id] = (med[e.id] || 0) + v.agora; n[e.id] = (n[e.id] || 0) + 1; teve = true; } });
+      if (teve) comDado++;
+    });
+    RG_EIXOS.forEach(function (e) { med[e.id] = n[e.id] ? Math.round(med[e.id] / n[e.id]) : null; });
+    if (!comDado) { cx.innerHTML = '<p class="rg-esp">Ninguém desta turma praticou no portal ainda, então o radar está vazio.</p>' + rgLinkCompleto(t); return; }
+    var fracos = RG_EIXOS.filter(function (e) { return med[e.id] != null; }).sort(function (a, b) { return med[a.id] - med[b.id]; });
+    var foco = fracos[0];
+    var abaixo = rs.filter(function (r) { var v = r.eixos && r.eixos[foco.id]; return v && v.agora != null && !v.pouca && v.agora < RG_DOMINIO; }).length;
+    cx.innerHTML = '<div class="rg-cx">' + rgSVG(med) + '<div>' + RG_EIXOS.map(function (e) {
+        var v = med[e.id];
+        return '<div class="rg-eixo"><span>' + e.ic + ' ' + e.nome + '</span><span class="bar"><i style="width:' + (v == null ? 0 : v) + '%;background:' + rgCor(v) + '"></i></span><b style="color:' + rgCor(v) + '">' + (v == null ? '–' : v + '%') + '</b></div>';
+      }).join('') + '</div></div>' +
+      (med[foco.id] < RG_DOMINIO
+        ? '<p class="rg-foco">🎯 <b>Onde focar:</b> ' + foco.ic + ' ' + foco.nome + ' (' + med[foco.id] + '% na média). ' + abaixo + ' de ' + comDado + ' aluno' + (comDado === 1 ? '' : 's') + ' com prática abaixo de ' + RG_DOMINIO + '%.</p>'
+        : '<p class="rg-foco">🎉 A turma está acima de ' + RG_DOMINIO + '% em todas as habilidades praticadas.</p>') +
+      '<p class="rg-esp" style="margin:.5rem 0 0">' + comDado + ' de ' + t.alunos.length + ' alunos com prática no portal.</p>' + rgLinkCompleto(t);
+  }).catch(function (e) { delete RG_CACHE[chave]; if ($('gavRadar') === cx) cx.innerHTML = '<p class="rg-esp">Não consegui montar o radar agora (' + esc(e.message) + ').</p>'; });
+}
+function rgLinkCompleto(t) {
+  return '<a class="rg-mais" href="visao-geral.html?escola=' + encodeURIComponent(t.escola) + '&prof=' + encodeURIComponent(t.prof) + '" target="_top">Ver o radar de cada aluno →</a>';
 }
 /* abre e fecha com a gaveta DESLIZANDO: o hidden sai antes e a classe .on entra no quadro seguinte (senão o navegador
    pula a transição); ao fechar, a .on sai primeiro e o hidden só volta quando a gaveta terminou de sair */
@@ -671,21 +755,39 @@ document.addEventListener('click', function (ev) {
   if (colT && agLigado() && Date.now() - agUltimoToque < 900) { if (!agEngoleClique) agToqueCria(colT, ev.clientY); return; }
   var fx = ev.target.classList && ev.target.classList.contains('g-faixas') && ev.target.dataset.d;
   if (fx && agLigado()) { agBalaoNovo({ data: fx, diaInteiro: true }, ev.target); return; }
-  /* o e-counseling do aluno (Pedro, 26/10/2026): abre o documento direto no Docs (fiskCounselingAbrirDoc, no kit) */
-  var cb = ev.target.closest('[data-couns]');
-  if (cb) {
-    var p = cb.dataset.couns.split('|'), ex = EVS[+p[0]], t = ex && ex.e.turma, a = t && t.alunos[+p[1]]; if (!a) return;
-    var ctx = { escola: t.escola, professor: t.prof, turma: t.tituloInteiro || t.titulo, aluno: String(a.nome).replace(/\([^)]*\)/g, '').trim(), estagio: a.book || '' };
-    /* abre o documento direto no Google Docs, numa aba nova (Pedro, 26/10/2026), sem a ferramenta nem a pasta no meio */
-    if (typeof fiskCounselingAbrirDoc === 'function') { fiskCounselingAbrirDoc(ctx); return; }
-    gavFecha();
-    if (typeof fiskCounselingGaveta === 'function') fiskCounselingGaveta(ctx);
-    else window.open('counseling.html?escola=' + encodeURIComponent(ctx.escola) + '&prof=' + encodeURIComponent(ctx.professor) + '&turma=' + encodeURIComponent(String(ctx.turma).split('\n')[0]) + '#aluno=' + encodeURIComponent(ctx.aluno), '_blank', 'noopener');   /* o nome no fragmento (B1) */
+  /* ANOTAR NO COUNSELING (Pedro, 26/11/2026): a anotação vai como observação no e-counseling do aluno (origem manual,
+     a mesma do Buddy), pela fiskCounseling do kit, que confere a pasta antes de escrever */
+  var av = ev.target.closest('[data-anotvai]');
+  if (av) {
+    var pa = av.dataset.anotvai.split('|'), exa = EVS[+pa[0]], ta = exa && exa.e.turma, aa = ta && ta.alunos[+pa[1]]; if (!aa) return;
+    var inp = av.parentNode.querySelector('input'), txt = inp.value.trim(); if (!txt) return;
+    var linhaA = av.closest('.al'), velho = linhaA.querySelector('.anot-ok'); if (velho) velho.remove();
+    var ctxA = { escola: ta.escola, professor: ta.prof, turma: ta.tituloInteiro || ta.titulo, aluno: String(aa.nome).replace(/\([^)]*\)/g, '').trim(), estagio: aa.book || '' };
+    av.disabled = true; inp.disabled = true; av.textContent = 'Anotando…';
+    fiskCounseling({ escola: ctxA.escola, professor: ctxA.professor, turma: ctxA.turma, aluno: ctxA.aluno, origem: 'manual', campos: { texto: txt, estagio: ctxA.estagio } }).then(function (j) {
+      var ok = j && j.ok, m = document.createElement('div'); m.className = 'anot-ok' + (ok ? '' : ' erro');
+      if (ok) {
+        m.innerHTML = '✓ Anotado no counseling' + (j.docUrl ? ' · <a href="' + esc(j.docUrl) + '" target="_blank" rel="noopener">abrir o documento</a>' : '');
+        inp.value = ''; av.textContent = '📝 Anotar no counseling'; av.disabled = true;
+      } else {
+        m.textContent = '⚠️ Não anotei: ' + ((j && (j.erro || j.error)) || 'sem resposta do servidor') + '. O texto continua no campo.';
+        av.textContent = '📝 Anotar no counseling'; av.disabled = false;
+      }
+      inp.disabled = false; linhaA.appendChild(m);
+    });
     return;
   }
   var b = ev.target.closest('[data-ev]'); if (b) { abreGaveta(+b.dataset.ev); return; }
   if (ev.target.closest('[data-fecha]')) { gavFecha(); return; }
   var t = ev.target.closest('[data-dia]'); if (t) { var nd = somaDias(segunda, +t.dataset.dia); irParaDia(nd, iso(nd) > iso(diaSel) ? 1 : iso(nd) < iso(diaSel) ? -1 : 0); }
+});
+document.addEventListener('input', function (ev) {
+  var i = ev.target.closest && ev.target.closest('[data-anot]'); if (!i) return;
+  var bt = i.parentNode.querySelector('.vai'); if (bt) bt.disabled = !i.value.trim();
+});
+document.addEventListener('keydown', function (ev) {
+  var i = ev.target.closest && ev.target.closest('[data-anot]');
+  if (i && ev.key === 'Enter') { ev.preventDefault(); var bt = i.parentNode.querySelector('.vai'); if (bt && !bt.disabled) bt.click(); }
 });
 document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') { if (!$('dlg').hidden) return; if (!$('bal').hidden) { agFechaBalao(); return; } gavFecha(); } });
 /* ── LEVAR PARA O GOOGLE AGENDA (26/10/2026, aprovado pelo Pedro) ──────────────────────────────────────────────
