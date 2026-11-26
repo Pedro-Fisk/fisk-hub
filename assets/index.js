@@ -1416,6 +1416,8 @@
         '<p class="an-prox">' + esc(tx('anProx')) + '</p>' + (prox.length ? prox.map(item).join('') : '<p class="av-vazio">' + esc(tx('anProxVazio')) + '</p>');
     }
     function recadoAniv(){
+      /* SAIU DA CENTRAL DE INFORMES (Pedro, 26/11/2026): os aniversariantes já têm o card próprio na prateleira "Em aula" */
+      return [];
       var aniv = anivDesta();
       if (!aniv.length) return [];
       var chave = 'fisk_aniv_ciente:' + segundaISO() + ':' + (eu() || '');
