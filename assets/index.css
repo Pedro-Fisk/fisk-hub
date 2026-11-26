@@ -181,7 +181,14 @@
   .sem-home-corpo.anima{transition:height .38s cubic-bezier(.22,.9,.24,1), opacity .3s ease}
   @media (prefers-reduced-motion:reduce){ .sem-home-corpo.anima{transition:none} }
   .sem-home-corpo iframe{display:block;width:100%;height:min(760px,82vh);border:0;background:transparent}
-  .sem-home-corpo .abrir{display:block;text-align:right;font-size:.82rem;font-weight:700;padding:.45rem .9rem;color:var(--ui,#3c6e98)}
+  /* o rodapé organizado (26/11/2026): dica à esquerda, a tela cheia como botão à direita */
+  .sem-pe{display:flex;align-items:center;gap:1rem;padding:.75rem 1rem;background:var(--white);border-top:1px solid var(--surface-border-color,#d5dde6)}
+  body.theme-dark .sem-pe{background:#1b1a1a}
+  .sem-dica{flex:1;min-width:0;font-size:var(--fs-mini,.78rem);color:var(--gray)}
+  .sem-home-corpo .abrir{flex:none;display:inline-flex;align-items:center;gap:.4rem;font-family:var(--font-body);font-size:var(--fs-tx,.88rem);font-weight:800;text-decoration:none;
+    color:#fff;background:var(--ui-dark,#223e5a);border-radius:12px;padding:.55rem 1rem;box-shadow:0 4px 12px rgba(15,31,78,.18);transition:transform .15s,background .15s}
+  .sem-home-corpo .abrir:hover{background:var(--ui,#2b4d70);transform:translateY(-1px)}
+  @media (max-width:640px){ .sem-dica{display:none} .sem-pe{justify-content:flex-end} }
 
 /* ── A ESCALA DE FONTES DA HOME (Pedro, 26/11/2026: "a irregularidade do tamanho das fontes") ──
    Eram dezesseis tamanhos em vinte e um textos (de 10,2 a 21,25 px). Ficam quatro, no computador; o celular segue com

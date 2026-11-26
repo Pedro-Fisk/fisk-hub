@@ -89,7 +89,8 @@
         'card-tutoria-h2': 'Centro de Estudos',
         'card-tutoria-p':  'Atender, frequência e horários do Centro de Estudos (o Learning Center, o plantão de dúvidas) num lugar só',
         'card-calendario-h2': 'Minha semana',
-        'sem-abrir': 'Abrir em tela cheia ↗',
+        'sem-abrir': 'Abrir em tela cheia',
+        'sem-dica':  'Toque numa aula para ver os alunos, fazer anotações e ver o radar da turma.',
         'card-calendario-p':  'Suas aulas, plantões, experimentais e aniversários da semana',
         'card-raftemp-h2': 'RAF temporário',
         'card-raftemp-p':  'Código para o aluno sem RAF entrar no portal',
@@ -173,7 +174,8 @@
         'card-tutoria-h2': 'Learning Center',
         'card-tutoria-p':  'Attend, attendance and schedule of the Learning Center (the tutoring sessions), all in one place',
         'card-calendario-h2': 'My week',
-        'sem-abrir': 'Open full screen ↗',
+        'sem-abrir': 'Open full screen',
+        'sem-dica':  'Tap a class to see the students, take notes and see the class radar.',
         'card-calendario-p':  'Your classes, tutoring shifts, trial classes and birthdays this week',
         'card-raftemp-h2': 'Temporary RAF',
         'card-raftemp-p':  'A code so a student without a RAF can log in to the portal',
@@ -257,7 +259,8 @@
         'card-tutoria-h2': 'Centro de Estudios',
         'card-tutoria-p':  'Atender, asistencia y horarios del Centro de Estudios (el Learning Center, la tutoría) en un solo lugar',
         'card-calendario-h2': 'Mi semana',
-        'sem-abrir': 'Abrir en pantalla completa ↗',
+        'sem-abrir': 'Abrir en pantalla completa',
+        'sem-dica':  'Toca una clase para ver a los alumnos, tomar notas y ver el radar del grupo.',
         'card-calendario-p':  'Tus clases, tutorías, clases de prueba y cumpleaños de la semana',
         'card-raftemp-h2': 'RAF temporal',
         'card-raftemp-p':  'Un código para que el alumno sin RAF entre al portal',
@@ -1918,6 +1921,11 @@
     if (sim && !corpo.querySelector('iframe')) {
       var f = document.createElement('iframe');
       f.src = 'calendario.html?embed=1'; f.title = 'Minha semana'; f.loading = jaViu ? 'lazy' : 'eager';   /* no dia do tour ele tem de carregar já */
+      /* a moldura acompanha a altura do calendário (26/11/2026), sem o cinza vazio embaixo; no máximo 90% da tela */
+      window.addEventListener('message', function (ev) {
+        if (ev.origin !== location.origin || !ev.data || !ev.data.fiskCalAltura || ev.source !== f.contentWindow) return;
+        f.style.height = Math.min(Math.max(420, ev.data.fiskCalAltura), Math.round(window.innerHeight * 0.9)) + 'px';
+      });
       corpo.insertBefore(f, corpo.firstChild);
     }
     clearTimeout(_anima); corpo.classList.remove('anima'); corpo.style.height = ''; corpo.style.opacity = '';

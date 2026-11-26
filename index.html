@@ -22,7 +22,7 @@
 <script>/* aplica o tema salvo antes da primeira pintura, para o modo escuro persistir entre as páginas sem piscar */try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
 <script>/* porteira do professor: decide antes da 1ª pintura se mostra o login ou o hub (sem flash) */try{document.body.classList.add(localStorage.getItem("fisk_prof")?"prof-in":"prof-out");}catch(e){document.body.classList.add("prof-out");}</script>
 
-  <link rel="stylesheet" href="assets/index.css?v=eceb425508">
+  <link rel="stylesheet" href="assets/index.css?v=6474f30c81">
   <link rel="stylesheet" href="assets/perfis-login.css?v=619a050111">
 
   <div id="profGate">
@@ -514,7 +514,8 @@
       <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
     <div class="sem-home-corpo" id="semHomeCorpo" hidden>
-      <a class="abrir" href="calendario.html" data-i18n="sem-abrir">Abrir em tela cheia ↗</a>
+      <!-- O RODAPÉ ORGANIZADO (Pedro, 26/11/2026): a dica à esquerda e a tela cheia como botão, à direita -->
+      <div class="sem-pe"><span class="sem-dica" data-i18n="sem-dica">Toque numa aula para ver os alunos, fazer anotações e ver o radar da turma.</span><a class="abrir" href="calendario.html"><span aria-hidden="true">⤢</span> <span data-i18n="sem-abrir">Abrir em tela cheia</span></a></div>
     </div>
   </section>
   </div>
@@ -586,6 +587,6 @@
   
   <script src="assets/fisk-shared.js?v=4bf85aa648"></script>
   <script src="assets/fisk-pre-aula.js?v=43e6e651bf"></script>
-  <script src="assets/index.js?v=f38fbea317"></script>
+  <script src="assets/index.js?v=678231264d"></script>
 </body>
 </html>
