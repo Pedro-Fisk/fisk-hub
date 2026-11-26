@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="assets/casa-tema.css?v=1e1bb28a31">
 <meta name="theme-color" content="#161414">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
-<script src="assets/fisk-shared.js?v=282254175d"></script>
+<script src="assets/fisk-shared.js?v=3cca6ce3e8"></script>
 <style>
   :root{ --hora: 34px; --cal-linha: var(--ui-line, #dfe6ef); --cal-fundo: var(--white, #fff); --cal-hoje: #fff7e6; --agora: #e11d48; }
   body.theme-dark{ --cal-linha: #2f3a48; --cal-hoje: #2a2412; --cal-fundo: var(--white); }   /* o --white escuro mora no body, não no :root */
@@ -171,7 +171,19 @@
   .gav .al .anot-ok a{ color: inherit; }
   /* o radar da turma dentro da gaveta (Pedro, 26/11/2026: "obrigar" o professor a ver o radar) */
   .gav .rg-cx{ display: grid; grid-template-columns: 170px 1fr; gap: .4rem 1.1rem; align-items: center; }
-  .gav .rg-cx svg{ width: 170px; height: auto; display: block; }
+  .gav .rg-cx svg{ width: 170px; height: auto; display: block; position: relative; }
+  /* A VARREDURA DO RADAR (Pedro, 26/11/2026: "aquela animação de radar"): o feixe da tela de espera do My Radar do Portal
+     (radar.js, .rd-espera .anel), girando devagar por cima do desenho; a área cresce do centro e os pontos acendem */
+  .gav .rg-tela{ position: relative; width: 170px; }
+  .gav .rg-tela::before{ content: ""; position: absolute; left: 50%; top: 48.75%; width: 76%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%;
+                         background: conic-gradient(from 0deg, rgba(59,130,246,.38), rgba(59,130,246,0) 75deg, transparent 360deg);
+                         animation: rgGira 4.5s linear infinite; pointer-events: none; }
+  .gav .rg-tela.espera::before{ animation-duration: 1.6s; }
+  .gav .rg-tela .rg-blip{ animation: rgBlip 2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  @keyframes rgGira{ from{ transform: translate(-50%, -50%) rotate(0deg); } to{ transform: translate(-50%, -50%) rotate(360deg); } }
+  @keyframes rgBlip{ 0%, 100%{ opacity: .55; } 45%{ opacity: 1; } }
+  @media (prefers-reduced-motion: reduce){ .gav .rg-tela::before{ display: none; } .gav .rg-tela .rg-blip{ animation: none; } }
+  .gav .rg-espera{ display: flex; align-items: center; gap: 1rem; }
   .gav .rg-eixo{ display: grid; grid-template-columns: 8.4rem 1fr 2.6rem; align-items: center; gap: .5rem; font-size: .84rem; padding: .16rem 0; }
   .gav .rg-eixo .bar{ height: .5rem; border-radius: 99px; background: var(--cal-linha); overflow: hidden; }
   .gav .rg-eixo .bar i{ display: block; height: 100%; border-radius: 99px; }
@@ -673,7 +685,7 @@ function abreGaveta(k) {
         '<div class="anot" hidden><textarea maxlength="600" data-anot="' + k + '|' + t.alunos.indexOf(a) + '" placeholder="O que anotar sobre ' + esc(String(nome).split(' ')[0]) + '?" aria-label="Anotação para o counseling de ' + nome + '"></textarea>' +
         '<button type="button" class="vai" data-anotvai="' + k + '|' + t.alunos.indexOf(a) + '" disabled>📝 Anotar no counseling</button></div></li>';
     }).join('') + '</ul></div>' +
-      '<div class="bloco"><b class="tit">📊 Radar da turma</b><div id="gavRadar"><p class="rg-esp">Montando o radar da turma…</p></div></div>';
+      '<div class="bloco"><b class="tit">📊 Radar da turma</b><div id="gavRadar"><div class="rg-espera"><div class="rg-tela espera">' + rgSVG({}) + '</div><p class="rg-esp">Montando o radar da turma…</p></div></div></div>';
     pe = '<a class="abrir-aula" href="turma-de-hoje.html#t=' + encodeURIComponent(t.escola + '|' + t.prof + '|' + t.linha) + '">Abrir na Minha aula →</a>';
   } else if (e.lc) {
     h += '<div class="bloco"><b class="tit">🙋 Plantão de dúvidas</b><p class="aviso">' + esc(e.lc.publico || '') + (e.lc.obs ? ' · ' + esc(e.lc.obs) : '') + '</p></div>';
@@ -701,10 +713,16 @@ function rgSVG(med) {
   [100, 50].forEach(function (r) { s += '<polygon points="' + rgPoli([r, r, r, r, r], R) + '" fill="none" stroke="currentColor" stroke-opacity="' + (r === 100 ? '.25' : '.12') + '"/>'; });
   RG_EIXOS.forEach(function (e, i) { var p = rgPto(i, 100, R); s += '<line x1="0" y1="0" x2="' + p[0].toFixed(1) + '" y2="' + p[1].toFixed(1) + '" stroke="currentColor" stroke-opacity=".12"/>'; });
   s += '<polygon points="' + rgPoli([70, 70, 70, 70, 70], R) + '" fill="none" stroke="currentColor" stroke-opacity=".45" stroke-dasharray="3 3"/>';
-  s += '<polygon points="' + rgPoli(vals, R) + '" fill="rgba(59,130,246,.22)" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round"/>';
+  var mexe = !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var cresce = mexe ? '<animateTransform attributeName="transform" type="scale" from="0" to="1" dur=".9s" calcMode="spline" keySplines=".2 .9 .3 1" keyTimes="0;1" fill="freeze"/>' : '';
+  s += '<g>' + cresce + '<polygon points="' + rgPoli(vals, R) + '" fill="rgba(59,130,246,.22)" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round"/>';
   RG_EIXOS.forEach(function (e, i) {
-    var p = rgPto(i, vals[i], R), q = rgPto(i, 100, R + 11), vazio = med[e.id] == null;
-    s += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="3.6" fill="' + (vazio ? '#fff' : rgCor(med[e.id])) + '" stroke="' + rgCor(med[e.id]) + '" stroke-width="1.6"/>';
+    var p = rgPto(i, vals[i], R), vazio = med[e.id] == null;
+    s += '<circle class="rg-blip" style="animation-delay:' + (i * 0.5) + 's" cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="3.6" fill="' + (vazio ? '#fff' : rgCor(med[e.id])) + '" stroke="' + rgCor(med[e.id]) + '" stroke-width="1.6"/>';
+  });
+  s += '</g>';
+  RG_EIXOS.forEach(function (e, i) {
+    var q = rgPto(i, 100, R + 11);
     s += '<text x="' + q[0].toFixed(1) + '" y="' + (q[1] + 4).toFixed(1) + '" text-anchor="middle" font-size="12">' + e.ic + '</text>';
   });
   return s + '</svg>';
@@ -728,7 +746,7 @@ function radarNaGaveta(t) {
     var fracos = RG_EIXOS.filter(function (e) { return med[e.id] != null; }).sort(function (a, b) { return med[a.id] - med[b.id]; });
     var foco = fracos[0];
     var abaixo = rs.filter(function (r) { var v = r.eixos && r.eixos[foco.id]; return v && v.agora != null && !v.pouca && v.agora < RG_DOMINIO; }).length;
-    cx.innerHTML = '<div class="rg-cx">' + rgSVG(med) + '<div>' + RG_EIXOS.map(function (e) {
+    cx.innerHTML = '<div class="rg-cx"><div class="rg-tela">' + rgSVG(med) + '</div><div>' + RG_EIXOS.map(function (e) {
         var v = med[e.id];
         return '<div class="rg-eixo"><span>' + e.ic + ' ' + e.nome + '</span><span class="bar"><i style="width:' + (v == null ? 0 : v) + '%;background:' + rgCor(v) + '"></i></span><b style="color:' + rgCor(v) + '">' + (v == null ? '–' : v + '%') + '</b></div>';
       }).join('') + '</div></div>' +

@@ -830,8 +830,7 @@ function fiskTrofeus() {
     document.head.appendChild(st);
   }
   var m = document.createElement('div'); m.id = 'fkTrofeus'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-label', 'Meus troféus e personagens');
-  var html = '<div class="tf-cx"><h2>🎮 Meus troféus e personagens<button type="button" class="tf-x" aria-label="Fechar">✕</button></h2>' +
-    '<p class="tf-sub">Cinco coisas que o Hub mostra sobre você, cada uma vinda de uma campanha. Nenhuma vale nota: é só a sua cara no sistema.</p>';
+  var html = '<div class="tf-cx"><h2>🎮 Meus troféus e personagens<button type="button" class="tf-x" aria-label="Fechar">✕</button></h2>';   /* o subtítulo saiu (Pedro, 26/11/2026) */
   camadas.forEach(function (c, i) {
     html += '<div class="tf-it"><div class="tf-ico">' + c.ico + '</div><div><b class="tf-t">' + c.t + '</b>' +
       c.p.map(function (l) { return '<p>' + l + '</p>'; }).join('') +

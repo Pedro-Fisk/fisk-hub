@@ -1443,7 +1443,8 @@
 
     function carrega(forcar){
       var s = sess(); if (!s || !s.token) return Promise.resolve(false);
-      $$('bdSub').textContent = tx('sub'); $$('bdNome').textContent = '📣 ' + tx('nome');
+      var bdS = $$('bdSub'); if (bdS) bdS.textContent = tx('sub');   /* o subtítulo saiu da tela em 26/11/2026 (Pedro) */
+      $$('bdNome').textContent = '📣 ' + tx('nome');
       var pedido = ++leitura;   /* duas leituras no ar: só a mais nova desenha */
       /* A VOLTA À HOME SEM CORTINA (Pedro, 26/10/2026: "parece que ele tem que carregar tudo toda vez"). A última resposta
          do mural fica guardada no aparelho (localStorage com dono e validade de um dia, fiskCacheGuarda; até 31/10/2026 era
