@@ -68,6 +68,26 @@
   .form-ped{grid-column:1 / -1;background:var(--blue-soft);border-radius:12px;padding:.7rem .8rem;margin-top:.3rem}
   .form-ped .campos{margin-top:0}
   .form-ped .linha{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-top:.6rem}
+  /* Pedido em lote (26/11/2026): vários documentos ou arquivos de uma vez */
+  .sel{display:flex;align-items:center;gap:.45rem;cursor:pointer}
+  .sel input{width:18px;height:18px;accent-color:var(--green,#32a889);cursor:pointer;margin:0}
+  .ped.marcado{background:rgba(50,168,137,.07);border-radius:10px}
+  .lote-topo{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:.1rem 0 .4rem;font-size:.82rem;color:var(--gray)}
+  .lote-barra{position:sticky;bottom:.6rem;z-index:5;background:var(--white);border:2px solid var(--green,#32a889);border-radius:14px;
+              box-shadow:0 6px 20px rgba(0,0,0,.12);padding:.7rem .85rem;margin-top:.8rem}
+  .lote-barra .linha{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+  .lote-barra .qtos{font-family:var(--font-heading);font-weight:700;margin-right:auto}
+  .lote-res{list-style:none;margin:.6rem 0 0;padding:0;font-size:.82rem;max-height:220px;overflow:auto}
+  .lote-res li{padding:.2rem 0;border-top:1px dashed var(--surface-border-color)}
+  .lote-res li:first-child{border-top:0}
+  .lote-res .ok{color:#1d7a46} .lote-res .erro{color:var(--red)} .lote-res .esp{color:var(--gray)}
+  .arqs{list-style:none;margin:.7rem 0 0;padding:0}
+  .arqs li{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:.5rem;align-items:center;padding:.35rem 0;border-top:1px solid var(--surface-border-color);font-size:.85rem}
+  .arqs li:first-child{border-top:0}
+  .arqs input{width:100%;box-sizing:border-box;border:1.5px solid var(--blue-bd);border-radius:8px;padding:.4rem .55rem;font-family:var(--font-body);font-size:.88rem;background:var(--white);color:inherit}
+  .arqs .tam{color:var(--gray);font-size:.78rem;white-space:nowrap}
+  .arqs .res{grid-column:2 / -1;font-size:.78rem;font-weight:700}
+  .arqs .res.ok{color:#1d7a46} .arqs .res.erro{color:var(--red)}
 </style>
 </head>
 <body>
@@ -101,8 +121,27 @@
     <p class="aviso" style="margin-top:.4rem">Boletins, termos de atraso e comunicados de 2nd Chance salvos na pasta do aluno, e os planners físicos que você gerou
       (a cópia do planner fica guardada por 30 dias). Daqui você abre o PDF de novo e pede impressão ou envio à família sem gerar outra vez.
       O histórico começa em 22/10/2026.</p>
-    <input class="busca" id="docsBusca" type="search" placeholder="🔎 Buscar por aluno ou documento">
+    <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+      <input class="busca" id="docsBusca" type="search" placeholder="🔎 Buscar por aluno ou documento" style="flex:1;min-width:200px">
+      <select class="busca" id="docsPeriodo" style="width:auto" aria-label="Período">
+        <option value="15">Últimos 15 dias</option><option value="30" selected>Últimos 30 dias</option><option value="0">Tudo (até 120 dias)</option>
+      </select>
+    </div>
+    <div class="lote-topo" id="loteTopo" hidden>
+      <span>Marque a caixinha dos documentos para pedir vários de uma vez.</span>
+      <button type="button" class="btn-leve" id="loteTodos">Marcar todos da lista</button>
+      <button type="button" class="btn-leve" id="loteNenhum" hidden>Desmarcar</button>
+    </div>
     <div id="docsLista"><p class="vazio">Carregando…</p></div>
+    <div class="lote-barra" id="loteBarra" hidden>
+      <div class="linha">
+        <span class="qtos" id="loteQtos"></span>
+        <button type="button" class="btn-cor" id="loteImprimir">🖨️ Imprimir todos</button>
+        <button type="button" class="btn-cor btn-zap" id="loteEnviar">💬 Enviar todos à família</button>
+      </div>
+      <div class="form-ped" id="loteForm" hidden style="margin-top:.6rem"></div>
+      <ul class="lote-res" id="loteRes" hidden></ul>
+    </div>
     <p class="status" id="docsStatus" role="status"></p>
   </section>
 
@@ -111,16 +150,14 @@
     <p class="aviso">Desenho para colorir, atividade extra, prova avulsa: qualquer material que precise sair no papel.
       Boletim e planner físico têm o botão verde <b>Solicitar impressão</b> dentro da própria ferramenta, logo depois de gerar o PDF.</p>
     <label class="drop" id="drop" for="arquivo" tabindex="0">
-      <b>Arraste o arquivo aqui</b> ou clique para escolher
-      <small>PDF, JPG ou PNG · até 15 MB</small>
+      <b>Arraste os arquivos aqui</b> ou clique para escolher
+      <small>Pode mandar vários de uma vez · PDF, JPG ou PNG · até 15 MB cada</small>
     </label>
-    <input type="file" id="arquivo" accept="application/pdf,image/jpeg,image/png" hidden>
-    <div class="arq" id="arqInfo" hidden><span>📎</span><b id="arqNome"></b><span id="arqTam" style="color:var(--gray)"></span>
-      <button type="button" class="btn-leve" id="arqTrocar">Trocar</button></div>
+    <input type="file" id="arquivo" accept="application/pdf,image/jpeg,image/png" multiple hidden>
+    <p class="aviso" id="arqDica" style="margin:.7rem 0 0" hidden>O título de cada arquivo é o que a secretária vê na lista. Cópias, prazo e observação valem para todos.</p>
+    <ul class="arqs" id="arqLista"></ul>
     <div class="campos">
-      <div class="campo largo"><label for="titulo">Título (é o que a secretária vê na lista)</label>
-        <input id="titulo" maxlength="140" placeholder="Ex.: Desenhos de Halloween para colorir"></div>
-      <div class="campo"><label for="copias">Cópias</label><input id="copias" type="number" min="1" max="200" value="1"></div>
+      <div class="campo"><label for="copias">Cópias de cada</label><input id="copias" type="number" min="1" max="200" value="1"></div>
       <div class="campo" id="campoEscola"><label for="escola">Escola</label><select id="escola"></select></div>
       <div class="campo"><label for="turma">Turma (opcional)</label><input id="turma" maxlength="120" placeholder="Ex.: Kids 2 · ter/qui 14h"></div>
       <div class="campo"><label for="precisaAte">Preciso até (opcional)</label><input id="precisaAte" type="date"></div>
@@ -128,6 +165,7 @@
         <textarea id="obs" rows="2" maxlength="500" placeholder="Ex.: frente e verso, colorido, grampear"></textarea></div>
     </div>
     <button type="button" class="enviar" id="enviar">Enviar pedido</button>
+    <button type="button" class="btn-leve" id="arqLimpar" style="margin-left:.4rem" hidden>Limpar a lista</button>
     <p class="status" id="status" role="status"></p>
   </section>
 
@@ -150,7 +188,7 @@ var EP = FISK_HUB_EP, MAX = 15 * 1024 * 1024;
 var TIPOS = { 'application/pdf': 1, 'image/jpeg': 1, 'image/png': 1 };
 var ROT = { boletim: 'BOL', planner: 'PLA', avulso: 'ARQ', termo: 'TER', '2nd': '2ND' },
     NOME = { boletim: 'Boletim', planner: 'Planner físico', avulso: '', termo: 'Termo de atraso', '2nd': '2nd Chance' };
-var arquivo = null;
+var arquivos = [];   /* fila do pedido avulso: { f, titulo, res } */
 function $(id) { return document.getElementById(id); }
 function esc(s) { return fiskEsc(String(s == null ? '' : s)); }
 function sessao() { return fiskSessao() || {}; }
@@ -170,52 +208,77 @@ function minhasEscolas() { return String(sessao().escolas || sessao().escola || 
   $('escola').innerHTML = (e.length ? e : ['Caçapava', 'Taubaté']).map(function (x) { return '<option>' + esc(x) + '</option>'; }).join('');
 })();
 
-function escolher(f) {
-  if (!f) return;
-  if (!TIPOS[f.type]) { status('Este arquivo não é PDF, JPG nem PNG. Salve como PDF e tente de novo.', 'erro'); return; }
-  if (f.size > MAX) { status('O arquivo tem ' + tamanho(f.size) + ' e o limite é 15 MB.', 'erro'); return; }
-  arquivo = f; status('');
-  $('arqNome').textContent = f.name; $('arqTam').textContent = '· ' + tamanho(f.size);
-  $('arqInfo').hidden = false; $('drop').hidden = true;
-  if (!$('titulo').value.trim()) $('titulo').value = f.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim().slice(0, 140);
+function tituloDe(f) { return f.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim().slice(0, 140); }
+function escolher(lista) {
+  var recusados = [];
+  [].forEach.call(lista || [], function (f) {
+    if (!TIPOS[f.type]) { recusados.push(f.name + ' (não é PDF, JPG nem PNG)'); return; }
+    if (f.size > MAX) { recusados.push(f.name + ' (' + tamanho(f.size) + ', o limite é 15 MB)'); return; }
+    if (arquivos.length >= 30) { recusados.push(f.name + ' (máximo de 30 por vez)'); return; }
+    arquivos.push({ f: f, titulo: tituloDe(f), res: null });
+  });
+  status(recusados.length ? 'Ficaram de fora: ' + recusados.join('; ') + '.' : '', recusados.length ? 'erro' : '');
+  desenhaArquivos();
 }
-$('arquivo').addEventListener('change', function () { escolher(this.files[0]); this.value = ''; });
-$('arqTrocar').addEventListener('click', function () { arquivo = null; $('arqInfo').hidden = true; $('drop').hidden = false; $('arquivo').click(); });
+function desenhaArquivos() {
+  var n = arquivos.length;
+  $('arqLista').innerHTML = arquivos.map(function (a, i) {
+    return '<li><span>📎</span><input maxlength="140" data-tit="' + i + '" value="' + esc(a.titulo) + '" aria-label="Título do arquivo ' + (i + 1) + '">' +
+      '<span class="tam">' + tamanho(a.f.size) + '</span>' +
+      '<button type="button" class="btn-leve" data-tira="' + i + '" title="Tirar da lista">✕</button>' +
+      (a.res ? '<span class="res ' + a.res.tipo + '">' + esc(a.res.txt) + '</span>' : '') + '</li>';
+  }).join('');
+  $('arqDica').hidden = n < 1; $('arqLimpar').hidden = n < 2;
+  $('drop').querySelector('b').textContent = n ? 'Adicionar mais arquivos' : 'Arraste os arquivos aqui';
+  $('enviar').textContent = n > 1 ? 'Enviar os ' + n + ' pedidos' : 'Enviar pedido';
+}
+$('arqLista').addEventListener('input', function (e) { var i = e.target.getAttribute('data-tit'); if (i != null && arquivos[i]) arquivos[i].titulo = e.target.value; });
+$('arqLista').addEventListener('click', function (e) { var b = e.target.closest('[data-tira]'); if (!b) return; arquivos.splice(+b.getAttribute('data-tira'), 1); desenhaArquivos(); });
+$('arqLimpar').addEventListener('click', function () { arquivos = []; status(''); desenhaArquivos(); });
+$('arquivo').addEventListener('change', function () { escolher(this.files); this.value = ''; });
 $('drop').addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('arquivo').click(); } });
 ['dragenter', 'dragover'].forEach(function (ev) { $('drop').addEventListener(ev, function (e) { e.preventDefault(); $('drop').classList.add('sobre'); }); });
 ['dragleave', 'drop'].forEach(function (ev) { $('drop').addEventListener(ev, function (e) { e.preventDefault(); $('drop').classList.remove('sobre'); }); });
-$('drop').addEventListener('drop', function (e) { escolher(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]); });
+$('drop').addEventListener('drop', function (e) { escolher(e.dataTransfer && e.dataTransfer.files); });
 
 /* páginas do PDF, só para a secretária ver o tamanho do trabalho (conta aproximada, sem biblioteca) */
 function contarPaginas(bytes) {
   try { var t = new TextDecoder('latin1').decode(bytes); var m = t.match(/\/Type\s*\/Page(?![s\w])/g); return m ? m.length : 0; } catch (e) { return 0; }
 }
 
+function lerBytes(f) {
+  return new Promise(function (ok, falha) { var r = new FileReader(); r.onload = function () { ok(new Uint8Array(r.result)); }; r.onerror = falha; r.readAsArrayBuffer(f); });
+}
+/* um arquivo por vez: o servidor tem trava, e o erro de um não para os outros */
 $('enviar').addEventListener('click', function () {
-  if (!arquivo) { status('Escolha o arquivo primeiro.', 'erro'); return; }
-  var titulo = $('titulo').value.trim();
-  if (!titulo) { status('Dê um título ao pedido.', 'erro'); $('titulo').focus(); return; }
-  $('enviar').disabled = true; status('Enviando o arquivo…');
-  var leitor = new FileReader();
-  leitor.onerror = function () { $('enviar').disabled = false; status('Não consegui ler o arquivo.', 'erro'); };
-  leitor.onload = function () {
-    var bytes = new Uint8Array(leitor.result);
-    post({ action: 'impPedir', origem: 'avulso', titulo: titulo, mime: arquivo.type, dados: fiskBytesToBase64(bytes),
-           paginas: arquivo.type === 'application/pdf' ? contarPaginas(bytes) : 1,
-           copias: $('copias').value, escola: $('escola').value, turma: $('turma').value.trim(),
-           precisaAte: $('precisaAte').value, obs: $('obs').value.trim() })
-      .then(function (j) {
-        $('enviar').disabled = false;
-        if (!j || !j.ok) { status((j && j.error) || 'Não consegui enviar.', 'erro'); return; }
-        status('Pedido enviado para a secretaria de ' + j.escola + '. Você recebe o aviso no Hub quando for impresso.', 'ok');
-        try { if (typeof fiskFesta === 'function') fiskFesta('🖨️', true); } catch (e) {} 
-        arquivo = null; $('arqInfo').hidden = true; $('drop').hidden = false;
-        ['titulo', 'turma', 'precisaAte', 'obs'].forEach(function (id) { $(id).value = ''; }); $('copias').value = 1;
-        carregar();
-      })
-      .catch(function () { $('enviar').disabled = false; status('Erro de conexão. O pedido não foi enviado; tente de novo.', 'erro'); });
-  };
-  leitor.readAsArrayBuffer(arquivo);
+  var fila = arquivos.filter(function (a) { return !a.res || a.res.tipo !== 'ok'; });
+  if (!fila.length) { status(arquivos.length ? 'Todos já foram enviados.' : 'Escolha o arquivo primeiro.', 'erro'); return; }
+  var semTitulo = fila.filter(function (a) { return !String(a.titulo).trim(); });
+  if (semTitulo.length) { status('Dê um título a cada arquivo.', 'erro'); return; }
+  var comum = { copias: $('copias').value, escola: $('escola').value, turma: $('turma').value.trim(), precisaAte: $('precisaAte').value, obs: $('obs').value.trim() };
+  $('enviar').disabled = true;
+  var feitos = 0, erros = 0, escola = '';
+  (function proximo(k) {
+    if (k >= fila.length) {
+      $('enviar').disabled = false;
+      if (!erros) {
+        status((feitos > 1 ? feitos + ' pedidos enviados' : 'Pedido enviado') + ' para a secretaria de ' + escola + '. Você recebe o aviso no Hub quando for impresso.', 'ok');
+        try { if (typeof fiskFesta === 'function') fiskFesta('🖨️', true); } catch (e) {}
+        arquivos = []; ['turma', 'precisaAte', 'obs'].forEach(function (id) { $(id).value = ''; }); $('copias').value = 1;
+      } else status(feitos + ' enviado(s) e ' + erros + ' com problema. Os que deram erro continuam na lista: clique de novo para tentar.', 'erro');
+      desenhaArquivos(); carregar(); return;
+    }
+    var a = fila[k];
+    status('Enviando ' + (k + 1) + ' de ' + fila.length + '…');
+    lerBytes(a.f).then(function (bytes) {
+      return post(Object.assign({ action: 'impPedir', origem: 'avulso', titulo: String(a.titulo).trim(), mime: a.f.type, dados: fiskBytesToBase64(bytes),
+                                  paginas: a.f.type === 'application/pdf' ? contarPaginas(bytes) : 1 }, comum));
+    }).then(function (j) {
+      if (j && j.ok) { feitos++; escola = j.escola; a.res = { tipo: 'ok', txt: '✓ enviado' }; }
+      else { erros++; a.res = { tipo: 'erro', txt: (j && j.error) || 'Não consegui enviar.' }; }
+    }).catch(function () { erros++; a.res = { tipo: 'erro', txt: 'Erro de conexão. Não foi enviado.' }; })
+      .then(function () { desenhaArquivos(); proximo(k + 1); });
+  })(0);
 });
 
 function carregar() {
@@ -259,7 +322,7 @@ function mostraAba(a) {
 $('abas').addEventListener('click', function (e) { var b = e.target.closest('[data-aba]'); if (b) mostraAba(b.getAttribute('data-aba')); });
 
 /* ── MEUS DOCUMENTOS (22/10/2026, backend Documentos.js) ── */
-var DOCS = [];
+var DOCS = [], MARCADOS = {}, PERIODO = 30;
 var ROTP = { pendente: 'aguardando', impresso: 'impresso', enviado: 'enviado', cancelado: 'cancelado' };
 function dia(ms) { return new Date(ms).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }); }
 function norm(s) { return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
@@ -271,9 +334,11 @@ function docsCarregar() {
   }).catch(function () { $('docsLista').innerHTML = '<p class="vazio">Erro de conexão. Tente Atualizar.</p>'; });
 }
 function docsDesenhar() {
-  var q = norm($('docsBusca').value), L = DOCS.filter(function (d) { return !q || norm(d.aluno + ' ' + d.rotulo + ' ' + d.turma).indexOf(q) > -1; });
+  var q = norm($('docsBusca').value), corte = PERIODO ? Date.now() - PERIODO * 86400000 : 0;
+  var L = DOCS.filter(function (d) { return d.quando >= corte && (!q || norm(d.aluno + ' ' + d.rotulo + ' ' + d.turma).indexOf(q) > -1); });
+  VISIVEIS = L;
   if (!DOCS.length) { $('docsLista').innerHTML = '<p class="vazio">Nenhum documento ainda. Os boletins, termos e comunicados que você salvar na pasta do aluno a partir de hoje aparecem aqui.</p>'; return; }
-  if (!L.length) { $('docsLista').innerHTML = '<p class="vazio">Nada com essa busca.</p>'; return; }
+  if (!L.length) { $('docsLista').innerHTML = '<p class="vazio">' + (q ? 'Nada com essa busca' : 'Nenhum documento') + (PERIODO ? ' nos últimos ' + PERIODO + ' dias.' : '.') + '</p>'; loteAtualiza(); return; }
   $('docsLista').innerHTML = L.map(function (d) {
     var chips = '';
     if (d.apagado) chips += '<span class="chip nao">cópia apagada (passou dos 30 dias)</span>';
@@ -282,21 +347,134 @@ function docsDesenhar() {
     if (d.familia) chips += '<span class="chip fam">👨‍👩‍👧 ' + (d.tipo === 'boletim' ? 'no Canto da Família (o mais recente)' : 'no Canto da Família') + '</span>';
     (d.pedidos || []).slice().reverse().forEach(function (p) {
       var env = p.acao === 'enviar', cls = p.status === 'pendente' ? 'esp' : p.status === 'cancelado' ? '' : 'ok';
-      var txt = (env ? '💬 envio: ' : '🖨️ impressão: ') + (ROTP[p.status] || p.status) + (p.feitoEm && p.status !== 'pendente' ? ' em ' + dia(p.feitoEm) : '');
+      var txt = env ? '💬 ' + { pendente: 'envio pedido em ' + dia(p.quando), enviado: 'enviado à família em ' + dia(p.feitoEm || p.quando), cancelado: 'envio cancelado' }[p.status]
+                    : '🖨️ ' + { pendente: 'enviado para impressão em ' + dia(p.quando) + ' (aguardando)', impresso: 'impresso em ' + dia(p.feitoEm || p.quando), cancelado: 'impressão cancelada' }[p.status];
+      if (!txt || /undefined/.test(txt)) txt = (env ? '💬 envio: ' : '🖨️ impressão: ') + (ROTP[p.status] || p.status);
       chips += '<span class="chip ' + cls + '" title="' + esc(p.motivo || ('pedido em ' + quando(p.quando))) + '">' + txt + '</span>';
     });
     var vivo = !d.apagado, id = esc(d.id);
-    return '<div class="ped doc" data-doc="' + id + '"><div class="tp ' + esc(d.tipo) + '">' + (ROT[d.tipo] || 'DOC') + '</div>' +
+    var cx = vivo ? '<label class="sel" title="Marcar para pedir junto com outros"><input type="checkbox" data-sel="' + id + '"' + (MARCADOS[d.id] ? ' checked' : '') + '>' : '<label class="sel"><input type="checkbox" disabled style="visibility:hidden">';
+    return '<div class="ped doc' + (MARCADOS[d.id] ? ' marcado' : '') + '" data-doc="' + id + '">' + cx + '<div class="tp ' + esc(d.tipo) + '">' + (ROT[d.tipo] || 'DOC') + '</div></label>' +
       '<div style="min-width:0"><b>' + esc(d.rotulo + ' · ' + d.aluno) + '</b><div class="sub">' + (d.turma ? esc(d.turma) + ' · ' : '') + 'gerado em ' + quando(d.quando) + '</div>' +
       '<div class="chips">' + chips + '</div></div>' +
       '<div class="acoes">' + (vivo ? '<button type="button" class="btn-leve" data-d="abrir" data-id="' + id + '">Abrir PDF</button>' +
         '<button type="button" class="btn-cor" data-d="imprimir" data-id="' + id + '">🖨️ Imprimir</button>' +
         (d.tipo !== 'planner' ? '<button type="button" class="btn-cor btn-zap" data-d="enviar" data-id="' + id + '">💬 Enviar à família</button>' : '') : '') + '</div></div>';
   }).join('');
+  loteAtualiza();
+}
+var VISIVEIS = [];
+/* o pedido que já existe para o documento (o cancelado não conta) */
+function jaPedido(d, acao) {
+  return (d.pedidos || []).filter(function (p) { return (p.acao === 'enviar' ? 'enviar' : 'imprimir') === acao && p.status !== 'cancelado'; })
+    .sort(function (x, y) { return y.quando - x.quando; })[0] || null;
+}
+function frasePedido(p, acao) {
+  if (acao === 'enviar') return p.status === 'enviado' ? 'enviado à família em ' + dia(p.feitoEm || p.quando) : 'pedido de envio feito em ' + dia(p.quando) + ', ainda aguardando';
+  return p.status === 'impresso' ? 'impresso em ' + dia(p.feitoEm || p.quando) : 'enviado para impressão em ' + dia(p.quando) + ', ainda aguardando';
+}
+/* janelinha de confirmação; botoes = [{ txt, valor, cor }]; devolve uma Promise com o valor escolhido (null = fechou) */
+function pergunta(titulo, html, botoes) {
+  return new Promise(function (fim) {
+    var fundo = document.createElement('div');
+    fundo.style.cssText = 'position:fixed;inset:0;background:rgba(15,20,30,.5);z-index:999;display:flex;align-items:center;justify-content:center;padding:1rem';
+    fundo.innerHTML = '<div role="dialog" aria-modal="true" style="background:var(--white);color:inherit;border-radius:16px;max-width:460px;width:100%;padding:1.2rem 1.3rem;box-shadow:0 20px 50px rgba(0,0,0,.3)">' +
+      '<h2 style="margin:0 0 .5rem;font-family:var(--font-heading);font-size:1.05rem">' + titulo + '</h2><div style="font-size:.9rem;line-height:1.5">' + html + '</div>' +
+      '<div style="display:flex;gap:.5rem;flex-wrap:wrap;justify-content:flex-end;margin-top:1rem">' +
+      botoes.map(function (b, i) { return '<button type="button" data-i="' + i + '" class="' + (b.cor ? 'btn-cor' : 'btn-leve') + '" style="font-size:.85rem;padding:.45rem .95rem">' + esc(b.txt) + '</button>'; }).join('') + '</div></div>';
+    function fecha(v) { document.removeEventListener('keydown', tecla); fundo.remove(); fim(v); }
+    function tecla(e) { if (e.key === 'Escape') fecha(null); }
+    fundo.addEventListener('click', function (e) { if (e.target === fundo) return fecha(null); var b = e.target.closest('[data-i]'); if (b) fecha(botoes[+b.getAttribute('data-i')].valor); });
+    document.addEventListener('keydown', tecla);
+    document.body.appendChild(fundo);
+    var ult = fundo.querySelectorAll('[data-i]'); if (ult.length) ult[ult.length - 1].focus();
+  });
+}
+
+/* ── pedido em lote (26/11/2026): marca vários e pede de uma vez ── */
+function marcadosVivos() { return DOCS.filter(function (d) { return MARCADOS[d.id] && !d.apagado; }); }
+function loteAtualiza() {
+  var M = marcadosVivos(), n = M.length, vivosVis = VISIVEIS.filter(function (d) { return !d.apagado; });
+  $('loteTopo').hidden = !vivosVis.length;
+  $('loteNenhum').hidden = !n;
+  $('loteBarra').hidden = !n && $('loteRes').hidden;
+  $('loteQtos').textContent = n ? n + (n > 1 ? ' documentos marcados' : ' documento marcado') : 'Nenhum documento marcado';
+  $('loteImprimir').disabled = !n;
+  var paraFamilia = M.filter(function (d) { return d.tipo !== 'planner'; }).length;
+  $('loteEnviar').disabled = !paraFamilia;
+  $('loteEnviar').title = n && !paraFamilia ? 'Planner físico é só para imprimir' : '';
+}
+$('loteTodos').addEventListener('click', function () { VISIVEIS.forEach(function (d) { if (!d.apagado) MARCADOS[d.id] = 1; }); docsDesenhar(); });
+$('loteNenhum').addEventListener('click', function () { MARCADOS = {}; $('loteForm').hidden = true; $('loteRes').hidden = true; docsDesenhar(); });
+$('docsLista').addEventListener('change', function (e) {
+  var c = e.target.closest('[data-sel]'); if (!c) return;
+  var id = c.getAttribute('data-sel'); if (c.checked) MARCADOS[id] = 1; else delete MARCADOS[id];
+  var l = c.closest('.doc'); if (l) l.classList.toggle('marcado', c.checked);
+  loteAtualiza();
+});
+function loteAbreForm(k) {
+  var f = $('loteForm');
+  if (!f.hidden && f.getAttribute('data-k') === k) { f.hidden = true; return; }
+  f.setAttribute('data-k', k); f.hidden = false; $('loteRes').hidden = true;
+  f.innerHTML = (k === 'imprimir'
+    ? '<div class="campos"><div class="campo"><label>Cópias de cada</label><input type="number" min="1" max="200" value="1" data-f="copias"></div>' +
+      '<div class="campo"><label>Preciso até (opcional)</label><input type="date" data-f="precisaAte"></div>' +
+      '<div class="campo largo"><label>Observação para a secretária (opcional, vale para todos)</label><input maxlength="500" data-f="obs" placeholder="Ex.: frente e verso"></div></div>'
+    : '<div class="campos"><div class="campo largo"><label>Recado para as famílias (opcional, entra na mensagem de cada uma)</label>' +
+      '<textarea rows="2" maxlength="500" data-f="recado" placeholder="Ex.: Qualquer dúvida, estou à disposição."></textarea></div>' +
+      '<div class="campo largo"><label>Observação para a secretária (opcional)</label><input maxlength="500" data-f="obs"></div></div>') +
+    '<div class="linha"><button type="button" class="btn-cor' + (k === 'enviar' ? ' btn-zap' : '') + '" id="loteVai">' +
+    (k === 'imprimir' ? 'Mandar todos para a secretaria imprimir' : 'Pedir à secretaria para enviar todos') + '</button></div>';
+  $('loteVai').addEventListener('click', function () { loteVai(k); });
+}
+$('loteImprimir').addEventListener('click', function () { loteAbreForm('imprimir'); });
+$('loteEnviar').addEventListener('click', function () { loteAbreForm('enviar'); });
+function loteVai(k) {
+  var f = $('loteForm'), val = function (n) { var x = f.querySelector('[data-f="' + n + '"]'); return x ? x.value : ''; };
+  var M = marcadosVivos(), pulados = [];
+  if (k === 'enviar') M = M.filter(function (d) { if (d.tipo === 'planner') { pulados.push(d); return false; } return true; });
+  if (!M.length) return;
+  var repetidos = M.filter(function (d) { return jaPedido(d, k); });
+  var decide = !repetidos.length ? Promise.resolve('todos') : pergunta(
+    (repetidos.length > 1 ? repetidos.length + ' destes documentos já foram pedidos' : 'Um destes documentos já foi pedido'),
+    '<ul style="margin:.2rem 0 .4rem;padding-left:1.1rem;max-height:180px;overflow:auto">' + repetidos.map(function (d) {
+      return '<li><b>' + esc(d.rotulo + ' · ' + d.aluno) + '</b>: ' + esc(frasePedido(jaPedido(d, k), k)) + '</li>'; }).join('') + '</ul>' +
+    'Quer pedir de novo ' + (repetidos.length > 1 ? 'esses' : 'esse') + ' ou mandar só os outros?',
+    [{ txt: 'Cancelar', valor: null }].concat(repetidos.length < M.length ? [{ txt: 'Só os que faltam', valor: 'novos' }] : [])
+      .concat([{ txt: repetidos.length < M.length ? 'Pedir todos de novo' : 'Pedir de novo', valor: 'todos', cor: 1 }]));
+  decide.then(function (r) {
+    if (!r) return;
+    var fila = r === 'novos' ? M.filter(function (d) { return !jaPedido(d, k); }) : M;
+    if (r === 'novos') repetidos.forEach(function (d) { delete MARCADOS[d.id]; });
+    pulados.forEach(function (d) { delete MARCADOS[d.id]; });
+    var comum = { acao: k, copias: val('copias'), precisaAte: val('precisaAte'), obs: val('obs').trim(), recado: val('recado').trim() };
+    var res = $('loteRes'), vai = $('loteVai'), ok = 0, erro = 0, escola = '';
+    res.hidden = false; f.hidden = true; $('loteImprimir').disabled = $('loteEnviar').disabled = true;
+    res.innerHTML = fila.map(function (d, i) { return '<li id="lr' + i + '" class="esp">⏳ ' + esc(d.rotulo + ' · ' + d.aluno) + '</li>'; }).join('') +
+      pulados.map(function (d) { return '<li class="esp">— ' + esc(d.rotulo + ' · ' + d.aluno) + ': planner é só para imprimir, ficou de fora</li>'; }).join('') +
+      (r === 'novos' ? repetidos.map(function (d) { return '<li class="esp">— ' + esc(d.rotulo + ' · ' + d.aluno) + ': já pedido, não mandei de novo</li>'; }).join('') : '');
+    (function proximo(i) {
+      if (i >= fila.length) {
+        var fimTxt = ok ? '<li class="ok"><b>' + ok + (ok > 1 ? ' pedidos enviados' : ' pedido enviado') + ' para a secretaria de ' + esc(escola) + '.</b> A resposta dela aparece aqui e no mural do Hub.</li>' : '';
+        if (erro) fimTxt += '<li class="erro"><b>' + (erro > 1 ? erro + ' não foram.</b> Eles continuam marcados' : '1 não foi.</b> Ele continua marcado') + ': é só pedir de novo.</li>';
+        res.insertAdjacentHTML('afterbegin', fimTxt);
+        if (ok) { try { if (typeof fiskFesta === 'function') fiskFesta(k === 'enviar' ? '💬' : '🖨️', true); } catch (e) {} }
+        docsCarregar(); carregar(); loteAtualiza(); return;
+      }
+      var d = fila[i], li = document.getElementById('lr' + i);
+      li.textContent = '⏳ ' + d.rotulo + ' · ' + d.aluno + ' (enviando ' + (i + 1) + ' de ' + fila.length + '…)';
+      post(Object.assign({ action: 'docPedir', id: d.id }, comum)).then(function (j) {
+        if (j && j.ok) { ok++; escola = j.escola; delete MARCADOS[d.id]; li.className = 'ok'; li.textContent = '✓ ' + d.rotulo + ' · ' + d.aluno; }
+        else { erro++; li.className = 'erro'; li.textContent = '✗ ' + d.rotulo + ' · ' + d.aluno + ': ' + ((j && j.error) || 'não consegui pedir'); }
+      }).catch(function () { erro++; li.className = 'erro'; li.textContent = '✗ ' + d.rotulo + ' · ' + d.aluno + ': erro de conexão'; })
+        .then(function () { proximo(i + 1); });
+    })(0);
+  });
 }
 function docAcha(id) { return DOCS.filter(function (d) { return d.id === id; })[0]; }
 function docsStatus(t, tipo) { $('docsStatus').textContent = t || ''; $('docsStatus').className = 'status' + (tipo ? ' ' + tipo : ''); }
 $('docsBusca').addEventListener('input', docsDesenhar);
+$('docsPeriodo').addEventListener('change', function () { PERIODO = +this.value; docsDesenhar(); });
 $('docsAtualizar').addEventListener('click', docsCarregar);
 $('docsLista').addEventListener('click', function (e) {
   var b = e.target.closest('[data-d]'); if (!b) return;
@@ -329,7 +507,19 @@ $('docsLista').addEventListener('click', function (e) {
     linha.appendChild(f);
     return;
   }
+  if (k === 'pedir' && !b.dataset.confirmado) {
+    var ak = b.getAttribute('data-k') === 'enviar' ? 'enviar' : 'imprimir', jp = d && jaPedido(d, ak);
+    if (jp) {
+      pergunta(ak === 'enviar' ? 'Este documento já foi pedido para a família' : 'Este documento já foi enviado para impressão',
+        '<b>' + esc(d.rotulo + ' · ' + d.aluno) + '</b>: ' + esc(frasePedido(jp, ak)) + '.<br>Você quer pedir de novo?',
+        [{ txt: 'Não', valor: null }, { txt: 'Pedir de novo', valor: 1, cor: 1 }]).then(function (r) {
+          if (r) { b.dataset.confirmado = '1'; b.click(); }
+        });
+      return;
+    }
+  }
   if (k === 'pedir') {
+    delete b.dataset.confirmado;
     var fp = b.closest('.form-ped'), val = function (n) { var x = fp.querySelector('[data-f="' + n + '"]'); return x ? x.value : ''; };
     b.disabled = true; b.textContent = 'Enviando…';
     post({ action: 'docPedir', id: id, acao: b.getAttribute('data-k') === 'enviar' ? 'enviar' : 'imprimir',
