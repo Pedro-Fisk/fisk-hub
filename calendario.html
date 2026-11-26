@@ -152,11 +152,18 @@
   .couns:hover{ border-color: var(--ui, #3c6e98); background: var(--ui-soft, #e9eff5); }
   /* a anotação direto para o counseling (Pedro, 26/11/2026) */
   .gav .al{ flex-wrap: wrap; }
-  .gav .al .anot{ flex: 1 1 100%; display: flex; gap: .45rem; align-items: center; margin-top: .1rem; }
-  .gav .al .anot input{ flex: 1; min-width: 0; border: 1.5px solid var(--cal-linha); border-radius: 10px; padding: .45rem .65rem; font: inherit; font-size: .86rem;
-                        background: var(--white); color: inherit; }
-  .gav .al .anot input:focus{ outline: none; border-color: var(--g-cor, var(--ui, #3c6e98)); }
-  .gav .al .anot .vai{ font-family: inherit; font-weight: 800; font-size: .76rem; border: 0; border-radius: 99px; padding: .45rem .85rem; cursor: pointer; white-space: nowrap;
+  /* recolhível como na chamada kids da Minha aula (.ak-nota / .ak-obs, Pedro, 26/11/2026) */
+  .gav .al .anot-tg{ flex: 1 1 100%; display: flex; align-items: center; gap: .4rem; background: none; border: 0; padding: 0; margin-top: .1rem;
+                     color: #64748b; font-weight: 800; font-size: .84rem; cursor: pointer; font-family: inherit; text-align: left; }
+  .gav .al .anot-tg:hover{ color: var(--g-cor, #1d4ed8); }
+  .gav .al .anot-tg.tem{ color: #15803d; }
+  .gav .al .anot{ flex: 1 1 100%; background: #fffbea; border: 2px solid #fde68a; border-radius: 14px; padding: .6rem; margin-top: .35rem; }
+  .gav .al .anot[hidden]{ display: none; }
+  body.theme-dark .gav .al .anot{ background: #2c2611; border-color: #6b5a1d; }
+  .gav .al .anot textarea{ width: 100%; min-height: 70px; box-sizing: border-box; border: 1.5px solid #f3d27a; border-radius: 10px; padding: .5rem .6rem;
+                           font: inherit; font-size: .9rem; resize: vertical; background: var(--white); color: inherit; }
+  .gav .al .anot textarea:focus{ outline: none; border-color: #b45309; }
+  .gav .al .anot .vai{ margin-top: .45rem; font-family: inherit; font-weight: 900; font-size: .84rem; border: 0; border-radius: 10px; padding: .48rem .9rem; cursor: pointer;
                        background: var(--g-cor, var(--ui, #3c6e98)); color: #fff; }
   .gav .al .anot .vai:disabled{ opacity: .45; cursor: default; }
   .gav .al .anot-ok{ flex: 1 1 100%; font-size: .78rem; font-weight: 700; color: #15803d; }
@@ -662,7 +669,8 @@ function abreGaveta(k) {
         (a.book ? '<span class="lv">' + esc(a.book) + '</span>' : '') +
         (Number(a.aulasAtraso) >= 4 ? '<span class="atr">' + a.aulasAtraso + ' aulas atrás</span>' : '') +
         /* a anotação vai direto para o counseling (Pedro, 26/11/2026): no lugar do botão que só abria o documento */
-        '<div class="anot"><input type="text" maxlength="600" data-anot="' + k + '|' + t.alunos.indexOf(a) + '" placeholder="Anotação sobre ' + esc(String(nome).split(' ')[0]) + '…" aria-label="Anotação para o counseling de ' + nome + '">' +
+        '<button type="button" class="anot-tg" data-anottg aria-expanded="false">📝 Anotações sobre o aluno</button>' +
+        '<div class="anot" hidden><textarea maxlength="600" data-anot="' + k + '|' + t.alunos.indexOf(a) + '" placeholder="O que anotar sobre ' + esc(String(nome).split(' ')[0]) + '?" aria-label="Anotação para o counseling de ' + nome + '"></textarea>' +
         '<button type="button" class="vai" data-anotvai="' + k + '|' + t.alunos.indexOf(a) + '" disabled>📝 Anotar no counseling</button></div></li>';
     }).join('') + '</ul></div>' +
       '<div class="bloco"><b class="tit">📊 Radar da turma</b><div id="gavRadar"><p class="rg-esp">Montando o radar da turma…</p></div></div>';
@@ -757,10 +765,16 @@ document.addEventListener('click', function (ev) {
   if (fx && agLigado()) { agBalaoNovo({ data: fx, diaInteiro: true }, ev.target); return; }
   /* ANOTAR NO COUNSELING (Pedro, 26/11/2026): a anotação vai como observação no e-counseling do aluno (origem manual,
      a mesma do Buddy), pela fiskCounseling do kit, que confere a pasta antes de escrever */
+  var tg = ev.target.closest('[data-anottg]');
+  if (tg) {
+    var pn = tg.parentNode.querySelector('.anot'); pn.hidden = !pn.hidden; tg.setAttribute('aria-expanded', String(!pn.hidden));
+    if (!pn.hidden) pn.querySelector('textarea').focus();
+    return;
+  }
   var av = ev.target.closest('[data-anotvai]');
   if (av) {
     var pa = av.dataset.anotvai.split('|'), exa = EVS[+pa[0]], ta = exa && exa.e.turma, aa = ta && ta.alunos[+pa[1]]; if (!aa) return;
-    var inp = av.parentNode.querySelector('input'), txt = inp.value.trim(); if (!txt) return;
+    var inp = av.parentNode.querySelector('textarea'), txt = inp.value.trim(); if (!txt) return;
     var linhaA = av.closest('.al'), velho = linhaA.querySelector('.anot-ok'); if (velho) velho.remove();
     var ctxA = { escola: ta.escola, professor: ta.prof, turma: ta.tituloInteiro || ta.titulo, aluno: String(aa.nome).replace(/\([^)]*\)/g, '').trim(), estagio: aa.book || '' };
     av.disabled = true; inp.disabled = true; av.textContent = 'Anotando…';
@@ -769,11 +783,12 @@ document.addEventListener('click', function (ev) {
       if (ok) {
         m.innerHTML = '✓ Anotado no counseling' + (j.docUrl ? ' · <a href="' + esc(j.docUrl) + '" target="_blank" rel="noopener">abrir o documento</a>' : '');
         inp.value = ''; av.textContent = '📝 Anotar no counseling'; av.disabled = true;
+        var tgA = linhaA.querySelector('.anot-tg'); if (tgA) { tgA.classList.add('tem'); tgA.textContent = '📝 Anotações sobre o aluno · ✓ anotado'; }
       } else {
         m.textContent = '⚠️ Não anotei: ' + ((j && (j.erro || j.error)) || 'sem resposta do servidor') + '. O texto continua no campo.';
         av.textContent = '📝 Anotar no counseling'; av.disabled = false;
       }
-      inp.disabled = false; linhaA.appendChild(m);
+      inp.disabled = false; av.parentNode.appendChild(m);
     });
     return;
   }
@@ -787,7 +802,7 @@ document.addEventListener('input', function (ev) {
 });
 document.addEventListener('keydown', function (ev) {
   var i = ev.target.closest && ev.target.closest('[data-anot]');
-  if (i && ev.key === 'Enter') { ev.preventDefault(); var bt = i.parentNode.querySelector('.vai'); if (bt && !bt.disabled) bt.click(); }
+  if (i && ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) { ev.preventDefault(); var bt = i.parentNode.querySelector('.vai'); if (bt && !bt.disabled) bt.click(); }
 });
 document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') { if (!$('dlg').hidden) return; if (!$('bal').hidden) { agFechaBalao(); return; } gavFecha(); } });
 /* ── LEVAR PARA O GOOGLE AGENDA (26/10/2026, aprovado pelo Pedro) ──────────────────────────────────────────────
