@@ -92,6 +92,8 @@
         'card-tutoria-p':  'Atender, frequência e horários do Centro de Estudos (o Learning Center, o plantão de dúvidas) num lugar só',
         'card-calendario-h2': 'Minha semana',
         'sem-abrir': 'Abrir em tela cheia ↗',
+        'infv-t': 'Informativo do mês',
+        'infv-s': 'Passando sozinho. Para a TV da sala, use "Abrir na TV".',
         'card-calendario-p':  'Suas aulas, plantões, experimentais e aniversários da semana',
         'card-raftemp-h2': 'RAF temporário',
         'card-raftemp-p':  'Código para o aluno sem RAF entrar no portal',
@@ -178,6 +180,8 @@
         'card-tutoria-p':  'Attend, attendance and schedule of the Learning Center (the tutoring sessions), all in one place',
         'card-calendario-h2': 'My week',
         'sem-abrir': 'Open full screen ↗',
+        'infv-t': 'Monthly newsletter',
+        'infv-s': 'Playing by itself. For the classroom TV, use "Abrir na TV".',
         'card-calendario-p':  'Your classes, tutoring shifts, trial classes and birthdays this week',
         'card-raftemp-h2': 'Temporary RAF',
         'card-raftemp-p':  'A code so a student without a RAF can log in to the portal',
@@ -264,6 +268,8 @@
         'card-tutoria-p':  'Atender, asistencia y horarios del Centro de Estudios (el Learning Center, la tutoría) en un solo lugar',
         'card-calendario-h2': 'Mi semana',
         'sem-abrir': 'Abrir en pantalla completa ↗',
+        'infv-t': 'Informativo del mes',
+        'infv-s': 'Pasando solo. Para la TV del aula, usa "Abrir na TV".',
         'card-calendario-p':  'Tus clases, tutorías, clases de prueba y cumpleaños de la semana',
         'card-raftemp-h2': 'RAF temporal',
         'card-raftemp-p':  'Un código para que el alumno sin RAF entre al portal',
@@ -2059,4 +2065,39 @@
   }
   marca();
   new MutationObserver(marca).observe(document.body, { childList: true, subtree: true });
+})();
+
+
+/* ═══ O INFORMATIVO DO MÊS NO TOPO DA HOME (Pedro, 26/11/2026) ═══
+   O carrossel da TV (informativo-tv.html?embed=1) num bloco que abre e fecha como a Minha semana (aberto da primeira
+   vez; a escolha fica por conta, hub:infv:<conta>). O iframe só nasce quando o bloco abre, e o PDF fica guardado no
+   aparelho pela própria página. Sem informativo enviado, a página avisa (fiskInfv: 'vazio') e o bloco some.
+   POR ENQUANTO SÓ PARA A DIREÇÃO vendo o Hub (master ou "ver como"): para abrir a todos, INFV_SO_DIRECAO = false (e o
+   card da prateleira aparece junto). */
+(function () {
+  var INFV_SO_DIRECAO = true;
+  var s = null; try { s = JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) {}
+  if (!s || !s.token) return;
+  if (INFV_SO_DIRECAO && !s.master && !s.viewingAs) return;
+  var card = document.querySelector('a.card-infv'); if (card) card.style.display = '';
+  var sec = document.getElementById('infvHome'), bt = document.getElementById('infvBtn'), corpo = document.getElementById('infvCorpo');
+  if (!sec || !bt || !corpo) return;
+  sec.hidden = false;
+  var CH = 'hub:infv:' + String(s.name || '').replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+  function abre(sim) {
+    try { localStorage.setItem(CH, sim ? '1' : '0'); } catch (e) {}
+    if (sim && !corpo.querySelector('iframe')) {
+      var f = document.createElement('iframe');
+      f.src = 'informativo-tv.html?embed=1'; f.title = 'Informativo do mês'; f.allow = 'fullscreen';
+      corpo.appendChild(f);
+    }
+    bt.setAttribute('aria-expanded', sim ? 'true' : 'false'); corpo.hidden = !sim;
+  }
+  bt.addEventListener('click', function () { abre(bt.getAttribute('aria-expanded') !== 'true'); });
+  window.addEventListener('message', function (ev) {
+    if (ev.origin !== location.origin || !ev.data || ev.data.fiskInfv !== 'vazio') return;
+    var f = corpo.querySelector('iframe'); if (f && ev.source === f.contentWindow) sec.hidden = true;
+  });
+  var guardado = null; try { guardado = localStorage.getItem(CH); } catch (e) {}
+  abre(guardado !== '0');
 })();

@@ -182,3 +182,7 @@
   @media (prefers-reduced-motion:reduce){ .sem-home-corpo.anima{transition:none} }
   .sem-home-corpo iframe{display:block;width:100%;height:min(760px,82vh);border:0;background:transparent}
   .sem-home-corpo .abrir{display:block;text-align:right;font-size:.82rem;font-weight:700;padding:.45rem .9rem;color:var(--ui,#3c6e98)}
+
+/* o informativo do mês no topo da home (26/11/2026): o carrossel em 16:9, no escuro da TV */
+.infv-corpo{background:#0b0e14}
+.infv-corpo iframe{display:block;width:100%;height:auto;aspect-ratio:16/9;border:0;background:#0b0e14}
