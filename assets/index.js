@@ -1320,12 +1320,17 @@
           ? '<a class="bd-img" href="' + esc(a.url) + '" target="_blank" rel="noopener"><img alt="' + esc(a.nome) + '" loading="lazy" src="' + esc(a.mini) + '"></a>'
           : '<a class="bd-arq" href="' + esc(a.url) + '" target="_blank" rel="noopener">📎 ' + esc(a.nome) + '</a>';
       }).join('');
+      /* AS CAPAS ILUSTRADAS (Pedro, 26/11/2026, mock 1 aprovado): cada recado abre com uma capa na cor do tipo e a
+         ilustração dele; o corpo fica embaixo, em branco. Lido, a capa desbota (CSS .lido). */
+      var IC = { dir: '🧑‍🏫', sec: '🎒', nov: '✨', aniv: '🎂' }, ic = m.urgente ? '🚨' : (m.ic || IC[m.tag] || '📣');
       d.innerHTML =
-        '<div class="bd-topo"><span class="bd-tag t-' + m.tag + '">' + esc(m.tag === 'nov' && m.selo ? m.selo : tx(ROT[m.tag])) + '</span>' + (m.urgente ? '<span class="bd-tag t-urg">' + esc(tx('urg')) + '</span>' : '') + '<small>' + ddmm(m.quando) + '</small></div>' +
+        '<div class="bd-capa c-' + (m.urgente ? 'urg' : m.tag) + '"><span class="bd-em" aria-hidden="true">' + ic + '</span>' +
+          '<span class="bd-tag t-' + m.tag + '">' + esc(m.tag === 'nov' && m.selo ? m.selo : tx(ROT[m.tag])) + '</span>' + (m.urgente ? '<span class="bd-tag t-urg">' + esc(tx('urg')) + '</span>' : '') + '<small>' + ddmm(m.quando) + '</small></div>' +
+        '<div class="bd-corpo">' +
         (m.titulo ? '<b class="bd-t">' + m.titulo + '</b>' : '') +
         '<div class="bd-tx">' + m.html + '</div>' + anexos +
         (m.link ? '<a class="bd-ir" href="' + esc(m.link.href) + '">' + m.link.rot + '</a>' : '') +
-        '<label class="bd-ck"><input type="checkbox"' + (m.ciente ? ' checked' : '') + (como() ? ' disabled' : '') + '> ' + esc(tx('ciente')) + '</label>';
+        '<label class="bd-ck"><input type="checkbox"' + (m.ciente ? ' checked' : '') + (como() ? ' disabled' : '') + '> ' + esc(tx('ciente')) + '</label></div>';
       d.querySelector('input').addEventListener('change', function(ev){
         var marcou = ev.target.checked;
         m.ciente = marcou; d.classList.toggle('lido', marcou); conta();
@@ -1566,6 +1571,7 @@
         var pedidos = (ja && ja.ok ? ja.avisos || [] : []).filter(function(a){ return (a.tipo === 'impressao' || a.tipo === 'transferencia' || a.tipo === 'matricula' || a.tipo === 'experimental' || a.tipo === 'exp_fechou') && a.quando >= corte; }).map(function(a){
           /* transferência de aluno entre turmas, aluno novo matriculado pelo portal e aula experimental na turma (Portal da Secretaria, 23/10/2026): recado sem link */
           return { id: 'av|' + a.id, avId: a.id, aviso: true, quando: a.quando, tag: 'sec', titulo: esc(a.titulo),
+                   ic: { impressao: '🖨️', transferencia: '🔁', matricula: '🎒', experimental: '🧪', exp_fechou: '🎉' }[a.tipo] || '',
                    html: a.texto ? '<p>' + texto(a.texto) + '</p>' : '', anexos: [], link: a.tipo === 'impressao' ? { href: 'imprimir.html#meus', rot: '📬 Ver meus pedidos' } : null, ciente: !!a.lido };
         });
         tutoria(); aniversarios();
