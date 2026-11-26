@@ -332,6 +332,19 @@
    como toda ferramenta da home: o "Abrir na Minha aula" abre a turma ao lado e o Hub fica atrás (Pedro, 27/10/2026). */
 var EMBED = /[?&]embed=1/.test(location.search);
 if (EMBED) { document.body.classList.add('embed'); var bse = document.createElement('base'); bse.target = '_blank'; document.head.appendChild(bse); }
+/* A ALTURA DO CONTEÚDO PARA A HOME (Pedro, 26/11/2026: o cinza vazio acima do rodapé). Embutida, a página conta à home
+   quanto o calendário mede, e a moldura acompanha; a home limita a 90% da tela (o resto rola aqui dentro). */
+if (EMBED && window.parent !== window) {
+  var _altEnviada = 0;
+  var avisaAltura = function () {
+    var m = document.querySelector('main'); if (!m) return;
+    var h = Math.ceil(m.getBoundingClientRect().bottom + window.scrollY + 4);
+    if (Math.abs(h - _altEnviada) < 3) return; _altEnviada = h;
+    try { window.parent.postMessage({ fiskCalAltura: h }, location.origin); } catch (e) {}
+  };
+  if (window.ResizeObserver) document.addEventListener('DOMContentLoaded', function () { var m = document.querySelector('main'); if (m) new ResizeObserver(avisaAltura).observe(m); });
+  window.addEventListener('load', avisaAltura);
+}
 </script>
 
 <header class="hero">
@@ -899,7 +912,8 @@ function irParaDia(novo, dir, seg) {
     desenhar();
   }
   var calmo = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (!celular() || !dir || calmo || _carrossel) { g.style.transition = ''; g.style.transform = ''; aplica(); return; }
+  /* desde 26/11/2026 (Pedro) também no computador: as setas e o "Hoje" passam a semana deslizando, como um carrossel */
+  if (!dir || calmo || _carrossel) { g.style.transition = ''; g.style.transform = ''; aplica(); return; }
   _carrossel = true;
   var w = g.offsetWidth + 24;
   g.style.transition = 'transform .2s cubic-bezier(.4,0,1,1), opacity .2s'; g.style.transform = 'translateX(' + (-dir * w) + 'px)'; g.style.opacity = '.4';
