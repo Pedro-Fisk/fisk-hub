@@ -822,6 +822,17 @@ body.theme-dark .prat-t{ color:#e4e7ec; border-bottom-color:#344054; }
 .bd-n{ margin-left:auto; min-width:24px; height:24px; padding:0 7px; border-radius:99px; background:#22c55e; color:#fff; font-size:.8rem; font-weight:800;
   line-height:24px; text-align:center; } .bd-n[hidden]{ display:none; }
 .bd-n + .av-fecha{ margin-left:.5rem; }
+/* MINIMIZAR (Pedro, 26/11/2026): o "_" ao lado do número; minimizada, fica só a faixa roxa. No celular a Central é a
+   gaveta da bolinha 📣, que já abre e fecha, e o botão não aparece. */
+.bd-min{ margin-left:auto; flex:none; width:34px; height:34px; border-radius:10px; border:1.5px solid rgba(255,255,255,.45); background:rgba(255,255,255,.14);
+  color:#fff; font:900 1.15rem/1 var(--font-body); cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0 0 .35rem; }
+.bd-min:hover{ background:rgba(255,255,255,.28); }
+.bd-min:focus-visible{ outline:2px solid #fff; outline-offset:2px; }
+.bd-n:not([hidden]) + .bd-min{ margin-left:.55rem; }
+.avisos.minimizada .bd-chat{ display:none; }
+.avisos.minimizada .bd-janela{ flex:none; }
+.avisos.minimizada .bd-min{ padding:0; font-size:1rem; }
+@media (max-width: 1180px){ .bd-min{ display:none; } }
 
 .bd-foto{ position:relative; width:44px; height:44px; border-radius:50%; background:#fff; flex:none; box-shadow:0 0 0 3px rgba(255,255,255,.4); }
 .bd-foto .rosto, .av-sino .rosto{ display:block; width:100%; height:100%; border-radius:50%; overflow:hidden; }
