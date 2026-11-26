@@ -182,3 +182,15 @@
   @media (prefers-reduced-motion:reduce){ .sem-home-corpo.anima{transition:none} }
   .sem-home-corpo iframe{display:block;width:100%;height:min(760px,82vh);border:0;background:transparent}
   .sem-home-corpo .abrir{display:block;text-align:right;font-size:.82rem;font-weight:700;padding:.45rem .9rem;color:var(--ui,#3c6e98)}
+
+/* ── A ESCALA DE FONTES DA HOME (Pedro, 26/11/2026: "a irregularidade do tamanho das fontes") ──
+   Eram dezesseis tamanhos em vinte e um textos (de 10,2 a 21,25 px). Ficam quatro, no computador; o celular segue com
+   a escala própria (style.css, até 640 px). O !important vence os tamanhos escritos no HTML da faixa da pesquisa.
+     SEÇÃO 1.25rem (Poppins) · TÍTULO 1.1rem (Poppins) · TEXTO .88rem (Nunito) · MIÚDO .78rem (Nunito, negrito) */
+:root{ --fs-sec:1.25rem; --fs-tit:1.1rem; --fs-tx:.88rem; --fs-mini:.78rem; }
+@media (min-width: 641px){
+  .prat-t, #bdNome, .links-title{ font-size:var(--fs-sec) !important; }
+  main.grid a.card h2, .bd-t, .tt-cab > span, .fwh-t b, #avInterna b{ font-size:var(--fs-tit) !important; line-height:1.28; }
+  main.grid a.card p, .bd-tx, .bd-tx p, .bd-tx li, #avInterna > span > span:not(:last-child), .link-chip, .tt-card .av-vazio, .tt-it, .an-it, .tt-card a{ font-size:var(--fs-tx) !important; }
+  .bd-tag, .bd-capa small, .bd-topo small, .bd-ck, .tt-cab small, .fwh-tag, #avInterna > span > span:last-child{ font-size:var(--fs-mini) !important; }
+}

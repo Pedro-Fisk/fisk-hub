@@ -1289,6 +1289,11 @@
       }
       if (a.tipo === 'matricula' && (m = /^Começa em (\d{2}\/\d{2})(?:\/\d{4})?/.exec(x))) x = 'Começa em ' + m[1] + '.' + (/A pasta ainda não foi criada/.test(x) ? ' A pasta ainda não foi criada.' : '');
       if (a.tipo === 'transferencia' && (m = /^Veio da turma (.+?) \(([^)]+)\), transferido/.exec(x))) { var c2 = turmaCurta(m[1]); x = 'Veio da turma de ' + (c2 || m[1]) + ' (' + m[2] + ').'; }
+      /* a aula experimental (Pedro, 26/11/2026): "Aula experimental na turma de 4ª 13h45: Nome" e "Em 02/12, às 13h45." */
+      if (a.tipo === 'experimental' && !/^Aula experimental na turma de (\d|Dom|Sáb)/.test(t) && (m = /^Aula experimental na turma (.+): ([^:]+)$/.exec(t))) {
+        var c3 = turmaCurta(m[1]); if (c3) t = 'Aula experimental na turma de ' + c3 + ': ' + m[2];
+      }
+      if (a.tipo === 'experimental' && (m = /^Em (\d{2}\/\d{2})(?:\/\d{4})?, às ([0-9h:]+)/.exec(x))) x = 'Em ' + m[1] + ', às ' + m[2] + '.';
       return { titulo: t, texto: x };
     }
     function doInforme(i){
