@@ -2134,9 +2134,13 @@
    card da prateleira aparece junto). */
 (function () {
   var INFV_SO_DIRECAO = true;
+  /* professores que já veem antes de abrir a todos, pelo nome da sessão (vazio: só a direção) */
+  var INFV_LIBERADOS = [];
   var s = null; try { s = JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) {}
   if (!s || !s.token) return;
-  if (INFV_SO_DIRECAO && !s.master && !s.viewingAs) return;
+  var npI = function (v) { return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); };
+  var liberado = INFV_LIBERADOS.some(function (n) { return npI(s.name) === npI(n); });
+  if (INFV_SO_DIRECAO && !s.master && !s.viewingAs && !liberado) return;
   var card = document.querySelector('a.card-infv'); if (card) card.style.display = '';
   var sec = document.getElementById('infvHome'), bt = document.getElementById('infvBtn'), corpo = document.getElementById('infvCorpo');
   if (!sec || !bt || !corpo) return;
@@ -2150,8 +2154,13 @@
   function abre(sim) {
     try { localStorage.setItem(CH, sim ? '1' : '0'); } catch (e) {}
     if (sim && !corpo.querySelector('iframe')) {
+      /* O PDF tem uns 23 MB e leva de 15 s em diante na primeira vez: sem isto o bloco abria vazio, só o título, e
+         parecia que não tinha nada (Pedro, 26/11/2026: "Não apareceu"). Agora gira no tamanho do carrossel. */
+      if (!corpo.querySelector('.infv-carrega')) corpo.innerHTML = '<div class="infv-carrega" role="status"><span class="infv-giro" aria-hidden="true"></span><span>Carregando o informativo do mês...</span></div>';
       pronto.then(function (j) {
-        if ((j && j.vazio) || corpo.querySelector('iframe') || bt.getAttribute('aria-expanded') !== 'true') return;
+        if (j && j.vazio) { sec.hidden = true; return; }
+        if (corpo.querySelector('iframe') || bt.getAttribute('aria-expanded') !== 'true') return;
+        corpo.innerHTML = '';
         var f = document.createElement('iframe');
         f.src = 'informativo-tv.html?embed=1'; f.title = 'Informativo do mês'; f.allow = 'fullscreen';
         corpo.appendChild(f);
