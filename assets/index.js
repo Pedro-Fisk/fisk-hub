@@ -43,6 +43,10 @@
         'prat-aula': 'Em aula', 'prat-docs': 'Documentos', 'prat-outras': 'Outras ferramentas',
         'card-planner-p':  'Crie o PPT / Planner do aluno com as datas corretas',
         'card-infv-h2': 'Informativo do mês na TV',
+        'card-conv-semana-h2': 'Conversação da semana',
+        'card-conv-semana-p': 'As atividades comunicativas desta semana, com os cliques do PowerPoint, direto na TV da sala',
+        'card-apres-h2': 'O que passou na TV',
+        'card-apres-p': 'Que conversação e que informativo cada professor abriu, em que turma e quanto tempo em tela cheia',
         'card-infv-p':  'O informativo da escola passando sozinho, slide por slide, para deixar na TV da sala',
         'card-conv-h2':    'Conversation Maker',
         'card-conv-p':     'Crie conversações completas em powerpoint, prontas para usar',
@@ -132,6 +136,10 @@
         'prat-aula': 'In class', 'prat-docs': 'Documents', 'prat-outras': 'Other tools',
         'card-planner-p':  'Create student planners with the correct dates',
         'card-infv-h2': 'Monthly newsletter on the TV',
+        'card-conv-semana-h2': "This week's conversation",
+        'card-conv-semana-p': "This week's communicative activities, with the PowerPoint clicks, straight on the classroom TV",
+        'card-apres-h2': 'What played on the TV',
+        'card-apres-p': 'Which conversation and newsletter each teacher opened, in which class and how long in full screen',
         'card-infv-p':  'The school newsletter playing by itself, slide by slide, to leave on the classroom TV',
         'card-conv-h2':    'Conversation Maker',
         'card-conv-p':     'Generate full conversation PowerPoints, ready to use',
@@ -221,6 +229,10 @@
         'prat-aula': 'En clase', 'prat-docs': 'Documentos', 'prat-outras': 'Otras herramientas',
         'card-planner-p':  'Crea planners del alumno con las fechas correctas',
         'card-infv-h2': 'Informativo del mes en la TV',
+        'card-conv-semana-h2': 'Conversación de la semana',
+        'card-conv-semana-p': 'Las actividades comunicativas de esta semana, con los clics del PowerPoint, directo en la TV del aula',
+        'card-apres-h2': 'Lo que pasó en la TV',
+        'card-apres-p': 'Qué conversación e informativo abrió cada profesor, en qué grupo y cuánto tiempo en pantalla completa',
         'card-infv-p':  'El informativo de la escuela pasando solo, diapositiva por diapositiva, para dejar en la TV del aula',
         'card-conv-h2':    'Conversation Maker',
         'card-conv-p':     'Genera conversaciones completas en PowerPoint, listas para usar',
@@ -2142,6 +2154,13 @@
   var liberado = INFV_LIBERADOS.some(function (n) { return npI(s.name) === npI(n); });
   if (INFV_SO_DIRECAO && !s.master && !s.viewingAs && !liberado) return;
   var card = document.querySelector('a.card-infv'); if (card) card.style.display = '';
+  /* a conversação da semana (27/11/2026): por enquanto o mesmo portão do informativo; o registro só para a direção */
+  var cConv = document.querySelector('a.card-conv'); if (cConv) cConv.style.display = '';
+  var cApres = document.querySelector('a.card-apres'); if (cApres && s.master) cApres.style.display = '';
+  /* e a semana de conversação desce sozinha, em segundo plano, 20 s depois de a home abrir (fiskConvBaixarSemana, no kit) */
+  setTimeout(function () { if (typeof fiskConvBaixarSemana === 'function') fiskConvBaixarSemana(); }, 20000);
+  /* e a TV do informativo abre sem internet: a página e o leitor ficam guardados (o PDF já desceu na tela de carregamento) */
+  setTimeout(function () { if (typeof fiskGuardarPaginaOffline === 'function') fiskGuardarPaginaOffline('informativo-tv.html'); }, 25000);
   var sec = document.getElementById('infvHome'), bt = document.getElementById('infvBtn'), corpo = document.getElementById('infvCorpo');
   if (!sec || !bt || !corpo) return;
   sec.hidden = false;

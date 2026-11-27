@@ -4,163 +4,458 @@
 <meta charset="UTF-8">
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Conversação na TV, FISK</title>
+<title>Conversação da semana, FISK</title>
 <meta name="theme-color" content="#000000">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/fisk-shared.css?v=f12a68d93f">
+<script src="assets/fisk-shared.js?v=cc9b8d2bd3"></script>
 <style>
-  /* A CONVERSAÇÃO NA TV (protótipo, Pedro, 26/11/2026). Os slides de conversação do início da aula, tocados dentro do
-     Hub, com as revelações por clique do PowerPoint (aparecer e esmaecer, os dois únicos efeitos que as atividades
-     usam). Cada clique do professor (mouse, seta, espaço ou o passador de slides) mostra o próximo estágio.
-     O slide foi exportado estágio por estágio (Keynote, "todas as etapas"), e cada estágio é uma imagem 1920×1080:
-     o que se vê é o que o PowerPoint mostraria naquele clique.
-     ⚠️ O Keynote exporta DUAS vezes a etapa de partida de slides cuja única animação é um esmaecido (no Babies, as
-     quatro perguntas do jogo: o professor clicava duas vezes até a bolinha verde). A conversão tira o estágio
-     idêntico ao anterior (Pedro, 26/11/2026).
-     OFFLINE: "Deixar disponível offline" guarda a página e as imagens no navegador deste computador
-     (sw-conversa.js); depois ela abre sem internet, pelo mesmo endereço. */
-  html, body{ margin: 0; height: 100%; background: #000; color: #fff; overflow: hidden; font-family: var(--font-body, system-ui, sans-serif); }
+  /* A CONVERSAÇÃO DA SEMANA NA TV (Pedro, 27/11/2026; fase 1, protótipo aprovado em 26/11).
+     Sem ?id: a lista das atividades da pasta da semana (backend ConversaSemana.js), por idioma.
+     Com ?id: o tocador. PDF passa página a página; PowerPoint passa pela versão "de cliques" (uma página por clique,
+     feita pelo conversor do Mac, fisk-hub/scripts/conversa/converter.py), então cada clique, seta, espaço ou o
+     passador de slides mostra o próximo passo, como no PowerPoint.
+     OFFLINE: "Deixar a semana offline" guarda a página, o leitor de PDF e as atividades da semana neste computador
+     (sw-conversa.js + Cache Storage 'fisk-conversa-v1'); depois o mesmo endereço abre sem internet.
+     CONTROLE DA DIREÇÃO: cada atividade aberta vira uma linha no registro (fiskApresentacao, no kit): turma da hora,
+     semana certa ou não, tempo aberto, tempo em TELA CHEIA e até que clique foi. */
+  html, body{ margin: 0; min-height: 100%; background: #eef2f7; color: #1e293b; font-family: var(--font-body, system-ui, sans-serif); }
+  body.theme-dark{ background: #0f141d; color: #dbe6f3; }
   [hidden]{ display: none !important; }
-  #palco{ position: fixed; inset: 0; background: #000; cursor: pointer; }
+  :root{ --verde: #31A889; --verde2: #23866d; }
+  /* a lista (mock 3 com o topo do mock 4, aprovados em 27/11/2026; estética da Central de Informes) */
+  #lista{ max-width: 1240px; margin: 0 auto; padding: 1.2rem 1.2rem 3rem; }
+  .volta{ display: inline-block; margin: 0 0 .7rem; color: #1d4ed8; font-weight: 800; text-decoration: none; }
+  body.theme-dark .volta{ color: #93c5fd; }
+  .jan{ background: #fff; border-radius: 22px; box-shadow: 0 12px 32px rgba(30,41,59,.14); overflow: hidden; }
+  body.theme-dark .jan{ background: #182131; }
+  .cab{ background: linear-gradient(120deg, #2563eb, #7c3aed); color: #fff; padding: 1.1rem 1.3rem 1.2rem; position: relative; overflow: hidden; }
+  .cab::after{ content: ""; position: absolute; right: -60px; top: -80px; width: 260px; height: 260px; border-radius: 50%; background: rgba(255,255,255,.12); pointer-events: none; }
+  .cab-l{ display: flex; align-items: center; gap: .8rem; position: relative; z-index: 1; }
+  .cab h1{ font: 800 1.6rem var(--font-heading, inherit); margin: 0; flex: 1; }
+  .pill{ font: 800 .9rem var(--font-body, inherit); background: rgba(255,255,255,.18); border: 1.5px solid rgba(255,255,255,.35); color: #fff; border-radius: 99px; padding: .5rem .95rem; cursor: pointer; }
+  .pill:hover{ background: rgba(255,255,255,.28); }
+  .sems{ display: grid; grid-template-columns: 1fr 1.5fr 1fr 1fr; gap: .6rem; margin-top: .9rem; position: relative; z-index: 1; }
+  .sem{ text-align: left; background: rgba(255,255,255,.16); color: #fff; border: 1.5px solid rgba(255,255,255,.35); border-radius: 16px; padding: .65rem .9rem; cursor: pointer; font: inherit; min-width: 0; }
+  .sem:hover{ background: rgba(255,255,255,.26); }
+  .sem b{ display: block; font: 800 .98rem var(--font-heading, inherit); }
+  .sem span{ display: block; font-weight: 800; font-size: .8rem; opacity: .9; }
+  .sem small{ display: block; font-weight: 700; font-size: .75rem; opacity: .8; margin-top: .2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sem.on{ background: #fff; color: #4c1d95; border-color: #fff; }
+  .sem.on b{ font-size: 1.15rem; }
+  .sem.vazia{ visibility: hidden; }
+  .corpo{ background: #f1f5f9; padding: 1.1rem 1.2rem 1.4rem; }
+  body.theme-dark .corpo{ background: #111827; }
+  .agora{ display: flex; align-items: center; gap: .8rem; background: #fff; border-radius: 16px; padding: .75rem 1rem; margin-bottom: 1rem; border: 1px solid #e2e8f0; font-weight: 800; flex-wrap: wrap; }
+  body.theme-dark .agora{ background: #1f2937; border-color: #334155; }
+  .agora .em{ font-size: 1.7rem; }
+  .agora small{ display: block; color: #64748b; font-weight: 700; }
+  .agora .ok{ margin-left: auto; color: var(--verde2); background: #e3f4ef; border-radius: 99px; padding: .35rem .8rem; font-size: .85rem; cursor: pointer; border: 0; font-weight: 800; font-family: inherit; }
+  .agora .ok.nao{ color: #92400e; background: #fef3c7; }
+  .aviso-sem{ background: #fef3c7; color: #92400e; border-radius: 12px; padding: .55rem .9rem; font-weight: 800; margin-bottom: .9rem; }
+  h3.sub{ font: 800 1.05rem var(--font-heading, inherit); margin: 1.3rem 0 .7rem; }
+  .tabs{ display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: .9rem; }
+  .tabs button{ font: 800 .9rem var(--font-body, inherit); padding: .5rem .9rem; border-radius: 99px; background: #fff; border: 1px solid #e2e8f0; color: inherit; cursor: pointer; }
+  .tabs button.on{ background: #1e293b; color: #fff; border-color: #1e293b; }
+  body.theme-dark .tabs button{ background: #1f2937; border-color: #334155; }
+  .grade{ display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+  /* o cartão de uma atividade */
+  .rec{ position: relative; background: #fff; border-radius: 18px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(15,23,42,.06); display: flex; flex-direction: column; }
+  body.theme-dark .rec{ background: #1f2937; border-color: #334155; }
+  .rec.hl{ border: 3px solid var(--verde); box-shadow: 0 10px 24px rgba(49,168,137,.25); margin-top: 1.1rem; }
+  .rec .flag{ position: absolute; top: -1.15rem; left: 14px; background: var(--verde); color: #fff; font-weight: 900; font-size: .8rem; border-radius: 10px 10px 0 0; padding: .25rem .8rem; }
+  .capa{ display: flex; align-items: center; gap: .6rem; padding: .55rem .9rem; color: #fff; position: relative; overflow: hidden; font-weight: 900; font-size: .8rem; letter-spacing: .05em; border-radius: 17px 17px 0 0; }
+  .rec.hl .capa{ border-radius: 15px 15px 0 0; }
+  .capa::after{ content: ""; position: absolute; right: -26px; bottom: -40px; width: 110px; height: 110px; border-radius: 50%; background: rgba(255,255,255,.14); }
+  .capa .e{ font-size: 1.3rem; }
+  .capa .tg{ background: rgba(255,255,255,.22); border-radius: 99px; padding: .15rem .6rem; }
+  .capa .pf{ margin-left: auto; background: #fff; color: #1e293b; border-radius: 99px; padding: .15rem .6rem; font-size: .75rem; position: relative; z-index: 1; }
+  .n-Basic{ background: linear-gradient(120deg, #0ea5e9, #2563eb); }
+  .n-Intermediate{ background: linear-gradient(120deg, #8b5cf6, #6d28d9); }
+  .n-Advanced{ background: linear-gradient(120deg, #f97316, #dc2626); }
+  .n-Teens{ background: linear-gradient(120deg, #f59e0b, #ea580c); }
+  .n-Todos, .n-{ background: linear-gradient(120deg, #64748b, #334155); }
+  .th{ position: relative; aspect-ratio: 16/9; background: #0b0e14; cursor: pointer; overflow: hidden; }
+  .th canvas{ width: 100%; height: 100%; display: block; object-fit: contain; }
+  .th .carrega{ position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #cbd5e1; font-weight: 800; font-size: .85rem; gap: .5rem; }
+  .th .carrega i{ width: 16px; height: 16px; border-radius: 50%; border: 3px solid rgba(255,255,255,.25); border-top-color: var(--verde); animation: gira .8s linear infinite; }
+  .th .l, .th .r{ position: absolute; top: 0; bottom: 0; width: 20%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 2rem; font-weight: 900; opacity: 0; transition: opacity .2s; }
+  .th .l{ left: 0; background: linear-gradient(90deg, rgba(0,0,0,.5), transparent); }
+  .th .r{ right: 0; background: linear-gradient(270deg, rgba(0,0,0,.5), transparent); }
+  .th:hover .l, .th:hover .r{ opacity: 1; }
+  .th .cnt{ position: absolute; right: 8px; bottom: 8px; background: rgba(15,23,42,.75); color: #fff; font-weight: 800; font-size: .75rem; border-radius: 99px; padding: .15rem .55rem; }
+  .inf{ padding: .7rem .9rem .8rem; display: flex; flex-direction: column; gap: .55rem; flex: 1; }
+  .inf b{ font: 800 1rem var(--font-heading, inherit); line-height: 1.25; }
+  .rod{ display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; margin-top: auto; }
+  .bt{ font: 900 .9rem var(--font-body, inherit); border: 0; border-radius: 12px; padding: .55rem .9rem; background: linear-gradient(120deg, var(--verde), var(--verde2)); color: #fff; cursor: pointer; }
+  .bt2{ font: 800 .85rem var(--font-body, inherit); border: 1.5px solid #cbd5e1; border-radius: 12px; padding: .5rem .8rem; background: #fff; color: #334155; cursor: pointer; }
+  body.theme-dark .bt2{ background: #182131; color: #dbe6f3; border-color: #334155; }
+  .rod .off{ margin-left: auto; color: var(--verde2); font-weight: 800; font-size: .78rem; }
+  .rod .prep{ margin-left: auto; color: #b45309; font-weight: 800; font-size: .78rem; }
+  /* o destaque: a atividade da turma de agora, na largura inteira */
+  .rec.dest{ display: grid; grid-template-columns: 1.55fr 1fr; }
+  .rec.dest .capa{ grid-column: 1 / -1; padding: .75rem 1.1rem; font-size: .9rem; }
+  .rec.dest .th{ border-radius: 0 0 0 15px; }
+  .rec.dest .inf{ padding: 1.1rem 1.2rem; gap: .8rem; }
+  .rec.dest .inf b{ font-size: 1.45rem; }
+  .rec.dest .bt{ font-size: 1.1rem; padding: .85rem 1.2rem; }
+  .rec.dest .dica{ color: #64748b; font-weight: 700; font-size: .85rem; }
+  @media (max-width: 820px){ .rec.dest{ grid-template-columns: 1fr; } .rec.dest .th{ border-radius: 0; } .sems{ grid-template-columns: 1fr 1fr; } }
+  /* todas as semanas */
+  #pastas{ position: fixed; inset: 0; background: rgba(15,23,42,.55); z-index: 20; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+  #pastas .cx2{ background: #fff; color: #1e293b; border-radius: 20px; max-width: 520px; width: 100%; max-height: 80vh; overflow: auto; padding: 1.1rem 1.2rem; }
+  #pastas h4{ margin: .8rem 0 .3rem; font: 800 .95rem var(--font-heading, inherit); }
+  #pastas button.w{ display: block; width: 100%; text-align: left; font: 700 .95rem var(--font-body, inherit); border: 0; background: #f1f5f9; border-radius: 10px; padding: .5rem .7rem; margin: .25rem 0; cursor: pointer; }
+  #pastas button.w.on{ background: #ede9fe; color: #4c1d95; font-weight: 900; }
+  .espera{ display: inline-flex; align-items: center; gap: .6rem; font-weight: 700; }
+  .espera i{ width: 18px; height: 18px; border-radius: 50%; border: 3px solid rgba(100,116,139,.3); border-top-color: var(--verde); animation: gira .8s linear infinite; }
+  @keyframes gira{ to{ transform: rotate(360deg); } }
+  .erro{ color: #dc2626; font-weight: 700; }
+  #tocador{ position: fixed; inset: 0; background: #000; }
+  #palco{ position: absolute; inset: 0; cursor: pointer; }
   #palco img{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; transition: opacity .45s ease-in-out; }
   #palco img.on{ opacity: 1; }
   body.esconde-cursor, body.esconde-cursor *{ cursor: none !important; }
-
   #barra{ position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); display: flex; align-items: center; gap: .55rem; padding: .5rem .7rem;
           background: rgba(15,15,20,.8); border: 1px solid rgba(255,255,255,.16); border-radius: 16px; backdrop-filter: blur(8px);
           opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 5; font-size: .9rem; white-space: nowrap; }
   body.mostra #barra{ opacity: 1; pointer-events: auto; }
-  #barra button{ font: inherit; font-weight: 800; color: #fff; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
-          border-radius: 10px; padding: .4rem .7rem; cursor: pointer; }
+  #barra button{ font: inherit; font-weight: 800; color: #fff; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); border-radius: 10px; padding: .4rem .7rem; cursor: pointer; }
   #barra button:hover{ background: rgba(255,255,255,.2); }
   #barra .n{ min-width: 6.5rem; text-align: center; font-weight: 800; opacity: .85; }
   #barra .sep{ width: 1px; align-self: stretch; background: rgba(255,255,255,.18); }
-  #prog{ position: fixed; left: 0; bottom: 0; height: 4px; width: 0; background: linear-gradient(90deg, #16a34a, #4ade80); z-index: 4; opacity: .8; transition: width .3s; }
-
-  #capa{ position: fixed; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center; padding: 1.5rem;
-         background: radial-gradient(120% 120% at 50% 0%, #1c2433 0%, #0b0e14 70%); }
-  .cx{ max-width: 600px; width: 100%; text-align: center; }
-  .cx img.logo{ height: 46px; margin-bottom: 1.1rem; }
-  .cx h1{ text-align: center; font-family: var(--font-heading, inherit); font-size: 1.9rem; margin: 0 0 .3rem; }
-  .cx .sub{ text-align: center; color: #94a3b8; font-weight: 700; margin: 0 0 1.1rem; }
-  .cx .capinha{ width: 100%; max-width: 440px; aspect-ratio: 16/9; object-fit: cover; border-radius: 14px; border: 1px solid rgba(255,255,255,.15); box-shadow: 0 18px 40px rgba(0,0,0,.45); }
-  .comeca{ display: inline-flex; align-items: center; gap: .6rem; margin-top: 1.4rem; font: 900 1.25rem var(--font-heading, inherit); color: #fff;
-           background: linear-gradient(120deg, #22c55e, #15803d); border: 0; border-radius: 18px; padding: 1rem 1.8rem; cursor: pointer;
-           box-shadow: 0 14px 34px rgba(22,163,74,.4); transition: transform .15s; }
-  .comeca:hover{ transform: translateY(-2px); }
+  #prog{ position: fixed; left: 0; bottom: 0; height: 4px; width: 0; background: linear-gradient(90deg, var(--verde2), var(--verde)); z-index: 4; opacity: .8; transition: width .3s; }
+  #capa{ position: fixed; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center; padding: 1.5rem; background: radial-gradient(120% 120% at 50% 0%, #1c2433 0%, #0b0e14 70%); }
+  .cx{ max-width: 620px; width: 100%; text-align: center; }
+  .cx h1{ font-family: var(--font-heading, inherit); font-size: 1.7rem; margin: 0 0 .3rem; text-align: center; }
+  .cx .sub{ color: #94a3b8; font-weight: 700; margin: 0 0 1rem; text-align: center; }
+  .cx .capinha{ width: 100%; max-width: 440px; aspect-ratio: 16/9; object-fit: contain; background: #000; border-radius: 14px; border: 1px solid rgba(255,255,255,.15); }
+  .comeca{ display: inline-flex; align-items: center; gap: .6rem; margin-top: 1.3rem; font: 900 1.25rem var(--font-heading, inherit); color: #fff;
+           background: linear-gradient(120deg, var(--verde), var(--verde2)); border: 0; border-radius: 18px; padding: 1rem 1.8rem; cursor: pointer; box-shadow: 0 14px 34px rgba(49,168,137,.4); }
   .linha{ display: flex; gap: .7rem; justify-content: center; flex-wrap: wrap; margin-top: .9rem; }
-  .sec{ font: 800 .95rem var(--font-body, inherit); color: #e2e8f0; background: rgba(255,255,255,.08); border: 1.5px solid rgba(255,255,255,.22);
-        border-radius: 12px; padding: .6rem 1rem; cursor: pointer; }
-  .sec:hover{ border-color: #fff; }
-  .sec.ok{ border-color: #4ade80; color: #bbf7d0; cursor: default; }
-  .sec:disabled{ opacity: .75; }
-  .dica{ margin-top: 1.3rem; font-size: .88rem; color: #94a3b8; line-height: 1.6; }
+  .dica{ margin-top: 1.2rem; font-size: .88rem; color: #94a3b8; line-height: 1.6; }
   .dica kbd{ background: rgba(255,255,255,.12); border-radius: 6px; padding: .05rem .4rem; font-weight: 800; color: #e2e8f0; }
-  .erro{ color: #fca5a5; font-weight: 700; }
-  .off{ display: inline-block; margin-top: .4rem; font-size: .82rem; font-weight: 800; color: #fbbf24; }
+  #capa .espera{ color: #cbd5e1; }
+  #capa .erro{ color: #fca5a5; }
+  #capa .sec{ font: 800 .95rem var(--font-body, inherit); color: #e2e8f0; background: rgba(255,255,255,.08); border: 1.5px solid rgba(255,255,255,.22); border-radius: 12px; padding: .6rem 1rem; cursor: pointer; }
+  #capa .aviso{ color: #fbbf24; font-weight: 800; }
 </style>
 </head>
 <body>
-<div id="palco" aria-live="polite"></div>
-<div id="prog"></div>
-<div id="barra" role="toolbar" aria-label="Controles da conversação">
-  <button type="button" id="bAnt" title="Voltar um clique (←)">◀</button>
-  <span class="n" id="bN">1 de 1</span>
-  <button type="button" id="bProx" title="Próximo clique (→, espaço)">▶</button>
-  <span class="sep"></span>
-  <button type="button" id="bInicio" title="Voltar ao início (Home)">⏮ Início</button>
-  <button type="button" id="bCheia" title="Tela cheia (F)">⛶ Tela cheia</button>
-  <button type="button" id="bSair" title="Voltar à abertura (Esc)">✕</button>
+<div id="lista">
+  <a class="volta" href="index.html">← Hub</a>
+  <div class="jan">
+    <div class="cab">
+      <div class="cab-l"><h1>💬 Conversação da semana</h1><button type="button" class="pill" id="bPastas">📁 Todas as semanas</button></div>
+      <div class="sems" id="sems"></div>
+    </div>
+    <div class="corpo" id="corpo"><div class="espera"><i></i> Buscando as atividades da semana…</div></div>
+  </div>
+</div>
+<div id="pastas" hidden><div class="cx2" id="pastasCx"></div></div>
+
+<div id="tocador" hidden>
+  <div id="palco" aria-live="polite"></div>
+  <div id="prog"></div>
+  <div id="barra" role="toolbar" aria-label="Controles da conversação">
+    <button type="button" id="bAnt" title="Voltar um clique (←)">◀</button>
+    <span class="n" id="bN">1 de 1</span>
+    <button type="button" id="bProx" title="Próximo clique (→, espaço)">▶</button>
+    <span class="sep"></span>
+    <button type="button" id="bInicio" title="Voltar ao início (Home)">⏮ Início</button>
+    <button type="button" id="bCheia" title="Tela cheia (F)">⛶ Tela cheia</button>
+    <button type="button" id="bSair" title="Voltar à abertura (Esc)">✕</button>
+  </div>
+  <div id="capa"><div class="cx" id="capaCorpo"></div></div>
 </div>
 
-<div id="capa">
-  <div class="cx" id="capaCorpo"><p>Carregando…</p></div>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js"></script>
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
-  var CACHE = 'fisk-conversa-v1';
-  var id = (location.search.match(/[?&]a=([\w-]+)/) || [])[1] || 'everyday-life-04-babies';
-  var base = 'conversacao/' + id + '/';
-  var atv = null, imgs = [], vez = 0, tocando = false;
-
-  /* o mesmo endereço abre sem internet: o sw-conversa.js atende do que foi guardado */
+  var CACHE = 'fisk-conversa-v1', PDFJS = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/';
+  var s = fiskSessao();
+  if (!s || !s.token) { location.replace('index.html'); return; }
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw-conversa.js', { scope: './conversacao' }).catch(function () {});
+  if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS + 'pdf.worker.min.js';
 
-  fetch(base + 'atividade.json').then(function (r) { if (!r.ok) throw new Error('atividade não encontrada'); return r.json(); })
-    .then(function (a) { atv = a; montaPalco(); capa(); })
-    .catch(function (e) { $('capaCorpo').innerHTML = '<p class="erro">Não consegui abrir a atividade (' + esc(e.message) + ').</p>' + (navigator.onLine ? '' : '<p>Sem internet, e esta atividade não foi deixada offline neste computador.</p>'); });
+  var dados = null, semanaId = '', registro = null, CH_LISTA = 'conv:semana:';
 
-  function montaPalco() {
-    document.title = atv.titulo + ' · Conversação, FISK';
-    var p = $('palco'); p.innerHTML = '';
-    imgs = atv.imagens.map(function (n, i) {
-      var im = new Image(); im.alt = 'Slide, clique ' + (i + 1); im.decoding = 'async';
-      im.dataset.src = base + n; p.appendChild(im); return im;
+  /* ── a lista: topo com as semanas, a faixa "Agora", o destaque e as outras ── */
+  function pedeSemana(id) {
+    return fiskFetch(FISK_HUB_EP, { action: 'conversaSemana', token: s.token, semanaId: id || '' }, { timeoutMs: 60000 })
+      .then(function (j) {
+        if (!j || !j.ok) throw new Error((j && (j.error || j.erro)) || 'não veio');
+        try { localStorage.setItem(CH_LISTA + (id || 'atual'), JSON.stringify(j)); if (j.semana) localStorage.setItem(CH_LISTA + j.semana.id, JSON.stringify(j)); } catch (e) {}
+        return j;
+      })
+      .catch(function (e) {
+        var g = null; try { g = JSON.parse(localStorage.getItem(CH_LISTA + (id || 'atual')) || 'null'); } catch (x) {}
+        if (g) { g._offline = true; return g; }
+        throw e;
+      });
+  }
+  function carregaLista(id) {
+    $('corpo').innerHTML = '<div class="espera"><i></i> Buscando as atividades da semana…</div>';
+    pedeSemana(id).then(function (j) { dados = j; semanaId = j.semana ? j.semana.id : ''; desenhaLista(); })
+      .catch(function (e) { $('corpo').innerHTML = '<p class="erro">Não consegui buscar as atividades (' + esc(e.message) + ').</p>'; });
+  }
+  function semanaAtual() { return ((dados && dados.semanas) || []).filter(function (x) { return x.atual; })[0]; }
+  function semanaCerta() { var at = semanaAtual(); return !(dados && dados.semana && at && at.id !== dados.semana.id); }
+  function chaveCache(it) { return location.origin + '/__conversa/' + it.id + '/' + it.quando; }
+  function todos() { var a = []; Object.keys((dados && dados.idiomas) || {}).forEach(function (k) { a = a.concat(dados.idiomas[k]); }); return a; }
+  /* "Ac - GTA 6 Launch Day - Basic - Jovens - Pedro Luz..." → "GTA 6 Launch Day" (nível e perfil viram etiquetas) */
+  function titulo(it) {
+    var p = String(it.nome).replace(/^Ac\s*-\s*/i, '').split(/\s+[-–—]\s+/);
+    return p[0] || it.nome;
+  }
+  function nivelDe(it) { return (it.niveis || []).filter(function (n) { return /Teens|Basic|Intermediate|Advanced|Todos/.test(n); })[0] || ''; }
+  function perfilDe(it) { return (it.niveis || []).filter(function (n) { return /Jovens|Adultos/.test(n); })[0] || ''; }
+  var EM = { Basic: '🌱', Intermediate: '🚀', Advanced: '🏆', Teens: '⭐', Todos: '🌍' };
+  /* "Semana 3 - de 14 a 20 de novembro" → { n: 'Semana 3', d: '14 a 20 de novembro' } */
+  function partesSemana(nome) { var m = String(nome).match(/^(Semana\s*\d+)\s*[-–]\s*(?:de\s+)?(.*?)(\s*\(.*\))?$/i); return m ? { n: m[1], d: m[2] } : { n: nome, d: '' }; }
+
+  function desenhaTopo() {
+    var lista = dados.semanas || [], i = lista.map(function (x) { return x.id; }).indexOf(dados.semana && dados.semana.id);
+    var mostra = [lista[i - 1], lista[i], lista[i + 1], lista[i + 2]];
+    $('sems').innerHTML = mostra.map(function (x, k) {
+      if (!x) return '<span class="sem vazia"></span>';
+      var p = partesSemana(x.nome);
+      return '<button type="button" class="sem' + (k === 1 ? ' on' : '') + '" data-sem="' + esc(x.id) + '"><b>' + esc(p.n) + (x.atual ? ' · hoje' : '') + '</b><span>' + esc(p.d) + '</span>' +
+        (k === 1 ? '<small>' + todos().length + ' atividades' + (Object.keys(dados.idiomas || {}).length ? ' · ' + esc(Object.keys(dados.idiomas).join(', ')) : '') + '</small>' : '') + '</button>';
+    }).join('');
+  }
+  function turmaBase() { var t = typeof fiskTurmaDeAgora === 'function' ? fiskTurmaDeAgora(s) : null, agora = !!t; if (!t && typeof fiskTurmaProxima === 'function') t = fiskTurmaProxima(s); if (t) t.agora = agora; return t; }
+  /* a atividade da turma: mesmo idioma, mesmo nível (Teens sem atividade própria → Basic Jovens) e o mesmo perfil */
+  function escolheDestaque(t) {
+    if (!t || !t.nivel || !semanaCerta()) return null;
+    var lista = (dados.idiomas && dados.idiomas[t.idioma]) || [];
+    lista = lista.filter(function (it) { return it.pronto; });
+    var nivel = t.nivel, perfil = t.perfil;
+    if (nivel === 'Teens' && !lista.some(function (it) { return nivelDe(it) === 'Teens'; })) { nivel = 'Basic'; perfil = 'Jovens'; }
+    var doNivel = lista.filter(function (it) { return nivelDe(it) === nivel; });
+    return doNivel.filter(function (it) { return !perfilDe(it) || perfilDe(it) === perfil; })[0] || doNivel[0] || null;
+  }
+  var aba = '';
+  function desenhaLista() {
+    desenhaTopo();
+    var t = turmaBase(), dest = escolheDestaque(t), h = '';
+    if (dados._offline) h += '<div class="aviso-sem">Sem internet: mostrando o que ficou guardado neste computador.</div>';
+    else if (!semanaCerta()) h += '<div class="aviso-sem">Atenção: esta NÃO é a semana de hoje.</div>';
+    h += '<div class="agora"><span class="em">🕐</span><div>' + (t ? (t.agora ? 'Agora: ' : 'Próxima aula: ') + esc(t.turma) + (t.livro ? ' · ' + esc(t.livro) : '') +
+      '<small>' + (dest ? 'A atividade dela está em destaque logo abaixo' : 'As atividades desta semana estão abaixo') + '</small>' : 'Sem aula agora<small>As atividades desta semana estão abaixo</small>') +
+      '</div><button type="button" class="ok nao" id="bOff">📥 Guardar a semana neste computador</button></div>';
+    if (dados.vazio || !todos().length) { $('corpo').innerHTML = h + '<p style="font-weight:700;color:#64748b">Nenhuma atividade nesta semana ainda.</p>'; marcaOffline(); return; }
+    if (dest) h += cartao(dest, true);
+    var grupos = gruposDe(dest);
+    if (!aba || !grupos.some(function (g) { return g.k === aba; })) aba = grupos[0] ? grupos[0].k : '';
+    h += '<h3 class="sub">📚 ' + (dest ? 'Outras desta semana' : 'Desta semana') + '</h3><div class="tabs">' + grupos.map(function (g) {
+      return '<button type="button" data-aba="' + esc(g.k) + '"' + (g.k === aba ? ' class="on"' : '') + '>' + esc(g.rot) + ' · ' + g.itens.length + '</button>'; }).join('') + '</div>';
+    grupos.forEach(function (g) { h += '<div class="grade" data-grade="' + esc(g.k) + '"' + (g.k === aba ? '' : ' hidden') + '>' + g.itens.map(function (it) { return cartao(it, false); }).join('') + '</div>'; });
+    $('corpo').innerHTML = h;
+    $('bOff').onclick = guardarSemana;
+    marcaOffline(); observaMiniaturas();
+  }
+  function gruposDe(dest) {
+    var out = [], extras = [];
+    ['English', 'Español'].concat(Object.keys(dados.idiomas || {}).filter(function (k) { return k !== 'English' && k !== 'Español'; })).forEach(function (idioma) {
+      var itens = (dados.idiomas[idioma] || []).filter(function (it) { return it !== dest; }), soltos = itens.filter(function (it) { return !it.grupo; });
+      var band = idioma === 'English' ? '🇺🇸 ' : idioma === 'Español' ? '🇪🇸 ' : '📁 ';
+      var ord = function (a, b) { var o = { Teens: 0, Basic: 1, Intermediate: 2, Advanced: 3, Todos: 4 }; return ((o[nivelDe(a)] == null ? 9 : o[nivelDe(a)]) - (o[nivelDe(b)] == null ? 9 : o[nivelDe(b)])) || (perfilDe(a) === perfilDe(b) ? 0 : (perfilDe(a) === 'Jovens' ? -1 : 1)); };
+      if (soltos.length) out.push({ k: idioma, rot: band + idioma, itens: soltos.sort(ord) });
+      var gs = {}; itens.filter(function (it) { return it.grupo; }).forEach(function (it) { (gs[it.grupo] = gs[it.grupo] || []).push(it); });
+      Object.keys(gs).forEach(function (g) { extras.push({ k: idioma + '|' + g, rot: '📁 ' + g.replace(/^Extra\s*-\s*/i, 'Extra: '), itens: gs[g].sort(ord) }); });
     });
+    return out.concat(extras);   /* os idiomas primeiro, as pastas extras depois */
   }
-  function carrega(i) { var im = imgs[i]; if (im && !im.src) im.src = im.dataset.src; }
-
-  function guardada() { return caches.open(CACHE).then(function (c) { return c.match(base + atv.imagens[atv.imagens.length - 1]); }).then(function (r) { return !!r; }).catch(function () { return false; }); }
-  function capa() {
-    $('capa').hidden = false; tocando = false; document.body.classList.remove('mostra');
-    $('capaCorpo').innerHTML =
-      '<img class="logo" src="assets/fisk-logo.png" alt="FISK" onerror="this.remove()">' +
-      '<h1>💬 ' + esc(atv.titulo) + '</h1>' +
-      '<p class="sub">' + esc(atv.nivel || '') + ' · ' + atv.imagens.length + ' cliques</p>' +
-      '<img class="capinha" src="' + esc(base + atv.imagens[0]) + '" alt="">' +
-      '<div><button type="button" class="comeca" id="comeca">▶ Começar na tela cheia</button></div>' +
-      '<div class="linha"><button type="button" class="sec" id="semCheia">Começar sem tela cheia</button>' +
-      '<button type="button" class="sec" id="bOff">📥 Deixar disponível offline</button></div>' +
-      (navigator.onLine ? '' : '<span class="off">Sem internet: abrindo do que ficou guardado neste computador</span>') +
-      '<p class="dica">Avance com <kbd>clique</kbd>, <kbd>→</kbd>, <kbd>espaço</kbd> ou o passador de slides. Volte com <kbd>←</kbd>.<br><kbd>F</kbd> tela cheia · <kbd>Esc</kbd> volta para cá</p>';
-    $('comeca').onclick = function () { comecar(true); };
-    $('semCheia').onclick = function () { comecar(false); };
-    $('bOff').onclick = deixarOffline;
-    guardada().then(function (sim) { if (sim) marcaOffline(); });
+  function cartao(it, dest) {
+    var n = nivelDe(it), pf = perfilDe(it);
+    return '<div class="rec' + (dest ? ' hl dest' : '') + '" data-rec="' + esc(it.id) + '">' + (dest ? '<span class="flag">★ Para a turma de agora</span>' : '') +
+      '<div class="capa n-' + esc(n) + '"><span class="e">' + (EM[n] || '💬') + '</span><span class="tg">' + esc((n === 'Todos' ? 'Todos os níveis' : n || 'Atividade').toUpperCase()) + '</span>' + (pf ? '<span class="pf">' + esc(pf) + '</span>' : '') + '</div>' +
+      '<div class="th" data-th="' + esc(it.id) + '" title="' + esc(it.nome) + '">' + (it.pronto ? '<span class="carrega"><i></i> preparando a miniatura…</span>' : '<span class="carrega">em preparação</span>') +
+      '<span class="l" title="Slide anterior">‹</span><span class="r" title="Próximo slide">›</span><span class="cnt" hidden></span></div>' +
+      '<div class="inf"><b>' + esc(titulo(it)) + '</b>' + (dest ? '<span class="dica">Clique nas bordas da imagem para ver os slides antes da aula.</span>' : '') +
+      '<div class="rod">' + (it.pronto ? '<button type="button" class="bt" data-abre="' + esc(it.id) + '">▶ ' + (dest ? 'Começar na tela cheia' : 'Começar') + '</button>' : '') +
+      '<button type="button" class="bt2" data-baixa="' + esc(it.id) + '">⬇️ ' + (it.tipo === 'pdf' ? 'PDF' : 'PowerPoint') + '</button>' +
+      (it.pronto ? '<span class="off" data-off="' + esc(it.id) + '" hidden>✓ offline</span>' : '<span class="prep">em preparação</span>') + '</div></div></div>';
   }
-  function marcaOffline() { var b = $('bOff'); if (!b) return; b.textContent = '✓ Disponível offline neste computador'; b.className = 'sec ok'; b.onclick = null; }
-
-  /* guarda a página, o kit e todas as imagens; o service worker serve daqui quando a rede falhar */
-  function deixarOffline() {
-    var b = $('bOff'); b.disabled = true;
-    var css = document.querySelector('link[rel=stylesheet]').getAttribute('href');
-    var pagina = ['conversacao.html', 'conversacao.html?a=' + id, css, 'assets/fisk-logo.png', base + 'atividade.json'];
-    var lista = pagina.concat(atv.imagens.map(function (n) { return base + n; })), feitas = 0;
+  function marcaOffline() {
+    if (!window.caches || !dados) return;
     caches.open(CACHE).then(function (c) {
-      var cadeia = Promise.resolve();
-      lista.forEach(function (u) {
-        cadeia = cadeia.then(function () {
-          return fetch(u, { cache: 'reload' }).then(function (r) { if (r.ok) return c.put(u, r); }).catch(function () {})
-            .then(function () { feitas++; b.textContent = '📥 Guardando… ' + Math.round(feitas * 100 / lista.length) + '%'; });
+      var prontos = todos().filter(function (i) { return i.pronto; });
+      return Promise.all(prontos.map(function (it) { return c.match(chaveCache(it)).then(function (r) { [].forEach.call(document.querySelectorAll('[data-off="' + it.id + '"]'), function (e) { e.hidden = !r; }); return !!r; }); }))
+        .then(function (rs) { var b = $('bOff'); if (!b) return; if (rs.length && rs.every(Boolean)) { b.textContent = '✓ Semana guardada neste computador'; b.className = 'ok'; } else { b.textContent = '📥 Guardar a semana neste computador'; b.className = 'ok nao'; } });
+    }).catch(function () {});
+  }
+
+  /* ── as miniaturas: o slide 1, e as bordas passam os slides (o PDF já está no aparelho; desenhar uma página é instantâneo) ── */
+  var docsMini = {};
+  function miniDoc(it) {
+    if (!docsMini[it.id]) docsMini[it.id] = obter(it).then(function (u) { return pdfjsLib.getDocument({ data: u }).promise; }).then(function (d) { marcaOffline(); return d; });
+    docsMini[it.id].catch(function () { delete docsMini[it.id]; });
+    return docsMini[it.id];
+  }
+  function miniPagina(box, it, n) {
+    return miniDoc(it).then(function (d) {
+      n = Math.max(1, Math.min(d.numPages, n)); box.dataset.p = n;
+      return d.getPage(n).then(function (pg) {
+        var v1 = pg.getViewport({ scale: 1 }), larg = Math.min(900, Math.round(box.clientWidth * (window.devicePixelRatio || 1))) || 640, vp = pg.getViewport({ scale: larg / v1.width });
+        var c = box.querySelector('canvas'); if (!c) { c = document.createElement('canvas'); box.insertBefore(c, box.firstChild); }
+        c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+        return pg.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise.then(function () {
+          var w = box.querySelector('.carrega'); if (w) w.remove();
+          var k = box.querySelector('.cnt'); k.hidden = false; k.textContent = n + ' / ' + d.numPages;
         });
       });
+    }).catch(function () { var w = box.querySelector('.carrega'); if (w) w.textContent = 'sem internet para a miniatura'; });
+  }
+  function observaMiniaturas() {
+    var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (!e.isIntersecting) return; io.unobserve(e.target); var it = porId(e.target.dataset.th); if (it && it.pronto) miniPagina(e.target, it, 1); });
+    }, { rootMargin: '200px' }) : null;
+    [].forEach.call(document.querySelectorAll('[data-th]'), function (b) { var it = porId(b.dataset.th); if (!it || !it.pronto) return; if (io) io.observe(b); else miniPagina(b, it, 1); });
+  }
+  function porId(id) { return todos().filter(function (i) { return i.id === id; })[0]; }
+  $('corpo').addEventListener('click', function (e) {
+    var t;
+    if ((t = e.target.closest('[data-aba]'))) { aba = t.dataset.aba; [].forEach.call(document.querySelectorAll('[data-aba]'), function (b) { b.classList.toggle('on', b === t); }); [].forEach.call(document.querySelectorAll('[data-grade]'), function (g) { g.hidden = g.dataset.grade !== aba; }); observaMiniaturas(); return; }
+    if ((t = e.target.closest('[data-abre]'))) { abre(t.dataset.abre); return; }
+    if ((t = e.target.closest('[data-baixa]'))) { baixar(porId(t.dataset.baixa), t); return; }
+    if ((t = e.target.closest('[data-th]'))) {
+      var it = porId(t.dataset.th); if (!it || !it.pronto) return;
+      var x = e.clientX - t.getBoundingClientRect().left, w = t.clientWidth, p = Number(t.dataset.p || 1);
+      if (x < w * 0.2) miniPagina(t, it, p - 1); else if (x > w * 0.8) miniPagina(t, it, p + 1); else abre(it.id);
+    }
+  });
+  $('sems').addEventListener('click', function (e) { var b = e.target.closest('[data-sem]'); if (b && b.dataset.sem !== semanaId) carregaLista(b.dataset.sem); });
+  /* todas as semanas: as pastas por mês, como no Drive */
+  $('bPastas').addEventListener('click', function () {
+    if (!dados) return;
+    var porMes = {}, ordem = [];
+    (dados.semanas || []).forEach(function (x) { var m = (String(x.nome).match(/de\s+([a-zç]+)\s*(?:\(|$)/i) || [])[1] || 'outras'; m = m.charAt(0).toUpperCase() + m.slice(1); if (!porMes[m]) { porMes[m] = []; ordem.push(m); } porMes[m].push(x); });
+    $('pastasCx').innerHTML = '<div style="display:flex;align-items:center"><b style="font:800 1.15rem var(--font-heading,inherit);flex:1">📁 Todas as semanas</b><button type="button" class="bt2" id="bFechaPastas">Fechar</button></div>' +
+      ordem.map(function (m) { return '<h4>📂 ' + esc(m) + '</h4>' + porMes[m].map(function (x) { return '<button type="button" class="w' + (x.id === semanaId ? ' on' : '') + '" data-w="' + esc(x.id) + '">📁 ' + esc(x.nome) + (x.atual ? ' · hoje' : '') + '</button>'; }).join(''); }).join('');
+    $('pastas').hidden = false;
+  });
+  $('pastas').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-w]'); if (b) { $('pastas').hidden = true; carregaLista(b.dataset.w); return; }
+    if (e.target.id === 'pastas' || e.target.id === 'bFechaPastas') $('pastas').hidden = true;
+  });
+
+  /* ── o PDF da atividade: do aparelho, senão do servidor ── */
+  function b64(d) { return Uint8Array.from(atob(d), function (c) { return c.charCodeAt(0); }); }
+  function obter(it) {
+    var k = chaveCache(it);
+    var baixa = function () {
+      return fiskFetch(FISK_HUB_EP, { action: 'conversaLer', token: s.token, id: it.id }, { timeoutMs: 120000 }).then(function (j) {
+        if (!j || !j.ok) throw new Error((j && (j.error || j.erro)) || 'não veio');
+        if (j.preparando) throw new Error('esta atividade ainda está em preparação');
+        return b64(j.dados);
+      });
+    };
+    if (!window.caches) return baixa();
+    return caches.open(CACHE).then(function (c) {
+      return c.match(k).then(function (r) {
+        if (r) return r.arrayBuffer().then(function (ab) { return new Uint8Array(ab); });
+        return baixa().then(function (u) {
+          c.keys().then(function (ks) { ks.forEach(function (q) { if (q.url.indexOf(location.origin + '/__conversa/' + it.id + '/') === 0 && q.url !== k) c.delete(q); }); }).catch(function () {});
+          return c.put(k, new Response(u.slice(), { headers: { 'Content-Type': 'application/pdf' } })).then(function () { return u; }, function () { return u; });
+        });
+      });
+    });
+  }
+  /* guardar a semana inteira neste computador (o Hub já faz isso sozinho ao abrir; este botão força agora) */
+  function guardarSemana() {
+    var b = $('bOff'); if (!dados || !window.caches) return;
+    var prontos = todos().filter(function (i) { return i.pronto; }), feitos = 0;
+    b.disabled = true;
+    fiskGuardarPaginaOffline('conversacao.html').then(function () {
+      var cadeia = Promise.resolve();
+      prontos.forEach(function (it) {
+        cadeia = cadeia.then(function () { return obter(it).catch(function () {}); }).then(function () { feitos++; b.textContent = '📥 Guardando… ' + feitos + ' de ' + prontos.length; });
+      });
       return cadeia;
-    }).then(function () {
-      try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
-      marcaOffline();
-    }).catch(function () { b.disabled = false; b.textContent = '📥 Não deu: tente de novo'; });
+    }).then(function () { try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {} b.disabled = false; marcaOffline(); })
+      .catch(function () { b.disabled = false; b.textContent = '📥 Não deu: tente de novo'; });
   }
 
+  /* ── o tocador ── */
+  var doc = null, paginas = [], vez = 0, tocando = false, atual = null;
+  function abre(id) {
+    atual = todos().filter(function (i) { return i.id === id; })[0]; if (!atual) return;
+    $('lista').hidden = true; $('tocador').hidden = false; $('capa').hidden = false; tocando = false;
+    $('capaCorpo').innerHTML = '<div class="espera"><i></i> Abrindo ' + esc(atual.nome) + '…</div>';
+    history.replaceState(null, '', '?id=' + encodeURIComponent(id) + (semanaId ? '&semana=' + encodeURIComponent(semanaId) : ''));
+    obter(atual).then(function (u) { return pdfjsLib.getDocument({ data: u }).promise; }).then(function (d) {
+      doc = d; paginas = []; $('palco').innerHTML = '';
+      for (var i = 0; i < d.numPages; i++) { var im = new Image(); im.alt = 'Clique ' + (i + 1); $('palco').appendChild(im); paginas.push(im); }
+      return desenha(0).then(capa);
+    }).catch(function (e) { $('capaCorpo').innerHTML = '<p class="erro">Não consegui abrir (' + esc(e.message) + ').</p><div class="linha"><button class="sec" id="bVolta">← Voltar à lista</button></div>'; $('bVolta').onclick = volta; });
+  }
+  function desenha(i) {
+    var im = paginas[i]; if (!im || im.dataset.ok) return Promise.resolve();
+    im.dataset.ok = '1';
+    return doc.getPage(i + 1).then(function (pg) {
+      var v1 = pg.getViewport({ scale: 1 }), vp = pg.getViewport({ scale: 1920 / v1.width });
+      var c = document.createElement('canvas'); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+      return pg.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise.then(function () {
+        return new Promise(function (ok) { c.toBlob(function (b) { im.src = URL.createObjectURL(b); c.width = c.height = 0; ok(); }, 'image/jpeg', 0.92); });
+      });
+    }).catch(function () { delete im.dataset.ok; });
+  }
+  function capa() {
+    tocando = false; document.body.classList.remove('mostra', 'esconde-cursor');
+    $('capa').hidden = false;
+    $('capaCorpo').innerHTML = '<h1>💬 ' + esc(titulo(atual)) + '</h1><p class="sub">' + esc(atual.niveis.join(' · ')) + (atual.niveis.length ? ' · ' : '') + paginas.length + (atual.tipo === 'pdf' ? ' slides' : ' cliques') + '</p>' +
+      '<img class="capinha" src="' + (paginas[0] && paginas[0].src || '') + '" alt="">' +
+      (semanaCerta() ? '' : '<p class="aviso ruim" style="margin-top:.8rem">Esta atividade não é da semana de hoje.</p>') +
+      '<div><button type="button" class="comeca" id="comeca">▶ Começar na tela cheia</button></div>' +
+      '<div class="linha"><button type="button" class="sec" id="semCheia">Começar sem tela cheia</button><button type="button" class="sec" id="bBaixa">⬇️ Baixar ' + (atual.tipo === 'pdf' ? 'o PDF' : 'o PowerPoint') + '</button><button type="button" class="sec" id="bVolta">← Voltar à lista</button></div>' +
+      '<p class="dica">Avance com <kbd>clique</kbd>, <kbd>→</kbd>, <kbd>espaço</kbd> ou o passador de slides. Volte com <kbd>←</kbd>.<br><kbd>F</kbd> tela cheia · <kbd>Esc</kbd> volta para cá</p>';
+    $('comeca').onclick = function () { comecar(true); }; $('semCheia').onclick = function () { comecar(false); }; $('bVolta').onclick = volta;
+    $('bBaixa').onclick = function () { baixar(atual, $('bBaixa')); };
+  }
+  /* "quero que o professor tenha a possibilidade de baixar" (Pedro, 27/11/2026): o arquivo como está na pasta */
+  function baixar(it, b) {
+    it = it && it.id ? it : atual; b = b && b.nodeType ? b : $('bBaixa');
+    var rot = b.textContent; b.disabled = true; b.textContent = '⬇️ Baixando…';
+    fiskFetch(FISK_HUB_EP, { action: 'conversaLer', token: s.token, id: it.id, original: 1 }, { timeoutMs: 120000 }).then(function (j) {
+      if (!j || !j.ok || !j.dados) throw new Error((j && (j.error || j.erro)) || 'não veio');
+      var a = document.createElement('a'), url = URL.createObjectURL(new Blob([b64(j.dados)], { type: j.mime || 'application/octet-stream' }));
+      a.href = url; a.download = j.nome || (it.nome + (it.tipo === 'pdf' ? '.pdf' : '.pptx'));
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+      b.textContent = rot;
+    }).catch(function (e) { b.textContent = '⬇️ Não deu: ' + e.message; }).then(function () { b.disabled = false; });
+  }
   function comecar(cheia) {
-    $('capa').hidden = true; tocando = true; vez = 0;
+    $('capa').hidden = true; tocando = true;
     if (cheia && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function () {});
+    if (!registro) registro = fiskApresentacao({ ferramenta: 'conversa', atividade: atual.nome, atividadeId: atual.id,
+      semana: dados && dados.semana ? dados.semana.nome : '', semanaCerta: semanaCerta() });
     mostra(0); acorda();
   }
   function mostra(i) {
-    vez = Math.max(0, Math.min(imgs.length - 1, i));
-    for (var k = vez; k < vez + 4; k++) carrega(k);   /* os próximos já descem, para o clique não esperar */
-    carrega(vez - 1);
-    imgs.forEach(function (im, k) { im.classList.toggle('on', k === vez); });
-    $('bN').textContent = (vez + 1) + ' de ' + imgs.length;
-    $('prog').style.width = ((vez + 1) * 100 / imgs.length) + '%';
+    vez = Math.max(0, Math.min(paginas.length - 1, i));
+    var cadeia = desenha(vez);
+    for (var k = vez + 1; k < vez + 4; k++) (function (n) { cadeia = cadeia.then(function () { return desenha(n); }); })(k);
+    paginas.forEach(function (im, k) { im.classList.toggle('on', k === vez); });
+    $('bN').textContent = (vez + 1) + ' de ' + paginas.length;
+    $('prog').style.width = ((vez + 1) * 100 / paginas.length) + '%';
+    if (registro) registro.etapa(vez + 1, paginas.length);
   }
-  function prox() { if (vez < imgs.length - 1) mostra(vez + 1); }
+  function prox() { if (vez < paginas.length - 1) mostra(vez + 1); }
   function ant() { if (vez > 0) mostra(vez - 1); }
   function cheia() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(function () {}); else document.exitFullscreen(); }
-
+  function volta() {
+    if (document.fullscreenElement) document.exitFullscreen();
+    if (registro) { registro.fim(); registro = null; }
+    paginas.forEach(function (im) { if (im.src) URL.revokeObjectURL(im.src); });
+    if (doc) { try { doc.destroy(); } catch (e) {} doc = null; }
+    tocando = false; $('tocador').hidden = true; $('lista').hidden = false;
+    history.replaceState(null, '', 'conversacao.html' + (semanaId ? '?semana=' + encodeURIComponent(semanaId) : ''));
+    marcaOffline();
+  }
   $('palco').addEventListener('click', function (e) { if (!tocando) return; (e.clientX < window.innerWidth * 0.2 ? ant : prox)(); });
   $('bProx').onclick = prox; $('bAnt').onclick = ant; $('bInicio').onclick = function () { mostra(0); };
   $('bCheia').onclick = cheia; $('bSair').onclick = function () { if (document.fullscreenElement) document.exitFullscreen(); capa(); };
@@ -170,7 +465,7 @@
     if (k === 'ArrowRight' || k === 'ArrowDown' || k === ' ' || k === 'PageDown' || k === 'Enter' || k === 'n') { e.preventDefault(); prox(); }
     else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp' || k === 'Backspace' || k === 'p') { e.preventDefault(); ant(); }
     else if (k === 'Home') mostra(0);
-    else if (k === 'End') mostra(imgs.length - 1);
+    else if (k === 'End') mostra(paginas.length - 1);
     else if (k === 'f' || k === 'F') cheia();
     else if (k === 'Escape' && !document.fullscreenElement) capa();
     acorda();
@@ -181,6 +476,13 @@
     clearTimeout(tCursor); tCursor = setTimeout(function () { document.body.classList.remove('mostra'); if (tocando) document.body.classList.add('esconde-cursor'); }, 2500);
   }
   document.addEventListener('mousemove', function () { if (tocando) acorda(); });
+
+  var q = new URLSearchParams(location.search), qId = q.get('id'), qSem = q.get('semana');
+  pedeSemana(qSem || '').then(function (j) { dados = j; semanaId = j.semana ? j.semana.id : ''; desenhaLista(); if (qId) abre(qId); })
+    .catch(function (e) { $('corpo').innerHTML = '<p class="erro">Não consegui buscar as atividades (' + esc(e.message) + ').</p>'; });
+  try { if (localStorage.getItem('fisk_theme') === 'dark') document.body.classList.add('theme-dark'); } catch (e) {}
+  fiskApresEnviar(false);   /* o que ficou na fila de uma aula sem internet */
+  try { fiskRegistrarUso('Conversação da semana', 'conversacao'); } catch (e) {}
 })();
 </script>
 </body>

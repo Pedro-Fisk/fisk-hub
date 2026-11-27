@@ -916,7 +916,18 @@ function fiskInfvObter(escola) {
     .then(function (j) { if (!j || !j.ok) throw new Error((j && (j.error || j.erro)) || 'não veio'); return j; }); };
   var b64 = function (d) { return Uint8Array.from(atob(d), function (c) { return c.charCodeAt(0); }); };
   var pre = location.origin + '/__informativo/' + encodeURIComponent(fiskInfvNP(escola)) + '/';
-  var p = !window.caches ? pede(false).then(function (j) { if (!j.vazio) j.bytes = b64(j.dados); return j; }) : pede(true).then(function (j) {
+  /* SEM INTERNET (Pedro, 27/11/2026): o último informativo guardado desta escola, mesmo sem saber se há um mais novo */
+  var guardado = function () {
+    return caches.open(FISK_INFV_CACHE).then(function (c) {
+      return c.keys().then(function (ks) {
+        var meus = ks.filter(function (q) { return q.url.indexOf(pre) === 0; }); if (!meus.length) throw new Error('sem internet e sem informativo guardado');
+        var k = meus[meus.length - 1];
+        return c.match(k).then(function (r) { return r.arrayBuffer(); }).then(function (ab) { return { ok: true, escola: escola, nome: 'Informativo', quando: k.url.slice(pre.length), bytes: new Uint8Array(ab), offline: true }; });
+      });
+    });
+  };
+  var p = !window.caches ? pede(false).then(function (j) { if (!j.vazio) j.bytes = b64(j.dados); return j; }) : pede(true).catch(function (e) { return guardado().then(function (g) { g._ok = true; return g; }, function () { throw e; }); }).then(function (j) {
+    if (j._ok) return j;
     info = j; if (j.vazio) return j;
     var k = pre + j.quando;
     return caches.open(FISK_INFV_CACHE).then(function (c) {
@@ -2108,3 +2119,150 @@ function fiskBuddyInfoGuarda(j) {
   function vai() { pega().then(festa).catch(function () {}); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', vai); else vai();
 })();
+
+/* ── O QUE PASSOU NA TV (Pedro, 27/11/2026: controle da direção) ─────────────────────────────────────────────────
+ * fiskApresentacao({ ferramenta: 'conversa'|'informativo', atividade, atividadeId, semana, semanaCerta, escola })
+ * devolve { etapa(n, total), fim() }. Conta o tempo com a página VISÍVEL e, dentro dele, o tempo em TELA CHEIA; a
+ * turma é a da hora, pela grade da Minha semana (cal:turmas). O estado vai ao servidor (apresRegistro, Apresentacoes.js
+ * do backend) a cada minuto, ao esconder a aba e ao fechar; sem internet fica na fila 'fisk_apres_fila' e vai depois.
+ * Cada envio troca a linha da mesma sessão no servidor (sid), então reenviar não dobra o tempo. */
+function fiskTurmaDeAgora(s) {
+  s = s || fiskSessao(); if (!s) return null;
+  var nome = s.name || '';
+  if (s.master) { try { var a = JSON.parse(localStorage.getItem('fisk_actas') || 'null'); if (a && a.name) nome = a.name; } catch (e) {} }
+  var g = null; try { g = JSON.parse(localStorage.getItem('cal:turmas:' + fiskInfvNP(nome)) || 'null'); } catch (e) {}
+  var d = new Date(), wd = d.getDay(), min = d.getHours() * 60 + d.getMinutes();
+  var t = ((g && g.t) || []).filter(function (t) { return t.h && t.h.dias.indexOf(wd) > -1 && t.h.ini - 15 <= min && min <= t.h.fim + 10; })
+    .sort(function (a, b) { return Math.abs(a.h.ini - min) - Math.abs(b.h.ini - min); })[0];
+  return t ? fiskPerfilDaTurma(t) : null;
+}
+/* A turma vista pela conversação (Pedro, 27/11/2026): o NÍVEL sai do livro mais comum entre os alunos (Teens Connect =
+   Teens; Essentials 1 e 2 = Basic; Transitions 1 e 2 = Intermediate; Fluency 1 e 2 e Focus = Advanced) e o PERFIL,
+   que é outro eixo, do título: "(+18)" ou "[+18]" = Adultos; o resto, Jovens. Livro do espanhol = Español.
+   (A idade dos alunos ajudaria, mas o card só guarda dia e mês do nascimento.) */
+function fiskPerfilDaTurma(t) {
+  var conta = {}; (t.alunos || []).forEach(function (a) { if (a.book) conta[a.book] = (conta[a.book] || 0) + 1; });
+  var livro = Object.keys(conta).sort(function (x, y) { return conta[y] - conta[x]; })[0] || '';
+  var L = fiskInfvNP(livro), tit = String(t.tituloInteiro || t.titulo || '');
+  var nivel = /TEENS/.test(L) ? 'Teens' : /ESSENTIAL/.test(L) ? 'Basic' : /TRANSITION/.test(L) ? 'Intermediate' : /FLUENCY|FOCUS/.test(L) ? 'Advanced' : '';
+  var idioma = /INMEDIATO|ESPANOL|SPANISH|AVANZA|SIELE/.test(L) ? 'Español' : 'English';
+  return { escola: t.escola || '', turma: t.titulo || t.tituloInteiro || '', livro: livro, nivel: nivel, idioma: idioma,
+           perfil: /[(\[]\s*\+\s*18\s*[)\]]/.test(tit) ? 'Adultos' : 'Jovens', ini: t.h ? t.h.ini : null };
+}
+/* a próxima turma de hoje (para quando não há aula agora) */
+function fiskTurmaProxima(s) {
+  s = s || fiskSessao(); if (!s) return null;
+  var nome = s.name || '';
+  if (s.master) { try { var a = JSON.parse(localStorage.getItem('fisk_actas') || 'null'); if (a && a.name) nome = a.name; } catch (e) {} }
+  var g = null; try { g = JSON.parse(localStorage.getItem('cal:turmas:' + fiskInfvNP(nome)) || 'null'); } catch (e) {}
+  var d = new Date(), wd = d.getDay(), min = d.getHours() * 60 + d.getMinutes();
+  var t = ((g && g.t) || []).filter(function (t) { return t.h && t.h.dias.indexOf(wd) > -1 && t.h.ini > min; }).sort(function (a, b) { return a.h.ini - b.h.ini; })[0];
+  return t ? fiskPerfilDaTurma(t) : null;
+}
+var FISK_APRES_FILA = 'fisk_apres_fila';
+function fiskApresEnviar(usarBeacon) {
+  var s = fiskSessao(); if (!s || !s.token) return;
+  var fila = []; try { fila = JSON.parse(localStorage.getItem(FISK_APRES_FILA) || '[]'); } catch (e) {}
+  if (!fila.length) return;
+  var corpo = JSON.stringify({ action: 'apresRegistro', token: s.token, regs: fila.slice(-30) });
+  var limpa = function (enviados) {
+    try {
+      var agora = JSON.parse(localStorage.getItem(FISK_APRES_FILA) || '[]');
+      var resto = agora.filter(function (r) { return !enviados.some(function (e) { return e.sid === r.sid && e.ultimo >= r.ultimo; }); });
+      localStorage.setItem(FISK_APRES_FILA, JSON.stringify(resto));
+    } catch (e) {}
+  };
+  if (usarBeacon && navigator.sendBeacon) { if (navigator.sendBeacon(FISK_HUB_EP, new Blob([corpo], { type: 'text/plain' }))) limpa(fila); return; }
+  fetch(FISK_HUB_EP, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: corpo, keepalive: true })
+    .then(function (r) { return r.json(); }).then(function (j) { if (j && j.ok) limpa(fila); }).catch(function () {});
+}
+function fiskApresentacao(o) {
+  var ag = function () { return Date.now(); };
+  var turma = fiskTurmaDeAgora() || {};
+  var reg = { sid: ag().toString(36) + Math.random().toString(36).slice(2, 8), ferramenta: o.ferramenta, atividade: o.atividade || '', atividadeId: o.atividadeId || '',
+              semana: o.semana || '', semanaCerta: o.semanaCerta, escola: turma.escola || o.escola || '', turma: turma.turma || '',
+              inicio: ag(), ultimo: ag(), segAberta: 0, segCheia: 0, etapa: 0, etapas: 0 };
+  var marca = ag(), vivo = true;
+  function conta() {
+    var t = ag(), dt = Math.max(0, Math.min(120, (t - marca) / 1000)); marca = t;
+    if (document.visibilityState === 'visible') { reg.segAberta += dt; if (document.fullscreenElement) reg.segCheia += dt; }
+    reg.ultimo = t;
+  }
+  function guarda() {
+    conta();
+    try {
+      var fila = JSON.parse(localStorage.getItem(FISK_APRES_FILA) || '[]').filter(function (r) { return r.sid !== reg.sid; });
+      fila.push(JSON.parse(JSON.stringify(reg))); localStorage.setItem(FISK_APRES_FILA, JSON.stringify(fila.slice(-60)));
+    } catch (e) {}
+  }
+  var tic = setInterval(function () { if (!vivo) return; guarda(); fiskApresEnviar(false); }, 60000);
+  document.addEventListener('fullscreenchange', conta);
+  document.addEventListener('visibilitychange', function () { if (!vivo) return; guarda(); if (document.visibilityState === 'hidden') fiskApresEnviar(true); else marca = ag(); });
+  window.addEventListener('pagehide', function () { if (!vivo) return; guarda(); fiskApresEnviar(true); });
+  window.addEventListener('online', function () { fiskApresEnviar(false); });
+  guarda(); fiskApresEnviar(false);
+  return {
+    etapa: function (n, total) { conta(); if (n > reg.etapa) reg.etapa = n; if (total) reg.etapas = total; },
+    fim: function () { if (!vivo) return; guarda(); vivo = false; clearInterval(tic); fiskApresEnviar(false); }
+  };
+}
+
+/* ── A SEMANA DE CONVERSAÇÃO JÁ BAIXADA (Pedro, 27/11/2026: "uma coisa a menos para o professor se preocupar") ───
+ * Ao abrir o Hub, as atividades da semana descem sozinhas, em segundo plano e sem perguntar, para o computador da sala
+ * ter tudo antes da aula mesmo que a internet caia. Mesmo cache e mesmas chaves da conversacao.html ('fisk-conversa-v1',
+ * <origem>/__conversa/<id>/<quando>), então lá elas abrem na hora e aparecem como "✓ offline". Uma atividade por vez,
+ * pulando o que já está guardado; tenta de novo no máximo a cada 6 h. Não roda com "economia de dados" ligada. */
+var FISK_CONV_CACHE = 'fisk-conversa-v1';
+function fiskConvBaixarSemana(opts) {
+  opts = opts || {};
+  var s = fiskSessao(); if (!s || !s.token || !window.caches) return Promise.resolve(null);
+  try { if (navigator.connection && navigator.connection.saveData) return Promise.resolve(null); } catch (e) {}
+  var CH = 'conv:baixou', agora = Date.now();
+  try { if (!opts.forcar && agora - Number(localStorage.getItem(CH) || 0) < 6 * 36e5) return Promise.resolve(null); localStorage.setItem(CH, String(agora)); } catch (e) {}
+  var base = location.href.replace(/[^\/]*([?#].*)?$/, ''), PDFJS = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/';
+  return fiskFetch(FISK_HUB_EP, { action: 'conversaSemana', token: s.token }, { timeoutMs: 60000 }).then(function (j) {
+    if (!j || !j.ok || !j.idiomas) return null;
+    try { localStorage.setItem('conv:semana:atual', JSON.stringify(j)); if (j.semana) localStorage.setItem('conv:semana:' + j.semana.id, JSON.stringify(j)); } catch (e) {}
+    var itens = []; Object.keys(j.idiomas).forEach(function (k) { itens = itens.concat(j.idiomas[k].filter(function (i) { return i.pronto; })); });
+    return caches.open(FISK_CONV_CACHE).then(function (c) {
+      /* a própria página e o leitor de PDF, para abrir sem internet */
+      fiskGuardarPaginaOffline('conversacao.html');
+      var cadeia = Promise.resolve(), baixadas = 0;
+      itens.forEach(function (it) {
+        var k = location.origin + '/__conversa/' + it.id + '/' + it.quando;
+        cadeia = cadeia.then(function () {
+          return c.match(k).then(function (r) {
+            if (r) return;
+            return fiskFetch(FISK_HUB_EP, { action: 'conversaLer', token: s.token, id: it.id }, { timeoutMs: 120000 }).then(function (x) {
+              if (!x || !x.ok || !x.dados) return;
+              var u = Uint8Array.from(atob(x.dados), function (ch) { return ch.charCodeAt(0); });
+              baixadas++;
+              return c.put(k, new Response(u, { headers: { 'Content-Type': 'application/pdf' } }));
+            }).catch(function () {});
+          });
+        });
+      });
+      return cadeia.then(function () { return { total: itens.length, baixadas: baixadas }; });
+    });
+  }).catch(function () { return null; });
+}
+
+/* ── PÁGINA QUE ABRE SEM INTERNET (Pedro, 27/11/2026: conversação e informativo) ─────────────────────────────────
+ * Guarda a página (sempre a versão de agora), o kit nas versões (?v=) que ELA pede, o logo e o leitor de PDF no cache
+ * 'fisk-conversa-v1'; o sw-conversa.js (registrado pela própria página) serve daqui quando a rede falhar. */
+function fiskGuardarPaginaOffline(pagina) {
+  if (!window.caches) return Promise.resolve();
+  var base = location.href.replace(/[^\/]*([?#].*)?$/, ''), PDFJS = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/';
+  return caches.open('fisk-conversa-v1').then(function (c) {
+    var guarda = function (url) { return c.match(url).then(function (r) { if (!r) return fetch(url).then(function (x) { if (x.ok) return c.put(url, x); }).catch(function () {}); }); };
+    return Promise.all([guarda(PDFJS + 'pdf.min.js'), guarda(PDFJS + 'pdf.worker.min.js'), guarda(base + 'assets/fisk-logo.png'),
+      fetch(base + pagina, { cache: 'no-cache' }).then(function (r) {
+        if (!r.ok) return;
+        return r.clone().text().then(function (html) {
+          return c.put(base + pagina, r).then(function () {
+            return Promise.all((html.match(/(?:href|src)="(assets\/[^"]+)"/g) || []).map(function (m) { return guarda(base + m.replace(/^(?:href|src)="|"$/g, '')); }));
+          });
+        });
+      }).catch(function () {})]);
+  }).catch(function () {});
+}
