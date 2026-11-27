@@ -242,7 +242,7 @@
       return '<div data-e="' + (j + 1) + '" class="ft-off" style="font-size:64px;font-weight:800;line-height:1.2;margin-bottom:50px">' + esc(q.question) + '</div>'; }).join('') + '</div>');
     novo('fechamento', '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><div style="font:800 150px/1.05 \'' + T + '\';color:' + p.prim + ';text-align:center;max-width:1300px">' + esc(rot.fim) + '</div></div>' + balao, true);
 
-    slides.forEach(function (s) { ligar(s); });
+    slides.forEach(function (s) { s.es = es; ligar(s); });   /* es: o "Correct!" do jogo sai na língua da aula */
     return { slides: slides, receita: r };
   }
 
@@ -262,8 +262,8 @@
         b.addEventListener('click', function (ev) {
           ev.stopPropagation();
           var i = +b.getAttribute('data-op');
-          if (i === certa) { var nova = !b.classList.contains('ft-certa'); b.classList.add('ft-certa'); msg.textContent = '🎉 Correct!'; msg.style.color = '#31A889'; if (nova && !ev.ftRevela) festa(el); }
-          else { b.classList.remove('ft-errada'); void b.offsetWidth; b.classList.add('ft-errada'); msg.textContent = '✗ Try again!'; msg.style.color = '#dc2626'; }
+          if (i === certa) { var nova = !b.classList.contains('ft-certa'); b.classList.add('ft-certa'); msg.textContent = s.es ? '🎉 ¡Correcto!' : '🎉 Correct!'; msg.style.color = '#31A889'; if (nova && !ev.ftRevela) festa(el); }
+          else { b.classList.remove('ft-errada'); void b.offsetWidth; b.classList.add('ft-errada'); msg.textContent = s.es ? '✗ ¡Inténtalo de nuevo!' : '✗ Try again!'; msg.style.color = '#dc2626'; }
           msg.classList.add('on');
         });
       });

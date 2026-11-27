@@ -285,7 +285,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js"></script>
-<script src="assets/tema-slides.js?v=9fbc93759f"></script>
+<script src="assets/tema-slides.js?v=245566565c"></script>
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
@@ -840,7 +840,7 @@
       /* sem voz: o professor lê. A frase aparece embaixo do 🔊 (nunca a voz do navegador) */
       if (botao) { botao.style.opacity = ''; var el = botao.parentNode, aviso = el.querySelector('.ft-leia');
         if (!aviso) { aviso = document.createElement('div'); aviso.className = 'ft-leia'; aviso.style.cssText = 'position:absolute;left:0;top:215px;font:700 40px/1.2 system-ui,sans-serif;color:#b91c1c'; el.appendChild(aviso); }
-        aviso.textContent = '📢 Leia para a turma: “' + texto + '”'; }
+        aviso.textContent = (vozLingua === 'es' ? '📢 Lee en voz alta: “' : '📢 Read aloud: “') + texto + '”'; }
     });
   }
   FiskTema.aoOuvir = vozToca;
@@ -849,6 +849,11 @@
     var ctl = new AbortController(), t = setTimeout(function () { ctl.abort(); }, ms || 20000);
     return fetch(AULA_API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(c), signal: ctl.signal })
       .then(function (r) { return r.json(); }).finally(function () { clearTimeout(t); });
+  }
+  /* a língua da aula, para o celular dos alunos e o que a turma lê na TV: a do Conversation Maker; no PDF, pelo nível */
+  function aulaLingua() {
+    if (deck) return vozLingua;
+    return atual && /inmediato|espa[nñ]ol|spanish/i.test(((atual.niveis || []).join(' ') + ' ' + (atual.nome || ''))) ? 'es' : 'en';
   }
   function aulaBotao() { var b = $('bAlunos'); if (!b) return; b.hidden = false; b.classList.toggle('on', !!aula); }
   /* os cliques da aula: no PDF cada página é um clique; na atividade do Conversation Maker, cada etapa de cada slide */
@@ -867,9 +872,16 @@
   function aulaTexto() {
     if (!aula) return;
     /* o texto é para a TURMA, que lê a TV (27/11/2026: o aviso para o professor, com a contagem, confundia) */
-    var tx = aula.fim ? 'A atividade inteira está aberta no celular até 23h59, para revisar e copiar o vocabulário.'
-      : aula.turma ? 'Também está no Portal do Aluno, no card "Conversação de hoje".' : '';
+    /* e na língua da aula (Pedro, 27/11/2026): os botões do professor, embaixo, continuam em português */
+    var es = aulaLingua() === 'es';
+    var tx = aula.fim ? (es ? 'Toda la actividad está abierta en el celular hasta las 23:59, para repasar, copiar el vocabulario y rehacer el juego.'
+        : 'The whole activity is open on your phone until 11:59 pm: review it, copy the vocabulary and redo the game.')
+      : aula.turma ? (es ? 'También está en el Portal del Alumno, en la tarjeta del día.' : 'It is also on the Student Portal, on today\'s card.') : '';
     $('qrAulaTxt').textContent = tx;
+    var cx = $('qrAula').querySelector('.cx');
+    cx.querySelector('.chip').textContent = es ? 'EN VIVO' : 'LIVE';
+    cx.querySelector('h2').textContent = es ? '¡A conversar! 📱' : "Let's talk! 📱";
+    cx.querySelector('h2').nextElementSibling.textContent = es ? 'Abre la cámara, apunta al código y sigue las diapositivas con la clase.' : 'Open your camera, point it at the code and follow the slides with the class.';
     $('aulaFim').hidden = !!aula.fim;
     /* o interruptor dos Fisk Dólares: só com jogo na atividade e com o pagamento ligado no servidor */
     var fb = $('aulaFd'), temJogo = !!(deck && deck.slides.some(function (x) { return x.tipo === 'jogo'; }));
@@ -884,7 +896,7 @@
     if (aula) { aulaTexto(); $('qrAula').hidden = false; return; }
     var turma = aulaTurma();
     $('qrAula').hidden = false; $('qrAulaImg').innerHTML = '<div class="espera" style="color:#475569"><i></i></div>'; $('qrAulaCod').textContent = ''; $('qrAulaTxt').textContent = 'Preparando…'; $('aulaFim').hidden = true;
-    aulaApi({ op: 'abrir', token: s.token, titulo: titulo(atual), ativ: atual.id + '_' + String(atual.quando || '').replace(/\W/g, ''), total: aulaTotal(), rafs: turma ? turma.rafs : [], fd: true }, 25000).then(function (r) {
+    aulaApi({ op: 'abrir', token: s.token, titulo: titulo(atual), ativ: atual.id + '_' + String(atual.quando || '').replace(/\W/g, ''), total: aulaTotal(), rafs: turma ? turma.rafs : [], fd: true, lingua: aulaLingua() }, 25000).then(function (r) {
       if (!r.ok) throw new Error(r.error || 'não deu');
       aula = { id: r.aula, chave: r.chave, ativId: atual.id, feitos: {}, alvo: 0, agora: 1, fim: false, alunos: r.alunos, turma: turma ? turma.turma : '', fd: r.fd !== false, fdPaga: !!r.fdPaga };
       aulaBotao(); aulaTexto(); aulaDesenhaQr();
@@ -1007,7 +1019,9 @@
       void box.offsetWidth; box.classList.add('on');
     }
     var cols = box.querySelectorAll('.col');
-    box.querySelector('.leg').textContent = tot ? '👥 ' + tot + (tot === 1 ? ' resposta' : ' respostas') : 'Ninguém respondeu esta';
+    /* o que a TURMA lê sai na língua da aula (Pedro, 27/11/2026); os controles do professor continuam em português */
+    var es = aulaLingua() === 'es';
+    box.querySelector('.leg').textContent = tot ? '👥 ' + tot + (es ? (tot === 1 ? ' respuesta' : ' respuestas') : (tot === 1 ? ' answer' : ' answers')) : (es ? 'Nadie respondió' : 'No answers yet');
     [].forEach.call(cols, function (c, i) {
       var q = (g.por && g.por[i]) || 0, pct = tot ? Math.round(q * 100 / tot) : 0, barra = c.querySelector('.barra'), num = c.querySelector('.num');
       var antes = +(num.dataset.q || 0);
@@ -1056,7 +1070,9 @@
       var g = r.jogos && r.jogos[n];
       if (!g) { el.hidden = true; return; }
       if (g.revelado && et >= 1) aulaGrafico(sl.el, g);
-      el.textContent = g.revelado ? '✅ ' + g.certos + ' de ' + g.resp + (g.certos === 1 ? ' acertou' : ' acertaram') : '👥 ' + g.resp + (g.resp === 1 ? ' respondeu' : ' responderam');
+      var es = aulaLingua() === 'es';
+      el.textContent = g.revelado ? '✅ ' + g.certos + (es ? ' de ' : ' of ') + g.resp + (es ? ' acertaron' : ' got it right')
+        : '👥 ' + g.resp + (es ? (g.resp === 1 ? ' respondió' : ' respondieron') : (g.resp === 1 ? ' answered' : ' answered'));
       el.hidden = false;
     }, function () {}).then(function () { if (ger === placarGer && a === aula) placarT = setTimeout(aulaPlacar, 3000); });
   }
