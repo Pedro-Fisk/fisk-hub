@@ -273,13 +273,23 @@
   var dados = null, semanaId = '', registro = null, CH_LISTA = 'conv:semana:';
 
   /* ── a lista: topo com as semanas, a faixa "Agora", o destaque e as outras ── */
-  function pedeSemana(id) {
+  /* a lista de uma semana; se a rede falhar, tenta de novo uma vez antes de cair no que ficou guardado (27/11/2026:
+     o Pedro viu "Failed to fetch" ao tocar na semana anterior) */
+  function buscaSemana(id, tentativa) {
     return fiskFetch(FISK_HUB_EP, { action: 'conversaSemana', token: s.token, semanaId: id || '' }, { timeoutMs: 60000 })
       .then(function (j) {
         if (!j || !j.ok) throw new Error((j && (j.error || j.erro)) || 'não veio');
+        j._em = Date.now();
         try { localStorage.setItem(CH_LISTA + (id || 'atual'), JSON.stringify(j)); if (j.semana) localStorage.setItem(CH_LISTA + j.semana.id, JSON.stringify(j)); } catch (e) {}
         return j;
       })
+      .catch(function (e) {
+        if (tentativa) throw e;
+        return new Promise(function (ok) { setTimeout(ok, 1500); }).then(function () { return buscaSemana(id, 1); });
+      });
+  }
+  function pedeSemana(id) {
+    return buscaSemana(id, 0)
       .catch(function (e) {
         var g = null; try { g = JSON.parse(localStorage.getItem(CH_LISTA + (id || 'atual')) || 'null'); } catch (x) {}
         if (g) { g._offline = true; return g; }
@@ -301,10 +311,35 @@
     dados.idiomas[MINHAS] = itens.map(function (m) { return { id: m.id, nome: m.nome, tipo: 'cm', niveis: [m.nivel, m.perfil].filter(Boolean), quando: m.quando, pronto: true, origem: 'minha' }; });
     dados.vazio = false;
   }
-  function carregaLista(id) {
-    $('corpo').innerHTML = '<div class="espera"><i></i> Buscando as atividades da semana…</div>';
-    Promise.all([pedeSemana(id), pedeMinhas()]).then(function (r) { var j = r[0]; dados = j; semKids(); juntaMinhas(r[1]); semanaId = j.semana ? j.semana.id : ''; desenhaLista(); })
-      .catch(function (e) { $('corpo').innerHTML = '<p class="erro">Não consegui buscar as atividades (' + esc(e.message) + ').</p>'; });
+  /* SEM ESPERA ao trocar de semana (Pedro, 27/11/2026): a semana guardada no computador aparece na hora, a do servidor
+     confere por trás e só redesenha se mudou. Depois a anterior e a próxima descem em segundo plano. As atividades
+     criadas pelo professor vêm uma vez só, não a cada troca de semana. */
+  var ultMinhas = null, vezLista = 0;
+  try { ultMinhas = JSON.parse(localStorage.getItem(CH_MINHAS) || 'null'); } catch (e) {}
+  function guardada(id) { try { return JSON.parse(localStorage.getItem(CH_LISTA + (id || 'atual')) || 'null'); } catch (e) { return null; } }
+  function semCarimbo(j) { return JSON.stringify({ s: j && j.semana, i: j && j.idiomas, ss: j && j.semanas }); }
+  function aplica(j) { dados = j; semKids(); juntaMinhas(ultMinhas || []); semanaId = j.semana ? j.semana.id : ''; desenhaLista(); }
+  function carregaLista(id, depois) {
+    var vez = ++vezLista, g = guardada(id), viu = false;
+    if (g && g.semana && g.idiomas) { delete g._offline; aplica(g); viu = true; if (depois) { depois(); depois = null; } }
+    else $('corpo').innerHTML = '<div class="espera"><i></i> Buscando as atividades da semana…</div>';
+    pedeSemana(id).then(function (j) {
+      if (vez !== vezLista) return;
+      if (!viu || j._offline || semCarimbo(j) !== semCarimbo(g)) { if (!(viu && j._offline)) aplica(j); }
+      if (depois) depois();
+      vizinhas();
+    }).catch(function (e) {
+      if (vez !== vezLista || viu) return;
+      $('corpo').innerHTML = '<p class="erro">Não consegui buscar as atividades (' + esc(e.message) + ').</p><button type="button" class="bt2" id="bTenta">↻ Tentar de novo</button>';
+      $('bTenta').onclick = function () { carregaLista(id, depois); };
+    });
+  }
+  /* a anterior e a próxima, em segundo plano, se não foram buscadas na última meia hora */
+  function vizinhas() {
+    var ss = (dados && dados.semanas) || [], i = ss.map(function (x) { return x.id; }).indexOf(semanaId);
+    [ss[i - 1], ss[i + 1]].filter(Boolean).reduce(function (p, x) {
+      return p.then(function () { var g = guardada(x.id); if (g && g._em && Date.now() - g._em < 30 * 6e4) return; return pedeSemana(x.id).catch(function () {}); });
+    }, Promise.resolve());
   }
   function semanaAtual() { return ((dados && dados.semanas) || []).filter(function (x) { return x.atual; })[0]; }
   function semanaCerta() { var at = semanaAtual(); return !(dados && dados.semana && at && at.id !== dados.semana.id); }
@@ -842,8 +877,8 @@
   $('qrAula').onclick = function (e) { if (e.target.id === 'qrAula' || e.target.id === 'qrAulaFecha') $('qrAula').hidden = true; };
 
   var q = new URLSearchParams(location.search), qId = q.get('id'), qSem = q.get('semana');
-  Promise.all([pedeSemana(qSem || ''), pedeMinhas()]).then(function (r) { var j = r[0]; dados = j; semKids(); juntaMinhas(r[1]); semanaId = j.semana ? j.semana.id : ''; desenhaLista(); if (qId) abre(qId); })
-    .catch(function (e) { $('corpo').innerHTML = '<p class="erro">Não consegui buscar as atividades (' + esc(e.message) + ').</p>'; });
+  carregaLista(qSem || '', qId ? function () { abre(qId); } : null);
+  pedeMinhas().then(function (itens) { ultMinhas = itens; if (dados && !$('lista').hidden) { juntaMinhas(itens); desenhaLista(); } });
   try { if (localStorage.getItem('fisk_theme') === 'dark') document.body.classList.add('theme-dark'); } catch (e) {}
   fiskApresEnviar(false);   /* o que ficou na fila de uma aula sem internet */
   try { fiskRegistrarUso('Conversação da semana', 'conversacao'); } catch (e) {}
