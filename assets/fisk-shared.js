@@ -2147,7 +2147,9 @@ function fiskPerfilDaTurma(t) {
   var nivel = /TEENS/.test(L) ? 'Teens' : /ESSENTIAL/.test(L) ? 'Basic' : /TRANSITION/.test(L) ? 'Intermediate' : /FLUENCY|FOCUS/.test(L) ? 'Advanced' : '';
   var idioma = /INMEDIATO|ESPANOL|SPANISH|AVANZA|SIELE/.test(L) ? 'Español' : 'English';
   return { escola: t.escola || '', turma: t.titulo || t.tituloInteiro || '', livro: livro, nivel: nivel, idioma: idioma,
-           perfil: /[(\[]\s*\+\s*18\s*[)\]]/.test(tit) ? 'Adultos' : 'Jovens', ini: t.h ? t.h.ini : null };
+           perfil: /[(\[]\s*\+\s*18\s*[)\]]/.test(tit) ? 'Adultos' : 'Jovens', ini: t.h ? t.h.ini : null,
+           /* os RAFs da turma (27/11/2026): a conversação libera a aula no portal de cada aluno (portal-aluno-fisk/api/aula.js) */
+           rafs: (t.alunos || []).map(function (a) { return String(a.raf || '').trim(); }).filter(Boolean) };
 }
 /* a próxima turma de hoje (para quando não há aula agora) */
 function fiskTurmaProxima(s) {

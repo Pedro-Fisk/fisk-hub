@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#000000">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/fisk-shared.css?v=f12a68d93f">
-<script src="assets/fisk-shared.js?v=cc9b8d2bd3"></script>
+<script src="assets/fisk-shared.js?v=e341b2a884"></script>
 <style>
   /* A CONVERSAÇÃO DA SEMANA NA TV (Pedro, 27/11/2026; fase 1, protótipo aprovado em 26/11).
      Sem ?id: a lista das atividades da pasta da semana (backend ConversaSemana.js), por idioma.
@@ -134,6 +134,25 @@
   #qrFone .qr{ width: 16rem; height: 16rem; margin: .7rem auto; display: flex; align-items: center; justify-content: center; }
   #qrFone .qr svg{ width: 100%; height: 100%; }
   #qrFone button{ font: 800 .95rem inherit; margin-top: .6rem; border: 1.5px solid #cbd5e1; background: #fff; border-radius: 12px; padding: .55rem 1rem; cursor: pointer; }
+  /* a conversação no celular dos alunos (27/11/2026): o QR grande e o pequeno no canto do palco */
+  #barra #bAlunos.on{ background: #e5484d; border-color: #e5484d; }
+  #qrAula{ position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; background: rgba(5,8,12,.78); }
+  #qrAula[hidden]{ display: none; }
+  #qrAula .cx{ background: #fff; color: #0f172a; border-radius: 22px; padding: 1.4rem 1.8rem; text-align: center; max-width: 34rem; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+  #qrAula h2{ margin: 0 0 .3rem; font-size: 1.5rem; }
+  #qrAula p{ margin: .35rem 0; color: #475569; }
+  #qrAula .qr{ width: 20rem; height: 20rem; margin: .6rem auto; display: flex; align-items: center; justify-content: center; }
+  #qrAula .qr svg{ width: 100%; height: 100%; }
+  #qrAula .cod{ font: 800 1.5rem ui-monospace, Menlo, monospace; letter-spacing: .18em; color: #0f172a; }
+  #qrAula .linha{ display: flex; gap: .6rem; justify-content: center; flex-wrap: wrap; margin-top: .8rem; }
+  #qrAula button{ font: 800 .95rem inherit; border: 1.5px solid #cbd5e1; background: #fff; border-radius: 12px; padding: .6rem 1rem; cursor: pointer; }
+  #qrAula button.fim{ background: #0f172a; color: #fff; border-color: #0f172a; }
+  #qrAula button:disabled{ opacity: .5; cursor: default; }
+  #aulaCanto{ position: fixed; right: 14px; bottom: 74px; z-index: 12; background: #fff; border-radius: 12px; padding: 6px; box-shadow: 0 6px 20px rgba(0,0,0,.4); cursor: pointer; text-align: center; }
+  #aulaCanto[hidden]{ display: none; }
+  #aulaCanto .qr{ width: 92px; height: 92px; }
+  #aulaCanto .qr svg{ width: 100%; height: 100%; display: block; }
+  #aulaCanto span{ display: block; font: 800 .62rem system-ui, sans-serif; color: #0f172a; margin-top: 2px; }
   #foneAviso{ position: fixed; top: 18px; left: 50%; transform: translateX(-50%); z-index: 31; background: #31A889; color: #fff; font-weight: 800; padding: .55rem 1rem; border-radius: 999px; box-shadow: 0 8px 24px rgba(0,0,0,.35); }
   #foneAviso[hidden]{ display: none; }
   #prog{ position: fixed; left: 0; bottom: 0; height: 4px; width: 0; background: linear-gradient(90deg, var(--verde2), var(--verde)); z-index: 4; opacity: .8; transition: width .3s; }
@@ -199,10 +218,13 @@
     <button type="button" id="bInicio" title="Voltar ao início (Home)">⏮ Início</button>
     <button type="button" id="bCheia" title="Tela cheia (F)">⛶ Tela cheia</button>
     <button type="button" id="bFone" title="Usar o celular como controle remoto">📱 Celular</button>
+    <button type="button" id="bAlunos" title="Os alunos acompanham no celular os cliques que você já mostrou">👥 Alunos</button>
     <button type="button" id="bSair" title="Voltar à abertura (Esc)">✕</button>
   </div>
   <div id="capa"><div id="capaFundo"></div><div class="cx" id="capaCorpo"></div></div>
   <div id="qrFone" hidden><div class="cx"><h2>📱 Controle pelo celular</h2><p>Abra a câmera do seu celular e aponte para o código.</p><div class="qr" id="qrImg"></div><p id="qrTxt" style="font-size:.85rem">Preparando…</p><button type="button" id="qrFecha">Fechar</button></div></div>
+  <div id="qrAula" hidden><div class="cx"><h2>👥 Acompanhe no seu celular</h2><p>Abra a câmera do celular e aponte para o código.</p><div class="qr" id="qrAulaImg"></div><p class="cod" id="qrAulaCod"></p><p id="qrAulaTxt" style="font-size:.9rem">Preparando…</p><div class="linha"><button type="button" class="fim" id="aulaFim">✓ Finalizar e liberar a atividade inteira</button><button type="button" id="qrAulaFecha">Fechar</button></div></div></div>
+  <div id="aulaCanto" hidden title="Os alunos acompanham por este código"><div class="qr" id="aulaCantoImg"></div><span id="aulaCantoCod"></span></div>
   <div id="foneAviso" hidden>📱 Celular ligado: pode conduzir por ele</div>
 </div>
 
@@ -263,10 +285,17 @@
   function semKids() { Object.keys((dados && dados.idiomas) || {}).forEach(function (k) { dados.idiomas[k] = dados.idiomas[k].filter(function (it) { return !soKids(it); }); if (!dados.idiomas[k].length) delete dados.idiomas[k]; }); }
   function todos() { var a = []; Object.keys((dados && dados.idiomas) || {}).forEach(function (k) { a = a.concat(dados.idiomas[k]); }); return a; }
   /* "Ac - GTA 6 Launch Day - Basic - Jovens - Pedro Luz..." → "GTA 6 Launch Day" (nível e perfil viram etiquetas) */
+  /* o nome sem o que não é título: "Ac -", o número da frente, o nível, o perfil e o autor
+     ("04 - Everyday Life - Babies - Intermediate" → "Everyday Life - Babies"; antes de 27/11/2026 saía só "04") */
+  var NAO_TITULO = /^(BASIC|BASICO|INTERMEDIATE|INTER|INTERM|INTERMEDIO|INTERMEDIARIO|ADVANCED|ADV|AVANZADO|AVANCADO|TEENS?|KIDS|ADULTOS?|ADULTS|JOVENS|PRE|ADOLESCENTES|REAL|BEGINNERS?|ALL|LEVELS|ESPANHOL|ESPANOL|VERSAO|&|AND|E|\d+|[()]+)$/;
   function titulo(it) {
-    var p = String(it.nome).replace(/^Ac\s*-\s*/i, '').split(/\s+[-–—]\s+/);
-    return p[0] || it.nome;
+    var p = String(it.nome).replace(/^Ac\s*-\s*/i, '').replace(/^\d+\s*[-–—]\s*/, '').split(/\s+[-–—]\s+/).filter(function (x) {
+      var w = csemTiraAcento(x).toUpperCase().replace(/[()]/g, ' ').split(/[\s-]+/).filter(String);
+      return w.length && !w.every(function (k) { return NAO_TITULO.test(k); }) && !/PEDRO LUZ/.test(csemTiraAcento(x).toUpperCase());
+    });
+    return p.join(' - ') || it.nome;
   }
+  function csemTiraAcento(x) { return String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
   function nivelDe(it) { return (it.niveis || []).filter(function (n) { return /Teens|Basic|Intermediate|Advanced|Todos/.test(n); })[0] || ''; }
   function perfilDe(it) { return (it.niveis || []).filter(function (n) { return /Jovens|Adultos/.test(n); })[0] || ''; }
   var EM = { Basic: '🌱', Intermediate: '🚀', Advanced: '🏆', Teens: '⭐', Todos: '🌍' };
@@ -478,6 +507,7 @@
   function passoAtual() { var n = 0; for (var k = 0; k < ci; k++) n += deck.slides[k].etapas + 1; return n + et + 1; }
   function abre(id) {
     atual = todos().filter(function (i) { return i.id === id; })[0]; if (!atual) return;
+    if (aula && aula.ativId !== id) aulaSolta();
     $('lista').hidden = true; $('tocador').hidden = false; $('capa').hidden = false; tocando = false;
     var cf0 = $('capaFundo'); if (cf0) { cf0.classList.remove('on'); cf0.style.backgroundImage = ''; }
     $('capaCorpo').innerHTML = '<div class="espera"><i></i> Abrindo ' + esc(atual.nome) + '…</div>';
@@ -486,26 +516,30 @@
     if (atual.tipo === 'cm') {
       obterCm(atual).then(function (o) {
         deck = deckDe(o); paginas = []; ci = 0; et = 0; $('palco').innerHTML = '';
+        aulaBotao();
         capa();
       }).catch(function (e) { $('capaCorpo').innerHTML = '<p class="erro">Não consegui abrir (' + esc(e.message) + ').</p><div class="linha"><button class="sec" id="bVolta">← Voltar à lista</button></div>'; $('bVolta').onclick = volta; });
       return;
     }
     obter(atual).then(function (u) { return pdfjsLib.getDocument({ data: u }).promise; }).then(function (d) {
       doc = d; paginas = []; $('palco').innerHTML = '';
+      aulaBotao();
       for (var i = 0; i < d.numPages; i++) { var im = new Image(); im.alt = 'Clique ' + (i + 1); $('palco').appendChild(im); paginas.push(im); }
       return desenha(0).then(capa);
     }).catch(function (e) { $('capaCorpo').innerHTML = '<p class="erro">Não consegui abrir (' + esc(e.message) + ').</p><div class="linha"><button class="sec" id="bVolta">← Voltar à lista</button></div>'; $('bVolta').onclick = volta; });
   }
   function desenha(i) {
-    var im = paginas[i]; if (!im || im.dataset.ok) return Promise.resolve();
+    var im = paginas[i]; if (!im) return Promise.resolve();
+    /* quem chega no meio do desenho espera o MESMO desenho (o pdf.js trava desenhando a mesma página duas vezes de uma vez) */
+    if (im.dataset.ok) return im._desenho || Promise.resolve();
     im.dataset.ok = '1';
-    return doc.getPage(i + 1).then(function (pg) {
+    return im._desenho = doc.getPage(i + 1).then(function (pg) {
       var v1 = pg.getViewport({ scale: 1 }), vp = pg.getViewport({ scale: 1920 / v1.width });
       var c = document.createElement('canvas'); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
       return pg.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise.then(function () {
         return new Promise(function (ok) { c.toBlob(function (b) { im.src = URL.createObjectURL(b); c.width = c.height = 0; ok(); }, 'image/jpeg', 0.92); });
       });
-    }).catch(function () { delete im.dataset.ok; });
+    }).catch(function () { delete im.dataset.ok; im._desenho = null; });
   }
   function capa() {
     tocando = false; document.body.classList.remove('mostra', 'esconde-cursor');
@@ -549,7 +583,7 @@
     $('bN').textContent = (vez + 1) + ' de ' + paginas.length;
     $('prog').style.width = ((vez + 1) * 100 / paginas.length) + '%';
     if (registro) registro.etapa(vez + 1, paginas.length);
-    salaEstado();
+    salaEstado(); aulaMostrou();
   }
   function prox() {
     if (deck) { if (et < deck.slides[ci].etapas) et++; else if (ci < deck.slides.length - 1) { ci++; et = 0; } mostraCm(); return; }
@@ -567,6 +601,7 @@
     if (doc) { try { doc.destroy(); } catch (e) {} doc = null; }
     deck = null; var cfv = $('capaFundo'); if (cfv) cfv.innerHTML = '';
     tocando = false; atual = null; $('tocador').hidden = true; $('lista').hidden = false; salaEstado();
+    aulaSolta();
     history.replaceState(null, '', 'conversacao.html' + (semanaId ? '?semana=' + encodeURIComponent(semanaId) : ''));
     marcaOffline();
   }
@@ -672,6 +707,103 @@
   }
   $('bFone').onclick = foneBotao; $('qrFone').onclick = function (e) { if (e.target.id === 'qrFone' || e.target.id === 'qrFecha') $('qrFone').hidden = true; };
   window.addEventListener('pagehide', function () { salaFim(); });
+
+  /* ── a conversação no celular dos alunos (27/11/2026) ──
+     "👥 Alunos" abre uma AULA na Vercel (portal-aluno-fisk/api/aula.js) com os RAFs da turma de agora: o card
+     "Conversação de hoje" acende no portal de cada um, e o QR (grande e no canto) é a reserva. A cada clique, ESTE
+     navegador manda a imagem do clique: o aluno nunca recebe o que ainda não foi mostrado (as respostas dos jogos).
+     "Finalizar" manda o resto e a atividade fica aberta até 23h59. Só atividade em PDF de cliques (as do Conversation
+     Maker são desenhadas na hora e ficam para a próxima etapa). Sem internet, a aula na TV segue igual. */
+  var AULA_API = 'https://portalfisk.com.br/api/aula', AULA_URL = 'https://portalfisk.com.br/aula.html';
+  var aula = null, aulaFila = Promise.resolve();
+  function aulaApi(c, ms) {
+    var ctl = new AbortController(), t = setTimeout(function () { ctl.abort(); }, ms || 20000);
+    return fetch(AULA_API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(c), signal: ctl.signal })
+      .then(function (r) { return r.json(); }).finally(function () { clearTimeout(t); });
+  }
+  function aulaBotao() { var b = $('bAlunos'); if (!b) return; b.hidden = !!deck; b.classList.toggle('on', !!aula); }
+  function aulaTurma() {
+    var t = typeof fiskTurmaDeAgora === 'function' ? fiskTurmaDeAgora(s) : null;
+    return t && t.rafs && t.rafs.length ? t : null;
+  }
+  function aulaDesenhaQr() {
+    var url = AULA_URL + '#a=' + aula.id;
+    return qrDe(url).then(function (svg) { $('qrAulaImg').innerHTML = svg; $('aulaCantoImg').innerHTML = svg; })
+      .catch(function () { $('qrAulaImg').innerHTML = ''; });
+  }
+  function aulaTexto() {
+    if (!aula) return;
+    var tx = aula.fim ? 'Finalizada: a atividade inteira está aberta para os alunos até 23h59.'
+      : (aula.turma ? 'Os ' + aula.alunos + ' alunos da turma ' + aula.turma + ' também acham no portal, no card "Conversação de hoje". ' : 'Sem turma neste horário: os alunos entram só pelo código. ') +
+        'Eles veem só o que você já mostrou.';
+    $('qrAulaTxt').textContent = tx;
+    $('aulaFim').hidden = !!aula.fim;
+    $('qrAulaCod').textContent = aula.id;
+    $('aulaCantoCod').textContent = aula.id;
+  }
+  function alunosBotao() {
+    if (deck || !atual || !paginas.length) return;
+    if (aula) { aulaTexto(); $('qrAula').hidden = false; return; }
+    var turma = aulaTurma();
+    $('qrAula').hidden = false; $('qrAulaImg').innerHTML = '<div class="espera" style="color:#475569"><i></i></div>'; $('qrAulaCod').textContent = ''; $('qrAulaTxt').textContent = 'Preparando…'; $('aulaFim').hidden = true;
+    aulaApi({ op: 'abrir', token: s.token, titulo: titulo(atual), ativ: atual.id + '_' + String(atual.quando || '').replace(/\W/g, ''), total: paginas.length, rafs: turma ? turma.rafs : [] }, 25000).then(function (r) {
+      if (!r.ok) throw new Error(r.error || 'não deu');
+      aula = { id: r.aula, chave: r.chave, ativId: atual.id, enviado: 0, fim: false, alunos: r.alunos, turma: turma ? turma.turma : '' };
+      aulaBotao(); aulaTexto(); aulaDesenhaQr();
+      $('aulaCanto').hidden = false;
+      if (tocando) aulaMostrou();
+    }).catch(function (e) { $('qrAulaImg').innerHTML = ''; $('qrAulaTxt').textContent = 'Não consegui abrir para os alunos (' + e.message + '). Confira a internet.'; });
+  }
+  /* a imagem de um clique, menor que a da TV (1280 px, ~60 a 150 KB): é o que vai para o celular. Sai da imagem que a
+     TV JÁ desenhou (desenha devolve o desenho em andamento); desenhar a página de novo no pdf.js, em outro tamanho e
+     junto com a TV adiantando as próximas, travava para sempre (27/11/2026) */
+  function aulaImagem(i) {
+    return desenha(i).then(function () {
+      var im = paginas[i];
+      if (!im || !im.src) throw new Error('sem a imagem do clique');
+      return (im.decode ? im.decode() : Promise.resolve()).then(function () {
+        var w = 1280, h = Math.round(w * (im.naturalHeight || 720) / (im.naturalWidth || 1280));
+        var c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(im, 0, 0, w, h);
+        var b64 = c.toDataURL('image/jpeg', 0.72).split(',')[1]; c.width = c.height = 0; return b64;
+      });
+    });
+  }
+  /* manda, em ordem, as imagens que faltam até o clique n e diz onde a TV está */
+  function aulaEnvia(n, atualN) {
+    var a = aula;
+    aulaFila = aulaFila.then(function () {
+      if (!a || a !== aula) return;
+      var passo = Promise.resolve();
+      for (var k = a.enviado + 1; k <= n; k++) (function (k) {
+        passo = passo.then(function () { return aulaImagem(k - 1); }).then(function (img) {
+          return aulaApi({ op: 'clique', aula: a.id, chave: a.chave, n: k, atual: Math.min(k, atualN), img: img });
+        }).then(function (r) { if (r && r.ok) a.enviado = Math.max(a.enviado, k); });
+      })(k);
+      return passo.then(function () { if (n <= a.enviado) return aulaApi({ op: 'clique', aula: a.id, chave: a.chave, n: a.enviado, atual: atualN }); });
+    }).catch(function () {});
+    return aulaFila;
+  }
+  function aulaMostrou() {
+    if (!aula || aula.fim || deck || !atual || atual.id !== aula.ativId) return;
+    aulaEnvia(Math.max(aula.enviado, vez + 1), vez + 1);
+  }
+  function aulaFinaliza() {
+    if (!aula || aula.fim) return;
+    var a = aula, b = $('aulaFim'); b.disabled = true; b.textContent = 'Enviando os slides…';
+    aulaEnvia(paginas.length, vez + 1).then(function () {
+      if (a.enviado < paginas.length) throw new Error('faltaram slides');
+      return aulaApi({ op: 'fim', aula: a.id, chave: a.chave });
+    }).then(function (r) {
+      if (!r || !r.ok) throw new Error(r && r.error || 'não deu');
+      a.fim = true; aulaTexto();
+    }).catch(function (e) { $('qrAulaTxt').textContent = 'Não consegui finalizar (' + e.message + '). Tente de novo.'; })
+      .then(function () { b.disabled = false; b.textContent = '✓ Finalizar e liberar a atividade inteira'; });
+  }
+  /* trocar de atividade ou sair: a aula fica com o que já foi mostrado (o professor finaliza se quiser liberar tudo) */
+  function aulaSolta() { aula = null; $('aulaCanto').hidden = true; $('qrAula').hidden = true; aulaBotao(); }
+  $('bAlunos').onclick = alunosBotao; $('aulaFim').onclick = aulaFinaliza;
+  $('aulaCanto').onclick = function () { aulaTexto(); $('qrAula').hidden = false; };
+  $('qrAula').onclick = function (e) { if (e.target.id === 'qrAula' || e.target.id === 'qrAulaFecha') $('qrAula').hidden = true; };
 
   var q = new URLSearchParams(location.search), qId = q.get('id'), qSem = q.get('semana');
   Promise.all([pedeSemana(qSem || ''), pedeMinhas()]).then(function (r) { var j = r[0]; dados = j; semKids(); juntaMinhas(r[1]); semanaId = j.semana ? j.semana.id : ''; desenhaLista(); if (qId) abre(qId); })
