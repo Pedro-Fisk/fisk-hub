@@ -61,6 +61,8 @@
 .card-termo        { --accent: #0B5394; } /* azul do documento (ecoa o card online) */
 .card-conversation { --accent: #2563EB; }
 .card-infv { --accent: #d81f26; }   /* Informativo do mês na TV (26/11/2026) */
+.card-conv { --accent: #16a34a; }   /* Conversação da semana (27/11/2026) */
+.card-apres { --accent: #1d4ed8; }  /* O que passou na TV, só a direção (27/11/2026) */
 .card-planner      { --accent: #15803D; }
 .card-lessonplan   { --accent: #4338CA; } /* indigo do planejador de aula */
 .card-turmahoje    { --accent: #1d3685; } /* o azul-marinho do planner do aluno */

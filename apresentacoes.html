@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>O que passou na TV, FISK</title>
+<link rel="stylesheet" href="assets/fisk-shared.css?v=f12a68d93f">
+<script src="assets/fisk-shared.js?v=cc9b8d2bd3"></script>
+<style>
+  /* O QUE PASSOU NA TV (Pedro, 27/11/2026: "maior controle sobre se os professores estão utilizando as atividades
+     comunicativas corretamente"). Só a direção. Lê o registro dirApresentacoes (backend Apresentacoes.js): cada vez
+     que um professor abriu uma conversação ou o informativo na TV, com a turma da hora, a semana, o tempo aberto, o
+     tempo em TELA CHEIA e até que clique foi. Em vermelho: atividade de outra semana, ou menos de 10 min em tela cheia
+     (conversação) / menos de 1 min (informativo). */
+  body{ margin: 0; font-family: var(--font-body, system-ui, sans-serif); background: var(--bg, #f4f6fb); color: var(--ink, #1f2d57); }
+  body.theme-dark{ background: #0f141d; color: #dbe6f3; }
+  main{ max-width: 1150px; margin: 0 auto; padding: 1.3rem 1.1rem 3rem; }
+  .topo{ display: flex; align-items: center; gap: .9rem; flex-wrap: wrap; }
+  .topo h1{ font-family: var(--font-heading, inherit); font-size: 1.5rem; margin: 0; flex: 1; }
+  .volta{ font-weight: 800; text-decoration: none; color: #1d4ed8; }
+  .filtros{ display: flex; gap: .5rem; flex-wrap: wrap; margin: 1rem 0; }
+  .filtros button{ font: 800 .92rem var(--font-body, inherit); border: 1.5px solid #cbd5e1; background: #fff; color: inherit; border-radius: 12px; padding: .5rem .9rem; cursor: pointer; }
+  .filtros button.on{ border-color: #16a34a; background: #dcfce7; color: #14532d; }
+  body.theme-dark .filtros button{ background: #182131; border-color: #2e4560; }
+  body.theme-dark .filtros button.on{ background: #14532d; color: #dcfce7; }
+  .resumo{ display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: .7rem; margin-bottom: 1.2rem; }
+  .cx{ background: #fff; border-radius: 14px; padding: .8rem 1rem; border: 1px solid #e2e8f0; }
+  body.theme-dark .cx{ background: #182131; border-color: #2e4560; }
+  .cx b{ display: block; font-size: 1.6rem; font-family: var(--font-heading, inherit); }
+  .cx span{ font-size: .85rem; font-weight: 700; opacity: .75; }
+  h2{ font-family: var(--font-heading, inherit); font-size: 1.15rem; margin: 1.6rem 0 .6rem; }
+  table{ width: 100%; border-collapse: collapse; background: #fff; border-radius: 14px; overflow: hidden; font-size: .9rem; }
+  body.theme-dark table{ background: #182131; }
+  th, td{ text-align: left; padding: .55rem .7rem; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+  body.theme-dark th, body.theme-dark td{ border-color: #2e4560; }
+  th{ font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; opacity: .7; }
+  td.num{ text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  tr.ruim td{ background: rgba(239,68,68,.08); }
+  .tag{ display: inline-block; font-size: .72rem; font-weight: 800; padding: .1rem .45rem; border-radius: 99px; background: #fee2e2; color: #991b1b; margin-left: .3rem; }
+  .ok{ color: #15803d; font-weight: 800; }
+  .vazio, .erro{ opacity: .8; font-weight: 700; }
+  .espera{ display: inline-flex; align-items: center; gap: .6rem; font-weight: 700; }
+  .espera i{ width: 18px; height: 18px; border-radius: 50%; border: 3px solid rgba(100,116,139,.3); border-top-color: #16a34a; animation: gira .8s linear infinite; }
+  @keyframes gira{ to{ transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<script>try { if (localStorage.getItem('fisk_theme') === 'dark') document.body.classList.add('theme-dark'); } catch (e) {}</script>
+<main>
+  <div class="topo"><a class="volta" href="index.html">← Hub</a><h1>📺 O que passou na TV</h1></div>
+  <div class="filtros" id="filtros">
+    <button type="button" data-p="semana" class="on">Esta semana</button>
+    <button type="button" data-p="passada">Semana passada</button>
+    <button type="button" data-p="14">Últimos 14 dias</button>
+  </div>
+  <div id="corpo"><div class="espera"><i></i> Lendo o registro…</div></div>
+</main>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var s = fiskSessao();
+  if (!s || !s.token || !s.master) { $('corpo').innerHTML = '<p class="erro">Só a direção vê esta tela.</p>'; return; }
+  var MIN_CONV = 10, MIN_INFV = 1;
+  function iso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function periodo(p) {
+    var h = new Date(); h.setHours(0, 0, 0, 0);
+    var seg = new Date(h); seg.setDate(h.getDate() - ((h.getDay() + 6) % 7));
+    if (p === 'semana') return { de: iso(seg), ate: iso(h) };
+    if (p === 'passada') { var a = new Date(seg); a.setDate(seg.getDate() - 7); var b = new Date(seg); b.setDate(seg.getDate() - 1); return { de: iso(a), ate: iso(b) }; }
+    var c = new Date(h); c.setDate(h.getDate() - 13); return { de: iso(c), ate: iso(h) };
+  }
+  function hora(ms) { var d = new Date(ms); return d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' }) + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); }
+  function carrega(p) {
+    [].forEach.call(document.querySelectorAll('#filtros button'), function (b) { b.classList.toggle('on', b.dataset.p === p); });
+    $('corpo').innerHTML = '<div class="espera"><i></i> Lendo o registro…</div>';
+    var per = periodo(p);
+    fiskFetch(FISK_HUB_EP, { action: 'dirApresentacoes', token: s.token, de: per.de, ate: per.ate }, { timeoutMs: 60000 }).then(function (j) {
+      if (!j || !j.ok) throw new Error((j && (j.error || j.erro)) || 'não veio');
+      desenha(j.linhas || []);
+    }).catch(function (e) { $('corpo').innerHTML = '<p class="erro">Não consegui ler o registro (' + esc(e.message) + ').</p>'; });
+  }
+  function ruim(l) { return l.semanaCerta === 'NÃO' || Number(l.minCheia) < (l.ferramenta === 'Informativo' ? MIN_INFV : MIN_CONV); }
+  function desenha(ls) {
+    if (!ls.length) { $('corpo').innerHTML = '<p class="vazio">Nada passou na TV neste período.</p>'; return; }
+    ls.sort(function (a, b) { return b.inicio - a.inicio; });
+    var conv = ls.filter(function (l) { return l.ferramenta !== 'Informativo'; }), infv = ls.filter(function (l) { return l.ferramenta === 'Informativo'; });
+    var profs = {}; ls.forEach(function (l) { profs[l.professor] = 1; });
+    var fora = conv.filter(function (l) { return l.semanaCerta === 'NÃO'; }).length, curtas = conv.filter(function (l) { return Number(l.minCheia) < MIN_CONV; }).length;
+    var turmasInfv = {}; infv.filter(function (l) { return Number(l.minCheia) >= MIN_INFV; }).forEach(function (l) { turmasInfv[l.professor + '|' + (l.turma || '?')] = 1; });
+    var h = '<div class="resumo">' +
+      '<div class="cx"><b>' + conv.length + '</b><span>conversações abertas</span></div>' +
+      '<div class="cx"><b>' + Object.keys(profs).length + '</b><span>professores</span></div>' +
+      '<div class="cx"><b>' + fora + '</b><span>de outra semana</span></div>' +
+      '<div class="cx"><b>' + curtas + '</b><span>com menos de ' + MIN_CONV + ' min em tela cheia</span></div>' +
+      '<div class="cx"><b>' + Object.keys(turmasInfv).length + '</b><span>turmas viram o informativo</span></div></div>';
+    function tabela(arr, titulo) {
+      if (!arr.length) return '<h2>' + titulo + '</h2><p class="vazio">Nenhum registro.</p>';
+      return '<h2>' + titulo + '</h2><table><thead><tr><th>Quando</th><th>Professor</th><th>Turma</th><th>Atividade</th><th class="num">Tela cheia</th><th class="num">Aberta</th><th class="num">Até o clique</th></tr></thead><tbody>' +
+        arr.map(function (l) {
+          var r = ruim(l);
+          return '<tr class="' + (r ? 'ruim' : '') + '"><td>' + esc(hora(l.inicio)) + '</td><td>' + esc(l.professor) + '</td><td>' + esc(l.turma || 'fora do horário') + (l.escola ? '<br><small>' + esc(l.escola) + '</small>' : '') + '</td>' +
+            '<td>' + esc(l.atividade) + (l.semanaCerta === 'NÃO' ? '<span class="tag">outra semana: ' + esc(l.semana) + '</span>' : '') + '</td>' +
+            '<td class="num">' + (Number(l.minCheia) < (l.ferramenta === 'Informativo' ? MIN_INFV : MIN_CONV) ? esc(l.minCheia) + ' min' : '<span class="ok">' + esc(l.minCheia) + ' min</span>') + '</td>' +
+            '<td class="num">' + esc(l.minAberta) + ' min</td><td class="num">' + esc(l.etapa) + ' de ' + esc(l.etapas) + '</td></tr>';
+        }).join('') + '</tbody></table>';
+    }
+    $('corpo').innerHTML = h + tabela(conv, '💬 Conversação') + tabela(infv, '📺 Informativo');
+  }
+  $('filtros').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) carrega(b.dataset.p); });
+  carrega('semana');
+})();
+</script>
+</body>
+</html>

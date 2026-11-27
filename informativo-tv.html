@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#000000">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/fisk-shared.css?v=f12a68d93f">
-<script src="assets/fisk-shared.js?v=803bfcd9c1"></script>
+<script src="assets/fisk-shared.js?v=cc9b8d2bd3"></script>
 <style>
   /* O INFORMATIVO DO MÊS NA TV (Pedro, 26/11/2026). O professor abre, arrasta a aba para a tela estendida da TV e
      clica em "Começar na tela cheia" (o navegador não deixa nenhum site abrir já em tela cheia: é uma trava de
@@ -109,6 +109,9 @@
   var EMBED = /[?&]embed=1/.test(location.search);
   if (EMBED) document.body.classList.add('embed');
   if (CALMO) document.body.classList.add('calmo');
+  /* SEM INTERNET (27/11/2026): esta página e o leitor de PDF ficam guardados (fiskGuardarPaginaOffline, chamado pela home)
+     e o sw-conversa.js os serve quando a rede cai; o PDF vem do último guardado da escola (fiskInfvObter) */
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw-conversa.js', { scope: './informativo-tv' }).catch(function () {});
   function sess() { try { return JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) { return null; } }
   function nP(v) { return String(v || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); }
   function eu(s) { if (s.master) { try { var a = JSON.parse(localStorage.getItem('fisk_actas') || 'null'); if (a && a.name) return a.name; } catch (e) {} } return s.name || ''; }
@@ -204,6 +207,7 @@
   function mostra(i) {
     if (!PAGINAS.length) return;
     vez = (i + PAGINAS.length) % PAGINAS.length;
+    if (registroTV) registroTV.etapa(vez + 1, PAGINAS.length);
     PAGINAS.forEach(function (d, k) { d.classList.toggle('on', k === vez); if (k !== vez) d.classList.remove('anda'); });
     var atual = PAGINAS[vez];
     document.documentElement.style.setProperty('--dur', (DUR + 1.5) + 's');
@@ -232,7 +236,11 @@
     if (!EMBED) pedeAcordado();
     mostra(0); acorda();
     if (!EMBED) { try { if (typeof fiskRegistrarUso === 'function') fiskRegistrarUso('Informativo na TV', 'informativo-tv'); } catch (e) {} }
+    /* CONTROLE DA DIREÇÃO (27/11/2026): a TV da sala (não o carrossel da home) vira linha no registro, com a turma da
+       hora e o tempo em tela cheia; é por ele que a direção vê se o informativo passou em todas as turmas */
+    if (!EMBED && !registroTV && typeof fiskApresentacao === 'function') registroTV = fiskApresentacao({ ferramenta: 'informativo', atividade: nomeAtual, escola: escolaAtual });
   }
+  var registroTV = null;
 
   /* a barra e o cursor aparecem ao mexer o mouse e somem depois de 3 s parados */
   var someT = 0;
