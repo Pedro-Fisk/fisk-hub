@@ -140,12 +140,15 @@
   #qrAula[hidden]{ display: none; }
   /* o card no clima do "Conversação de hoje" da home do aluno (azul, bolhas, chip vermelho de ao vivo) */
   #qrAula .cx{ position: relative; overflow: hidden; color: #fff; border-radius: 28px; padding: 1.6rem 2rem 1.4rem; text-align: center; max-width: 36rem;
-    background: linear-gradient(135deg, #2546b8 0%, #1d3a8a 45%, #14245a 100%); box-shadow: 0 24px 70px rgba(0,0,0,.55); animation: aulaEntra .45s cubic-bezier(.2,1.4,.4,1); }
-  #qrAula .cx:before, #qrAula .cx:after{ content: ""; position: absolute; border-radius: 50%; background: rgba(255,255,255,.08); pointer-events: none; }
-  #qrAula .cx:before{ width: 260px; height: 260px; right: -90px; top: -110px; }
-  #qrAula .cx:after{ width: 180px; height: 180px; left: -70px; bottom: -80px; }
+    background: linear-gradient(135deg, #2b52c9 0%, #1d3a8a 35%, #14245a 65%, #23439f 100%); background-size: 240% 240%; box-shadow: 0 24px 70px rgba(0,0,0,.55);
+    animation: aulaEntra .45s cubic-bezier(.2,1.4,.4,1), aulaOnda 14s ease-in-out infinite; }
+  /* o fundo vivo (27/11/2026, pedido do Pedro): o azul ondula, e três bolhas claras derivam devagar, cada uma no seu ritmo */
+  #qrAula .cx:before, #qrAula .cx:after, #qrAula .bolhas:before{ content: ""; position: absolute; border-radius: 50%; background: rgba(255,255,255,.09); pointer-events: none; }
+  #qrAula .cx:before{ width: 260px; height: 260px; right: -90px; top: -110px; animation: aulaDeriva1 11s ease-in-out infinite; }
+  #qrAula .cx:after{ width: 180px; height: 180px; left: -70px; bottom: -80px; animation: aulaDeriva2 13s ease-in-out infinite; }
+  #qrAula .bolhas:before{ width: 120px; height: 120px; left: 38%; top: -70px; background: rgba(255,255,255,.06); animation: aulaDeriva3 17s ease-in-out infinite; }
   #qrAula .bolhas{ position: absolute; inset: 0; pointer-events: none; }
-  #qrAula .bolhas i{ position: absolute; font-style: normal; font-size: 1.6rem; opacity: .9; animation: aulaFlutua 3.2s ease-in-out infinite; }
+  #qrAula .bolhas i{ position: absolute; font-style: normal; font-size: 1.8rem; opacity: .95; animation: aulaFlutua 3.6s ease-in-out infinite; }
   #qrAula .chip{ display: inline-flex; align-items: center; gap: .4rem; font: 800 .78rem system-ui, sans-serif; letter-spacing: .05em; background: #e5484d; color: #fff; padding: .3rem .8rem; border-radius: 999px; }
   #qrAula .chip:before{ content: ""; width: 8px; height: 8px; border-radius: 50%; background: #fff; animation: aulaPisca 1.4s infinite; }
   #qrAula h2{ position: relative; margin: .55rem 0 .15rem; font-size: 2rem; line-height: 1.15; }
@@ -162,10 +165,14 @@
   #qrAula #qrAulaFecha{ background: rgba(255,255,255,.16); color: #fff; }
   #qrAula button:disabled{ opacity: .6; cursor: default; }
   @keyframes aulaEntra{ from{ transform: scale(.85) translateY(20px); opacity: 0; } }
-  @keyframes aulaFlutua{ 50%{ transform: translateY(-10px) rotate(-6deg); } }
+  @keyframes aulaFlutua{ 25%{ transform: translate(4px, -8px) rotate(6deg); } 50%{ transform: translate(0, -14px) rotate(-6deg); } 75%{ transform: translate(-4px, -6px) rotate(4deg); } }
+  @keyframes aulaOnda{ 50%{ background-position: 100% 100%; } }
+  @keyframes aulaDeriva1{ 50%{ transform: translate(-60px, 40px) scale(1.12); } }
+  @keyframes aulaDeriva2{ 50%{ transform: translate(70px, -30px) scale(.9); } }
+  @keyframes aulaDeriva3{ 50%{ transform: translate(-90px, 60px) scale(1.25); } }
   @keyframes aulaPulsa{ 50%{ box-shadow: 0 0 0 14px rgba(255,255,255,.08), 0 10px 30px rgba(0,0,0,.3); } }
   @keyframes aulaPisca{ 50%{ opacity: .3; } }
-  @media (prefers-reduced-motion: reduce){ #qrAula .cx, #qrAula .bolhas i, #qrAula .qr, #qrAula .chip:before{ animation: none; } }
+  @media (prefers-reduced-motion: reduce){ #qrAula .cx, #qrAula .cx:before, #qrAula .cx:after, #qrAula .bolhas:before, #qrAula .bolhas i, #qrAula .qr, #qrAula .chip:before{ animation: none; } }
   #aulaCanto{ position: fixed; right: 14px; bottom: 74px; z-index: 12; background: #fff; border-radius: 12px; padding: 6px; box-shadow: 0 6px 20px rgba(0,0,0,.4); cursor: pointer; text-align: center; }
   #aulaCanto[hidden]{ display: none; }
   #aulaCanto .qr{ width: 92px; height: 92px; }
