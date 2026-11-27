@@ -310,7 +310,11 @@
       var msg = el.querySelector('.ft-msg'); if (msg) msg.classList.remove('on');
       var som = raiz.FiskTema.som; raiz.FiskTema.som = false; mostrar(deck, i, etapa); raiz.FiskTema.som = som;
       return new Promise(function (ok) { setTimeout(ok, 60); })
-        .then(function () { var k = (largura || 1280) / 1920; return window.htmlToImage.toJpeg(el, { width: 1920, height: 1080, pixelRatio: k, quality: 0.75, cacheBust: false }); })
+        .then(function () {
+          /* onde cada opção do jogo está desenhada (frações do slide): o celular põe a área de toque em cima dela */
+          if (s.jogo) { var b0 = el.getBoundingClientRect(); s.jogo.areas = [].map.call(el.querySelectorAll('.ft-op'), function (b) {
+            var r = b.getBoundingClientRect(), f = function (v, t) { return Math.round(v / t * 10000) / 10000; };
+            return [f(r.left - b0.left, 1920), f(r.top - b0.top, 1080), f(r.width, 1920), f(r.height, 1080)]; }); } var k = (largura || 1280) / 1920; return window.htmlToImage.toJpeg(el, { width: 1920, height: 1080, pixelRatio: k, quality: 0.75, cacheBust: false }); })
         .then(function (url) { palco.remove(); return url; }, function (e) { palco.remove(); throw e; });
     });
     fotoFila = r.catch(function () {});

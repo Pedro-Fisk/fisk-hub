@@ -264,7 +264,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js"></script>
-<script src="assets/tema-slides.js?v=610fe83ce1"></script>
+<script src="assets/tema-slides.js?v=c4aed65445"></script>
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
@@ -903,7 +903,8 @@
     if (!deck) return undefined;
     var p = aulaPasso(k - 1), sl = p && deck.slides[p.i];
     if (!sl || sl.tipo !== 'jogo' || !sl.jogo || p.et !== 0) return undefined;
-    return { p: sl.jogo.pergunta, o: sl.jogo.opcoes, c: sl.jogo.certa, rev: k + 1 };
+    /* a = onde cada opção está no slide (medido pelo FiskTema.foto, que roda antes deste envio): o aluno toca direto nela */
+    return { p: sl.jogo.pergunta, o: sl.jogo.opcoes, c: sl.jogo.certa, rev: k + 1, a: sl.jogo.areas };
   }
   /* o contador discreto no canto: "7 responderam" e, depois de revelar, "5 de 7 acertaram". Só consulta (a cada 3 s)
      enquanto a TV está num slide de jogo com a aula aberta. */
