@@ -136,18 +136,36 @@
   #qrFone button{ font: 800 .95rem inherit; margin-top: .6rem; border: 1.5px solid #cbd5e1; background: #fff; border-radius: 12px; padding: .55rem 1rem; cursor: pointer; }
   /* a conversação no celular dos alunos (27/11/2026): o QR grande e o pequeno no canto do palco */
   #barra #bAlunos.on{ background: #e5484d; border-color: #e5484d; }
-  #qrAula{ position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; background: rgba(5,8,12,.78); }
+  #qrAula{ position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; background: rgba(5,8,12,.72); }
   #qrAula[hidden]{ display: none; }
-  #qrAula .cx{ background: #fff; color: #0f172a; border-radius: 22px; padding: 1.4rem 1.8rem; text-align: center; max-width: 34rem; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
-  #qrAula h2{ margin: 0 0 .3rem; font-size: 1.5rem; }
-  #qrAula p{ margin: .35rem 0; color: #475569; }
-  #qrAula .qr{ width: 20rem; height: 20rem; margin: .6rem auto; display: flex; align-items: center; justify-content: center; }
+  /* o card no clima do "Conversação de hoje" da home do aluno (azul, bolhas, chip vermelho de ao vivo) */
+  #qrAula .cx{ position: relative; overflow: hidden; color: #fff; border-radius: 28px; padding: 1.6rem 2rem 1.4rem; text-align: center; max-width: 36rem;
+    background: linear-gradient(135deg, #2546b8 0%, #1d3a8a 45%, #14245a 100%); box-shadow: 0 24px 70px rgba(0,0,0,.55); animation: aulaEntra .45s cubic-bezier(.2,1.4,.4,1); }
+  #qrAula .cx:before, #qrAula .cx:after{ content: ""; position: absolute; border-radius: 50%; background: rgba(255,255,255,.08); pointer-events: none; }
+  #qrAula .cx:before{ width: 260px; height: 260px; right: -90px; top: -110px; }
+  #qrAula .cx:after{ width: 180px; height: 180px; left: -70px; bottom: -80px; }
+  #qrAula .bolhas{ position: absolute; inset: 0; pointer-events: none; }
+  #qrAula .bolhas i{ position: absolute; font-style: normal; font-size: 1.6rem; opacity: .9; animation: aulaFlutua 3.2s ease-in-out infinite; }
+  #qrAula .chip{ display: inline-flex; align-items: center; gap: .4rem; font: 800 .78rem system-ui, sans-serif; letter-spacing: .05em; background: #e5484d; color: #fff; padding: .3rem .8rem; border-radius: 999px; }
+  #qrAula .chip:before{ content: ""; width: 8px; height: 8px; border-radius: 50%; background: #fff; animation: aulaPisca 1.4s infinite; }
+  #qrAula h2{ position: relative; margin: .55rem 0 .15rem; font-size: 2rem; line-height: 1.15; }
+  #qrAula p{ position: relative; margin: .35rem 0; color: rgba(255,255,255,.9); }
+  #qrAula .qr{ position: relative; width: 17rem; height: 17rem; margin: .7rem auto .5rem; padding: .7rem; background: #fff; border-radius: 22px; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 0 6px rgba(255,255,255,.18), 0 10px 30px rgba(0,0,0,.3); animation: aulaPulsa 2.4s ease-in-out infinite; }
   #qrAula .qr svg{ width: 100%; height: 100%; }
-  #qrAula .cod{ font: 800 1.5rem ui-monospace, Menlo, monospace; letter-spacing: .18em; color: #0f172a; }
-  #qrAula .linha{ display: flex; gap: .6rem; justify-content: center; flex-wrap: wrap; margin-top: .8rem; }
-  #qrAula button{ font: 800 .95rem inherit; border: 1.5px solid #cbd5e1; background: #fff; border-radius: 12px; padding: .6rem 1rem; cursor: pointer; }
-  #qrAula button.fim{ background: #0f172a; color: #fff; border-color: #0f172a; }
-  #qrAula button:disabled{ opacity: .5; cursor: default; }
+  #qrAula .cod{ position: relative; display: inline-block; font: 800 1.35rem ui-monospace, Menlo, monospace; letter-spacing: .2em; color: #14245a; background: #ffd24a; padding: .2rem .9rem; border-radius: 12px; margin: .2rem 0 .3rem; }
+  #qrAula .linha{ position: relative; display: flex; gap: .6rem; justify-content: center; flex-wrap: wrap; margin-top: .9rem; }
+  #qrAula button{ font: 800 1rem inherit; border: 0; border-radius: 999px; padding: .75rem 1.3rem; cursor: pointer; }
+  #qrAula button.fim{ background: #22b07d; color: #fff; box-shadow: 0 4px 0 #15805a; }
+  #qrAula button.fim:hover{ filter: brightness(1.06); }
+  #qrAula button.fim:active{ transform: translateY(2px); box-shadow: 0 2px 0 #15805a; }
+  #qrAula #qrAulaFecha{ background: rgba(255,255,255,.16); color: #fff; }
+  #qrAula button:disabled{ opacity: .6; cursor: default; }
+  @keyframes aulaEntra{ from{ transform: scale(.85) translateY(20px); opacity: 0; } }
+  @keyframes aulaFlutua{ 50%{ transform: translateY(-10px) rotate(-6deg); } }
+  @keyframes aulaPulsa{ 50%{ box-shadow: 0 0 0 14px rgba(255,255,255,.08), 0 10px 30px rgba(0,0,0,.3); } }
+  @keyframes aulaPisca{ 50%{ opacity: .3; } }
+  @media (prefers-reduced-motion: reduce){ #qrAula .cx, #qrAula .bolhas i, #qrAula .qr, #qrAula .chip:before{ animation: none; } }
   #aulaCanto{ position: fixed; right: 14px; bottom: 74px; z-index: 12; background: #fff; border-radius: 12px; padding: 6px; box-shadow: 0 6px 20px rgba(0,0,0,.4); cursor: pointer; text-align: center; }
   #aulaCanto[hidden]{ display: none; }
   #aulaCanto .qr{ width: 92px; height: 92px; }
@@ -223,7 +241,7 @@
   </div>
   <div id="capa"><div id="capaFundo"></div><div class="cx" id="capaCorpo"></div></div>
   <div id="qrFone" hidden><div class="cx"><h2>📱 Controle pelo celular</h2><p>Abra a câmera do seu celular e aponte para o código.</p><div class="qr" id="qrImg"></div><p id="qrTxt" style="font-size:.85rem">Preparando…</p><button type="button" id="qrFecha">Fechar</button></div></div>
-  <div id="qrAula" hidden><div class="cx"><h2>👥 Acompanhe no seu celular</h2><p>Abra a câmera do celular e aponte para o código.</p><div class="qr" id="qrAulaImg"></div><p class="cod" id="qrAulaCod"></p><p id="qrAulaTxt" style="font-size:.9rem">Preparando…</p><div class="linha"><button type="button" class="fim" id="aulaFim">✓ Finalizar e liberar a atividade inteira</button><button type="button" id="qrAulaFecha">Fechar</button></div></div></div>
+  <div id="qrAula" hidden><div class="cx"><div class="bolhas" aria-hidden="true"><i style="left:5%;top:5%">💬</i><i style="right:6%;top:8%;animation-delay:.8s">🎉</i><i style="left:6%;top:44%;animation-delay:1.6s">✨</i><i style="right:7%;top:50%;animation-delay:2.2s">💬</i></div><span class="chip">AO VIVO</span><h2>Bora conversar! 📱</h2><p>Abra a câmera, aponte para o código e siga os slides junto com a turma.</p><div class="qr" id="qrAulaImg"></div><p class="cod" id="qrAulaCod"></p><p id="qrAulaTxt" style="font-size:.9rem">Preparando…</p><div class="linha"><button type="button" class="fim" id="aulaFim">✓ Finalizar e liberar a atividade inteira</button><button type="button" id="qrAulaFecha">Fechar</button></div></div></div>
   <div id="aulaCanto" hidden title="Os alunos acompanham por este código"><div class="qr" id="aulaCantoImg"></div><span id="aulaCantoCod"></span></div>
   <div id="foneAviso" hidden>📱 Celular ligado: pode conduzir por ele</div>
 </div>
