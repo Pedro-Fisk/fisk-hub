@@ -145,6 +145,22 @@
   #capaFundo.on{ opacity: 1; }
   #capa{ isolation: isolate; overflow: hidden; }
   #capa::before{ content: ""; position: absolute; inset: 0; background: rgba(11,14,20,.35); z-index: -1; }
+  /* o texto da espera num CARTÃO BRANCO por cima do slide desfocado (Pedro, 27/11/2026: "ficou pouco legível") */
+  #capa .cx{ background: rgba(255,255,255,.96); color: #1e293b; border-radius: 26px; padding: 1.8rem 2rem 1.6rem; box-shadow: 0 24px 60px rgba(0,0,0,.35); }
+  #capa .cx h1{ color: #1e293b; }
+  #capa .cx p, #capa .cx .sub{ color: #475569 !important; }
+  #capa .dica{ color: #64748b !important; }
+  #capa .dica kbd{ background: #e2e8f0 !important; color: #1e293b !important; }
+  #capa .sec, #capa .sem-cheia{ color: #334155 !important; }
+  #capa .sec{ background: #f1f5f9 !important; border-color: #cbd5e1 !important; }
+  #capa .sec:hover{ border-color: #64748b !important; }
+  #capa .esc{ background: #f1f5f9 !important; color: #1e293b; }
+  #capa .esc button{ color: #1d4ed8 !important; }
+  #capa .escolas button{ color: #1e293b !important; background: #f1f5f9 !important; border-color: #cbd5e1 !important; }
+  #capa .espera{ color: #475569 !important; }
+  #capa .erro{ color: #b91c1c !important; }
+  #capa .aviso{ color: #b45309 !important; }
+  #capa .capinha{ border-color: #e2e8f0 !important; }
 </style>
 </head>
 <body>
