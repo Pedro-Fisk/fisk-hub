@@ -243,6 +243,8 @@
     /* 8. avaliação e fechamento (com o balão da FISK) */
     if ((L.evaluation || []).length) novo('avaliacao', h2(rot.av) + '<div style="position:absolute;left:250px;right:250px;top:260px">' + L.evaluation.map(function (q, j) {
       return '<div data-e="' + (j + 1) + '" class="ft-off" style="font-size:64px;font-weight:800;line-height:1.2;margin-bottom:50px">' + esc(q.question) + '</div>'; }).join('') + '</div>');
+    /* a avaliação no celular dos alunos (27/11/2026): as perguntas cruas, a nota e o comentário saem de lá */
+    if ((L.evaluation || []).length) slides[slides.length - 1].aval = L.evaluation.map(function (q) { return String(q.question || ''); });
     novo('fechamento', '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><div style="font:800 150px/1.05 \'' + T + '\';color:' + p.prim + ';text-align:center;max-width:1300px">' + esc(rot.fim) + '</div></div>' + balao, true);
 
     slides.forEach(function (s) { s.es = es; ligar(s); });   /* es: o "Correct!" do jogo sai na língua da aula */

@@ -187,6 +187,14 @@
   #aulaPlacar{ position: fixed; right: 14px; bottom: 200px; z-index: 12; background: rgba(15,23,42,.82); color: #fff; font: 800 .95rem system-ui, sans-serif;
     padding: 6px 12px; border-radius: 999px; box-shadow: 0 4px 14px rgba(0,0,0,.35); pointer-events: none; }
   #aulaPlacar[hidden]{ display: none; }
+  #avalVer{ position: fixed; inset: 0; z-index: 45; background: rgba(8,12,24,.8); display: flex; align-items: center; justify-content: center; }
+  #avalVer[hidden]{ display: none; }
+  #avalVer .cx{ background: #fff; color: #0f172a; border-radius: 20px; padding: 24px 28px; width: min(92vw, 760px); max-height: 86vh; overflow-y: auto; font: 500 1rem/1.4 system-ui, sans-serif; }
+  #avalVer h2{ margin: 0 0 8px; } #avalVer .res{ font-size: 1.15rem; margin: 0 0 6px; }
+  #avalVer .dist{ display: flex; gap: 14px; margin-bottom: 14px; font-weight: 700; }
+  #avalVer .it{ border-top: 1px solid #e2e8f0; padding: 10px 0; } #avalVer .it .em{ font-size: 1.5rem; }
+  #avalVer .it p{ margin: 4px 0; } #avalVer .it small{ color: #64748b; } #avalVer .com{ font-weight: 700; }
+  #avalVer button{ margin-top: 12px; border: 0; border-radius: 999px; padding: 10px 20px; background: #1d3a8a; color: #fff; font-weight: 800; cursor: pointer; }
   /* FERRAMENTAS DA AULA (Pedro, 27/11/2026): o cronômetro do Pair Work (ligado por padrão, o professor desliga) e o
      sorteio (desligado por padrão, o professor ativa). Liga e desliga no ⚙ da barra, guardado neste computador. */
   #ferr{ position: fixed; right: 14px; bottom: 74px; z-index: 30; background: #fff; color: #0f172a; border-radius: 14px; padding: 14px 16px; box-shadow: 0 10px 30px rgba(0,0,0,.35); display: flex; flex-direction: column; gap: 8px; font: 600 .92rem system-ui, sans-serif; min-width: 270px; }
@@ -312,8 +320,9 @@
   </div>
   <div id="capa"><div id="capaFundo"></div><div class="cx" id="capaCorpo"></div></div>
   <div id="qrFone" hidden><div class="cx"><h2>📱 Controle pelo celular</h2><p>Abra a câmera do seu celular e aponte para o código.</p><div class="qr" id="qrImg"></div><p id="qrTxt" style="font-size:.85rem">Preparando…</p><button type="button" id="qrFecha">Fechar</button></div></div>
-  <div id="qrAula" hidden><div class="cx"><div class="bolhas" aria-hidden="true"><i style="left:5%;top:5%">💬</i><i style="right:6%;top:8%;animation-delay:.8s">🎉</i><img class="logo" src="assets/fisk-logo-balao-360.png" alt="" style="left:2.5%;top:33%"><i style="left:8%;top:64%;animation-delay:1.6s">✨</i><i style="right:7%;top:50%;animation-delay:2.2s">💬</i></div><span class="chip">AO VIVO</span><h2>Bora conversar! 📱</h2><p>Abra a câmera, aponte para o código e siga os slides junto com a turma.</p><div class="qr" id="qrAulaImg"></div><p class="cod" id="qrAulaCod"></p><p id="qrAulaTxt" style="font-size:.9rem">Preparando…</p><div class="linha"><button type="button" class="fim" id="aulaFim">✓ Finalizar e liberar a atividade inteira</button><button type="button" id="aulaFd" hidden title="Vale para a aula inteira: 20 por acerto e 5 por responder, no Portal do Aluno de quem entrou pelo card ou está logado">💰 Jogo vale Fisk Dólares: SIM</button><button type="button" id="aulaCopia" title="Para a turma online: cole no chat do Google Meet e cada aluno abre numa aba">📋 Copiar o link para o chat</button><button type="button" id="qrAulaFecha">Fechar</button></div></div></div>
+  <div id="qrAula" hidden><div class="cx"><div class="bolhas" aria-hidden="true"><i style="left:5%;top:5%">💬</i><i style="right:6%;top:8%;animation-delay:.8s">🎉</i><img class="logo" src="assets/fisk-logo-balao-360.png" alt="" style="left:2.5%;top:33%"><i style="left:8%;top:64%;animation-delay:1.6s">✨</i><i style="right:7%;top:50%;animation-delay:2.2s">💬</i></div><span class="chip">AO VIVO</span><h2>Bora conversar! 📱</h2><p>Abra a câmera, aponte para o código e siga os slides junto com a turma.</p><div class="qr" id="qrAulaImg"></div><p class="cod" id="qrAulaCod"></p><p id="qrAulaTxt" style="font-size:.9rem">Preparando…</p><div class="linha"><button type="button" class="fim" id="aulaFim">✓ Finalizar e liberar a atividade inteira</button><button type="button" id="aulaFd" hidden title="Vale para a aula inteira: 20 por acerto e 5 por responder, no Portal do Aluno de quem entrou pelo card ou está logado">💰 Jogo vale Fisk Dólares: SIM</button><button type="button" id="aulaAval" title="O que a turma respondeu no slide de avaliação, com os comentários (sem nome de aluno)">📝 Avaliações</button><button type="button" id="aulaCopia" title="Para a turma online: cole no chat do Google Meet e cada aluno abre numa aba">📋 Copiar o link para o chat</button><button type="button" id="qrAulaFecha">Fechar</button></div></div></div>
   <div id="aulaPlacar" hidden aria-live="polite"></div>
+  <div id="avalVer" hidden><div class="cx"><h2>📝 Avaliações da aula</h2><div id="avalVerCorpo"></div><button type="button" id="avalVerFecha">Fechar</button></div></div>
   <div id="ferr" hidden><b>Ferramentas da aula</b>
     <label><input type="checkbox" id="fCrono"> ⏱ Cronômetro no Pair Work</label>
     <div class="min">Tempo: <button type="button" id="fMenos">−</button> <span id="fMin">3</span> min <button type="button" id="fMais">+</button> <button type="button" id="fJa" title="Começar o cronômetro agora, em qualquer slide">▶ Agora</button></div>
@@ -327,7 +336,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js"></script>
-<script src="assets/tema-slides.js?v=1c15640c72"></script>
+<script src="assets/tema-slides.js?v=63826218e7"></script>
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
@@ -999,7 +1008,7 @@
         var jg = aulaJogo(k);
         /* ouça e escolha: o mesmo mp3 que a TV tocou vai para os celulares (se a voz falhou, vai sem áudio) */
         return (jg && jg.ot ? vozMp3(jg.ot).catch(function () { return null; }) : Promise.resolve(null)).then(function (mp3) {
-          return aulaApi({ op: 'clique', aula: a.id, chave: a.chave, n: k, atual: a.agora, img: img, jogo: jg, s: mp3 || undefined, vocab: aulaVocab(k) });
+          return aulaApi({ op: 'clique', aula: a.id, chave: a.chave, n: k, atual: a.agora, img: img, jogo: jg, s: mp3 || undefined, vocab: aulaVocab(k), aval: aulaAval(k) });
         });
       }).then(function (r) {
         if (!r || !r.ok) throw new Error('não gravou');
@@ -1027,6 +1036,33 @@
   function aulaPaga() {
     var a = aula; if (!a || !a.fdPaga) return;
     try { fiskFetch(FISK_HUB_EP, { action: 'aulaFdPagar', token: s.token, aula: a.id }, { timeoutMs: 60000 }).catch(function () {}); } catch (e) {}
+  }
+  /* A AVALIAÇÃO DA AULA (27/11/2026): no slide de Activity Evaluation, quantos avaliaram e a média (para a turma, na
+     língua da aula); o professor lê tudo no "📝 Avaliações" do painel dos alunos (em português, sem nome de aluno) */
+  var EMO = ['😞', '🙁', '😐', '🙂', '😍'];
+  function aulaAvalPlacar(ger) {
+    var el = $('aulaPlacar'), a = aula;
+    aulaApi({ op: 'avaliacoes', aula: a.id, chave: a.chave }, 8000).then(function (r) {
+      if (ger !== placarGer || a !== aula || !r || !r.ok) return;
+      var es = aulaLingua() === 'es';
+      el.textContent = '📝 ' + r.total + (es ? (r.total === 1 ? ' evaluación' : ' evaluaciones') : (r.total === 1 ? ' answer' : ' answers')) + (r.media ? ' · ' + EMO[Math.round(r.media) - 1] + ' ' + String(r.media).replace('.', es ? ',' : '.') : '');
+      el.hidden = false;
+    }, function () {}).then(function () { if (ger === placarGer && a === aula) placarT = setTimeout(aulaPlacar, 4000); });
+  }
+  function aulaAvalVer() {
+    if (!aula) return;
+    var box = $('avalVerCorpo'); $('avalVer').hidden = false; box.innerHTML = '<p>Carregando…</p>';
+    aulaApi({ op: 'avaliacoes', aula: aula.id, chave: aula.chave }, 15000).then(function (r) {
+      if (!r || !r.ok) throw 0;
+      if (!r.total) { box.innerHTML = '<p>Nenhuma avaliação ainda. Elas aparecem quando a turma chega ao slide de avaliação.</p>'; return; }
+      var h = '<p class="res"><b>' + r.total + (r.total === 1 ? ' avaliação' : ' avaliações') + '</b>' + (r.media ? ' · média ' + EMO[Math.round(r.media) - 1] + ' ' + String(r.media).replace('.', ',') : '') + '</p>';
+      h += '<div class="dist">' + r.dist.map(function (q, i) { return '<span>' + EMO[i] + ' ' + q + '</span>'; }).join('') + '</div>';
+      h += r.itens.map(function (it) {
+        return '<div class="it">' + (it.r ? '<span class="em">' + EMO[it.r - 1] + '</span>' : '') + (it.a || []).map(function (x, i) { return x ? '<p><small>' + esc(r.perguntas[i] || '') + '</small><br>' + esc(x) + '</p>' : ''; }).join('') +
+          (it.c ? '<p class="com">💬 ' + esc(it.c) + '</p>' : '') + '</div>';
+      }).join('');
+      box.innerHTML = h;
+    }).catch(function () { box.innerHTML = '<p>Não consegui carregar. Confira a internet.</p>'; });
   }
   function aulaTiraGraficos() {
     if (!deck) return;
@@ -1096,6 +1132,11 @@
     var p = aulaPasso(k - 1), sl = p && deck.slides[p.i];
     return sl && sl.vocab && sl.vocab.length ? sl.vocab : undefined;
   }
+  function aulaAval(k) {
+    if (!deck) return undefined;
+    var p = aulaPasso(k - 1), sl = p && deck.slides[p.i];
+    return sl && sl.aval && sl.aval.length ? sl.aval : undefined;
+  }
   function aulaJogo(k) {
     if (!deck) return undefined;
     var p = aulaPasso(k - 1), sl = p && deck.slides[p.i];
@@ -1114,6 +1155,7 @@
   function aulaPlacar() {
     clearTimeout(placarT); var ger = ++placarGer;   /* troca de slide no meio da consulta: só a mais nova continua */
     var el = $('aulaPlacar'), sl = deck && deck.slides[ci];
+    if (aula && sl && sl.tipo === 'avaliacao' && tocando && atual.id === aula.ativId) { aulaAvalPlacar(ger); return; }
     if (!aula || !sl || sl.tipo !== 'jogo' || !tocando || atual.id !== aula.ativId) { el.hidden = true; return; }
     var n = aulaAgora() - et, a = aula;
     aulaApi({ op: 'placar', aula: a.id, chave: a.chave }, 8000).then(function (r) {
@@ -1142,6 +1184,7 @@
   }
   /* trocar de atividade ou sair: a aula fica com o que já foi mostrado (o professor finaliza se quiser liberar tudo) */
   function aulaSolta() { aula = null; clearTimeout(placarT); $('aulaPlacar').hidden = true; $('aulaCanto').hidden = true; $('qrAula').hidden = true; aulaBotao(); }
+  $('aulaAval').onclick = aulaAvalVer; $('avalVerFecha').onclick = function () { $('avalVer').hidden = true; };
   $('bAlunos').onclick = alunosBotao; $('aulaFim').onclick = aulaFinaliza; $('aulaFd').onclick = aulaFdTroca;
   $('aulaCopia').onclick = function () {
     if (!aula) return;
