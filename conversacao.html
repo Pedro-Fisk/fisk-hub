@@ -124,6 +124,18 @@
   #barra button:hover{ background: rgba(255,255,255,.2); }
   #barra .n{ min-width: 6.5rem; text-align: center; font-weight: 800; opacity: .85; }
   #barra .sep{ width: 1px; align-self: stretch; background: rgba(255,255,255,.18); }
+  #barra #bFone.on{ background: #31A889; border-color: #31A889; }
+  /* o celular como controle remoto (27/11/2026): o QR code sobre a TV até o celular parear */
+  #qrFone{ position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; background: rgba(5,8,12,.72); }
+  #qrFone[hidden]{ display: none; }
+  #qrFone .cx{ background: #fff; color: #0f172a; border-radius: 22px; padding: 1.4rem 1.6rem; text-align: center; max-width: 26rem; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+  #qrFone h2{ margin: 0 0 .3rem; font-size: 1.35rem; }
+  #qrFone p{ margin: .3rem 0; color: #475569; }
+  #qrFone .qr{ width: 16rem; height: 16rem; margin: .7rem auto; display: flex; align-items: center; justify-content: center; }
+  #qrFone .qr svg{ width: 100%; height: 100%; }
+  #qrFone button{ font: 800 .95rem inherit; margin-top: .6rem; border: 1.5px solid #cbd5e1; background: #fff; border-radius: 12px; padding: .55rem 1rem; cursor: pointer; }
+  #foneAviso{ position: fixed; top: 18px; left: 50%; transform: translateX(-50%); z-index: 31; background: #31A889; color: #fff; font-weight: 800; padding: .55rem 1rem; border-radius: 999px; box-shadow: 0 8px 24px rgba(0,0,0,.35); }
+  #foneAviso[hidden]{ display: none; }
   #prog{ position: fixed; left: 0; bottom: 0; height: 4px; width: 0; background: linear-gradient(90deg, var(--verde2), var(--verde)); z-index: 4; opacity: .8; transition: width .3s; }
   #capa{ position: fixed; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center; padding: 1.5rem; background: radial-gradient(120% 120% at 50% 0%, #1c2433 0%, #0b0e14 70%); }
   .cx{ max-width: 620px; width: 100%; text-align: center; }
@@ -186,9 +198,12 @@
     <span class="sep"></span>
     <button type="button" id="bInicio" title="Voltar ao início (Home)">⏮ Início</button>
     <button type="button" id="bCheia" title="Tela cheia (F)">⛶ Tela cheia</button>
+    <button type="button" id="bFone" title="Usar o celular como controle remoto">📱 Celular</button>
     <button type="button" id="bSair" title="Voltar à abertura (Esc)">✕</button>
   </div>
   <div id="capa"><div id="capaFundo"></div><div class="cx" id="capaCorpo"></div></div>
+  <div id="qrFone" hidden><div class="cx"><h2>📱 Controle pelo celular</h2><p>Abra a câmera do seu celular e aponte para o código.</p><div class="qr" id="qrImg"></div><p id="qrTxt" style="font-size:.85rem">Preparando…</p><button type="button" id="qrFecha">Fechar</button></div></div>
+  <div id="foneAviso" hidden>📱 Celular ligado: pode conduzir por ele</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js"></script>
@@ -503,6 +518,7 @@
       '<div><button type="button" class="comeca" id="comeca">▶ Começar na tela cheia</button></div>' +
       '<div class="linha"><button type="button" class="sec" id="semCheia">Começar sem tela cheia</button><button type="button" class="sec" id="bVolta">← Voltar à lista</button></div>' +
       '<p class="dica">Avance com <kbd>clique</kbd>, <kbd>→</kbd>, <kbd>espaço</kbd> ou o passador de slides. Volte com <kbd>←</kbd>.<br><kbd>F</kbd> tela cheia · <kbd>Esc</kbd> volta para cá</p>';
+    salaEstado();
     $('comeca').onclick = function () { comecar(true); }; $('semCheia').onclick = function () { comecar(false); }; $('bVolta').onclick = volta;
     if (deck) { var cx = $('capinhaCm'), c0 = deck.slides[0].el.cloneNode(true); c0.style.pointerEvents = 'none'; cx.appendChild(c0); FiskTema.encaixar(c0, cx); }
   }
@@ -522,6 +538,7 @@
     $('bN').textContent = 'slide ' + (ci + 1) + ' de ' + deck.slides.length;
     $('prog').style.width = (n * 100 / tot) + '%';
     if (registro) registro.etapa(n, tot);
+    salaEstado();
   }
   function mostra(i) {
     if (deck) { if (i === 0) { ci = 0; et = 0; } else if (i === Infinity) { ci = deck.slides.length - 1; et = deck.slides[ci].etapas; } mostraCm(); return; }
@@ -532,6 +549,7 @@
     $('bN').textContent = (vez + 1) + ' de ' + paginas.length;
     $('prog').style.width = ((vez + 1) * 100 / paginas.length) + '%';
     if (registro) registro.etapa(vez + 1, paginas.length);
+    salaEstado();
   }
   function prox() {
     if (deck) { if (et < deck.slides[ci].etapas) et++; else if (ci < deck.slides.length - 1) { ci++; et = 0; } mostraCm(); return; }
@@ -548,7 +566,7 @@
     paginas.forEach(function (im) { if (im.src) URL.revokeObjectURL(im.src); });
     if (doc) { try { doc.destroy(); } catch (e) {} doc = null; }
     deck = null; var cfv = $('capaFundo'); if (cfv) cfv.innerHTML = '';
-    tocando = false; $('tocador').hidden = true; $('lista').hidden = false;
+    tocando = false; atual = null; $('tocador').hidden = true; $('lista').hidden = false; salaEstado();
     history.replaceState(null, '', 'conversacao.html' + (semanaId ? '?semana=' + encodeURIComponent(semanaId) : ''));
     marcaOffline();
   }
@@ -573,6 +591,87 @@
     clearTimeout(tCursor); tCursor = setTimeout(function () { document.body.classList.remove('mostra'); if (tocando) document.body.classList.add('esconde-cursor'); }, 2500);
   }
   document.addEventListener('mousemove', function () { if (tocando) acorda(); });
+
+  /* ── o celular como controle remoto (27/11/2026) ──
+     A sala mora na Vercel (portal-aluno-fisk/api/sala.js). A TV cria a sala, mostra o QR (que leva um par de uso
+     único), fica numa espera longa pelos comandos e devolve o estado a cada clique. Sem internet o botão avisa e a
+     aula segue no teclado/passador, como sempre. */
+  var SALA_API = 'https://portalfisk.com.br/api/sala', SALA_FONE = 'https://portalfisk.com.br/controle.html';
+  var sala = null, salaVez = 0, tEstado = null, tAviso = null;
+  function salaApi(c, ms) {
+    var ctl = new AbortController(), t = setTimeout(function () { ctl.abort(); }, ms || 15000);
+    return fetch(SALA_API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(c), signal: ctl.signal })
+      .then(function (r) { return r.json(); }).finally(function () { clearTimeout(t); });
+  }
+  function qrDe(url) {
+    var faz = function () { var q = qrcode(0, 'M'); q.addData(url); q.make(); return q.createSvgTag({ cellSize: 8, margin: 2, scalable: true }); };
+    if (window.qrcode) return Promise.resolve(faz());
+    return new Promise(function (ok, nao) {
+      var sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js';
+      sc.onload = function () { ok(faz()); }; sc.onerror = function () { nao(new Error('sem o gerador de QR')); }; document.head.appendChild(sc);
+    });
+  }
+  function mostraQr(par) {
+    var url = SALA_FONE + '#s=' + sala.id + '&p=' + par;
+    $('qrFone').hidden = false;
+    qrDe(url).then(function (svg) { $('qrImg').innerHTML = svg; $('qrTxt').textContent = 'O código vale para um celular só. Depois de ligado, ele some.'; })
+      .catch(function () { $('qrImg').innerHTML = ''; $('qrTxt').textContent = 'Não consegui desenhar o código. Confira a internet.'; });
+  }
+  function foneBotao() {
+    if (sala) { salaApi({ op: 'novoPar', sala: sala.id, chaveTV: sala.chave }).then(function (r) { if (r.ok) { $('bFone').classList.remove('on'); mostraQr(r.par); } else { salaFim(); foneBotao(); } }).catch(function () { $('qrFone').hidden = false; $('qrTxt').textContent = 'Sem internet: o celular não consegue ligar agora.'; }); return; }
+    $('qrFone').hidden = false; $('qrImg').innerHTML = '<div class="espera" style="color:#475569"><i></i></div>'; $('qrTxt').textContent = 'Preparando…';
+    salaApi({ op: 'criar', token: s.token }, 25000).then(function (r) {
+      if (!r.ok) throw new Error(r.error || 'não deu');
+      sala = { id: r.sala, chave: r.chaveTV }; salaVez++;
+      mostraQr(r.par); salaEscuta(salaVez); salaEstado();
+    }).catch(function (e) { $('qrImg').innerHTML = ''; $('qrTxt').textContent = 'Não consegui preparar o controle (' + e.message + '). Confira a internet.'; });
+  }
+  function salaEscuta(vez) {
+    if (!sala || vez !== salaVez) return;
+    salaApi({ op: 'esperar', sala: sala.id, chave: sala.chave, lado: 'tv' }, 32000).then(function (r) {
+      if (!sala || vez !== salaVez) return;
+      if (!r.ok) { if (r.cod === 'sala' || r.cod === 'chave') { salaFim(true); return; } throw new Error(r.error); }
+      (r.itens || []).forEach(function (it) {
+        if (it.pareou) { $('qrFone').hidden = true; $('bFone').classList.add('on'); $('foneAviso').hidden = false; clearTimeout(tAviso); tAviso = setTimeout(function () { $('foneAviso').hidden = true; }, 3500); salaEstado(); }
+        if (!it.acao) return;
+        if (!tocando) { if (atual && !$('capa').hidden && (deck || paginas.length)) comecar(false); return; }
+        if (it.acao === 'prox') prox(); else if (it.acao === 'ant') ant(); else if (it.acao === 'ini') mostra(0);
+      });
+      salaEscuta(vez);
+    }).catch(function () { setTimeout(function () { salaEscuta(vez); }, 2000); });
+  }
+  function textoDe(el) { return el ? String(el.innerText || el.textContent || '').replace(/[ \t]+/g, ' ').replace(/\n\s*\n+/g, '\n').trim() : ''; }
+  /* o roteiro do slide para o celular: cada item que a TV revela por clique, ✓ os que já apareceram, · os que vêm */
+  function roteiroDe(el) {
+    var linhas = [];
+    [].forEach.call(el.querySelectorAll('[data-e]'), function (x) {
+      if (x.hidden) return;
+      var c = x.closest('[data-carta]'), t;
+      if (c) t = textoDe(c.firstElementChild) + ' → ' + textoDe(x);
+      else t = x.children.length ? [].map.call(x.children, function (k) { return textoDe(k); }).filter(String).join(' ') : textoDe(x);
+      t = t.replace(/^(\d+) /, '$1. ').replace(/\s+/g, ' ').trim();
+      if (t) linhas.push((x.classList.contains('ft-off') ? '· ' : '✓ ') + t);
+    });
+    return linhas.length ? linhas.join('\n') : textoDe(el);
+  }
+  function tituloDe(el) { var h = el && el.querySelector('h1,h2,h3,.ft-titulo'); return textoDe(h) || ''; }
+  /* o que o celular mostra: onde a TV está e o texto do slide (com as respostas-modelo, que o professor pode ler) */
+  function salaEstado() {
+    if (!sala) return;
+    clearTimeout(tEstado); tEstado = setTimeout(function () {
+      var e = {};
+      if (!tocando) e = { titulo: atual ? titulo(atual) : '', agora: atual ? 'Na tela de abertura. Toque ▶ para começar.' : 'Na lista de atividades.' };
+      else if (deck) { var sl = deck.slides[ci], pr = deck.slides[ci + 1]; e = { slide: ci + 1, total: deck.slides.length, etapa: et, etapas: sl.etapas, titulo: tituloDe(sl.el), agora: roteiroDe(sl.el).slice(0, 600), depois: pr ? tituloDe(pr.el) || textoDe(pr.el).slice(0, 80) : '' }; }
+      else e = { slide: vez + 1, total: paginas.length, titulo: atual ? titulo(atual) : '' };
+      salaApi({ op: 'estado', sala: sala.id, chaveTV: sala.chave, estado: e }).catch(function () {});
+    }, 150);
+  }
+  function salaFim(soLocal) {
+    if (sala && !soLocal) { try { navigator.sendBeacon(SALA_API, new Blob([JSON.stringify({ op: 'fechar', sala: sala.id, chaveTV: sala.chave })], { type: 'text/plain' })); } catch (e) {} }
+    sala = null; salaVez++; $('bFone').classList.remove('on'); $('qrFone').hidden = true;
+  }
+  $('bFone').onclick = foneBotao; $('qrFone').onclick = function (e) { if (e.target.id === 'qrFone' || e.target.id === 'qrFecha') $('qrFone').hidden = true; };
+  window.addEventListener('pagehide', function () { salaFim(); });
 
   var q = new URLSearchParams(location.search), qId = q.get('id'), qSem = q.get('semana');
   Promise.all([pedeSemana(qSem || ''), pedeMinhas()]).then(function (r) { var j = r[0]; dados = j; semKids(); juntaMinhas(r[1]); semanaId = j.semana ? j.semana.id : ''; desenhaLista(); if (qId) abre(qId); })
