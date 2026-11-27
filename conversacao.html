@@ -259,7 +259,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js"></script>
-<script src="assets/tema-slides.js?v=38aecbf6bb"></script>
+<script src="assets/tema-slides.js?v=8e4249692c"></script>
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
@@ -567,7 +567,7 @@
 
   /* ── o tocador ── */
   var doc = null, paginas = [], vez = 0, tocando = false, atual = null;
-  var deck = null, ci = 0, et = 0;   /* atividade do Conversation Maker: slide e clique dentro dele */
+  var deck = null, deckFoto = null, ci = 0, et = 0;   /* atividade do Conversation Maker: slide e clique dentro dele */
   function passos() { var n = 0; deck.slides.forEach(function (x) { n += x.etapas + 1; }); return n; }
   function passoAtual() { var n = 0; for (var k = 0; k < ci; k++) n += deck.slides[k].etapas + 1; return n + et + 1; }
   function abre(id) {
@@ -580,7 +580,7 @@
     deck = null;
     if (atual.tipo === 'cm') {
       obterCm(atual).then(function (o) {
-        deck = deckDe(o); paginas = []; ci = 0; et = 0; $('palco').innerHTML = '';
+        deck = deckDe(o); deckFoto = deckDe(o); paginas = []; ci = 0; et = 0; $('palco').innerHTML = '';
         aulaBotao();
         capa();
       }).catch(function (e) { $('capaCorpo').innerHTML = '<p class="erro">Não consegui abrir (' + esc(e.message) + ').</p><div class="linha"><button class="sec" id="bVolta">← Voltar à lista</button></div>'; $('bVolta').onclick = volta; });
@@ -637,7 +637,7 @@
     $('bN').textContent = 'slide ' + (ci + 1) + ' de ' + deck.slides.length;
     $('prog').style.width = (n * 100 / tot) + '%';
     if (registro) registro.etapa(n, tot);
-    salaEstado();
+    salaEstado(); aulaMostrou();
   }
   function mostra(i) {
     if (deck) { if (i === 0) { ci = 0; et = 0; } else if (i === Infinity) { ci = deck.slides.length - 1; et = deck.slides[ci].etapas; } mostraCm(); return; }
@@ -664,7 +664,7 @@
     if (registro) { registro.fim(); registro = null; }
     paginas.forEach(function (im) { if (im.src) URL.revokeObjectURL(im.src); });
     if (doc) { try { doc.destroy(); } catch (e) {} doc = null; }
-    deck = null; var cfv = $('capaFundo'); if (cfv) cfv.innerHTML = '';
+    deck = null; deckFoto = null; var cfv = $('capaFundo'); if (cfv) cfv.innerHTML = '';
     tocando = false; atual = null; $('tocador').hidden = true; $('lista').hidden = false; salaEstado();
     aulaSolta();
     history.replaceState(null, '', 'conversacao.html' + (semanaId ? '?semana=' + encodeURIComponent(semanaId) : ''));
@@ -777,8 +777,9 @@
      "👥 Alunos" abre uma AULA na Vercel (portal-aluno-fisk/api/aula.js) com os RAFs da turma de agora: o card
      "Conversação de hoje" acende no portal de cada um, e o QR (grande e no canto) é a reserva. A cada clique, ESTE
      navegador manda a imagem do clique: o aluno nunca recebe o que ainda não foi mostrado (as respostas dos jogos).
-     "Finalizar" manda o resto e a atividade fica aberta até 23h59. Só atividade em PDF de cliques (as do Conversation
-     Maker são desenhadas na hora e ficam para a próxima etapa). Sem internet, a aula na TV segue igual. */
+     "Finalizar" manda o resto e a atividade fica aberta até 23h59. Vale para o PDF de cliques e, desde 27/11/2026,
+     para as do Conversation Maker: cada etapa de cada slide é um clique, fotografado num segundo deck (FiskTema.foto)
+     para o slide da TV não piscar. Sem internet, a aula na TV segue igual. */
   var AULA_API = 'https://portalfisk.com.br/api/aula', AULA_URL = 'https://portalfisk.com.br/aula.html';
   var aula = null, aulaFila = Promise.resolve();
   function aulaApi(c, ms) {
@@ -786,7 +787,11 @@
     return fetch(AULA_API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(c), signal: ctl.signal })
       .then(function (r) { return r.json(); }).finally(function () { clearTimeout(t); });
   }
-  function aulaBotao() { var b = $('bAlunos'); if (!b) return; b.hidden = !!deck; b.classList.toggle('on', !!aula); }
+  function aulaBotao() { var b = $('bAlunos'); if (!b) return; b.hidden = false; b.classList.toggle('on', !!aula); }
+  /* os cliques da aula: no PDF cada página é um clique; na atividade do Conversation Maker, cada etapa de cada slide */
+  function aulaTotal() { return deck ? passos() : paginas.length; }
+  function aulaAgora() { return deck ? passoAtual() : vez + 1; }
+  function aulaPasso(n) { for (var k = 0; k < deck.slides.length; k++) { var e = deck.slides[k].etapas + 1; if (n < e) return { i: k, et: n }; n -= e; } return null; }
   function aulaTurma() {
     var t = typeof fiskTurmaDeAgora === 'function' ? fiskTurmaDeAgora(s) : null;
     return t && t.rafs && t.rafs.length ? t : null;
@@ -807,11 +812,11 @@
     $('aulaCantoCod').textContent = aula.id;
   }
   function alunosBotao() {
-    if (deck || !atual || !paginas.length) return;
+    if (!atual || !aulaTotal()) return;
     if (aula) { aulaTexto(); $('qrAula').hidden = false; return; }
     var turma = aulaTurma();
     $('qrAula').hidden = false; $('qrAulaImg').innerHTML = '<div class="espera" style="color:#475569"><i></i></div>'; $('qrAulaCod').textContent = ''; $('qrAulaTxt').textContent = 'Preparando…'; $('aulaFim').hidden = true;
-    aulaApi({ op: 'abrir', token: s.token, titulo: titulo(atual), ativ: atual.id + '_' + String(atual.quando || '').replace(/\W/g, ''), total: paginas.length, rafs: turma ? turma.rafs : [] }, 25000).then(function (r) {
+    aulaApi({ op: 'abrir', token: s.token, titulo: titulo(atual), ativ: atual.id + '_' + String(atual.quando || '').replace(/\W/g, ''), total: aulaTotal(), rafs: turma ? turma.rafs : [] }, 25000).then(function (r) {
       if (!r.ok) throw new Error(r.error || 'não deu');
       aula = { id: r.aula, chave: r.chave, ativId: atual.id, enviado: 0, fim: false, alunos: r.alunos, turma: turma ? turma.turma : '' };
       aulaBotao(); aulaTexto(); aulaDesenhaQr();
@@ -823,6 +828,11 @@
      TV JÁ desenhou (desenha devolve o desenho em andamento); desenhar a página de novo no pdf.js, em outro tamanho e
      junto com a TV adiantando as próximas, travava para sempre (27/11/2026) */
   function aulaImagem(i) {
+    if (deck) {
+      var p = aulaPasso(i), df = deckFoto;
+      if (!p || !df) return Promise.reject(new Error('sem o slide'));
+      return FiskTema.foto(df, p.i, p.et, 1280).then(function (url) { return url.split(',')[1]; });
+    }
     return desenha(i).then(function () {
       var im = paginas[i];
       if (!im || !im.src) throw new Error('sem a imagem do clique');
@@ -849,14 +859,15 @@
     return aulaFila;
   }
   function aulaMostrou() {
-    if (!aula || aula.fim || deck || !atual || atual.id !== aula.ativId) return;
-    aulaEnvia(Math.max(aula.enviado, vez + 1), vez + 1);
+    if (!aula || aula.fim || !atual || atual.id !== aula.ativId) return;
+    aulaEnvia(Math.max(aula.enviado, aulaAgora()), aulaAgora());
   }
   function aulaFinaliza() {
     if (!aula || aula.fim) return;
     var a = aula, b = $('aulaFim'); b.disabled = true; b.textContent = 'Enviando os slides…';
-    aulaEnvia(paginas.length, vez + 1).then(function () {
-      if (a.enviado < paginas.length) throw new Error('faltaram slides');
+    var tot = aulaTotal();
+    aulaEnvia(tot, aulaAgora()).then(function () {
+      if (a.enviado < tot) throw new Error('faltaram slides');
       return aulaApi({ op: 'fim', aula: a.id, chave: a.chave });
     }).then(function (r) {
       if (!r || !r.ok) throw new Error(r && r.error || 'não deu');

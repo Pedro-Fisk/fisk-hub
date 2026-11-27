@@ -285,5 +285,28 @@
         });
       });
   }
-  raiz.FiskTema = { montar: montar, mostrar: mostrar, encaixar: encaixar, receita: receita, contraste: contraste, paginas: paginas, gerarPdf: gerarPdf, FONTES_OK: FONTES_OK };
+  /* A FOTO DE UM CLIQUE para o celular dos alunos (27/11/2026): o slide i na etapa dada, como JPEG de "largura" px.
+     Use um deck SÓ para fotos (outro montar), porque o slide sai da tela por um instante: o da TV não pode piscar. */
+  var fotoFila = Promise.resolve();
+  function foto(deck, i, etapa, largura) {
+    var r = fotoFila.then(function () {
+      return carregaScript('https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js', 'htmlToImage');
+    }).then(function () { return document.fonts && document.fonts.ready; }).then(function () {
+      var s = deck.slides[i]; if (!s) throw new Error('sem o slide ' + (i + 1));
+      var palco = document.createElement('div'), el = s.el;
+      palco.style.cssText = 'position:fixed;left:-30000px;top:0;width:1920px;height:1080px;overflow:hidden';
+      document.body.appendChild(palco); palco.appendChild(el);
+      el.style.transform = 'none'; el.style.position = 'absolute'; el.style.left = '0px'; el.style.top = '0px';
+      el.querySelectorAll('[data-e]').forEach(function (x) { x.style.transition = 'none'; });
+      [].forEach.call(el.querySelectorAll('.ft-op'), function (b) { b.classList.remove('ft-certa', 'ft-errada'); });
+      var msg = el.querySelector('.ft-msg'); if (msg) msg.classList.remove('on');
+      var som = raiz.FiskTema.som; raiz.FiskTema.som = false; mostrar(deck, i, etapa); raiz.FiskTema.som = som;
+      return new Promise(function (ok) { setTimeout(ok, 60); })
+        .then(function () { var k = (largura || 1280) / 1920; return window.htmlToImage.toJpeg(el, { width: 1920, height: 1080, pixelRatio: k, quality: 0.75, cacheBust: false }); })
+        .then(function (url) { palco.remove(); return url; }, function (e) { palco.remove(); throw e; });
+    });
+    fotoFila = r.catch(function () {});
+    return r;
+  }
+  raiz.FiskTema = { montar: montar, mostrar: mostrar, encaixar: encaixar, receita: receita, contraste: contraste, paginas: paginas, gerarPdf: gerarPdf, foto: foto, FONTES_OK: FONTES_OK };
 })(typeof window !== 'undefined' ? window : this);
