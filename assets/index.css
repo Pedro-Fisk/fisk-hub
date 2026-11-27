@@ -203,6 +203,8 @@
 }
 
 /* o informativo do mês no topo da home (26/11/2026): o carrossel em 16:9, no escuro da TV */
+.infv-ico{flex:none;width:44px;height:44px;border-radius:11px;background:#d81f26;color:#fff;display:flex;align-items:center;justify-content:center;margin-right:.2rem}
+.infv-ico svg{width:24px;height:24px}
 .infv-corpo{background:#0b0e14}
 .infv-corpo iframe{display:block;width:100%;height:auto;aspect-ratio:16/9;border:0;background:#0b0e14}
 .infv-carrega{aspect-ratio:16/9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.9rem;color:#cfd8e6;font-size:1rem}
