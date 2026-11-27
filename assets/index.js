@@ -2134,8 +2134,8 @@
    card da prateleira aparece junto). */
 (function () {
   var INFV_SO_DIRECAO = true;
-  /* os professores que já veem antes de abrir a todos (Pedro, 26/11/2026: o Leonardo) */
-  var INFV_LIBERADOS = ['LEONARDO'];
+  /* professores que já veem antes de abrir a todos, pelo nome da sessão (vazio: só a direção) */
+  var INFV_LIBERADOS = [];
   var s = null; try { s = JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) {}
   if (!s || !s.token) return;
   var npI = function (v) { return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase(); };
