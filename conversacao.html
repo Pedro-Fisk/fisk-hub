@@ -54,6 +54,22 @@
   .agora .ok.nao{ color: #92400e; background: #fef3c7; }
   .aviso-sem{ background: #fef3c7; color: #92400e; border-radius: 12px; padding: .55rem .9rem; font-weight: 800; margin-bottom: .9rem; }
   h3.sub{ font: 800 1.05rem var(--font-heading, inherit); margin: 1.3rem 0 .7rem; }
+  /* ATIVIDADES CRIADAS POR MIM (27/11/2026): fora das semanas, com ordem e busca */
+  .pill.on{ background: #fff; color: #1e293b; }
+  .pill .nm{ display: inline-block; min-width: 1.3rem; margin-left: .35rem; padding: 0 .35rem; border-radius: 99px; background: rgba(255,255,255,.28); font-size: .8rem; }
+  .pill.on .nm{ background: #1e293b; color: #fff; }
+  .mi-topo{ display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .mi-topo h2{ font: 800 1.25rem var(--font-heading, inherit); margin: 0; flex: 1 1 auto; }
+  .mi-topo .bt2{ white-space: nowrap; }
+  .mi-ctl{ display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .mi-ctl .rot{ font-weight: 800; color: #64748b; font-size: .9rem; }
+  .mi-ctl input{ font: 600 .95rem var(--font-body, inherit); padding: .5rem .8rem; border-radius: 99px; border: 1px solid #e2e8f0; min-width: 14rem; flex: 1 1 14rem; max-width: 22rem; background: #fff; color: inherit; }
+  body.theme-dark .mi-ctl input{ background: #1f2937; border-color: #334155; }
+  .mi-ctl .tabs{ margin: 0; }
+  .rec .data{ font-size: .78rem; color: #64748b; font-weight: 700; margin-top: .15rem; }
+  .mi-vazio{ text-align: center; padding: 2.2rem 1rem; color: #64748b; font-weight: 700; }
+  .mi-vazio .e{ font-size: 2.6rem; display: block; margin-bottom: .4rem; }
+  .mi-vazio a{ color: #2563eb; }
   .tabs{ display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: .9rem; }
   .tabs button{ font: 800 .9rem var(--font-body, inherit); padding: .5rem .9rem; border-radius: 99px; background: #fff; border: 1px solid #e2e8f0; color: inherit; cursor: pointer; }
   .tabs button.on{ background: #1e293b; color: #fff; border-color: #1e293b; }
@@ -226,7 +242,7 @@
   <a class="volta" href="index.html">← Hub</a>
   <div class="jan">
     <div class="cab">
-      <div class="cab-l"><h1>💬 Conversação da semana</h1><button type="button" class="pill" id="bPastas">📁 Todas as semanas</button></div>
+      <div class="cab-l"><h1>💬 Conversação da semana</h1><button type="button" class="pill" id="bPastas">📁 Todas as semanas</button><button type="button" class="pill" id="bMinhas" title="As atividades que você criou no Conversation Maker, de qualquer semana">🧩 Criadas por mim<span class="nm" id="nMinhas" hidden></span></button></div>
       <div class="sems" id="sems"></div>
     </div>
     <div class="corpo" id="corpo"><div class="espera"><i></i> Buscando as atividades da semana…</div></div>
@@ -291,12 +307,12 @@
       .then(function (j) { if (!j || !j.ok) throw 0; try { localStorage.setItem(CH_MINHAS, JSON.stringify(j.itens || [])); } catch (e) {} return j.itens || []; })
       .catch(function () { try { return JSON.parse(localStorage.getItem(CH_MINHAS) || '[]'); } catch (e) { return []; } });
   }
+  /* desde 27/11/2026 (pedido do Pedro) elas NÃO entram na semana: moram no botão "🧩 Criadas por mim", com o histórico
+     inteiro, ordem (data, A–Z, nível) e busca */
+  var minhas = [], modo = 'semana', ordemMi = 'data', buscaMi = '';
   function juntaMinhas(itens) {
-    if (!dados) return; dados.idiomas = dados.idiomas || {};
-    delete dados.idiomas[MINHAS];
-    if (!itens.length) return;
-    dados.idiomas[MINHAS] = itens.map(function (m) { return { id: m.id, nome: m.nome, tipo: 'cm', niveis: [m.nivel, m.perfil].filter(Boolean), quando: m.quando, pronto: true, origem: 'minha' }; });
-    dados.vazio = false;
+    minhas = (itens || []).map(function (m) { return { id: m.id, nome: m.nome, tipo: 'cm', niveis: [m.nivel, m.perfil].filter(Boolean), idioma: m.idioma || '', quando: m.quando, pronto: true, origem: 'minha' }; });
+    var n = $('nMinhas'); if (n) { n.hidden = !minhas.length; n.textContent = minhas.length; }
   }
   function carregaLista(id) {
     $('corpo').innerHTML = '<div class="espera"><i></i> Buscando as atividades da semana…</div>';
@@ -310,7 +326,8 @@
      A atividade só com "Kids" no nome some da lista (a que diz Kids e outro nível, como "Kids + Teens", fica). */
   function soKids(it) { var n = it.niveis || []; return n.indexOf('Kids') > -1 && !n.some(function (x) { return /Teens|Basic|Intermediate|Advanced|Todos/.test(x); }); }
   function semKids() { Object.keys((dados && dados.idiomas) || {}).forEach(function (k) { dados.idiomas[k] = dados.idiomas[k].filter(function (it) { return !soKids(it); }); if (!dados.idiomas[k].length) delete dados.idiomas[k]; }); }
-  function todos() { var a = []; Object.keys((dados && dados.idiomas) || {}).forEach(function (k) { a = a.concat(dados.idiomas[k]); }); return a; }
+  function todos() { var a = []; Object.keys((dados && dados.idiomas) || {}).forEach(function (k) { a = a.concat(dados.idiomas[k]); }); return a.concat(minhas); }
+  function daSemana() { var a = []; Object.keys((dados && dados.idiomas) || {}).forEach(function (k) { a = a.concat(dados.idiomas[k]); }); return a; }
   /* "Ac - GTA 6 Launch Day - Basic - Jovens - Pedro Luz..." → "GTA 6 Launch Day" (nível e perfil viram etiquetas) */
   /* o nome sem o que não é título: "Ac -", o número da frente, o nível, o perfil e o autor
      ("04 - Everyday Life - Babies - Intermediate" → "Everyday Life - Babies"; antes de 27/11/2026 saía só "04") */
@@ -352,14 +369,15 @@
   }
   var aba = '';
   function desenhaLista() {
-    desenhaTopo();
+    if (modo === 'minhas') { desenhaMinhas(); return; }
+    desenhaTopo(); $('bMinhas').classList.remove('on');
     var t = turmaBase(), dest = escolheDestaque(t), h = '';
     if (dados._offline) h += '<div class="aviso-sem">Sem internet: mostrando o que ficou guardado neste computador.</div>';
     else if (!semanaCerta()) h += '<div class="aviso-sem">Atenção: esta NÃO é a semana de hoje.</div>';
     h += '<div class="agora"><span class="em">🕐</span><div>' + (t ? (t.agora ? 'Agora: ' : 'Próxima aula: ') + esc(t.turma) + (t.livro ? ' · ' + esc(t.livro) : '') +
       '<small>' + (dest ? 'A atividade dela está em destaque logo abaixo' : 'As atividades desta semana estão abaixo') + '</small>' : 'Sem aula agora<small>As atividades desta semana estão abaixo</small>') +
       '</div><button type="button" class="ok nao" id="bOff">📥 Guardar a semana neste computador</button></div>';
-    if (dados.vazio || !todos().length) { $('corpo').innerHTML = h + '<p style="font-weight:700;color:#64748b">Nenhuma atividade nesta semana ainda.</p>'; marcaOffline(); return; }
+    if (dados.vazio || !daSemana().length) { $('corpo').innerHTML = h + '<p style="font-weight:700;color:#64748b">Nenhuma atividade nesta semana ainda.</p>'; marcaOffline(); return; }
     if (dest) h += cartao(dest, true);
     var grupos = gruposDe(dest);
     if (!aba || !grupos.some(function (g) { return g.k === aba; })) aba = grupos[0] ? grupos[0].k : '';
@@ -388,10 +406,37 @@
       '<div class="capa n-' + esc(n) + '"><span class="e">' + (EM[n] || '💬') + '</span><span class="tg">' + esc((n === 'Todos' ? 'Todos os níveis' : n || 'Atividade').toUpperCase()) + '</span>' + (pf ? '<span class="pf">' + esc(pf) + '</span>' : '') + '</div>' +
       '<div class="th" data-th="' + esc(it.id) + '" title="' + esc(it.nome) + '">' + (it.pronto ? '<span class="carrega"><i></i> preparando a miniatura…</span>' : '<span class="carrega">em preparação</span>') +
       '<span class="l" title="Slide anterior">‹</span><span class="r" title="Próximo slide">›</span><span class="cnt" hidden></span></div>' +
-      '<div class="inf"><b>' + esc(titulo(it)) + '</b>' + (dest ? '<span class="dica">Clique nas bordas da imagem para ver os slides antes da aula.</span>' : '') +
+      '<div class="inf"><b>' + esc(titulo(it)) + '</b>' + (it.origem === 'minha' && it.quando ? '<span class="data">Criada em ' + esc(dataBr(it.quando)) + '</span>' : '') + (dest ? '<span class="dica">Clique nas bordas da imagem para ver os slides antes da aula.</span>' : '') +
       '<div class="rod">' + (it.pronto ? '<button type="button" class="bt" data-abre="' + esc(it.id) + '">▶ ' + (dest ? 'Começar na tela cheia' : 'Começar') + '</button>' : '') +
       (it.pronto ? '<span class="off" data-off="' + esc(it.id) + '" hidden>✓ offline</span>' : '<span class="prep">em preparação</span>') + '</div></div></div>';
   }
+  function dataBr(t) { var d = new Date(Number(t)); return isNaN(d) ? '' : ('0' + d.getDate()).slice(-2) + '/' + ('0' + (d.getMonth() + 1)).slice(-2) + '/' + d.getFullYear(); }
+  function semAcento(x) { return csemTiraAcento(x).toLowerCase(); }
+  var ORD_NIVEL = { Teens: 0, Basic: 1, Intermediate: 2, Advanced: 3, Todos: 4 };
+  function desenhaMinhas() {
+    $('bMinhas').classList.add('on');
+    [].forEach.call(document.querySelectorAll('#sems .sem'), function (b) { b.classList.remove('on'); });
+    var b = semAcento(buscaMi.trim()), lista = minhas.filter(function (it) { return !b || semAcento(titulo(it) + ' ' + it.niveis.join(' ')).indexOf(b) > -1; });
+    var porNome = function (a, c) { return titulo(a).localeCompare(titulo(c), 'pt', { sensitivity: 'base' }); };
+    lista.sort(ordemMi === 'az' ? porNome
+      : ordemMi === 'nivel' ? function (a, c) { var x = ORD_NIVEL[nivelDe(a)], y = ORD_NIVEL[nivelDe(c)]; return ((x == null ? 9 : x) - (y == null ? 9 : y)) || (perfilDe(a) === perfilDe(c) ? 0 : (perfilDe(a) === 'Jovens' ? -1 : 1)) || porNome(a, c); }
+      : function (a, c) { return Number(c.quando || 0) - Number(a.quando || 0); });
+    var h = '<div class="mi-topo"><h2>🧩 Atividades criadas por mim</h2><button type="button" class="bt2" id="miVolta">← Voltar à semana</button></div>';
+    if (!minhas.length) {
+      $('corpo').innerHTML = h + '<div class="mi-vazio"><span class="e">🧩</span>Você ainda não criou atividades.<br>Crie no <a href="https://conversation-maker.vercel.app/" target="_blank" rel="noopener">Conversation Maker</a> e toque em "Mostrar no portal": ela aparece aqui, em qualquer semana.</div>';
+      $('miVolta').onclick = voltaSemana; return;
+    }
+    h += '<div class="mi-ctl"><span class="rot">Ordenar:</span><div class="tabs">' +
+      [['data', '🕐 Mais recentes'], ['az', '🔤 A–Z'], ['nivel', '📶 Nível']].map(function (o) { return '<button type="button" data-ord="' + o[0] + '"' + (o[0] === ordemMi ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join('') +
+      '</div><input type="search" id="miBusca" placeholder="🔎 Buscar pelo nome ou nível" value="' + esc(buscaMi) + '"></div>';
+    h += lista.length ? '<div class="grade">' + lista.map(function (it) { return cartao(it, false); }).join('') + '</div>'
+      : '<div class="mi-vazio">Nenhuma atividade com "' + esc(buscaMi) + '".</div>';
+    $('corpo').innerHTML = h;
+    $('miVolta').onclick = voltaSemana;
+    var inp = $('miBusca'); inp.oninput = function () { buscaMi = inp.value; var pos = inp.selectionStart; desenhaMinhas(); var n = $('miBusca'); n.focus(); try { n.setSelectionRange(pos, pos); } catch (e) {} };
+    marcaOffline(); observaMiniaturas();
+  }
+  function voltaSemana() { modo = 'semana'; desenhaLista(); }
   function marcaOffline() {
     if (!window.caches || !dados) return;
     caches.open(CACHE).then(function (c) {
@@ -448,6 +493,7 @@
   $('corpo').addEventListener('click', function (e) {
     var t;
     if ((t = e.target.closest('[data-aba]'))) { aba = t.dataset.aba; [].forEach.call(document.querySelectorAll('[data-aba]'), function (b) { b.classList.toggle('on', b === t); }); [].forEach.call(document.querySelectorAll('[data-grade]'), function (g) { g.hidden = g.dataset.grade !== aba; }); observaMiniaturas(); return; }
+    if ((t = e.target.closest('[data-ord]'))) { ordemMi = t.dataset.ord; desenhaMinhas(); return; }
     if ((t = e.target.closest('[data-abre]'))) { abre(t.dataset.abre); return; }
     if ((t = e.target.closest('[data-th]'))) {
       var it = porId(t.dataset.th); if (!it || !it.pronto) return;
@@ -455,7 +501,8 @@
       if (x < w * 0.2) miniPagina(t, it, p - 1); else if (x > w * 0.8) miniPagina(t, it, p + 1); else abre(it.id);
     }
   });
-  $('sems').addEventListener('click', function (e) { var b = e.target.closest('[data-sem]'); if (b && b.dataset.sem !== semanaId) carregaLista(b.dataset.sem); });
+  $('sems').addEventListener('click', function (e) { var b = e.target.closest('[data-sem]'); if (!b) return; if (modo === 'minhas') { modo = 'semana'; if (b.dataset.sem === semanaId) { desenhaLista(); return; } } if (b.dataset.sem !== semanaId) carregaLista(b.dataset.sem); });
+  $('bMinhas').addEventListener('click', function () { if (modo === 'minhas') { voltaSemana(); return; } modo = 'minhas'; desenhaMinhas(); window.scrollTo(0, 0); });
   /* todas as semanas: as pastas por mês, como no Drive */
   $('bPastas').addEventListener('click', function () {
     if (!dados) return;
