@@ -327,7 +327,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js"></script>
-<script src="assets/tema-slides.js?v=245566565c"></script>
+<script src="assets/tema-slides.js?v=1c15640c72"></script>
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
@@ -940,7 +940,7 @@
     if (aula) { aulaTexto(); $('qrAula').hidden = false; return; }
     var turma = aulaTurma();
     $('qrAula').hidden = false; $('qrAulaImg').innerHTML = '<div class="espera" style="color:#475569"><i></i></div>'; $('qrAulaCod').textContent = ''; $('qrAulaTxt').textContent = 'Preparando…'; $('aulaFim').hidden = true;
-    aulaApi({ op: 'abrir', token: s.token, titulo: titulo(atual), ativ: atual.id + '_' + String(atual.quando || '').replace(/\W/g, ''), total: aulaTotal(), rafs: turma ? turma.rafs : [], fd: true, lingua: aulaLingua() }, 25000).then(function (r) {
+    aulaApi({ op: 'abrir', token: s.token, titulo: titulo(atual), ativ: atual.id + '_' + String(atual.quando || '').replace(/\W/g, ''), total: aulaTotal(), rafs: turma ? turma.rafs : [], fd: true, lingua: aulaLingua(), semente: atual.id }, 25000).then(function (r) {
       if (!r.ok) throw new Error(r.error || 'não deu');
       aula = { id: r.aula, chave: r.chave, ativId: atual.id, feitos: {}, alvo: 0, agora: 1, fim: false, alunos: r.alunos, turma: turma ? turma.turma : '', fd: r.fd !== false, fdPaga: !!r.fdPaga };
       aulaBotao(); aulaTexto(); aulaDesenhaQr();
@@ -999,7 +999,7 @@
         var jg = aulaJogo(k);
         /* ouça e escolha: o mesmo mp3 que a TV tocou vai para os celulares (se a voz falhou, vai sem áudio) */
         return (jg && jg.ot ? vozMp3(jg.ot).catch(function () { return null; }) : Promise.resolve(null)).then(function (mp3) {
-          return aulaApi({ op: 'clique', aula: a.id, chave: a.chave, n: k, atual: a.agora, img: img, jogo: jg, s: mp3 || undefined });
+          return aulaApi({ op: 'clique', aula: a.id, chave: a.chave, n: k, atual: a.agora, img: img, jogo: jg, s: mp3 || undefined, vocab: aulaVocab(k) });
         });
       }).then(function (r) {
         if (!r || !r.ok) throw new Error('não gravou');
@@ -1089,6 +1089,13 @@
      opções, índice certo e o clique que revela, que é o seguinte). O índice certo fica só no servidor até a revelação;
      o aluno toca no celular e o servidor só aceita antes de a TV mostrar o clique que revela. Só nas atividades do
      Conversation Maker: as de PDF não têm o dado do jogo. */
+  /* as palavras do slide de Important Words, em cada clique dele: o celular mostra com 🔊 (a voz que o aluno ouve é
+     autorizada pela aula: só palavras registradas aqui) */
+  function aulaVocab(k) {
+    if (!deck) return undefined;
+    var p = aulaPasso(k - 1), sl = p && deck.slides[p.i];
+    return sl && sl.vocab && sl.vocab.length ? sl.vocab : undefined;
+  }
   function aulaJogo(k) {
     if (!deck) return undefined;
     var p = aulaPasso(k - 1), sl = p && deck.slides[p.i];
