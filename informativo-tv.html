@@ -97,6 +97,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js"></script>
+<script src="assets/infv-leve.js?v=2b9809a293"></script>
 <script>
 (function () {
   var EP = FISK_HUB_EP, ESCOLAS = ['Caçapava', 'Taubaté'];
@@ -145,6 +146,7 @@
       }
       nomeAtual = j.nome || 'Informativo';
       return montar(j.bytes).then(function () {
+        completarLeve(j, escola);
         if (EMBED) { comecar(false); return; }   /* na home não há abertura: já começa a passar */
         capa('<p><b>' + esc(nomeAtual.replace(/\.pdf$/i, '')) + '</b></p>' +
           '<span class="esc">🏫 ' + esc(escola) + (porque ? ' <small style="opacity:.75;font-weight:600">(' + esc(porque) + ')</small>' : '') + '<button type="button" id="trocarEsc">trocar</button></span>' +
@@ -154,6 +156,21 @@
           '<p class="dica">Durante a exibição: <kbd>F</kbd> tela cheia · <kbd>espaço</kbd> pausa · <kbd>←</kbd> <kbd>→</kbd> troca o slide · <kbd>Esc</kbd> sai</p>');
       });
     }).catch(function (e) { capa('<p class="erro">Não consegui abrir o informativo (' + esc(e.message) + ').</p>' + trocarLink()); });
+  }
+  /* A VERSÃO LEVE QUE FALTAR (26/11/2026): o PDF que caiu direto na pasta do Drive chega pesado (23 MB em novembro).
+     A DIREÇÃO, na primeira vez que abre, gera a leve aqui mesmo, por trás, com o pdf.js já aberto, e manda ao servidor;
+     dali em diante todo professor baixa a leve (~4 MB). Uma tentativa por arquivo e por aparelho. */
+  function completarLeve(j, escola) {
+    var s = sess();
+    if (!j || j.leve !== false || !j.id || !s || !s.master || !s.token || !pdfDoc || typeof fiskInfvLeveDoDoc !== 'function') return;
+    var chave = 'infv_leve_tentou_' + j.id;
+    try { if (localStorage.getItem(chave)) return; localStorage.setItem(chave, String(Date.now())); } catch (e) { return; }
+    setTimeout(function () {
+      fiskInfvLeveDoDoc(pdfDoc).then(function (u) {
+        return fiskFetch(FISK_HUB_EP, { action: 'informativoLeve', token: s.token, escola: escola, deId: j.id, leve: fiskInfvB64(u) }, { timeoutMs: 120000 });
+      }).then(function (r) { console.log('[informativo] versão leve:', r && r.ok ? 'gravada' : (r && (r.error || r.erro))); })
+        .catch(function (e) { console.log('[informativo] versão leve falhou:', e && e.message); try { localStorage.removeItem(chave); } catch (x) {} });
+    }, 4000);
   }
   /* O PDF GUARDADO NO APARELHO: fiskInfvObter, no kit (a home já o baixa durante a tela de carregamento) */
   function obterPdf(escola) { return fiskInfvObter(escola); }
