@@ -187,6 +187,24 @@
   #aulaPlacar{ position: fixed; right: 14px; bottom: 200px; z-index: 12; background: rgba(15,23,42,.82); color: #fff; font: 800 .95rem system-ui, sans-serif;
     padding: 6px 12px; border-radius: 999px; box-shadow: 0 4px 14px rgba(0,0,0,.35); pointer-events: none; }
   #aulaPlacar[hidden]{ display: none; }
+  /* O GRÁFICO DAS RESPOSTAS (Pedro, 27/11/2026: "uma animação fluida para montar o gráfico"): depois de revelar, uma
+     barra embaixo de cada opção do slide. A caixa sobe, as barras crescem uma depois da outra e os números contam até o
+     valor; a da certa fica verde e ganha um brilho que passa. Mora DENTRO do slide (escala com a TV); o deck das fotos
+     dos celulares é outro e nunca recebe o gráfico. */
+  .ft-grafico{ opacity: 0; transform: translateY(40px); transition: opacity .55s ease, transform .7s cubic-bezier(.22,1,.36,1); }
+  .ft-grafico.on{ opacity: 1; transform: none; }
+  .ft-grafico .col{ flex: 1; min-width: 0; }
+  .ft-grafico .trilho{ position: relative; height: 74px; border-radius: 37px; background: rgba(127,127,127,.18); overflow: hidden; }
+  .ft-grafico .barra{ position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 37px; background: #94a3b8;
+    transition: width 1.5s cubic-bezier(.16,1,.3,1); overflow: hidden; }
+  .ft-grafico .barra.certa{ background: linear-gradient(90deg, #2a9a7d, #31A889 60%, #3cc29f); box-shadow: 0 0 0 6px rgba(49,168,137,.22); }
+  .ft-grafico .barra.certa:after{ content: ""; position: absolute; top: 0; bottom: 0; width: 40%; left: -45%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent); animation: ftBrilho 1.1s ease-in-out 1.7s 2; }
+  @keyframes ftBrilho{ to{ left: 110%; } }
+  .ft-grafico .num{ position: absolute; inset: 0; display: flex; align-items: center; padding: 0 28px; font: 900 44px/1 system-ui, sans-serif; color: inherit; white-space: nowrap; }
+  .ft-grafico .num small{ font-size: 30px; font-weight: 700; opacity: .7; margin-left: 12px; }
+  .ft-grafico .leg{ margin-top: 18px; text-align: center; font: 800 34px/1 system-ui, sans-serif; opacity: .7; flex-basis: 100%; }
+  @media (prefers-reduced-motion: reduce){ .ft-grafico, .ft-grafico .barra{ transition: none; } .ft-grafico .barra.certa:after{ animation: none; } }
   #aulaCanto .qr{ width: 92px; height: 92px; }
   #aulaCanto .qr svg{ width: 100%; height: 100%; display: block; }
   #aulaCanto span{ display: block; font: 800 .62rem system-ui, sans-serif; color: #0f172a; margin-top: 2px; }
@@ -899,10 +917,11 @@
     })();
   }
   function aulaMostrou() {
+    aulaTiraGraficos();   /* chegou num clique: o gráfico se monta de novo, animado, se for a revelação */
     aulaPlacar();
     if (!aula || aula.fim || !atual || atual.id !== aula.ativId) return;
     var revela = !!(deck && deck.slides[ci] && deck.slides[ci].tipo === 'jogo' && et >= 1);
-    aulaEnvia(aulaAgora(), aulaAgora()).then(function () { if (revela) aulaPaga(); });
+    aulaEnvia(aulaAgora(), aulaAgora()).then(function () { if (revela) { aulaPaga(); aulaPlacar(); } });   /* o servidor já sabe da revelação: o gráfico sem esperar a próxima consulta */
   }
   /* FISK DÓLARES (Pedro, 27/11/2026: começa ligado, vale para a aula inteira, 20 por acerto e 5 por responder). Quem
      paga é o BACKEND: depois de cada revelação (e no Finalizar), a TV só avisa "a aula X tem resultado"; o backend lê o
@@ -911,6 +930,51 @@
   function aulaPaga() {
     var a = aula; if (!a || !a.fdPaga) return;
     try { fiskFetch(FISK_HUB_EP, { action: 'aulaFdPagar', token: s.token, aula: a.id }, { timeoutMs: 60000 }).catch(function () {}); } catch (e) {}
+  }
+  function aulaTiraGraficos() {
+    if (!deck) return;
+    deck.slides.forEach(function (x) {
+      var gr = x.el.querySelector('.ft-grafico'); if (gr) gr.remove();
+      var m = x.el.querySelector('.ft-msg'); if (m) m.style.visibility = '';
+    });
+  }
+  /* o número conta até o valor junto com a barra (a mesma curva: rápido no começo, assentando no fim) */
+  function aulaConta(el, de, ate, ms, fmt) {
+    var t0 = performance.now();
+    (function passo(t) {
+      var k = Math.min(1, (t - t0) / ms), e = 1 - Math.pow(1 - k, 4);
+      el.innerHTML = fmt(Math.round(de + (ate - de) * e));
+      if (k < 1) requestAnimationFrame(passo);
+    })(t0);
+  }
+  function aulaGrafico(slideEl, g) {
+    var j = slideEl.querySelector('[data-jogo]'); if (!j) return;
+    var certa = +j.getAttribute('data-jogo'), ops = j.querySelectorAll('.ft-op'), tot = g.resp || 0;
+    var box = slideEl.querySelector('.ft-grafico'), novo = !box;
+    if (novo) {
+      box = document.createElement('div'); box.className = 'ft-grafico';
+      /* as medidas do slide (1920×1080) não sofrem a escala da TV: offset* é a coordenada do próprio slide */
+      box.style.cssText = 'position:absolute;z-index:6;display:flex;flex-wrap:wrap;gap:40px;left:' + j.offsetLeft + 'px;width:' + j.offsetWidth + 'px;top:' + (j.offsetTop + j.offsetHeight + 36) + 'px';
+      for (var i = 0; i < ops.length; i++) box.insertAdjacentHTML('beforeend', '<div class="col"><div class="trilho"><div class="barra' + (i === certa ? ' certa' : '') + '"></div><div class="num">0</div></div></div>');
+      box.insertAdjacentHTML('beforeend', '<div class="leg"></div>');
+      slideEl.appendChild(box);
+      var m = slideEl.querySelector('.ft-msg'); if (m) m.style.visibility = 'hidden';
+      void box.offsetWidth; box.classList.add('on');
+    }
+    var cols = box.querySelectorAll('.col');
+    box.querySelector('.leg').textContent = tot ? '👥 ' + tot + (tot === 1 ? ' resposta' : ' respostas') : 'Ninguém respondeu esta';
+    [].forEach.call(cols, function (c, i) {
+      var q = (g.por && g.por[i]) || 0, pct = tot ? Math.round(q * 100 / tot) : 0, barra = c.querySelector('.barra'), num = c.querySelector('.num');
+      var antes = +(num.dataset.q || 0);
+      if (!novo && antes === q && num.dataset.t === String(tot)) return;
+      num.dataset.q = q; num.dataset.t = tot;
+      var fmt = function (v) { return v + '<small>' + (tot ? Math.round(v * 100 / tot) : 0) + '%</small>'; };
+      /* uma depois da outra: a caixa sobe primeiro, e cada barra sai 180 ms depois da anterior */
+      var atraso = novo ? 450 + i * 180 : 0;
+      barra.style.transitionDelay = atraso + 'ms';
+      setTimeout(function () { aulaConta(num, antes, q, 1500, fmt); }, atraso);
+      requestAnimationFrame(function () { barra.style.width = Math.max(pct, q ? 4 : 0) + '%'; });
+    });
   }
   function aulaFdTroca() {
     var a = aula; if (!a) return;
@@ -941,6 +1005,7 @@
       if (ger !== placarGer || a !== aula || !r || !r.ok) return;
       var g = r.jogos && r.jogos[n];
       if (!g) { el.hidden = true; return; }
+      if (g.revelado && et >= 1) aulaGrafico(sl.el, g);
       el.textContent = g.revelado ? '✅ ' + g.certos + ' de ' + g.resp + (g.certos === 1 ? ' acertou' : ' acertaram') : '👥 ' + g.resp + (g.resp === 1 ? ' respondeu' : ' responderam');
       el.hidden = false;
     }, function () {}).then(function () { if (ger === placarGer && a === aula) placarT = setTimeout(aulaPlacar, 3000); });
