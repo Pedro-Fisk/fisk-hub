@@ -259,7 +259,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js"></script>
-<script src="assets/tema-slides.js?v=8e4249692c"></script>
+<script src="assets/tema-slides.js?v=1d06a72ab6"></script>
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
@@ -818,7 +818,7 @@
     $('qrAula').hidden = false; $('qrAulaImg').innerHTML = '<div class="espera" style="color:#475569"><i></i></div>'; $('qrAulaCod').textContent = ''; $('qrAulaTxt').textContent = 'Preparando…'; $('aulaFim').hidden = true;
     aulaApi({ op: 'abrir', token: s.token, titulo: titulo(atual), ativ: atual.id + '_' + String(atual.quando || '').replace(/\W/g, ''), total: aulaTotal(), rafs: turma ? turma.rafs : [] }, 25000).then(function (r) {
       if (!r.ok) throw new Error(r.error || 'não deu');
-      aula = { id: r.aula, chave: r.chave, ativId: atual.id, enviado: 0, fim: false, alunos: r.alunos, turma: turma ? turma.turma : '' };
+      aula = { id: r.aula, chave: r.chave, ativId: atual.id, feitos: {}, alvo: 0, agora: 1, fim: false, alunos: r.alunos, turma: turma ? turma.turma : '' };
       aulaBotao(); aulaTexto(); aulaDesenhaQr();
       $('aulaCanto').hidden = false;
       if (tocando) aulaMostrou();
@@ -843,31 +843,58 @@
       });
     });
   }
-  /* manda, em ordem, as imagens que faltam até o clique n e diz onde a TV está */
+  /* O QUE MANDAR PRIMEIRO (Pedro, 27/11/2026: "fica muito atrasado quando o professor passa vários slides de uma vez").
+     Antes ia em ordem, 1, 2, 3…, e o celular andava clique por clique até alcançar a TV. Agora vai uma imagem por vez,
+     e a cada uma a pergunta é refeita: o clique em que a TV ESTÁ vai na frente, e os que ficaram para trás vêm depois,
+     para o aluno poder voltar. Se o professor pular de novo no meio, o clique novo fura a fila. */
   function aulaEnvia(n, atualN) {
-    var a = aula;
-    aulaFila = aulaFila.then(function () {
-      if (!a || a !== aula) return;
-      var passo = Promise.resolve();
-      for (var k = a.enviado + 1; k <= n; k++) (function (k) {
-        passo = passo.then(function () { return aulaImagem(k - 1); }).then(function (img) {
-          return aulaApi({ op: 'clique', aula: a.id, chave: a.chave, n: k, atual: Math.min(k, atualN), img: img });
-        }).then(function (r) { if (r && r.ok) a.enviado = Math.max(a.enviado, k); });
-      })(k);
-      return passo.then(function () { if (n <= a.enviado) return aulaApi({ op: 'clique', aula: a.id, chave: a.chave, n: a.enviado, atual: atualN }); });
-    }).catch(function () {});
-    return aulaFila;
+    var a = aula; if (!a) return Promise.resolve();
+    a.feitos = a.feitos || {}; a.alvo = Math.max(a.alvo || 0, n); a.agora = atualN;
+    var p = new Promise(function (ok) { (a.espera = a.espera || []).push(ok); });
+    aulaBomba(a);
+    return p;
+  }
+  function aulaFeitos(a) { var c = 0; for (var k in a.feitos) c++; return c; }
+  function aulaBomba(a) {
+    if (a.ocupado || a !== aula) return;
+    var k = 0;
+    if (!a.feitos[a.agora]) k = a.agora;
+    else for (var j = 1; j <= a.alvo; j++) if (!a.feitos[j]) { k = j; break; }
+    if (!k) {
+      a.ocupado = true;
+      var acabou = function () { a.ocupado = false; if (a.falhou) return; var w = a.espera || []; a.espera = []; w.forEach(function (f) { f(); }); };
+      if (a.avisado === a.agora) { acabou(); return; }
+      var ag = a.agora;
+      aulaApi({ op: 'clique', aula: a.id, chave: a.chave, n: ag, atual: ag }).then(function (r) { if (r && r.ok) a.avisado = ag; }, function () {}).then(acabou);
+      return;
+    }
+    a.ocupado = true; a.falhou = false;
+    var tentativas = 0;
+    (function vai() {
+      aulaImagem(k - 1).then(function (img) {
+        return aulaApi({ op: 'clique', aula: a.id, chave: a.chave, n: k, atual: a.agora, img: img });
+      }).then(function (r) {
+        if (!r || !r.ok) throw new Error('não gravou');
+        a.feitos[k] = 1; if (k === a.agora) a.avisado = k;
+        a.ocupado = false; aulaBomba(a);
+      }).catch(function () {
+        /* sem internet ou servidor ocupado: tenta de novo devagar; a aula na TV não espera por isso */
+        if (++tentativas < 3) { setTimeout(vai, 1500 * tentativas); return; }
+        a.ocupado = false; a.falhou = true; var w = a.espera || []; a.espera = []; w.forEach(function (f) { f(); });
+        setTimeout(function () { if (a === aula) { a.falhou = false; aulaBomba(a); } }, 8000);
+      });
+    })();
   }
   function aulaMostrou() {
     if (!aula || aula.fim || !atual || atual.id !== aula.ativId) return;
-    aulaEnvia(Math.max(aula.enviado, aulaAgora()), aulaAgora());
+    aulaEnvia(aulaAgora(), aulaAgora());
   }
   function aulaFinaliza() {
     if (!aula || aula.fim) return;
     var a = aula, b = $('aulaFim'); b.disabled = true; b.textContent = 'Enviando os slides…';
     var tot = aulaTotal();
     aulaEnvia(tot, aulaAgora()).then(function () {
-      if (a.enviado < tot) throw new Error('faltaram slides');
+      if (aulaFeitos(a) < tot) throw new Error('faltaram slides');
       return aulaApi({ op: 'fim', aula: a.id, chave: a.chave });
     }).then(function (r) {
       if (!r || !r.ok) throw new Error(r && r.error || 'não deu');
