@@ -277,7 +277,6 @@
       '<span class="l" title="Slide anterior">‹</span><span class="r" title="Próximo slide">›</span><span class="cnt" hidden></span></div>' +
       '<div class="inf"><b>' + esc(titulo(it)) + '</b>' + (dest ? '<span class="dica">Clique nas bordas da imagem para ver os slides antes da aula.</span>' : '') +
       '<div class="rod">' + (it.pronto ? '<button type="button" class="bt" data-abre="' + esc(it.id) + '">▶ ' + (dest ? 'Começar na tela cheia' : 'Começar') + '</button>' : '') +
-      '<button type="button" class="bt2" data-baixa="' + esc(it.id) + '">⬇️ ' + (it.tipo === 'pdf' ? 'PDF' : 'PowerPoint') + '</button>' +
       (it.pronto ? '<span class="off" data-off="' + esc(it.id) + '" hidden>✓ offline</span>' : '<span class="prep">em preparação</span>') + '</div></div></div>';
   }
   function marcaOffline() {
@@ -321,7 +320,6 @@
     var t;
     if ((t = e.target.closest('[data-aba]'))) { aba = t.dataset.aba; [].forEach.call(document.querySelectorAll('[data-aba]'), function (b) { b.classList.toggle('on', b === t); }); [].forEach.call(document.querySelectorAll('[data-grade]'), function (g) { g.hidden = g.dataset.grade !== aba; }); observaMiniaturas(); return; }
     if ((t = e.target.closest('[data-abre]'))) { abre(t.dataset.abre); return; }
-    if ((t = e.target.closest('[data-baixa]'))) { baixar(porId(t.dataset.baixa), t); return; }
     if ((t = e.target.closest('[data-th]'))) {
       var it = porId(t.dataset.th); if (!it || !it.pronto) return;
       var x = e.clientX - t.getBoundingClientRect().left, w = t.clientWidth, p = Number(t.dataset.p || 1);
@@ -411,23 +409,12 @@
       '<img class="capinha" src="' + (paginas[0] && paginas[0].src || '') + '" alt="">' +
       (semanaCerta() ? '' : '<p class="aviso ruim" style="margin-top:.8rem">Esta atividade não é da semana de hoje.</p>') +
       '<div><button type="button" class="comeca" id="comeca">▶ Começar na tela cheia</button></div>' +
-      '<div class="linha"><button type="button" class="sec" id="semCheia">Começar sem tela cheia</button><button type="button" class="sec" id="bBaixa">⬇️ Baixar ' + (atual.tipo === 'pdf' ? 'o PDF' : 'o PowerPoint') + '</button><button type="button" class="sec" id="bVolta">← Voltar à lista</button></div>' +
+      '<div class="linha"><button type="button" class="sec" id="semCheia">Começar sem tela cheia</button><button type="button" class="sec" id="bVolta">← Voltar à lista</button></div>' +
       '<p class="dica">Avance com <kbd>clique</kbd>, <kbd>→</kbd>, <kbd>espaço</kbd> ou o passador de slides. Volte com <kbd>←</kbd>.<br><kbd>F</kbd> tela cheia · <kbd>Esc</kbd> volta para cá</p>';
     $('comeca').onclick = function () { comecar(true); }; $('semCheia').onclick = function () { comecar(false); }; $('bVolta').onclick = volta;
-    $('bBaixa').onclick = function () { baixar(atual, $('bBaixa')); };
   }
-  /* "quero que o professor tenha a possibilidade de baixar" (Pedro, 27/11/2026): o arquivo como está na pasta */
-  function baixar(it, b) {
-    it = it && it.id ? it : atual; b = b && b.nodeType ? b : $('bBaixa');
-    var rot = b.textContent; b.disabled = true; b.textContent = '⬇️ Baixando…';
-    fiskFetch(FISK_HUB_EP, { action: 'conversaLer', token: s.token, id: it.id, original: 1 }, { timeoutMs: 120000 }).then(function (j) {
-      if (!j || !j.ok || !j.dados) throw new Error((j && (j.error || j.erro)) || 'não veio');
-      var a = document.createElement('a'), url = URL.createObjectURL(new Blob([b64(j.dados)], { type: j.mime || 'application/octet-stream' }));
-      a.href = url; a.download = j.nome || (it.nome + (it.tipo === 'pdf' ? '.pdf' : '.pptx'));
-      document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
-      b.textContent = rot;
-    }).catch(function (e) { b.textContent = '⬇️ Não deu: ' + e.message; }).then(function () { b.disabled = false; });
-  }
+  /* o botão de baixar o PowerPoint SAIU em 27/11/2026 (Pedro: "isso é uma indicação para o professor não abrir dentro do
+     portal"). A rota conversaLer com original=1 continua no servidor, sem uso. */
   function comecar(cheia) {
     $('capa').hidden = true; tocando = true;
     if (cheia && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function () {});
