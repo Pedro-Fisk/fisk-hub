@@ -55,7 +55,7 @@
   function injetaCss(r, base) {
     var id = 'ft-css-' + (r.fontes.titulo + r.fontes.corpo).replace(/\W/g, '');
     if (document.getElementById(id)) return;
-    var l = document.createElement('link'); l.rel = 'stylesheet'; l.id = id;
+    var l = document.createElement('link'); l.rel = 'stylesheet'; l.id = id; l.crossOrigin = 'anonymous';   /* o PDF de backup precisa ler as regras da fonte para embuti-la */
     l.href = 'https://fonts.googleapis.com/css2?family=' + [r.fontes.titulo, r.fontes.corpo].filter(function (x, i, a) { return a.indexOf(x) === i; }).map(function (f) { return f.replace(/ /g, '+') + ':wght@500;600;700;800;900'; }).join('&family=') + '&display=swap';
     document.head.appendChild(l);
     if (css) return;
@@ -229,5 +229,57 @@
     var w = caixa.clientWidth, h = caixa.clientHeight, k = Math.min(w / 1920, h / 1080);
     el.style.transform = 'scale(' + k + ')'; el.style.position = 'absolute'; el.style.left = ((w - 1920 * k) / 2) + 'px'; el.style.top = ((h - 1080 * k) / 2) + 'px';
   }
-  raiz.FiskTema = { montar: montar, mostrar: mostrar, encaixar: encaixar, receita: receita, contraste: contraste, FONTES_OK: FONTES_OK };
+  /* O PDF DE BACKUP (Pedro, 27/11/2026: "para mostrar futuramente no computador de novo"; o jogo "em dois slides
+     separados, um só com a pergunta e o outro mostrando a resposta"). Cada slide entra com tudo revelado; cada item do
+     jogo entra duas vezes. Desenha no próprio navegador (html-to-image + pdf-lib, pelo jsDelivr) e devolve os bytes. */
+  function paginas(deck) {
+    var out = [];
+    deck.slides.forEach(function (s, i) {
+      if (s.tipo === 'jogo') { out.push({ i: i, etapa: 0 }); out.push({ i: i, etapa: 1 }); }
+      else out.push({ i: i, etapa: s.etapas });
+    });
+    return out;
+  }
+  function carregaScript(src, global) {
+    return new Promise(function (ok, erro) {
+      if (window[global]) return ok();
+      var e = document.createElement('script'); e.src = src; e.onload = function () { ok(); }; e.onerror = function () { erro(new Error('não carregou ' + src)); }; document.head.appendChild(e);
+    });
+  }
+  function gerarPdf(deck, aoAndar) {
+    return carregaScript('https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js', 'htmlToImage')
+      .then(function () { return carregaScript('https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js', 'PDFLib'); })
+      .then(function () { return document.fonts && document.fonts.ready; })
+      .then(function () {
+        var pags = paginas(deck), palco = document.createElement('div');
+        palco.style.cssText = 'position:fixed;left:-30000px;top:0;width:1920px;height:1080px;overflow:hidden';
+        document.body.appendChild(palco);
+        var imgs = [], cadeia = Promise.resolve();
+        pags.forEach(function (pg, k) {
+          cadeia = cadeia.then(function () {
+            var s = deck.slides[pg.i], el = s.el, antes = el.style.cssText;
+            palco.innerHTML = ''; palco.appendChild(el);
+            el.style.transform = 'none'; el.style.left = '0px'; el.style.top = '0px';
+            [].forEach.call(el.querySelectorAll('.ft-op'), function (b) { b.classList.remove('ft-certa', 'ft-errada'); });
+            var msg = el.querySelector('.ft-msg'); if (msg) msg.classList.remove('on');
+            el.querySelectorAll('[data-e]').forEach(function (x) { x.style.transition = 'none'; });
+            mostrar(deck, pg.i, pg.etapa);
+            return new Promise(function (r) { setTimeout(r, 80); })
+              .then(function () { return window.htmlToImage.toJpeg(el, { width: 1920, height: 1080, pixelRatio: 1, quality: 0.85, cacheBust: false }); })
+              .then(function (url) { imgs.push(url); el.style.cssText = antes; el.querySelectorAll('[data-e]').forEach(function (x) { x.style.transition = ''; }); if (aoAndar) aoAndar(k + 1, pags.length); });
+          });
+        });
+        return cadeia.then(function () {
+          palco.remove();
+          return window.PDFLib.PDFDocument.create().then(function (pdf) {
+            var c2 = Promise.resolve();
+            imgs.forEach(function (url) {
+              c2 = c2.then(function () { return pdf.embedJpg(url); }).then(function (img) { var page = pdf.addPage([960, 540]); page.drawImage(img, { x: 0, y: 0, width: 960, height: 540 }); });
+            });
+            return c2.then(function () { return pdf.save(); });
+          });
+        });
+      });
+  }
+  raiz.FiskTema = { montar: montar, mostrar: mostrar, encaixar: encaixar, receita: receita, contraste: contraste, paginas: paginas, gerarPdf: gerarPdf, FONTES_OK: FONTES_OK };
 })(typeof window !== 'undefined' ? window : this);
