@@ -908,6 +908,23 @@
     if (deck) return vozLingua;
     return atual && /inmediato|espa[nñ]ol|spanish/i.test(((atual.niveis || []).join(' ') + ' ' + (atual.nome || ''))) ? 'es' : 'en';
   }
+  /* ABERTA ATÉ A PRÓXIMA AULA (Pedro, 27/11/2026): o fim do dia (meia-noite de Brasília, em segundos) da próxima aula da
+     turma, pelos dias da grade; o servidor limita a 7 dias. Sem a grade: nada, e vale a meia-noite de hoje */
+  function aulaProxima(turma) {
+    var dias = turma && turma.dias; if (!dias || !dias.length) return undefined;
+    var d = new Date();
+    for (var k = 1; k <= 7; k++) {
+      var x = new Date(d.getFullYear(), d.getMonth(), d.getDate() + k);
+      if (dias.indexOf(x.getDay()) > -1) return Math.floor(Date.UTC(x.getFullYear(), x.getMonth(), x.getDate() + 1, 3, 0, 0) / 1000);
+    }
+    return undefined;
+  }
+  function aulaAteTexto(es) {
+    var exp = aula && aula.exp ? aula.exp * 1000 : 0;
+    if (!exp || exp - Date.now() < 26 * 3600e3) return es ? 'hasta las 23:59' : 'until 11:59 pm';
+    var d = new Date(exp - 60e3);
+    return (es ? 'hasta el ' : 'until ') + d.toLocaleDateString(es ? 'es-MX' : 'en-US', { weekday: 'long', day: 'numeric', month: es ? 'numeric' : 'short' });
+  }
   function aulaBotao() { var b = $('bAlunos'); if (!b) return; b.hidden = false; b.classList.toggle('on', !!aula); }
   /* os cliques da aula: no PDF cada página é um clique; na atividade do Conversation Maker, cada etapa de cada slide */
   function aulaTotal() { return deck ? passos() : paginas.length; }
@@ -927,8 +944,8 @@
     /* o texto é para a TURMA, que lê a TV (27/11/2026: o aviso para o professor, com a contagem, confundia) */
     /* e na língua da aula (Pedro, 27/11/2026): os botões do professor, embaixo, continuam em português */
     var es = aulaLingua() === 'es';
-    var tx = aula.fim ? (es ? 'Toda la actividad está abierta en el celular hasta las 23:59, para repasar, copiar el vocabulario y rehacer el juego.'
-        : 'The whole activity is open on your phone until 11:59 pm: review it, copy the vocabulary and redo the game.')
+    var tx = aula.fim ? (es ? 'Toda la actividad está abierta en el celular ' + aulaAteTexto(true) + ', para repasar, copiar el vocabulario y rehacer el juego.'
+        : 'The whole activity is open on your phone ' + aulaAteTexto(false) + ': review it, copy the vocabulary and redo the game.')
       : aula.turma ? (es ? 'También está en el Portal del Alumno, en la tarjeta del día.' : 'It is also on the Student Portal, on today\'s card.') : '';
     $('qrAulaTxt').textContent = tx;
     var cx = $('qrAula').querySelector('.cx');
@@ -949,9 +966,9 @@
     if (aula) { aulaTexto(); $('qrAula').hidden = false; return; }
     var turma = aulaTurma();
     $('qrAula').hidden = false; $('qrAulaImg').innerHTML = '<div class="espera" style="color:#475569"><i></i></div>'; $('qrAulaCod').textContent = ''; $('qrAulaTxt').textContent = 'Preparando…'; $('aulaFim').hidden = true;
-    aulaApi({ op: 'abrir', token: s.token, titulo: titulo(atual), ativ: atual.id + '_' + String(atual.quando || '').replace(/\W/g, ''), total: aulaTotal(), rafs: turma ? turma.rafs : [], fd: true, lingua: aulaLingua(), semente: atual.id }, 25000).then(function (r) {
+    aulaApi({ op: 'abrir', token: s.token, titulo: titulo(atual), ativ: atual.id + '_' + String(atual.quando || '').replace(/\W/g, ''), total: aulaTotal(), rafs: turma ? turma.rafs : [], fd: true, lingua: aulaLingua(), semente: atual.id, ate: aulaProxima(turma) }, 25000).then(function (r) {
       if (!r.ok) throw new Error(r.error || 'não deu');
-      aula = { id: r.aula, chave: r.chave, ativId: atual.id, feitos: {}, alvo: 0, agora: 1, fim: false, alunos: r.alunos, turma: turma ? turma.turma : '', fd: r.fd !== false, fdPaga: !!r.fdPaga };
+      aula = { exp: r.exp, id: r.aula, chave: r.chave, ativId: atual.id, feitos: {}, alvo: 0, agora: 1, fim: false, alunos: r.alunos, turma: turma ? turma.turma : '', fd: r.fd !== false, fdPaga: !!r.fdPaga };
       aulaBotao(); aulaTexto(); aulaDesenhaQr();
       $('aulaCanto').hidden = false;
       if (tocando) aulaMostrou();
