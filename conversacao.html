@@ -113,12 +113,12 @@
   .erro{ color: #dc2626; font-weight: 700; }
   #tocador{ position: fixed; inset: 0; background: #000; }
   #palco{ position: absolute; inset: 0; cursor: pointer; }
-  #palco img{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; transition: opacity .45s ease-in-out; }
-  #palco img.on{ opacity: 1; }
+  #palco > img{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; transition: opacity .45s ease-in-out; }
+  #palco > img.on{ opacity: 1; }
   body.esconde-cursor, body.esconde-cursor *{ cursor: none !important; }
   #barra{ position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); display: flex; align-items: center; gap: .55rem; padding: .5rem .7rem;
           background: rgba(15,15,20,.8); border: 1px solid rgba(255,255,255,.16); border-radius: 16px; backdrop-filter: blur(8px);
-          opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 5; font-size: .9rem; white-space: nowrap; }
+          opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 5; font-size: .9rem; white-space: nowrap; color: #fff; }
   body.mostra #barra{ opacity: 1; pointer-events: auto; }
   #barra button{ font: inherit; font-weight: 800; color: #fff; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); border-radius: 10px; padding: .4rem .7rem; cursor: pointer; }
   #barra button:hover{ background: rgba(255,255,255,.2); }
@@ -139,6 +139,28 @@
   #capa .erro{ color: #fca5a5; }
   #capa .sec{ font: 800 .95rem var(--font-body, inherit); color: #e2e8f0; background: rgba(255,255,255,.08); border: 1.5px solid rgba(255,255,255,.22); border-radius: 12px; padding: .6rem 1rem; cursor: pointer; }
   #capa .aviso{ color: #fbbf24; font-weight: 800; }
+  /* a tela de espera NÃO é preta (Pedro, 27/11/2026, como no Canva): o primeiro slide aparece por trás, desbotado e
+     desfocado, para dar uma prévia sem mostrar tudo */
+  #capaFundo{ position: absolute; inset: -40px; background-size: cover; background-position: center; filter: blur(16px) saturate(.55) brightness(.72); transform: scale(1.06); opacity: 0; transition: opacity .6s; z-index: -1; }
+  #capaFundo.on{ opacity: 1; }
+  #capa{ isolation: isolate; overflow: hidden; }
+  #capa::before{ content: ""; position: absolute; inset: 0; background: rgba(11,14,20,.35); z-index: -1; }
+  /* o texto da espera num CARTÃO BRANCO por cima do slide desfocado (Pedro, 27/11/2026: "ficou pouco legível") */
+  #capa .cx{ background: rgba(255,255,255,.96); color: #1e293b; border-radius: 26px; padding: 1.8rem 2rem 1.6rem; box-shadow: 0 24px 60px rgba(0,0,0,.35); }
+  #capa .cx h1{ color: #1e293b; }
+  #capa .cx p, #capa .cx .sub{ color: #475569 !important; }
+  #capa .dica{ color: #64748b !important; }
+  #capa .dica kbd{ background: #e2e8f0 !important; color: #1e293b !important; }
+  #capa .sec, #capa .sem-cheia{ color: #334155 !important; }
+  #capa .sec{ background: #f1f5f9 !important; border-color: #cbd5e1 !important; }
+  #capa .sec:hover{ border-color: #64748b !important; }
+  #capa .esc{ background: #f1f5f9 !important; color: #1e293b; }
+  #capa .esc button{ color: #1d4ed8 !important; }
+  #capa .escolas button{ color: #1e293b !important; background: #f1f5f9 !important; border-color: #cbd5e1 !important; }
+  #capa .espera{ color: #475569 !important; }
+  #capa .erro{ color: #b91c1c !important; }
+  #capa .aviso{ color: #b45309 !important; }
+  #capa .capinha{ border-color: #e2e8f0 !important; }
 </style>
 </head>
 <body>
@@ -166,10 +188,11 @@
     <button type="button" id="bCheia" title="Tela cheia (F)">⛶ Tela cheia</button>
     <button type="button" id="bSair" title="Voltar à abertura (Esc)">✕</button>
   </div>
-  <div id="capa"><div class="cx" id="capaCorpo"></div></div>
+  <div id="capa"><div id="capaFundo"></div><div class="cx" id="capaCorpo"></div></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js"></script>
+<script src="assets/tema-slides.js?v=38aecbf6bb"></script>
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
@@ -196,9 +219,24 @@
         throw e;
       });
   }
+  /* MINHAS CONVERSAÇÕES (27/11/2026): as atividades que o professor mostrou no portal pelo Conversation Maker (modelo
+     tema), guardadas na pasta dele no Drive (backend CmPortal.js). Valem em qualquer semana; tocam pelo desenhista. */
+  var MINHAS = 'Minhas conversações', CH_MINHAS = 'conv:minhas';
+  function pedeMinhas() {
+    return fiskFetch(FISK_HUB_EP, { action: 'cmMinhas', token: s.token }, { timeoutMs: 45000 })
+      .then(function (j) { if (!j || !j.ok) throw 0; try { localStorage.setItem(CH_MINHAS, JSON.stringify(j.itens || [])); } catch (e) {} return j.itens || []; })
+      .catch(function () { try { return JSON.parse(localStorage.getItem(CH_MINHAS) || '[]'); } catch (e) { return []; } });
+  }
+  function juntaMinhas(itens) {
+    if (!dados) return; dados.idiomas = dados.idiomas || {};
+    delete dados.idiomas[MINHAS];
+    if (!itens.length) return;
+    dados.idiomas[MINHAS] = itens.map(function (m) { return { id: m.id, nome: m.nome, tipo: 'cm', niveis: [m.nivel, m.perfil].filter(Boolean), quando: m.quando, pronto: true, origem: 'minha' }; });
+    dados.vazio = false;
+  }
   function carregaLista(id) {
     $('corpo').innerHTML = '<div class="espera"><i></i> Buscando as atividades da semana…</div>';
-    pedeSemana(id).then(function (j) { dados = j; semKids(); semanaId = j.semana ? j.semana.id : ''; desenhaLista(); })
+    Promise.all([pedeSemana(id), pedeMinhas()]).then(function (r) { var j = r[0]; dados = j; semKids(); juntaMinhas(r[1]); semanaId = j.semana ? j.semana.id : ''; desenhaLista(); })
       .catch(function (e) { $('corpo').innerHTML = '<p class="erro">Não consegui buscar as atividades (' + esc(e.message) + ').</p>'; });
   }
   function semanaAtual() { return ((dados && dados.semanas) || []).filter(function (x) { return x.atual; })[0]; }
@@ -227,7 +265,7 @@
       if (!x) return '<span class="sem vazia"></span>';
       var p = partesSemana(x.nome);
       return '<button type="button" class="sem' + (k === 1 ? ' on' : '') + '" data-sem="' + esc(x.id) + '"><b>' + esc(p.n) + (x.atual ? ' · hoje' : '') + '</b><span>' + esc(p.d) + '</span>' +
-        (k === 1 ? '<small>' + todos().length + ' atividades' + (Object.keys(dados.idiomas || {}).length ? ' · ' + esc(Object.keys(dados.idiomas).join(', ')) : '') + '</small>' : '') + '</button>';
+        (k === 1 ? (function () { var ks = Object.keys(dados.idiomas || {}).filter(function (x) { return x !== MINHAS; }), n = 0; ks.forEach(function (x) { n += dados.idiomas[x].length; }); return '<small>' + (n ? n + (n === 1 ? ' atividade' : ' atividades') + ' · ' + esc(ks.join(', ')) : 'nenhuma atividade da semana ainda') + '</small>'; })() : '') + '</button>';
     }).join('');
   }
   function turmaBase() { var t = typeof fiskTurmaDeAgora === 'function' ? fiskTurmaDeAgora(s) : null, agora = !!t; if (!t && typeof fiskTurmaProxima === 'function') t = fiskTurmaProxima(s); if (t) t.agora = agora; return t; }
@@ -265,7 +303,7 @@
     var out = [], extras = [];
     ['English', 'Español'].concat(Object.keys(dados.idiomas || {}).filter(function (k) { return k !== 'English' && k !== 'Español'; })).forEach(function (idioma) {
       var itens = (dados.idiomas[idioma] || []).filter(function (it) { return it !== dest; }), soltos = itens.filter(function (it) { return !it.grupo; });
-      var band = idioma === 'English' ? '🇺🇸 ' : idioma === 'Español' ? '🇪🇸 ' : '📁 ';
+      var band = idioma === 'English' ? '🇺🇸 ' : idioma === 'Español' ? '🇪🇸 ' : idioma === MINHAS ? '🧩 ' : '📁 ';
       var ord = function (a, b) { var o = { Teens: 0, Basic: 1, Intermediate: 2, Advanced: 3, Todos: 4 }; return ((o[nivelDe(a)] == null ? 9 : o[nivelDe(a)]) - (o[nivelDe(b)] == null ? 9 : o[nivelDe(b)])) || (perfilDe(a) === perfilDe(b) ? 0 : (perfilDe(a) === 'Jovens' ? -1 : 1)); };
       if (soltos.length) out.push({ k: idioma, rot: band + idioma, itens: soltos.sort(ord) });
       var gs = {}; itens.filter(function (it) { return it.grupo; }).forEach(function (it) { (gs[it.grupo] = gs[it.grupo] || []).push(it); });
@@ -299,7 +337,23 @@
     docsMini[it.id].catch(function () { delete docsMini[it.id]; });
     return docsMini[it.id];
   }
+  var decksMini = {};
+  function miniCm(box, it, n) {
+    if (!decksMini[it.id]) decksMini[it.id] = obterCm(it).then(function (o) { marcaOffline(); return deckDe(o); });
+    return decksMini[it.id].then(function (deck) {
+      n = Math.max(1, Math.min(deck.slides.length, n)); box.dataset.p = n;
+      var velho = box.querySelector('.ft-s'); if (velho) velho.remove();
+      var c = box.querySelector('canvas'); if (c) c.remove();
+      var sl = deck.slides[n - 1], el = sl.el.cloneNode(true);
+      el.style.pointerEvents = 'none'; box.insertBefore(el, box.firstChild);
+      FiskTema.mostrar({ slides: [{ el: el, etapas: sl.etapas, tipo: sl.tipo }] }, 0, sl.etapas);
+      FiskTema.encaixar(el, box); requestAnimationFrame(function () { FiskTema.encaixar(el, box); });
+      var w = box.querySelector('.carrega'); if (w) w.remove();
+      var k = box.querySelector('.cnt'); k.hidden = false; k.textContent = n + ' / ' + deck.slides.length;
+    }).catch(function () { delete decksMini[it.id]; var w = box.querySelector('.carrega'); if (w) w.textContent = 'sem internet para a miniatura'; });
+  }
   function miniPagina(box, it, n) {
+    if (it.tipo === 'cm') return miniCm(box, it, n);
     return miniDoc(it).then(function (d) {
       n = Math.max(1, Math.min(d.numPages, n)); box.dataset.p = n;
       return d.getPage(n).then(function (pg) {
@@ -347,7 +401,27 @@
 
   /* ── o PDF da atividade: do aparelho, senão do servidor ── */
   function b64(d) { return Uint8Array.from(atob(d), function (c) { return c.charCodeAt(0); }); }
+  function obterCm(it) {
+    var k = chaveCache(it);
+    var baixa = function () {
+      var pedido = it.origem === 'minha' ? { action: 'cmLer', token: s.token, id: it.id } : { action: 'conversaLer', token: s.token, id: it.id };
+      return fiskFetch(FISK_HUB_EP, pedido, { timeoutMs: 60000 }).then(function (j) {
+        if (!j || !j.ok || !j.dados) throw new Error((j && (j.error || j.erro)) || 'não veio');
+        return it.origem === 'minha' ? j.dados : decodeURIComponent(escape(atob(j.dados)));
+      });
+    };
+    var parse = function (t) { var o = JSON.parse(t); if (!o || !o.lesson) throw new Error('atividade sem conteúdo'); return o; };
+    if (!window.caches) return baixa().then(parse);
+    return caches.open(CACHE).then(function (c) {
+      return c.match(k).then(function (r) {
+        if (r) return r.text().then(parse);
+        return baixa().then(function (t) { return c.put(k, new Response(t, { headers: { 'Content-Type': 'application/json' } })).then(function () { return parse(t); }, function () { return parse(t); }); });
+      });
+    });
+  }
+  function deckDe(o) { return FiskTema.montar(Object.assign({}, o.lesson, { perfil: o.lesson.ageLabel || o.lesson.perfil || '' }), o.design || {}, { base: '' }); }
   function obter(it) {
+    if (it.tipo === 'cm') return obterCm(it);
     var k = chaveCache(it);
     var baixa = function () {
       return fiskFetch(FISK_HUB_EP, { action: 'conversaLer', token: s.token, id: it.id }, { timeoutMs: 120000 }).then(function (j) {
@@ -384,11 +458,23 @@
 
   /* ── o tocador ── */
   var doc = null, paginas = [], vez = 0, tocando = false, atual = null;
+  var deck = null, ci = 0, et = 0;   /* atividade do Conversation Maker: slide e clique dentro dele */
+  function passos() { var n = 0; deck.slides.forEach(function (x) { n += x.etapas + 1; }); return n; }
+  function passoAtual() { var n = 0; for (var k = 0; k < ci; k++) n += deck.slides[k].etapas + 1; return n + et + 1; }
   function abre(id) {
     atual = todos().filter(function (i) { return i.id === id; })[0]; if (!atual) return;
     $('lista').hidden = true; $('tocador').hidden = false; $('capa').hidden = false; tocando = false;
+    var cf0 = $('capaFundo'); if (cf0) { cf0.classList.remove('on'); cf0.style.backgroundImage = ''; }
     $('capaCorpo').innerHTML = '<div class="espera"><i></i> Abrindo ' + esc(atual.nome) + '…</div>';
     history.replaceState(null, '', '?id=' + encodeURIComponent(id) + (semanaId ? '&semana=' + encodeURIComponent(semanaId) : ''));
+    deck = null;
+    if (atual.tipo === 'cm') {
+      obterCm(atual).then(function (o) {
+        deck = deckDe(o); paginas = []; ci = 0; et = 0; $('palco').innerHTML = '';
+        capa();
+      }).catch(function (e) { $('capaCorpo').innerHTML = '<p class="erro">Não consegui abrir (' + esc(e.message) + ').</p><div class="linha"><button class="sec" id="bVolta">← Voltar à lista</button></div>'; $('bVolta').onclick = volta; });
+      return;
+    }
     obter(atual).then(function (u) { return pdfjsLib.getDocument({ data: u }).promise; }).then(function (d) {
       doc = d; paginas = []; $('palco').innerHTML = '';
       for (var i = 0; i < d.numPages; i++) { var im = new Image(); im.alt = 'Clique ' + (i + 1); $('palco').appendChild(im); paginas.push(im); }
@@ -409,13 +495,16 @@
   function capa() {
     tocando = false; document.body.classList.remove('mostra', 'esconde-cursor');
     $('capa').hidden = false;
-    $('capaCorpo').innerHTML = '<h1>💬 ' + esc(titulo(atual)) + '</h1><p class="sub">' + esc(atual.niveis.join(' · ')) + (atual.niveis.length ? ' · ' : '') + paginas.length + (atual.tipo === 'pdf' ? ' slides' : ' cliques') + '</p>' +
-      '<img class="capinha" src="' + (paginas[0] && paginas[0].src || '') + '" alt="">' +
+    var cf = $('capaFundo'); if (cf && paginas[0] && paginas[0].src) { cf.style.backgroundImage = 'url(' + paginas[0].src + ')'; cf.classList.add('on'); }
+    if (cf && deck) { cf.style.backgroundImage = ''; cf.innerHTML = ''; var fx = deck.slides[0].el.cloneNode(true); cf.appendChild(fx); FiskTema.encaixar(fx, cf); cf.classList.add('on'); }
+    $('capaCorpo').innerHTML = '<h1>💬 ' + esc(titulo(atual)) + '</h1><p class="sub">' + esc(atual.niveis.join(' · ')) + (atual.niveis.length ? ' · ' : '') + (deck ? deck.slides.length + ' slides' : paginas.length + (atual.tipo === 'pdf' ? ' slides' : ' cliques')) + '</p>' +
+      (deck ? '<div class="capinha" id="capinhaCm" style="position:relative;overflow:hidden;margin:0 auto"></div>' : '<img class="capinha" src="' + (paginas[0] && paginas[0].src || '') + '" alt="">') +
       (semanaCerta() ? '' : '<p class="aviso ruim" style="margin-top:.8rem">Esta atividade não é da semana de hoje.</p>') +
       '<div><button type="button" class="comeca" id="comeca">▶ Começar na tela cheia</button></div>' +
       '<div class="linha"><button type="button" class="sec" id="semCheia">Começar sem tela cheia</button><button type="button" class="sec" id="bVolta">← Voltar à lista</button></div>' +
       '<p class="dica">Avance com <kbd>clique</kbd>, <kbd>→</kbd>, <kbd>espaço</kbd> ou o passador de slides. Volte com <kbd>←</kbd>.<br><kbd>F</kbd> tela cheia · <kbd>Esc</kbd> volta para cá</p>';
     $('comeca').onclick = function () { comecar(true); }; $('semCheia').onclick = function () { comecar(false); }; $('bVolta').onclick = volta;
+    if (deck) { var cx = $('capinhaCm'), c0 = deck.slides[0].el.cloneNode(true); c0.style.pointerEvents = 'none'; cx.appendChild(c0); FiskTema.encaixar(c0, cx); }
   }
   /* o botão de baixar o PowerPoint SAIU em 27/11/2026 (Pedro: "isso é uma indicação para o professor não abrir dentro do
      portal"). A rota conversaLer com original=1 continua no servidor, sem uso. */
@@ -426,7 +515,16 @@
       semana: dados && dados.semana ? dados.semana.nome : '', semanaCerta: semanaCerta() });
     mostra(0); acorda();
   }
+  function mostraCm() {
+    var sl = deck.slides[ci]; $('palco').innerHTML = ''; $('palco').appendChild(sl.el);
+    FiskTema.encaixar(sl.el, $('palco')); FiskTema.mostrar(deck, ci, et);
+    var tot = passos(), n = passoAtual();
+    $('bN').textContent = 'slide ' + (ci + 1) + ' de ' + deck.slides.length;
+    $('prog').style.width = (n * 100 / tot) + '%';
+    if (registro) registro.etapa(n, tot);
+  }
   function mostra(i) {
+    if (deck) { if (i === 0) { ci = 0; et = 0; } else if (i === Infinity) { ci = deck.slides.length - 1; et = deck.slides[ci].etapas; } mostraCm(); return; }
     vez = Math.max(0, Math.min(paginas.length - 1, i));
     var cadeia = desenha(vez);
     for (var k = vez + 1; k < vez + 4; k++) (function (n) { cadeia = cadeia.then(function () { return desenha(n); }); })(k);
@@ -435,19 +533,27 @@
     $('prog').style.width = ((vez + 1) * 100 / paginas.length) + '%';
     if (registro) registro.etapa(vez + 1, paginas.length);
   }
-  function prox() { if (vez < paginas.length - 1) mostra(vez + 1); }
-  function ant() { if (vez > 0) mostra(vez - 1); }
+  function prox() {
+    if (deck) { if (et < deck.slides[ci].etapas) et++; else if (ci < deck.slides.length - 1) { ci++; et = 0; } mostraCm(); return; }
+    if (vez < paginas.length - 1) mostra(vez + 1);
+  }
+  function ant() {
+    if (deck) { if (et > 0) et--; else if (ci > 0) { ci--; et = deck.slides[ci].etapas; } mostraCm(); return; }
+    if (vez > 0) mostra(vez - 1);
+  }
   function cheia() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(function () {}); else document.exitFullscreen(); }
   function volta() {
     if (document.fullscreenElement) document.exitFullscreen();
     if (registro) { registro.fim(); registro = null; }
     paginas.forEach(function (im) { if (im.src) URL.revokeObjectURL(im.src); });
     if (doc) { try { doc.destroy(); } catch (e) {} doc = null; }
+    deck = null; var cfv = $('capaFundo'); if (cfv) cfv.innerHTML = '';
     tocando = false; $('tocador').hidden = true; $('lista').hidden = false;
     history.replaceState(null, '', 'conversacao.html' + (semanaId ? '?semana=' + encodeURIComponent(semanaId) : ''));
     marcaOffline();
   }
-  $('palco').addEventListener('click', function (e) { if (!tocando) return; (e.clientX < window.innerWidth * 0.2 ? ant : prox)(); });
+  $('palco').addEventListener('click', function (e) { if (!tocando) return; if (deck && e.target.closest('[data-carta],.ft-op')) return; (e.clientX < window.innerWidth * 0.2 ? ant : prox)(); });
+  window.addEventListener('resize', function () { if (deck && tocando) mostraCm(); });
   $('bProx').onclick = prox; $('bAnt').onclick = ant; $('bInicio').onclick = function () { mostra(0); };
   $('bCheia').onclick = cheia; $('bSair').onclick = function () { if (document.fullscreenElement) document.exitFullscreen(); capa(); };
   document.addEventListener('keydown', function (e) {
@@ -456,7 +562,7 @@
     if (k === 'ArrowRight' || k === 'ArrowDown' || k === ' ' || k === 'PageDown' || k === 'Enter' || k === 'n') { e.preventDefault(); prox(); }
     else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp' || k === 'Backspace' || k === 'p') { e.preventDefault(); ant(); }
     else if (k === 'Home') mostra(0);
-    else if (k === 'End') mostra(paginas.length - 1);
+    else if (k === 'End') mostra(deck ? Infinity : paginas.length - 1);
     else if (k === 'f' || k === 'F') cheia();
     else if (k === 'Escape' && !document.fullscreenElement) capa();
     acorda();
@@ -469,7 +575,7 @@
   document.addEventListener('mousemove', function () { if (tocando) acorda(); });
 
   var q = new URLSearchParams(location.search), qId = q.get('id'), qSem = q.get('semana');
-  pedeSemana(qSem || '').then(function (j) { dados = j; semKids(); semanaId = j.semana ? j.semana.id : ''; desenhaLista(); if (qId) abre(qId); })
+  Promise.all([pedeSemana(qSem || ''), pedeMinhas()]).then(function (r) { var j = r[0]; dados = j; semKids(); juntaMinhas(r[1]); semanaId = j.semana ? j.semana.id : ''; desenhaLista(); if (qId) abre(qId); })
     .catch(function (e) { $('corpo').innerHTML = '<p class="erro">Não consegui buscar as atividades (' + esc(e.message) + ').</p>'; });
   try { if (localStorage.getItem('fisk_theme') === 'dark') document.body.classList.add('theme-dark'); } catch (e) {}
   fiskApresEnviar(false);   /* o que ficou na fila de uma aula sem internet */
