@@ -163,6 +163,9 @@
   #qrAula button.fim:hover{ filter: brightness(1.06); }
   #qrAula button.fim:active{ transform: translateY(2px); box-shadow: 0 2px 0 #15805a; }
   #qrAula #qrAulaFecha{ background: rgba(255,255,255,.16); color: #fff; }
+  /* a turma online (27/11/2026): no computador ninguém lê o QR; o link vai para o chat do Meet e abre numa aba (também nas sub-salas) */
+  #qrAula #aulaCopia{ background: #fff; color: #14245a; box-shadow: 0 4px 0 rgba(0,0,0,.18); }
+  #qrAula #aulaCopia.ok{ background: #ffd24a; }
   #qrAula button:disabled{ opacity: .6; cursor: default; }
   @keyframes aulaEntra{ from{ transform: scale(.85) translateY(20px); opacity: 0; } }
   #qrAula .bolhas .logo{ position: absolute; width: 104px; filter: drop-shadow(0 6px 10px rgba(0,0,0,.35)); animation: aulaLogo 4.6s ease-in-out infinite; }
@@ -244,13 +247,13 @@
     <span class="sep"></span>
     <button type="button" id="bInicio" title="Voltar ao início (Home)">⏮ Início</button>
     <button type="button" id="bCheia" title="Tela cheia (F)">⛶ Tela cheia</button>
-    <button type="button" id="bFone" title="Usar o celular como controle remoto">📱 Celular</button>
+    <button type="button" id="bFone" title="Usar o celular como controle remoto">📱 Controlar pelo celular</button>
     <button type="button" id="bAlunos" title="Os alunos acompanham no celular os cliques que você já mostrou">👥 Alunos</button>
     <button type="button" id="bSair" title="Voltar à abertura (Esc)">✕</button>
   </div>
   <div id="capa"><div id="capaFundo"></div><div class="cx" id="capaCorpo"></div></div>
   <div id="qrFone" hidden><div class="cx"><h2>📱 Controle pelo celular</h2><p>Abra a câmera do seu celular e aponte para o código.</p><div class="qr" id="qrImg"></div><p id="qrTxt" style="font-size:.85rem">Preparando…</p><button type="button" id="qrFecha">Fechar</button></div></div>
-  <div id="qrAula" hidden><div class="cx"><div class="bolhas" aria-hidden="true"><i style="left:5%;top:5%">💬</i><i style="right:6%;top:8%;animation-delay:.8s">🎉</i><img class="logo" src="assets/fisk-logo-balao-360.png" alt="" style="left:2.5%;top:33%"><i style="left:8%;top:64%;animation-delay:1.6s">✨</i><i style="right:7%;top:50%;animation-delay:2.2s">💬</i></div><span class="chip">AO VIVO</span><h2>Bora conversar! 📱</h2><p>Abra a câmera, aponte para o código e siga os slides junto com a turma.</p><div class="qr" id="qrAulaImg"></div><p class="cod" id="qrAulaCod"></p><p id="qrAulaTxt" style="font-size:.9rem">Preparando…</p><div class="linha"><button type="button" class="fim" id="aulaFim">✓ Finalizar e liberar a atividade inteira</button><button type="button" id="qrAulaFecha">Fechar</button></div></div></div>
+  <div id="qrAula" hidden><div class="cx"><div class="bolhas" aria-hidden="true"><i style="left:5%;top:5%">💬</i><i style="right:6%;top:8%;animation-delay:.8s">🎉</i><img class="logo" src="assets/fisk-logo-balao-360.png" alt="" style="left:2.5%;top:33%"><i style="left:8%;top:64%;animation-delay:1.6s">✨</i><i style="right:7%;top:50%;animation-delay:2.2s">💬</i></div><span class="chip">AO VIVO</span><h2>Bora conversar! 📱</h2><p>Abra a câmera, aponte para o código e siga os slides junto com a turma.</p><div class="qr" id="qrAulaImg"></div><p class="cod" id="qrAulaCod"></p><p id="qrAulaTxt" style="font-size:.9rem">Preparando…</p><div class="linha"><button type="button" class="fim" id="aulaFim">✓ Finalizar e liberar a atividade inteira</button><button type="button" id="aulaCopia" title="Para a turma online: cole no chat do Google Meet e cada aluno abre numa aba">📋 Copiar o link para o chat</button><button type="button" id="qrAulaFecha">Fechar</button></div></div></div>
   <div id="aulaCanto" hidden title="Os alunos acompanham por este código"><div class="qr" id="aulaCantoImg"></div><span id="aulaCantoCod"></span></div>
   <div id="foneAviso" hidden>📱 Celular ligado: pode conduzir por ele</div>
 </div>
@@ -829,6 +832,12 @@
   /* trocar de atividade ou sair: a aula fica com o que já foi mostrado (o professor finaliza se quiser liberar tudo) */
   function aulaSolta() { aula = null; $('aulaCanto').hidden = true; $('qrAula').hidden = true; aulaBotao(); }
   $('bAlunos').onclick = alunosBotao; $('aulaFim').onclick = aulaFinaliza;
+  $('aulaCopia').onclick = function () {
+    if (!aula) return;
+    var b = $('aulaCopia'), url = AULA_URL + '#a=' + aula.id, txt = '💬 Conversação ao vivo: abra numa aba e acompanhe os slides → ' + url;
+    var feito = function () { b.classList.add('ok'); b.textContent = '✓ Link copiado: cole no chat do Meet'; setTimeout(function () { b.classList.remove('ok'); b.textContent = '📋 Copiar o link para o chat'; }, 3500); };
+    (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(txt) : Promise.reject()).then(feito).catch(function () { window.prompt('Copie o link e cole no chat do Meet:', url); });
+  };
   $('aulaCanto').onclick = function () { aulaTexto(); $('qrAula').hidden = false; };
   $('qrAula').onclick = function (e) { if (e.target.id === 'qrAula' || e.target.id === 'qrAulaFecha') $('qrAula').hidden = true; };
 
