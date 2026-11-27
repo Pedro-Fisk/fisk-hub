@@ -140,12 +140,15 @@
   #qrAula[hidden]{ display: none; }
   /* o card no clima do "Conversação de hoje" da home do aluno (azul, bolhas, chip vermelho de ao vivo) */
   #qrAula .cx{ position: relative; overflow: hidden; color: #fff; border-radius: 28px; padding: 1.6rem 2rem 1.4rem; text-align: center; max-width: 36rem;
-    background: linear-gradient(135deg, #2546b8 0%, #1d3a8a 45%, #14245a 100%); box-shadow: 0 24px 70px rgba(0,0,0,.55); animation: aulaEntra .45s cubic-bezier(.2,1.4,.4,1); }
-  #qrAula .cx:before, #qrAula .cx:after{ content: ""; position: absolute; border-radius: 50%; background: rgba(255,255,255,.08); pointer-events: none; }
-  #qrAula .cx:before{ width: 260px; height: 260px; right: -90px; top: -110px; }
-  #qrAula .cx:after{ width: 180px; height: 180px; left: -70px; bottom: -80px; }
+    background: linear-gradient(135deg, #2b52c9 0%, #1d3a8a 35%, #14245a 65%, #23439f 100%); background-size: 240% 240%; box-shadow: 0 24px 70px rgba(0,0,0,.55);
+    animation: aulaEntra .45s cubic-bezier(.2,1.4,.4,1), aulaOnda 14s ease-in-out infinite; }
+  /* o fundo vivo (27/11/2026, pedido do Pedro): o azul ondula, e três bolhas claras derivam devagar, cada uma no seu ritmo */
+  #qrAula .cx:before, #qrAula .cx:after, #qrAula .bolhas:before{ content: ""; position: absolute; border-radius: 50%; background: rgba(255,255,255,.09); pointer-events: none; }
+  #qrAula .cx:before{ width: 260px; height: 260px; right: -90px; top: -110px; animation: aulaDeriva1 11s ease-in-out infinite; }
+  #qrAula .cx:after{ width: 180px; height: 180px; left: -70px; bottom: -80px; animation: aulaDeriva2 13s ease-in-out infinite; }
+  #qrAula .bolhas:before{ width: 120px; height: 120px; left: 38%; top: -70px; background: rgba(255,255,255,.06); animation: aulaDeriva3 17s ease-in-out infinite; }
   #qrAula .bolhas{ position: absolute; inset: 0; pointer-events: none; }
-  #qrAula .bolhas i{ position: absolute; font-style: normal; font-size: 1.6rem; opacity: .9; animation: aulaFlutua 3.2s ease-in-out infinite; }
+  #qrAula .bolhas i{ position: absolute; font-style: normal; font-size: 1.8rem; opacity: .95; animation: aulaFlutua 3.6s ease-in-out infinite; }
   #qrAula .chip{ display: inline-flex; align-items: center; gap: .4rem; font: 800 .78rem system-ui, sans-serif; letter-spacing: .05em; background: #e5484d; color: #fff; padding: .3rem .8rem; border-radius: 999px; }
   #qrAula .chip:before{ content: ""; width: 8px; height: 8px; border-radius: 50%; background: #fff; animation: aulaPisca 1.4s infinite; }
   #qrAula h2{ position: relative; margin: .55rem 0 .15rem; font-size: 2rem; line-height: 1.15; }
@@ -162,10 +165,16 @@
   #qrAula #qrAulaFecha{ background: rgba(255,255,255,.16); color: #fff; }
   #qrAula button:disabled{ opacity: .6; cursor: default; }
   @keyframes aulaEntra{ from{ transform: scale(.85) translateY(20px); opacity: 0; } }
-  @keyframes aulaFlutua{ 50%{ transform: translateY(-10px) rotate(-6deg); } }
+  #qrAula .bolhas .logo{ position: absolute; width: 104px; filter: drop-shadow(0 6px 10px rgba(0,0,0,.35)); animation: aulaLogo 4.6s ease-in-out infinite; }
+  @keyframes aulaLogo{ 0%,100%{ transform: translateY(0) rotate(-8deg); } 50%{ transform: translateY(-12px) rotate(-3deg) scale(1.05); } }
+  @keyframes aulaFlutua{ 25%{ transform: translate(4px, -8px) rotate(6deg); } 50%{ transform: translate(0, -14px) rotate(-6deg); } 75%{ transform: translate(-4px, -6px) rotate(4deg); } }
+  @keyframes aulaOnda{ 50%{ background-position: 100% 100%; } }
+  @keyframes aulaDeriva1{ 50%{ transform: translate(-60px, 40px) scale(1.12); } }
+  @keyframes aulaDeriva2{ 50%{ transform: translate(70px, -30px) scale(.9); } }
+  @keyframes aulaDeriva3{ 50%{ transform: translate(-90px, 60px) scale(1.25); } }
   @keyframes aulaPulsa{ 50%{ box-shadow: 0 0 0 14px rgba(255,255,255,.08), 0 10px 30px rgba(0,0,0,.3); } }
   @keyframes aulaPisca{ 50%{ opacity: .3; } }
-  @media (prefers-reduced-motion: reduce){ #qrAula .cx, #qrAula .bolhas i, #qrAula .qr, #qrAula .chip:before{ animation: none; } }
+  @media (prefers-reduced-motion: reduce){ #qrAula .cx, #qrAula .cx:before, #qrAula .cx:after, #qrAula .bolhas:before, #qrAula .bolhas i, #qrAula .bolhas .logo, #qrAula .qr, #qrAula .chip:before{ animation: none; } }
   #aulaCanto{ position: fixed; right: 14px; bottom: 74px; z-index: 12; background: #fff; border-radius: 12px; padding: 6px; box-shadow: 0 6px 20px rgba(0,0,0,.4); cursor: pointer; text-align: center; }
   #aulaCanto[hidden]{ display: none; }
   #aulaCanto .qr{ width: 92px; height: 92px; }
@@ -241,7 +250,7 @@
   </div>
   <div id="capa"><div id="capaFundo"></div><div class="cx" id="capaCorpo"></div></div>
   <div id="qrFone" hidden><div class="cx"><h2>📱 Controle pelo celular</h2><p>Abra a câmera do seu celular e aponte para o código.</p><div class="qr" id="qrImg"></div><p id="qrTxt" style="font-size:.85rem">Preparando…</p><button type="button" id="qrFecha">Fechar</button></div></div>
-  <div id="qrAula" hidden><div class="cx"><div class="bolhas" aria-hidden="true"><i style="left:5%;top:5%">💬</i><i style="right:6%;top:8%;animation-delay:.8s">🎉</i><i style="left:6%;top:44%;animation-delay:1.6s">✨</i><i style="right:7%;top:50%;animation-delay:2.2s">💬</i></div><span class="chip">AO VIVO</span><h2>Bora conversar! 📱</h2><p>Abra a câmera, aponte para o código e siga os slides junto com a turma.</p><div class="qr" id="qrAulaImg"></div><p class="cod" id="qrAulaCod"></p><p id="qrAulaTxt" style="font-size:.9rem">Preparando…</p><div class="linha"><button type="button" class="fim" id="aulaFim">✓ Finalizar e liberar a atividade inteira</button><button type="button" id="qrAulaFecha">Fechar</button></div></div></div>
+  <div id="qrAula" hidden><div class="cx"><div class="bolhas" aria-hidden="true"><i style="left:5%;top:5%">💬</i><i style="right:6%;top:8%;animation-delay:.8s">🎉</i><img class="logo" src="assets/fisk-logo-balao-360.png" alt="" style="left:2.5%;top:33%"><i style="left:8%;top:64%;animation-delay:1.6s">✨</i><i style="right:7%;top:50%;animation-delay:2.2s">💬</i></div><span class="chip">AO VIVO</span><h2>Bora conversar! 📱</h2><p>Abra a câmera, aponte para o código e siga os slides junto com a turma.</p><div class="qr" id="qrAulaImg"></div><p class="cod" id="qrAulaCod"></p><p id="qrAulaTxt" style="font-size:.9rem">Preparando…</p><div class="linha"><button type="button" class="fim" id="aulaFim">✓ Finalizar e liberar a atividade inteira</button><button type="button" id="qrAulaFecha">Fechar</button></div></div></div>
   <div id="aulaCanto" hidden title="Os alunos acompanham por este código"><div class="qr" id="aulaCantoImg"></div><span id="aulaCantoCod"></span></div>
   <div id="foneAviso" hidden>📱 Celular ligado: pode conduzir por ele</div>
 </div>
@@ -751,9 +760,9 @@
   }
   function aulaTexto() {
     if (!aula) return;
-    var tx = aula.fim ? 'Finalizada: a atividade inteira está aberta para os alunos até 23h59.'
-      : (aula.turma ? 'Os ' + aula.alunos + ' alunos da turma ' + aula.turma + ' também acham no portal, no card "Conversação de hoje". ' : 'Sem turma neste horário: os alunos entram só pelo código. ') +
-        'Eles veem só o que você já mostrou.';
+    /* o texto é para a TURMA, que lê a TV (27/11/2026: o aviso para o professor, com a contagem, confundia) */
+    var tx = aula.fim ? 'A atividade inteira está aberta no celular até 23h59, para revisar e copiar o vocabulário.'
+      : aula.turma ? 'Também está no Portal do Aluno, no card "Conversação de hoje".' : '';
     $('qrAulaTxt').textContent = tx;
     $('aulaFim').hidden = !!aula.fim;
     $('qrAulaCod').textContent = aula.id;
