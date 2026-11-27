@@ -161,15 +161,27 @@
       jogo.forEach(function (g, gi) {
         var titJ = h2(rot.jogo + ' · ' + (gi + 1) + '/' + jogo.length);
         if (g.type === 'order' || g.type === 'match' || g.type === 'type_in') { jogoNovo(g, titJ); return; }
-        novo('jogo', h2(rot.jogo + ' · ' + (gi + 1) + '/' + jogo.length) +
-          '<div style="position:absolute;left:250px;right:250px;top:270px;font:800 ' + (String(g.question).length > 70 ? 74 : 90) + 'px/1.2 \'' + T + '\'">' + esc(g.question) + '</div>' +
+        /* OUÇA E ESCOLHA (item 6, 27/11/2026): a pergunta é um áudio (voz neural, api/voz.js do portal, tocada pela
+           conversacao.html por FiskTema.aoOuvir); o 🔊 toca de novo, e a revelação mostra o que foi dito */
+        var ouve = g.type === 'listen' && g.audio;
+        novo('jogo', titJ +
+          (ouve ? '<div style="position:absolute;left:250px;right:250px;top:250px;display:flex;align-items:center;gap:44px">' +
+              '<button type="button" class="ft-ouvir" data-ouvir="' + esc(g.audio) + '" style="flex:none;width:200px;height:200px;border-radius:50%;border:0;cursor:pointer;background:' + p.dest + ';color:' + sobreDest + ';font-size:96px;box-shadow:0 12px 30px rgba(0,0,0,.18)">🔊</button>' +
+              '<div style="font:800 ' + (String(g.question).length > 50 ? 62 : 76) + 'px/1.2 \'' + T + '\'">' + esc(g.question) + '</div></div>' +
+              /* ⚠️ nada de opacity no style deste elemento: a opacidade escrita no elemento vence o .ft-off e a frase (que
+                 em "o que você ouviu?" É a resposta) aparecia na foto da pergunta dos celulares (bancada, 27/11/2026) */
+              '<div data-e="1" class="ft-off" style="position:absolute;left:250px;right:250px;top:475px;font:700 50px/1.25 \'' + B + '\';font-style:italic"><span style="color:' + p.txt + ';filter:opacity(.85)">“' + esc(g.audio) + '”</span></div>'
+            : '<div style="position:absolute;left:250px;right:250px;top:270px;font:800 ' + (String(g.question).length > 70 ? 74 : 90) + 'px/1.2 \'' + T + '\'">' + esc(g.question) + '</div>') +
           '<div data-jogo="' + g.correctIndex + '" style="position:absolute;left:250px;right:250px;top:600px;display:flex;gap:40px">' + (g.options || []).map(function (o, i) {
-            return '<button type="button" class="ft-op" data-op="' + i + '" style="flex:1;font:800 64px \'' + B + '\';border-radius:30px;padding:34px 20px;background:' + cartao + ';color:' + p.txt + ';border:5px solid ' + p.sec + '">' + 'abc'[i] + ') ' + esc(o) + '</button>'; }).join('') + '</div>' +
-          '<div class="ft-msg" style="position:absolute;left:250px;right:250px;top:830px;text-align:center;font-size:56px;font-weight:900"></div>' +
+            /* a letra encolhe com a alternativa mais longa: duas linhas de 64 px empurravam o "Correct!" para cima dos botões */
+            var maior = Math.max.apply(null, (g.options || []).map(function (x) { return String(x).length; }).concat([1])), fsOp = maior > 22 ? 46 : maior > 14 ? 54 : 64;
+            return '<button type="button" class="ft-op" data-op="' + i + '" style="flex:1;font:800 ' + fsOp + 'px \'' + B + '\';border-radius:30px;padding:34px 20px;background:' + cartao + ';color:' + p.txt + ';border:5px solid ' + p.sec + '">' + 'abc'[i] + ') ' + esc(o) + '</button>'; }).join('') + '</div>' +
+          '<div class="ft-msg" style="position:absolute;left:250px;right:250px;top:' + ((g.options || []).some(function (x) { return String(x).length > 22; }) ? 880 : 830) + 'px;text-align:center;font-size:56px;font-weight:900"></div>' +
           '<span data-e="1" class="ft-off ft-revela" hidden></span>' +
           (g.source ? '<div style="position:absolute;left:250px;bottom:40px;font-size:26px;font-weight:700;opacity:.55">' + esc(g.source) + '</div>' : ''));
         /* o item cru, para o jogo clicável no celular dos alunos (conversacao.html → portal api/aula.js) */
         slides[slides.length - 1].jogo = { pergunta: String(g.question || ''), opcoes: (g.options || []).map(String), certa: +g.correctIndex };
+        if (ouve) slides[slides.length - 1].jogo.ouvir = String(g.audio);
       });
     }
     /* OS TIPOS NOVOS DO JOGO (item 7, Pedro 27/11/2026). No dado da aula, todos usam "options" (o editor do Conversation
@@ -239,6 +251,9 @@
     var el = s.el;
     [].forEach.call(el.querySelectorAll('[data-carta]'), function (c) {
       c.addEventListener('click', function (ev) { ev.stopPropagation(); var t = c.querySelector('.ft-trad'); if (t) t.classList.remove('ft-off'); });
+    });
+    [].forEach.call(el.querySelectorAll('.ft-ouvir'), function (b) {
+      b.addEventListener('click', function (ev) { ev.stopPropagation(); if (raiz.FiskTema && raiz.FiskTema.aoOuvir) raiz.FiskTema.aoOuvir(b.getAttribute('data-ouvir'), b); });
     });
     var j = el.querySelector('[data-jogo]');
     if (j) {

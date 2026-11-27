@@ -285,7 +285,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js"></script>
-<script src="assets/tema-slides.js?v=e0dbc68981"></script>
+<script src="assets/tema-slides.js?v=9fbc93759f"></script>
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
@@ -607,6 +607,7 @@
     if (atual.tipo === 'cm') {
       obterCm(atual).then(function (o) {
         deck = deckDe(o); deckFoto = deckDe(o); paginas = []; ci = 0; et = 0; $('palco').innerHTML = '';
+        vozLingua = o.lesson && o.lesson.language === 'spanish' ? 'es' : 'en'; vozAntecipa();
         aulaBotao();
         capa();
       }).catch(function (e) { $('capaCorpo').innerHTML = '<p class="erro">Não consegui abrir (' + esc(e.message) + ').</p><div class="linha"><button class="sec" id="bVolta">← Voltar à lista</button></div>'; $('bVolta').onclick = volta; });
@@ -659,6 +660,10 @@
   function mostraCm() {
     var sl = deck.slides[ci]; $('palco').innerHTML = ''; $('palco').appendChild(sl.el);
     FiskTema.encaixar(sl.el, $('palco')); FiskTema.mostrar(deck, ci, et);
+    /* ouça e escolha: toca ao CHEGAR na pergunta (redesenhar no resize não toca de novo; o 🔊 repete) */
+    var aqui = ci + '|' + et;
+    if (sl.jogo && sl.jogo.ouvir && et === 0 && vozOnde !== aqui) vozToca(sl.jogo.ouvir, sl.el.querySelector('.ft-ouvir'));
+    vozOnde = aqui;
     var tot = passos(), n = passoAtual();
     $('bN').textContent = 'slide ' + (ci + 1) + ' de ' + deck.slides.length;
     $('prog').style.width = (n * 100 / tot) + '%';
@@ -696,7 +701,7 @@
     history.replaceState(null, '', 'conversacao.html' + (semanaId ? '?semana=' + encodeURIComponent(semanaId) : ''));
     marcaOffline();
   }
-  $('palco').addEventListener('click', function (e) { if (!tocando) return; if (deck && e.target.closest('[data-carta],.ft-op')) return; (e.clientX < window.innerWidth * 0.2 ? ant : prox)(); });
+  $('palco').addEventListener('click', function (e) { if (!tocando) return; if (deck && e.target.closest('[data-carta],.ft-op,.ft-ouvir')) return; (e.clientX < window.innerWidth * 0.2 ? ant : prox)(); });
   window.addEventListener('resize', function () { if (deck && tocando) mostraCm(); });
   $('bProx').onclick = prox; $('bAnt').onclick = ant; $('bInicio').onclick = function () { mostra(0); };
   $('bCheia').onclick = cheia; $('bSair').onclick = function () { if (document.fullscreenElement) document.exitFullscreen(); capa(); };
@@ -807,6 +812,38 @@
      para as do Conversation Maker: cada etapa de cada slide é um clique, fotografado num segundo deck (FiskTema.foto)
      para o slide da TV não piscar. Sem internet, a aula na TV segue igual. */
   var AULA_API = 'https://portalfisk.com.br/api/aula', AULA_URL = 'https://portalfisk.com.br/aula.html';
+  /* ── OUÇA E ESCOLHA (item 6, 27/11/2026) ──
+     A pergunta em áudio do jogo. ⚠️ Voz SEMPRE neural (regra do Pedro): vem do portal (api/voz.js, a Azure da conversa
+     ao vivo, as vozes dos geradores offline), uma voz por atividade, guardada lá por 30 dias. Nunca speechSynthesis: se a
+     voz falhar, o texto aparece no slide para o professor ler. Os áudios da atividade são pedidos já ao abrir, para a
+     TV não esperar na hora; o mesmo mp3 vai para os celulares junto do item. */
+  var VOZ_API = 'https://portalfisk.com.br/api/voz', vozLingua = 'en', vozCache = {}, vozAgora = null, vozOnde = '';
+  function vozMp3(texto) {
+    if (!vozCache[texto]) vozCache[texto] = fetch(VOZ_API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ token: s.token, texto: texto, lingua: vozLingua, semente: atual ? atual.id : '' }) })
+      .then(function (r) { return r.json(); }).then(function (j) { if (!j || !j.ok || !j.mp3) throw new Error((j && j.error) || 'sem voz'); return j.mp3; })
+      .catch(function (e) { delete vozCache[texto]; throw e; });
+    return vozCache[texto];
+  }
+  function vozAntecipa() {
+    if (!deck) return;
+    deck.slides.forEach(function (x) { if (x.jogo && x.jogo.ouvir) vozMp3(x.jogo.ouvir).catch(function () {}); });
+  }
+  function vozToca(texto, botao) {
+    try { if (vozAgora) vozAgora.pause(); } catch (e) {}
+    if (botao) botao.style.opacity = '.6';
+    vozMp3(texto).then(function (mp3) {
+      vozAgora = new Audio('data:audio/mpeg;base64,' + mp3);
+      vozAgora.onended = function () { if (botao) botao.style.opacity = ''; };
+      return vozAgora.play();
+    }).catch(function () {
+      /* sem voz: o professor lê. A frase aparece embaixo do 🔊 (nunca a voz do navegador) */
+      if (botao) { botao.style.opacity = ''; var el = botao.parentNode, aviso = el.querySelector('.ft-leia');
+        if (!aviso) { aviso = document.createElement('div'); aviso.className = 'ft-leia'; aviso.style.cssText = 'position:absolute;left:0;top:215px;font:700 40px/1.2 system-ui,sans-serif;color:#b91c1c'; el.appendChild(aviso); }
+        aviso.textContent = '📢 Leia para a turma: “' + texto + '”'; }
+    });
+  }
+  FiskTema.aoOuvir = vozToca;
   var aula = null, aulaFila = Promise.resolve();
   function aulaApi(c, ms) {
     var ctl = new AbortController(), t = setTimeout(function () { ctl.abort(); }, ms || 20000);
@@ -903,7 +940,11 @@
     var tentativas = 0;
     (function vai() {
       aulaImagem(k - 1).then(function (img) {
-        return aulaApi({ op: 'clique', aula: a.id, chave: a.chave, n: k, atual: a.agora, img: img, jogo: aulaJogo(k) });
+        var jg = aulaJogo(k);
+        /* ouça e escolha: o mesmo mp3 que a TV tocou vai para os celulares (se a voz falhou, vai sem áudio) */
+        return (jg && jg.ot ? vozMp3(jg.ot).catch(function () { return null; }) : Promise.resolve(null)).then(function (mp3) {
+          return aulaApi({ op: 'clique', aula: a.id, chave: a.chave, n: k, atual: a.agora, img: img, jogo: jg, s: mp3 || undefined });
+        });
       }).then(function (r) {
         if (!r || !r.ok) throw new Error('não gravou');
         a.feitos[k] = 1; if (k === a.agora) a.avisado = k;
@@ -1000,7 +1041,7 @@
     if (jg.tipo === 'ordem') return { t: 'ordem', p: jg.pergunta, o: jg.opcoes, c: jg.certa, rev: k + 1 };
     if (jg.tipo === 'pares') return { t: 'pares', p: jg.pergunta, o: jg.opcoes, r: jg.direita, c: jg.certa, rev: k + 1 };
     if (jg.tipo === 'digitar') return { t: 'digitar', p: jg.pergunta, c: jg.certa, rev: k + 1 };
-    return { p: jg.pergunta, o: jg.opcoes, c: jg.certa, rev: k + 1, a: jg.areas };
+    return { p: jg.pergunta, o: jg.opcoes, c: jg.certa, rev: k + 1, a: jg.areas, ot: jg.ouvir };
   }
   /* o contador discreto no canto: "7 responderam" e, depois de revelar, "5 de 7 acertaram". Só consulta (a cada 3 s)
      enquanto a TV está num slide de jogo com a aula aberta. */
