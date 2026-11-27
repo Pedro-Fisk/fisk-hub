@@ -187,6 +187,10 @@
   #aulaPlacar{ position: fixed; right: 14px; bottom: 200px; z-index: 12; background: rgba(15,23,42,.82); color: #fff; font: 800 .95rem system-ui, sans-serif;
     padding: 6px 12px; border-radius: 999px; box-shadow: 0 4px 14px rgba(0,0,0,.35); pointer-events: none; }
   #aulaPlacar[hidden]{ display: none; }
+  .notaAc{ display: flex; gap: 4px; align-items: center; justify-content: center; flex-wrap: wrap; margin: .4rem 0 .2rem; font-weight: 700; }
+  .notaAc button{ border: 0; background: none; font-size: 1.9rem; line-height: 1; color: #cbd5e1; cursor: pointer; padding: 0 2px; }
+  .notaAc button.on{ color: #facc15; } .notaAc button:hover{ transform: scale(1.15); }
+  .notaAc small{ flex-basis: 100%; text-align: center; font-weight: 600; opacity: .75; }
   #avalVer{ position: fixed; inset: 0; z-index: 45; background: rgba(8,12,24,.8); display: flex; align-items: center; justify-content: center; }
   #avalVer[hidden]{ display: none; }
   #avalVer .cx{ background: #fff; color: #0f172a; border-radius: 20px; padding: 24px 28px; width: min(92vw, 760px); max-height: 86vh; overflow-y: auto; font: 500 1rem/1.4 system-ui, sans-serif; }
@@ -381,6 +385,24 @@
       .then(function (j) { if (!j || !j.ok) throw 0; try { localStorage.setItem(CH_MINHAS, JSON.stringify(j.itens || [])); } catch (e) {} return j.itens || []; })
       .catch(function () { try { return JSON.parse(localStorage.getItem(CH_MINHAS) || '[]'); } catch (e) { return []; } });
   }
+  /* O ACERVO DOS PROFESSORES (Pedro, 27/11/2026): as atividades que os OUTROS professores mostraram no portal pelo
+     Conversation Maker, com o autor e a nota de quem já usou (backend CmPortal.js, cmAcervo e cmNota). Abre como as
+     "Minhas" (cmLer). Enquanto o backend não tiver a rota, a categoria simplesmente não aparece. */
+  var ACERVO = 'Acervo dos professores', CH_ACERVO = 'conv:acervo', ultAcervo = null;
+  try { ultAcervo = JSON.parse(localStorage.getItem(CH_ACERVO) || 'null'); } catch (e) {}
+  function pedeAcervo() {
+    return fiskFetch(FISK_HUB_EP, { action: 'cmAcervo', token: s.token }, { timeoutMs: 45000 })
+      .then(function (j) { if (!j || !j.ok) throw 0; try { localStorage.setItem(CH_ACERVO, JSON.stringify(j.itens || [])); } catch (e) {} return j.itens || []; })
+      .catch(function () { return ultAcervo || []; });
+  }
+  function juntaAcervo(itens) {
+    if (!dados) return; dados.idiomas = dados.idiomas || {};
+    delete dados.idiomas[ACERVO];
+    if (!itens || !itens.length) return;
+    dados.idiomas[ACERVO] = itens.map(function (m) { return { id: m.id, nome: m.nome, tipo: 'cm', niveis: [m.nivel, m.perfil].filter(Boolean), quando: m.quando, pronto: true, origem: 'acervo',
+      autor: m.autor, nota: m.nota, notas: m.notas, minha: m.minha }; });
+    dados.vazio = false;
+  }
   function juntaMinhas(itens) {
     if (!dados) return; dados.idiomas = dados.idiomas || {};
     delete dados.idiomas[MINHAS];
@@ -395,7 +417,7 @@
   try { ultMinhas = JSON.parse(localStorage.getItem(CH_MINHAS) || 'null'); } catch (e) {}
   function guardada(id) { try { return JSON.parse(localStorage.getItem(CH_LISTA + (id || 'atual')) || 'null'); } catch (e) { return null; } }
   function semCarimbo(j) { return JSON.stringify({ s: j && j.semana, i: j && j.idiomas, ss: j && j.semanas }); }
-  function aplica(j) { dados = j; semKids(); juntaMinhas(ultMinhas || []); semanaId = j.semana ? j.semana.id : ''; desenhaLista(); }
+  function aplica(j) { dados = j; semKids(); juntaMinhas(ultMinhas || []); juntaAcervo(ultAcervo || []); semanaId = j.semana ? j.semana.id : ''; desenhaLista(); }
   function carregaLista(id, depois) {
     var vez = ++vezLista, g = guardada(id), viu = false;
     if (g && g.semana && g.idiomas) { delete g._offline; aplica(g); viu = true; if (depois) { depois(); depois = null; } }
@@ -451,7 +473,7 @@
       if (!x) return '<span class="sem vazia"></span>';
       var p = partesSemana(x.nome);
       return '<button type="button" class="sem' + (k === 1 ? ' on' : '') + '" data-sem="' + esc(x.id) + '"><b>' + esc(p.n) + (x.atual ? ' · hoje' : '') + '</b><span>' + esc(p.d) + '</span>' +
-        (k === 1 ? (function () { var ks = Object.keys(dados.idiomas || {}).filter(function (x) { return x !== MINHAS; }), n = 0; ks.forEach(function (x) { n += dados.idiomas[x].length; }); return '<small>' + (n ? n + (n === 1 ? ' atividade' : ' atividades') + ' · ' + esc(ks.join(', ')) : 'nenhuma atividade da semana ainda') + '</small>'; })() : '') + '</button>';
+        (k === 1 ? (function () { var ks = Object.keys(dados.idiomas || {}).filter(function (x) { return x !== MINHAS && x !== ACERVO; }), n = 0; ks.forEach(function (x) { n += dados.idiomas[x].length; }); return '<small>' + (n ? n + (n === 1 ? ' atividade' : ' atividades') + ' · ' + esc(ks.join(', ')) : 'nenhuma atividade da semana ainda') + '</small>'; })() : '') + '</button>';
     }).join('');
   }
   function turmaBase() { var t = typeof fiskTurmaDeAgora === 'function' ? fiskTurmaDeAgora(s) : null, agora = !!t; if (!t && typeof fiskTurmaProxima === 'function') t = fiskTurmaProxima(s); if (t) t.agora = agora; return t; }
@@ -489,7 +511,7 @@
     var out = [], extras = [];
     ['English', 'Español'].concat(Object.keys(dados.idiomas || {}).filter(function (k) { return k !== 'English' && k !== 'Español'; })).forEach(function (idioma) {
       var itens = (dados.idiomas[idioma] || []).filter(function (it) { return it !== dest; }), soltos = itens.filter(function (it) { return !it.grupo; });
-      var band = idioma === 'English' ? '🇺🇸 ' : idioma === 'Español' ? '🇪🇸 ' : idioma === MINHAS ? '🧩 ' : '📁 ';
+      var band = idioma === 'English' ? '🇺🇸 ' : idioma === 'Español' ? '🇪🇸 ' : idioma === MINHAS ? '🧩 ' : idioma === ACERVO ? '🗂️ ' : '📁 ';
       var ord = function (a, b) { var o = { Teens: 0, Basic: 1, Intermediate: 2, Advanced: 3, Todos: 4 }; return ((o[nivelDe(a)] == null ? 9 : o[nivelDe(a)]) - (o[nivelDe(b)] == null ? 9 : o[nivelDe(b)])) || (perfilDe(a) === perfilDe(b) ? 0 : (perfilDe(a) === 'Jovens' ? -1 : 1)); };
       if (soltos.length) out.push({ k: idioma, rot: band + idioma, itens: soltos.sort(ord) });
       var gs = {}; itens.filter(function (it) { return it.grupo; }).forEach(function (it) { (gs[it.grupo] = gs[it.grupo] || []).push(it); });
@@ -497,13 +519,31 @@
     });
     return out.concat(extras);   /* os idiomas primeiro, as pastas extras depois */
   }
+  /* a nota do acervo: as estrelas na capa da atividade; dar de novo troca a nota do professor */
+  function notaAcervo() {
+    var box = $('notaAc'); if (!box || !atual) return;
+    var it = atual, desenha = function (msg) {
+      box.innerHTML = '<span>Já usou? Sua nota: </span>' + [1, 2, 3, 4, 5].map(function (n) { return '<button type="button" data-n="' + n + '" class="' + (n <= (it.minha || 0) ? 'on' : '') + '">★</button>'; }).join('') +
+        '<small>' + (msg || (it.notas ? 'média ' + String(it.nota).replace('.', ',') + ' de ' + it.notas : 'ninguém deu nota ainda')) + '</small>';
+      [].forEach.call(box.querySelectorAll('button'), function (b) {
+        b.onclick = function () {
+          var n = +b.getAttribute('data-n'); it.minha = n; desenha('salvando…');
+          fiskFetch(FISK_HUB_EP, { action: 'cmNota', token: s.token, id: it.id, nota: n }, { timeoutMs: 30000 }).then(function (j) {
+            if (!j || !j.ok) throw 0; it.nota = j.nota; it.notas = j.notas; desenha('✓ nota salva · média ' + String(j.nota).replace('.', ',') + ' de ' + j.notas);
+          }).catch(function () { desenha('não salvou: tente de novo'); });
+        };
+      });
+    };
+    desenha();
+  }
   function cartao(it, dest) {
     var n = nivelDe(it), pf = perfilDe(it);
     return '<div class="rec' + (dest ? ' hl dest' : '') + '" data-rec="' + esc(it.id) + '">' + (dest ? '<span class="flag">★ Para a turma de agora</span>' : '') +
       '<div class="capa n-' + esc(n) + '"><span class="e">' + (EM[n] || '💬') + '</span><span class="tg">' + esc((n === 'Todos' ? 'Todos os níveis' : n || 'Atividade').toUpperCase()) + '</span>' + (pf ? '<span class="pf">' + esc(pf) + '</span>' : '') + '</div>' +
       '<div class="th" data-th="' + esc(it.id) + '" title="' + esc(it.nome) + '">' + (it.pronto ? '<span class="carrega"><i></i> preparando a miniatura…</span>' : '<span class="carrega">em preparação</span>') +
       '<span class="l" title="Slide anterior">‹</span><span class="r" title="Próximo slide">›</span><span class="cnt" hidden></span></div>' +
-      '<div class="inf"><b>' + esc(titulo(it)) + '</b>' + (dest ? '<span class="dica">Clique nas bordas da imagem para ver os slides antes da aula.</span>' : '') +
+      '<div class="inf"><b>' + esc(titulo(it)) + '</b>' +
+      (it.origem === 'acervo' ? '<span class="dica">por ' + esc(it.autor || '') + (it.notas ? ' · ★ ' + String(it.nota).replace('.', ',') + ' (' + it.notas + (it.notas === 1 ? ' nota' : ' notas') + ')' : ' · ainda sem nota') + '</span>' : '') + (dest ? '<span class="dica">Clique nas bordas da imagem para ver os slides antes da aula.</span>' : '') +
       '<div class="rod">' + (it.pronto ? '<button type="button" class="bt" data-abre="' + esc(it.id) + '">▶ ' + (dest ? 'Começar na tela cheia' : 'Começar') + '</button>' : '') +
       (it.pronto ? '<span class="off" data-off="' + esc(it.id) + '" hidden>✓ offline</span>' : '<span class="prep">em preparação</span>') + '</div></div></div>';
   }
@@ -590,10 +630,11 @@
   function obterCm(it) {
     var k = chaveCache(it);
     var baixa = function () {
-      var pedido = it.origem === 'minha' ? { action: 'cmLer', token: s.token, id: it.id } : { action: 'conversaLer', token: s.token, id: it.id };
+      var doMaker = it.origem === 'minha' || it.origem === 'acervo';   /* do Conversation Maker: as minhas e as do acervo */
+      var pedido = doMaker ? { action: 'cmLer', token: s.token, id: it.id } : { action: 'conversaLer', token: s.token, id: it.id };
       return fiskFetch(FISK_HUB_EP, pedido, { timeoutMs: 60000 }).then(function (j) {
         if (!j || !j.ok || !j.dados) throw new Error((j && (j.error || j.erro)) || 'não veio');
-        return it.origem === 'minha' ? j.dados : decodeURIComponent(escape(atob(j.dados)));
+        return doMaker ? j.dados : decodeURIComponent(escape(atob(j.dados)));
       });
     };
     var parse = function (t) { var o = JSON.parse(t); if (!o || !o.lesson) throw new Error('atividade sem conteúdo'); return o; };
@@ -630,7 +671,7 @@
   /* guardar a semana inteira neste computador (o Hub já faz isso sozinho ao abrir; este botão força agora) */
   function guardarSemana() {
     var b = $('bOff'); if (!dados || !window.caches) return;
-    var prontos = todos().filter(function (i) { return i.pronto; }), feitos = 0;
+    var prontos = todos().filter(function (i) { return i.pronto && i.origem !== 'acervo'; }), feitos = 0;   /* o acervo não desce inteiro */
     b.disabled = true;
     fiskGuardarPaginaOffline('conversacao.html').then(function () {
       var cadeia = Promise.resolve();
@@ -692,11 +733,13 @@
     if (cf && deck) { cf.style.backgroundImage = ''; cf.innerHTML = ''; var fx = deck.slides[0].el.cloneNode(true); cf.appendChild(fx); FiskTema.encaixar(fx, cf); cf.classList.add('on'); }
     $('capaCorpo').innerHTML = '<h1>💬 ' + esc(titulo(atual)) + '</h1><p class="sub">' + esc(atual.niveis.join(' · ')) + (atual.niveis.length ? ' · ' : '') + (deck ? deck.slides.length + ' slides' : paginas.length + (atual.tipo === 'pdf' ? ' slides' : ' cliques')) + '</p>' +
       (deck ? '<div class="capinha" id="capinhaCm" style="position:relative;overflow:hidden;margin:0 auto"></div>' : '<img class="capinha" src="' + (paginas[0] && paginas[0].src || '') + '" alt="">') +
-      (semanaCerta() ? '' : '<p class="aviso ruim" style="margin-top:.8rem">Esta atividade não é da semana de hoje.</p>') +
+      (atual.origem === 'acervo' ? '<p class="sub">🗂️ Do acervo · por ' + esc(atual.autor || '') + '</p><div class="notaAc" id="notaAc"></div>'
+        : semanaCerta() ? '' : '<p class="aviso ruim" style="margin-top:.8rem">Esta atividade não é da semana de hoje.</p>') +
       '<div><button type="button" class="comeca" id="comeca">▶ Começar na tela cheia</button></div>' +
       '<div class="linha"><button type="button" class="sec" id="semCheia">Começar sem tela cheia</button><button type="button" class="sec" id="bVolta">← Voltar à lista</button></div>' +
       '<p class="dica">Avance com <kbd>clique</kbd>, <kbd>→</kbd>, <kbd>espaço</kbd> ou o passador de slides. Volte com <kbd>←</kbd>.<br><kbd>F</kbd> tela cheia · <kbd>Esc</kbd> volta para cá</p>';
     salaEstado();
+    if (atual.origem === 'acervo') notaAcervo();
     $('comeca').onclick = function () { comecar(true); }; $('semCheia').onclick = function () { comecar(false); }; $('bVolta').onclick = volta;
     if (deck) { var cx = $('capinhaCm'), c0 = deck.slides[0].el.cloneNode(true); c0.style.pointerEvents = 'none'; cx.appendChild(c0); FiskTema.encaixar(c0, cx); }
   }
@@ -1316,6 +1359,7 @@
   var q = new URLSearchParams(location.search), qId = q.get('id'), qSem = q.get('semana');
   carregaLista(qSem || '', qId ? function () { abre(qId); } : null);
   pedeMinhas().then(function (itens) { ultMinhas = itens; if (dados && !$('lista').hidden) { juntaMinhas(itens); desenhaLista(); } });
+  pedeAcervo().then(function (itens) { ultAcervo = itens; if (dados && !$('lista').hidden) { juntaAcervo(itens); desenhaLista(); } });
   try { if (localStorage.getItem('fisk_theme') === 'dark') document.body.classList.add('theme-dark'); } catch (e) {}
   fiskApresEnviar(false);   /* o que ficou na fila de uma aula sem internet */
   try { fiskRegistrarUso('Conversação da semana', 'conversacao'); } catch (e) {}
