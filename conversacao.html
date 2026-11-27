@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#000000">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/fisk-shared.css?v=f12a68d93f">
-<script src="assets/fisk-shared.js?v=23b61b9403"></script>
+<script src="assets/fisk-shared.js?v=b6079f9752"></script>
 <style>
   /* A CONVERSAÇÃO DA SEMANA NA TV (Pedro, 27/11/2026; fase 1, protótipo aprovado em 26/11).
      Sem ?id: a lista das atividades da pasta da semana (backend ConversaSemana.js), por idioma.
@@ -187,6 +187,38 @@
   #aulaPlacar{ position: fixed; right: 14px; bottom: 200px; z-index: 12; background: rgba(15,23,42,.82); color: #fff; font: 800 .95rem system-ui, sans-serif;
     padding: 6px 12px; border-radius: 999px; box-shadow: 0 4px 14px rgba(0,0,0,.35); pointer-events: none; }
   #aulaPlacar[hidden]{ display: none; }
+  /* FERRAMENTAS DA AULA (Pedro, 27/11/2026): o cronômetro do Pair Work (ligado por padrão, o professor desliga) e o
+     sorteio (desligado por padrão, o professor ativa). Liga e desliga no ⚙ da barra, guardado neste computador. */
+  #ferr{ position: fixed; right: 14px; bottom: 74px; z-index: 30; background: #fff; color: #0f172a; border-radius: 14px; padding: 14px 16px; box-shadow: 0 10px 30px rgba(0,0,0,.35); display: flex; flex-direction: column; gap: 8px; font: 600 .92rem system-ui, sans-serif; min-width: 270px; }
+  #ferr[hidden]{ display: none; }
+  #ferr .min button{ border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 8px; padding: 2px 9px; font-weight: 800; cursor: pointer; }
+  #ferr small{ color: #64748b; font-weight: 500; }
+  #crono{ position: fixed; right: 18px; top: 18px; z-index: 14; width: 150px; height: 150px; cursor: pointer; filter: drop-shadow(0 8px 18px rgba(0,0,0,.35)); }
+  #crono[hidden]{ display: none; }
+  #crono svg{ width: 100%; height: 100%; transform: rotate(-90deg); }
+  #crono circle{ fill: none; stroke-width: 12; }
+  #crono .trilho{ fill: rgba(15,23,42,.78); stroke: rgba(255,255,255,.15); }
+  #crono .arco{ stroke: #31A889; stroke-linecap: round; stroke-dasharray: 326.7; transition: stroke-dashoffset 1s linear, stroke .4s; }
+  #crono.pouco .arco{ stroke: #f59e0b; } #crono.zero .arco{ stroke: #e5484d; }
+  #crono #cronoT{ position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; font: 900 2.3rem system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+  #crono.pausa #cronoT{ opacity: .55; }
+  #crono.zero{ animation: cronoPulsa .6s ease-in-out 6; }
+  @keyframes cronoPulsa{ 50%{ transform: scale(1.12); } }
+  #crono button{ position: absolute; border: 0; width: 30px; height: 30px; border-radius: 50%; background: #fff; color: #0f172a; font-weight: 900; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,.3); }
+  #cronoDe{ left: -4px; bottom: -4px; } #cronoX{ right: -4px; top: -4px; font-size: .75rem; }
+  #sorteio{ position: fixed; inset: 0; z-index: 40; background: rgba(8,12,24,.82); display: flex; align-items: center; justify-content: center; }
+  #sorteio[hidden]{ display: none; }
+  #sorteio .cx{ background: linear-gradient(135deg, #1d3a8a, #7c3aed); color: #fff; border-radius: 28px; padding: 34px 40px; width: min(92vw, 980px); text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+  #sorteio .tit{ margin: 0; font: 800 1.6rem system-ui, sans-serif; opacity: .9; }
+  #sorNome{ font: 900 clamp(3rem, 9vw, 6.5rem)/1.1 system-ui, sans-serif; margin: 18px 0 26px; min-height: 1.1em; }
+  #sorNome.rola{ opacity: .7; filter: blur(.5px); }
+  #sorNome.saiu{ animation: sorSai .5s cubic-bezier(.2,1.5,.4,1); text-shadow: 0 0 30px rgba(255,255,255,.5); }
+  @keyframes sorSai{ from{ transform: scale(.6); } }
+  #sorDuplas{ display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin: 18px 0 24px; text-align: left; }
+  #sorDuplas div{ background: rgba(255,255,255,.14); border-radius: 14px; padding: 10px 14px; font: 700 1.25rem system-ui, sans-serif; animation: sorSai .45s cubic-bezier(.2,1.5,.4,1) both; }
+  #sorteio .linha{ display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center; font: 600 .95rem system-ui, sans-serif; }
+  #sorteio .linha button{ border: 0; border-radius: 999px; padding: 10px 18px; font: 800 1rem system-ui, sans-serif; cursor: pointer; background: #fff; color: #1d3a8a; }
+  #sorteio #sorFecha{ background: rgba(255,255,255,.2); color: #fff; }
   /* O GRÁFICO DAS RESPOSTAS (Pedro, 27/11/2026: "uma animação fluida para montar o gráfico"): depois de revelar, uma
      barra embaixo de cada opção do slide. A caixa sobe, as barras crescem uma depois da outra e os números contam até o
      valor; a da certa fica verde e ganha um brilho que passa. Mora DENTRO do slide (escala com a TV); o deck das fotos
@@ -273,6 +305,8 @@
     <button type="button" id="bInicio" title="Voltar ao início (Home)">⏮ Início</button>
     <button type="button" id="bCheia" title="Tela cheia (F)">⛶ Tela cheia</button>
     <button type="button" id="bFone" title="Usar o celular como controle remoto">📱 Controlar pelo celular</button>
+    <button type="button" id="bSorteio" hidden title="Sortear um aluno ou formar duplas, com os nomes da turma de agora">🎲 Sorteio</button>
+    <button type="button" id="bFerr" title="Cronômetro do Pair Work e sorteio: ligar e desligar">⚙</button>
     <button type="button" id="bAlunos" title="Os alunos acompanham no celular os cliques que você já mostrou">👥 Alunos</button>
     <button type="button" id="bSair" title="Voltar à abertura (Esc)">✕</button>
   </div>
@@ -280,6 +314,14 @@
   <div id="qrFone" hidden><div class="cx"><h2>📱 Controle pelo celular</h2><p>Abra a câmera do seu celular e aponte para o código.</p><div class="qr" id="qrImg"></div><p id="qrTxt" style="font-size:.85rem">Preparando…</p><button type="button" id="qrFecha">Fechar</button></div></div>
   <div id="qrAula" hidden><div class="cx"><div class="bolhas" aria-hidden="true"><i style="left:5%;top:5%">💬</i><i style="right:6%;top:8%;animation-delay:.8s">🎉</i><img class="logo" src="assets/fisk-logo-balao-360.png" alt="" style="left:2.5%;top:33%"><i style="left:8%;top:64%;animation-delay:1.6s">✨</i><i style="right:7%;top:50%;animation-delay:2.2s">💬</i></div><span class="chip">AO VIVO</span><h2>Bora conversar! 📱</h2><p>Abra a câmera, aponte para o código e siga os slides junto com a turma.</p><div class="qr" id="qrAulaImg"></div><p class="cod" id="qrAulaCod"></p><p id="qrAulaTxt" style="font-size:.9rem">Preparando…</p><div class="linha"><button type="button" class="fim" id="aulaFim">✓ Finalizar e liberar a atividade inteira</button><button type="button" id="aulaFd" hidden title="Vale para a aula inteira: 20 por acerto e 5 por responder, no Portal do Aluno de quem entrou pelo card ou está logado">💰 Jogo vale Fisk Dólares: SIM</button><button type="button" id="aulaCopia" title="Para a turma online: cole no chat do Google Meet e cada aluno abre numa aba">📋 Copiar o link para o chat</button><button type="button" id="qrAulaFecha">Fechar</button></div></div></div>
   <div id="aulaPlacar" hidden aria-live="polite"></div>
+  <div id="ferr" hidden><b>Ferramentas da aula</b>
+    <label><input type="checkbox" id="fCrono"> ⏱ Cronômetro no Pair Work</label>
+    <div class="min">Tempo: <button type="button" id="fMenos">−</button> <span id="fMin">3</span> min <button type="button" id="fMais">+</button> <button type="button" id="fJa" title="Começar o cronômetro agora, em qualquer slide">▶ Agora</button></div>
+    <label><input type="checkbox" id="fSorteio"> 🎲 Botão de sorteio na barra</label>
+    <small>Fica guardado neste computador.</small></div>
+  <div id="crono" hidden title="Clique para pausar ou continuar"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" class="trilho"></circle><circle cx="60" cy="60" r="52" class="arco" id="cronoArco"></circle></svg><span id="cronoT">3:00</span><button type="button" id="cronoDe" title="Recomeçar">↻</button><button type="button" id="cronoX" title="Esconder">✕</button></div>
+  <div id="sorteio" hidden><div class="cx"><p class="tit" id="sorTit">🎲</p><div id="sorNome">…</div><div id="sorDuplas" hidden></div>
+    <div class="linha"><button type="button" id="sorDeNovo">🎲 Sortear de novo</button><button type="button" id="sorDup">👥 Formar duplas</button><label><input type="checkbox" id="sorRep" checked> não repetir</label><button type="button" id="sorFecha">Fechar</button></div></div></div>
   <div id="aulaCanto" hidden title="Os alunos acompanham por este código"><div class="qr" id="aulaCantoImg"></div><span id="aulaCantoCod"></span></div>
   <div id="foneAviso" hidden>📱 Celular ligado: pode conduzir por ele</div>
 </div>
@@ -635,6 +677,7 @@
   }
   function capa() {
     tocando = false; document.body.classList.remove('mostra', 'esconde-cursor');
+    if (typeof cronoPara === 'function') cronoPara();
     $('capa').hidden = false;
     var cf = $('capaFundo'); if (cf && paginas[0] && paginas[0].src) { cf.style.backgroundImage = 'url(' + paginas[0].src + ')'; cf.classList.add('on'); }
     if (cf && deck) { cf.style.backgroundImage = ''; cf.innerHTML = ''; var fx = deck.slides[0].el.cloneNode(true); cf.appendChild(fx); FiskTema.encaixar(fx, cf); cf.classList.add('on'); }
@@ -668,7 +711,7 @@
     $('bN').textContent = 'slide ' + (ci + 1) + ' de ' + deck.slides.length;
     $('prog').style.width = (n * 100 / tot) + '%';
     if (registro) registro.etapa(n, tot);
-    salaEstado(); aulaMostrou();
+    salaEstado(); aulaMostrou(); cronoNoSlide();
   }
   function mostra(i) {
     if (deck) { if (i === 0) { ci = 0; et = 0; } else if (i === Infinity) { ci = deck.slides.length - 1; et = deck.slides[ci].etapas; } mostraCm(); return; }
@@ -692,6 +735,7 @@
   function cheia() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(function () {}); else document.exitFullscreen(); }
   function volta() {
     if (document.fullscreenElement) document.exitFullscreen();
+    cronoPara(); $('sorteio').hidden = true;
     if (registro) { registro.fim(); registro = null; }
     paginas.forEach(function (im) { if (im.src) URL.revokeObjectURL(im.src); });
     if (doc) { try { doc.destroy(); } catch (e) {} doc = null; }
@@ -1100,6 +1144,107 @@
   };
   $('aulaCanto').onclick = function () { aulaTexto(); $('qrAula').hidden = false; };
   $('qrAula').onclick = function (e) { if (e.target.id === 'qrAula' || e.target.id === 'qrAulaFecha') $('qrAula').hidden = true; };
+
+  /* ── FERRAMENTAS DA AULA (27/11/2026) ──
+     ⏱ CRONÔMETRO DO PAIR WORK: começa sozinho quando a TV CHEGA num slide de conversa em dupla (nas atividades do
+     Conversation Maker; no PDF, o "▶ Agora" do ⚙), recomeça a cada slide de conversa e some fora deles. Clique pausa;
+     no zero toca o sino e pulsa. Ligado por padrão; o professor desliga no ⚙.
+     🎲 SORTEIO: desligado por padrão; ligado no ⚙, aparece na barra. Sorteia um nome da turma de agora (a grade da
+     Minha semana, já no aparelho: nenhuma chamada nova) sem repetir até acabar a lista, ou forma duplas (sobrou um,
+     vira trio). O que a turma lê sai na língua da aula; os botões do professor, em português. */
+  var FERR = { crono: 'conv:crono', min: 'conv:cronoMin', sorteio: 'conv:sorteio' };
+  function pref(k, padrao) { try { var v = localStorage.getItem(FERR[k]); return v == null ? padrao : v; } catch (e) { return padrao; } }
+  function guardaPref(k, v) { try { localStorage.setItem(FERR[k], String(v)); } catch (e) {} }
+  var cronoLig = pref('crono', '1') === '1', cronoMin = Math.max(1, Math.min(15, parseInt(pref('min', '3'), 10) || 3)), sorteioLig = pref('sorteio', '0') === '1';
+  var crono = { fim: 0, resta: 0, t: null, pausa: false, total: 0, slide: -1 };
+  function cronoDesenha() {
+    var seg = Math.max(0, Math.ceil(crono.resta / 1000)), el = $('crono');
+    $('cronoT').textContent = Math.floor(seg / 60) + ':' + ('0' + seg % 60).slice(-2);
+    $('cronoArco').style.strokeDashoffset = String(326.7 * (1 - (crono.total ? crono.resta / crono.total : 0)));
+    el.classList.toggle('pouco', seg > 0 && seg <= 30); el.classList.toggle('zero', seg === 0); el.classList.toggle('pausa', crono.pausa);
+  }
+  function cronoTique() {
+    clearTimeout(crono.t);
+    if (crono.pausa) return;
+    crono.resta = Math.max(0, crono.fim - Date.now()); cronoDesenha();
+    if (crono.resta <= 0) { cronoSino(); return; }
+    crono.t = setTimeout(cronoTique, 250);
+  }
+  function cronoComeca() {
+    crono.total = crono.resta = cronoMin * 60000; crono.fim = Date.now() + crono.total; crono.pausa = false;
+    $('crono').hidden = false; cronoTique();
+  }
+  function cronoPara() { clearTimeout(crono.t); $('crono').hidden = true; crono.slide = -1; }
+  function cronoSino() {
+    try { var c = new (window.AudioContext || window.webkitAudioContext)(), t0 = c.currentTime;
+      [[1046.5, 0], [784, .22], [1046.5, .44], [1318.5, .66]].forEach(function (n) { var o = c.createOscillator(), g = c.createGain(); o.frequency.value = n[0];
+        g.gain.setValueAtTime(0, t0 + n[1]); g.gain.linearRampToValueAtTime(.25, t0 + n[1] + .02); g.gain.exponentialRampToValueAtTime(.001, t0 + n[1] + .7);
+        o.connect(g); g.connect(c.destination); o.start(t0 + n[1]); o.stop(t0 + n[1] + .8); }); } catch (e) {}
+  }
+  /* chamado a cada clique da TV: chegou num slide de conversa (outro, não o mesmo) → recomeça; saiu deles → some */
+  function cronoNoSlide() {
+    if (!deck || !tocando) return;
+    var sl = deck.slides[ci], conversa = sl && sl.tipo === 'conversa';
+    if (!conversa) { if (crono.slide !== -2) cronoPara(); return; }
+    if (!cronoLig || crono.slide === ci) return;
+    crono.slide = ci; cronoComeca();
+  }
+  $('crono').onclick = function (e) {
+    if (e.target.id === 'cronoDe') { cronoComeca(); return; }
+    if (e.target.id === 'cronoX') { cronoPara(); return; }
+    if (crono.resta <= 0) return;
+    crono.pausa = !crono.pausa;
+    if (!crono.pausa) crono.fim = Date.now() + crono.resta;
+    cronoTique(); cronoDesenha();
+  };
+  function ferrDesenha() {
+    $('fCrono').checked = cronoLig; $('fSorteio').checked = sorteioLig; $('fMin').textContent = cronoMin;
+    $('bSorteio').hidden = !sorteioLig;
+  }
+  $('bFerr').onclick = function (e) { e.stopPropagation(); ferrDesenha(); $('ferr').hidden = !$('ferr').hidden; };
+  $('ferr').onclick = function (e) { e.stopPropagation(); };
+  document.addEventListener('click', function () { $('ferr').hidden = true; });
+  $('fCrono').onchange = function () { cronoLig = this.checked; guardaPref('crono', cronoLig ? 1 : 0); if (!cronoLig) cronoPara(); else { crono.slide = -1; cronoNoSlide(); } };
+  $('fSorteio').onchange = function () { sorteioLig = this.checked; guardaPref('sorteio', sorteioLig ? 1 : 0); ferrDesenha(); };
+  $('fMenos').onclick = function () { cronoMin = Math.max(1, cronoMin - 1); guardaPref('min', cronoMin); ferrDesenha(); };
+  $('fMais').onclick = function () { cronoMin = Math.min(15, cronoMin + 1); guardaPref('min', cronoMin); ferrDesenha(); };
+  $('fJa').onclick = function () { crono.slide = -2; cronoComeca(); $('ferr').hidden = true; };
+  ferrDesenha();
+
+  var sorPool = [], sorUsados = {};
+  function sorNomes() {
+    var t = typeof fiskTurmaDeAgora === 'function' ? fiskTurmaDeAgora(s) : null;
+    if (!t && typeof fiskTurmaProxima === 'function') t = fiskTurmaProxima(s);
+    return (t && t.nomes) || [];
+  }
+  function sorTxt(k) {
+    var es = aulaLingua() === 'es';
+    return { tit: es ? '🎲 ¿Quién sigue?' : "🎲 Who's next?", dup: es ? '👥 Parejas' : '👥 Pairs', vazio: es ? 'Sin lista de la clase' : 'No class list' }[k];
+  }
+  function sorteia() {
+    var nomes = sorNomes(); $('sorDuplas').hidden = true; $('sorNome').hidden = false; $('sorTit').textContent = sorTxt('tit');
+    if (!nomes.length) { $('sorNome').textContent = sorTxt('vazio'); $('sorNome').className = ''; return; }
+    var rep = $('sorRep').checked, livres = nomes.filter(function (n) { return !rep || !sorUsados[n]; });
+    if (!livres.length) { sorUsados = {}; livres = nomes.slice(); }
+    var escolhido = livres[Math.floor(Math.random() * livres.length)], el = $('sorNome'), k = 0, passos = 22;
+    el.className = 'rola';
+    /* a roleta desacelera: cada troca de nome demora um pouco mais que a anterior */
+    (function gira() {
+      if (k < passos) { el.textContent = nomes[Math.floor(Math.random() * nomes.length)]; k++; setTimeout(gira, 40 + k * k * 0.9); return; }
+      el.textContent = escolhido; el.className = 'saiu'; sorUsados[escolhido] = 1; cronoSino();
+    })();
+  }
+  function duplas() {
+    var nomes = sorNomes().slice(); $('sorNome').hidden = true; $('sorTit').textContent = sorTxt('dup');
+    for (var i = nomes.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), x = nomes[i]; nomes[i] = nomes[j]; nomes[j] = x; }
+    var grupos = []; for (var k = 0; k + 1 < nomes.length; k += 2) grupos.push([nomes[k], nomes[k + 1]]);
+    if (nomes.length % 2) { if (grupos.length) grupos[grupos.length - 1].push(nomes[nomes.length - 1]); else grupos.push([nomes[0]]); }
+    var box = $('sorDuplas'); box.hidden = false; box.innerHTML = '';
+    if (!grupos.length) { box.textContent = sorTxt('vazio'); return; }
+    grupos.forEach(function (g, i) { var d = document.createElement('div'); d.style.animationDelay = (i * 0.08) + 's'; d.textContent = (i + 1) + '. ' + g.join(' & '); box.appendChild(d); });
+  }
+  $('bSorteio').onclick = function () { $('sorteio').hidden = false; sorteia(); };
+  $('sorDeNovo').onclick = sorteia; $('sorDup').onclick = duplas; $('sorFecha').onclick = function () { $('sorteio').hidden = true; };
 
   var q = new URLSearchParams(location.search), qId = q.get('id'), qSem = q.get('semana');
   carregaLista(qSem || '', qId ? function () { abre(qId); } : null);
