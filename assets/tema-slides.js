@@ -6,7 +6,8 @@
  * guardados no próprio Hub (assets/icones/fluent/<nome>.svg), para não depender de serviço de fora.
  *
  *   var deck = FiskTema.montar(lesson, design, { base: 'https://pedro-fisk.github.io/fisk-hub/' })
- *   deck.slides  → [{ tipo, etapas, el, jogo? }]   (jogo = { pergunta, opcoes, certa } no slide de Language Game)   (el = <div class="ft-s"> de 1920×1080; etapas = quantos cliques ele tem)
+ *   deck.slides  → [{ tipo, etapas, el, jogo? }]   (jogo = { pergunta, opcoes, certa } no slide de Language Game; nos tipos
+ *                  novos também jogo.tipo = 'ordem' | 'pares' | 'digitar' e, nos pares, jogo.direita)   (el = <div class="ft-s"> de 1920×1080; etapas = quantos cliques ele tem)
  *   FiskTema.mostrar(deck, i, etapa)          → aplica a etapa no slide i (o que tem data-e <= etapa aparece)
  *   FiskTema.encaixar(el, caixa)              → escala o slide para caber na caixa
  *
@@ -22,6 +23,15 @@
   var CLASSICO = { escuro: false, paleta: { fundo: '#ffffff', fundo2: '#fde2e2', prim: '#c8102e', sec: '#111827', dest: '#c8102e', txt: '#111827' },
     fontes: { titulo: 'Poppins', corpo: 'Nunito' }, fundo: 'pontos', heroi: 'megaphone', icones: ['speech-balloon', 'megaphone', 'light-bulb', 'star', 'thought-balloon', 'speaking-head'] };
 
+  /* embaralha sempre igual para a mesma semente, e nunca devolve a ordem certa (senão o jogo de ordenar estaria pronto) */
+  function embaralha(arr, semente) {
+    var h = 2166136261; for (var i = 0; i < semente.length; i++) { h ^= semente.charCodeAt(i); h = Math.imul(h, 16777619); }
+    var rnd = function () { h += 0x6D2B79F5; var t = h; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+    var a = arr.slice();
+    for (var k = a.length - 1; k > 0; k--) { var j = Math.floor(rnd() * (k + 1)), x = a[k]; a[k] = a[j]; a[j] = x; }
+    if (a.length > 1 && a.every(function (x, i) { return x === arr[i]; })) a.push(a.shift());
+    return a;
+  }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function hexRgb(h) { h = String(h || '').replace('#', ''); if (h.length === 3) h = h.replace(/./g, '$&$&'); var n = parseInt(h, 16); return isNaN(n) ? [255, 255, 255] : [n >> 16 & 255, n >> 8 & 255, n & 255]; }
   function lum(h) { return hexRgb(h).map(function (v) { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }).reduce(function (a, v, i) { return a + v * [.2126, .7152, .0722][i]; }, 0); }
@@ -149,6 +159,8 @@
     if (jogo.length) {
       divisor(rot.jogo, 2);
       jogo.forEach(function (g, gi) {
+        var titJ = h2(rot.jogo + ' · ' + (gi + 1) + '/' + jogo.length);
+        if (g.type === 'order' || g.type === 'match' || g.type === 'type_in') { jogoNovo(g, titJ); return; }
         novo('jogo', h2(rot.jogo + ' · ' + (gi + 1) + '/' + jogo.length) +
           '<div style="position:absolute;left:250px;right:250px;top:270px;font:800 ' + (String(g.question).length > 70 ? 74 : 90) + 'px/1.2 \'' + T + '\'">' + esc(g.question) + '</div>' +
           '<div data-jogo="' + g.correctIndex + '" style="position:absolute;left:250px;right:250px;top:600px;display:flex;gap:40px">' + (g.options || []).map(function (o, i) {
@@ -159,6 +171,51 @@
         /* o item cru, para o jogo clicável no celular dos alunos (conversacao.html → portal api/aula.js) */
         slides[slides.length - 1].jogo = { pergunta: String(g.question || ''), opcoes: (g.options || []).map(String), certa: +g.correctIndex };
       });
+    }
+    /* OS TIPOS NOVOS DO JOGO (item 7, Pedro 27/11/2026). No dado da aula, todos usam "options" (o editor do Conversation
+       Maker só sabe editar lista): order = as palavras NA ORDEM CERTA; match = "palavra = par"; type_in = as respostas
+       aceitas, a primeira é a que aparece. Na TV ninguém clica: o clique seguinte revela, como na múltipla escolha. O
+       embaralhamento é DETERMINÍSTICO (pela pergunta e pelas palavras), porque a TV e a foto dos celulares saem de dois
+       decks montados à parte e precisam mostrar a mesma ordem. */
+    function jogoNovo(g, titJ) {
+      var ops = (g.options || []).map(function (x) { return String(x == null ? '' : x).trim(); }).filter(Boolean), q = String(g.question || '');
+      var caixa = 'background:' + cartao + ';border:5px solid ' + p.sec + ';border-radius:26px;color:' + p.txt;
+      var verde = 'background:#31A889;color:#fff;border-radius:26px;box-shadow:0 0 0 12px rgba(49,168,137,.22)';
+      var perg = '<div style="position:absolute;left:250px;right:250px;top:250px;font:800 ' + (q.length > 70 ? 64 : 78) + 'px/1.2 \'' + T + '\'">' + esc(q) + '</div>';
+      var fonte = g.source ? '<div style="position:absolute;left:250px;bottom:40px;font-size:26px;font-weight:700;opacity:.55">' + esc(g.source) + '</div>' : '';
+      var revela = '<span data-e="1" class="ft-off ft-revela" hidden></span>';
+      if (g.type === 'order') {
+        var emb = embaralha(ops.map(function (x, i) { return i; }), q + '|' + ops.join(' '));
+        /* a letra encolhe com a frase, para as palavras caberem numa linha (duas, no máximo); a resposta e o gráfico
+           ficam sempre EMBAIXO delas (mesma coluna), nunca por cima (achado na bancada com 6 palavras, 27/11/2026) */
+        var tam = ops.join('').length + ops.length * 3, fsO = tam > 60 ? 44 : tam > 44 ? 50 : tam > 32 ? 56 : 64;
+        novo('jogo', titJ + perg + '<div data-jogo2 style="position:absolute;left:250px;right:250px;top:420px;display:flex;flex-direction:column;gap:34px;align-items:center">' +
+          '<div style="display:flex;flex-wrap:wrap;gap:20px;justify-content:center">' +
+          emb.map(function (i) { return '<span style="' + caixa + ';font:800 ' + fsO + 'px \'' + B + '\';padding:' + Math.round(fsO * 0.3) + 'px ' + Math.round(fsO * 0.5) + 'px">' + esc(ops[i]) + '</span>'; }).join('') + '</div>' +
+          '<div data-e="1" class="ft-off" style="align-self:stretch;text-align:center;font:800 ' + Math.min(70, fsO + 6) + 'px/1.2 \'' + T + '\';padding:22px 40px;' + verde + '">✔ ' + esc(ops.join(' ')) + '</div></div>' + fonte);
+        slides[slides.length - 1].jogo = { tipo: 'ordem', pergunta: q, opcoes: emb.map(function (i) { return ops[i]; }), certa: ops.slice() };
+        return;
+      }
+      if (g.type === 'match') {
+        var pares = ops.map(function (x) { var k = x.indexOf('='); return k > 0 ? [x.slice(0, k).trim(), x.slice(k + 1).trim()] : null; }).filter(function (x) { return x && x[0] && x[1]; }).slice(0, 6);
+        var ord = embaralha(pares.map(function (x, i) { return i; }), q + '|' + ops.join('|'));
+        var certa = pares.map(function (x, i) { return ord.indexOf(i); }), alt = pares.length > 4 ? 96 : 116, fs = pares.length > 4 ? 50 : 58;
+        var linha = function (txt, extra) { return '<div style="' + caixa + ';height:' + (alt - 18) + 'px;display:flex;align-items:center;gap:20px;padding:0 30px;font:800 ' + fs + 'px \'' + B + '\'">' + extra + '<span style="flex:1">' + esc(txt) + '</span></div>'; };
+        var tag = function (t, cor) { return '<b style="flex:none;width:64px;height:64px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:38px;background:' + cor + ';color:#fff">' + t + '</b>'; };
+        novo('jogo', titJ + '<div style="position:absolute;left:250px;right:250px;top:200px;font:800 60px/1.2 \'' + T + '\'">' + esc(q) + '</div>' +
+          '<div data-jogo2 style="position:absolute;left:250px;right:250px;top:310px;display:grid;grid-template-columns:1fr 1fr;column-gap:80px;row-gap:18px">' +
+          pares.map(function (pr, i) {
+            return linha(pr[0], tag(i + 1, p.dest) + '<span data-e="1" class="ft-off" style="order:3;flex:none;' + verde + ';border-radius:18px;padding:6px 18px;font-size:' + (fs - 8) + 'px">→ ' + 'ABCDEF'.charAt(certa[i]) + '</span>') +
+              linha(pares[ord[i]][1], tag('ABCDEF'.charAt(i), p.prim));
+          }).join('') + '</div>' + fonte);
+        slides[slides.length - 1].jogo = { tipo: 'pares', pergunta: q, opcoes: pares.map(function (x) { return x[0]; }), direita: ord.map(function (i) { return pares[i][1]; }), certa: certa };
+        return;
+      }
+      /* type_in */
+      novo('jogo', titJ + perg + '<div data-jogo2 style="position:absolute;left:420px;right:420px;top:560px;height:150px;' + caixa + ';border-style:dashed;display:flex;align-items:center;justify-content:center;font:800 66px \'' + B + '\'">' +
+        '<span style="opacity:.35">✍️</span></div>' +
+        '<div data-e="1" class="ft-off" style="position:absolute;left:420px;right:420px;top:560px;height:150px;display:flex;align-items:center;justify-content:center;font:800 72px \'' + T + '\';' + verde + '">' + esc(ops[0] || '') + '</div>' + fonte);
+      slides[slides.length - 1].jogo = { tipo: 'digitar', pergunta: q, opcoes: [], certa: ops.slice(0, 6) };
     }
     /* 7. revisão: o português primeiro, o inglês no clique */
     if (voc.length) {

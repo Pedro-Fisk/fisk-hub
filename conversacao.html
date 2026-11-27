@@ -285,7 +285,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js"></script>
-<script src="assets/tema-slides.js?v=c4aed65445"></script>
+<script src="assets/tema-slides.js?v=e0dbc68981"></script>
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
@@ -948,14 +948,18 @@
     })(t0);
   }
   function aulaGrafico(slideEl, g) {
-    var j = slideEl.querySelector('[data-jogo]'); if (!j) return;
-    var certa = +j.getAttribute('data-jogo'), ops = j.querySelectorAll('.ft-op'), tot = g.resp || 0;
+    /* múltipla escolha: uma barra embaixo de cada opção. Os tipos novos (montar a frase, pares, digitar): duas barras,
+       acertaram e erraram, embaixo do conteúdo (g.por = [acertaram, erraram]) */
+    var j = slideEl.querySelector('[data-jogo]'), j2 = !j && slideEl.querySelector('[data-jogo2]'); if (!j && !j2) return;
+    var mc = !!j, certa = mc ? +j.getAttribute('data-jogo') : 0, nCol = mc ? j.querySelectorAll('.ft-op').length : 2, tot = g.resp || 0;
+    var rotulo = mc ? ['', '', '', '', '', ''] : ['✅ ', '❌ '];
     var box = slideEl.querySelector('.ft-grafico'), novo = !box;
     if (novo) {
       box = document.createElement('div'); box.className = 'ft-grafico';
       /* as medidas do slide (1920×1080) não sofrem a escala da TV: offset* é a coordenada do próprio slide */
-      box.style.cssText = 'position:absolute;z-index:6;display:flex;flex-wrap:wrap;gap:40px;left:' + j.offsetLeft + 'px;width:' + j.offsetWidth + 'px;top:' + (j.offsetTop + j.offsetHeight + 36) + 'px';
-      for (var i = 0; i < ops.length; i++) box.insertAdjacentHTML('beforeend', '<div class="col"><div class="trilho"><div class="barra' + (i === certa ? ' certa' : '') + '"></div><div class="num">0</div></div></div>');
+      if (mc) box.style.cssText = 'position:absolute;z-index:6;display:flex;flex-wrap:wrap;gap:40px;left:' + j.offsetLeft + 'px;width:' + j.offsetWidth + 'px;top:' + (j.offsetTop + j.offsetHeight + 36) + 'px';
+      else box.style.cssText = 'position:absolute;z-index:6;display:flex;flex-wrap:wrap;gap:40px;left:250px;right:250px;top:' + Math.min(j2.offsetTop + j2.offsetHeight + 40, 870) + 'px';
+      for (var i = 0; i < nCol; i++) box.insertAdjacentHTML('beforeend', '<div class="col"><div class="trilho"><div class="barra' + (i === certa ? ' certa' : '') + '"></div><div class="num">0</div></div></div>');
       box.insertAdjacentHTML('beforeend', '<div class="leg"></div>');
       slideEl.appendChild(box);
       var m = slideEl.querySelector('.ft-msg'); if (m) m.style.visibility = 'hidden';
@@ -968,7 +972,7 @@
       var antes = +(num.dataset.q || 0);
       if (!novo && antes === q && num.dataset.t === String(tot)) return;
       num.dataset.q = q; num.dataset.t = tot;
-      var fmt = function (v) { return v + '<small>' + (tot ? Math.round(v * 100 / tot) : 0) + '%</small>'; };
+      var fmt = function (v) { return rotulo[i] + v + '<small>' + (tot ? Math.round(v * 100 / tot) : 0) + '%</small>'; };
       /* uma depois da outra: a caixa sobe primeiro, e cada barra sai 180 ms depois da anterior */
       var atraso = novo ? 450 + i * 180 : 0;
       barra.style.transitionDelay = atraso + 'ms';
@@ -991,7 +995,12 @@
     var p = aulaPasso(k - 1), sl = p && deck.slides[p.i];
     if (!sl || sl.tipo !== 'jogo' || !sl.jogo || p.et !== 0) return undefined;
     /* a = onde cada opção está no slide (medido pelo FiskTema.foto, que roda antes deste envio): o aluno toca direto nela */
-    return { p: sl.jogo.pergunta, o: sl.jogo.opcoes, c: sl.jogo.certa, rev: k + 1, a: sl.jogo.areas };
+    var jg = sl.jogo;
+    /* os tipos novos (item 7): o formato que o api/aula.js confere; a resposta certa só sai de lá depois da revelação */
+    if (jg.tipo === 'ordem') return { t: 'ordem', p: jg.pergunta, o: jg.opcoes, c: jg.certa, rev: k + 1 };
+    if (jg.tipo === 'pares') return { t: 'pares', p: jg.pergunta, o: jg.opcoes, r: jg.direita, c: jg.certa, rev: k + 1 };
+    if (jg.tipo === 'digitar') return { t: 'digitar', p: jg.pergunta, c: jg.certa, rev: k + 1 };
+    return { p: jg.pergunta, o: jg.opcoes, c: jg.certa, rev: k + 1, a: jg.areas };
   }
   /* o contador discreto no canto: "7 responderam" e, depois de revelar, "5 de 7 acertaram". Só consulta (a cada 3 s)
      enquanto a TV está num slide de jogo com a aula aberta. */
