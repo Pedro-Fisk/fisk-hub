@@ -180,6 +180,10 @@
   @media (prefers-reduced-motion: reduce){ #qrAula .cx, #qrAula .cx:before, #qrAula .cx:after, #qrAula .bolhas:before, #qrAula .bolhas i, #qrAula .bolhas .logo, #qrAula .qr, #qrAula .chip:before{ animation: none; } }
   #aulaCanto{ position: fixed; right: 14px; bottom: 74px; z-index: 12; background: #fff; border-radius: 12px; padding: 6px; box-shadow: 0 6px 20px rgba(0,0,0,.4); cursor: pointer; text-align: center; }
   #aulaCanto[hidden]{ display: none; }
+  /* o placar do jogo clicável: discreto, em cima do QR do canto */
+  #aulaPlacar{ position: fixed; right: 14px; bottom: 200px; z-index: 12; background: rgba(15,23,42,.82); color: #fff; font: 800 .95rem system-ui, sans-serif;
+    padding: 6px 12px; border-radius: 999px; box-shadow: 0 4px 14px rgba(0,0,0,.35); pointer-events: none; }
+  #aulaPlacar[hidden]{ display: none; }
   #aulaCanto .qr{ width: 92px; height: 92px; }
   #aulaCanto .qr svg{ width: 100%; height: 100%; display: block; }
   #aulaCanto span{ display: block; font: 800 .62rem system-ui, sans-serif; color: #0f172a; margin-top: 2px; }
@@ -254,12 +258,13 @@
   <div id="capa"><div id="capaFundo"></div><div class="cx" id="capaCorpo"></div></div>
   <div id="qrFone" hidden><div class="cx"><h2>📱 Controle pelo celular</h2><p>Abra a câmera do seu celular e aponte para o código.</p><div class="qr" id="qrImg"></div><p id="qrTxt" style="font-size:.85rem">Preparando…</p><button type="button" id="qrFecha">Fechar</button></div></div>
   <div id="qrAula" hidden><div class="cx"><div class="bolhas" aria-hidden="true"><i style="left:5%;top:5%">💬</i><i style="right:6%;top:8%;animation-delay:.8s">🎉</i><img class="logo" src="assets/fisk-logo-balao-360.png" alt="" style="left:2.5%;top:33%"><i style="left:8%;top:64%;animation-delay:1.6s">✨</i><i style="right:7%;top:50%;animation-delay:2.2s">💬</i></div><span class="chip">AO VIVO</span><h2>Bora conversar! 📱</h2><p>Abra a câmera, aponte para o código e siga os slides junto com a turma.</p><div class="qr" id="qrAulaImg"></div><p class="cod" id="qrAulaCod"></p><p id="qrAulaTxt" style="font-size:.9rem">Preparando…</p><div class="linha"><button type="button" class="fim" id="aulaFim">✓ Finalizar e liberar a atividade inteira</button><button type="button" id="aulaCopia" title="Para a turma online: cole no chat do Google Meet e cada aluno abre numa aba">📋 Copiar o link para o chat</button><button type="button" id="qrAulaFecha">Fechar</button></div></div></div>
+  <div id="aulaPlacar" hidden aria-live="polite"></div>
   <div id="aulaCanto" hidden title="Os alunos acompanham por este código"><div class="qr" id="aulaCantoImg"></div><span id="aulaCantoCod"></span></div>
   <div id="foneAviso" hidden>📱 Celular ligado: pode conduzir por ele</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js"></script>
-<script src="assets/tema-slides.js?v=1d06a72ab6"></script>
+<script src="assets/tema-slides.js?v=610fe83ce1"></script>
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
@@ -872,7 +877,7 @@
     var tentativas = 0;
     (function vai() {
       aulaImagem(k - 1).then(function (img) {
-        return aulaApi({ op: 'clique', aula: a.id, chave: a.chave, n: k, atual: a.agora, img: img });
+        return aulaApi({ op: 'clique', aula: a.id, chave: a.chave, n: k, atual: a.agora, img: img, jogo: aulaJogo(k) });
       }).then(function (r) {
         if (!r || !r.ok) throw new Error('não gravou');
         a.feitos[k] = 1; if (k === a.agora) a.avisado = k;
@@ -886,8 +891,35 @@
     })();
   }
   function aulaMostrou() {
+    aulaPlacar();
     if (!aula || aula.fim || !atual || atual.id !== aula.ativId) return;
     aulaEnvia(aulaAgora(), aulaAgora());
+  }
+  /* O JOGO CLICÁVEL (27/11/2026): no clique da PERGUNTA de um Language Game, o item vai junto da imagem (pergunta,
+     opções, índice certo e o clique que revela, que é o seguinte). O índice certo fica só no servidor até a revelação;
+     o aluno toca no celular e o servidor só aceita antes de a TV mostrar o clique que revela. Só nas atividades do
+     Conversation Maker: as de PDF não têm o dado do jogo. */
+  function aulaJogo(k) {
+    if (!deck) return undefined;
+    var p = aulaPasso(k - 1), sl = p && deck.slides[p.i];
+    if (!sl || sl.tipo !== 'jogo' || !sl.jogo || p.et !== 0) return undefined;
+    return { p: sl.jogo.pergunta, o: sl.jogo.opcoes, c: sl.jogo.certa, rev: k + 1 };
+  }
+  /* o contador discreto no canto: "7 responderam" e, depois de revelar, "5 de 7 acertaram". Só consulta (a cada 3 s)
+     enquanto a TV está num slide de jogo com a aula aberta. */
+  var placarT = null, placarGer = 0;
+  function aulaPlacar() {
+    clearTimeout(placarT); var ger = ++placarGer;   /* troca de slide no meio da consulta: só a mais nova continua */
+    var el = $('aulaPlacar'), sl = deck && deck.slides[ci];
+    if (!aula || !sl || sl.tipo !== 'jogo' || !tocando || atual.id !== aula.ativId) { el.hidden = true; return; }
+    var n = aulaAgora() - et, a = aula;
+    aulaApi({ op: 'placar', aula: a.id, chave: a.chave }, 8000).then(function (r) {
+      if (ger !== placarGer || a !== aula || !r || !r.ok) return;
+      var g = r.jogos && r.jogos[n];
+      if (!g) { el.hidden = true; return; }
+      el.textContent = g.revelado ? '✅ ' + g.certos + ' de ' + g.resp + (g.certos === 1 ? ' acertou' : ' acertaram') : '👥 ' + g.resp + (g.resp === 1 ? ' respondeu' : ' responderam');
+      el.hidden = false;
+    }, function () {}).then(function () { if (ger === placarGer && a === aula) placarT = setTimeout(aulaPlacar, 3000); });
   }
   function aulaFinaliza() {
     if (!aula || aula.fim) return;
@@ -903,7 +935,7 @@
       .then(function () { b.disabled = false; b.textContent = '✓ Finalizar e liberar a atividade inteira'; });
   }
   /* trocar de atividade ou sair: a aula fica com o que já foi mostrado (o professor finaliza se quiser liberar tudo) */
-  function aulaSolta() { aula = null; $('aulaCanto').hidden = true; $('qrAula').hidden = true; aulaBotao(); }
+  function aulaSolta() { aula = null; clearTimeout(placarT); $('aulaPlacar').hidden = true; $('aulaCanto').hidden = true; $('qrAula').hidden = true; aulaBotao(); }
   $('bAlunos').onclick = alunosBotao; $('aulaFim').onclick = aulaFinaliza;
   $('aulaCopia').onclick = function () {
     if (!aula) return;

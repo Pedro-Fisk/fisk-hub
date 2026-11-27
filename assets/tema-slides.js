@@ -6,7 +6,7 @@
  * guardados no próprio Hub (assets/icones/fluent/<nome>.svg), para não depender de serviço de fora.
  *
  *   var deck = FiskTema.montar(lesson, design, { base: 'https://pedro-fisk.github.io/fisk-hub/' })
- *   deck.slides  → [{ tipo, etapas, el }]   (el = <div class="ft-s"> de 1920×1080; etapas = quantos cliques ele tem)
+ *   deck.slides  → [{ tipo, etapas, el, jogo? }]   (jogo = { pergunta, opcoes, certa } no slide de Language Game)   (el = <div class="ft-s"> de 1920×1080; etapas = quantos cliques ele tem)
  *   FiskTema.mostrar(deck, i, etapa)          → aplica a etapa no slide i (o que tem data-e <= etapa aparece)
  *   FiskTema.encaixar(el, caixa)              → escala o slide para caber na caixa
  *
@@ -156,6 +156,8 @@
           '<div class="ft-msg" style="position:absolute;left:250px;right:250px;top:830px;text-align:center;font-size:56px;font-weight:900"></div>' +
           '<span data-e="1" class="ft-off ft-revela" hidden></span>' +
           (g.source ? '<div style="position:absolute;left:250px;bottom:40px;font-size:26px;font-weight:700;opacity:.55">' + esc(g.source) + '</div>' : ''));
+        /* o item cru, para o jogo clicável no celular dos alunos (conversacao.html → portal api/aula.js) */
+        slides[slides.length - 1].jogo = { pergunta: String(g.question || ''), opcoes: (g.options || []).map(String), certa: +g.correctIndex };
       });
     }
     /* 7. revisão: o português primeiro, o inglês no clique */
