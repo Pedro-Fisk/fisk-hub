@@ -198,12 +198,16 @@
   }
   function carregaLista(id) {
     $('corpo').innerHTML = '<div class="espera"><i></i> Buscando as atividades da semana…</div>';
-    pedeSemana(id).then(function (j) { dados = j; semanaId = j.semana ? j.semana.id : ''; desenhaLista(); })
+    pedeSemana(id).then(function (j) { dados = j; semKids(); semanaId = j.semana ? j.semana.id : ''; desenhaLista(); })
       .catch(function (e) { $('corpo').innerHTML = '<p class="erro">Não consegui buscar as atividades (' + esc(e.message) + ').</p>'; });
   }
   function semanaAtual() { return ((dados && dados.semanas) || []).filter(function (x) { return x.atual; })[0]; }
   function semanaCerta() { var at = semanaAtual(); return !(dados && dados.semana && at && at.id !== dados.semana.id); }
   function chaveCache(it) { return location.origin + '/__conversa/' + it.id + '/' + it.quando; }
+  /* KIDS FICA DE FORA (Pedro, 27/11/2026): turma kids trabalha com jogos e as orientações da Minha aula kids, não com slides.
+     A atividade só com "Kids" no nome some da lista (a que diz Kids e outro nível, como "Kids + Teens", fica). */
+  function soKids(it) { var n = it.niveis || []; return n.indexOf('Kids') > -1 && !n.some(function (x) { return /Teens|Basic|Intermediate|Advanced|Todos/.test(x); }); }
+  function semKids() { Object.keys((dados && dados.idiomas) || {}).forEach(function (k) { dados.idiomas[k] = dados.idiomas[k].filter(function (it) { return !soKids(it); }); if (!dados.idiomas[k].length) delete dados.idiomas[k]; }); }
   function todos() { var a = []; Object.keys((dados && dados.idiomas) || {}).forEach(function (k) { a = a.concat(dados.idiomas[k]); }); return a; }
   /* "Ac - GTA 6 Launch Day - Basic - Jovens - Pedro Luz..." → "GTA 6 Launch Day" (nível e perfil viram etiquetas) */
   function titulo(it) {
@@ -465,7 +469,7 @@
   document.addEventListener('mousemove', function () { if (tocando) acorda(); });
 
   var q = new URLSearchParams(location.search), qId = q.get('id'), qSem = q.get('semana');
-  pedeSemana(qSem || '').then(function (j) { dados = j; semanaId = j.semana ? j.semana.id : ''; desenhaLista(); if (qId) abre(qId); })
+  pedeSemana(qSem || '').then(function (j) { dados = j; semKids(); semanaId = j.semana ? j.semana.id : ''; desenhaLista(); if (qId) abre(qId); })
     .catch(function (e) { $('corpo').innerHTML = '<p class="erro">Não consegui buscar as atividades (' + esc(e.message) + ').</p>'; });
   try { if (localStorage.getItem('fisk_theme') === 'dark') document.body.classList.add('theme-dark'); } catch (e) {}
   fiskApresEnviar(false);   /* o que ficou na fila de uma aula sem internet */
