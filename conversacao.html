@@ -166,6 +166,9 @@
   /* a turma online (27/11/2026): no computador ninguém lê o QR; o link vai para o chat do Meet e abre numa aba (também nas sub-salas) */
   #qrAula #aulaCopia{ background: #fff; color: #14245a; box-shadow: 0 4px 0 rgba(0,0,0,.18); }
   #qrAula #aulaCopia.ok{ background: #ffd24a; }
+  #qrAula #aulaFd{ background: #facc15; color: #422006; box-shadow: 0 4px 0 rgba(0,0,0,.18); }
+  #qrAula #aulaFd.nao{ background: rgba(255,255,255,.18); color: #fff; }
+  #qrAula #aulaFd[hidden]{ display: none; }
   #qrAula button:disabled{ opacity: .6; cursor: default; }
   @keyframes aulaEntra{ from{ transform: scale(.85) translateY(20px); opacity: 0; } }
   #qrAula .bolhas .logo{ position: absolute; width: 104px; filter: drop-shadow(0 6px 10px rgba(0,0,0,.35)); animation: aulaLogo 4.6s ease-in-out infinite; }
@@ -257,7 +260,7 @@
   </div>
   <div id="capa"><div id="capaFundo"></div><div class="cx" id="capaCorpo"></div></div>
   <div id="qrFone" hidden><div class="cx"><h2>📱 Controle pelo celular</h2><p>Abra a câmera do seu celular e aponte para o código.</p><div class="qr" id="qrImg"></div><p id="qrTxt" style="font-size:.85rem">Preparando…</p><button type="button" id="qrFecha">Fechar</button></div></div>
-  <div id="qrAula" hidden><div class="cx"><div class="bolhas" aria-hidden="true"><i style="left:5%;top:5%">💬</i><i style="right:6%;top:8%;animation-delay:.8s">🎉</i><img class="logo" src="assets/fisk-logo-balao-360.png" alt="" style="left:2.5%;top:33%"><i style="left:8%;top:64%;animation-delay:1.6s">✨</i><i style="right:7%;top:50%;animation-delay:2.2s">💬</i></div><span class="chip">AO VIVO</span><h2>Bora conversar! 📱</h2><p>Abra a câmera, aponte para o código e siga os slides junto com a turma.</p><div class="qr" id="qrAulaImg"></div><p class="cod" id="qrAulaCod"></p><p id="qrAulaTxt" style="font-size:.9rem">Preparando…</p><div class="linha"><button type="button" class="fim" id="aulaFim">✓ Finalizar e liberar a atividade inteira</button><button type="button" id="aulaCopia" title="Para a turma online: cole no chat do Google Meet e cada aluno abre numa aba">📋 Copiar o link para o chat</button><button type="button" id="qrAulaFecha">Fechar</button></div></div></div>
+  <div id="qrAula" hidden><div class="cx"><div class="bolhas" aria-hidden="true"><i style="left:5%;top:5%">💬</i><i style="right:6%;top:8%;animation-delay:.8s">🎉</i><img class="logo" src="assets/fisk-logo-balao-360.png" alt="" style="left:2.5%;top:33%"><i style="left:8%;top:64%;animation-delay:1.6s">✨</i><i style="right:7%;top:50%;animation-delay:2.2s">💬</i></div><span class="chip">AO VIVO</span><h2>Bora conversar! 📱</h2><p>Abra a câmera, aponte para o código e siga os slides junto com a turma.</p><div class="qr" id="qrAulaImg"></div><p class="cod" id="qrAulaCod"></p><p id="qrAulaTxt" style="font-size:.9rem">Preparando…</p><div class="linha"><button type="button" class="fim" id="aulaFim">✓ Finalizar e liberar a atividade inteira</button><button type="button" id="aulaFd" hidden title="Vale para a aula inteira: 20 por acerto e 5 por responder, no Portal do Aluno de quem entrou pelo card ou está logado">💰 Jogo vale Fisk Dólares: SIM</button><button type="button" id="aulaCopia" title="Para a turma online: cole no chat do Google Meet e cada aluno abre numa aba">📋 Copiar o link para o chat</button><button type="button" id="qrAulaFecha">Fechar</button></div></div></div>
   <div id="aulaPlacar" hidden aria-live="polite"></div>
   <div id="aulaCanto" hidden title="Os alunos acompanham por este código"><div class="qr" id="aulaCantoImg"></div><span id="aulaCantoCod"></span></div>
   <div id="foneAviso" hidden>📱 Celular ligado: pode conduzir por ele</div>
@@ -813,6 +816,11 @@
       : aula.turma ? 'Também está no Portal do Aluno, no card "Conversação de hoje".' : '';
     $('qrAulaTxt').textContent = tx;
     $('aulaFim').hidden = !!aula.fim;
+    /* o interruptor dos Fisk Dólares: só com jogo na atividade e com o pagamento ligado no servidor */
+    var fb = $('aulaFd'), temJogo = !!(deck && deck.slides.some(function (x) { return x.tipo === 'jogo'; }));
+    fb.hidden = !aula.fdPaga || !temJogo || !!aula.fim;
+    fb.classList.toggle('nao', !aula.fd);
+    fb.textContent = '💰 Jogo vale Fisk Dólares: ' + (aula.fd ? 'SIM' : 'NÃO');
     $('qrAulaCod').textContent = aula.id;
     $('aulaCantoCod').textContent = aula.id;
   }
@@ -821,9 +829,9 @@
     if (aula) { aulaTexto(); $('qrAula').hidden = false; return; }
     var turma = aulaTurma();
     $('qrAula').hidden = false; $('qrAulaImg').innerHTML = '<div class="espera" style="color:#475569"><i></i></div>'; $('qrAulaCod').textContent = ''; $('qrAulaTxt').textContent = 'Preparando…'; $('aulaFim').hidden = true;
-    aulaApi({ op: 'abrir', token: s.token, titulo: titulo(atual), ativ: atual.id + '_' + String(atual.quando || '').replace(/\W/g, ''), total: aulaTotal(), rafs: turma ? turma.rafs : [] }, 25000).then(function (r) {
+    aulaApi({ op: 'abrir', token: s.token, titulo: titulo(atual), ativ: atual.id + '_' + String(atual.quando || '').replace(/\W/g, ''), total: aulaTotal(), rafs: turma ? turma.rafs : [], fd: true }, 25000).then(function (r) {
       if (!r.ok) throw new Error(r.error || 'não deu');
-      aula = { id: r.aula, chave: r.chave, ativId: atual.id, feitos: {}, alvo: 0, agora: 1, fim: false, alunos: r.alunos, turma: turma ? turma.turma : '' };
+      aula = { id: r.aula, chave: r.chave, ativId: atual.id, feitos: {}, alvo: 0, agora: 1, fim: false, alunos: r.alunos, turma: turma ? turma.turma : '', fd: r.fd !== false, fdPaga: !!r.fdPaga };
       aulaBotao(); aulaTexto(); aulaDesenhaQr();
       $('aulaCanto').hidden = false;
       if (tocando) aulaMostrou();
@@ -893,7 +901,22 @@
   function aulaMostrou() {
     aulaPlacar();
     if (!aula || aula.fim || !atual || atual.id !== aula.ativId) return;
-    aulaEnvia(aulaAgora(), aulaAgora());
+    var revela = !!(deck && deck.slides[ci] && deck.slides[ci].tipo === 'jogo' && et >= 1);
+    aulaEnvia(aulaAgora(), aulaAgora()).then(function () { if (revela) aulaPaga(); });
+  }
+  /* FISK DÓLARES (Pedro, 27/11/2026: começa ligado, vale para a aula inteira, 20 por acerto e 5 por responder). Quem
+     paga é o BACKEND: depois de cada revelação (e no Finalizar), a TV só avisa "a aula X tem resultado"; o backend lê o
+     resultado direto no portal (op fdLer, com um segredo que só os servidores conhecem) e credita uma vez por aluno e
+     por pergunta. Avisar duas vezes não paga duas vezes. Sem o pagamento ligado no servidor (fdPaga), nada disso roda. */
+  function aulaPaga() {
+    var a = aula; if (!a || !a.fdPaga) return;
+    try { fiskFetch(FISK_HUB_EP, { action: 'aulaFdPagar', token: s.token, aula: a.id }, { timeoutMs: 60000 }).catch(function () {}); } catch (e) {}
+  }
+  function aulaFdTroca() {
+    var a = aula; if (!a) return;
+    var b = $('aulaFd'), liga = !a.fd; b.disabled = true;
+    aulaApi({ op: 'fd', aula: a.id, chave: a.chave, liga: liga }, 15000).then(function (r) { if (r && r.ok) a.fd = r.fd; })
+      .catch(function () {}).then(function () { b.disabled = false; aulaTexto(); });
   }
   /* O JOGO CLICÁVEL (27/11/2026): no clique da PERGUNTA de um Language Game, o item vai junto da imagem (pergunta,
      opções, índice certo e o clique que revela, que é o seguinte). O índice certo fica só no servidor até a revelação;
@@ -931,13 +954,13 @@
       return aulaApi({ op: 'fim', aula: a.id, chave: a.chave });
     }).then(function (r) {
       if (!r || !r.ok) throw new Error(r && r.error || 'não deu');
-      a.fim = true; aulaTexto();
+      a.fim = true; aulaTexto(); aulaPaga();
     }).catch(function (e) { $('qrAulaTxt').textContent = 'Não consegui finalizar (' + e.message + '). Tente de novo.'; })
       .then(function () { b.disabled = false; b.textContent = '✓ Finalizar e liberar a atividade inteira'; });
   }
   /* trocar de atividade ou sair: a aula fica com o que já foi mostrado (o professor finaliza se quiser liberar tudo) */
   function aulaSolta() { aula = null; clearTimeout(placarT); $('aulaPlacar').hidden = true; $('aulaCanto').hidden = true; $('qrAula').hidden = true; aulaBotao(); }
-  $('bAlunos').onclick = alunosBotao; $('aulaFim').onclick = aulaFinaliza;
+  $('bAlunos').onclick = alunosBotao; $('aulaFim').onclick = aulaFinaliza; $('aulaFd').onclick = aulaFdTroca;
   $('aulaCopia').onclick = function () {
     if (!aula) return;
     var b = $('aulaCopia'), url = AULA_URL + '#a=' + aula.id, txt = '💬 Conversação ao vivo: abra numa aba e acompanhe os slides → ' + url;
