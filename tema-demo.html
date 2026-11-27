@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conversation Maker: visual por atividade (demonstração)</title>
+<script src="assets/tema-slides.js?v=b675e007ec"></script>
+<style>
+  /* A DEMONSTRAÇÃO DO DESENHISTA (27/11/2026): as quatro aulas que o Pedro pediu (promoção, BTS, futebol, GTA 6),
+     cada uma com a receita de visual que a IA devolveria, tocadas como na sala: → espaço ou clique avança,
+     ← volta, clique na carta do vocabulário revela a tradução, clique na opção do jogo diz se acertou. */
+  html, body{ margin: 0; height: 100%; background: #0b0e14; color: #fff; font-family: system-ui, sans-serif; overflow: hidden; }
+  #palco{ position: fixed; inset: 0 0 64px 0; }
+  #barra{ position: fixed; left: 0; right: 0; bottom: 0; height: 64px; display: flex; align-items: center; gap: .6rem; padding: 0 1rem; background: #111827; }
+  #barra button, #barra select{ font: 700 15px system-ui; color: #fff; background: #1f2937; border: 1px solid #374151; border-radius: 10px; padding: .45rem .8rem; cursor: pointer; }
+  #n{ margin-left: auto; opacity: .8; font-weight: 700; }
+</style>
+</head>
+<body>
+<div id="palco"></div>
+<div id="barra">
+  <select id="aula"></select>
+  <select id="modelo"><option value="tema">Visual do tema</option><option value="classico">Modelo clássico</option></select>
+  <button id="ant">◀</button><button id="prox">▶</button>
+  <span id="n"></span>
+</div>
+<script>
+var AULAS = [
+  { lesson: { coverTitle: 'Asking for a Promotion', coverLevel: 'Intermediate', perfil: 'Adultos', language: 'english',
+      objectives: ['Talk about your achievements at work', 'Learn how to ask for a raise politely', 'Practice negotiation vocabulary'],
+      vocabulary: [{ word: 'a raise', translation: 'um aumento' }, { word: 'to negotiate', translation: 'negociar' }, { word: 'performance review', translation: 'avaliação de desempenho' }, { word: 'achievement', translation: 'conquista' }, { word: 'responsibilities', translation: 'responsabilidades' }, { word: 'to deserve', translation: 'merecer' }, { word: 'salary', translation: 'salário' }, { word: 'feedback', translation: 'retorno' }],
+      introText: 'Asking for a promotion can feel scary, but preparation makes it easier. Before the meeting, list your achievements, think about your new responsibilities and choose the right moment to talk to your boss.',
+      conversation: [{ question: 'Have you ever asked for a raise? How did you prepare?', modelAnswers: ['Yes, I have. I...'] }, { question: 'Which achievements would you show your boss?', modelAnswers: [] }, { question: 'Is it better to ask in person or by email? Why?', modelAnswers: [] }, { question: 'What would you do if your boss said no?', modelAnswers: [] }, { question: 'Do you think salaries are fair in your area?', modelAnswers: [] }, { question: 'How often should companies give feedback?', modelAnswers: [] }, { question: 'What is more important: money or a good team?', modelAnswers: [] }, { question: 'Would you change jobs for a higher salary?', modelAnswers: [] }, { question: 'What advice would you give someone in their first job?', modelAnswers: [] }],
+      languageGame: [{ question: "I'd like to discuss my ______ for next year.", options: ['salary', 'holiday', 'lunch'], correctIndex: 0 }, { question: 'I think I ______ a promotion.', options: ['deserve', 'deserves', 'deserving'], correctIndex: 0 }, { question: 'We need to ______ the new contract.', options: ['negotiate', 'negotiation', 'negotiated'], correctIndex: 0 }],
+      evaluation: [{ question: 'Which expression from today will you use at work?' }, { question: 'How do you feel about asking for a raise now?' }] },
+    design: { escuro: false, paleta: { fundo: '#f4f6fa', fundo2: '#e3e9f3', prim: '#1e3a5f', sec: '#d4a017', dest: '#0f766e', txt: '#14213d' }, fontes: { titulo: 'Montserrat', corpo: 'Source Sans 3' }, fundo: 'bolhas', heroi: 'briefcase', icones: ['chart-increasing', 'handshake', 'money-bag', 'necktie', 'trophy', 'light-bulb', 'calendar', 'speech-balloon'] } },
+  { lesson: { coverTitle: 'BTS: More Than Music', coverLevel: 'Teens', perfil: 'Jovens', language: 'english',
+      objectives: ['Talk about music and bands', 'Learn words about concerts and fans', 'Practice the verb to be'],
+      vocabulary: [{ word: 'fan', translation: 'fã' }, { word: 'concert', translation: 'show' }, { word: 'lyrics', translation: 'letra da música' }, { word: 'band', translation: 'banda' }, { word: 'to dance', translation: 'dançar' }, { word: 'album', translation: 'álbum' }, { word: 'famous', translation: 'famoso' }, { word: 'message', translation: 'mensagem' }],
+      introText: 'BTS is a K-pop band from South Korea. They have millions of fans around the world, called ARMY. Their songs talk about friendship, dreams and loving yourself.',
+      conversation: [{ question: 'Do you like K-pop? Who is your favorite singer?', modelAnswers: ['Yes, I do. My favorite is...'] }, { question: 'Would you go to a BTS concert? Why?', modelAnswers: [] }, { question: 'What message do you like in a song?', modelAnswers: [] }, { question: 'Can you dance? Do you like dancing?', modelAnswers: [] }, { question: 'What is your favorite album?', modelAnswers: [] }, { question: 'Do you read the lyrics of the songs you like?', modelAnswers: [] }],
+      languageGame: [{ question: 'BTS ______ from South Korea.', options: ['is', 'are', 'am'], correctIndex: 1 }, { question: 'I ______ a big fan of K-pop.', options: ['is', 'are', 'am'], correctIndex: 2 }, { question: 'Their songs ______ very famous.', options: ['is', 'are', 'am'], correctIndex: 1 }],
+      evaluation: [{ question: 'What new word did you learn today?' }, { question: 'Did you like talking about music?' }] },
+    design: { escuro: false, paleta: { fundo: '#f5f0ff', fundo2: '#e9ddff', prim: '#5b21b6', sec: '#c4b5fd', dest: '#db2777', txt: '#2e1065' }, fontes: { titulo: 'Poppins', corpo: 'Nunito' }, fundo: 'bolhas', heroi: 'studio-microphone', icones: ['purple-heart', 'musical-notes', 'headphone', 'ticket', 'sparkles', 'glowing-star', 'party-popper', 'musical-note'] } },
+  { lesson: { coverTitle: 'Football Stars Around the World', coverLevel: 'Basic', perfil: 'Jovens', language: 'english',
+      objectives: ['Talk about football and players', 'Learn sports vocabulary', 'Practice the simple past'],
+      vocabulary: [{ word: 'player', translation: 'jogador' }, { word: 'team', translation: 'time' }, { word: 'goal', translation: 'gol' }, { word: 'coach', translation: 'técnico' }, { word: 'match', translation: 'partida' }, { word: 'fans', translation: 'torcedores' }, { word: 'to score', translation: 'marcar' }, { word: 'champion', translation: 'campeão' }],
+      introText: 'Many football players leave their countries to play in big teams in Europe. They learn new languages, meet new fans and become stars all over the world.',
+      conversation: [{ question: 'Who is your favorite international player?', modelAnswers: ['My favorite player is...'] }, { question: 'Which team do you support?', modelAnswers: ['I support...'] }, { question: 'Would you like to play in another country?', modelAnswers: ['Yes, I would. / No, I wouldn\'t.'] }, { question: 'Do you play football with your friends?', modelAnswers: [] }, { question: 'Did you watch a match last weekend?', modelAnswers: [] }, { question: 'Who is the best coach in the world?', modelAnswers: [] }],
+      languageGame: [{ question: 'He ______ two goals yesterday.', options: ['scored', 'scores', 'scoring'], correctIndex: 0 }, { question: 'The team ______ the champion last year.', options: ['was', 'were', 'is'], correctIndex: 0 }, { question: 'The fans ______ very happy after the match.', options: ['was', 'were', 'is'], correctIndex: 1 }],
+      evaluation: [{ question: 'What was the best part of today\'s class?' }, { question: 'Which new word will you use?' }] },
+    design: { escuro: false, paleta: { fundo: '#f0fdf4', fundo2: '#dcfce7', prim: '#166534', sec: '#facc15', dest: '#1d4ed8', txt: '#0f2e1b' }, fontes: { titulo: 'Barlow Condensed', corpo: 'Barlow' }, fundo: 'faixas', heroi: 'soccer-ball', icones: ['trophy', 'goal-net', 'stadium', 'sports-medal', 'globe-showing-europe-africa', 'running-shoe', '1st-place-medal', 'airplane'] } },
+  { lesson: { coverTitle: 'GTA 6: The Hype Is Real', coverLevel: 'Advanced', perfil: 'Jovens', language: 'english',
+      objectives: ['Discuss video games and their impact', 'Express opinions and justify them', 'Use passive voice and expressions about expectations'],
+      vocabulary: [{ word: 'release date', translation: 'data de lançamento' }, { word: 'hype', translation: 'expectativa enorme' }, { word: 'open world', translation: 'mundo aberto' }, { word: 'to be worth it', translation: 'valer a pena' }, { word: 'trailer', translation: 'trailer' }, { word: 'gameplay', translation: 'jogabilidade' }, { word: 'delayed', translation: 'adiado' }, { word: 'console', translation: 'console' }],
+      introText: 'GTA 6 is one of the most anticipated games in history. Its first trailer broke records within hours, and the game was delayed more than once. Fans have been waiting for over a decade.\n\nBut is any game worth this much hype? And what does it say about the gaming industry today?',
+      conversation: [{ question: 'Was GTA 6 worth the wait? Why (not)?', modelAnswers: [] }, { question: 'Should violent games have age limits?', modelAnswers: [] }, { question: 'What makes an open-world game so addictive?', modelAnswers: [] }, { question: 'Do trailers create unrealistic expectations?', modelAnswers: [] }, { question: 'Would you pay full price on the release date?', modelAnswers: [] }, { question: 'How have video games changed in the last ten years?', modelAnswers: [] }, { question: 'Can games be considered art?', modelAnswers: [] }, { question: 'Is it fair when a game is delayed many times?', modelAnswers: [] }, { question: 'What game would you like to see made in Brazil?', modelAnswers: [] }, { question: 'Do you think gaming can be a real career?', modelAnswers: [] }, { question: 'How much time is too much time playing?', modelAnswers: [] }, { question: 'What would your perfect open world look like?', modelAnswers: [] }],
+      languageGame: [{ question: 'The game was ______ twice before its release.', options: ['delayed', 'deleted', 'delivered'], correctIndex: 0 }, { question: 'The trailer ______ by millions of people in one day.', options: ['was watched', 'watched', 'was watching'], correctIndex: 0 }, { question: 'Fans have been waiting ______ over a decade.', options: ['for', 'since', 'during'], correctIndex: 0 }],
+      evaluation: [{ question: 'Which opinion from your partner surprised you?' }, { question: 'What expression will you try to use this week?' }] },
+    design: { escuro: true, paleta: { fundo: '#1a1033', fundo2: '#3b1a5c', prim: '#ff4d9d', sec: '#ff9f43', dest: '#2ee6c5', txt: '#fdf2ff' }, fontes: { titulo: 'Rubik', corpo: 'Rubik' }, fundo: 'gradiente', heroi: 'video-game', icones: ['joystick', 'racing-car', 'palm-tree', 'smiling-face-with-sunglasses', 'cityscape', 'police-car-light', 'money-with-wings', 'sunset'] } }
+];
+var $ = function (id) { return document.getElementById(id); };
+AULAS.forEach(function (a, i) { var o = document.createElement('option'); o.value = i; o.textContent = a.lesson.coverTitle; $('aula').appendChild(o); });
+var deck, i = 0, etapa = 0;
+function carrega() {
+  var a = AULAS[+$('aula').value], d = $('modelo').value === 'classico' ? { modelo: 'classico' } : a.design;
+  deck = FiskTema.montar(a.lesson, d, { base: '' });
+  i = 0; etapa = 0; mostra();
+}
+function mostra() {
+  var s = deck.slides[i]; $('palco').innerHTML = ''; $('palco').appendChild(s.el);
+  FiskTema.encaixar(s.el, $('palco')); FiskTema.mostrar(deck, i, etapa);
+  $('n').textContent = 'slide ' + (i + 1) + ' de ' + deck.slides.length + (s.etapas ? ' · clique ' + etapa + ' de ' + s.etapas : '');
+}
+function prox() { var s = deck.slides[i]; if (etapa < s.etapas) etapa++; else if (i < deck.slides.length - 1) { i++; etapa = 0; } mostra(); }
+function ant() { if (etapa > 0) etapa--; else if (i > 0) { i--; etapa = deck.slides[i].etapas; } mostra(); }
+$('prox').onclick = prox; $('ant').onclick = ant; $('aula').onchange = carrega; $('modelo').onchange = carrega;
+$('palco').addEventListener('click', function (e) { if (e.target.closest('[data-carta],.ft-op')) return; prox(); });
+document.addEventListener('keydown', function (e) { if (/ArrowRight|ArrowDown|PageDown| /.test(e.key)) { e.preventDefault(); prox(); } else if (/ArrowLeft|ArrowUp|PageUp/.test(e.key)) { e.preventDefault(); ant(); } });
+window.addEventListener('resize', function () { FiskTema.encaixar(deck.slides[i].el, $('palco')); });
+carrega();
+</script>
+</body>
+</html>
