@@ -42,12 +42,14 @@
     p.prim = legivel(p.prim, p.fundo, p.txt);
     return r;
   }
+  function alfa(hex, a) { var m = /^#?([0-9a-f]{6})$/i.exec(String(hex || '')); if (!m) return hex; var n = parseInt(m[1], 16); return 'rgba(' + (n >> 16) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')'; }
   function fundoCss(r) {
     var p = r.paleta;
     if (r.fundo === 'gradiente' || r.escuro) return 'background:linear-gradient(160deg,' + p.fundo + ' 0%,' + p.fundo2 + ' 75%);';
     if (r.fundo === 'estrelas') return 'background-color:' + p.fundo + ';background-image:radial-gradient(2px 2px at 20% 30%,#fff 50%,transparent 51%),radial-gradient(2px 2px at 70% 60%,#fff 50%,transparent 51%),radial-gradient(3px 3px at 40% 80%,#c7d2fe 50%,transparent 51%),radial-gradient(2px 2px at 85% 15%,#fff 50%,transparent 51%),linear-gradient(160deg,' + p.fundo + ',' + p.fundo2 + ');';
     if (r.fundo === 'pontos') return 'background-color:' + p.fundo + ';background-image:radial-gradient(' + p.fundo2 + ' 3px,transparent 3.5px);background-size:46px 46px;';
-    if (r.fundo === 'faixas') return 'background-color:' + p.fundo + ';background-image:repeating-linear-gradient(135deg,' + p.fundo2 + ' 0 26px,transparent 26px 90px);';
+    /* faixas finas e claras (Pedro 27/11/2026: as listras largas atrapalhavam a leitura das perguntas) */
+    if (r.fundo === 'faixas') return 'background-color:' + p.fundo + ';background-image:repeating-linear-gradient(135deg,' + alfa(p.fundo2, 0.45) + ' 0 10px,transparent 10px 120px);';
     return 'background-color:' + p.fundo + ';background-image:radial-gradient(circle at 92% 12%,' + p.fundo2 + ' 0 230px,transparent 231px),radial-gradient(circle at 6% 92%,' + p.fundo2 + ' 0 260px,transparent 261px);';
   }
 
@@ -122,12 +124,14 @@
     }
     /* 4. introdução */
     if (L.introText) { divisor(rot.intro, 1); novo('introducao', h2(rot.intro) + '<div style="position:absolute;left:250px;right:250px;top:250px;font-size:' + (String(L.introText).length > 420 ? 48 : 58) + 'px;font-weight:700;line-height:1.35">' + esc(L.introText).replace(/\n\n/g, '<br><br>') + '</div>'); }
-    /* 5. pair work: 3 ou 4 perguntas por slide, uma por clique; o começo de resposta aparece com a pergunta */
+    /* 5. pair work: 3 perguntas por slide, uma por clique; o começo de resposta aparece com a pergunta.
+       Sem o título "Pair Work" em cada slide (Pedro 27/11/2026): um divisor anuncia uma vez, e as perguntas ganham a tela, centradas */
     var conv = L.conversation || [];
     if (conv.length) {
-      var porSlide = conv.length % 4 === 0 && conv.length >= 8 ? 4 : 3, n0 = 0;
+      var porSlide = 3, n0 = 0;
+      divisor(rot.pw, 3);
       for (var k = 0; k < conv.length; k += porSlide) (function (grupo) {
-        novo('conversa', h2(rot.pw) + '<div style="position:absolute;left:250px;right:250px;top:240px">' + grupo.map(function (q, j) {
+        novo('conversa', '<div style="position:absolute;left:250px;right:250px;top:70px;bottom:60px;display:flex;flex-direction:column;justify-content:center">' + grupo.map(function (q, j) {
           var num = n0 + j + 1;
           return '<div data-e="' + (j + 1) + '" class="ft-off" style="display:flex;gap:28px;align-items:flex-start;margin-bottom:' + (porSlide === 4 ? 30 : 44) + 'px"><span style="flex:none;width:96px;height:96px;border-radius:30px;background:' + p.dest + ';color:' + sobreDest + ';font:800 56px \'' + T + '\';display:flex;align-items:center;justify-content:center">' + num + '</span><div><div style="font-size:' + (porSlide === 4 ? 56 : 64) + 'px;font-weight:800;line-height:1.18">' + esc(q.question) + '</div>' +
             ((q.modelAnswers || []).length ? '<div style="font-size:40px;font-weight:600;opacity:.75;margin-top:8px">' + q.modelAnswers.map(esc).join(' · ') + '</div>' : '') + '</div></div>'; }).join('') + '</div>');
