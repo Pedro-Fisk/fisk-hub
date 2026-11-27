@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conversação na TV, FISK</title>
+<meta name="theme-color" content="#000000">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/fisk-shared.css?v=f12a68d93f">
+<style>
+  /* A CONVERSAÇÃO NA TV (protótipo, Pedro, 26/11/2026). Os slides de conversação do início da aula, tocados dentro do
+     Hub, com as revelações por clique do PowerPoint (aparecer e esmaecer, os dois únicos efeitos que as atividades
+     usam). Cada clique do professor (mouse, seta, espaço ou o passador de slides) mostra o próximo estágio.
+     O slide foi exportado estágio por estágio (Keynote, "todas as etapas"), e cada estágio é uma imagem 1920×1080:
+     o que se vê é o que o PowerPoint mostraria naquele clique.
+     OFFLINE: "Deixar disponível offline" guarda a página e as imagens no navegador deste computador
+     (sw-conversa.js); depois ela abre sem internet, pelo mesmo endereço. */
+  html, body{ margin: 0; height: 100%; background: #000; color: #fff; overflow: hidden; font-family: var(--font-body, system-ui, sans-serif); }
+  [hidden]{ display: none !important; }
+  #palco{ position: fixed; inset: 0; background: #000; cursor: pointer; }
+  #palco img{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; transition: opacity .45s ease-in-out; }
+  #palco img.on{ opacity: 1; }
+  body.esconde-cursor, body.esconde-cursor *{ cursor: none !important; }
+
+  #barra{ position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); display: flex; align-items: center; gap: .55rem; padding: .5rem .7rem;
+          background: rgba(15,15,20,.8); border: 1px solid rgba(255,255,255,.16); border-radius: 16px; backdrop-filter: blur(8px);
+          opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 5; font-size: .9rem; white-space: nowrap; }
+  body.mostra #barra{ opacity: 1; pointer-events: auto; }
+  #barra button{ font: inherit; font-weight: 800; color: #fff; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+          border-radius: 10px; padding: .4rem .7rem; cursor: pointer; }
+  #barra button:hover{ background: rgba(255,255,255,.2); }
+  #barra .n{ min-width: 6.5rem; text-align: center; font-weight: 800; opacity: .85; }
+  #barra .sep{ width: 1px; align-self: stretch; background: rgba(255,255,255,.18); }
+  #prog{ position: fixed; left: 0; bottom: 0; height: 4px; width: 0; background: linear-gradient(90deg, #16a34a, #4ade80); z-index: 4; opacity: .8; transition: width .3s; }
+
+  #capa{ position: fixed; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+         background: radial-gradient(120% 120% at 50% 0%, #1c2433 0%, #0b0e14 70%); }
+  .cx{ max-width: 600px; width: 100%; text-align: center; }
+  .cx img.logo{ height: 46px; margin-bottom: 1.1rem; }
+  .cx h1{ text-align: center; font-family: var(--font-heading, inherit); font-size: 1.9rem; margin: 0 0 .3rem; }
+  .cx .sub{ text-align: center; color: #94a3b8; font-weight: 700; margin: 0 0 1.1rem; }
+  .cx .capinha{ width: 100%; max-width: 440px; aspect-ratio: 16/9; object-fit: cover; border-radius: 14px; border: 1px solid rgba(255,255,255,.15); box-shadow: 0 18px 40px rgba(0,0,0,.45); }
+  .comeca{ display: inline-flex; align-items: center; gap: .6rem; margin-top: 1.4rem; font: 900 1.25rem var(--font-heading, inherit); color: #fff;
+           background: linear-gradient(120deg, #22c55e, #15803d); border: 0; border-radius: 18px; padding: 1rem 1.8rem; cursor: pointer;
+           box-shadow: 0 14px 34px rgba(22,163,74,.4); transition: transform .15s; }
+  .comeca:hover{ transform: translateY(-2px); }
+  .linha{ display: flex; gap: .7rem; justify-content: center; flex-wrap: wrap; margin-top: .9rem; }
+  .sec{ font: 800 .95rem var(--font-body, inherit); color: #e2e8f0; background: rgba(255,255,255,.08); border: 1.5px solid rgba(255,255,255,.22);
+        border-radius: 12px; padding: .6rem 1rem; cursor: pointer; }
+  .sec:hover{ border-color: #fff; }
+  .sec.ok{ border-color: #4ade80; color: #bbf7d0; cursor: default; }
+  .sec:disabled{ opacity: .75; }
+  .dica{ margin-top: 1.3rem; font-size: .88rem; color: #94a3b8; line-height: 1.6; }
+  .dica kbd{ background: rgba(255,255,255,.12); border-radius: 6px; padding: .05rem .4rem; font-weight: 800; color: #e2e8f0; }
+  .erro{ color: #fca5a5; font-weight: 700; }
+  .off{ display: inline-block; margin-top: .4rem; font-size: .82rem; font-weight: 800; color: #fbbf24; }
+</style>
+</head>
+<body>
+<div id="palco" aria-live="polite"></div>
+<div id="prog"></div>
+<div id="barra" role="toolbar" aria-label="Controles da conversação">
+  <button type="button" id="bAnt" title="Voltar um clique (←)">◀</button>
+  <span class="n" id="bN">1 de 1</span>
+  <button type="button" id="bProx" title="Próximo clique (→, espaço)">▶</button>
+  <span class="sep"></span>
+  <button type="button" id="bInicio" title="Voltar ao início (Home)">⏮ Início</button>
+  <button type="button" id="bCheia" title="Tela cheia (F)">⛶ Tela cheia</button>
+  <button type="button" id="bSair" title="Voltar à abertura (Esc)">✕</button>
+</div>
+
+<div id="capa">
+  <div class="cx" id="capaCorpo"><p>Carregando…</p></div>
+</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var CACHE = 'fisk-conversa-v1';
+  var id = (location.search.match(/[?&]a=([\w-]+)/) || [])[1] || 'everyday-life-04-babies';
+  var base = 'conversacao/' + id + '/';
+  var atv = null, imgs = [], vez = 0, tocando = false;
+
+  /* o mesmo endereço abre sem internet: o sw-conversa.js atende do que foi guardado */
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw-conversa.js', { scope: './conversacao' }).catch(function () {});
+
+  fetch(base + 'atividade.json').then(function (r) { if (!r.ok) throw new Error('atividade não encontrada'); return r.json(); })
+    .then(function (a) { atv = a; montaPalco(); capa(); })
+    .catch(function (e) { $('capaCorpo').innerHTML = '<p class="erro">Não consegui abrir a atividade (' + esc(e.message) + ').</p>' + (navigator.onLine ? '' : '<p>Sem internet, e esta atividade não foi deixada offline neste computador.</p>'); });
+
+  function montaPalco() {
+    document.title = atv.titulo + ' · Conversação, FISK';
+    var p = $('palco'); p.innerHTML = '';
+    imgs = atv.imagens.map(function (n, i) {
+      var im = new Image(); im.alt = 'Slide, clique ' + (i + 1); im.decoding = 'async';
+      im.dataset.src = base + n; p.appendChild(im); return im;
+    });
+  }
+  function carrega(i) { var im = imgs[i]; if (im && !im.src) im.src = im.dataset.src; }
+
+  function guardada() { return caches.open(CACHE).then(function (c) { return c.match(base + atv.imagens[atv.imagens.length - 1]); }).then(function (r) { return !!r; }).catch(function () { return false; }); }
+  function capa() {
+    $('capa').hidden = false; tocando = false; document.body.classList.remove('mostra');
+    $('capaCorpo').innerHTML =
+      '<img class="logo" src="assets/fisk-logo.png" alt="FISK" onerror="this.remove()">' +
+      '<h1>💬 ' + esc(atv.titulo) + '</h1>' +
+      '<p class="sub">' + esc(atv.nivel || '') + ' · ' + atv.imagens.length + ' cliques</p>' +
+      '<img class="capinha" src="' + esc(base + atv.imagens[0]) + '" alt="">' +
+      '<div><button type="button" class="comeca" id="comeca">▶ Começar na tela cheia</button></div>' +
+      '<div class="linha"><button type="button" class="sec" id="semCheia">Começar sem tela cheia</button>' +
+      '<button type="button" class="sec" id="bOff">📥 Deixar disponível offline</button></div>' +
+      (navigator.onLine ? '' : '<span class="off">Sem internet: abrindo do que ficou guardado neste computador</span>') +
+      '<p class="dica">Avance com <kbd>clique</kbd>, <kbd>→</kbd>, <kbd>espaço</kbd> ou o passador de slides. Volte com <kbd>←</kbd>.<br><kbd>F</kbd> tela cheia · <kbd>Esc</kbd> volta para cá</p>';
+    $('comeca').onclick = function () { comecar(true); };
+    $('semCheia').onclick = function () { comecar(false); };
+    $('bOff').onclick = deixarOffline;
+    guardada().then(function (sim) { if (sim) marcaOffline(); });
+  }
+  function marcaOffline() { var b = $('bOff'); if (!b) return; b.textContent = '✓ Disponível offline neste computador'; b.className = 'sec ok'; b.onclick = null; }
+
+  /* guarda a página, o kit e todas as imagens; o service worker serve daqui quando a rede falhar */
+  function deixarOffline() {
+    var b = $('bOff'); b.disabled = true;
+    var css = document.querySelector('link[rel=stylesheet]').getAttribute('href');
+    var pagina = ['conversacao.html', 'conversacao.html?a=' + id, css, 'assets/fisk-logo.png', base + 'atividade.json'];
+    var lista = pagina.concat(atv.imagens.map(function (n) { return base + n; })), feitas = 0;
+    caches.open(CACHE).then(function (c) {
+      var cadeia = Promise.resolve();
+      lista.forEach(function (u) {
+        cadeia = cadeia.then(function () {
+          return fetch(u, { cache: 'reload' }).then(function (r) { if (r.ok) return c.put(u, r); }).catch(function () {})
+            .then(function () { feitas++; b.textContent = '📥 Guardando… ' + Math.round(feitas * 100 / lista.length) + '%'; });
+        });
+      });
+      return cadeia;
+    }).then(function () {
+      try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+      marcaOffline();
+    }).catch(function () { b.disabled = false; b.textContent = '📥 Não deu: tente de novo'; });
+  }
+
+  function comecar(cheia) {
+    $('capa').hidden = true; tocando = true; vez = 0;
+    if (cheia && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function () {});
+    mostra(0); acorda();
+  }
+  function mostra(i) {
+    vez = Math.max(0, Math.min(imgs.length - 1, i));
+    for (var k = vez; k < vez + 4; k++) carrega(k);   /* os próximos já descem, para o clique não esperar */
+    carrega(vez - 1);
+    imgs.forEach(function (im, k) { im.classList.toggle('on', k === vez); });
+    $('bN').textContent = (vez + 1) + ' de ' + imgs.length;
+    $('prog').style.width = ((vez + 1) * 100 / imgs.length) + '%';
+  }
+  function prox() { if (vez < imgs.length - 1) mostra(vez + 1); }
+  function ant() { if (vez > 0) mostra(vez - 1); }
+  function cheia() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(function () {}); else document.exitFullscreen(); }
+
+  $('palco').addEventListener('click', function (e) { if (!tocando) return; (e.clientX < window.innerWidth * 0.2 ? ant : prox)(); });
+  $('bProx').onclick = prox; $('bAnt').onclick = ant; $('bInicio').onclick = function () { mostra(0); };
+  $('bCheia').onclick = cheia; $('bSair').onclick = function () { if (document.fullscreenElement) document.exitFullscreen(); capa(); };
+  document.addEventListener('keydown', function (e) {
+    if (!tocando) return;
+    var k = e.key;
+    if (k === 'ArrowRight' || k === 'ArrowDown' || k === ' ' || k === 'PageDown' || k === 'Enter' || k === 'n') { e.preventDefault(); prox(); }
+    else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp' || k === 'Backspace' || k === 'p') { e.preventDefault(); ant(); }
+    else if (k === 'Home') mostra(0);
+    else if (k === 'End') mostra(imgs.length - 1);
+    else if (k === 'f' || k === 'F') cheia();
+    else if (k === 'Escape' && !document.fullscreenElement) capa();
+    acorda();
+  });
+  var tCursor;
+  function acorda() {
+    document.body.classList.add('mostra'); document.body.classList.remove('esconde-cursor');
+    clearTimeout(tCursor); tCursor = setTimeout(function () { document.body.classList.remove('mostra'); if (tocando) document.body.classList.add('esconde-cursor'); }, 2500);
+  }
+  document.addEventListener('mousemove', function () { if (tocando) acorda(); });
+})();
+</script>
+</body>
+</html>
