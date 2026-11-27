@@ -71,6 +71,12 @@
   body.embed #barra button, body.embed #barra select{ padding: .3rem .55rem; }
   body.embed .cx img{ height: 30px; margin-bottom: .6rem; } body.embed .cx h1{ font-size: 1.25rem; }
   body.embed .cx p{ font-size: .9rem; }
+  /* a tela de espera NÃO é preta (Pedro, 27/11/2026, como no Canva): o primeiro slide aparece por trás, desbotado e
+     desfocado, para dar uma prévia sem mostrar tudo */
+  #capaFundo{ position: absolute; inset: -40px; background-size: cover; background-position: center; filter: blur(16px) saturate(.55) brightness(.72); transform: scale(1.06); opacity: 0; transition: opacity .6s; z-index: -1; }
+  #capaFundo.on{ opacity: 1; }
+  #capa{ isolation: isolate; overflow: hidden; }
+  #capa::before{ content: ""; position: absolute; inset: 0; background: rgba(11,14,20,.35); z-index: -1; }
 </style>
 </head>
 <body>
@@ -88,7 +94,7 @@
   <button type="button" id="bSair" title="Fechar (Esc)">✕</button>
 </div>
 
-<div id="capa">
+<div id="capa"><div id="capaFundo"></div>
   <div class="cx">
     <img src="assets/fisk-logo.png" alt="FISK">
     <h1>📺 Informativo do mês</h1>
@@ -150,6 +156,7 @@
       nomeAtual = j.nome || 'Informativo';
       return montar(j.bytes).then(function () {
         completarLeve(j, escola);
+        try { var c0 = PAGINAS[0] && PAGINAS[0].querySelector('canvas'), cf = $('capaFundo'); if (c0 && cf) { cf.style.backgroundImage = 'url(' + c0.toDataURL('image/jpeg', .6) + ')'; cf.classList.add('on'); } } catch (e) {}
         if (EMBED) { comecar(false); return; }   /* na home não há abertura: já começa a passar */
         capa('<p><b>' + esc(nomeAtual.replace(/\.pdf$/i, '')) + '</b></p>' +
           '<span class="esc">🏫 ' + esc(escola) + (porque ? ' <small style="opacity:.75;font-weight:600">(' + esc(porque) + ')</small>' : '') + '<button type="button" id="trocarEsc">trocar</button></span>' +

@@ -139,6 +139,12 @@
   #capa .erro{ color: #fca5a5; }
   #capa .sec{ font: 800 .95rem var(--font-body, inherit); color: #e2e8f0; background: rgba(255,255,255,.08); border: 1.5px solid rgba(255,255,255,.22); border-radius: 12px; padding: .6rem 1rem; cursor: pointer; }
   #capa .aviso{ color: #fbbf24; font-weight: 800; }
+  /* a tela de espera NÃO é preta (Pedro, 27/11/2026, como no Canva): o primeiro slide aparece por trás, desbotado e
+     desfocado, para dar uma prévia sem mostrar tudo */
+  #capaFundo{ position: absolute; inset: -40px; background-size: cover; background-position: center; filter: blur(16px) saturate(.55) brightness(.72); transform: scale(1.06); opacity: 0; transition: opacity .6s; z-index: -1; }
+  #capaFundo.on{ opacity: 1; }
+  #capa{ isolation: isolate; overflow: hidden; }
+  #capa::before{ content: ""; position: absolute; inset: 0; background: rgba(11,14,20,.35); z-index: -1; }
 </style>
 </head>
 <body>
@@ -166,7 +172,7 @@
     <button type="button" id="bCheia" title="Tela cheia (F)">⛶ Tela cheia</button>
     <button type="button" id="bSair" title="Voltar à abertura (Esc)">✕</button>
   </div>
-  <div id="capa"><div class="cx" id="capaCorpo"></div></div>
+  <div id="capa"><div id="capaFundo"></div><div class="cx" id="capaCorpo"></div></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js"></script>
@@ -387,6 +393,7 @@
   function abre(id) {
     atual = todos().filter(function (i) { return i.id === id; })[0]; if (!atual) return;
     $('lista').hidden = true; $('tocador').hidden = false; $('capa').hidden = false; tocando = false;
+    var cf0 = $('capaFundo'); if (cf0) { cf0.classList.remove('on'); cf0.style.backgroundImage = ''; }
     $('capaCorpo').innerHTML = '<div class="espera"><i></i> Abrindo ' + esc(atual.nome) + '…</div>';
     history.replaceState(null, '', '?id=' + encodeURIComponent(id) + (semanaId ? '&semana=' + encodeURIComponent(semanaId) : ''));
     obter(atual).then(function (u) { return pdfjsLib.getDocument({ data: u }).promise; }).then(function (d) {
@@ -409,6 +416,7 @@
   function capa() {
     tocando = false; document.body.classList.remove('mostra', 'esconde-cursor');
     $('capa').hidden = false;
+    var cf = $('capaFundo'); if (cf && paginas[0] && paginas[0].src) { cf.style.backgroundImage = 'url(' + paginas[0].src + ')'; cf.classList.add('on'); }
     $('capaCorpo').innerHTML = '<h1>💬 ' + esc(titulo(atual)) + '</h1><p class="sub">' + esc(atual.niveis.join(' · ')) + (atual.niveis.length ? ' · ' : '') + paginas.length + (atual.tipo === 'pdf' ? ' slides' : ' cliques') + '</p>' +
       '<img class="capinha" src="' + (paginas[0] && paginas[0].src || '') + '" alt="">' +
       (semanaCerta() ? '' : '<p class="aviso ruim" style="margin-top:.8rem">Esta atividade não é da semana de hoje.</p>') +
