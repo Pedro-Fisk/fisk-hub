@@ -2170,7 +2170,9 @@
      aula hoje), o próprio carrossel pergunta. Sem informativo enviado, o bloco some antes de aparecer vazio. */
   var e0 = typeof fiskInfvEscolaDaAula === 'function' ? fiskInfvEscolaDaAula(s) : null;
   var pronto = (e0 && typeof fiskInfvObter === 'function') ? fiskInfvObter(e0.escola).then(function (j) { if (j && j.vazio) sec.hidden = true; return j; }, function () { return null; }) : Promise.resolve(null);
-  function abre(sim) {
+  /* abrir e fechar com movimento, como a Minha semana logo acima (Pedro, 27/11/2026: "um corte seco") */
+  var _anima = null;
+  function abre(sim, animar) {
     try { localStorage.setItem(CH, sim ? '1' : '0'); } catch (e) {}
     if (sim && !corpo.querySelector('iframe')) {
       /* O PDF tem uns 23 MB e leva de 15 s em diante na primeira vez: sem isto o bloco abria vazio, só o título, e
@@ -2185,9 +2187,21 @@
         corpo.appendChild(f);
       });
     }
-    bt.setAttribute('aria-expanded', sim ? 'true' : 'false'); corpo.hidden = !sim;
+    clearTimeout(_anima); corpo.classList.remove('anima'); corpo.style.height = ''; corpo.style.opacity = '';
+    if (!animar) { bt.setAttribute('aria-expanded', sim ? 'true' : 'false'); corpo.hidden = !sim; return; }
+    if (sim) {
+      bt.setAttribute('aria-expanded', 'true'); corpo.hidden = false;
+      var h = corpo.scrollHeight;
+      corpo.style.height = '0px'; corpo.style.opacity = '0'; void corpo.offsetHeight;
+      corpo.classList.add('anima'); corpo.style.height = h + 'px'; corpo.style.opacity = '1';
+      _anima = setTimeout(function () { corpo.classList.remove('anima'); corpo.style.height = ''; corpo.style.opacity = ''; }, 420);
+    } else {
+      corpo.style.height = corpo.offsetHeight + 'px'; void corpo.offsetHeight;
+      corpo.classList.add('anima'); corpo.style.height = '0px'; corpo.style.opacity = '0';
+      _anima = setTimeout(function () { corpo.hidden = true; corpo.classList.remove('anima'); corpo.style.height = ''; corpo.style.opacity = ''; bt.setAttribute('aria-expanded', 'false'); }, 420);
+    }
   }
-  bt.addEventListener('click', function () { abre(bt.getAttribute('aria-expanded') !== 'true'); });
+  bt.addEventListener('click', function () { abre(corpo.hidden || corpo.style.height === '0px', true); });
   window.addEventListener('message', function (ev) {
     if (ev.origin !== location.origin || !ev.data || ev.data.fiskInfv !== 'vazio') return;
     var f = corpo.querySelector('iframe'); if (f && ev.source === f.contentWindow) sec.hidden = true;
