@@ -1822,8 +1822,8 @@ function fiskBuscaMeusAlunos(q) {
 })();
 
 /* ══ O BUDDY EM QUALQUER TELA (Pedro, 06/10/2026) ══════════════════════════
- * A bolinha do urso no canto de baixo, à direita, em toda página do Hub que
- * carrega este kit. Clicar abre uma janelinha com a conversa (buddy.html em
+ * A bolinha do urso no canto de baixo, à direita, SÓ NA HOME do Hub (até
+ * 27/11/2026 era em toda página que carrega este kit; cobria os slides). Clicar abre uma janelinha com a conversa (buddy.html em
  * modo `mini`, dentro de um iframe). A CONVERSA ACOMPANHA O PROFESSOR de página
  * em página (a janelinha guarda o que foi dito nesta aba e redesenha ao abrir;
  * se ela estava aberta, reabre sozinha). Só recomeça em "Nova conversa". O
@@ -1846,7 +1846,8 @@ function fiskBuddyInfoGuarda(j) {
 }
 (function () {
   if (window.parent !== window) return;
-  if (/buddy(-ajustes)?\.html/.test(location.pathname)) return;
+  /* SÓ NA HOME desde 27/11/2026 (Pedro: a bolinha ficava em cima dos slides da conversação; "poderia estar só na home") */
+  if (!/(^|\/)(index\.html)?$/.test(location.pathname)) return;
   var s = (typeof fiskSessao === 'function') ? fiskSessao() : null;
   if (!s || !s.token) return;
   function pode() {
@@ -2222,29 +2223,47 @@ function fiskConvBaixarSemana(opts) {
   var CH = 'conv:baixou', agora = Date.now();
   try { if (!opts.forcar && agora - Number(localStorage.getItem(CH) || 0) < 6 * 36e5) return Promise.resolve(null); localStorage.setItem(CH, String(agora)); } catch (e) {}
   var base = location.href.replace(/[^\/]*([?#].*)?$/, ''), PDFJS = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/';
-  return fiskFetch(FISK_HUB_EP, { action: 'conversaSemana', token: s.token }, { timeoutMs: 60000 }).then(function (j) {
-    if (!j || !j.ok || !j.idiomas) return null;
-    try { localStorage.setItem('conv:semana:atual', JSON.stringify(j)); if (j.semana) localStorage.setItem('conv:semana:' + j.semana.id, JSON.stringify(j)); } catch (e) {}
-    var itens = []; Object.keys(j.idiomas).forEach(function (k) { itens = itens.concat(j.idiomas[k].filter(function (i) { return i.pronto; })); });
+  /* a lista de uma semana (vazio = a de hoje), guardada como a conversacao.html guarda (conv:semana:<id>, com a hora) */
+  function lista(id) {
+    return fiskFetch(FISK_HUB_EP, { action: 'conversaSemana', token: s.token, semanaId: id || '' }, { timeoutMs: 60000 }).then(function (j) {
+      if (!j || !j.ok) return null;
+      j._em = Date.now();
+      try { if (!id) localStorage.setItem('conv:semana:atual', JSON.stringify(j)); if (j.semana) localStorage.setItem('conv:semana:' + j.semana.id, JSON.stringify(j)); } catch (e) {}
+      return j;
+    }).catch(function () { return null; });
+  }
+  function pdfs(j, c) {
+    var itens = []; Object.keys((j && j.idiomas) || {}).forEach(function (k) { itens = itens.concat(j.idiomas[k].filter(function (i) { return i.pronto && i.tipo !== 'cm'; })); });
+    var cadeia = Promise.resolve(), baixadas = 0;
+    itens.forEach(function (it) {
+      var k = location.origin + '/__conversa/' + it.id + '/' + it.quando;
+      cadeia = cadeia.then(function () {
+        return c.match(k).then(function (r) {
+          if (r) return;
+          return fiskFetch(FISK_HUB_EP, { action: 'conversaLer', token: s.token, id: it.id }, { timeoutMs: 120000 }).then(function (x) {
+            if (!x || !x.ok || !x.dados) return;
+            var u = Uint8Array.from(atob(x.dados), function (ch) { return ch.charCodeAt(0); });
+            baixadas++;
+            return c.put(k, new Response(u, { headers: { 'Content-Type': 'application/pdf' } }));
+          }).catch(function () {});
+        });
+      });
+    });
+    return cadeia.then(function () { return { total: itens.length, baixadas: baixadas }; });
+  }
+  /* A SEMANA DE HOJE PRIMEIRO, DEPOIS A ANTERIOR E A PRÓXIMA (Pedro, 27/11/2026: trocar de semana sem espera nem
+     "Failed to fetch"). Primeiro as três listas, depois os PDFs, sempre um por vez e em segundo plano. */
+  return lista('').then(function (j) {
+    if (!j || !j.idiomas) return null;
+    var ss = j.semanas || [], i = ss.map(function (x) { return x.id; }).indexOf(j.semana && j.semana.id);
+    var viz = [ss[i - 1], ss[i + 1]].filter(Boolean).map(function (x) { return x.id; });
     return caches.open(FISK_CONV_CACHE).then(function (c) {
       /* a própria página e o leitor de PDF, para abrir sem internet */
       fiskGuardarPaginaOffline('conversacao.html');
-      var cadeia = Promise.resolve(), baixadas = 0;
-      itens.forEach(function (it) {
-        var k = location.origin + '/__conversa/' + it.id + '/' + it.quando;
-        cadeia = cadeia.then(function () {
-          return c.match(k).then(function (r) {
-            if (r) return;
-            return fiskFetch(FISK_HUB_EP, { action: 'conversaLer', token: s.token, id: it.id }, { timeoutMs: 120000 }).then(function (x) {
-              if (!x || !x.ok || !x.dados) return;
-              var u = Uint8Array.from(atob(x.dados), function (ch) { return ch.charCodeAt(0); });
-              baixadas++;
-              return c.put(k, new Response(u, { headers: { 'Content-Type': 'application/pdf' } }));
-            }).catch(function () {});
-          });
-        });
-      });
-      return cadeia.then(function () { return { total: itens.length, baixadas: baixadas }; });
+      var outras = [];
+      return viz.reduce(function (p, id) { return p.then(function () { return lista(id).then(function (x) { if (x) outras.push(x); }); }); }, Promise.resolve())
+        .then(function () { return pdfs(j, c); })
+        .then(function (r) { return outras.reduce(function (p, x) { return p.then(function (acc) { return pdfs(x, c).then(function (q) { return { total: acc.total + q.total, baixadas: acc.baixadas + q.baixadas }; }); }); }, Promise.resolve(r)); });
     });
   }).catch(function () { return null; });
 }
