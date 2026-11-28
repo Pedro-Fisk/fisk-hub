@@ -131,10 +131,16 @@
       var porSlide = 3, n0 = 0;
       divisor(rot.pw, 3);
       for (var k = 0; k < conv.length; k += porSlide) (function (grupo) {
-        novo('conversa', '<div style="position:absolute;left:250px;right:250px;top:70px;bottom:60px;display:flex;flex-direction:column;justify-content:center">' + grupo.map(function (q, j) {
+        /* respostas-modelo uma por linha, com marcador (Pedro 27/11/2026), maiores que antes (40px); a carga do slide
+           (linhas de pergunta + linhas de resposta) decide se cabe no tamanho cheio ou um degrau abaixo */
+        var carga = 0; grupo.forEach(function (q) { carga += Math.ceil(String(q.question).length / 42) * 76 + (q.modelAnswers || []).reduce(function (s, r) { return s + Math.ceil(String(r).length / 58) * 60 + 6; }, 0) + 44; });
+        var cheio = carga > 840, tamQ = cheio ? 56 : 64, tamR = cheio ? 42 : 48;
+        /* cada pergunta num card que aparece com ela (Pedro 27/11/2026: mesmo clareando, o fundo atrapalhava a leitura) */
+        var fundoCard = r.escuro ? alfa(p.fundo, 0.92) : 'rgba(255,255,255,.96)';
+        novo('conversa', '<div style="position:absolute;left:220px;right:220px;top:60px;bottom:50px;display:flex;flex-direction:column;justify-content:center">' + grupo.map(function (q, j) {
           var num = n0 + j + 1;
-          return '<div data-e="' + (j + 1) + '" class="ft-off" style="display:flex;gap:28px;align-items:flex-start;margin-bottom:' + (porSlide === 4 ? 30 : 44) + 'px"><span style="flex:none;width:96px;height:96px;border-radius:30px;background:' + p.dest + ';color:' + sobreDest + ';font:800 56px \'' + T + '\';display:flex;align-items:center;justify-content:center">' + num + '</span><div><div style="font-size:' + (porSlide === 4 ? 56 : 64) + 'px;font-weight:800;line-height:1.18">' + esc(q.question) + '</div>' +
-            ((q.modelAnswers || []).length ? '<div style="font-size:40px;font-weight:600;opacity:.75;margin-top:8px">' + q.modelAnswers.map(esc).join(' · ') + '</div>' : '') + '</div></div>'; }).join('') + '</div>');
+          return '<div data-e="' + (j + 1) + '" class="ft-off" style="display:flex;gap:28px;align-items:flex-start;margin-bottom:' + (cheio ? 20 : 30) + 'px;background:' + fundoCard + ';border-radius:32px;padding:' + (cheio ? 20 : 28) + 'px 36px;box-shadow:0 10px 30px rgba(0,0,0,.10)' + (r.escuro ? ';border:2px solid rgba(255,255,255,.10)' : '') + '"><span style="flex:none;width:96px;height:96px;border-radius:30px;background:' + p.dest + ';color:' + sobreDest + ';font:800 56px \'' + T + '\';display:flex;align-items:center;justify-content:center">' + num + '</span><div><div style="font-size:' + tamQ + 'px;font-weight:800;line-height:1.18">' + esc(q.question) + '</div>' +
+            ((q.modelAnswers || []).length ? '<ul style="list-style:none;margin:10px 0 0;padding:0;font-size:' + tamR + 'px;font-weight:600;line-height:1.25">' + q.modelAnswers.map(function (r) { return '<li style="display:flex;gap:16px;margin-top:6px"><span style="color:' + p.dest + ';flex:none">•</span><span style="opacity:.85">' + esc(r) + '</span></li>'; }).join('') + '</ul>' : '') + '</div></div>'; }).join('') + '</div>');
         n0 += grupo.length;
       })(conv.slice(k, k + porSlide));
     }
