@@ -77,6 +77,11 @@
   .tabs button.on{ background: #0f172a; color: #fff; border-color: #0f172a; }
   body.theme-dark .tabs button{ background: #1f2937; border-color: #334155; } body.theme-dark .tabs button.on{ background: #e2e8f0; color: #0f172a; }
   .grade{ display: grid; grid-template-columns: repeat(auto-fill, minmax(min(236px, 100%), 1fr)); gap: 30px 18px; padding: 14px 0 16px; }
+  /* a prateleira da atividade opcional, separada da principal por uma linha */
+  .prat-opc{ margin-top: .6rem; padding-top: .4rem; border-top: 2px dashed #e2e8f0; }
+  .prat-opc h3.sub{ margin-bottom: .15rem; }
+  .prat-sub{ margin: 0 0 .2rem; color: #64748b; font-weight: 700; font-size: .85rem; }
+  body.theme-dark .prat-opc{ border-top-color: #334155; }
   /* o cartão de uma atividade */
   .rec{ position: relative; background: #fff; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(15,23,42,.06); display: flex; flex-direction: column; }
   body.theme-dark .rec{ background: #1f2937; border-color: #334155; }
@@ -757,7 +762,12 @@
     if (!aba || !grupos.some(function (g) { return g.k === aba; })) aba = grupos[0] ? grupos[0].k : '';
     h += '<h3 class="sub">📚 Desta semana</h3><div class="tabs">' + grupos.map(function (g) {
       return '<button type="button" data-aba="' + esc(g.k) + '"' + (g.k === aba ? ' class="on"' : '') + '>' + esc(g.rot) + ' · ' + g.itens.length + '</button>'; }).join('') + '</div>';
-    grupos.forEach(function (g) { h += '<div class="grade" data-grade="' + esc(g.k) + '"' + (g.k === aba ? '' : ' hidden') + '>' + g.itens.map(function (it) { return cartao(it, sug[it.id]); }).join('') + '</div>'; });
+    grupos.forEach(function (g) {
+      var cards = function (l) { return l.map(function (it) { return cartao(it, sug[it.id]); }).join(''); };
+      if (!g.opcionais || !g.opcionais.length) { h += '<div class="grade" data-grade="' + esc(g.k) + '"' + (g.k === aba ? '' : ' hidden') + '>' + cards(g.itens) + '</div>'; return; }
+      h += '<div data-grade="' + esc(g.k) + '"' + (g.k === aba ? '' : ' hidden') + '>' + (g.itens.length ? '<div class="grade">' + cards(g.itens) + '</div>' : '') +
+        '<div class="prat-opc"><h3 class="sub">✨ Atividade opcional</h3><p class="prat-sub">Pode ser dada ou não: fica a critério do professor, depois da principal.</p><div class="grade">' + cards(g.opcionais) + '</div></div></div>';
+    });
     $('corpo').innerHTML = h;
     $('bOff').onclick = guardarSemana;
     marcaOffline(); observaMiniaturas(); ajustaTitulos();
@@ -771,8 +781,12 @@
     var o = function (x) { return ORDEM_NIVEL[nivelDe(x)] == null ? 9 : ORDEM_NIVEL[nivelDe(x)]; }, p = function (x) { return perfilDe(x) === 'Jovens' ? 0 : perfilDe(x) === 'Adultos' ? 1 : 2; };
     return ((ehEspanhol(a) ? 1 : 0) - (ehEspanhol(b) ? 1 : 0)) || (o(a) - o(b)) || (p(a) - p(b)) || titulo(a).localeCompare(titulo(b));
   }
+  /* A ATIVIDADE OPCIONAL (Pedro, 28/11/2026: "toda semana tem a atividade principal e a outra, que pode ser dada ou não"):
+     a coordenação põe a opcional numa subpasta "Opcional" dentro de English ou Español da semana (o backend já entrega a
+     subpasta como grupo). Ela vai para a prateleira de baixo, nunca é a sugerida da turma e não vira aba. */
+  function ehOpcional(it) { return /opcion/i.test(csemTiraAcento(it.grupo || '')); }
   function gruposDe() {
-    var semana = [], out = [], extras = [];
+    var semana = [], out = [], extras = [], opcionais = [];
     Object.keys(dados.idiomas || {}).forEach(function (idioma) {
       (dados.idiomas[idioma] || []).forEach(function (it) { it._idioma = idioma; });
     });
@@ -781,11 +795,12 @@
       var itens = dados.idiomas[idioma] || [];
       if (daSemana(idioma)) {
         semana = semana.concat(itens.filter(function (it) { return !it.grupo; }));
-        var gs = {}; itens.filter(function (it) { return it.grupo; }).forEach(function (it) { (gs[it.grupo] = gs[it.grupo] || []).push(it); });
+        opcionais = opcionais.concat(itens.filter(function (it) { return ehOpcional(it); }));
+        var gs = {}; itens.filter(function (it) { return it.grupo && !ehOpcional(it); }).forEach(function (it) { (gs[it.grupo] = gs[it.grupo] || []).push(it); });
         Object.keys(gs).forEach(function (g) { extras.push({ k: idioma + '|' + g, rot: '📁 ' + g.replace(/^Extra\s*-\s*/i, 'Extra: '), itens: gs[g].sort(ordem) }); });
       }
     });
-    if (semana.length) out.push({ k: 'semana', rot: '📅 Da semana', itens: semana.sort(ordem) });
+    if (semana.length || opcionais.length) out.push({ k: 'semana', rot: '📅 Da semana', itens: semana.sort(ordem), opcionais: opcionais.sort(ordem) });
     out = out.concat(extras);
     [[MINHAS, '🧩 '], [ACERVO, '🗂️ '], [BUDDY, '🐻 '], [PAISES, '🌍 '], [VIDA, '🏡 '], [YT, '▶️ ']].forEach(function (x) {
       var itens = (dados.idiomas || {})[x[0]]; if (itens && itens.length) out.push({ k: x[0], rot: x[1] + x[0], itens: itens.slice().sort(ordem) });
@@ -796,7 +811,7 @@
      78% do normal) e usa esse em todos; o que ainda não couber termina em reticências. No celular são até duas linhas. */
   function ajustaTitulos() {
     if (semCel()) return;
-    [].forEach.call(document.querySelectorAll('.grade:not([hidden])'), function (g) {
+    [].forEach.call(document.querySelectorAll('[data-grade]:not([hidden])'), function (g) {   /* a aba inteira: a principal e a opcional com o MESMO tamanho */
       var hs = [].slice.call(g.querySelectorAll('.inf b')); if (!hs.length) return;
       hs.forEach(function (h) { h.style.fontSize = ''; });
       var f = parseFloat(getComputedStyle(hs[0]).fontSize), min = f * .78;
