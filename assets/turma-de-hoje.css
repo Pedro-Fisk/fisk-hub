@@ -811,5 +811,13 @@ html.fk-novo body.theme-dark .painel.aula-filtro { background: linear-gradient(1
 html.fk-novo .af-ir, html.fk-novo .af-trazer { box-sizing: border-box; min-width: 7.2rem; height: 2.5rem; padding: 0 1rem; font: 900 .9rem var(--font-body); display: inline-flex; align-items: center; justify-content: center; }
 html.fk-novo .af-ir.pede, html.fk-novo .af-ir:not(.pede):not(:disabled), html.fk-novo .af-trazer { box-shadow: 0 3px 0 #1f7a63; }
 
+/* O BALÃO DA FISK FLUTUANDO no lugar da escolinha (Pedro, 28/11/2026): um quadrado no canto esquerdo, e os campos
+   chegam para a direita para dar lugar a ele */
+html.fk-novo .painel.aula-filtro{ grid-template-columns: 132px minmax(0, 1fr); gap: 1.2rem; }
+html.fk-novo .af-ico{ align-self: center; justify-self: center; width: 124px; height: 124px; margin: 0; display: flex; align-items: center; justify-content: center; animation: afFlutua 3.4s ease-in-out infinite; filter: none; }
+html.fk-novo .af-ico img{ width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 10px 14px rgba(0,0,0,.3)); }
+@keyframes afFlutua{ 0%, 100%{ transform: translateY(0) rotate(-4deg); } 50%{ transform: translateY(-9px) rotate(3deg); } }
+@media (max-width: 640px){ html.fk-novo .painel.aula-filtro{ grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce){ html.fk-novo .af-ico{ animation: none; } }
 /* O PROFESSOR VÊ O CARD DE SEMPRE até as novidades abrirem (fiskNovidades, no kit): os elementos novos somem */
 html:not(.fk-novo) .af-ico, html:not(.fk-novo) .af-rot, html:not(.fk-novo) #bIrTurma, html:not(.fk-novo) #bTrazer, html:not(.fk-novo) .af-lupa, html:not(.fk-novo) #conv-card{ display: none !important; }

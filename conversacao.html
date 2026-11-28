@@ -46,8 +46,12 @@
   /* contain: sem ele, a faixa larga demais alargava a página inteira no celular */
   .sems{ contain: inline-size; display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 3 * 12px) / 4); gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; margin-top: 1rem; padding: 10px 2px 8px; scrollbar-width: none; }
   .sems::-webkit-scrollbar{ display: none; }
-  .sem{ scroll-snap-align: start; position: relative; text-align: left; background: rgba(255,255,255,.14); color: #fff; border: 1.5px solid rgba(255,255,255,.3); border-radius: 18px; padding: .75rem .9rem; cursor: pointer; font: inherit; min-width: 0; min-height: 86px; }
+  .sem{ position: relative; text-align: left; background: rgba(255,255,255,.14); color: #fff; border: 1.5px solid rgba(255,255,255,.3); border-radius: 18px; padding: .75rem .9rem; cursor: pointer; font: inherit; min-width: 0; min-height: 86px; }
   .sem:hover{ background: rgba(255,255,255,.24); }
+  /* ARRASTAR TAMBÉM VAI DE QUATRO EM QUATRO (Pedro, 28/11/2026): só a 1ª, a 5ª, a 9ª... semana são ponto de parada, e o
+     scroll-snap-stop impede pular mais de uma página num arrasto rápido. No celular (uma semana por vez) para em cada uma */
+  .sem:nth-child(4n+1){ scroll-snap-align: start; scroll-snap-stop: always; }
+  @media (max-width: 640px){ .sem{ scroll-snap-align: start; } }
   .sem b{ display: block; font: 900 1.02rem var(--font-heading, inherit); }
   .sem span{ display: block; font-weight: 800; font-size: .8rem; opacity: .92; margin-top: 2px; }
   .sem small{ display: block; font-weight: 800; font-size: .74rem; opacity: .85; margin-top: .45rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -695,7 +699,7 @@
   function semVisivel(b) { var c = $('sems').getBoundingClientRect(), r = b.getBoundingClientRect(); return r.left >= c.left - 2 && r.right <= c.right + 2; }
   /* no computador, a semana com a anterior à esquerda; no celular, ela primeiro */
   function semMostra(b, jaPosiciona) {
-    if (!b) return; var box = $('sems'), alvo = (!semCel() && b.previousElementSibling) || b;
+    if (!b) return; var box = $('sems'), bs = [].slice.call(box.children), alvo = semCel() ? b : bs[Math.floor(bs.indexOf(b) / 4) * 4] || b;
     box.scrollLeft += alvo.getBoundingClientRect().left - box.getBoundingClientRect().left - 2;
   }
   function semIndicadores() {
