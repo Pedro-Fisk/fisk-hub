@@ -105,6 +105,15 @@
        slides grandes e a cabeça dele no canto dos de conteúdo (para não cobrir o texto), a introdução em balões de fala.
        As imagens são as do PowerPoint original, em buddy-talks/img/. design.pele = 'buddy' liga; o resto não muda. */
     var pele = design && design.pele === 'buddy' ? { img: base + (design.imgs || 'buddy-talks/img/') } : null;
+    /* A PELE DE COUNTRIES (Pedro, 28/11/2026: as atividades de países do Drive Master): como o PowerPoint original,
+       fotos do país em tela cheia e painéis brancos com o título azul-marinho; nos slides de conteúdo, a foto escurecida
+       por trás. design.pele = 'countries'; as fotos vêm de L.fotos e de L.pais (countries/img/, ao lado da página). */
+    var cp = design && design.pele === 'countries' ? { img: base + (design.imgs || 'countries/img/'), cor: (L.pais && L.pais.cor) || '#c8102e' } : null;
+    var CP_AZUL = '#16365c', cpFotos = cp ? (L.fotos || []).filter(function (f) { return f.img; }) : [];
+    function cpUrl(n) { return /^https?:|^\//.test(String(n)) ? String(n) : cp.img + n; }
+    function cpFotoDe(i) { return cpFotos.length ? cpFotos[i % cpFotos.length] : (L.pais && L.pais.capa ? { img: L.pais.capa, local: L.pais.capaLocal || '' } : null); }
+    function cpPino(t) { return t ? '<div style="position:absolute;right:46px;bottom:46px;background:#fff;color:' + CP_AZUL + ';border-radius:16px;padding:12px 26px;font:800 38px \'' + B + '\';box-shadow:0 8px 24px rgba(0,0,0,.3)">📍 ' + esc(t) + '</div>' : ''; }
+    function cpPainel(html, larg, extra) { return '<div style="position:absolute;left:0;top:0;bottom:0;width:' + (larg || 860) + 'px;background:rgba(255,255,255,.96);color:' + CP_AZUL + ';display:flex;flex-direction:column;justify-content:center;padding:0 80px;' + (extra || '') + '">' + html + '</div>'; }
     function buddyFundo(tipo, capa) {
       var grande = capa || /^(divisor|introducao|audio|fechamento)$/.test(tipo);
       var faixa = function (larg) { return '<div style="position:absolute;right:0;top:0;bottom:0;width:' + larg + 'px;background:#c1121f"><div style="position:absolute;left:' + Math.round(larg * .28) + 'px;top:0;bottom:0;width:' + Math.round(larg * .1) + 'px;background:#f3f4f6"></div><div style="position:absolute;left:' + Math.round(larg * .46) + 'px;top:0;bottom:0;width:' + Math.round(larg * .05) + 'px;background:#f3f4f6"></div></div>'; };
@@ -112,8 +121,17 @@
         html: grande ? faixa(capa ? 760 : 470) + (capa ? '' : '<img alt="" src="' + pele.img + 'urso.png" style="position:absolute;right:10px;bottom:0;height:640px;pointer-events:none">')
           : faixa(120) + '<img alt="" src="' + pele.img + 'cabeca.png" style="position:absolute;right:16px;bottom:18px;width:190px;pointer-events:none;filter:drop-shadow(0 8px 14px rgba(0,0,0,.4))">' };
     }
-    function novo(tipo, corpo, capa) {
+    function novo(tipo, corpo, capa, foto) {
       var el = document.createElement('div'); el.className = 'ft-s';
+      if (cp) {
+        var fd = foto ? cpUrl(foto) : (cpFotoDe(slides.length) ? cpUrl(cpFotoDe(slides.length).img) : '');
+        el.style.cssText = (foto ? 'background:#0b1a2e url("' + fd + '") center/cover no-repeat;'
+          : 'background:linear-gradient(rgba(10,24,44,.84),rgba(10,24,44,.9))' + (fd ? ',url("' + fd + '") center/cover no-repeat' : '') + ',#0b1a2e;') + 'font-family:"' + B + '",sans-serif;color:#ffffff';
+        el.innerHTML = (foto ? '' : '<div style="position:absolute;left:0;top:0;right:0;height:18px;background:' + cp.cor + '"></div>') + corpo;
+        var et1 = 0; [].forEach.call(el.querySelectorAll('[data-e]'), function (x) { et1 = Math.max(et1, +x.getAttribute('data-e')); });
+        slides.push({ tipo: tipo, etapas: et1, el: el });
+        return el;
+      }
       if (pele) {
         var bf = buddyFundo(tipo, capa && tipo === 'capa');
         el.style.cssText = bf.css + 'font-family:"' + B + '",sans-serif;color:#ffffff';
@@ -133,7 +151,13 @@
     var chip = function (t, bg, cor) { return '<span style="display:inline-block;font-weight:800;font-size:34px;padding:10px 26px;border-radius:99px;letter-spacing:.06em;background:' + bg + ';color:' + cor + ';margin-right:12px">' + esc(t) + '</span>'; };
 
     /* 1. capa */
-    if (pele) novo('capa', '<img alt="BUDDY TALKS" src="' + pele.img + 'logo.png" style="position:absolute;left:150px;top:110px;width:620px">' +
+    var PA = L.pais || {};
+    if (cp) novo('capa', cpPainel((PA.bandeira ? '<img alt="" src="' + cpUrl(PA.bandeira) + '" style="width:210px;border-radius:12px;box-shadow:0 8px 22px rgba(0,0,0,.25);margin-bottom:46px;align-self:flex-start">' : '') +
+      '<div style="font:800 40px/1 \'' + B + '\';letter-spacing:.14em;color:' + cp.cor + '">COUNTRIES' + (PA.num ? ' #' + String(PA.num).padStart(2, '0') : '') + '</div>' +
+      '<div style="font:900 ' + (String(PA.nome || '').length > 11 ? 112 : 150) + 'px/1 \'' + T + '\';margin:20px 0 40px">' + esc(PA.nome || L.coverTitle || '') + '</div>' +
+      '<div>' + (L.coverLevel ? chip(String(L.coverLevel).toUpperCase(), cp.cor, '#ffffff') : '') + '</div>' +
+      '<img alt="FISK" src="' + base + 'assets/fisk-marca.png" style="position:absolute;left:80px;bottom:60px;height:84px">') + cpPino(PA.capaLocal), true, PA.capa);
+    else if (pele) novo('capa', '<img alt="BUDDY TALKS" src="' + pele.img + 'logo.png" style="position:absolute;left:150px;top:110px;width:620px">' +
       '<div style="position:absolute;left:150px;top:470px;width:900px">' +
       (L.topic ? '<div style="font:800 64px/1.1 \'' + T + '\';color:#38bdf8">' + esc(L.topic) + '</div>' : '') +
       '<div style="font:800 104px/1.05 \'' + T + '\';margin:22px 0 30px;color:#fff">' + esc(String(L.coverTitle || '').replace(/^Buddy Talks\s*·\s*/i, '')) + '</div>' +
@@ -148,10 +172,30 @@
     if ((L.objectives || []).length) novo('objetivos', h2(rot.obj) + '<div style="position:absolute;left:250px;right:250px;top:270px">' + L.objectives.map(function (o, i) {
       return '<div data-e="' + (i + 1) + '" class="ft-off" style="display:flex;gap:28px;align-items:center;margin-bottom:46px"><span style="flex:none;width:90px;height:90px;border-radius:28px;background:' + p.dest + ';color:' + sobreDest + ';font:800 54px \'' + T + '\';display:flex;align-items:center;justify-content:center">' + (i + 1) + '</span><span style="font-size:64px;font-weight:800;line-height:1.2">' + esc(o) + '</span></div>'; }).join('') + '</div>');
     /* 3. abertura do capítulo e vocabulário (a tradução num clique separado, palavra por palavra) */
-    var divisor = function (t, n) { return novo('divisor', '<div style="position:absolute;inset:0;' + (pele ? 'right:760px;left:80px;' : '') + 'display:flex;align-items:center;justify-content:center;flex-direction:column;gap:30px">' + (pele ? '' : '<img alt="" src="' + ico(base, r.icones[n % r.icones.length]) + '" onerror="this.remove()" style="width:260px">') + '<div style="font:800 ' + (pele ? 124 : 150) + 'px/1.05 \'' + T + '\';color:' + p.prim + ';text-align:center">' + esc(t) + '</div></div>'); };
+    var divisor = function (t, n, sub) {
+      if (cp) { var fdv = cpFotoDe(n + 1);
+        return novo('divisor', cpPainel('<div style="font:900 ' + Math.min(116, Math.floor(640 / (0.78 * Math.max.apply(null, String(t).split(/\s+/).map(function (w) { return w.length; }))))) + 'px/1.05 \'' + T + '\';text-align:center;text-transform:uppercase">' + esc(t) + '</div>' +
+          (sub ? '<div style="font:800 40px/1.3 \'' + B + '\';margin-top:30px;text-align:center;color:' + cp.cor + '">' + esc(sub) + '</div>' : ''), 820, 'align-items:center') + cpPino(fdv && fdv.local), false, fdv && fdv.img); }
+      return novo('divisor', '<div style="position:absolute;inset:0;' + (pele ? 'right:760px;left:80px;' : '') + 'display:flex;align-items:center;justify-content:center;flex-direction:column;gap:30px">' + (pele ? '' : '<img alt="" src="' + ico(base, r.icones[n % r.icones.length]) + '" onerror="this.remove()" style="width:260px">') + '<div style="font:800 ' + (pele ? 124 : 150) + 'px/1.05 \'' + T + '\';color:' + p.prim + ';text-align:center">' + esc(t) + '</div></div>'); };
+    /* COUNTRIES: a introdução, o aquecimento, o quadro do país e as fotos vêm ANTES das palavras, como no original */
+    if (cp) {
+      divisor(rot.intro, 0, L.introSub || '');
+      if (L.introText) novo('introducao', cpPainel('<div style="font:700 ' + (String(L.introText).length > 260 ? 52 : 62) + 'px/1.4 \'' + B + '\';text-align:center">' + esc(L.introText).replace(/\n\n/g, '<br><br>') + '</div>', 1000) + cpPino(cpFotoDe(1) && cpFotoDe(1).local), false, cpFotoDe(1) && cpFotoDe(1).img);
+      fazConversa(L.warmup || [], null);
+      if (PA.fatos && PA.fatos.length) novo('fatos', cpPainel('<div style="font:700 ' + (String(PA.texto || '').length > 230 ? 46 : 54) + 'px/1.4 \'' + B + '\'">' + esc(PA.texto || '').replace(/\n/g, '<br><br>') + '</div>', 1000) +
+        '<div style="position:absolute;right:90px;top:50%;transform:translateY(-50%);width:640px;background:#fff;color:' + CP_AZUL + ';border-radius:28px;padding:40px 46px;border:6px solid ' + cp.cor + ';box-shadow:0 14px 40px rgba(0,0,0,.35)">' +
+        (PA.mapa ? '<img alt="" src="' + cpUrl(PA.mapa) + '" style="display:block;max-width:100%;max-height:300px;margin:0 auto 26px;border-radius:12px">' : '') +
+        '<div style="font:900 40px/1.2 \'' + T + '\';margin-bottom:18px;color:' + cp.cor + '">' + esc(PA.oficial || PA.nome || '') + '</div>' +
+        PA.fatos.map(function (f) { return '<div style="font:700 36px/1.35 \'' + B + '\';margin-top:8px"><b style="font-weight:900">' + esc(f[0]) + ':</b> ' + esc(f[1]) + '</div>'; }).join('') + '</div>', false, cpFotoDe(0) && cpFotoDe(0).img);
+      (L.fotos || []).forEach(function (f, fi) {
+        if (!f.img || f.fundo) return;   /* fundo: a foto só veste os outros slides */
+        novo('foto', (f.texto ? cpPainel('<div style="font:700 ' + (String(f.texto).length > 200 ? 46 : 56) + 'px/1.4 \'' + B + '\';text-align:center">' + esc(f.texto).replace(/\n/g, '<br><br>') + '</div>', 820) : '') +
+          (f.titulo ? '<div style="position:absolute;left:' + (f.texto ? 880 : 60) + 'px;top:50px;background:' + cp.cor + ';color:#fff;border-radius:18px;padding:14px 34px;font:900 56px \'' + T + '\';text-transform:uppercase;box-shadow:0 8px 24px rgba(0,0,0,.3)">' + esc(f.titulo) + '</div>' : '') + cpPino(f.local), false, f.img);
+      });
+    }
     var voc = L.vocabulary || [];
     if (voc.length) {
-      divisor(rot.iw, 0);
+      divisor(cp ? (L.vocabTitulo || rot.iw) : rot.iw, cp ? 2 : 0, cp ? (L.vocabSub || '') : '');
       var longa = voc.some(function (v) { return String(v.word).length > 14; }), cols = longa ? 3 : 4;
       novo('vocabulario', h2(rot.iw) + '<div style="position:absolute;left:250px;right:250px;top:240px;display:grid;grid-template-columns:repeat(' + cols + ',minmax(0,1fr));gap:24px">' + voc.map(function (v, i) {
         var maior = Math.max.apply(null, String(v.word).split(/\s+/).map(function (x) { return x.length; }));
@@ -170,7 +214,7 @@
         novo('introducao', '<img alt="" src="' + pele.img + 'balao.png" style="position:absolute;left:110px;top:120px;width:1200px;height:763px;transform:scaleX(-1)">' +
           '<div style="position:absolute;left:210px;top:190px;width:1000px;height:470px;display:flex;align-items:center;justify-content:center;text-align:center;color:#12306b;font:700 ' + tam + 'px/1.35 \'' + B + '\'">' + esc(fala).replace(/\n/g, '<br>') + '</div>');
       });
-    } else if (L.introText) { divisor(rot.intro, 1); novo('introducao', h2(rot.intro) + '<div style="position:absolute;left:250px;right:250px;top:250px;font-size:' + (String(L.introText).length > 420 ? 48 : 58) + 'px;font-weight:700;line-height:1.35">' + esc(L.introText).replace(/\n\n/g, '<br><br>') + '</div>'); }
+    } else if (L.introText && !cp) { divisor(rot.intro, 1); novo('introducao', h2(rot.intro) + '<div style="position:absolute;left:250px;right:250px;top:250px;font-size:' + (String(L.introText).length > 420 ? 48 : 58) + 'px;font-weight:700;line-height:1.35">' + esc(L.introText).replace(/\n\n/g, '<br><br>') + '</div>'); }
     /* 4b. O ÁUDIO DO LIVRO (Buddy Talks, 28/11/2026): um slide por faixa, "🎧 Let's practice!", com o botão grande e de
        onde vem a faixa. Quem toca é a conversacao.html (FiskTema.aoAudio): o áudio fica no Drive, nunca neste código. */
     (L.audios || []).forEach(function (a, ai) {
@@ -182,12 +226,34 @@
         '<div class="ft-leia-audio" style="margin-top:24px;font-size:40px;font-weight:700;line-height:1.25;color:' + (pele || r.escuro ? '#fca5a5' : '#b91c1c') + '"></div></div></div>');
       slides[slides.length - 1].audio = { i: ai, nome: String(a.nome || ''), ref: String(a.ref || ''), id: String(a.id || '') };
     });
+    /* COUNTRIES: a leitura (o roteiro do vídeo, um parágrafo por slide), o vídeo, a compreensão e o pair work */
+    if (cp) {
+      var LE = L.leitura;
+      if (LE && (LE.paragrafos || []).length) {
+        divisor(LE.titulo || 'Reading', 3, LE.instrucao || '');
+        LE.paragrafos.forEach(function (par, pi) {
+          novo('leitura', h2((LE.titulo || 'Reading') + ' · ' + (pi + 1) + '/' + LE.paragrafos.length) + '<div style="position:absolute;left:200px;right:200px;top:220px;bottom:70px;background:rgba(255,255,255,.96);color:' + CP_AZUL + ';border-radius:30px;padding:50px 60px;font:600 ' + (String(par).length > 640 ? 40 : 46) + 'px/1.5 \'' + B + '\';overflow:hidden">' + esc(par) + '</div>');
+        });
+      }
+      var VD = L.video;
+      if (VD && (VD.drive || VD.youtube)) {
+        divisor(VD.titulo || 'Watch the video', 4, VD.instrucao || '');
+        var fv = cpFotoDe(5);
+        novo('video', '<div class="ft-video" data-drive="' + esc(VD.drive || '') + '" data-youtube="' + esc(VD.youtube || '') + '" style="position:absolute;left:180px;top:90px;width:1560px;height:878px;border-radius:26px;overflow:hidden;background:#000 ' + (fv ? 'url(&quot;' + esc(cpUrl(fv.img)) + '&quot;) center/cover' : '') + ';box-shadow:0 20px 50px rgba(0,0,0,.5);cursor:pointer">' +
+          '<div class="ft-video-capa" style="position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px">' +
+          '<div style="width:230px;height:230px;border-radius:50%;background:' + cp.cor + ';color:#fff;font-size:120px;display:flex;align-items:center;justify-content:center;padding-left:18px;box-shadow:0 16px 40px rgba(0,0,0,.4)">▶</div>' +
+          '<div style="font:900 64px \'' + T + '\';text-shadow:0 4px 14px rgba(0,0,0,.6)">' + esc(VD.nome || 'Watch the video') + '</div></div></div>');
+        slides[slides.length - 1].video = { drive: String(VD.drive || ''), youtube: String(VD.youtube || '') };
+      }
+      fazJogo(L.languageGame || [], L.jogoTitulo || rot.jogo);
+      fazConversa(L.conversation || [], rot.pw);
+    }
     /* 5. pair work: 3 perguntas por slide, uma por clique; o começo de resposta aparece com a pergunta.
        Sem o título "Pair Work" em cada slide (Pedro 27/11/2026): um divisor anuncia uma vez, e as perguntas ganham a tela, centradas */
-    var conv = L.conversation || [];
+    function fazConversa(conv, titDiv) {
     if (conv.length) {
       var porSlide = 3, n0 = 0;
-      divisor(rot.pw, 3);
+      if (titDiv) divisor(titDiv, 3);
       for (var k = 0; k < conv.length; k += porSlide) (function (grupo) {
         /* respostas-modelo uma por linha, com marcador (Pedro 27/11/2026), maiores que antes (40px); a carga do slide
            (linhas de pergunta + linhas de resposta) decide se cabe no tamanho cheio ou um degrau abaixo */
@@ -202,12 +268,14 @@
         n0 += grupo.length;
       })(conv.slice(k, k + porSlide));
     }
+    }
+    if (!cp) fazConversa(L.conversation || [], rot.pw);
     /* 6. o jogo: um item por slide, opções clicáveis (o professor toca e a tela diz); o clique seguinte revela a certa */
-    var jogo = L.languageGame || [];
+    function fazJogo(jogo, titJogo) {
     if (jogo.length) {
-      divisor(rot.jogo, 2);
+      divisor(titJogo, 2);
       jogo.forEach(function (g, gi) {
-        var titJ = h2(rot.jogo + ' · ' + (gi + 1) + '/' + jogo.length);
+        var titJ = h2(titJogo + ' · ' + (gi + 1) + '/' + jogo.length);
         if (g.type === 'order' || g.type === 'match' || g.type === 'type_in') { jogoNovo(g, titJ); return; }
         /* OUÇA E ESCOLHA (item 6, 27/11/2026): a pergunta é um áudio (voz neural, api/voz.js do portal, tocada pela
            conversacao.html por FiskTema.aoOuvir); o 🔊 toca de novo, e a revelação mostra o que foi dito */
@@ -220,18 +288,22 @@
                  em "o que você ouviu?" É a resposta) aparecia na foto da pergunta dos celulares (bancada, 27/11/2026) */
               '<div data-e="1" class="ft-off" style="position:absolute;left:250px;right:250px;top:475px;font:700 50px/1.25 \'' + B + '\';font-style:italic"><span style="color:' + p.txt + ';filter:opacity(.85)">“' + esc(g.audio) + '”</span></div>'
             : '<div style="position:absolute;left:250px;right:250px;top:270px;font:800 ' + (String(g.question).length > 70 ? 74 : 90) + 'px/1.2 \'' + T + '\'">' + esc(g.question) + '</div>') +
-          '<div data-jogo="' + g.correctIndex + '" style="position:absolute;left:250px;right:250px;top:600px;display:flex;gap:40px">' + (g.options || []).map(function (o, i) {
+          '<div data-jogo="' + g.correctIndex + '" style="position:absolute;left:250px;right:250px;top:' + ((g.options || []).length > 3 ? 500 : 600) + 'px;' + ((g.options || []).length > 3 ? 'display:grid;grid-template-columns:1fr 1fr' : 'display:flex') + ';gap:' + ((g.options || []).length > 3 ? 28 : 40) + 'px">' + (g.options || []).map(function (o, i) {
             /* a letra encolhe com a alternativa mais longa: duas linhas de 64 px empurravam o "Correct!" para cima dos botões */
             var maior = Math.max.apply(null, (g.options || []).map(function (x) { return String(x).length; }).concat([1])), fsOp = maior > 22 ? 46 : maior > 14 ? 54 : 64;
-            return '<button type="button" class="ft-op" data-op="' + i + '" style="flex:1;font:800 ' + fsOp + 'px \'' + B + '\';border-radius:30px;padding:34px 20px;background:' + cartao + ';color:' + p.txt + ';border:5px solid ' + p.sec + '">' + 'abc'[i] + ') ' + esc(o) + '</button>'; }).join('') + '</div>' +
-          '<div class="ft-msg" style="position:absolute;left:250px;right:250px;top:' + ((g.options || []).some(function (x) { return String(x).length > 22; }) ? 880 : 830) + 'px;text-align:center;font-size:56px;font-weight:900"></div>' +
+            return '<button type="button" class="ft-op" data-op="' + i + '" style="flex:1;font:800 ' + fsOp + 'px \'' + B + '\';border-radius:30px;padding:34px 20px;background:' + cartao + ';color:' + p.txt + ';border:5px solid ' + p.sec + '">' + 'abcdef'[i] + ') ' + esc(o) + '</button>'; }).join('') + '</div>' +
+          '<div class="ft-msg" style="position:absolute;left:250px;right:250px;top:' + ((g.options || []).length > 3 ? 905 : (g.options || []).some(function (x) { return String(x).length > 22; }) ? 880 : 830) + 'px;text-align:center;font-size:56px;font-weight:900"></div>' +
           '<span data-e="1" class="ft-off ft-revela" hidden></span>' +
+          /* a explicação da resposta (o "False – the harp is" do Countries) aparece com a revelação */
+          (g.explanation ? '<div data-e="1" class="ft-off" style="position:absolute;left:250px;right:250px;bottom:40px;text-align:center;font:800 46px/1.25 \'' + B + '\'"><span style="background:rgba(255,255,255,.95);color:#16365c;border-radius:18px;padding:12px 28px;display:inline-block">💡 ' + esc(g.explanation) + '</span></div>' : '') +
           (g.source ? '<div style="position:absolute;left:250px;bottom:40px;font-size:26px;font-weight:700;opacity:.55">' + esc(g.source) + '</div>' : ''));
         /* o item cru, para o jogo clicável no celular dos alunos (conversacao.html → portal api/aula.js) */
         slides[slides.length - 1].jogo = { pergunta: String(g.question || ''), opcoes: (g.options || []).map(String), certa: +g.correctIndex };
         if (ouve) slides[slides.length - 1].jogo.ouvir = String(g.audio);
       });
     }
+    }
+    if (!cp) fazJogo(L.languageGame || [], rot.jogo);
     /* OS TIPOS NOVOS DO JOGO (item 7, Pedro 27/11/2026). No dado da aula, todos usam "options" (o editor do Conversation
        Maker só sabe editar lista): order = as palavras NA ORDEM CERTA; match = "palavra = par"; type_in = as respostas
        aceitas, a primeira é a que aparece. Na TV ninguém clica: o clique seguinte revela, como na múltipla escolha. O
@@ -291,7 +363,9 @@
       return '<div data-e="' + (j + 1) + '" class="ft-off" style="font-size:64px;font-weight:800;line-height:1.2;margin-bottom:50px">' + esc(q.question) + '</div>'; }).join('') + '</div>');
     /* a avaliação no celular dos alunos (27/11/2026): as perguntas cruas, a nota e o comentário saem de lá */
     if ((L.evaluation || []).length) slides[slides.length - 1].aval = L.evaluation.map(function (q) { return String(q.question || ''); });
-    if (pele) novo('fechamento', '<div style="position:absolute;left:100px;top:0;bottom:0;width:1100px;display:flex;align-items:center;justify-content:center"><div style="font:800 130px/1.05 \'' + T + '\';color:#38bdf8;text-align:center">' + esc(rot.fim) + '</div></div>' +
+    if (cp) novo('fechamento', cpPainel('<div style="font:900 120px/1.05 \'' + T + '\';text-align:center">' + esc(rot.fim) + '</div>' +
+      '<img alt="FISK" src="' + base + 'assets/fisk-marca.png" style="height:96px;margin-top:60px;align-self:center">', 860, 'align-items:center') + cpPino(PA.capaLocal), true, PA.capa);
+    else if (pele) novo('fechamento', '<div style="position:absolute;left:100px;top:0;bottom:0;width:1100px;display:flex;align-items:center;justify-content:center"><div style="font:800 130px/1.05 \'' + T + '\';color:#38bdf8;text-align:center">' + esc(rot.fim) + '</div></div>' +
       '<div style="position:absolute;left:70px;bottom:60px;background:#fff;border-radius:18px;padding:14px 22px"><img alt="FISK" src="' + base + 'assets/fisk-marca.png" style="height:90px;display:block"></div>');
     else novo('fechamento', '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><div style="font:800 150px/1.05 \'' + T + '\';color:' + p.prim + ';text-align:center;max-width:1300px">' + esc(rot.fim) + '</div></div>' + balao, true);
 
@@ -310,6 +384,18 @@
     });
     [].forEach.call(el.querySelectorAll('.ft-ouvir'), function (b) {
       b.addEventListener('click', function (ev) { ev.stopPropagation(); if (raiz.FiskTema && raiz.FiskTema.aoOuvir) raiz.FiskTema.aoOuvir(b.getAttribute('data-ouvir'), b); });
+    });
+    /* O VÍDEO (Countries): o player só nasce no toque do professor, para a foto dos celulares e o deck guardado não
+       abrirem o vídeo do Drive à toa. A cópia do Drive (da escola, sem anúncio) vem antes do YouTube. */
+    [].forEach.call(el.querySelectorAll('.ft-video'), function (v) {
+      v.addEventListener('click', function (ev) {
+        ev.stopPropagation(); if (v.querySelector('iframe')) return;
+        var d = v.getAttribute('data-drive'), y = v.getAttribute('data-youtube'), f = document.createElement('iframe');
+        f.src = d ? 'https://drive.google.com/file/d/' + encodeURIComponent(d) + '/preview' : 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(y) + '?autoplay=1&rel=0';
+        f.allow = 'autoplay; fullscreen; encrypted-media'; f.setAttribute('allowfullscreen', '');
+        f.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0;background:#000';
+        v.appendChild(f); var c = v.querySelector('.ft-video-capa'); if (c) c.remove();
+      });
     });
     var j = el.querySelector('[data-jogo]');
     if (j) {

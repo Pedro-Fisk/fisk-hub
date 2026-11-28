@@ -1,0 +1,158 @@
+{
+ "lesson": {
+  "coverTitle": "Countries · Japan",
+  "coverLevel": "Intermediate",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Japan",
+  "objectives": [
+   "Talking about Japanese culture.",
+   "Developing conversation skills."
+  ],
+  "pais": {
+   "nome": "Japan",
+   "oficial": "",
+   "num": 1,
+   "cor": "#bc002d",
+   "bandeira": "jp/bandeira.svg",
+   "capa": "jp/capa.jpg",
+   "capaLocal": "Chureito Pagoda and Mount Fuji",
+   "mapa": "",
+   "texto": "",
+   "fatos": []
+  },
+  "introText": "Today, we’ll talk about Japan. We’ll take a look at Japanese food, traditions and culture.",
+  "introSub": "Japanese food, traditions and culture",
+  "warmup": [
+   {
+    "question": "How well do you know Japanese culture?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Would you like to visit Japan?",
+    "modelAnswers": []
+   }
+  ],
+  "fotos": [
+   {
+    "img": "jp/ramen.jpg",
+    "titulo": "Food",
+    "local": "Ramen",
+    "texto": "Japanese food is famous all over the world: sushi, ramen, tempura… Sushi is made with rice and, many times, raw fish."
+   },
+   {
+    "img": "jp/kyoto.jpg",
+    "titulo": "Origami & traditions",
+    "local": "Kyoto",
+    "texto": "Origami is the Japanese art of folding paper into shapes, like birds and flowers."
+   },
+   {
+    "img": "jp/fuji.jpg",
+    "titulo": "Samurais",
+    "local": "Mount Fuji",
+    "texto": "Samurais were the warriors of old Japan, famous for their honor and discipline."
+   },
+   {
+    "img": "jp/shibuya.jpg",
+    "titulo": "Anime",
+    "local": "Shibuya, Tokyo",
+    "texto": "Anime is the Japanese style of animation, loved all over the world."
+   },
+   {
+    "img": "jp/tokyo.jpg",
+    "local": "Tokyo",
+    "fundo": true
+   }
+  ],
+  "vocabulary": [
+   {
+    "word": "raw",
+    "translation": "cru"
+   },
+   {
+    "word": "to fold",
+    "translation": "dobrar"
+   }
+  ],
+  "vocabTitulo": "",
+  "vocabSub": "",
+  "video": null,
+  "leitura": null,
+  "languageGame": [],
+  "jogoTitulo": "",
+  "conversation": [
+   {
+    "question": "Are you familiar with Japanese food?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you like to eat raw fish?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you know how to fold origami?",
+    "modelAnswers": [
+     "Yeah, I know how to fold a (bird).",
+     "No, but I’d like to learn.",
+     "No, I’m not interested in it."
+    ]
+   },
+   {
+    "question": "Are you good at manual skills, such as drawing, painting, etc?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Folding origami requires a lot of patience. Are you a patient person?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Would you like to be a samurai?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Which skills must a samurai have?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you know any anime?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Which cartoons were part of your childhood?",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about Japanese culture?"
+   },
+   {
+    "question": "Which other countries would you like to learn more about? I’d like to know more about... (France)."
+   }
+  ],
+  "serie": "countries"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "countries",
+  "imgs": "countries/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#0b1a2e",
+   "fundo2": "#16365c",
+   "prim": "#ffffff",
+   "sec": "#bc002d",
+   "dest": "#bc002d",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "globe-showing-americas",
+  "icones": [
+   "globe-showing-americas"
+  ]
+ }
+}

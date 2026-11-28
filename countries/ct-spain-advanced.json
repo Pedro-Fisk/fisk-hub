@@ -1,0 +1,153 @@
+{
+ "lesson": {
+  "coverTitle": "Countries · Spain",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Spain",
+  "objectives": [
+   "Talking about Spain.",
+   "Developing conversation skills."
+  ],
+  "pais": {
+   "nome": "Spain",
+   "oficial": "",
+   "num": 3,
+   "cor": "#c60b1e",
+   "bandeira": "es/bandeira.svg",
+   "capa": "es/tossa.jpg",
+   "capaLocal": "Tossa de Mar",
+   "mapa": "",
+   "texto": "",
+   "fatos": []
+  },
+  "introText": "Today we’ll learn about Spain. We’ll see youtuber Tina explore the city of Valencia.",
+  "introSub": "One day in Valencia",
+  "warmup": [
+   {
+    "question": "How well do you know Spanish culture?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Are you aware that more than 40% of Spanish people speak English?",
+    "modelAnswers": []
+   }
+  ],
+  "fotos": [
+   {
+    "img": "es/hola.jpg",
+    "local": "Hola!",
+    "fundo": true
+   },
+   {
+    "img": "es/cidade.jpg",
+    "local": "Spain",
+    "fundo": true
+   },
+   {
+    "img": "es/rua.jpg",
+    "local": "Spain",
+    "fundo": true
+   },
+   {
+    "img": "es/viagem.jpg",
+    "local": "Spain",
+    "fundo": true
+   }
+  ],
+  "vocabulary": [],
+  "vocabTitulo": "",
+  "vocabSub": "",
+  "video": {
+   "drive": "1MqpOVeioVQTNAj9mlfN6V1-DuJzFkfN8",
+   "youtube": "qBN6bHP_kQw",
+   "nome": "One Day in Valencia, Spain",
+   "instrucao": "Teacher: pause the video from time to time to check comprehension."
+  },
+  "leitura": null,
+  "languageGame": [],
+  "jogoTitulo": "",
+  "conversation": [
+   {
+    "question": "What was the most interesting part of the video for you?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What’s your opinion about the itinerary that the couple created?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Which part of the schedule did you like the most?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Can you speak Spanish?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Nowadays, how important is it to learn Spanish?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Would you like to visit Valencia?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Would you like to visit other Spanish speaking countries?",
+    "modelAnswers": []
+   },
+   {
+    "question": "How often do you take the time to see the sunset?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Would you rather see the sunset from a boat or from the top of a mountain?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Have you ever rented a bike, like the one they rented in the video?",
+    "modelAnswers": []
+   },
+   {
+    "question": "SPEAKING TASK: with a partner, create a travel schedule (like the one in the video) for someone who has only 1 day to see the Vale do Paraíba region.",
+    "modelAnswers": [
+     "What cities are crucial to visit nearby?",
+     "What tourist spots are cool?",
+     "What food should be tried out?"
+    ]
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about Spain?"
+   },
+   {
+    "question": "Which other countries would you like to learn more about?"
+   }
+  ],
+  "serie": "countries"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "countries",
+  "imgs": "countries/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#0b1a2e",
+   "fundo2": "#16365c",
+   "prim": "#ffffff",
+   "sec": "#c60b1e",
+   "dest": "#c60b1e",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "globe-showing-americas",
+  "icones": [
+   "globe-showing-americas"
+  ]
+ }
+}
