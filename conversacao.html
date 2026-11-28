@@ -1029,7 +1029,8 @@
   var VOZ_API = 'https://portalfisk.com.br/api/voz', vozLingua = 'en', vozCache = {}, vozAgora = null, vozOnde = '';
   function vozMp3(texto) {
     if (!vozCache[texto]) vozCache[texto] = fetch(VOZ_API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ token: s.token, texto: texto, lingua: vozLingua, semente: atual ? atual.id : '' }) })
+        body: JSON.stringify({ token: s.token, texto: texto, lingua: vozLingua, semente: atual ? atual.id : '' }),
+        signal: window.AbortSignal && AbortSignal.timeout ? AbortSignal.timeout(15000) : undefined })
       .then(function (r) { return r.json(); }).then(function (j) { if (!j || !j.ok || !j.mp3) throw new Error((j && j.error) || 'sem voz'); return j.mp3; })
       .catch(function (e) { delete vozCache[texto]; throw e; });
     return vozCache[texto];
@@ -1046,11 +1047,20 @@
       vozAgora.onended = function () { if (botao) botao.style.opacity = ''; };
       return vozAgora.play();
     }).catch(function () {
-      /* sem voz: o professor lê. A frase aparece embaixo do 🔊 (nunca a voz do navegador) */
-      if (botao) { botao.style.opacity = ''; var el = botao.parentNode, aviso = el.querySelector('.ft-leia');
-        if (!aviso) { aviso = document.createElement('div'); aviso.className = 'ft-leia'; aviso.style.cssText = 'position:absolute;left:0;top:215px;font:700 40px/1.2 system-ui,sans-serif;color:#b91c1c'; el.appendChild(aviso); }
-        aviso.textContent = (vozLingua === 'es' ? '📢 Lee en voz alta: “' : '📢 Read aloud: “') + texto + '”'; }
+      /* sem voz: o professor lê (nunca a voz do navegador). UM aviso só, num balão no rodapé da tela, que troca a cada
+         clique e some sozinho; antes era um texto por linha da lista, todos no mesmo ponto, empilhados (Pedro, 28/11/2026) */
+      if (botao) botao.style.opacity = '';
+      vozAviso((vozLingua === 'es' ? '📢 Lee en voz alta: “' : '📢 Read aloud: “') + texto + '”');
     });
+  }
+  var vozAvisoT = 0;
+  function vozAviso(txt) {
+    var a = document.getElementById('vozAviso');
+    if (!a) { a = document.createElement('div'); a.id = 'vozAviso'; a.setAttribute('role', 'status');
+      a.style.cssText = 'position:fixed;left:50%;bottom:4vh;transform:translateX(-50%);z-index:9999;max-width:90vw;padding:.55em 1.1em;border-radius:999px;background:#fff;color:#b91c1c;font:700 clamp(18px,2.6vw,34px)/1.2 system-ui,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.35);pointer-events:none;transition:opacity .25s';
+      document.body.appendChild(a); }
+    a.textContent = txt; a.style.opacity = '1'; a.hidden = false;
+    clearTimeout(vozAvisoT); vozAvisoT = setTimeout(function () { a.style.opacity = '0'; }, 5000);
   }
   FiskTema.aoOuvir = vozToca;
   /* ── O ÁUDIO DO LIVRO (Buddy Talks, 28/11/2026) ── O slide "Let's practice" traz só o id do arquivo no Drive; o
@@ -1074,6 +1084,8 @@
       au.onerror = function () { if (!comecou) falha(new Error('sem áudio')); else botao.textContent = '▶'; };
       audioAgora = au;
       var pr = au.play(); if (pr && pr.catch) pr.catch(function (e) { if (!comecou) falha(e); });
+      /* o Drive às vezes não responde nem dá erro: em 12 s sem tocar, desiste e passa para a próxima tentativa */
+      setTimeout(function () { if (!comecou) { try { au.pause(); au.removeAttribute('src'); au.load(); } catch (e) {} falha(new Error('demorou')); } }, 12000);
     });
   }
   FiskTema.aoAudio = function (i, botao, slideEl) {
