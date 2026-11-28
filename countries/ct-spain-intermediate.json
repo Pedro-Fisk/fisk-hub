@@ -123,14 +123,14 @@
   "modelo": "tema",
   "pele": "countries",
   "imgs": "countries/img/",
-  "escuro": true,
+  "escuro": false,
   "paleta": {
-   "fundo": "#0b1a2e",
-   "fundo2": "#16365c",
-   "prim": "#ffffff",
+   "fundo": "#ffffff",
+   "fundo2": "#eef3f8",
+   "prim": "#16365c",
    "sec": "#c60b1e",
    "dest": "#c60b1e",
-   "txt": "#ffffff"
+   "txt": "#16365c"
   },
   "fontes": {
    "titulo": "Montserrat",

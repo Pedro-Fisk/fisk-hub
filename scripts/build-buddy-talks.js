@@ -106,6 +106,8 @@ function aula(conteudo, nivelChave, topico) {
     coverTitle: 'Buddy Talks · ' + titulo(n.titulo),
     coverLevel: NIVEL[nivelChave], ageLabel: '', language: 'english',
     topic: n.subtitulo || '', objectives: n.objetivos || [],
+    /* o Material Needed do PowerPoint (o original diz 10 minutos em toda a série) */
+    material: ['PowerPoint activity', n.nomeDoAudio || ('Buddy Talks AUDIO FILE - ' + titulo(n.titulo))], duracao: '10 minutes',
     vocabulary, introText: intro.trim(),
     /* as falas do Buddy, uma por balão, na ordem do PowerPoint: a apresentação, o som revelado, por que importa, se errar */
     buddyBaloes: [junta(n.buddy), [rv.titulo, rv.explicacao, rv.exemplo].filter(Boolean).join('\n'), junta(n.porQue), junta(n.seErrar)].filter(Boolean),

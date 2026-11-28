@@ -32,8 +32,9 @@ const ORDEM = ['Basic', 'Teens', 'Intermediate', 'Advanced'];
 const perg = (lista) => (lista || []).map((q) => ({ question: q[0], modelAnswers: q.slice(1) }));
 
 function design(pais) {
-  return { modelo: 'tema', pele: 'countries', imgs: 'countries/img/', escuro: true,
-    paleta: { fundo: '#0b1a2e', fundo2: '#16365c', prim: '#ffffff', sec: pais.cor, dest: pais.cor, txt: '#ffffff' },
+  /* claro: os slides de conteúdo do original são brancos com o texto azul-marinho (as fotos ficam nos grandes) */
+  return { modelo: 'tema', pele: 'countries', imgs: 'countries/img/', escuro: false,
+    paleta: { fundo: '#ffffff', fundo2: '#eef3f8', prim: '#16365c', sec: pais.cor, dest: pais.cor, txt: '#16365c' },
     fontes: { titulo: 'Montserrat', corpo: 'Nunito' }, fundo: 'gradiente', heroi: 'globe-showing-americas', icones: ['globe-showing-americas'] };
 }
 

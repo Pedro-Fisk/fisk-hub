@@ -115,19 +115,23 @@
     function cpPino(t) { return t ? '<div style="position:absolute;right:46px;bottom:46px;background:#fff;color:' + CP_AZUL + ';border-radius:16px;padding:12px 26px;font:800 38px \'' + B + '\';box-shadow:0 8px 24px rgba(0,0,0,.3)">📍 ' + esc(t) + '</div>' : ''; }
     function cpPainel(html, larg, extra) { return '<div style="position:absolute;left:0;top:0;bottom:0;width:' + (larg || 860) + 'px;background:rgba(255,255,255,.96);color:' + CP_AZUL + ';display:flex;flex-direction:column;justify-content:center;padding:0 80px;' + (extra || '') + '">' + html + '</div>'; }
     function buddyFundo(tipo, capa) {
-      var grande = capa || /^(divisor|introducao|audio|fechamento)$/.test(tipo);
+      /* fiel ao PowerPoint (Pedro, 28/11/2026: "não queria a estética descaracterizada"): os slides grandes são pretos com
+         a faixa e o Buddy; os de conteúdo, vinho e limpos (sem a cabeça no canto); o de áudio tem o Buddy à esquerda */
+      var grande = capa || /^(introducao|fechamento|objetivos|avaliacao|material)$/.test(tipo);
       var faixa = function (larg) { return '<div style="position:absolute;right:0;top:0;bottom:0;width:' + larg + 'px;background:#c1121f"><div style="position:absolute;left:' + Math.round(larg * .28) + 'px;top:0;bottom:0;width:' + Math.round(larg * .1) + 'px;background:#f3f4f6"></div><div style="position:absolute;left:' + Math.round(larg * .46) + 'px;top:0;bottom:0;width:' + Math.round(larg * .05) + 'px;background:#f3f4f6"></div></div>'; };
+      if (tipo === 'audio') return { css: 'background:#0b0b0b;', html: faixa(150) };
       return { css: 'background:' + (grande ? '#0b0b0b' : 'linear-gradient(160deg,#5b1616 0%,#3a0d0d 100%)') + ';',
         html: grande ? faixa(capa ? 760 : 470) + (capa ? '' : '<img alt="" src="' + pele.img + 'urso.png" style="position:absolute;right:10px;bottom:0;height:640px;pointer-events:none">')
-          : faixa(120) + '<img alt="" src="' + pele.img + 'cabeca.png" style="position:absolute;right:16px;bottom:18px;width:190px;pointer-events:none;filter:drop-shadow(0 8px 14px rgba(0,0,0,.4))">' };
+          : faixa(46) };
     }
     function novo(tipo, corpo, capa, foto) {
       var el = document.createElement('div'); el.className = 'ft-s';
       if (cp) {
         var fd = foto ? cpUrl(foto) : (cpFotoDe(slides.length) ? cpUrl(cpFotoDe(slides.length).img) : '');
-        el.style.cssText = (foto ? 'background:#0b1a2e url("' + fd + '") center/cover no-repeat;'
-          : 'background:linear-gradient(rgba(10,24,44,.84),rgba(10,24,44,.9))' + (fd ? ',url("' + fd + '") center/cover no-repeat' : '') + ',#0b1a2e;') + 'font-family:"' + B + '",sans-serif;color:#ffffff';
-        el.innerHTML = (foto ? '' : '<div style="position:absolute;left:0;top:0;right:0;height:18px;background:' + cp.cor + '"></div>') + corpo;
+        /* os de conteúdo são brancos com o texto azul-marinho e uma faixa da foto à direita, como o Pair Work do original */
+        el.style.cssText = (foto ? 'background:#0b1a2e url("' + fd + '") center/cover no-repeat;color:#ffffff;' : 'background:#ffffff;color:' + CP_AZUL + ';') + 'font-family:"' + B + '",sans-serif';
+        el.innerHTML = (foto ? '' : '<div style="position:absolute;left:0;top:0;right:0;height:18px;background:' + cp.cor + '"></div>' +
+          (fd ? '<div style="position:absolute;right:0;top:18px;bottom:0;width:200px;background:url(&quot;' + esc(fd) + '&quot;) center/cover no-repeat"></div>' : '')) + corpo;
         var et1 = 0; [].forEach.call(el.querySelectorAll('[data-e]'), function (x) { et1 = Math.max(et1, +x.getAttribute('data-e')); });
         slides.push({ tipo: tipo, etapas: et1, el: el });
         return el;
@@ -146,7 +150,7 @@
       slides.push({ tipo: tipo, etapas: etapas, el: el });
       return el;
     }
-    var h2 = function (t) { return '<h2 style="position:absolute;left:250px;top:60px;margin:0;font:800 ' + (pele ? '86px' : '100px') + '/1.1 \'' + T + '\';color:' + p.prim + (pele ? ';text-transform:uppercase' : '') + '">' + esc(t) + '</h2>'; };
+    var h2 = function (t) { return '<h2 style="position:absolute;left:' + (pele ? 120 : 250) + 'px;top:60px;margin:0;font:800 ' + (pele ? '86px' : '100px') + '/1.1 \'' + T + '\';color:' + p.prim + (pele ? ';text-transform:uppercase' : '') + '">' + esc(t) + '</h2>'; };
     var balao = '<div style="position:absolute;left:70px;bottom:60px;background:#fff;border:6px solid #111;border-radius:40px;padding:26px 40px;transform:rotate(-4deg);box-shadow:8px 8px 0 rgba(0,0,0,.15)"><img alt="FISK" src="' + base + 'assets/fisk-marca.png" style="height:110px;display:block"></div>';
     var chip = function (t, bg, cor) { return '<span style="display:inline-block;font-weight:800;font-size:34px;padding:10px 26px;border-radius:99px;letter-spacing:.06em;background:' + bg + ';color:' + cor + ';margin-right:12px">' + esc(t) + '</span>'; };
 
@@ -168,11 +172,18 @@
       '<div style="font:800 132px/1.04 \'' + T + '\';margin:36px 0 34px;color:' + p.prim + '">' + esc(L.coverTitle || L.topic || '') + '</div>' +
       (L.coverLevel ? chip(String(L.coverLevel).toUpperCase(), p.prim, sobrePrim) : '') + (L.perfil ? chip(L.perfil, p.sec, legivel('#111827', p.sec, '#ffffff')) : '') + '</div>' +
       '<img alt="" src="' + ico(base, r.heroi) + '" onerror="this.remove()" style="position:absolute;right:170px;top:290px;width:480px;filter:drop-shadow(0 30px 40px rgba(0,0,0,.28))">' + balao, true);
-    /* 2. objetivos, um por clique */
-    if ((L.objectives || []).length) novo('objetivos', h2(rot.obj) + '<div style="position:absolute;left:250px;right:250px;top:270px">' + L.objectives.map(function (o, i) {
+    /* 2. objetivos, um por clique (na pele das Buddy Talks, antes deles o Material Needed, como no PowerPoint) */
+    if (pele) {
+      if ((L.material || []).length) novo('material', h2('Material needed') + '<div style="position:absolute;left:120px;right:820px;top:250px;color:#fff;font:600 60px/1.35 \'' + B + '\'">' +
+        L.material.map(function (m, i) { return '<div style="margin-bottom:18px">' + (i + 1) + '. ' + esc(m) + '</div>'; }).join('') +
+        (L.duracao ? '<div style="margin-top:60px;color:#38bdf8;font-weight:800">LENGTH: <span style="color:#fff">' + esc(L.duracao) + '</span></div>' : '') + '</div>');
+      if ((L.objectives || []).length) novo('objetivos', h2('Objective of the activity') + '<div style="position:absolute;left:120px;right:820px;top:270px">' + L.objectives.map(function (o, i) {
+        return '<div data-e="' + (i + 1) + '" class="ft-off" style="font:600 68px/1.25 \'' + B + '\';color:#fff;margin-bottom:34px">' + (i + 1) + '. ' + esc(o) + '</div>'; }).join('') + '</div>');
+    } else if ((L.objectives || []).length) novo('objetivos', h2(rot.obj) + '<div style="position:absolute;left:250px;right:250px;top:270px">' + L.objectives.map(function (o, i) {
       return '<div data-e="' + (i + 1) + '" class="ft-off" style="display:flex;gap:28px;align-items:center;margin-bottom:46px"><span style="flex:none;width:90px;height:90px;border-radius:28px;background:' + p.dest + ';color:' + sobreDest + ';font:800 54px \'' + T + '\';display:flex;align-items:center;justify-content:center">' + (i + 1) + '</span><span style="font-size:64px;font-weight:800;line-height:1.2">' + esc(o) + '</span></div>'; }).join('') + '</div>');
     /* 3. abertura do capítulo e vocabulário (a tradução num clique separado, palavra por palavra) */
     var divisor = function (t, n, sub) {
+      if (pele) return null;   /* o PowerPoint das Buddy Talks não tem slide de abertura de seção */
       if (cp) { var fdv = cpFotoDe(n + 1);
         return novo('divisor', cpPainel('<div style="font:900 ' + Math.min(116, Math.floor(640 / (0.78 * Math.max.apply(null, String(t).split(/\s+/).map(function (w) { return w.length; }))))) + 'px/1.05 \'' + T + '\';text-align:center;text-transform:uppercase">' + esc(t) + '</div>' +
           (sub ? '<div style="font:800 40px/1.3 \'' + B + '\';margin-top:30px;text-align:center;color:' + cp.cor + '">' + esc(sub) + '</div>' : ''), 820, 'align-items:center') + cpPino(fdv && fdv.local), false, fdv && fdv.img); }
@@ -183,7 +194,7 @@
       if (L.introText) novo('introducao', cpPainel('<div style="font:700 ' + (String(L.introText).length > 260 ? 52 : 62) + 'px/1.4 \'' + B + '\';text-align:center">' + esc(L.introText).replace(/\n\n/g, '<br><br>') + '</div>', 1000) + cpPino(cpFotoDe(1) && cpFotoDe(1).local), false, cpFotoDe(1) && cpFotoDe(1).img);
       fazConversa(L.warmup || [], null);
       if (PA.fatos && PA.fatos.length) novo('fatos', cpPainel('<div style="font:700 ' + (String(PA.texto || '').length > 230 ? 46 : 54) + 'px/1.4 \'' + B + '\'">' + esc(PA.texto || '').replace(/\n/g, '<br><br>') + '</div>', 1000) +
-        '<div style="position:absolute;right:90px;top:50%;transform:translateY(-50%);width:640px;background:#fff;color:' + CP_AZUL + ';border-radius:28px;padding:40px 46px;border:6px solid ' + cp.cor + ';box-shadow:0 14px 40px rgba(0,0,0,.35)">' +
+        '<div style="position:absolute;right:90px;top:0;bottom:0;margin:auto 0;height:fit-content;width:640px;background:#fff;color:' + CP_AZUL + ';border-radius:28px;padding:40px 46px;border:6px solid ' + cp.cor + ';box-shadow:0 14px 40px rgba(0,0,0,.35)">' +
         (PA.mapa ? '<img alt="" src="' + cpUrl(PA.mapa) + '" style="display:block;max-width:100%;max-height:300px;margin:0 auto 26px;border-radius:12px">' : '') +
         '<div style="font:900 40px/1.2 \'' + T + '\';margin-bottom:18px;color:' + cp.cor + '">' + esc(PA.oficial || PA.nome || '') + '</div>' +
         PA.fatos.map(function (f) { return '<div style="font:700 36px/1.35 \'' + B + '\';margin-top:8px"><b style="font-weight:900">' + esc(f[0]) + ':</b> ' + esc(f[1]) + '</div>'; }).join('') + '</div>', false, cpFotoDe(0) && cpFotoDe(0).img);
@@ -194,19 +205,32 @@
       });
     }
     var voc = L.vocabulary || [];
-    if (voc.length) {
+    function fazVocab() {
+    if (voc.length && pele) {
+      /* a lista do PowerPoint: duas colunas, a palavra em branco e o som em azul; o 🔊 toca a palavra */
+      var metade = Math.ceil(voc.length / 2), colV = function (lst) { return '<div>' + lst.map(function (v) {
+        return '<div style="display:flex;align-items:center;gap:22px;margin-bottom:' + (voc.length > 10 ? 18 : 30) + 'px"><button type="button" class="ft-ouvir" data-ouvir="' + esc(v.word) + '" title="Ouvir" style="flex:none;width:58px;height:58px;border-radius:50%;border:0;cursor:pointer;background:#c1121f;color:#fff;font-size:28px;line-height:1">🔊</button>' +
+          '<span style="font:700 ' + (voc.length > 10 ? 54 : 64) + 'px/1.1 \'' + B + '\';color:#fff">' + esc(v.word) + '</span>' + (v.translation ? '<span style="font:700 ' + (voc.length > 10 ? 50 : 58) + 'px \'' + B + '\';color:#38bdf8">' + esc(v.translation) + '</span>' : '') + '</div>'; }).join('') + '</div>'; };
+      novo('vocabulario', '<div style="position:absolute;left:120px;right:200px;top:90px;bottom:60px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-content:center">' + colV(voc.slice(0, metade)) + colV(voc.slice(metade)) + '</div>');
+      slides[slides.length - 1].vocab = voc.map(function (v) { return String(v.word || '').trim(); }).filter(Boolean);
+    } else if (voc.length) {
       divisor(cp ? (L.vocabTitulo || rot.iw) : rot.iw, cp ? 2 : 0, cp ? (L.vocabSub || '') : '');
-      var longa = voc.some(function (v) { return String(v.word).length > 14; }), cols = longa ? 3 : 4;
+      var longa = voc.some(function (v) { return String(v.word).length > 14 || Math.max.apply(null, String(v.word).split(/\s+/).map(function (x) { return x.length; })) > 8; }), cols = longa ? 3 : 4;
       novo('vocabulario', h2(rot.iw) + '<div style="position:absolute;left:250px;right:250px;top:240px;display:grid;grid-template-columns:repeat(' + cols + ',minmax(0,1fr));gap:24px">' + voc.map(function (v, i) {
         var maior = Math.max.apply(null, String(v.word).split(/\s+/).map(function (x) { return x.length; }));
         /* PRONÚNCIA (27/11/2026): o 🔊 do canto toca a palavra em voz neural (FiskTema.aoOuvir, como no ouça e escolha) */
         return '<div data-carta="' + (i + 1) + '" style="position:relative;background:' + cartao + ';border-radius:26px;padding:24px 28px;border:4px solid ' + p.sec + ';cursor:pointer;min-height:' + (voc.length > 8 ? 150 : 190) + 'px">' +
           '<button type="button" class="ft-ouvir" data-ouvir="' + esc(v.word) + '" title="Ouvir" style="position:absolute;right:14px;top:14px;width:62px;height:62px;border-radius:50%;border:0;cursor:pointer;background:' + p.dest + ';color:' + sobreDest + ';font-size:30px;line-height:1">🔊</button>' +
-          '<div style="padding-right:66px;font:800 ' + Math.min(58, Math.floor((longa ? 380 : 270) / (0.6 * maior))) + 'px/1.1 \'' + T + '\';color:' + p.prim + '">' + esc(v.word) + '</div>' +   /* 66 px: o 🔊 do canto não cobre a palavra */
+          /* a largura útil do cartão (coluna menos o respiro e o 🔊) sobre a largura média da letra grossa (0,72 em): com 0,6 e
+             270 px a Montserrat real passava da borda (o PDF de 28/11/2026 mostrou) */
+          '<div style="padding-right:66px;overflow-wrap:anywhere;font:800 ' + Math.max(30, Math.min(58, Math.floor((longa ? 335 : 215) / (0.72 * maior)))) + 'px/1.1 \'' + T + '\';color:' + p.prim + '">' + esc(v.word) + '</div>' +   /* 66 px: o 🔊 do canto não cobre a palavra */
           /* sem tradução (as listas de pronúncia das Buddy Talks), sem o clique de revelar: seria um clique para nada */
           (String(v.translation || '').trim() ? '<div data-e="' + (i + 1) + '" class="ft-trad ft-off" style="font-size:42px;font-weight:700;margin-top:10px;color:' + legivel(p.dest, r.escuro ? p.fundo : '#ffffff') + '">' + esc(v.translation) + '</div>' : '') + '</div>'; }).join('') + '</div>');
       slides[slides.length - 1].vocab = voc.map(function (v) { return String(v.word || '').trim(); }).filter(Boolean);
     }
+    }
+    if (!pele) fazVocab();
+
     /* 4. introdução (na pele das Buddy Talks: cada fala do Buddy num balão, como no PowerPoint original) */
     if (pele && (L.buddyBaloes || []).length) {
       L.buddyBaloes.forEach(function (fala) {
@@ -218,21 +242,34 @@
     /* 4b. O ÁUDIO DO LIVRO (Buddy Talks, 28/11/2026): um slide por faixa, "🎧 Let's practice!", com o botão grande e de
        onde vem a faixa. Quem toca é a conversacao.html (FiskTema.aoAudio): o áudio fica no Drive, nunca neste código. */
     (L.audios || []).forEach(function (a, ai) {
-      novo('audio', h2((es ? '🎧 ¡A practicar!' : "🎧 Let's practice!") + ((L.audios.length > 1) ? ' (' + (ai + 1) + ')' : '')) +
+      /* na pele das Buddy Talks, o slide do PowerPoint: o Buddy à esquerda com o balão "LET'S PRACTICE! (1)", à direita
+         "LISTEN TO THE AUDIO FILE", a página do livro e o "(2x) Listen and repeat." em vermelho; o ▶ toca a faixa */
+      if (pele) novo('audio', '<img alt="" src="' + pele.img + 'urso.png" style="position:absolute;left:-30px;bottom:0;height:700px;transform:scaleX(-1)">' +
+        '<img alt="" src="' + pele.img + 'balao.png" style="position:absolute;left:330px;top:30px;width:820px;height:522px">' +
+        '<div style="position:absolute;left:400px;top:90px;width:690px;height:300px;display:flex;align-items:center;justify-content:center;text-align:center;font:800 96px/1.15 \'' + B + '\';color:#12306b">LET’S PRACTICE!' + (L.audios.length > 1 ? ' (' + (ai + 1) + ')' : '') + '</div>' +
+        '<div style="position:absolute;right:200px;top:560px;width:900px;text-align:right;color:#fff">' +
+        '<div style="font:700 56px \'' + B + '\';border-bottom:3px solid #fff;padding-bottom:16px">LISTEN TO THE AUDIO FILE</div>' +
+        (a.ref ? '<div style="font:italic 600 44px \'' + B + '\';margin-top:18px">' + esc(a.ref) + (a.nome ? ' · ' + esc(a.nome) : '') + '</div>' : '') +
+        '<div style="display:inline-block;margin-top:26px;background:#c1121f;font:700 50px \'' + B + '\';padding:8px 22px">(2x) Listen and repeat.</div>' +
+        '<div class="ft-leia-audio" style="margin-top:20px;font-size:38px;font-weight:700;line-height:1.25;color:#fca5a5"></div></div>' +
+        '<button type="button" class="ft-audio" data-audio="' + ai + '" style="position:absolute;right:230px;top:150px;width:230px;height:230px;border-radius:50%;border:0;cursor:pointer;background:#c1121f;color:#fff;font-size:110px;box-shadow:0 16px 40px rgba(0,0,0,.35)">▶</button>');
+      else novo('audio', h2((es ? '🎧 ¡A practicar!' : "🎧 Let's practice!") + ((L.audios.length > 1) ? ' (' + (ai + 1) + ')' : '')) +
         '<div style="position:absolute;left:250px;right:250px;top:300px;display:flex;align-items:center;gap:60px">' +
         '<button type="button" class="ft-audio" data-audio="' + ai + '" style="flex:none;width:280px;height:280px;border-radius:50%;border:0;cursor:pointer;background:' + p.dest + ';color:' + sobreDest + ';font-size:130px;box-shadow:0 16px 40px rgba(0,0,0,.2)">▶</button>' +
         '<div style="max-width:' + (pele ? 760 : 1000) + 'px"><div style="font:800 84px/1.1 \'' + T + '\';color:' + p.prim + '">' + esc(a.nome || '') + '</div>' +
         (a.ref ? '<div style="margin-top:24px;font-size:48px;font-weight:700;opacity:.75">📖 ' + esc(a.ref) + '</div>' : '') +
         '<div class="ft-leia-audio" style="margin-top:24px;font-size:40px;font-weight:700;line-height:1.25;color:' + (pele || r.escuro ? '#fca5a5' : '#b91c1c') + '"></div></div></div>');
       slides[slides.length - 1].audio = { i: ai, nome: String(a.nome || ''), ref: String(a.ref || ''), id: String(a.id || '') };
+      if (pele && ai === 0) fazVocab();   /* no PowerPoint, a lista vem entre a faixa A e a B */
     });
+    if (pele && !(L.audios || []).length) fazVocab();
     /* COUNTRIES: a leitura (o roteiro do vídeo, um parágrafo por slide), o vídeo, a compreensão e o pair work */
     if (cp) {
       var LE = L.leitura;
       if (LE && (LE.paragrafos || []).length) {
         divisor(LE.titulo || 'Reading', 3, LE.instrucao || '');
         LE.paragrafos.forEach(function (par, pi) {
-          novo('leitura', h2((LE.titulo || 'Reading') + ' · ' + (pi + 1) + '/' + LE.paragrafos.length) + '<div style="position:absolute;left:200px;right:200px;top:220px;bottom:70px;background:rgba(255,255,255,.96);color:' + CP_AZUL + ';border-radius:30px;padding:50px 60px;font:600 ' + (String(par).length > 640 ? 40 : 46) + 'px/1.5 \'' + B + '\';overflow:hidden">' + esc(par) + '</div>');
+          novo('leitura', h2((LE.titulo || 'Reading') + ' · ' + (pi + 1) + '/' + LE.paragrafos.length) + '<div style="position:absolute;left:200px;right:200px;top:220px;bottom:70px;background:#fff;color:' + CP_AZUL + ';border:4px solid ' + cp.cor + ';border-radius:30px;padding:50px 60px;font:600 ' + (String(par).length > 640 ? 40 : 46) + 'px/1.5 \'' + B + '\';overflow:hidden">' + esc(par) + '</div>');
         });
       }
       var VD = L.video;
@@ -261,6 +298,12 @@
         var cheio = carga > 840, tamQ = cheio ? 56 : 64, tamR = cheio ? 42 : 48;
         /* cada pergunta num card que aparece com ela (Pedro 27/11/2026: mesmo clareando, o fundo atrapalhava a leitura) */
         var fundoCard = r.escuro ? alfa(p.fundo, 0.92) : 'rgba(255,255,255,.96)';
+        if (pele) {   /* as Buddy Talks: a pergunta em branco e a resposta embaixo, sem cartão nem número, como no PowerPoint */
+          novo('conversa', '<div style="position:absolute;left:120px;right:260px;top:70px;bottom:60px;display:flex;flex-direction:column;justify-content:center">' + grupo.map(function (q, j) {
+            return '<div data-e="' + (j + 1) + '" class="ft-off" style="margin-bottom:' + (cheio ? 40 : 56) + 'px;color:#fff"><div style="font:600 ' + (tamQ + 4) + 'px/1.2 \'' + B + '\'">' + esc(q.question) + '</div>' +
+              (q.modelAnswers || []).map(function (r) { return '<div style="font:500 ' + tamR + 'px/1.3 \'' + B + '\';margin-top:10px;opacity:.9">' + esc(r) + '</div>'; }).join('') + '</div>'; }).join('') + '</div>');
+          n0 += grupo.length; return;
+        }
         novo('conversa', '<div style="position:absolute;left:220px;right:220px;top:60px;bottom:50px;display:flex;flex-direction:column;justify-content:center">' + grupo.map(function (q, j) {
           var num = n0 + j + 1;
           return '<div data-e="' + (j + 1) + '" class="ft-off" style="display:flex;gap:28px;align-items:flex-start;margin-bottom:' + (cheio ? 20 : 30) + 'px;background:' + fundoCard + ';border-radius:32px;padding:' + (cheio ? 20 : 28) + 'px 36px;box-shadow:0 10px 30px rgba(0,0,0,.10)' + (r.escuro ? ';border:2px solid rgba(255,255,255,.10)' : '') + '"><span style="flex:none;width:96px;height:96px;border-radius:30px;background:' + p.dest + ';color:' + sobreDest + ';font:800 56px \'' + T + '\';display:flex;align-items:center;justify-content:center">' + num + '</span><div><div style="font-size:' + tamQ + 'px;font-weight:800;line-height:1.18">' + esc(q.question) + '</div>' +
@@ -295,7 +338,7 @@
           '<div class="ft-msg" style="position:absolute;left:250px;right:250px;top:' + ((g.options || []).length > 3 ? 905 : (g.options || []).some(function (x) { return String(x).length > 22; }) ? 880 : 830) + 'px;text-align:center;font-size:56px;font-weight:900"></div>' +
           '<span data-e="1" class="ft-off ft-revela" hidden></span>' +
           /* a explicação da resposta (o "False – the harp is" do Countries) aparece com a revelação */
-          (g.explanation ? '<div data-e="1" class="ft-off" style="position:absolute;left:250px;right:250px;bottom:40px;text-align:center;font:800 46px/1.25 \'' + B + '\'"><span style="background:rgba(255,255,255,.95);color:#16365c;border-radius:18px;padding:12px 28px;display:inline-block">💡 ' + esc(g.explanation) + '</span></div>' : '') +
+          (g.explanation ? '<div data-e="1" class="ft-off" style="position:absolute;left:250px;right:250px;bottom:40px;text-align:center;font:800 46px/1.25 \'' + B + '\'"><span style="background:#fff;color:#16365c;border:3px solid #16365c;border-radius:18px;padding:12px 28px;display:inline-block">💡 ' + esc(g.explanation) + '</span></div>' : '') +
           (g.source ? '<div style="position:absolute;left:250px;bottom:40px;font-size:26px;font-weight:700;opacity:.55">' + esc(g.source) + '</div>' : ''));
         /* o item cru, para o jogo clicável no celular dos alunos (conversacao.html → portal api/aula.js) */
         slides[slides.length - 1].jogo = { pergunta: String(g.question || ''), opcoes: (g.options || []).map(String), certa: +g.correctIndex };
@@ -353,21 +396,21 @@
        treinam pronúncia, e "/t/ → walked" não é revisão) */
     if (voc.length && !L.semRevisao) {
       var longaR = voc.some(function (v) { return String(v.word).length > 14 || String(v.translation).length > 16; }), colsR = longaR ? 3 : 4;
-      var tam = function (t, larg, max) { var m = Math.max.apply(null, String(t).split(/\s+/).map(function (x) { return x.length; })); return Math.min(max, Math.floor(larg / (0.6 * m))); };
+      var tam = function (t, larg, max) { var m = Math.max.apply(null, String(t).split(/\s+/).map(function (x) { return x.length; })); return Math.max(26, Math.min(max, Math.floor(larg / (0.72 * m)))); };
       novo('revisao', h2(rot.rev) + '<div style="position:absolute;left:250px;right:250px;top:240px;display:grid;grid-template-columns:repeat(' + colsR + ',minmax(0,1fr));gap:24px">' + voc.map(function (v, i) {
-        var larg = longaR ? 440 : 330;
+        var larg = longaR ? 400 : 280;
         return '<div data-carta="' + (i + 1) + '" style="background:' + cartao + ';border-radius:26px;padding:24px 28px;border:4px solid ' + p.sec + ';cursor:pointer;min-height:170px"><div style="font-size:' + tam(v.translation, larg, 44) + 'px;font-weight:700;color:' + legivel(p.dest, r.escuro ? p.fundo : '#ffffff') + '">' + esc(v.translation) + '</div><div data-e="' + (i + 1) + '" class="ft-trad ft-off" style="font:800 ' + tam(v.word, larg, 54) + 'px/1.1 \'' + T + '\';color:' + p.prim + ';margin-top:10px">' + esc(v.word) + '</div></div>'; }).join('') + '</div>');
     }
     /* 8. avaliação e fechamento (com o balão da FISK) */
-    if ((L.evaluation || []).length) novo('avaliacao', h2(rot.av) + '<div style="position:absolute;left:250px;right:250px;top:260px">' + L.evaluation.map(function (q, j) {
+    if ((L.evaluation || []).length) novo('avaliacao', h2(rot.av) + '<div style="position:absolute;left:' + (pele ? 120 : 250) + 'px;right:' + (pele ? 820 : 250) + 'px;top:260px">' + L.evaluation.map(function (q, j) {
       return '<div data-e="' + (j + 1) + '" class="ft-off" style="font-size:64px;font-weight:800;line-height:1.2;margin-bottom:50px">' + esc(q.question) + '</div>'; }).join('') + '</div>');
     /* a avaliação no celular dos alunos (27/11/2026): as perguntas cruas, a nota e o comentário saem de lá */
     if ((L.evaluation || []).length) slides[slides.length - 1].aval = L.evaluation.map(function (q) { return String(q.question || ''); });
     if (cp) novo('fechamento', cpPainel('<div style="font:900 120px/1.05 \'' + T + '\';text-align:center">' + esc(rot.fim) + '</div>' +
       '<img alt="FISK" src="' + base + 'assets/fisk-marca.png" style="height:96px;margin-top:60px;align-self:center">', 860, 'align-items:center') + cpPino(PA.capaLocal), true, PA.capa);
-    else if (pele) novo('fechamento', '<div style="position:absolute;left:100px;top:0;bottom:0;width:1100px;display:flex;align-items:center;justify-content:center"><div style="font:800 130px/1.05 \'' + T + '\';color:#38bdf8;text-align:center">' + esc(rot.fim) + '</div></div>' +
+    else if (pele && false) novo('fechamento', '<div style="position:absolute;left:100px;top:0;bottom:0;width:1100px;display:flex;align-items:center;justify-content:center"><div style="font:800 130px/1.05 \'' + T + '\';color:#38bdf8;text-align:center">' + esc(rot.fim) + '</div></div>' +
       '<div style="position:absolute;left:70px;bottom:60px;background:#fff;border-radius:18px;padding:14px 22px"><img alt="FISK" src="' + base + 'assets/fisk-marca.png" style="height:90px;display:block"></div>');
-    else novo('fechamento', '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><div style="font:800 150px/1.05 \'' + T + '\';color:' + p.prim + ';text-align:center;max-width:1300px">' + esc(rot.fim) + '</div></div>' + balao, true);
+    else if (!pele) novo('fechamento', '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><div style="font:800 150px/1.05 \'' + T + '\';color:' + p.prim + ';text-align:center;max-width:1300px">' + esc(rot.fim) + '</div></div>' + balao, true);
 
     slides.forEach(function (s) { s.es = es; ligar(s); });   /* es: o "Correct!" do jogo sai na língua da aula */
     return { slides: slides, receita: r };
