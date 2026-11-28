@@ -301,12 +301,13 @@ function pintaFila() {
   f.innerHTML = '<div class="pl-topo"><span class="pl-ico">📋</span><div class="pl-txt"><span class="pl-tit">Planejador · ordem dos alunos</span>' +
     '<div class="pl-nome">' + esc(plTit) + '</div><span class="rt-info">' + info + '</span></div>' +
     '<button type="button" class="btn-recarrega pl-rec" data-recarrega title="Lê de novo o roteiro, as anotações e as marcas dos alunos">↻ Recarregar</button></div>' +
-    '<div class="pl-acoes">' + prio.replace('class="prio-grande"', 'class="prio-grande' + (estado.prioridade ? ' on' : '') + '"') +
+    /* o "Ordenar por prioridade" no FIM, à direita, no mesmo lugar do "Ir para Conversações" do card de cima (28/11/2026) */
+    '<div class="pl-acoes">' +
     (estado.plantao ? '' : '<div class="pl-salvar"><label class="rt-data">Aula de <input type="date" data-rtdata value="' + dataRoteiroPadrao() + '"></label>' +
       '<button type="button" class="rt-btn forte" data-rtsalva title="Guarda esta ordem para a aula da data escolhida">Salvar ordem</button></div>' +
       '<details class="pl-saidas pl-mais"><summary class="rt-btn">⋯ Mais</summary><div class="pl-mais-menu"><button type="button" class="rt-btn" data-rtcopia>📋 Copiar ordem</button>' +
       '<button type="button" class="rt-btn" data-rtpdf title="Grava o PDF da ordem na pasta da turma">💾 Salvar PDF na pasta da turma</button></div></details>') +
-    '</div>';
+    prio.replace('class="prio-grande"', 'class="prio-grande' + (estado.prioridade ? ' on' : '') + '"') + '</div>';
   var topo = f.querySelector('.pl-topo');
   if (topo) topo.insertAdjacentElement('afterend', poeDica(topo, 'O Planejador decide a ORDEM dos alunos nesta tela: por prioridade, ou a que você arrastar. "Salvar ordem" guarda essa fila para a aula do dia.'));
   var bp = f.querySelector('[data-prio]');
@@ -600,8 +601,9 @@ function statusHtml(html, err) { var el = $('status'); el.innerHTML = html || ''
 /* O CONTADOR DE SEGUNDOS (auditoria de 30/10/2026, A6): fiskEsperando do kit no status, em toda leitura que segura a
    tela. Um de cada vez: a espera nova encerra a anterior, e `esperaFim()` encerra no sucesso E no erro. */
 var _thEsperaFim = null;
-function espera(frases) { esperaFim(); _thEsperaFim = fiskEsperando(function (t) { status(t); }, frases); }
-function esperaFim() { if (_thEsperaFim) { _thEsperaFim(); _thEsperaFim = null; } }
+/* o carregamento com animação (Pedro, 28/11/2026: "atualmente é só uma frase"): a rodinha e a barra correndo ao lado */
+function espera(frases) { esperaFim(); _thEsperaFim = fiskEsperando(function (t) { status(String(t).replace(/^🔄\s*/, '')); var el = $('status'); el.classList.add('esperando'); }, frases); }
+function esperaFim() { if (_thEsperaFim) { _thEsperaFim(); _thEsperaFim = null; } var el = $('status'); if (el) el.classList.remove('esperando'); }
 function get(params) {
   params.token = token();
   var qs = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
@@ -761,6 +763,7 @@ function initCascata() {
       if (selEscola.value !== escola || selProf.value !== prof) return;
       var antes = selTurma.value;
       montarSelect(selTurma, 'Escolha a turma…', [{ v: PLANTAO, t: '🙋 Centro de Estudos (alunos da escola, pela busca)' }].concat(turmas.map(function (t) { return { v: t.linhaTitulo, t: t.titulo }; })));
+      setTimeout(pintaIr, 0);
       if (antes && (antes === PLANTAO || turmas.some(function (t) { return String(t.linhaTitulo) === antes; }))) { selTurma.value = antes; return; }
       if (pedida && pedida.escola === escola && pedida.prof === prof) {
         var linhaPedida = pedida.linha; pedida = null;
@@ -779,13 +782,31 @@ function initCascata() {
       else status('Fora do horário de aula de ' + prof + ': escolha a turma acima.');
     });
   });
-  selTurma.addEventListener('change', function () {
+  /* O "IR" (Pedro, 28/11/2026: "às vezes eu clico na turma errada e não quero que já vá gastando tempo para carregar"):
+     a turma que o PROFESSOR escolhe na lista só carrega no botão. A que a página escolhe sozinha (o horário de agora, o
+     link do card, o Centro de Estudos) continua abrindo na hora: ali não há clique errado. */
+  var bIr = $('bIrTurma'), aberta = '';
+  function abreTurma() {
     if (!selTurma.value) return;
     var titulo = selTurma.options[selTurma.selectedIndex].text;
+    aberta = selEscola.value + '|' + selProf.value + '|' + selTurma.value; pintaIr();
     if (selTurma.value === PLANTAO) { carregarPlantao(selEscola.value, selProf.value); return; }
     fiskLembrarTurma(selEscola.value, selProf.value, selTurma.value, titulo);
     carregarTurma(selEscola.value, selProf.value, selTurma.value, titulo);
-  });  /* a primeira lista vem DEPOIS dos três listeners: do cache ela escolhe na hora, e o change precisa de quem ouvir */
+  }
+  function pintaIr() {
+    var aqui = selEscola.value + '|' + selProf.value + '|' + selTurma.value, pronta = !!selTurma.value && !selTurma.disabled;
+    bIr.disabled = !pronta || aqui === aberta;
+    bIr.classList.toggle('pede', pronta && aqui !== aberta);
+    bIr.textContent = pronta && aqui === aberta ? '✓ Aberta' : 'Ir ▶';
+  }
+  selTurma.addEventListener('change', function (ev) {
+    if (!selTurma.value) return;
+    if (ev.isTrusted) { pintaIr(); if (!bIr.disabled) status('Turma escolhida: toque em "Ir" para carregar.'); return; }
+    abreTurma();
+  });
+  bIr.addEventListener('click', abreTurma);
+  [selEscola, selProf].forEach(function (s) { s.addEventListener('change', function () { setTimeout(pintaIr, 0); }); });  /* a primeira lista vem DEPOIS dos três listeners: do cache ela escolhe na hora, e o change precisa de quem ouvir */
   lista('escolas', { action: 'card', fn: 'escolas' }, 'escolas', function (escolas) {
     var antes = selEscola.value;
     montarSelect(selEscola, 'Escolha a escola…', escolas.map(function (e) { return { v: e, t: e }; }));
@@ -1057,6 +1078,7 @@ function tirarVisitante(raf) {
     var b = ev.target.closest('button[data-i]'); if (!b) return;
     trazerAluno(box._lista[+b.dataset.i]);
   });
+  var bt = $('bTrazer'); if (bt) bt.addEventListener('click', function () { q.focus(); if (q.value.trim().length >= 3) q.dispatchEvent(new Event('input')); else { box.hidden = false; box.innerHTML = '<div class="vazio">Escreva o nome completo ou o RAF do aluno.</div>'; } });
   q.addEventListener('keydown', function (ev) {
     if (ev.key === 'Escape') { box.hidden = true; }
     if (ev.key === 'Enter' && box._lista && box._lista.length === 1 && !box.hidden) { ev.preventDefault(); trazerAluno(box._lista[0]); }
