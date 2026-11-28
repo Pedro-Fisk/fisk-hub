@@ -642,27 +642,44 @@ body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ 
 }
 
 /* A CONVERSAÇÃO DA SEMANA NA MINHA AULA (Pedro, 28/11/2026): um card retangular com a atividade comunicativa sugerida
-   para esta turma (o nível e o perfil saem do livro dos alunos, como na conversação) e o botão que abre a ferramenta
-   em outra aba, já na atividade. */
-.conv-card{ max-width: 1500px; margin: 0 auto .8rem; display: flex; align-items: center; gap: 1rem; padding: .8rem 1rem;
-  border-radius: 14px; background: linear-gradient(135deg, #eef2ff, #f5f3ff); border: 1px solid #c7d2fe; color: #1e1b4b; }
-.conv-card .cc-ico{ font-size: 1.8rem; flex: none; }
+   para esta turma e o botão que abre a ferramenta em outra aba. "Mais alegre" (Pedro, 28/11/2026): degradê colorido que
+   se mexe devagar, confete de fundo, o 💬 pulando, o botão amarelo que sobe no hover. Quem pede menos movimento no
+   sistema recebe o card parado. */
+@keyframes ccDegrade{ 0%{ background-position: 0% 50%; } 50%{ background-position: 100% 50%; } 100%{ background-position: 0% 50%; } }
+@keyframes ccPula{ 0%, 100%{ transform: translateY(0) rotate(-6deg); } 50%{ transform: translateY(-6px) rotate(6deg); } }
+@keyframes ccBrilho{ 0%{ transform: translateX(-120%) skewX(-20deg); } 60%, 100%{ transform: translateX(260%) skewX(-20deg); } }
+.conv-card{ position: relative; overflow: hidden; max-width: 1500px; margin: 0 auto .9rem; display: flex; align-items: center; gap: 1.1rem; padding: .9rem 1.1rem;
+  border-radius: 18px; color: #fff; border: 0;
+  background: linear-gradient(120deg, #ff6b6b, #f59e0b, #ec4899, #8b5cf6, #3b82f6); background-size: 300% 300%; animation: ccDegrade 14s ease infinite;
+  box-shadow: 0 10px 26px rgba(236,72,153,.28); }
+/* confete de fundo (bolinhas e estrelinhas, só CSS) */
+.conv-card::before{ content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .35;
+  background-image: radial-gradient(circle, #fff 2px, transparent 2.5px), radial-gradient(circle, #fde047 3px, transparent 3.5px), radial-gradient(circle, #fff 1.5px, transparent 2px);
+  background-size: 46px 46px, 70px 70px, 30px 30px; background-position: 0 0, 18px 26px, 8px 14px; }
+.conv-card > *{ position: relative; }
+.conv-card .cc-ico{ font-size: 2.2rem; flex: none; animation: ccPula 2.4s ease-in-out infinite; filter: drop-shadow(0 3px 6px rgba(0,0,0,.2)); }
 .conv-card .cc-txt{ flex: 1; min-width: 0; }
-.conv-card .cc-rot{ font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #6366f1; }
-.conv-card .cc-nome{ font-weight: 800; font-size: 1.02rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.conv-card .cc-sub{ font-size: .8rem; color: #4b5563; }
-.conv-card .cc-abre{ flex: none; text-decoration: none; background: #4f46e5; color: #fff; font-weight: 800; border-radius: 999px; padding: .55rem 1.1rem; white-space: nowrap; }
-.conv-card .cc-abre:hover{ background: #4338ca; }
-.conv-card.cc-vazio{ background: #f8fafc; border-color: #e2e8f0; }
-.conv-card.cc-vazio .cc-abre{ background: #64748b; }
-body.theme-dark .conv-card{ background: linear-gradient(135deg, #1e1b4b, #2e1065); border-color: #4338ca; color: #e0e7ff; }
-body.theme-dark .conv-card .cc-sub{ color: #c7d2fe; }
-body.theme-dark .conv-card.cc-vazio{ background: #1f2937; border-color: #374151; }
-body.pt-ativo #conv-card{ display: none !important; }
-@media (max-width: 640px){ .conv-card{ flex-wrap: wrap; } .conv-card .cc-abre{ width: 100%; text-align: center; } .conv-card .cc-nome{ white-space: normal; } }
-.conv-card .cc-th{ position: relative; flex: none; width: 240px; aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; background: #e0e7ff; display: block; box-shadow: 0 4px 14px rgba(30,27,75,.18); }
+.conv-card .cc-rot{ display: inline-block; font-size: .72rem; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; color: #7c2d12;
+  background: #fde047; border-radius: 999px; padding: .15rem .6rem; box-shadow: 0 2px 0 rgba(0,0,0,.12); }
+.conv-card .cc-nome{ font-weight: 900; font-size: 1.12rem; margin-top: .25rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 2px 6px rgba(0,0,0,.25); }
+.conv-card .cc-sub{ font-size: .82rem; font-weight: 600; color: rgba(255,255,255,.92); }
+.conv-card .cc-abre{ position: relative; overflow: hidden; flex: none; text-decoration: none; background: #fde047; color: #7c2d12; font-weight: 900; border-radius: 999px;
+  padding: .6rem 1.2rem; white-space: nowrap; box-shadow: 0 4px 0 #ca8a04, 0 8px 18px rgba(0,0,0,.18); transition: transform .15s ease, box-shadow .15s ease; }
+.conv-card .cc-abre::after{ content: ''; position: absolute; top: 0; bottom: 0; width: 40%; background: rgba(255,255,255,.55); animation: ccBrilho 3.2s ease-in-out infinite; }
+.conv-card .cc-abre:hover{ transform: translateY(-2px); box-shadow: 0 6px 0 #ca8a04, 0 12px 22px rgba(0,0,0,.22); }
+.conv-card .cc-abre:active{ transform: translateY(2px); box-shadow: 0 2px 0 #ca8a04; }
+.conv-card .cc-th{ position: relative; flex: none; width: 240px; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: rgba(255,255,255,.35); display: block;
+  border: 3px solid #fff; box-shadow: 0 6px 16px rgba(0,0,0,.22); transform: rotate(-2deg); transition: transform .2s ease; }
+.conv-card .cc-th:hover{ transform: rotate(0deg) scale(1.03); }
 .conv-card .cc-th .ft-s{ position: absolute; left: 0; top: 0; }
 .conv-card .cc-th canvas{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.conv-card .cc-th-msg{ position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; color: #6366f1; text-align: center; }
-.conv-card .cc-th-n{ position: absolute; right: 6px; bottom: 6px; background: rgba(15,23,42,.75); color: #fff; font-size: .68rem; font-weight: 700; border-radius: 999px; padding: 2px 8px; }
-@media (max-width: 640px){ .conv-card .cc-th{ width: 100%; } }
+.conv-card .cc-th-msg{ position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: .78rem; font-weight: 800; color: #fff; text-align: center; }
+.conv-card .cc-th-n{ position: absolute; right: 6px; bottom: 6px; background: #fde047; color: #7c2d12; font-size: .68rem; font-weight: 900; border-radius: 999px; padding: 2px 8px; }
+.conv-card.cc-vazio{ background: linear-gradient(120deg, #94a3b8, #64748b); animation: none; box-shadow: none; }
+.conv-card.cc-vazio .cc-abre{ background: #fff; color: #334155; box-shadow: 0 4px 0 #cbd5e1; }
+.conv-card.cc-vazio .cc-abre::after, .conv-card.cc-vazio .cc-ico{ animation: none; }
+body.theme-dark .conv-card{ box-shadow: 0 10px 26px rgba(139,92,246,.35); }
+body.pt-ativo #conv-card{ display: none !important; }
+@media (prefers-reduced-motion: reduce){ .conv-card, .conv-card .cc-ico, .conv-card .cc-abre::after{ animation: none; } }
+@media (max-width: 640px){ .conv-card{ flex-wrap: wrap; } .conv-card .cc-abre{ width: 100%; text-align: center; } .conv-card .cc-nome{ white-space: normal; }
+  .conv-card .cc-th{ width: 100%; transform: none; } }
