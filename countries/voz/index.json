@@ -1,0 +1,383 @@
+{
+ "ct-japan-basic": {
+  "voz": "en-US-AndrewNeural",
+  "a": {
+   "raw": "f35e43a14c8d347f.mp3",
+   "to fold": "696571fe878685bd.mp3"
+  }
+ },
+ "ct-japan-intermediate": {
+  "voz": "en-US-EricNeural",
+  "a": {
+   "raw": "2a4f7872a1be7544.mp3",
+   "to fold": "625b6f3ef50be3ac.mp3"
+  }
+ },
+ "ct-japan-advanced": {
+  "voz": "en-US-GuyNeural",
+  "a": {
+   "raw": "99c9d9f1f2e86f02.mp3",
+   "to fold": "78b66683e85ff4d5.mp3"
+  }
+ },
+ "ct-usa-basic": {
+  "voz": "en-US-EricNeural",
+  "a": {
+   "genre": "d92884848438aa8d.mp3",
+   "marketplace": "941dbc012e79bfa1.mp3"
+  }
+ },
+ "ct-usa-interadv": {
+  "voz": "en-US-EmmaNeural",
+  "a": {
+   "genre": "30190180fe78d70c.mp3",
+   "marketplace": "ba5719701f7f3d18.mp3"
+  }
+ },
+ "ct-spain-basic": {
+  "voz": "en-US-GuyNeural",
+  "a": {}
+ },
+ "ct-spain-teens": {
+  "voz": "en-US-MichelleNeural",
+  "a": {}
+ },
+ "ct-spain-intermediate": {
+  "voz": "en-US-EricNeural",
+  "a": {}
+ },
+ "ct-spain-advanced": {
+  "voz": "en-US-MichelleNeural",
+  "a": {}
+ },
+ "ct-new-zealand-basic": {
+  "voz": "en-US-JennyNeural",
+  "a": {
+   "lands": "effe2d3d967d39f6.mp3",
+   "mountains": "06299fe16790d1ea.mp3",
+   "place": "a10fbcd5c86b31c8.mp3",
+   "culture": "176db333aeb343eb.mp3",
+   "natural": "762c74bd81eefeed.mp3",
+   "beautiful": "14a336daab9c2cdf.mp3"
+  }
+ },
+ "ct-new-zealand-intermediate": {
+  "voz": "en-US-JennyNeural",
+  "a": {
+   "lands": "effe2d3d967d39f6.mp3",
+   "“wide open”": "807e1cee99c7bf49.mp3",
+   "countryside": "507f27fd1842c7a9.mp3",
+   "culture": "176db333aeb343eb.mp3",
+   "natural": "762c74bd81eefeed.mp3",
+   "within": "491d1c0a5d83e1f0.mp3"
+  }
+ },
+ "ct-new-zealand-advanced": {
+  "voz": "en-US-JennyNeural",
+  "a": {
+   "[to] show (someone) around": "8fddb8bce603c7ea.mp3",
+   "[to be] thrown head-first into": "56ef07ddabb2692a.mp3",
+   "“wide open”": "807e1cee99c7bf49.mp3",
+   "countryside": "507f27fd1842c7a9.mp3",
+   "culture": "176db333aeb343eb.mp3",
+   "within": "491d1c0a5d83e1f0.mp3",
+   "throughout": "daedf13b82a648c9.mp3"
+  }
+ },
+ "ct-ireland-basic": {
+  "voz": "en-US-EmmaNeural",
+  "a": {
+   "amazing": "dfeaf413f827a427.mp3",
+   "windswept": "d4743163b5799fb1.mp3",
+   "striking": "13c50369f83546ba.mp3",
+   "misconception": "970af7a9df86bc60.mp3",
+   "shamrock": "25ad74597cd0302e.mp3",
+   "harp": "e4eb28ef4f9a3544.mp3",
+   "weasel": "f3e60f7095f839d3.mp3",
+   "lighthouse": "091e7ef99384c1c0.mp3"
+  }
+ },
+ "ct-ireland-intermediate": {
+  "voz": "en-US-MichelleNeural",
+  "a": {
+   "amazing": "364c3c88138c6b0f.mp3",
+   "to gape": "21a98ba44461db44.mp3",
+   "windswept": "0820b725b2943d9d.mp3",
+   "striking": "ce668ff049c0603a.mp3",
+   "to relish": "9385f374dd6a8314.mp3",
+   "misconception": "d31b3e758995ab5a.mp3",
+   "shamrock": "0d9c675340701895.mp3",
+   "harp": "9e7189af302d4663.mp3",
+   "weasel": "c57334184820a9f8.mp3",
+   "polecat": "eb5ea9a33d542a76.mp3",
+   "roe deer": "030dad348db69f88.mp3",
+   "lighthouse": "c80c2bc19516afc5.mp3"
+  }
+ },
+ "ct-ireland-advanced": {
+  "voz": "en-US-ChristopherNeural",
+  "a": {
+   "amazing": "a1002f19c0ff39c3.mp3",
+   "to gape": "15f37c3adefdc26f.mp3",
+   "windswept": "76f5f16eed131f72.mp3",
+   "striking": "2b55769b1ffdd67d.mp3",
+   "to relish": "601d198e3de05c46.mp3",
+   "misconception": "ff444105f09b18f7.mp3",
+   "shamrock": "7009763320f18237.mp3",
+   "harp": "8fad16900abe60c9.mp3",
+   "weasel": "be828e2f2d80548c.mp3",
+   "polecat": "9e8207dcaf584fc1.mp3",
+   "roe deer": "b298c8d8e0900ef8.mp3",
+   "lighthouse": "2335a8ddab47f5ac.mp3"
+  }
+ },
+ "ct-india-basic": {
+  "voz": "en-US-EricNeural",
+  "a": {
+   "to spread": "a90dfdbeef3846dd.mp3",
+   "Christianity": "e16b569edb8d0457.mp3",
+   "press": "8b175f50a7a8eb59.mp3",
+   "syntax": "5b929f9b574a7828.mp3",
+   "coinage": "736b3e6525f8a538.mp3",
+   "feature": "67b95a1ab11205ea.mp3",
+   "retroflex trilled": "6998f3b3de20234e.mp3",
+   "merging": "08f6dc6a9d9f9e40.mp3"
+  }
+ },
+ "ct-india-intermediate": {
+  "voz": "en-US-ChristopherNeural",
+  "a": {
+   "to spread": "038078dc7c3f1214.mp3",
+   "Christianity": "c45e387f8c0a4072.mp3",
+   "press": "c82d6d8b52ad965f.mp3",
+   "syntax": "bcbe194250c8dc60.mp3",
+   "coinage": "c7fedf19a46409ab.mp3",
+   "feature": "3dc2c693c5f7c465.mp3",
+   "retroflex trilled": "43ef7a220bef7b68.mp3",
+   "merging": "97919b0e9758c781.mp3"
+  }
+ },
+ "ct-india-advanced": {
+  "voz": "en-US-JennyNeural",
+  "a": {
+   "to spread": "329bbdddac5ce8c4.mp3",
+   "Christianity": "dbaf3b51e8c26cec.mp3",
+   "press": "18d1ea17c1ad3d2d.mp3",
+   "syntax": "ff747af8c723a4cc.mp3",
+   "coinage": "c002e8175450d14b.mp3",
+   "feature": "98faccb1132238ed.mp3",
+   "retroflex trilled": "103286f7c3518f6c.mp3",
+   "merging": "eb8a83dc458bb8a3.mp3"
+  }
+ },
+ "ct-peru-all": {
+  "voz": "en-US-GuyNeural",
+  "a": {}
+ },
+ "ct-australia-basic": {
+  "voz": "en-US-MichelleNeural",
+  "a": {
+   "g’day": "2891b800b319a354.mp3",
+   "mate": "edfbbdff2d539399.mp3",
+   "arvo": "4c6ddac870cfb1ef.mp3",
+   "brekkie": "7fe3fe9813abb2a5.mp3",
+   "barbie": "7073758054ee222b.mp3",
+   "no worries": "981e819e4114d493.mp3",
+   "heaps": "260aeed33ab213a1.mp3",
+   "thongs": "10cc907017d5b839.mp3"
+  }
+ },
+ "ct-australia-intermediate": {
+  "voz": "en-US-AvaNeural",
+  "a": {
+   "g’day": "423e48bcd82d4a4a.mp3",
+   "mate": "3ba6b381fefa6884.mp3",
+   "arvo": "499692c897c48989.mp3",
+   "brekkie": "be909d789725b218.mp3",
+   "barbie": "537b38ea35f22d8e.mp3",
+   "no worries": "687cc961e6710630.mp3",
+   "heaps": "4646302bcadc2448.mp3",
+   "thongs": "5aed5558a2135984.mp3"
+  }
+ },
+ "ct-australia-advanced": {
+  "voz": "en-US-AriaNeural",
+  "a": {
+   "g’day": "87a704ebf4a600f5.mp3",
+   "mate": "7d6e38fd110dc4ea.mp3",
+   "arvo": "10487c175ede5898.mp3",
+   "brekkie": "809da1787e2a714e.mp3",
+   "no worries": "17db80ca83dec0ec.mp3",
+   "thongs": "8bb59843df1397cb.mp3",
+   "diminutive": "e9edb7ee6fbe2e81.mp3",
+   "register": "72e0738bf2db789e.mp3",
+   "sacred": "bd1d386368f3e013.mp3",
+   "compulsory": "79f9739bc736fe72.mp3"
+  }
+ },
+ "ct-south-africa-basic": {
+  "voz": "en-US-JennyNeural",
+  "a": {
+   "howzit?": "8b9813e8349b061b.mp3",
+   "braai": "64ebb869318d5982.mp3",
+   "lekker": "975bcfc86f79aed8.mp3",
+   "robot": "ae3550da60ca2ad6.mp3",
+   "eish!": "2aec3a5007bc1f14.mp3",
+   "now now": "4ffd6d4de52c7fe8.mp3",
+   "just now": "1ddad276d4407e6a.mp3",
+   "sharp sharp": "d63a8d3b3cd1dfe7.mp3"
+  }
+ },
+ "ct-south-africa-intermediate": {
+  "voz": "en-US-AndrewNeural",
+  "a": {
+   "howzit?": "539b875f7020af03.mp3",
+   "braai": "bc35dc00b7c3deaa.mp3",
+   "lekker": "ef2f7a934f1a7c3a.mp3",
+   "robot": "4bde7bd1d1d1fbc5.mp3",
+   "eish!": "b1f8fa1b9e4135f4.mp3",
+   "now now": "44d80251884d144c.mp3",
+   "just now": "218b35d44841662e.mp3",
+   "sharp sharp": "b93496ef63fd5e80.mp3"
+  }
+ },
+ "ct-south-africa-advanced": {
+  "voz": "en-US-EricNeural",
+  "a": {
+   "howzit?": "ac04e4f3e185a388.mp3",
+   "braai": "5fec9e6239c3e683.mp3",
+   "lekker": "d8f0671d637ccc51.mp3",
+   "robot": "551c507d90b7704d.mp3",
+   "just now": "f7c6f8fd7a26db6a.mp3",
+   "ubuntu": "ce054b0e580f6334.mp3",
+   "branch of government": "0af2902367021107.mp3",
+   "neutral ground": "b7637c2176e600fd.mp3",
+   "to switch languages": "1838895e448c59f3.mp3"
+  }
+ },
+ "ct-jamaica-basic": {
+  "voz": "en-US-EmmaNeural",
+  "a": {
+   "Wah gwaan?": "abb24848011dad03.mp3",
+   "irie": "036254e9990b5612.mp3",
+   "big up": "4c15854c138f9171.mp3",
+   "bredrin": "9cd76ba2e3cf40bd.mp3",
+   "yaad": "70e4ef61559976be.mp3",
+   "one love": "eacaf1f689d30731.mp3",
+   "soon come": "08f7dd70deff04e2.mp3",
+   "nyam": "5a892f627cb80900.mp3",
+   "likkle": "8f2aa8be25ba2180.mp3"
+  }
+ },
+ "ct-jamaica-intermediate": {
+  "voz": "en-US-AndrewNeural",
+  "a": {
+   "Wah gwaan?": "90056b7a8d07b79e.mp3",
+   "irie": "2effca3287ef6960.mp3",
+   "big up": "d866a6ab7fd7248f.mp3",
+   "bredrin": "5745da4247f081d3.mp3",
+   "yaad": "0d2133e6b85720f4.mp3",
+   "one love": "2cedf8542b933fce.mp3",
+   "soon come": "659c5faab611e86b.mp3",
+   "nyam": "b4c58c40014940a5.mp3",
+   "likkle": "3d7809060bdf2097.mp3"
+  }
+ },
+ "ct-jamaica-advanced": {
+  "voz": "en-US-EmmaNeural",
+  "a": {
+   "Wah gwaan?": "abb24848011dad03.mp3",
+   "irie": "036254e9990b5612.mp3",
+   "big up": "4c15854c138f9171.mp3",
+   "bredrin": "9cd76ba2e3cf40bd.mp3",
+   "soon come": "08f7dd70deff04e2.mp3",
+   "creole": "a85ffffac48fe863.mp3",
+   "motto": "795c400e91bb694c.mp3",
+   "heritage": "1da946105795a4e1.mp3",
+   "to look down on": "50b50cc90fc73941.mp3"
+  }
+ },
+ "ct-singapore-basic": {
+  "voz": "en-US-ChristopherNeural",
+  "a": {
+   "lah": "d95d4b139e353ff5.mp3",
+   "can / cannot": "9752bd44dfd9c471.mp3",
+   "makan": "98300e1b6a210772.mp3",
+   "shiok": "51b49a3d0b0fa000.mp3",
+   "chope": "db5e2a821fbac10d.mp3",
+   "kopi": "f52b9906f8fbdeeb.mp3",
+   "You eat already?": "0b422eac39a63fef.mp3",
+   "hawker centre": "a66880483e5af1a2.mp3",
+   "aiyoh!": "d0e02ad54503f2c6.mp3"
+  }
+ },
+ "ct-singapore-intermediate": {
+  "voz": "en-US-EricNeural",
+  "a": {
+   "lah": "c3fb39791a1ef1b5.mp3",
+   "can / cannot": "8dea637a4b6705a9.mp3",
+   "makan": "e4aacccad6725ab5.mp3",
+   "shiok": "28388f340aac46b3.mp3",
+   "chope": "84ac02f16eaf5cd7.mp3",
+   "kopi": "fc8adb23202f3bdd.mp3",
+   "You eat already?": "df34adb54a0c3ccc.mp3",
+   "hawker centre": "cdc01bbdfc1c6183.mp3",
+   "aiyoh!": "bc9d3e029fcd8ba3.mp3"
+  }
+ },
+ "ct-singapore-advanced": {
+  "voz": "en-US-EmmaNeural",
+  "a": {
+   "lah": "e93cdbc3481c1abf.mp3",
+   "can / cannot": "3236b1171b0080ac.mp3",
+   "chope": "8060186edf7dd98f.mp3",
+   "You eat already?": "1e5d3712f693dd5e.mp3",
+   "kiasu": "41d4241005bd19ab.mp3",
+   "city-state": "00b4315d7b238a9d.mp3",
+   "mother tongue": "9572507fd45a413e.mp3",
+   "littering": "c4d4f7e4e5631b39.mp3",
+   "to switch registers": "b10b1f854ab879d0.mp3"
+  }
+ },
+ "ct-london-basic": {
+  "voz": "en-US-AriaNeural",
+  "a": {
+   "the Tube": "48a83750d2c13972.mp3",
+   "Mind the gap!": "06a5a4df87cc8f4b.mp3",
+   "You alright?": "c1d6b091d6273493.mp3",
+   "cheers": "20e101048942c594.mp3",
+   "queue": "a2fbde251c1f1b0b.mp3",
+   "Oyster card": "e7ea303a1ab9e735.mp3",
+   "the high street": "183c994e72d38dc5.mp3",
+   "a cuppa": "fc6b9cc15dcb37fd.mp3",
+   "innit?": "c5d54da316e608ee.mp3"
+  }
+ },
+ "ct-london-intermediate": {
+  "voz": "en-US-AndrewNeural",
+  "a": {
+   "the Tube": "4705b6093169c11b.mp3",
+   "Mind the gap!": "aa3bc46aa6501990.mp3",
+   "You alright?": "69c7e8edba1bd921.mp3",
+   "cheers": "0e585d56c1987c5d.mp3",
+   "queue": "837d598ebff108a7.mp3",
+   "Oyster card": "ace470a110630463.mp3",
+   "the high street": "c01308affe0cbb14.mp3",
+   "a cuppa": "3e2f9cfee74069e7.mp3",
+   "innit?": "ed81c0241dfdcb1a.mp3"
+  }
+ },
+ "ct-london-advanced": {
+  "voz": "en-US-EmmaNeural",
+  "a": {
+   "the Tube": "3abd291198df11ff.mp3",
+   "Mind the gap!": "ea24b1c147decc02.mp3",
+   "cheers": "1b3f948e5f8582ac.mp3",
+   "queue": "8971ee3c4ab50ff8.mp3",
+   "to jump the queue": "1338b2e09733a10b.mp3",
+   "understatement": "03ff75bebea70ca6.mp3",
+   "lift / flat": "ff7ab0d5efcc025b.mp3",
+   "to apologise": "39bf6b5eb50f92f4.mp3"
+  }
+ }
+}
