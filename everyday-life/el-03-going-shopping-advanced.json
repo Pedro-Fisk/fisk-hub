@@ -1,0 +1,144 @@
+{
+ "lesson": {
+  "coverTitle": "#03 – Going Shopping",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Going Shopping",
+  "objectives": [
+   "Talking about going shopping.",
+   "Expanding vocabulary.",
+   "Learning new expressions."
+  ],
+  "material": [
+   "PowerPoint activity"
+  ],
+  "duracao": "20 minutes",
+  "fotosSerie": {
+   "capa": "03-basic/capa.jpg",
+   "iw": "03-basic/iw.jpg",
+   "jogo": "",
+   "conv": "03-basic/iw.jpg",
+   "icone": "03-basic/icone.png"
+  },
+  "vocabulary": [
+   {
+    "word": "(to) spend",
+    "translation": ""
+   },
+   {
+    "word": "on sale",
+    "translation": ""
+   },
+   {
+    "word": "(to) look for",
+    "translation": ""
+   },
+   {
+    "word": "(to) make money",
+    "translation": ""
+   },
+   {
+    "word": "inexpensive x cheap",
+    "translation": ""
+   },
+   {
+    "word": "(to) be crazy for",
+    "translation": ""
+   },
+   {
+    "word": "(to) hate",
+    "translation": ""
+   },
+   {
+    "word": "(to) regret; to repent",
+    "translation": ""
+   },
+   {
+    "word": "(to) go shopping",
+    "translation": "fazer compras"
+   },
+   {
+    "word": "(to) go to the shopping mall",
+    "translation": "ir ao shopping (lugar)"
+   }
+  ],
+  "notas": [],
+  "languageGame": [],
+  "conversation": [
+   {
+    "question": "Do you enjoy spending money or do you prefer to save it?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you prefer to buy inexpensive clothes or are you crazy for grifes?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you usually look for sales or you go and buy what you want, if you really like the thing?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Have you ever bought something expensive and then you regretted?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What are the advantages and disadvantages of shopping on line?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What are the advantages and disadvantages of shopping in stores?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What was the last item of clothing you bought? And what will be the next item?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you prefer to pay cash or to use the credit card for shopping? Why?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What do you like to spend more money on: books, clothes, games, food?",
+    "modelAnswers": []
+   },
+   {
+    "question": "And what do you hate spending money on: medicine, magazines, perfume?",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about going shopping?"
+   }
+  ],
+  "semRevisao": true,
+  "serie": "everyday-life"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "everyday",
+  "imgs": "everyday-life/img/",
+  "faixa1": "#002060",
+  "faixa2": "#FFC000",
+  "destaque": "#FFC000",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#000000",
+   "fundo2": "#111111",
+   "prim": "#FFC000",
+   "sec": "#002060",
+   "dest": "#FFC000",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "house",
+  "icones": [
+   "house"
+  ]
+ }
+}

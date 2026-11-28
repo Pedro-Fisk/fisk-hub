@@ -1,0 +1,153 @@
+{
+ "lesson": {
+  "coverTitle": "#10 – TV Shows or Series?",
+  "coverLevel": "Basic & Teens",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "TV Shows or Series?",
+  "objectives": [],
+  "material": [
+   "PowerPoint activity"
+  ],
+  "duracao": "20 minutes",
+  "fotosSerie": {
+   "capa": "10-basic/capa.jpg",
+   "iw": "10-basic/iw.jpg",
+   "jogo": "",
+   "conv": "10-basic/conv.jpg",
+   "icone": "10-basic/icone.png"
+  },
+  "vocabulary": [
+   {
+    "word": "TV shows",
+    "translation": "programas de TV"
+   },
+   {
+    "word": "series",
+    "translation": "séries"
+   },
+   {
+    "word": "(to) show",
+    "translation": "mostrar"
+   },
+   {
+    "word": "character",
+    "translation": "personagem"
+   },
+   {
+    "word": "Soap opera",
+    "translation": "novela"
+   },
+   {
+    "word": "most famous",
+    "translation": "mais famoso"
+   },
+   {
+    "word": "(to) prefer",
+    "translation": "preferir"
+   }
+  ],
+  "notas": [],
+  "languageGame": [],
+  "conversation": [
+   {
+    "question": "What is your favorite TV show?",
+    "modelAnswers": [
+     "My favorite TV show is __."
+    ]
+   },
+   {
+    "question": "Who is your favorite artist on TV?",
+    "modelAnswers": [
+     "My favorite artist on TV is __."
+    ]
+   },
+   {
+    "question": "What is your favorite series?",
+    "modelAnswers": [
+     "My favorite series is ___."
+    ]
+   },
+   {
+    "question": "Who is your favorite character in series?",
+    "modelAnswers": [
+     "My favorite character in series is ___."
+    ]
+   },
+   {
+    "question": "Do you prefer TV shows or series?",
+    "modelAnswers": [
+     "I prefer _______ because ______."
+    ]
+   },
+   {
+    "question": "What’s the most famous TV show in Brazil? Do you like it?",
+    "modelAnswers": [
+     "The most famous TV show is ____ and I __."
+    ]
+   },
+   {
+    "question": "What’s the most famous series in Brazil? Do you like it?",
+    "modelAnswers": [
+     "The most famous series is __and I _______."
+    ]
+   },
+   {
+    "question": "Do you like soap operas?",
+    "modelAnswers": [
+     "Yes. I like soap operas very much.",
+     "No. I don’t like soap operas."
+    ]
+   },
+   {
+    "question": "What’s your favorite TV program?",
+    "modelAnswers": [
+     "My favorite TV program is _______."
+    ]
+   },
+   {
+    "question": "What’s your favorite series?",
+    "modelAnswers": [
+     "My favorite series is _______."
+    ]
+   },
+   {
+    "question": "What’s the most famous series of all times?",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about tv shows or series?"
+   }
+  ],
+  "semRevisao": true,
+  "serie": "everyday-life"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "everyday",
+  "imgs": "everyday-life/img/",
+  "faixa1": "#00ACA0",
+  "faixa2": "#00B0F0",
+  "destaque": "#FFC000",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#000000",
+   "fundo2": "#111111",
+   "prim": "#FFC000",
+   "sec": "#00ACA0",
+   "dest": "#FFC000",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "house",
+  "icones": [
+   "house"
+  ]
+ }
+}

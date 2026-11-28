@@ -1,0 +1,91 @@
+{
+ "lesson": {
+  "coverTitle": "#11 – Music",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Music",
+  "objectives": [],
+  "material": [
+   "PowerPoint activity"
+  ],
+  "duracao": "20 minutes",
+  "fotosSerie": {
+   "capa": "11-basic/capa.jpg",
+   "iw": "",
+   "jogo": "",
+   "conv": "11-basic/conv.jpg",
+   "icone": "11-basic/icone.png"
+  },
+  "vocabulary": [],
+  "notas": [],
+  "languageGame": [],
+  "conversation": [
+   {
+    "question": "How often do you listen to songs in English?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Can music be a way to help you focus?",
+    "modelAnswers": []
+   },
+   {
+    "question": "In which situations can music be a distraction?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you agree that there are certain types of music for different situations?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Are you able to play any instruments?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Which instrument would you like to be able to play?",
+    "modelAnswers": []
+   },
+   {
+    "question": "In your opinion, which is better: Latin or American pop music?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Where do you listen to music? (radio, youtube, spotify, deezer)",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about music?"
+   }
+  ],
+  "semRevisao": true,
+  "serie": "everyday-life"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "everyday",
+  "imgs": "everyday-life/img/",
+  "faixa1": "#00ACA0",
+  "faixa2": "#00B0F0",
+  "destaque": "#FFC000",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#000000",
+   "fundo2": "#111111",
+   "prim": "#FFC000",
+   "sec": "#00ACA0",
+   "dest": "#FFC000",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "house",
+  "icones": [
+   "house"
+  ]
+ }
+}

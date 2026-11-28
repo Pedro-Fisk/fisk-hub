@@ -1,0 +1,185 @@
+{
+ "lesson": {
+  "coverTitle": "#03 – Going Shopping",
+  "coverLevel": "Basic & Teens",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Going Shopping",
+  "objectives": [
+   "Talking about going shopping.",
+   "Expanding vocabulary.",
+   "Learning new expressions."
+  ],
+  "material": [
+   "PowerPoint activity"
+  ],
+  "duracao": "20 minutes",
+  "fotosSerie": {
+   "capa": "03-basic/capa.jpg",
+   "iw": "03-basic/iw.jpg",
+   "jogo": "",
+   "conv": "03-basic/iw.jpg",
+   "icone": "03-basic/icone.png"
+  },
+  "vocabulary": [
+   {
+    "word": "(to) spend",
+    "translation": "gastar"
+   },
+   {
+    "word": "on sale",
+    "translation": "na promoção"
+   },
+   {
+    "word": "(to) look for",
+    "translation": "procurar"
+   },
+   {
+    "word": "(to) save money",
+    "translation": "economizar"
+   },
+   {
+    "word": "(to) shop for",
+    "translation": "comprar"
+   },
+   {
+    "word": "(to) go shopping",
+    "translation": "fazer compras"
+   },
+   {
+    "word": "(to) go to the shopping mall",
+    "translation": "ir ao shopping (lugar)"
+   }
+  ],
+  "notas": [
+   {
+    "titulo": "Glossary (question 8)",
+    "texto": "expensive = caro · cheap = barato"
+   }
+  ],
+  "languageGame": [
+   {
+    "question": "Gastar dinheiro.",
+    "options": [
+     "(to) spend money.",
+     "(to) borrow money.",
+     "(to) save more money."
+    ],
+    "correctIndex": 0
+   },
+   {
+    "question": "Procurar por promoções.",
+    "options": [
+     "(to) wait for a promotion.",
+     "(to) look for sales.",
+     "(to) find good prices."
+    ],
+    "correctIndex": 1
+   },
+   {
+    "question": "Pagar à vista.",
+    "options": [
+     "(to) pay a lot of money.",
+     "(to) pay cash.",
+     "(to) use more money."
+    ],
+    "correctIndex": 1
+   },
+   {
+    "question": "Ir ao shopping center.",
+    "options": [
+     "(to) go shopping.",
+     "(to) go to the stores.",
+     "(to) go to the mall."
+    ],
+    "correctIndex": 2
+   }
+  ],
+  "conversation": [
+   {
+    "question": "Do you enjoy spending money?",
+    "modelAnswers": [
+     "Yes, I do. But I like to look for sales.",
+     "No, I don’t. I prefer to save money."
+    ]
+   },
+   {
+    "question": "How often do you go shopping at the mall?",
+    "modelAnswers": [
+     "I _______ go shopping at the mall.",
+     "(always / sometimes / hardly ever)"
+    ]
+   },
+   {
+    "question": "Who likes to spend money and save money in your family?",
+    "modelAnswers": [
+     "My ... likes to [spend / save / money] in my family."
+    ]
+   },
+   {
+    "question": "Who likes to shop online in your house?",
+    "modelAnswers": [
+     "My ... likes to shop online in my house."
+    ]
+   },
+   {
+    "question": "Do you prefer to pay cash or to use the credit card for shopping?",
+    "modelAnswers": [
+     "To tell you the truth, I prefer to...",
+     "Well, it depends on the store."
+    ]
+   },
+   {
+    "question": "What do you like to spend more money on?",
+    "modelAnswers": [
+     "Well, I like to spend more money on... [food / clothes / perfumes / electronics] etc."
+    ]
+   },
+   {
+    "question": "What was the last thing you bought?",
+    "modelAnswers": [
+     "The last thing I bought was..."
+    ]
+   },
+   {
+    "question": "Do you like to buy expensive clothes or cheap ones?",
+    "modelAnswers": [
+     "I like to buy..."
+    ]
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about going shopping?"
+   }
+  ],
+  "semRevisao": true,
+  "serie": "everyday-life"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "everyday",
+  "imgs": "everyday-life/img/",
+  "faixa1": "#002060",
+  "faixa2": "#FFC000",
+  "destaque": "#FFC000",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#000000",
+   "fundo2": "#111111",
+   "prim": "#FFC000",
+   "sec": "#002060",
+   "dest": "#FFC000",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "house",
+  "icones": [
+   "house"
+  ]
+ }
+}

@@ -1,0 +1,136 @@
+{
+ "lesson": {
+  "coverTitle": "#01",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Everyday Chores",
+  "objectives": [
+   "Talking about everyday situations.",
+   "Expanding vocabulary.",
+   "Learning new expressions."
+  ],
+  "material": [
+   "PowerPoint activity"
+  ],
+  "duracao": "20 minutes",
+  "fotosSerie": {
+   "capa": "01-basic/capa.jpg",
+   "iw": "01-basic/iw.jpg",
+   "jogo": "",
+   "conv": "01-basic/conv.jpg",
+   "icone": ""
+  },
+  "vocabulary": [
+   {
+    "word": "(to) buy groceries",
+    "translation": ""
+   },
+   {
+    "word": "(to) pay the bills",
+    "translation": ""
+   },
+   {
+    "word": "(to) do the dishes",
+    "translation": ""
+   },
+   {
+    "word": "(to) do the laundry",
+    "translation": ""
+   },
+   {
+    "word": "(to) make the bed",
+    "translation": ""
+   },
+   {
+    "word": "(to) iron the clothes",
+    "translation": ""
+   },
+   {
+    "word": "(to) put up with",
+    "translation": ""
+   },
+   {
+    "word": "(to) argue about",
+    "translation": ""
+   },
+   {
+    "word": "(to) get along",
+    "translation": ""
+   },
+   {
+    "word": "(to) help out",
+    "translation": ""
+   },
+   {
+    "word": "(to) eat up",
+    "translation": ""
+   }
+  ],
+  "notas": [],
+  "languageGame": [],
+  "conversation": [
+   {
+    "question": "Do you enjoy helping out at home?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Is there any chore you can’t put up with?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Which is your favorite chore: do the dishes or do the laundry?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you enjoy cooking? Do you eat up the food you cook?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Is there any chore that you and your family argue about who should do it?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Is there any chore that you refuse to do? Why?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Is there any member of your family who doesn’t help with the chores? How do you get along with him/her?",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about everyday chores?"
+   }
+  ],
+  "semRevisao": true,
+  "serie": "everyday-life"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "everyday",
+  "imgs": "everyday-life/img/",
+  "faixa1": "#002060",
+  "faixa2": "#FFC000",
+  "destaque": "#FFC000",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#000000",
+   "fundo2": "#111111",
+   "prim": "#FFC000",
+   "sec": "#002060",
+   "dest": "#FFC000",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "house",
+  "icones": [
+   "house"
+  ]
+ }
+}

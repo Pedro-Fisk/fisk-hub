@@ -1,0 +1,138 @@
+{
+ "lesson": {
+  "coverTitle": "#05 – Acting",
+  "coverLevel": "Intermediate",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Acting",
+  "objectives": [
+   "Talking about acting, actors and actresses.",
+   "Expanding vocabulary."
+  ],
+  "material": [
+   "PowerPoint activity"
+  ],
+  "duracao": "20 minutes",
+  "fotosSerie": {
+   "capa": "05-basic/capa.jpg",
+   "iw": "05-basic/iw.jpg",
+   "jogo": "",
+   "conv": "05-basic/iw.jpg",
+   "icone": "05-basic/icone.png"
+  },
+  "vocabulary": [
+   {
+    "word": "[to] play",
+    "translation": "atuar"
+   },
+   {
+    "word": "acting",
+    "translation": "atuação"
+   },
+   {
+    "word": "actor / actress",
+    "translation": "ator / atriz"
+   },
+   {
+    "word": "character",
+    "translation": "personagem"
+   },
+   {
+    "word": "soap opera",
+    "translation": "novela"
+   },
+   {
+    "word": "series",
+    "translation": "série ou séries"
+   }
+  ],
+  "notas": [
+   {
+    "titulo": "Attention!",
+    "texto": "“serie” doesn’t exist!"
+   }
+  ],
+  "languageGame": [],
+  "conversation": [
+   {
+    "question": "Tell me an actor/actress you like.",
+    "modelAnswers": [
+     "I like..."
+    ]
+   },
+   {
+    "question": "What movie was this person in?",
+    "modelAnswers": [
+     "This person was in... (movie)."
+    ]
+   },
+   {
+    "question": "Is there an actor/actress you don’t like?",
+    "modelAnswers": [
+     "Yeah, there is. It’s... / No, there isn’t."
+    ]
+   },
+   {
+    "question": "Would you like to be an actor?",
+    "modelAnswers": [
+     "Yeah, I would. / No, I wouldn’t."
+    ]
+   },
+   {
+    "question": "Do you prefer watching movies, series or soap operas?",
+    "modelAnswers": [
+     "I prefer watching..."
+    ]
+   },
+   {
+    "question": "What is your favorite movie/series?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you have a favorite character?",
+    "modelAnswers": [
+     "Yeah, it’s... (batman). / No, I don’t."
+    ]
+   },
+   {
+    "question": "What character would you like to play?",
+    "modelAnswers": [
+     "I’d like to play... (black panther)."
+    ]
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about acting?"
+   }
+  ],
+  "semRevisao": true,
+  "serie": "everyday-life"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "everyday",
+  "imgs": "everyday-life/img/",
+  "faixa1": "#9D3D23",
+  "faixa2": "#65BBBF",
+  "destaque": "#FFC000",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#000000",
+   "fundo2": "#111111",
+   "prim": "#FFC000",
+   "sec": "#9D3D23",
+   "dest": "#FFC000",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "house",
+  "icones": [
+   "house"
+  ]
+ }
+}

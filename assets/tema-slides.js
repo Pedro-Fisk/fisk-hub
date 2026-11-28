@@ -108,7 +108,7 @@
     /* A PELE DO EVERYDAY LIFE (Pedro, 28/11/2026: refazer a série sem descaracterizar a arte): slides pretos com as faixas
        da série no topo e no rodapé (azul-marinho e amarelo no Basic, verde-água no Advanced), a foto do tema no painel
        da direita e os títulos em imagem do PowerPoint (logo, IMPORTANT WORDS, Conversation), em everyday-life/img/. */
-    var vida = design && design.pele === 'everyday' ? { img: base + (design.imgs || 'everyday-life/img/'), c1: design.faixa1 || '#002060', c2: design.faixa2 || '#FFC000', f: L.fotosSerie || {} } : null;
+    var vida = design && design.pele === 'everyday' ? { img: base + (design.imgs || 'everyday-life/img/'), c1: design.faixa1 || '#002060', c2: design.faixa2 || '#FFC000', dest: design.destaque || '#FFC000', f: L.fotosSerie || {} } : null;
     function vUrl(n) { return /^https?:|^\//.test(String(n)) ? String(n) : vida.img + n; }
     function vFoto(k) { var f = vida.f[k] || vida.f.conv || vida.f.iw || vida.f.capa; return f ? vUrl(f) : ''; }
     function vFaixas() { return '<div style="position:absolute;left:0;right:0;top:0;height:30px;background:' + vida.c1 + '"></div><div style="position:absolute;left:0;right:0;top:30px;height:8px;background:' + vida.c2 + '"></div>' +
@@ -219,7 +219,7 @@
       if (vida) {
         var tImg = t === rot.iw ? 'iw.png' : t === rot.pw ? 'conv.png' : '', chave = t === rot.iw ? 'iw' : t === rot.pw ? 'conv' : 'jogo';
         return novo('divisor', '<div style="position:absolute;left:0;top:38px;bottom:38px;width:1280px;display:flex;flex-direction:column;align-items:center;justify-content:center">' +
-          (tImg ? '<img alt="' + esc(t) + '" src="' + vida.img + tImg + '" style="max-width:' + (tImg === 'conv.png' ? 980 : 760) + 'px;max-height:700px">'
+          (tImg ? '<img alt="' + esc(t) + '" src="' + vida.img + tImg + '" style="width:' + (tImg === 'conv.png' ? 1000 : 720) + 'px">'
             : '<div style="font:500 110px/1 \'' + B + '\';color:#1d6fd1">LANGUAGE</div><div style="font:500 230px/1 \'' + B + '\';color:#1d6fd1">GAME</div>' +
               '<div style="font:600 52px/1.3 \'' + B + '\';margin-top:26px;text-align:center">' + esc(sub || 'Choose the correct alternative.') + '</div>') + '</div>' + vPainel(vFoto(chave)));
       }
@@ -249,10 +249,15 @@
       divisor(rot.iw, 0);
       for (var vi = 0; vi < voc.length; vi += 3) novo('vocabulario', '<div style="position:absolute;left:120px;right:120px;top:80px;bottom:80px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">' +
         voc.slice(vi, vi + 3).map(function (v) {
-          return '<div style="margin:22px 0"><div style="display:flex;align-items:center;justify-content:center;gap:24px"><span style="font:italic 600 78px/1.15 \'' + B + '\';color:' + vida.c2 + '">' + esc(v.word) + '</span>' +
+          return '<div style="margin:22px 0"><div style="display:flex;align-items:center;justify-content:center;gap:24px"><span style="font:italic 600 78px/1.15 \'' + B + '\';color:' + vida.dest + '">' + esc(v.word) + '</span>' +
             '<button type="button" class="ft-ouvir" data-ouvir="' + esc(v.word) + '" title="Ouvir" style="flex:none;width:64px;height:64px;border-radius:50%;border:0;cursor:pointer;background:' + vida.c1 + ';color:#fff;font-size:30px;line-height:1">🔊</button></div>' +
             (v.translation ? '<div style="font:italic 500 66px/1.2 \'' + B + '\'">= ' + esc(v.translation) + '</div>' : '') + '</div>'; }).join('') + '</div>');
       slides[slides.length - 1].vocab = voc.map(function (v) { return String(v.word || '').trim(); }).filter(Boolean);
+      (L.notas || []).forEach(function (nt) {
+        novo('nota', '<div style="position:absolute;left:140px;right:140px;top:80px;bottom:80px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">' +
+          '<div style="font:800 96px/1.1 \'' + B + '\';color:' + vida.dest + '">' + esc(nt.titulo || '') + '</div>' +
+          '<div style="font:600 58px/1.4 \'' + B + '\';margin-top:40px">' + esc(nt.texto || '').replace(/ · /g, '<br>') + '</div></div>');
+      });
     } else if (voc.length && pele) {
       /* a lista do PowerPoint: duas colunas, a palavra em branco e o som em azul; o 🔊 toca a palavra */
       var metade = Math.ceil(voc.length / 2), colV = function (lst) { return '<div>' + lst.map(function (v) {
@@ -348,7 +353,7 @@
         if (vida) {   /* o Everyday Life: numeradas, a pergunta em branco e as respostas-modelo em amarelo */
           novo('conversa', '<div style="position:absolute;left:110px;right:160px;top:60px;bottom:60px;display:flex;flex-direction:column;justify-content:center">' + grupo.map(function (q, j) {
             return '<div data-e="' + (j + 1) + '" class="ft-off" style="margin-bottom:' + (cheio ? 34 : 48) + 'px;display:flex;gap:26px"><span style="flex:none;font:600 ' + (tamQ + 2) + 'px/1.2 \'' + B + '\'">' + (n0 + j + 1) + '.</span><div><div style="font:600 ' + (tamQ + 2) + 'px/1.2 \'' + B + '\'">' + esc(q.question) + '</div>' +
-              (q.modelAnswers || []).map(function (r) { return '<div style="font:500 ' + tamR + 'px/1.3 \'' + B + '\';margin-top:8px;color:' + vida.c2 + '">' + esc(r) + '</div>'; }).join('') + '</div></div>'; }).join('') + '</div>');
+              (q.modelAnswers || []).map(function (r) { return '<div style="font:500 ' + tamR + 'px/1.3 \'' + B + '\';margin-top:8px;color:' + vida.dest + '">' + esc(r) + '</div>'; }).join('') + '</div></div>'; }).join('') + '</div>');
           n0 += grupo.length; return;
         }
         if (pele) {   /* as Buddy Talks: a pergunta em branco e a resposta embaixo, sem cartão nem número, como no PowerPoint */

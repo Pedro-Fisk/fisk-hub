@@ -1,0 +1,128 @@
+{
+ "lesson": {
+  "coverTitle": "#02",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Vacation",
+  "objectives": [
+   "Talking about vacations.",
+   "Expanding vocabulary.",
+   "Learning new expressions."
+  ],
+  "material": [
+   "PowerPoint activity"
+  ],
+  "duracao": "20 minutes",
+  "fotosSerie": {
+   "capa": "02-basic/capa.jpg",
+   "iw": "02-basic/iw.jpg",
+   "jogo": "",
+   "conv": "02-basic/conv.jpg",
+   "icone": "02-intermediate/icone.png"
+  },
+  "vocabulary": [
+   {
+    "word": "(to) go on vacation",
+    "translation": ""
+   },
+   {
+    "word": "(to) go on a trip",
+    "translation": ""
+   },
+   {
+    "word": "(to) chill",
+    "translation": ""
+   },
+   {
+    "word": "(to) pack",
+    "translation": ""
+   },
+   {
+    "word": "(to) put up with",
+    "translation": ""
+   },
+   {
+    "word": "(to) break down",
+    "translation": ""
+   },
+   {
+    "word": "(to) stay in",
+    "translation": ""
+   },
+   {
+    "word": "(to) go out",
+    "translation": ""
+   },
+   {
+    "word": "(to) be one’s cup of tea",
+    "translation": ""
+   }
+  ],
+  "notas": [],
+  "languageGame": [],
+  "conversation": [
+   {
+    "question": "Have you ever gone on vacation and got very stressed? What happened?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Where is the ideal place for you to chill?",
+    "modelAnswers": []
+   },
+   {
+    "question": "When you go on vacation, do you prefer to stay in or to go out and see the local people?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What is one thing you can’t put up with when you travel?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What things are your cup of tea when you travel?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Have you ever gone on a trip and your car broke down? Tell us about.",
+    "modelAnswers": []
+   },
+   {
+    "question": "What kind of trip calms you down?",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about vacation?"
+   }
+  ],
+  "semRevisao": true,
+  "serie": "everyday-life"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "everyday",
+  "imgs": "everyday-life/img/",
+  "faixa1": "#002060",
+  "faixa2": "#FF3399",
+  "destaque": "#FFC000",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#000000",
+   "fundo2": "#111111",
+   "prim": "#FFC000",
+   "sec": "#002060",
+   "dest": "#FFC000",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "house",
+  "icones": [
+   "house"
+  ]
+ }
+}

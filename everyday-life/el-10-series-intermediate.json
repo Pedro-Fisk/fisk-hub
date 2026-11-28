@@ -1,0 +1,140 @@
+{
+ "lesson": {
+  "coverTitle": "#10 – TV Shows or Series?",
+  "coverLevel": "Intermediate",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "TV Shows or Series?",
+  "objectives": [],
+  "material": [
+   "PowerPoint activity"
+  ],
+  "duracao": "20 minutes",
+  "fotosSerie": {
+   "capa": "10-basic/capa.jpg",
+   "iw": "10-basic/iw.jpg",
+   "jogo": "",
+   "conv": "10-basic/conv.jpg",
+   "icone": "10-basic/icone.png"
+  },
+  "vocabulary": [
+   {
+    "word": "TV shows",
+    "translation": "programas de TV"
+   },
+   {
+    "word": "series",
+    "translation": "séries"
+   },
+   {
+    "word": "(to) show",
+    "translation": "mostrar"
+   },
+   {
+    "word": "character",
+    "translation": "personagem"
+   },
+   {
+    "word": "Soap opera",
+    "translation": "novela"
+   },
+   {
+    "word": "most famous",
+    "translation": "mais famoso"
+   },
+   {
+    "word": "(to) prefer",
+    "translation": "preferir"
+   }
+  ],
+  "notas": [],
+  "languageGame": [],
+  "conversation": [
+   {
+    "question": "What is your favorite TV show? At what time do you watch it?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Who is your favorite artist on TV? Why is he/she so special for you?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What is your favorite series? Why?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Who is your favorite character in series?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you prefer TV shows or series? Why?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What’s the most famous TV show in Brazil? Do you like it? Why?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What’s the most famous series in Brazil? Do you like it? Why?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you like soap operas?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What’s your favorite TV program?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What’s your favorite series?",
+    "modelAnswers": []
+   },
+   {
+    "question": "In SERIES, do you prefer drama, terror, love, historical stories or adventure?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What’s the most famous series of all times?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Why is this series so famous?",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about tv shows or series?"
+   }
+  ],
+  "semRevisao": true,
+  "serie": "everyday-life"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "everyday",
+  "imgs": "everyday-life/img/",
+  "faixa1": "#00ACA0",
+  "faixa2": "#00B0F0",
+  "destaque": "#FFC000",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#000000",
+   "fundo2": "#111111",
+   "prim": "#FFC000",
+   "sec": "#00ACA0",
+   "dest": "#FFC000",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "house",
+  "icones": [
+   "house"
+  ]
+ }
+}

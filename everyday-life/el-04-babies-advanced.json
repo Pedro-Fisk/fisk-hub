@@ -1,0 +1,141 @@
+{
+ "lesson": {
+  "coverTitle": "#04 – Babies",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Babies",
+  "objectives": [
+   "Talking about babies.",
+   "Expanding vocabulary.",
+   "Learning new expressions."
+  ],
+  "material": [
+   "PowerPoint activity"
+  ],
+  "duracao": "20 minutes",
+  "fotosSerie": {
+   "capa": "04-basic/capa.jpg",
+   "iw": "04-basic/iw.jpg",
+   "jogo": "",
+   "conv": "04-basic/conv.jpg",
+   "icone": "04-basic/icone.png"
+  },
+  "vocabulary": [
+   {
+    "word": "[to] grow up",
+    "translation": ""
+   },
+   {
+    "word": "[to] take care of (a baby)",
+    "translation": ""
+   },
+   {
+    "word": "diaper",
+    "translation": ""
+   },
+   {
+    "word": "lullaby",
+    "translation": ""
+   },
+   {
+    "word": "pacifier",
+    "translation": ""
+   },
+   {
+    "word": "little angel",
+    "translation": ""
+   },
+   {
+    "word": "little brat",
+    "translation": ""
+   },
+   {
+    "word": "(to) build castles in the air",
+    "translation": ""
+   }
+  ],
+  "notas": [
+   {
+    "titulo": "Learning time!",
+    "texto": "Teacher, explain the verb TO BE BORN in the whiteboard. Use the variables WAS/WERE. Practice with the students. If needed, use the following slide to explain."
+   },
+   {
+    "titulo": "Attention!",
+    "texto": "to be born = nascer · (to) born = NÃO EXISTE. Example: “I born in 1992.” (wrong) → “I was born in 1992.”"
+   },
+   {
+    "titulo": "Language practice",
+    "texto": "In group. Teacher asks and students answer: When were you born? When was your (mother) born? When was your best friend born? When was your teacher born?"
+   }
+  ],
+  "languageGame": [],
+  "conversation": [
+   {
+    "question": "Are you able to take care of babies?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What qualities are necessary for one to take care of a baby?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you remember a baby who was a little angel?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What kind of baby does your mom say you were: an angel or a brat?",
+    "modelAnswers": []
+   },
+   {
+    "question": "If somebody asked you to change his baby’s diaper, would you accept or turn down?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Who was the cutest baby in your family?",
+    "modelAnswers": []
+   },
+   {
+    "question": "How many babies are there in your family now?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you remember any lullaby songs from your childhood? Which one?",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about babies?"
+   }
+  ],
+  "semRevisao": true,
+  "serie": "everyday-life"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "everyday",
+  "imgs": "everyday-life/img/",
+  "faixa1": "#65BBBF",
+  "faixa2": "#002060",
+  "destaque": "#FFC000",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#000000",
+   "fundo2": "#111111",
+   "prim": "#FFC000",
+   "sec": "#65BBBF",
+   "dest": "#FFC000",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "house",
+  "icones": [
+   "house"
+  ]
+ }
+}

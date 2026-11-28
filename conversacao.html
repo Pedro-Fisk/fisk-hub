@@ -394,7 +394,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js"></script>
-<script src="assets/tema-slides.js?v=e3b2a014f5"></script>
+<script src="assets/tema-slides.js?v=b36140f1b7"></script>
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
@@ -474,7 +474,19 @@
   }
   /* AS ATIVIDADES COUNTRIES (Pedro, 28/11/2026): a série de países do Drive Master, gerada por scripts/build-countries.js
      em countries/ (ao lado desta página, como as Buddy Talks). O vídeo toca do Drive dentro do slide. */
-  var PAISES = 'Countries', ultPaises = null;
+  var PAISES = 'Countries', ultPaises = null, VIDA = 'Everyday Life', ultVida = null;
+  /* EVERYDAY LIFE (28/11/2026): a série do Drive Master, gerada por scripts/build-everyday.js em everyday-life/ */
+  function pedeVida() {
+    return fetch('everyday-life/index.json', { cache: 'no-cache' }).then(function (r) { return r.json(); })
+      .then(function (l) { return Array.isArray(l) ? l : []; }).catch(function () { return []; });
+  }
+  function juntaVida(itens) {
+    if (!dados) return; dados.idiomas = dados.idiomas || {};
+    delete dados.idiomas[VIDA];
+    if (!itens || !itens.length) return;
+    dados.idiomas[VIDA] = itens.map(function (m) { return { id: m.id, nome: m.nome, tipo: 'cm', niveis: m.niveis || [], pronto: true, origem: 'everyday' }; });
+    dados.vazio = false;
+  }
   function pedePaises() {
     return fetch('countries/index.json', { cache: 'no-cache' }).then(function (r) { return r.json(); })
       .then(function (l) { return Array.isArray(l) ? l : []; }).catch(function () { return []; });
@@ -500,7 +512,7 @@
   try { ultMinhas = JSON.parse(localStorage.getItem(CH_MINHAS) || 'null'); } catch (e) {}
   function guardada(id) { try { return JSON.parse(localStorage.getItem(CH_LISTA + (id || 'atual')) || 'null'); } catch (e) { return null; } }
   function semCarimbo(j) { return JSON.stringify({ s: j && j.semana, i: j && j.idiomas, ss: j && j.semanas }); }
-  function aplica(j) { dados = j; semKids(); juntaMinhas(ultMinhas || []); juntaAcervo(ultAcervo || []); juntaBuddy(ultBuddy || []); juntaPaises(ultPaises || []); semanaId = j.semana ? j.semana.id : ''; desenhaLista(); }
+  function aplica(j) { dados = j; semKids(); juntaMinhas(ultMinhas || []); juntaAcervo(ultAcervo || []); juntaBuddy(ultBuddy || []); juntaPaises(ultPaises || []); juntaVida(ultVida || []); semanaId = j.semana ? j.semana.id : ''; desenhaLista(); }
   function carregaLista(id, depois) {
     var vez = ++vezLista, g = guardada(id), viu = false;
     if (g && g.semana && g.idiomas) { delete g._offline; aplica(g); viu = true; if (depois) { depois(); depois = null; } }
@@ -556,7 +568,7 @@
       if (!x) return '<span class="sem vazia"></span>';
       var p = partesSemana(x.nome);
       return '<button type="button" class="sem' + (k === 1 ? ' on' : '') + '" data-sem="' + esc(x.id) + '"><b>' + esc(p.n) + (x.atual ? ' · hoje' : '') + '</b><span>' + esc(p.d) + '</span>' +
-        (k === 1 ? (function () { var ks = Object.keys(dados.idiomas || {}).filter(function (x) { return x !== MINHAS && x !== ACERVO && x !== BUDDY && x !== PAISES; }), n = 0; ks.forEach(function (x) { n += dados.idiomas[x].length; }); return '<small>' + (n ? n + (n === 1 ? ' atividade' : ' atividades') + ' · ' + esc(ks.join(', ')) : 'nenhuma atividade da semana ainda') + '</small>'; })() : '') + '</button>';
+        (k === 1 ? (function () { var ks = Object.keys(dados.idiomas || {}).filter(function (x) { return x !== MINHAS && x !== ACERVO && x !== BUDDY && x !== PAISES && x !== VIDA; }), n = 0; ks.forEach(function (x) { n += dados.idiomas[x].length; }); return '<small>' + (n ? n + (n === 1 ? ' atividade' : ' atividades') + ' · ' + esc(ks.join(', ')) : 'nenhuma atividade da semana ainda') + '</small>'; })() : '') + '</button>';
     }).join('');
   }
   function turmaBase() { var t = typeof fiskTurmaDeAgora === 'function' ? fiskTurmaDeAgora(s) : null, agora = !!t; if (!t && typeof fiskTurmaProxima === 'function') t = fiskTurmaProxima(s); if (t) t.agora = agora; return t; }
@@ -594,7 +606,7 @@
     var out = [], extras = [];
     ['English', 'Español'].concat(Object.keys(dados.idiomas || {}).filter(function (k) { return k !== 'English' && k !== 'Español'; })).forEach(function (idioma) {
       var itens = (dados.idiomas[idioma] || []).filter(function (it) { return it !== dest; }), soltos = itens.filter(function (it) { return !it.grupo; });
-      var band = idioma === 'English' ? '🇺🇸 ' : idioma === 'Español' ? '🇪🇸 ' : idioma === MINHAS ? '🧩 ' : idioma === ACERVO ? '🗂️ ' : idioma === BUDDY ? '🐻 ' : idioma === PAISES ? '🌍 ' : '📁 ';
+      var band = idioma === 'English' ? '🇺🇸 ' : idioma === 'Español' ? '🇪🇸 ' : idioma === MINHAS ? '🧩 ' : idioma === ACERVO ? '🗂️ ' : idioma === BUDDY ? '🐻 ' : idioma === PAISES ? '🌍 ' : idioma === VIDA ? '🏡 ' : '📁 ';
       var ord = function (a, b) { var o = { Teens: 0, Basic: 1, Intermediate: 2, Advanced: 3, Todos: 4 }; return ((o[nivelDe(a)] == null ? 9 : o[nivelDe(a)]) - (o[nivelDe(b)] == null ? 9 : o[nivelDe(b)])) || (perfilDe(a) === perfilDe(b) ? 0 : (perfilDe(a) === 'Jovens' ? -1 : 1)); };
       if (soltos.length) out.push({ k: idioma, rot: band + idioma, itens: soltos.sort(ord) });
       var gs = {}; itens.filter(function (it) { return it.grupo; }).forEach(function (it) { (gs[it.grupo] = gs[it.grupo] || []).push(it); });
@@ -713,6 +725,7 @@
   function obterCm(it) {
     var k = chaveCache(it);
     var baixa = function () {
+      if (it.origem === 'everyday') return fetch('everyday-life/' + encodeURIComponent(it.id) + '.json', { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error('não veio'); return r.text(); });
       if (it.origem === 'countries') return fetch('countries/' + encodeURIComponent(it.id) + '.json', { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error('não veio'); return r.text(); });
       if (it.origem === 'buddy') return fetch('buddy-talks/' + encodeURIComponent(it.id) + '.json', { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error('não veio'); return r.text(); });
       var doMaker = it.origem === 'minha' || it.origem === 'acervo';   /* do Conversation Maker: as minhas e as do acervo */
@@ -756,7 +769,7 @@
   /* guardar a semana inteira neste computador (o Hub já faz isso sozinho ao abrir; este botão força agora) */
   function guardarSemana() {
     var b = $('bOff'); if (!dados || !window.caches) return;
-    var prontos = todos().filter(function (i) { return i.pronto && i.origem !== 'acervo' && i.origem !== 'buddy' && i.origem !== 'countries'; }), feitos = 0;   /* o acervo não desce inteiro */
+    var prontos = todos().filter(function (i) { return i.pronto && i.origem !== 'acervo' && i.origem !== 'buddy' && i.origem !== 'countries' && i.origem !== 'everyday'; }), feitos = 0;   /* o acervo não desce inteiro */
     b.disabled = true;
     fiskGuardarPaginaOffline('conversacao.html').then(function () {
       var cadeia = Promise.resolve();
@@ -1494,6 +1507,7 @@
   pedeMinhas().then(function (itens) { ultMinhas = itens; if (dados && !$('lista').hidden) { juntaMinhas(itens); desenhaLista(); } });
   pedeBuddy().then(function (itens) { ultBuddy = itens; if (dados && !$('lista').hidden) { juntaBuddy(itens); desenhaLista(); } });
   pedePaises().then(function (itens) { ultPaises = itens; if (dados && !$('lista').hidden) { juntaPaises(itens); desenhaLista(); } });
+  pedeVida().then(function (itens) { ultVida = itens; if (dados && !$('lista').hidden) { juntaVida(itens); desenhaLista(); } });
   pedeAcervo().then(function (itens) { ultAcervo = itens; if (dados && !$('lista').hidden) { juntaAcervo(itens); desenhaLista(); } });
   try { if (localStorage.getItem('fisk_theme') === 'dark') document.body.classList.add('theme-dark'); } catch (e) {}
   fiskApresEnviar(false);   /* o que ficou na fila de uma aula sem internet */
