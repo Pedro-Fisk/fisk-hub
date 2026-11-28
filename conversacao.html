@@ -1045,9 +1045,11 @@
   /* AS VOZES DO CONVERSATION MAKER (Pedro, 28/11/2026: "gerar mp3 ao publicar"): o "💾 Salvar no portal" grava os mp3
      (edge-tts, api/vozes.py do conversation-maker) DENTRO do .cmjson, em vozes.a { "<texto>": "<base64>" }. Entram
      direto no cache da voz; a Azure só é chamada para o que não veio (atividade salva antes de 28/11). */
+  var vozCm = {};   /* texto → base64 da atividade do CM aberta: também vai para o celular (aulaVocabSom) */
   function vozDoCm(o) {
+    vozCm = {};
     var a = o && o.vozes && o.vozes.a; if (!a) return;
-    Object.keys(a).forEach(function (t) { if (a[t]) vozCache[t] = Promise.resolve(a[t]); });
+    Object.keys(a).forEach(function (t) { if (a[t]) { vozCache[t] = Promise.resolve(a[t]); vozCm[t] = a[t]; } });
   }
   function base64De(buf) {
     var u = new Uint8Array(buf), out = '';
@@ -1277,7 +1279,7 @@
         return (jg && jg.ot ? vozMp3(jg.ot).catch(function () { return null; }) : Promise.resolve(null)).then(function (mp3) {
           return aulaAudioPasso(k).then(function (au) {
             return aulaApi({ op: 'clique', aula: a.id, chave: a.chave, n: k, atual: a.agora, img: img, jogo: jg, s: mp3 || (au && au.s) || undefined,
-              somPasso: au ? { nome: au.nome, d: au.d, u: au.u } : undefined, vocab: aulaVocab(k), vocabArq: aulaVocabArq(k), aval: aulaAval(k) });
+              somPasso: au ? { nome: au.nome, d: au.d, u: au.u } : undefined, vocab: aulaVocab(k), vocabArq: aulaVocabArq(k), vocabSom: aulaVocabSom(k), aval: aulaAval(k) });
           });
         });
       }).then(function (r) {
@@ -1406,6 +1408,14 @@
   function aulaVocabArq(k) {
     var v = aulaVocab(k); if (!v) return undefined;
     var l = v.map(function (w) { return vozArq[w] || ''; });
+    return l.some(Boolean) ? l : undefined;
+  }
+  /* AS VOZES DO CONVERSATION MAKER NO CELULAR (28/11/2026): o mp3 de cada palavra vem dentro da atividade (vozCm), então
+     vai junto, no PRIMEIRO clique do slide de vocabulário (os outros cliques do mesmo slide não repetem o peso). O portal
+     guarda até o fim da aula e o celular toca de lá (api/aula.js, ?voc=) */
+  function aulaVocabSom(k) {
+    var v = aulaVocab(k), p = v && aulaPasso(k - 1); if (!v || !p || p.et !== 0) return undefined;
+    var l = v.map(function (w) { return vozArq[w] ? '' : (vozCm[w] || ''); });
     return l.some(Boolean) ? l : undefined;
   }
   function aulaAval(k) {
