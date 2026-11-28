@@ -105,7 +105,8 @@ node --check assets/index.js
 
 # mexeu em QUALQUER .js/.css local? recalcula o ?v= de todas as páginas pelo md5 do arquivo
 node scripts/bump-version.js
-# e antes do push: acusa (e sai com 1) se algum ?v= não bate com o arquivo em disco,
+# e antes do push (desde 28/11/2026 o .githooks/pre-push roda sozinho e RECUSA o push; emergência: --no-verify;
+# cópia nova do repositório: git config core.hooksPath .githooks): acusa se algum ?v= não bate com o arquivo em disco,
 # ou se uma atividade das séries mudou depois das vozes (<pasta>/voz/fonte.json) ou falta mp3 do índice
 node scripts/conferir-publicacao.js
 # rodou um build-buddy-talks/countries/everyday/youtubers.js? gere as vozes (edge-tts + playwright, no computador)
