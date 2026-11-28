@@ -810,7 +810,7 @@
     if (atual.tipo === 'cm') {
       obterCm(atual).then(function (o) {
         deck = deckDe(o); deckFoto = deckDe(o); paginas = []; ci = 0; et = 0; $('palco').innerHTML = '';
-        vozLingua = o.lesson && o.lesson.language === 'spanish' ? 'es' : 'en'; vozCache = {}; vozArqCarrega(atual).then(vozAntecipa);
+        vozLingua = o.lesson && o.lesson.language === 'spanish' ? 'es' : 'en'; vozCache = {}; vozDoCm(o); vozArqCarrega(atual).then(vozAntecipa);
         aulaBotao();
         capa();
       }).catch(function (e) { $('capaCorpo').innerHTML = '<p class="erro">Não consegui abrir (' + esc(e.message) + ').</p><div class="linha"><button class="sec" id="bVolta">← Voltar à lista</button></div>'; $('bVolta').onclick = volta; });
@@ -1041,6 +1041,13 @@
       Object.keys(a).forEach(function (t) { fora[t] = new URL(pasta + '/voz/' + a[t], location.href).href; });
       if (atual === it) vozArq = fora;
     });
+  }
+  /* AS VOZES DO CONVERSATION MAKER (Pedro, 28/11/2026: "gerar mp3 ao publicar"): o "💾 Salvar no portal" grava os mp3
+     (edge-tts, api/vozes.py do conversation-maker) DENTRO do .cmjson, em vozes.a { "<texto>": "<base64>" }. Entram
+     direto no cache da voz; a Azure só é chamada para o que não veio (atividade salva antes de 28/11). */
+  function vozDoCm(o) {
+    var a = o && o.vozes && o.vozes.a; if (!a) return;
+    Object.keys(a).forEach(function (t) { if (a[t]) vozCache[t] = Promise.resolve(a[t]); });
   }
   function base64De(buf) {
     var u = new Uint8Array(buf), out = '';
