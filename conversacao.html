@@ -148,15 +148,23 @@
   #palco > img{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; transition: opacity .45s ease-in-out; }
   #palco > img.on{ opacity: 1; }
   body.esconde-cursor, body.esconde-cursor *{ cursor: none !important; }
-  #barra{ position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); display: flex; align-items: center; gap: .55rem; padding: .5rem .7rem;
-          background: rgba(15,15,20,.8); border: 1px solid rgba(255,255,255,.16); border-radius: 16px; backdrop-filter: blur(8px);
-          opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 5; font-size: .9rem; white-space: nowrap; color: #fff; }
+  /* A BARRA DO PROFESSOR (Pedro, 28/11/2026: "mais bonito, mais colorido e com a letra um pouquinho maior"): cada
+     botão com a sua cor, letra de 1,1 rem, e o ⚙ virou "⏱ Cronômetro". Ligado (celular, cronômetro, alunos) = contorno
+     amarelo, porque a cor já é do botão */
+  #barra{ position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); display: flex; align-items: center; gap: .6rem; padding: .6rem .75rem;
+          background: rgba(15,23,42,.9); border: 1px solid rgba(255,255,255,.12); border-radius: 22px; backdrop-filter: blur(8px); box-shadow: 0 12px 34px rgba(0,0,0,.35);
+          opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 5; font-size: 1.1rem; white-space: nowrap; color: #fff; }
   body.mostra #barra{ opacity: 1; pointer-events: auto; }
-  #barra button{ font: inherit; font-weight: 800; color: #fff; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); border-radius: 10px; padding: .4rem .7rem; cursor: pointer; }
-  #barra button:hover{ background: rgba(255,255,255,.2); }
-  #barra .n{ min-width: 6.5rem; text-align: center; font-weight: 800; opacity: .85; }
-  #barra .sep{ width: 1px; align-self: stretch; background: rgba(255,255,255,.18); }
-  #barra #bFone.on{ background: #31A889; border-color: #31A889; }
+  #barra button{ font: inherit; font-weight: 800; color: #fff; background: rgba(255,255,255,.12); border: 0; border-radius: 14px; padding: .55rem .95rem; cursor: pointer;
+                 transition: transform .15s, filter .15s, box-shadow .2s; }
+  #barra button:hover{ filter: brightness(1.12); transform: translateY(-2px); }
+  #barra #bAnt, #barra #bProx{ background: #fff; color: #0f172a; min-width: 2.8rem; }
+  #barra #bInicio{ background: #6366f1; } #barra #bCheia{ background: #0ea5e9; } #barra #bFone{ background: #31A889; }
+  #barra #bCrono{ background: linear-gradient(135deg, #f59e0b, #f97316); } #barra #bSorteio{ background: #a855f7; }
+  #barra #bAlunos{ background: #e5484d; } #barra #bSair{ background: rgba(255,255,255,.14); min-width: 2.8rem; }
+  #barra button.on{ box-shadow: 0 0 0 3px #fde68a; }
+  #barra .n{ min-width: 6rem; text-align: center; font-weight: 800; opacity: .9; }
+  #barra .sep{ width: 2px; align-self: stretch; background: rgba(255,255,255,.15); border-radius: 2px; }
   /* o celular como controle remoto (27/11/2026): o QR code sobre a TV até o celular parear */
   #qrFone{ position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; background: rgba(5,8,12,.72); }
   #qrFone[hidden]{ display: none; }
@@ -167,7 +175,7 @@
   #qrFone .qr svg{ width: 100%; height: 100%; }
   #qrFone button{ font: 800 .95rem inherit; margin-top: .6rem; border: 1.5px solid #cbd5e1; background: #fff; border-radius: 12px; padding: .55rem 1rem; cursor: pointer; }
   /* a conversação no celular dos alunos (27/11/2026): o QR grande e o pequeno no canto do palco */
-  #barra #bAlunos.on{ background: #e5484d; border-color: #e5484d; }
+
   #qrAula{ position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; background: rgba(5,8,12,.72); }
   #qrAula[hidden]{ display: none; }
   /* o card no clima do "Conversação de hoje" da home do aluno (azul, bolhas, chip vermelho de ao vivo) */
@@ -233,23 +241,48 @@
   #avalVer button{ margin-top: 12px; border: 0; border-radius: 999px; padding: 10px 20px; background: #1d3a8a; color: #fff; font-weight: 800; cursor: pointer; }
   /* FERRAMENTAS DA AULA (Pedro, 27/11/2026): o cronômetro do Pair Work (desligado por padrão desde 28/11/2026, o professor liga) e o
      sorteio (desligado por padrão, o professor ativa). Liga e desliga no ⚙ da barra, guardado neste computador. */
-  #ferr{ position: fixed; right: 14px; bottom: 74px; z-index: 30; background: #fff; color: #0f172a; border-radius: 14px; padding: 14px 16px; box-shadow: 0 10px 30px rgba(0,0,0,.35); display: flex; flex-direction: column; gap: 8px; font: 600 .92rem system-ui, sans-serif; min-width: 270px; }
+  /* A JANELA DO CRONÔMETRO (28/11/2026: "muito pequena... quero maior, mais funcional, mais visível"): tempos prontos, o
+     tempo grande para ajustar, começar/pausar/parar e os dois interruptores, tudo à vista */
+  #ferr{ position: fixed; right: 24px; bottom: 96px; z-index: 30; width: 440px; max-width: calc(100vw - 16px); background: #fff; color: #0f172a; border-radius: 24px; padding: 20px 22px 18px;
+         box-shadow: 0 24px 60px rgba(0,0,0,.4); font: 600 1rem system-ui, sans-serif; }
   #ferr[hidden]{ display: none; }
-  #ferr .min button{ border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 8px; padding: 2px 9px; font-weight: 800; cursor: pointer; }
-  #ferr small{ color: #64748b; font-weight: 500; }
-  #crono{ position: fixed; right: 18px; top: 18px; z-index: 14; width: 150px; height: 150px; cursor: pointer; filter: drop-shadow(0 8px 18px rgba(0,0,0,.35)); }
+  #ferr .topo{ display: flex; align-items: center; margin-bottom: 14px; }
+  #ferr .topo b{ font-size: 1.45rem; font-weight: 900; }
+  #ferr button{ font: inherit; border: 0; cursor: pointer; }
+  #fFecha{ margin-left: auto; width: 36px; height: 36px; border-radius: 50%; background: #f1f5f9; font-weight: 900 !important; }
+  #ferr .chips{ display: flex; gap: 8px; margin-bottom: 12px; }
+  #ferr .chips button{ flex: 1; padding: 11px 0; border-radius: 14px; background: #f1f5f9; font-weight: 900; font-size: 1.15rem; color: #0f172a; }
+  #ferr .chips button.sel{ background: #f97316; color: #fff; }
+  #ferr .ajuste{ display: flex; align-items: center; justify-content: center; gap: 18px; margin: 4px 0 14px; }
+  #ferr .ajuste button{ width: 52px; height: 52px; border-radius: 50%; background: #f1f5f9; font-size: 1.8rem; font-weight: 900; color: #0f172a; }
+  #fMin{ font: 900 2.9rem system-ui, sans-serif; font-variant-numeric: tabular-nums; min-width: 7.5rem; text-align: center; }
+  #ferr .acoes{ display: flex; gap: 10px; }
+  #ferr .acoes button{ flex: 1; padding: 13px 0; border-radius: 16px; font-weight: 900; font-size: 1.12rem; }
+  #fJa{ background: #31A889; color: #fff; } #fPausa{ background: #fef3c7; color: #92400e; } #fPara{ background: #fee2e2; color: #b91c1c; }
+  #ferr .acoes button[hidden]{ display: none; }
+  #ferr .liga{ display: flex; align-items: center; gap: 12px; margin-top: 14px; font-weight: 700; color: #334155; cursor: pointer; }
+  #ferr .liga input{ appearance: none; -webkit-appearance: none; flex: none; width: 46px; height: 27px; border-radius: 14px; background: #cbd5e1; position: relative; cursor: pointer; transition: background .2s; margin: 0; }
+  #ferr .liga input::after{ content: ""; position: absolute; left: 3px; top: 3px; width: 21px; height: 21px; border-radius: 50%; background: #fff; transition: left .2s; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+  #ferr .liga input:checked{ background: #31A889; } #ferr .liga input:checked::after{ left: 22px; }
+  #ferr small{ display: block; margin-top: 10px; color: #64748b; font-weight: 500; font-size: .85rem; }
+  /* O ANEL (28/11/2026, opção A): verde, amarelo nos últimos 30 s e vermelho no zero, com a bolinha na ponta */
+  #crono{ position: fixed; right: 26px; top: 22px; z-index: 14; width: 230px; height: 230px; cursor: pointer; filter: drop-shadow(0 16px 30px rgba(0,0,0,.3)); }
   #crono[hidden]{ display: none; }
-  #crono svg{ width: 100%; height: 100%; transform: rotate(-90deg); }
-  #crono circle{ fill: none; stroke-width: 12; }
-  #crono .trilho{ fill: rgba(15,23,42,.78); stroke: rgba(255,255,255,.15); }
-  #crono .arco{ stroke: #31A889; stroke-linecap: round; stroke-dasharray: 326.7; transition: stroke-dashoffset 1s linear, stroke .4s; }
-  #crono.pouco .arco{ stroke: #f59e0b; } #crono.zero .arco{ stroke: #e5484d; }
-  #crono #cronoT{ position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; font: 900 2.3rem system-ui, sans-serif; font-variant-numeric: tabular-nums; }
-  #crono.pausa #cronoT{ opacity: .55; }
+  #crono svg{ width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
+  #crono circle{ fill: none; }
+  #crono .trilho{ fill: #0f172a; stroke: rgba(255,255,255,.88); stroke-width: 15; }
+  #crono .arco{ stroke: #31A889; stroke-width: 15; stroke-linecap: round; stroke-dasharray: 326.7; transition: stroke-dashoffset .25s linear, stroke .4s; }
+  #crono .ponta{ fill: #fff; stroke: #31A889; stroke-width: 5; transition: stroke .4s; }
+  #crono.pouco .arco, #crono.pouco .ponta{ stroke: #f59e0b; } #crono.zero .arco, #crono.zero .ponta{ stroke: #e5484d; }
+  #crono .meio{ position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; pointer-events: none; }
+  #cronoT{ font: 900 3.9rem/1 system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+  #cronoS{ font: 800 .95rem system-ui, sans-serif; letter-spacing: .14em; color: #6ee7b7; margin-top: 6px; }
+  #crono.pouco #cronoS{ color: #fcd34d; } #crono.zero #cronoS{ color: #fca5a5; }
+  #crono.pausa #cronoT{ opacity: .5; }
   #crono.zero{ animation: cronoPulsa .6s ease-in-out 6; }
-  @keyframes cronoPulsa{ 50%{ transform: scale(1.12); } }
-  #crono button{ position: absolute; border: 0; width: 30px; height: 30px; border-radius: 50%; background: #fff; color: #0f172a; font-weight: 900; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,.3); }
-  #cronoDe{ left: -4px; bottom: -4px; } #cronoX{ right: -4px; top: -4px; font-size: .75rem; }
+  @keyframes cronoPulsa{ 50%{ transform: scale(1.1); } }
+  #crono button{ position: absolute; border: 0; width: 38px; height: 38px; border-radius: 50%; background: #fff; color: #0f172a; font-weight: 900; font-size: 1.05rem; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,.3); }
+  #cronoDe{ left: 4px; bottom: 4px; } #cronoX{ right: 4px; top: 4px; font-size: .85rem !important; }
   #sorteio{ position: fixed; inset: 0; z-index: 40; background: rgba(8,12,24,.82); display: flex; align-items: center; justify-content: center; }
   #sorteio[hidden]{ display: none; }
   #sorteio .cx{ background: linear-gradient(135deg, #1d3a8a, #7c3aed); color: #fff; border-radius: 28px; padding: 34px 40px; width: min(92vw, 980px); text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
@@ -340,12 +373,13 @@
     #barra .sep{ display: none; }
     #barra .n{ min-width: 0; font-size: .82rem; padding: 0 .2rem; white-space: nowrap; }
     #barra button{ padding: .45rem .7rem; font-size: 1.05rem; line-height: 1; min-width: 42px; min-height: 40px; }
-    #crono{ width: 92px; height: 92px; top: max(8px, env(safe-area-inset-top)); right: 8px; }
-    #crono #cronoT{ font-size: 1.35rem; } #crono button{ width: 24px; height: 24px; font-size: .7rem; }
+    #crono{ width: 120px; height: 120px; top: max(8px, env(safe-area-inset-top)); right: 8px; }
+    #cronoT{ font-size: 1.9rem; } #cronoS{ font-size: .55rem; margin-top: 3px; } #crono button{ width: 28px; height: 28px; font-size: .75rem; }
     #aulaCanto{ right: 8px; bottom: auto; top: max(8px, env(safe-area-inset-top)); left: 8px; right: auto; padding: 4px; }
     #aulaCanto .qr{ width: 58px; height: 58px; } #aulaCanto span{ font-size: .55rem; }
     #aulaPlacar{ right: auto; left: 50%; transform: translateX(-50%); bottom: auto; top: max(8px, env(safe-area-inset-top)); font-size: .85rem; }
-    #ferr{ left: 8px; right: 8px; min-width: 0; bottom: 120px; }
+    #ferr{ left: 8px; right: 8px; width: auto; bottom: 120px; max-height: calc(100vh - 140px); overflow-y: auto; padding: 16px; }
+    #fMin{ font-size: 2.3rem; } #ferr .chips button{ padding: 9px 0; font-size: 1rem; }
     #qrAula{ align-items: flex-start; overflow-y: auto; padding: max(8px, env(safe-area-inset-top)) 8px 8px; }
     #qrAula .cx{ max-width: 100%; padding: 1rem 1rem .9rem; border-radius: 20px; margin: auto 0; }
     #qrAula .bolhas{ display: none; }
@@ -417,7 +451,7 @@
     <button type="button" id="bCheia" title="Tela cheia (F)">⛶<span class="tx"> Tela cheia</span></button>
     <button type="button" id="bFone" title="Usar o celular como controle remoto">📱<span class="tx"> Controlar pelo celular</span></button>
     <button type="button" id="bSorteio" hidden title="Sortear um aluno ou formar duplas, com os nomes da turma de agora">🎲<span class="tx"> Sorteio</span></button>
-    <button type="button" id="bFerr" title="Cronômetro do Pair Work e sorteio: ligar e desligar">⚙</button>
+    <button type="button" id="bCrono" title="Cronômetro do Pair Work (e o botão do sorteio)">⏱<span class="tx"> Cronômetro</span></button>
     <button type="button" id="bAlunos" title="Os alunos acompanham no celular os cliques que você já mostrou">👥<span class="tx"> Alunos</span></button>
     <button type="button" id="bSair" title="Voltar à abertura (Esc)">✕</button>
   </div>
@@ -426,12 +460,15 @@
   <div id="qrAula" hidden><div class="cx"><div class="bolhas" aria-hidden="true"><i style="left:5%;top:5%">💬</i><i style="right:6%;top:8%;animation-delay:.8s">🎉</i><img class="logo" src="assets/fisk-logo-balao-360.png" alt="" style="left:2.5%;top:33%"><i style="left:8%;top:64%;animation-delay:1.6s">✨</i><i style="right:7%;top:50%;animation-delay:2.2s">💬</i></div><span class="chip">AO VIVO</span><h2>Bora conversar! 📱</h2><p>Abra a câmera, aponte para o código e siga os slides junto com a turma.</p><div class="qr" id="qrAulaImg"></div><p class="cod" id="qrAulaCod"></p><p id="qrAulaTxt" style="font-size:.9rem">Preparando…</p><div class="linha"><button type="button" class="fim" id="aulaFim">✓ Finalizar e liberar a atividade inteira</button><button type="button" id="aulaFd" hidden title="Vale para a aula inteira: 20 por acerto e 5 por responder, no Portal do Aluno de quem entrou pelo card ou está logado">💰 Jogo vale Fisk Dólares: SIM</button><button type="button" id="aulaAval" title="O que a turma respondeu no slide de avaliação, com os comentários (sem nome de aluno)">📝 Avaliações</button><button type="button" id="aulaCopia" title="Para a turma online: cole no chat do Google Meet e cada aluno abre numa aba">📋 Copiar o link para o chat</button><button type="button" id="qrAulaFecha">Fechar</button></div></div></div>
   <div id="aulaPlacar" hidden aria-live="polite"></div>
   <div id="avalVer" hidden><div class="cx"><h2>📝 Avaliações da aula</h2><div id="avalVerCorpo"></div><button type="button" id="avalVerFecha">Fechar</button></div></div>
-  <div id="ferr" hidden><b>Ferramentas da aula</b>
-    <label><input type="checkbox" id="fCrono"> ⏱ Cronômetro no Pair Work</label>
-    <div class="min">Tempo: <button type="button" id="fMenos">−</button> <span id="fMin">3</span> min <button type="button" id="fMais">+</button> <button type="button" id="fJa" title="Começar o cronômetro agora, em qualquer slide">▶ Agora</button></div>
-    <label><input type="checkbox" id="fSorteio"> 🎲 Botão de sorteio na barra</label>
+  <div id="ferr" hidden>
+    <div class="topo"><b>⏱ Cronômetro</b><button type="button" id="fFecha" title="Fechar">✕</button></div>
+    <div class="chips" id="fChips"><button type="button" data-m="1">1</button><button type="button" data-m="2">2</button><button type="button" data-m="3">3</button><button type="button" data-m="5">5</button><button type="button" data-m="10">10</button></div>
+    <div class="ajuste"><button type="button" id="fMenos" title="Um minuto a menos">−</button><span id="fMin">3:00</span><button type="button" id="fMais" title="Um minuto a mais">+</button></div>
+    <div class="acoes"><button type="button" id="fJa" title="Começar agora, em qualquer slide">▶ Começar</button><button type="button" id="fPausa" hidden>⏸ Pausar</button><button type="button" id="fPara" hidden>■ Parar</button></div>
+    <label class="liga"><input type="checkbox" id="fCrono"> Começar sozinho em todo Pair Work</label>
+    <label class="liga"><input type="checkbox" id="fSorteio"> 🎲 Mostrar o Sorteio na barra</label>
     <small>Fica guardado neste computador.</small></div>
-  <div id="crono" hidden title="Clique para pausar ou continuar"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" class="trilho"></circle><circle cx="60" cy="60" r="52" class="arco" id="cronoArco"></circle></svg><span id="cronoT">3:00</span><button type="button" id="cronoDe" title="Recomeçar">↻</button><button type="button" id="cronoX" title="Esconder">✕</button></div>
+  <div id="crono" hidden title="Clique para pausar ou continuar"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" class="trilho"></circle><circle cx="60" cy="60" r="52" class="arco" id="cronoArco"></circle><circle cx="112" cy="60" r="6" class="ponta" id="cronoPonta"></circle></svg><span class="meio"><span id="cronoT">3:00</span><span id="cronoS">PAIR WORK</span></span><button type="button" id="cronoDe" title="Recomeçar">↻</button><button type="button" id="cronoX" title="Esconder">✕</button></div>
   <div id="sorteio" hidden><div class="cx"><p class="tit" id="sorTit">🎲</p><div id="sorNome">…</div><div id="sorDuplas" hidden></div>
     <div class="linha"><button type="button" id="sorDeNovo">🎲 Sortear de novo</button><button type="button" id="sorDup">👥 Formar duplas</button><label><input type="checkbox" id="sorRep" checked> não repetir</label><button type="button" id="sorFecha">Fechar</button></div></div></div>
   <div id="aulaCanto" hidden title="Os alunos acompanham por este código"><div class="qr" id="aulaCantoImg"></div><span id="aulaCantoCod"></span></div>
@@ -1635,8 +1672,14 @@
   function cronoDesenha() {
     var seg = Math.max(0, Math.ceil(crono.resta / 1000)), el = $('crono');
     $('cronoT').textContent = Math.floor(seg / 60) + ':' + ('0' + seg % 60).slice(-2);
-    $('cronoArco').style.strokeDashoffset = String(326.7 * (1 - (crono.total ? crono.resta / crono.total : 0)));
+    var fr = crono.total ? crono.resta / crono.total : 0, ang = 2 * Math.PI * fr;
+    $('cronoArco').style.strokeDashoffset = String(326.7 * (1 - fr));
+    /* a bolinha na ponta do arco (o svg está girado -90°: ângulo 0 = topo) */
+    $('cronoPonta').setAttribute('cx', (60 + 52 * Math.cos(ang)).toFixed(2)); $('cronoPonta').setAttribute('cy', (60 + 52 * Math.sin(ang)).toFixed(2));
+    $('cronoPonta').style.display = seg > 0 ? '' : 'none';
+    $('cronoS').textContent = crono.pausa ? '⏸' : (aulaLingua() === 'es' ? 'EN PAREJAS' : 'PAIR WORK');
     el.classList.toggle('pouco', seg > 0 && seg <= 30); el.classList.toggle('zero', seg === 0); el.classList.toggle('pausa', crono.pausa);
+    if (!$('ferr').hidden) ferrDesenha();
   }
   function cronoTique() {
     clearTimeout(crono.t);
@@ -1649,7 +1692,7 @@
     crono.total = crono.resta = cronoMin * 60000; crono.fim = Date.now() + crono.total; crono.pausa = false;
     $('crono').hidden = false; cronoTique();
   }
-  function cronoPara() { clearTimeout(crono.t); $('crono').hidden = true; crono.slide = -1; }
+  function cronoPara() { clearTimeout(crono.t); $('crono').hidden = true; crono.slide = -1; if (!$('ferr').hidden) ferrDesenha(); }
   function cronoSino() {
     try { var c = new (window.AudioContext || window.webkitAudioContext)(), t0 = c.currentTime;
       [[1046.5, 0], [784, .22], [1046.5, .44], [1318.5, .66]].forEach(function (n) { var o = c.createOscillator(), g = c.createGain(); o.frequency.value = n[0];
@@ -1673,16 +1716,25 @@
     cronoTique(); cronoDesenha();
   };
   function ferrDesenha() {
-    $('fCrono').checked = cronoLig; $('fSorteio').checked = sorteioLig; $('fMin').textContent = cronoMin;
-    $('bSorteio').hidden = !sorteioLig;
+    var anda = !$('crono').hidden;
+    $('fCrono').checked = cronoLig; $('fSorteio').checked = sorteioLig; $('fMin').textContent = cronoMin + ':00';
+    [].forEach.call($('fChips').children, function (b) { b.classList.toggle('sel', +b.getAttribute('data-m') === cronoMin); });
+    $('fJa').textContent = anda ? '↻ Recomeçar' : '▶ Começar';
+    $('fPausa').hidden = $('fPara').hidden = !anda || crono.resta <= 0; $('fPausa').textContent = crono.pausa ? '▶ Continuar' : '⏸ Pausar';
+    $('bSorteio').hidden = !sorteioLig; $('bCrono').classList.toggle('on', cronoLig || anda);
   }
-  $('bFerr').onclick = function (e) { e.stopPropagation(); ferrDesenha(); $('ferr').hidden = !$('ferr').hidden; };
+  function cronoMinimo(m) { cronoMin = Math.max(1, Math.min(15, m)); guardaPref('min', cronoMin); ferrDesenha(); }
+  $('bCrono').onclick = function (e) { e.stopPropagation(); ferrDesenha(); $('ferr').hidden = !$('ferr').hidden; };
+  $('fFecha').onclick = function () { $('ferr').hidden = true; };
+  $('fChips').onclick = function (e) { var m = e.target.getAttribute && e.target.getAttribute('data-m'); if (m) cronoMinimo(+m); };
+  $('fPausa').onclick = function () { if (crono.resta <= 0) return; crono.pausa = !crono.pausa; if (!crono.pausa) crono.fim = Date.now() + crono.resta; cronoTique(); cronoDesenha(); ferrDesenha(); };
+  $('fPara').onclick = function () { cronoPara(); };
   $('ferr').onclick = function (e) { e.stopPropagation(); };
   document.addEventListener('click', function () { $('ferr').hidden = true; });
-  $('fCrono').onchange = function () { cronoLig = this.checked; guardaPref('crono', cronoLig ? 1 : 0); if (!cronoLig) cronoPara(); else { crono.slide = -1; cronoNoSlide(); } };
+  $('fCrono').onchange = function () { cronoLig = this.checked; guardaPref('crono', cronoLig ? 1 : 0); if (!cronoLig) cronoPara(); else { crono.slide = -1; cronoNoSlide(); } ferrDesenha(); };
   $('fSorteio').onchange = function () { sorteioLig = this.checked; guardaPref('sorteio', sorteioLig ? 1 : 0); ferrDesenha(); };
-  $('fMenos').onclick = function () { cronoMin = Math.max(1, cronoMin - 1); guardaPref('min', cronoMin); ferrDesenha(); };
-  $('fMais').onclick = function () { cronoMin = Math.min(15, cronoMin + 1); guardaPref('min', cronoMin); ferrDesenha(); };
+  $('fMenos').onclick = function () { cronoMinimo(cronoMin - 1); };
+  $('fMais').onclick = function () { cronoMinimo(cronoMin + 1); };
   $('fJa').onclick = function () { crono.slide = -2; cronoComeca(); $('ferr').hidden = true; };
   ferrDesenha();
 
