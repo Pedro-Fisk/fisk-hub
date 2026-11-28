@@ -283,24 +283,31 @@ function pintaFila() {
   var nAt = Object.keys(estado.atendidos).length;
   f.className = 'fila-info roteiro' + (plano && plano.ordem && plano.ordem.length ? '' : ' sem');
   var info;
+  var plTit;
   if (plano && plano.ordem && plano.ordem.length) {
     var na = estado.alunos.filter(function (a) { return a._plan; }).length;
     var d = plano.data ? plano.data.split('-').reverse().join('/') : '';
-    info = '📋 <b>Ordem salva' + (plano.hoje ? ' para hoje' : ' em ' + esc(d)) + '</b>' + ' · ' + na + ' de ' + estado.alunos.length + ' na ordem';
-  } else info = '📋 <b>Sem ordem salva.</b> Os alunos estão na ordem do card.';
+    plTit = 'Ordem salva' + (plano.hoje ? ' para hoje' : ' em ' + d);
+    info = na + ' de ' + estado.alunos.length + ' alunos na ordem';
+  } else { plTit = 'Sem ordem salva'; info = 'Os alunos estão na ordem do card'; }
+  if (estado.prioridade) info = '⚡ Ordenados por prioridade · ' + info;
   if (estado.ontem) info = '<span class="rt-ontem">📅 <b>Lançando a aula de ontem (' + esc(ontemIsoTH().split('-').reverse().slice(0, 2).join('/')) + ')</b> · presença e falta vão para a célula de ontem do card, só se estiver vazia</span> · ' + info;
   if (nAt) info += ' · <b>' + nAt + ' atendido' + (nAt === 1 ? '' : 's') + '</b>';
   var prio = estado.alunos.length > 1 ? '<button type="button" class="prio-grande" data-prio>' + (estado.prioridade ? '↺ Voltar à ordem ' + (estado.plantao ? 'de chegada' : 'da turma') : '⚡ Ordenar por prioridade') + '</button>' : '';
   /* painel do Planejador (Pedro, 17/09): título e situação em cima; ordenar, data + salvar, e as saídas agrupadas.
      O "Lançar a aula de ontem" saiu da tela até algum professor pedir (o servidor continua aceitando). */
-  f.innerHTML = '<div class="pl-topo"><span class="pl-tit">Planejador</span>' +
-    '<button type="button" class="btn-recarrega pl-rec" data-recarrega title="Lê de novo o roteiro, as anotações e as marcas dos alunos">↻ Recarregar</button><span class="rt-info">' + info + '</span></div>' +
-    '<div class="pl-acoes">' + prio.replace('class="prio-grande"', 'class="prio-grande' + (estado.prioridade ? ' on' : '') + '"') +
+  /* A MESMA CARA DO CARD DA CONVERSAÇÃO (Pedro, 28/11/2026: "padronizar o tamanho e a estética"): faixa colorida, o
+     rótulo em pílula, o título grande, e os botões verdes à direita */
+  f.innerHTML = '<div class="pl-topo"><span class="pl-ico">📋</span><div class="pl-txt"><span class="pl-tit">Planejador · ordem dos alunos</span>' +
+    '<div class="pl-nome">' + esc(plTit) + '</div><span class="rt-info">' + info + '</span></div>' +
+    '<button type="button" class="btn-recarrega pl-rec" data-recarrega title="Lê de novo o roteiro, as anotações e as marcas dos alunos">↻ Recarregar</button></div>' +
+    /* o "Ordenar por prioridade" no FIM, à direita, no mesmo lugar do "Ir para Conversações" do card de cima (28/11/2026) */
+    '<div class="pl-acoes">' +
     (estado.plantao ? '' : '<div class="pl-salvar"><label class="rt-data">Aula de <input type="date" data-rtdata value="' + dataRoteiroPadrao() + '"></label>' +
       '<button type="button" class="rt-btn forte" data-rtsalva title="Guarda esta ordem para a aula da data escolhida">Salvar ordem</button></div>' +
       '<details class="pl-saidas pl-mais"><summary class="rt-btn">⋯ Mais</summary><div class="pl-mais-menu"><button type="button" class="rt-btn" data-rtcopia>📋 Copiar ordem</button>' +
       '<button type="button" class="rt-btn" data-rtpdf title="Grava o PDF da ordem na pasta da turma">💾 Salvar PDF na pasta da turma</button></div></details>') +
-    '</div>';
+    prio.replace('class="prio-grande"', 'class="prio-grande' + (estado.prioridade ? ' on' : '') + '"') + '</div>';
   var topo = f.querySelector('.pl-topo');
   if (topo) topo.insertAdjacentElement('afterend', poeDica(topo, 'O Planejador decide a ORDEM dos alunos nesta tela: por prioridade, ou a que você arrastar. "Salvar ordem" guarda essa fila para a aula do dia.'));
   var bp = f.querySelector('[data-prio]');
@@ -594,8 +601,9 @@ function statusHtml(html, err) { var el = $('status'); el.innerHTML = html || ''
 /* O CONTADOR DE SEGUNDOS (auditoria de 30/10/2026, A6): fiskEsperando do kit no status, em toda leitura que segura a
    tela. Um de cada vez: a espera nova encerra a anterior, e `esperaFim()` encerra no sucesso E no erro. */
 var _thEsperaFim = null;
-function espera(frases) { esperaFim(); _thEsperaFim = fiskEsperando(function (t) { status(t); }, frases); }
-function esperaFim() { if (_thEsperaFim) { _thEsperaFim(); _thEsperaFim = null; } }
+/* o carregamento com animação (Pedro, 28/11/2026: "atualmente é só uma frase"): a rodinha e a barra correndo ao lado */
+function espera(frases) { esperaFim(); _thEsperaFim = fiskEsperando(function (t) { status(String(t).replace(/^🔄\s*/, '')); var el = $('status'); el.classList.add('esperando'); }, frases); }
+function esperaFim() { if (_thEsperaFim) { _thEsperaFim(); _thEsperaFim = null; } var el = $('status'); if (el) el.classList.remove('esperando'); }
 function get(params) {
   params.token = token();
   var qs = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
@@ -755,6 +763,7 @@ function initCascata() {
       if (selEscola.value !== escola || selProf.value !== prof) return;
       var antes = selTurma.value;
       montarSelect(selTurma, 'Escolha a turma…', [{ v: PLANTAO, t: '🙋 Centro de Estudos (alunos da escola, pela busca)' }].concat(turmas.map(function (t) { return { v: t.linhaTitulo, t: t.titulo }; })));
+      setTimeout(pintaIr, 0);
       if (antes && (antes === PLANTAO || turmas.some(function (t) { return String(t.linhaTitulo) === antes; }))) { selTurma.value = antes; return; }
       if (pedida && pedida.escola === escola && pedida.prof === prof) {
         var linhaPedida = pedida.linha; pedida = null;
@@ -773,13 +782,31 @@ function initCascata() {
       else status('Fora do horário de aula de ' + prof + ': escolha a turma acima.');
     });
   });
-  selTurma.addEventListener('change', function () {
+  /* O "IR" (Pedro, 28/11/2026: "às vezes eu clico na turma errada e não quero que já vá gastando tempo para carregar"):
+     a turma que o PROFESSOR escolhe na lista só carrega no botão. A que a página escolhe sozinha (o horário de agora, o
+     link do card, o Centro de Estudos) continua abrindo na hora: ali não há clique errado. */
+  var bIr = $('bIrTurma'), aberta = '';
+  function abreTurma() {
     if (!selTurma.value) return;
     var titulo = selTurma.options[selTurma.selectedIndex].text;
+    aberta = selEscola.value + '|' + selProf.value + '|' + selTurma.value; pintaIr();
     if (selTurma.value === PLANTAO) { carregarPlantao(selEscola.value, selProf.value); return; }
     fiskLembrarTurma(selEscola.value, selProf.value, selTurma.value, titulo);
     carregarTurma(selEscola.value, selProf.value, selTurma.value, titulo);
-  });  /* a primeira lista vem DEPOIS dos três listeners: do cache ela escolhe na hora, e o change precisa de quem ouvir */
+  }
+  function pintaIr() {
+    var aqui = selEscola.value + '|' + selProf.value + '|' + selTurma.value, pronta = !!selTurma.value && !selTurma.disabled;
+    bIr.disabled = !pronta || aqui === aberta;
+    bIr.classList.toggle('pede', pronta && aqui !== aberta);
+    bIr.textContent = pronta && aqui === aberta ? '✓ Aberta' : 'Ir ▶';
+  }
+  selTurma.addEventListener('change', function (ev) {
+    if (!selTurma.value) return;
+    if (ev.isTrusted) { pintaIr(); if (!bIr.disabled) status('Turma escolhida: toque em "Ir" para carregar.'); return; }
+    abreTurma();
+  });
+  bIr.addEventListener('click', abreTurma);
+  [selEscola, selProf].forEach(function (s) { s.addEventListener('change', function () { setTimeout(pintaIr, 0); }); });  /* a primeira lista vem DEPOIS dos três listeners: do cache ela escolhe na hora, e o change precisa de quem ouvir */
   lista('escolas', { action: 'card', fn: 'escolas' }, 'escolas', function (escolas) {
     var antes = selEscola.value;
     montarSelect(selEscola, 'Escolha a escola…', escolas.map(function (e) { return { v: e, t: e }; }));
@@ -1051,6 +1078,7 @@ function tirarVisitante(raf) {
     var b = ev.target.closest('button[data-i]'); if (!b) return;
     trazerAluno(box._lista[+b.dataset.i]);
   });
+  var bt = $('bTrazer'); if (bt) bt.addEventListener('click', function () { q.focus(); if (q.value.trim().length >= 3) q.dispatchEvent(new Event('input')); else { box.hidden = false; box.innerHTML = '<div class="vazio">Escreva o nome completo ou o RAF do aluno.</div>'; } });
   q.addEventListener('keydown', function (ev) {
     if (ev.key === 'Escape') { box.hidden = true; }
     if (ev.key === 'Enter' && box._lista && box._lista.length === 1 && !box.hidden) { ev.preventDefault(); trazerAluno(box._lista[0]); }
@@ -1104,14 +1132,31 @@ function convLer() {
   }).catch(function () { return convSemana; }).then(function (r) { convPedido = null; return r; });
   return convPedido;
 }
+/* a(s) atividade(s) da turma: a mesma regra da conversacao.html (escolheDestaque). TURMA MISTA (Pedro, 28/11/2026,
+   opção A): uma por nível com 2 ou mais alunos (fiskPerfilDaTurma().niveis). Devolve [{ it, nivel, alunos }]. */
 function convEscolhe(t, d) {
-  if (!t || !t.nivel || !d || !d.idiomas) return null;
+  if (!t || !t.nivel || !d || !d.idiomas) return [];
   var nv = function (it) { return (it.niveis || []).filter(function (n) { return /Teens|Basic|Intermediate|Advanced|Todos/.test(n); })[0] || ''; };
   var pf = function (it) { return (it.niveis || []).filter(function (n) { return /Jovens|Adultos/.test(n); })[0] || ''; };
-  var lista = (d.idiomas[t.idioma] || []).filter(function (it) { return it.pronto; }), nivel = t.nivel, perfil = t.perfil;
-  if (nivel === 'Teens' && !lista.some(function (it) { return nv(it) === 'Teens'; })) { nivel = 'Basic'; perfil = 'Jovens'; }
-  var doNivel = lista.filter(function (it) { return nv(it) === nivel; });
-  return doNivel.filter(function (it) { return !pf(it) || pf(it) === perfil; })[0] || doNivel[0] || null;
+  var lista = (d.idiomas[t.idioma] || []).filter(function (it) { return it.pronto && !it.grupo; });
+  var um = function (nivel) {
+    var perfil = t.perfil;
+    if (nivel === 'Teens' && !lista.some(function (it) { return nv(it) === 'Teens'; })) { nivel = 'Basic'; perfil = 'Jovens'; }
+    var doNivel = lista.filter(function (it) { return nv(it) === nivel; });
+    return doNivel.filter(function (it) { return !pf(it) || pf(it) === perfil; })[0] || doNivel[0] || null;
+  };
+  var out = [];
+  (t.niveis && t.niveis.length > 1 ? t.niveis : [{ nivel: t.nivel, alunos: 0 }]).forEach(function (n) {
+    var it = um(n.nivel); if (it && !out.some(function (o) { return o.it === it; })) out.push({ it: it, nivel: n.nivel, alunos: n.alunos });
+  });
+  return out.slice(0, 2);
+}
+/* o nome sem "Ac -", o nível e o perfil (o mesmo corte da conversacao.html, em versão curta) */
+function convTitulo(nome) {
+  var fora = /^(BASIC|BASICO|INTERMEDIATE|INTER|INTERMEDIO|ADVANCED|ADV|AVANZADO|TEENS?|KIDS|ADULTOS?|ADULTS|JOVENS|ALL LEVELS|\d+)$/;
+  var p = String(nome || '').replace(/^Ac\s*-\s*/i, '').replace(/^\d+\s*[-–—]\s*/, '').split(/\s+[-–—]\s+/)
+    .filter(function (x) { return !fora.test(String(x).normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().trim()); });
+  return p.join(' - ') || nome;
 }
 /* A MINIATURA (Pedro, 28/11/2026: "um thumbnail de prévia da atividade"): o primeiro slide da atividade do Conversation
    Maker (montado pelo assets/tema-slides.js) ou a primeira página do PDF (pdf.js, carregado só quando precisa). O arquivo
@@ -1178,24 +1223,34 @@ function convMini(box, it) {
 }
 function pintaConversa() {
   var cx = $('conv-card'); if (!cx) return;
-  if (ptEstado || !estado.alunos || !estado.alunos.length || typeof fiskPerfilDaTurma !== 'function') { cx.hidden = true; return; }
+  /* o Centro de Estudos (plantão) não tem atividade comunicativa (Pedro, 28/11/2026) */
+  if (ptEstado || estado.plantao || !estado.alunos || !estado.alunos.length || typeof fiskPerfilDaTurma !== 'function') { cx.hidden = true; return; }
   var turma = estado.turma;
   var desenha = function (d) {
     if (estado.turma !== turma) return;
     var t = fiskPerfilDaTurma({ alunos: estado.alunos, tituloInteiro: estado.turma, titulo: String(estado.turma || '').split('\n')[0] });
-    var it = convEscolhe(t, d), sem = d && d.semana ? d.semana : null;
-    var url = 'conversacao.html' + (it ? '?id=' + encodeURIComponent(it.id) + (sem ? '&semana=' + encodeURIComponent(sem.id) : '') : '');
-    var nivelTxt = [t.idioma === 'Español' ? 'Español' : '', t.nivel, t.perfil].filter(Boolean).join(' · ');
-    cx.className = 'conv-card' + (it ? '' : ' cc-vazio');
-    var assin = it ? it.id + '|' + it.quando : '';
-    if (it && cx.dataset.mini === assin && cx.querySelector('.cc-th')) return;   /* mesma atividade: não remonta a miniatura */
+    var sug = convEscolhe(t, d), sem = d && d.semana ? d.semana : null, mista = sug.length > 1;
+    var urlDe = function (it) { return 'conversacao.html' + (it ? '?id=' + encodeURIComponent(it.id) + (sem ? '&semana=' + encodeURIComponent(sem.id) : '') : (sem ? '?semana=' + encodeURIComponent(sem.id) : '')); };
+    var nivelTxt = mista ? 'turma mista: ' + sug.map(function (x) { return x.nivel + ' (' + x.alunos + ')'; }).join(' + ')
+      : [t.idioma === 'Español' ? 'Español' : '', t.nivel, t.perfil].filter(Boolean).join(' · ');
+    cx.className = 'conv-card' + (sug.length ? '' : ' cc-vazio') + (mista ? ' cc-duas' : '');
+    var assin = sug.map(function (x) { return x.it.id + '|' + x.it.quando; }).join(',');
+    if (assin && cx.dataset.mini === assin && cx.querySelector('.cc-th')) return;   /* mesmas atividades: não remonta as miniaturas */
     cx.dataset.mini = assin;
-    cx.innerHTML = (it ? '<a class="cc-th" href="' + url + '" target="_blank" rel="noopener" title="Abrir a atividade"><span class="cc-th-msg">carregando a prévia…</span><span class="cc-th-n" hidden></span></a>' : '<span class="cc-ico">💬</span>') + '<div class="cc-txt"><div class="cc-rot">Conversação da semana' + (sem && sem.nome ? ' · ' + esc(String(sem.nome).replace(/\s*-\s*.*$/, '')) : '') + '</div>' +
-      '<div class="cc-nome">' + (it ? esc(it.nome) : (d ? 'Sem atividade prevista para esta turma nesta semana' : 'Buscando a atividade da semana…')) + '</div>' +
-      '<div class="cc-sub">' + esc(nivelTxt || 'nível da turma não identificado') + (it ? ' · sugerida para esta turma' : ' · veja todas na ferramenta') + '</div></div>' +
-      '<a class="cc-abre" href="' + url + '" target="_blank" rel="noopener">' + (it ? '▶ Abrir a atividade' : 'Abrir a conversação') + ' ↗</a>';
+    /* as miniaturas lado a lado (na turma mista, uma por nível), cada uma abre a SUA atividade; o card não cresce */
+    var ths = sug.length ? '<div class="cc-ths">' + sug.map(function (x) {
+      return '<a class="cc-th" href="' + urlDe(x.it) + '" target="_blank" rel="noopener" title="Abrir: ' + esc(convTitulo(x.it.nome)) + '"><span class="cc-th-msg">carregando a prévia…</span>' +
+        (mista ? '<span class="cc-th-nv">' + esc(x.nivel) + ' · ' + x.alunos + '</span>' : '') + '<span class="cc-th-n" hidden></span></a>';
+    }).join('') + '</div>' : '<span class="cc-ico">💬</span>';
+    var nome = !sug.length ? (d ? 'Sem atividade prevista para esta turma nesta semana' : 'Buscando a atividade da semana…')
+      : sug.map(function (x) { return convTitulo(x.it.nome); }).join(' · ');
+    cx.innerHTML = ths + '<div class="cc-txt"><div class="cc-rot">Conversação da semana' + (sem && sem.nome ? ' · ' + esc(String(sem.nome).replace(/\s*-\s*.*$/, '')) : '') + '</div>' +
+      '<div class="cc-nome" title="' + esc(nome) + '">' + esc(nome) + '</div>' +
+      '<div class="cc-sub">' + esc(nivelTxt || 'nível da turma não identificado') + (sug.length ? (mista ? ' · uma sugestão por nível: toque na prévia para abrir' : ' · sugerida para esta turma: toque na prévia para abrir') : ' · veja todas na ferramenta') + '</div></div>' +
+      /* Pedro, 28/11/2026: "deveria se chamar Ir para Conversações, e ser verde como todos os botões da página" */
+      '<a class="cc-abre" href="' + urlDe(sug.length === 1 ? sug[0].it : null) + '" target="_blank" rel="noopener">Ir para Conversações ↗</a>';
     cx.hidden = false;
-    if (it && it.pronto) { var th = cx.querySelector('.cc-th'); if (th) convMini(th, it); }
+    [].forEach.call(cx.querySelectorAll('.cc-th'), function (th, k) { if (sug[k] && sug[k].it.pronto) convMini(th, sug[k].it); });
   };
   var pedido = convLer();   /* lê o cache na hora (síncrono) e, se velho, busca de novo */
   desenha(convSemana);

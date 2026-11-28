@@ -32,7 +32,7 @@
      (a turma inteira numa leitura por aba) e `panoramaProf` (os alunos da
      turma com RAF, vindos do card).
      ═══════════════════════════════════════════════════════════════════════ -->
-<link rel="stylesheet" href="assets/turma-de-hoje.css?v=7c189beb30">
+<link rel="stylesheet" href="assets/turma-de-hoje.css?v=511241c602">
 </head>
 <body>
 <script>try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
@@ -45,26 +45,37 @@
 </header>
 
 <main>
-  <div class="painel">
-    <div class="cascata">
-      <div><label for="selEscola">Escola</label><select id="selEscola" disabled><option value="" disabled selected>Carregando…</option></select></div>
-      <div><label for="selProf">Professor(a)</label><select id="selProf" disabled><option value="" disabled selected>Professor(a)…</option></select></div>
-      <div><label for="selTurma">Turma</label><select id="selTurma" disabled><option value="" disabled selected>Turma…</option></select></div>
-    </div>
-    <div class="status" id="status">Escolha a turma. Os alunos e a posição de cada um vêm do card.</div>
-    <!-- outro aluno (Pedro, 15/09/2026): turmas juntadas por falta; o aluno buscado entra embaixo, sem tirar os da turma -->
-    <div class="busca-al">
-      <label for="qAluno">🔎 Trazer outro aluno</label>
-      <input id="qAluno" type="search" autocomplete="off" placeholder="Nome completo ou RAF de qualquer aluno da escola">
-      <div id="achadosAluno" class="achados-al" hidden></div>
-    </div>
-    <div class="legenda" id="legenda" hidden>
-      <details class="leg-det"><summary>? Legenda das marcas</summary><div class="leg-itens"><span><i class="mk l-a" style="width:18px;height:18px;border-width:2px"></i> o aluno marcou</span>
-      <span><i class="mk r-prof" style="width:18px;height:18px;border-width:2px"></i> você confirmou</span>
-      <span><i class="mk cheia-prof" style="width:18px;height:18px;border-width:2px"></i> o professor marcou</span>
-      <span><i class="mk quad plat" style="width:18px;height:18px;border-width:2px;border-radius:5px"></i> o portal comprovou</span>
-      <span><i class="mk tri" style="width:18px;height:16px"></i> tarefa: só o aluno marca</span></div></details>
-      <button type="button" class="obs-toggle" id="obsToggle">🙈 Esconder as anotações (tela na TV)</button>
+  <!-- O CARD DA AULA (Pedro, 28/11/2026, mock-up 1): a mesma cara dos cards da conversação e do Planejador. A turma só
+       carrega no "Ir" (escolher na lista não carrega: às vezes a turma clicada é a errada); a do horário abre sozinha. -->
+  <div class="painel aula-filtro">
+    <span class="af-ico" aria-hidden="true">🏫</span>
+    <div class="af-corpo">
+      <span class="af-rot">Sua aula</span>
+      <div class="cascata">
+        <div class="af-campo"><label for="selEscola">Escola</label><select id="selEscola" disabled><option value="" disabled selected>Carregando…</option></select></div>
+        <div class="af-campo"><label for="selProf">Professor(a)</label><select id="selProf" disabled><option value="" disabled selected>Professor(a)…</option></select></div>
+        <div class="af-campo af-turma"><label for="selTurma">Turma</label><select id="selTurma" disabled><option value="" disabled selected>Turma…</option></select>
+          <button type="button" class="af-ir" id="bIrTurma" disabled title="Carregar a turma escolhida">Ir ▶</button></div>
+      </div>
+      <div class="status" id="status">Escolha a turma. Os alunos e a posição de cada um vêm do card.</div>
+      <div class="af-linha">
+        <!-- outro aluno (Pedro, 15/09/2026): turmas juntadas por falta; o aluno buscado entra embaixo, sem tirar os da turma -->
+        <div class="busca-al">
+          <label for="qAluno" class="af-oculto">Trazer outro aluno</label>
+          <span class="af-lupa" aria-hidden="true">🔎</span>
+          <input id="qAluno" type="search" autocomplete="off" placeholder="Outro aluno: nome ou RAF">
+          <button type="button" class="af-trazer" id="bTrazer">＋ Trazer</button>
+          <div id="achadosAluno" class="achados-al" hidden></div>
+        </div>
+        <div class="legenda" id="legenda" hidden>
+          <details class="leg-det"><summary>? Legenda das marcas</summary><div class="leg-itens"><span><i class="mk l-a" style="width:18px;height:18px;border-width:2px"></i> o aluno marcou</span>
+          <span><i class="mk r-prof" style="width:18px;height:18px;border-width:2px"></i> você confirmou</span>
+          <span><i class="mk cheia-prof" style="width:18px;height:18px;border-width:2px"></i> o professor marcou</span>
+          <span><i class="mk quad plat" style="width:18px;height:18px;border-width:2px;border-radius:5px"></i> o portal comprovou</span>
+          <span><i class="mk tri" style="width:18px;height:16px"></i> tarefa: só o aluno marca</span></div></details>
+          <button type="button" class="obs-toggle" id="obsToggle">🙈 Esconder as anotações (tela na TV)</button>
+        </div>
+      </div>
     </div>
   </div>
   <div id="fila-off" class="fila-off" hidden></div>
@@ -95,7 +106,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="assets/fisk-shared.js?v=1269b6ec82"></script>
 <script src="assets/fisk-pre-aula.js?v=43e6e651bf"></script>
-<script src="assets/turma-de-hoje.js?v=102477154f"></script>
+<script src="assets/turma-de-hoje.js?v=2a2a933173"></script>
 <script src="assets/tema-slides.js?v=81aec39068" defer></script><!-- a miniatura da conversação da semana (card da Minha aula) -->
 </body>
 </html>
