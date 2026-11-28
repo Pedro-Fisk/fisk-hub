@@ -1,0 +1,243 @@
+{
+ "lesson": {
+  "coverTitle": "Countries · Australia",
+  "coverLevel": "Intermediate",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Australia",
+  "objectives": [
+   "Talking about Australian culture.",
+   "Developing conversation skills."
+  ],
+  "pais": {
+   "nome": "Australia",
+   "oficial": "",
+   "num": 8,
+   "cor": "#00008b",
+   "bandeira": "au/bandeira.svg",
+   "capa": "au/capa.jpg",
+   "capaLocal": "Sydney Opera House",
+   "mapa": "",
+   "texto": "Australia is a country and a continent at once. It is the home of animals like the kangaroo and the koala.\nBefore the British arrived in 1788, Aboriginal peoples already spoke hundreds of languages there. Words like kangaroo, boomerang and koala came into English from them.",
+   "fatos": [
+    [
+     "Capital",
+     "Canberra"
+    ],
+    [
+     "Languages",
+     "English and more than 100 Indigenous languages"
+    ],
+    [
+     "Currency",
+     "Australian dollar (A$)"
+    ],
+    [
+     "Population",
+     "≈ 27 million"
+    ]
+   ]
+  },
+  "introText": "Today, we’ll talk about Australia. We’ll take a look at Aussie English, food, animals and famous places.",
+  "introSub": "Aussie English, food, animals and famous places",
+  "warmup": [
+   {
+    "question": "When you think of Australia, what comes to your mind?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Would you like to visit Australia? Why (not)?",
+    "modelAnswers": []
+   }
+  ],
+  "fotos": [
+   {
+    "img": "au/uluru.jpg",
+    "titulo": "Uluru",
+    "local": "Uluru, in the centre of Australia",
+    "texto": "Uluru is the red monolith in the centre of the country. It is sacred to the Anangu people."
+   },
+   {
+    "img": "au/reef.jpg",
+    "local": "Great Barrier Reef, Queensland",
+    "texto": "The Great Barrier Reef is the largest coral reef system on the planet."
+   },
+   {
+    "img": "au/bondi.jpg",
+    "titulo": "Christmas on the beach",
+    "local": "Bondi Beach, Sydney",
+    "texto": "Bondi is one of the best-known beaches in Sydney, famous for surfing. December is summer in Australia, and many people spend Christmas at the beach!"
+   },
+   {
+    "img": "au/vegemite.jpg",
+    "titulo": "Brekkie",
+    "local": "Vegemite on toast",
+    "texto": "Vegemite is a dark, very salty spread. Because it is so salty, Australians put only a thin layer on their toast."
+   },
+   {
+    "img": "au/lamington.jpg",
+    "local": "Lamington",
+    "texto": "A cube of sponge cake covered in chocolate and coconut: a classic Australian sweet."
+   }
+  ],
+  "vocabulary": [
+   {
+    "word": "g’day",
+    "translation": "olá, e aí"
+   },
+   {
+    "word": "mate",
+    "translation": "amigo, cara, parceiro"
+   },
+   {
+    "word": "arvo",
+    "translation": "tarde (afternoon)"
+   },
+   {
+    "word": "brekkie",
+    "translation": "café da manhã (breakfast)"
+   },
+   {
+    "word": "barbie",
+    "translation": "churrasco (barbecue)"
+   },
+   {
+    "word": "no worries",
+    "translation": "sem problema, de nada"
+   },
+   {
+    "word": "heaps",
+    "translation": "muito, um montão"
+   },
+   {
+    "word": "thongs",
+    "translation": "chinelos de dedo"
+   }
+  ],
+  "vocabTitulo": "Aussie English",
+  "vocabSub": "words you will hear in Australia · pay attention to pronunciation",
+  "video": null,
+  "leitura": null,
+  "languageGame": [
+   {
+    "question": "Uluru is sacred to the Anangu people.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "Australians put a thick layer of Vegemite on their toast.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": "Vegemite is very salty, so they use only a thin layer."
+   },
+   {
+    "question": "In Australia, Christmas is in the summer.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "The words kangaroo and koala came into English from Spanish.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": "They came from Aboriginal languages."
+   },
+   {
+    "question": "The Great Barrier Reef is the largest coral reef system on the planet.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   }
+  ],
+  "jogoTitulo": "True or False?",
+  "conversation": [
+   {
+    "question": "Which place in the pictures would you like to visit first? Why?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Australia is famous for its animals. Which Australian animal would you like to see?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Would you rather spend Christmas on the beach or in a cold place? Why?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Have you ever tried a food that was too salty or too strange for you? What was it?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Australians shorten many words: brekkie, arvo, barbie. Do Brazilians shorten words too? Can you give examples?",
+    "modelAnswers": [
+     "Yeah, we say...",
+     "Actually, ..."
+    ]
+   },
+   {
+    "question": "Australians call friends, colleagues and even strangers “mate”. How do you talk to strangers?",
+    "modelAnswers": []
+   },
+   {
+    "question": "In Australia, a barbecue is a “barbie”. How often do you have a churrasco with friends or family?",
+    "modelAnswers": []
+   },
+   {
+    "question": "In Australia, tipping is not expected. What do you think about tipping in restaurants? Why?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Would you like to study English in Australia? Why (not)?",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about Australia?"
+   },
+   {
+    "question": "Which other countries would you like to learn more about? I’d like to know more about... (Canada)."
+   }
+  ],
+  "serie": "countries"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "countries",
+  "imgs": "countries/img/",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#ffffff",
+   "fundo2": "#eef3f8",
+   "prim": "#16365c",
+   "sec": "#00008b",
+   "dest": "#00008b",
+   "txt": "#16365c"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "globe-showing-americas",
+  "icones": [
+   "globe-showing-americas"
+  ]
+ }
+}

@@ -1,0 +1,277 @@
+{
+ "lesson": {
+  "coverTitle": "Countries · Singapore",
+  "coverLevel": "Basic & Teens",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Singapore",
+  "objectives": [
+   "Talking about Singapore.",
+   "Developing conversation skills."
+  ],
+  "pais": {
+   "nome": "Singapore",
+   "oficial": "",
+   "num": 11,
+   "cor": "#ef3340",
+   "bandeira": "sg/bandeira.svg",
+   "capa": "sg/capa.jpg",
+   "capaLocal": "Gardens by the Bay",
+   "mapa": "",
+   "texto": "Singapore is an island the size of a large city: the city is the country. It has four official languages: English, Mandarin, Malay and Tamil.\nMany Singaporeans speak two Englishes: formal English at school and at work, and Singlish, the English of the street, with friends.",
+   "fatos": [
+    [
+     "Capital",
+     "Singapore (the city is the country)"
+    ],
+    [
+     "Official languages",
+     "English, Mandarin, Malay and Tamil"
+    ],
+    [
+     "Currency",
+     "Singapore dollar (S$)"
+    ],
+    [
+     "Population",
+     "≈ 6 million"
+    ],
+    [
+     "Area",
+     "about 730 km²"
+    ]
+   ]
+  },
+  "introText": "Today, we’ll talk about Singapore. We’ll take a look at Singlish, hawker centres and life in a city-state.",
+  "introSub": "Singlish, hawker centres and life in a city-state",
+  "warmup": [
+   {
+    "question": "Do you know where Singapore is?",
+    "modelAnswers": [
+     "Yes, I do. It’s in Asia.",
+     "No, I don’t."
+    ]
+   },
+   {
+    "question": "Would you like to visit Singapore?",
+    "modelAnswers": [
+     "Yes, I would.",
+     "No, I wouldn’t."
+    ]
+   }
+  ],
+  "fotos": [
+   {
+    "img": "sg/hawker.jpg",
+    "titulo": "Hawker centres",
+    "local": "Newton Food Centre",
+    "texto": "Halls with many stalls selling cheap food. Tip: a packet of tissues on the table means “taken”!"
+   },
+   {
+    "img": "sg/chickenrice.jpg",
+    "titulo": "Food",
+    "local": "Hainanese chicken rice",
+    "texto": "Poached chicken with rice cooked in the stock. It is often called the national dish."
+   },
+   {
+    "img": "sg/chillicrab.jpg",
+    "local": "Chilli crab",
+    "texto": "Crab in a chilli and tomato sauce, eaten with fried buns."
+   },
+   {
+    "img": "sg/kaya.jpg",
+    "local": "Kaya toast",
+    "texto": "A traditional breakfast: toast with kaya (a coconut and egg jam), soft-boiled eggs and kopi."
+   },
+   {
+    "img": "sg/kampongglam.jpg",
+    "local": "Kampong Glam",
+    "texto": "Chinatown, Little India and Kampong Glam: three neighbourhoods with three heritages, Chinese, Indian and Malay."
+   },
+   {
+    "img": "sg/marinabay.jpg",
+    "titulo": "A very orderly city",
+    "local": "ArtScience Museum, Marina Bay Sands",
+    "texto": "In Singapore, eating and drinking on the metro is not allowed, and littering gets you a fine."
+   }
+  ],
+  "vocabulary": [
+   {
+    "word": "lah",
+    "translation": "(ênfase no fim da frase)"
+   },
+   {
+    "word": "can / cannot",
+    "translation": "dá / não dá"
+   },
+   {
+    "word": "makan",
+    "translation": "comer, comida"
+   },
+   {
+    "word": "shiok",
+    "translation": "delicioso, sensacional"
+   },
+   {
+    "word": "chope",
+    "translation": "guardar lugar"
+   },
+   {
+    "word": "kopi",
+    "translation": "café (do jeito local)"
+   },
+   {
+    "word": "You eat already?",
+    "translation": "já comeu? (cumprimento)"
+   },
+   {
+    "word": "hawker centre",
+    "translation": "praça de alimentação popular"
+   },
+   {
+    "word": "aiyoh!",
+    "translation": "ai! nossa! poxa!"
+   }
+  ],
+  "vocabTitulo": "Singlish",
+  "vocabSub": "words you will hear in Singapore · pay attention to pronunciation",
+  "video": null,
+  "leitura": null,
+  "languageGame": [
+   {
+    "question": "Singapore has four official languages.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "At a hawker centre, a packet of tissues on the table means “taken”.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "In Singapore, you can eat and drink on the metro.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": "It is not allowed."
+   },
+   {
+    "question": "Kaya toast is a traditional dinner.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": "It is a traditional breakfast."
+   },
+   {
+    "question": "Hainanese chicken rice is often called the national dish.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   }
+  ],
+  "jogoTitulo": "True or False?",
+  "conversation": [
+   {
+    "question": "Do you like to try new food?",
+    "modelAnswers": [
+     "Yes, I do. I love new food!",
+     "No, I don’t. I like the food I know."
+    ]
+   },
+   {
+    "question": "Would you like to eat chilli crab?",
+    "modelAnswers": [
+     "Yes, I would. It looks delicious!",
+     "No, I wouldn’t. I don’t like seafood."
+    ]
+   },
+   {
+    "question": "What do you usually have for breakfast?",
+    "modelAnswers": [
+     "I usually have (toast and coffee)."
+    ]
+   },
+   {
+    "question": "Is there a food court near your house?",
+    "modelAnswers": [
+     "Yes, there is. I go there on (weekends).",
+     "No, there isn’t."
+    ]
+   },
+   {
+    "question": "In Singapore, people say “You eat already?” to mean “How are you?”. What do you say when you meet a friend?",
+    "modelAnswers": [
+     "I say (“Tudo bem?”)."
+    ]
+   },
+   {
+    "question": "In Singapore, you can’t eat on the metro. Do you eat on the bus?",
+    "modelAnswers": [
+     "Yes, sometimes I do.",
+     "No, I don’t."
+    ]
+   },
+   {
+    "question": "Do you like big cities?",
+    "modelAnswers": [
+     "Yes, I do. I love big cities!",
+     "No, I don’t. I prefer small towns."
+    ]
+   },
+   {
+    "question": "Would you like to speak four languages?",
+    "modelAnswers": [
+     "Yes, I would. I’d like to speak (Spanish and French).",
+     "No, two languages are enough!"
+    ]
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about Singapore?"
+   },
+   {
+    "question": "Which other countries would you like to learn more about? I’d like to know more about... (China)."
+   }
+  ],
+  "serie": "countries"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "countries",
+  "imgs": "countries/img/",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#ffffff",
+   "fundo2": "#eef3f8",
+   "prim": "#16365c",
+   "sec": "#ef3340",
+   "dest": "#ef3340",
+   "txt": "#16365c"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "globe-showing-americas",
+  "icones": [
+   "globe-showing-americas"
+  ]
+ }
+}

@@ -1,0 +1,260 @@
+{
+ "lesson": {
+  "coverTitle": "Countries · Jamaica",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Jamaica",
+  "objectives": [
+   "Talking about Jamaican culture.",
+   "Developing conversation skills."
+  ],
+  "pais": {
+   "nome": "Jamaica",
+   "oficial": "",
+   "num": 10,
+   "cor": "#009b3a",
+   "bandeira": "jm/bandeira.svg",
+   "capa": "jm/capa.jpg",
+   "capaLocal": "Blue Lagoon",
+   "mapa": "",
+   "texto": "Two languages live side by side in Jamaica: English, the official one, of school, newspapers and courts, and Jamaican Patois, the language of home and the street.\nJamaica’s official motto is “Out of Many, One People”: one people, formed by people of many origins.",
+   "fatos": [
+    [
+     "Capital",
+     "Kingston"
+    ],
+    [
+     "Languages",
+     "English (official) and Jamaican Patois"
+    ],
+    [
+     "Currency",
+     "Jamaican dollar (J$)"
+    ],
+    [
+     "Population",
+     "≈ 2.8 million"
+    ],
+    [
+     "Motto",
+     "Out of Many, One People"
+    ]
+   ]
+  },
+  "introText": "Today, we’ll talk about Jamaica. We’ll take a look at Patois, reggae, Jamaican food and beautiful places.",
+  "introSub": "Patois, reggae, food and beautiful places",
+  "warmup": [
+   {
+    "question": "What images come to your mind when you think of Jamaica?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Can music teach us a language? How?",
+    "modelAnswers": []
+   }
+  ],
+  "fotos": [
+   {
+    "img": "jm/marley.jpg",
+    "titulo": "Reggae",
+    "local": "Bob Marley statue, Kingston",
+    "texto": "Reggae was born in Kingston in the late 1960s. Bob Marley took it to the world, with songs like “One Love” and “Three Little Birds”."
+   },
+   {
+    "img": "jm/kingston.jpg",
+    "local": "Kingston",
+    "texto": "The capital of Jamaica. The Bob Marley Museum is in his own house."
+   },
+   {
+    "img": "jm/jerk.jpg",
+    "titulo": "Food",
+    "local": "Jerk chicken",
+    "texto": "Chicken marinated in scotch bonnet pepper and allspice, slowly smoked over pimento wood."
+   },
+   {
+    "img": "jm/ackee.jpg",
+    "local": "Ackee and saltfish",
+    "texto": "The national dish: the ackee fruit with salted cod, often eaten at breakfast."
+   },
+   {
+    "img": "jm/bluemountains.jpg",
+    "local": "Blue Mountains",
+    "texto": "These mountains are famous for Blue Mountain coffee, grown there."
+   },
+   {
+    "img": "jm/dunnsriver.jpg",
+    "local": "Dunn’s River Falls, Ocho Rios",
+    "texto": "A stepped waterfall that visitors can climb on foot."
+   }
+  ],
+  "vocabulary": [
+   {
+    "word": "Wah gwaan?",
+    "translation": "e aí? o que está rolando?"
+   },
+   {
+    "word": "irie",
+    "translation": "tudo bem, na paz, ótimo"
+   },
+   {
+    "word": "big up",
+    "translation": "mandar respeito, dar valor"
+   },
+   {
+    "word": "bredrin",
+    "translation": "amigo, irmão (de consideração)"
+   },
+   {
+    "word": "soon come",
+    "translation": "já vou, chego logo (sem hora marcada)"
+   },
+   {
+    "word": "creole",
+    "translation": "crioulo (língua nascida do encontro de outras)"
+   },
+   {
+    "word": "motto",
+    "translation": "lema"
+   },
+   {
+    "word": "heritage",
+    "translation": "patrimônio, herança"
+   },
+   {
+    "word": "to look down on",
+    "translation": "menosprezar"
+   }
+  ],
+  "vocabTitulo": "Jamaican Patois",
+  "vocabSub": "expressions from the island · pay attention to pronunciation",
+  "video": null,
+  "leitura": null,
+  "languageGame": [
+   {
+    "question": "English is the only language people speak in Jamaica.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": "People also speak Jamaican Patois, the language of home and the street."
+   },
+   {
+    "question": "Reggae was born in Kingston.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "Ackee and saltfish is the national dish of Jamaica.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "Visitors can climb Dunn’s River Falls on foot.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "The Blue Mountains are famous for their tea.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": "They are famous for Blue Mountain coffee."
+   }
+  ],
+  "jogoTitulo": "True or False?",
+  "conversation": [
+   {
+    "question": "Patois is a complete creole language, with its own grammar, not “broken English”. Why do you think many people saw it as a mistake?",
+    "modelAnswers": []
+   },
+   {
+    "question": "For a long time, speaking Patois in the wrong place was treated as a sign of poor education. Are there accents or ways of speaking that people look down on in Brazil?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Music carried Patois out of the island and made it something to be proud of. Can music change how people see a language or a culture? Give examples.",
+    "modelAnswers": []
+   },
+   {
+    "question": "Words like “big up” and “wagwan” are now used by teenagers far from Jamaica. Is using slang from another culture appreciation or appropriation?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Reggae has been UNESCO Intangible Cultural Heritage since 2018. Which Brazilian music style deserves the same recognition? Why?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Jamaica’s motto is “Out of Many, One People”. Could this motto describe Brazil too? Why (not)?",
+    "modelAnswers": []
+   },
+   {
+    "question": "In Jamaica, switching between English and Patois is a skill, not confusion. Do you think speaking two languages changes the way people think?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Usain Bolt holds the world records in the 100 and 200 metres. How important are sports stars for a small country’s image?",
+    "modelAnswers": []
+   },
+   {
+    "question": "How can tourism on a Caribbean island benefit local people, and not only big hotels?",
+    "modelAnswers": []
+   },
+   {
+    "question": "“Soon come” has no set time. How do different cultures see time and punctuality? Which attitude is closer to yours?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Would you rather visit Jamaica for the music, the food or the nature? Why?",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about Jamaica?"
+   },
+   {
+    "question": "Which other countries would you like to learn more about?"
+   }
+  ],
+  "serie": "countries"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "countries",
+  "imgs": "countries/img/",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#ffffff",
+   "fundo2": "#eef3f8",
+   "prim": "#16365c",
+   "sec": "#009b3a",
+   "dest": "#009b3a",
+   "txt": "#16365c"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "globe-showing-americas",
+  "icones": [
+   "globe-showing-americas"
+  ]
+ }
+}

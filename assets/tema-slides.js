@@ -273,7 +273,10 @@
     } else if (voc.length) {
       divisor(cp ? (L.vocabTitulo || rot.iw) : rot.iw, cp ? 2 : 0, cp ? (L.vocabSub || '') : '');
       var longa = voc.some(function (v) { return String(v.word).length > 14 || Math.max.apply(null, String(v.word).split(/\s+/).map(function (x) { return x.length; })) > 8; }), cols = longa ? 3 : 4;
-      novo('vocabulario', h2(rot.iw) + '<div style="position:absolute;left:250px;right:250px;top:240px;display:grid;grid-template-columns:repeat(' + cols + ',minmax(0,1fr));gap:24px">' + voc.map(function (v, i) {
+      /* duas fileiras por slide (8 cartões em 4 colunas, 6 em 3): a 9ª palavra passava da borda (Jamaica, 28/11/2026) */
+      var porV = cols * 2; porV = Math.ceil(voc.length / Math.ceil(voc.length / porV));   /* dividido por igual: 9 viram 5 + 4 */
+      for (var vb = 0; vb < voc.length; vb += porV) (function (lote) {
+      novo('vocabulario', h2(rot.iw) + '<div style="position:absolute;left:250px;right:250px;top:240px;display:grid;grid-template-columns:repeat(' + cols + ',minmax(0,1fr));gap:24px">' + lote.map(function (v, i) {
         var maior = Math.max.apply(null, String(v.word).split(/\s+/).map(function (x) { return x.length; }));
         /* PRONÚNCIA (27/11/2026): o 🔊 do canto toca a palavra em voz neural (FiskTema.aoOuvir, como no ouça e escolha) */
         return '<div data-carta="' + (i + 1) + '" style="position:relative;background:' + cartao + ';border-radius:26px;padding:24px 28px;border:4px solid ' + p.sec + ';cursor:pointer;min-height:' + (voc.length > 8 ? 150 : 190) + 'px">' +
@@ -283,6 +286,7 @@
           '<div style="padding-right:66px;overflow-wrap:anywhere;font:800 ' + Math.max(30, Math.min(58, Math.floor((longa ? 335 : 215) / (0.72 * maior)))) + 'px/1.1 \'' + T + '\';color:' + p.prim + '">' + esc(v.word) + '</div>' +   /* 66 px: o 🔊 do canto não cobre a palavra */
           /* sem tradução (as listas de pronúncia das Buddy Talks), sem o clique de revelar: seria um clique para nada */
           (String(v.translation || '').trim() ? '<div data-e="' + (i + 1) + '" class="ft-trad ft-off" style="font-size:42px;font-weight:700;margin-top:10px;color:' + legivel(p.dest, r.escuro ? p.fundo : '#ffffff') + '">' + esc(v.translation) + '</div>' : '') + '</div>'; }).join('') + '</div>');
+      })(voc.slice(vb, vb + porV));
       slides[slides.length - 1].vocab = voc.map(function (v) { return String(v.word || '').trim(); }).filter(Boolean);
     }
     }

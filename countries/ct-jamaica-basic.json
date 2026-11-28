@@ -1,0 +1,282 @@
+{
+ "lesson": {
+  "coverTitle": "Countries · Jamaica",
+  "coverLevel": "Basic & Teens",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Jamaica",
+  "objectives": [
+   "Talking about Jamaican culture.",
+   "Developing conversation skills."
+  ],
+  "pais": {
+   "nome": "Jamaica",
+   "oficial": "",
+   "num": 10,
+   "cor": "#009b3a",
+   "bandeira": "jm/bandeira.svg",
+   "capa": "jm/capa.jpg",
+   "capaLocal": "Blue Lagoon",
+   "mapa": "",
+   "texto": "Two languages live side by side in Jamaica: English, the official one, of school, newspapers and courts, and Jamaican Patois, the language of home and the street.\nJamaica’s official motto is “Out of Many, One People”: one people, formed by people of many origins.",
+   "fatos": [
+    [
+     "Capital",
+     "Kingston"
+    ],
+    [
+     "Languages",
+     "English (official) and Jamaican Patois"
+    ],
+    [
+     "Currency",
+     "Jamaican dollar (J$)"
+    ],
+    [
+     "Population",
+     "≈ 2.8 million"
+    ],
+    [
+     "Motto",
+     "Out of Many, One People"
+    ]
+   ]
+  },
+  "introText": "Today, we’ll talk about Jamaica. We’ll take a look at Patois, reggae, Jamaican food and beautiful places.",
+  "introSub": "Patois, reggae, food and beautiful places",
+  "warmup": [
+   {
+    "question": "Do you know any songs from Jamaica?",
+    "modelAnswers": [
+     "Yes, I do. I know (“Three Little Birds”).",
+     "No, I don’t."
+    ]
+   },
+   {
+    "question": "Would you like to visit Jamaica?",
+    "modelAnswers": [
+     "Yes, I would.",
+     "No, I wouldn’t."
+    ]
+   }
+  ],
+  "fotos": [
+   {
+    "img": "jm/marley.jpg",
+    "titulo": "Reggae",
+    "local": "Bob Marley statue, Kingston",
+    "texto": "Reggae was born in Kingston in the late 1960s. Bob Marley took it to the world, with songs like “One Love” and “Three Little Birds”."
+   },
+   {
+    "img": "jm/kingston.jpg",
+    "local": "Kingston",
+    "texto": "The capital of Jamaica. The Bob Marley Museum is in his own house."
+   },
+   {
+    "img": "jm/jerk.jpg",
+    "titulo": "Food",
+    "local": "Jerk chicken",
+    "texto": "Chicken marinated in scotch bonnet pepper and allspice, slowly smoked over pimento wood."
+   },
+   {
+    "img": "jm/ackee.jpg",
+    "local": "Ackee and saltfish",
+    "texto": "The national dish: the ackee fruit with salted cod, often eaten at breakfast."
+   },
+   {
+    "img": "jm/bluemountains.jpg",
+    "local": "Blue Mountains",
+    "texto": "These mountains are famous for Blue Mountain coffee, grown there."
+   },
+   {
+    "img": "jm/dunnsriver.jpg",
+    "local": "Dunn’s River Falls, Ocho Rios",
+    "texto": "A stepped waterfall that visitors can climb on foot."
+   }
+  ],
+  "vocabulary": [
+   {
+    "word": "Wah gwaan?",
+    "translation": "e aí? o que está rolando?"
+   },
+   {
+    "word": "irie",
+    "translation": "tudo bem, na paz, ótimo"
+   },
+   {
+    "word": "big up",
+    "translation": "mandar respeito, dar valor"
+   },
+   {
+    "word": "bredrin",
+    "translation": "amigo, irmão (de consideração)"
+   },
+   {
+    "word": "yaad",
+    "translation": "casa, a Jamaica"
+   },
+   {
+    "word": "one love",
+    "translation": "um abraço, fica em paz"
+   },
+   {
+    "word": "soon come",
+    "translation": "já vou, chego logo (sem hora marcada)"
+   },
+   {
+    "word": "nyam",
+    "translation": "comer"
+   },
+   {
+    "word": "likkle",
+    "translation": "pequeno (little)"
+   }
+  ],
+  "vocabTitulo": "Jamaican Patois",
+  "vocabSub": "expressions from the island · pay attention to pronunciation",
+  "video": null,
+  "leitura": null,
+  "languageGame": [
+   {
+    "question": "English is the only language people speak in Jamaica.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": "People also speak Jamaican Patois, the language of home and the street."
+   },
+   {
+    "question": "Reggae was born in Kingston.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "Ackee and saltfish is the national dish of Jamaica.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "Visitors can climb Dunn’s River Falls on foot.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "The Blue Mountains are famous for their tea.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": "They are famous for Blue Mountain coffee."
+   }
+  ],
+  "jogoTitulo": "True or False?",
+  "conversation": [
+   {
+    "question": "Do you like reggae?",
+    "modelAnswers": [
+     "Yes, I do. I love it!",
+     "No, I don’t. I prefer (pop)."
+    ]
+   },
+   {
+    "question": "What kind of music do you listen to?",
+    "modelAnswers": [
+     "I listen to (rock and funk)."
+    ]
+   },
+   {
+    "question": "Do you know any Bob Marley songs?",
+    "modelAnswers": [
+     "Yes, I know (“One Love”).",
+     "No, I don’t."
+    ]
+   },
+   {
+    "question": "Would you like to climb a waterfall, like Dunn’s River Falls?",
+    "modelAnswers": [
+     "Yes, I would. It looks fun!",
+     "No, I wouldn’t. It looks scary!"
+    ]
+   },
+   {
+    "question": "Do you like spicy food, like jerk chicken?",
+    "modelAnswers": [
+     "Yes, I do.",
+     "No, I don’t. It’s too hot for me!"
+    ]
+   },
+   {
+    "question": "What do you usually eat for breakfast?",
+    "modelAnswers": [
+     "I usually eat (bread and eggs)."
+    ]
+   },
+   {
+    "question": "Do you drink coffee?",
+    "modelAnswers": [
+     "Yes, I do. I drink coffee every (morning).",
+     "No, I don’t."
+    ]
+   },
+   {
+    "question": "In Jamaica, people say “Wah gwaan?” to mean “What’s up?”. How do you say hi to your friends?",
+    "modelAnswers": [
+     "I say (“E aí?”)."
+    ]
+   },
+   {
+    "question": "Do you speak in a different way with your friends and at school?",
+    "modelAnswers": [
+     "Yes, I do.",
+     "No, I don’t."
+    ]
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about Jamaica?"
+   },
+   {
+    "question": "Which other countries would you like to learn more about? I’d like to know more about... (Cuba)."
+   }
+  ],
+  "serie": "countries"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "countries",
+  "imgs": "countries/img/",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#ffffff",
+   "fundo2": "#eef3f8",
+   "prim": "#16365c",
+   "sec": "#009b3a",
+   "dest": "#009b3a",
+   "txt": "#16365c"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "globe-showing-americas",
+  "icones": [
+   "globe-showing-americas"
+  ]
+ }
+}

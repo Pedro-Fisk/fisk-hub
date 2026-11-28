@@ -1,0 +1,249 @@
+{
+ "lesson": {
+  "coverTitle": "Countries · South Africa",
+  "coverLevel": "Intermediate",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "South Africa",
+  "objectives": [
+   "Talking about South African culture.",
+   "Developing conversation skills."
+  ],
+  "pais": {
+   "nome": "South Africa",
+   "oficial": "",
+   "num": 9,
+   "cor": "#007a4d",
+   "bandeira": "za/bandeira.svg",
+   "capa": "za/capa.jpg",
+   "capaLocal": "Table Mountain, Cape Town",
+   "mapa": "",
+   "texto": "South Africa has twelve official languages. English is the first language of under 10% of the population, but it is the language of the news, the law and business.\nSouth African English took words like braai and lekker from Afrikaans. And there, a traffic light is called a “robot”!",
+   "fatos": [
+    [
+     "Capitals",
+     "Pretoria, Cape Town and Bloemfontein"
+    ],
+    [
+     "Official languages",
+     "12, including English, Zulu, Xhosa and Afrikaans"
+    ],
+    [
+     "Currency",
+     "Rand (R)"
+    ],
+    [
+     "Driving side",
+     "left"
+    ],
+    [
+     "Population",
+     "≈ 62 million"
+    ]
+   ]
+  },
+  "introText": "Today, we’ll talk about South Africa. We’ll take a look at its languages, food, wildlife and history.",
+  "introSub": "Twelve languages, braai, wildlife and history",
+  "warmup": [
+   {
+    "question": "When you think of South Africa, what comes to your mind?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Would you like to visit South Africa? Why (not)?",
+    "modelAnswers": []
+   }
+  ],
+  "fotos": [
+   {
+    "img": "za/braai.jpg",
+    "titulo": "Braai",
+    "local": "A braai fire",
+    "texto": "A braai is much more than a barbecue: it is the gathering itself. South Africans invite friends with: “Come for a braai!”"
+   },
+   {
+    "img": "za/bunnychow.jpg",
+    "local": "Bunny chow, Durban",
+    "texto": "Half a loaf of bread, hollowed out and filled with curry. It was invented by the Indian community of Durban."
+   },
+   {
+    "img": "za/kruger.jpg",
+    "titulo": "Wildlife",
+    "local": "Kruger National Park",
+    "texto": "One of the largest wildlife parks in Africa, with lions, elephants and rhinos."
+   },
+   {
+    "img": "za/robben.jpg",
+    "local": "Robben Island",
+    "texto": "The prison island where Nelson Mandela spent 18 years. Today it is a museum and a UNESCO World Heritage Site."
+   },
+   {
+    "img": "za/gardenroute.jpg",
+    "local": "The Garden Route",
+    "texto": "A stretch of coast in the south of the country, with forest, beaches and lagoons."
+   },
+   {
+    "img": "za/makeba.jpg",
+    "titulo": "Music",
+    "local": "Miriam Makeba, “Mama Africa”",
+    "texto": "The singer who took songs in Xhosa to stages around the world."
+   }
+  ],
+  "vocabulary": [
+   {
+    "word": "howzit?",
+    "translation": "e aí? tudo bem?"
+   },
+   {
+    "word": "braai",
+    "translation": "churrasco (e o encontro)"
+   },
+   {
+    "word": "lekker",
+    "translation": "gostoso, ótimo, bacana"
+   },
+   {
+    "word": "robot",
+    "translation": "semáforo"
+   },
+   {
+    "word": "eish!",
+    "translation": "eita! poxa! nossa!"
+   },
+   {
+    "word": "now now",
+    "translation": "agora mesmo"
+   },
+   {
+    "word": "just now",
+    "translation": "daqui a pouco (não agora)"
+   },
+   {
+    "word": "sharp sharp",
+    "translation": "beleza, tudo certo, até logo"
+   }
+  ],
+  "vocabTitulo": "South African English",
+  "vocabSub": "words you will hear in South Africa · pay attention to pronunciation",
+  "video": null,
+  "leitura": null,
+  "languageGame": [
+   {
+    "question": "South Africa has only one official language.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": "It has twelve official languages."
+   },
+   {
+    "question": "In South Africa, a traffic light is called a “robot”.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "Nelson Mandela spent 18 years on Robben Island.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "Bunny chow is a dish made with rabbit meat.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": "It is half a loaf of bread, filled with curry."
+   },
+   {
+    "question": "In Kruger National Park, you can see lions, elephants and rhinos.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   }
+  ],
+  "jogoTitulo": "True or False?",
+  "conversation": [
+   {
+    "question": "Which place in the pictures would you like to visit first? Why?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Would you like to go on a safari in Kruger National Park? Which animals would you like to see?",
+    "modelAnswers": []
+   },
+   {
+    "question": "In South Africa, a braai is much more than a barbecue: it is the gathering itself. How important is the churrasco for Brazilians?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Have you ever tried Indian or African food? What did you think of it?",
+    "modelAnswers": []
+   },
+   {
+    "question": "South Africa has twelve official languages. How would life be different if Brazil had many official languages?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Many South Africans mix English with other languages in the same sentence. Do you ever mix English and Portuguese? When?",
+    "modelAnswers": []
+   },
+   {
+    "question": "In South Africa, “just now” means “in a little while”. Are you a punctual person?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What do you know about Nelson Mandela?",
+    "modelAnswers": []
+   },
+   {
+    "question": "South Africa has three capitals. Do you think it’s a good idea? Why (not)?",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about South Africa?"
+   },
+   {
+    "question": "Which other countries would you like to learn more about? I’d like to know more about... (Egypt)."
+   }
+  ],
+  "serie": "countries"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "countries",
+  "imgs": "countries/img/",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#ffffff",
+   "fundo2": "#eef3f8",
+   "prim": "#16365c",
+   "sec": "#007a4d",
+   "dest": "#007a4d",
+   "txt": "#16365c"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "globe-showing-americas",
+  "icones": [
+   "globe-showing-americas"
+  ]
+ }
+}

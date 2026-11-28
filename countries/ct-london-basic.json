@@ -1,0 +1,281 @@
+{
+ "lesson": {
+  "coverTitle": "Countries · London",
+  "coverLevel": "Basic & Teens",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "London",
+  "objectives": [
+   "Talking about London.",
+   "Developing conversation skills."
+  ],
+  "pais": {
+   "nome": "London",
+   "oficial": "",
+   "num": 12,
+   "cor": "#c8102e",
+   "bandeira": "ldn/bandeira.svg",
+   "capa": "ldn/capa.jpg",
+   "capaLocal": "Tower Bridge",
+   "mapa": "",
+   "texto": "London is the capital of the United Kingdom and a city of many languages: over 300 are spoken there.\nThe River Thames runs through the city, and under it runs the Tube, the oldest underground railway in the world, opened in 1863.",
+   "fatos": [
+    [
+     "Country",
+     "United Kingdom"
+    ],
+    [
+     "River",
+     "Thames"
+    ],
+    [
+     "Population",
+     "≈ 9 million"
+    ],
+    [
+     "Languages",
+     "more than 300 spoken in the city"
+    ],
+    [
+     "Currency",
+     "Pound sterling (£)"
+    ]
+   ]
+  },
+  "introText": "Today, we’ll talk about London. We’ll take a look at the Tube, afternoon tea, markets and the city’s many languages.",
+  "introSub": "The Tube, afternoon tea, markets and a city of many languages",
+  "warmup": [
+   {
+    "question": "Do you know any famous places in London?",
+    "modelAnswers": [
+     "Yes, I do. I know (Big Ben).",
+     "No, I don’t."
+    ]
+   },
+   {
+    "question": "Would you like to visit London?",
+    "modelAnswers": [
+     "Yes, I would. It’s my dream!",
+     "No, I wouldn’t."
+    ]
+   }
+  ],
+  "fotos": [
+   {
+    "img": "ldn/bigben.jpg",
+    "local": "Big Ben"
+   },
+   {
+    "img": "ldn/tube.jpg",
+    "titulo": "The Tube",
+    "local": "A London Underground station",
+    "texto": "The Tube opened in 1863. On the platform, you hear: “Mind the gap!” (be careful with the space between the train and the platform)."
+   },
+   {
+    "img": "ldn/tea.jpg",
+    "titulo": "Afternoon tea",
+    "local": "Afternoon tea with scones",
+    "texto": "Many British people drink their black tea with a little milk. A cup of tea is “a cuppa”."
+   },
+   {
+    "img": "ldn/camden.jpg",
+    "titulo": "The sacred queue",
+    "local": "Camden Market",
+    "texto": "In a market, a shop or a bus stop, wait for your turn: jumping the queue is seen as very rude."
+   },
+   {
+    "img": "ldn/nottinghill.jpg",
+    "local": "The houses of Notting Hill"
+   },
+   {
+    "img": "ldn/city.jpg",
+    "local": "The City of London at night"
+   }
+  ],
+  "vocabulary": [
+   {
+    "word": "the Tube",
+    "translation": "o metrô de Londres"
+   },
+   {
+    "word": "Mind the gap!",
+    "translation": "cuidado com o vão!"
+   },
+   {
+    "word": "You alright?",
+    "translation": "tudo bem?"
+   },
+   {
+    "word": "cheers",
+    "translation": "obrigado, valeu, tchau"
+   },
+   {
+    "word": "queue",
+    "translation": "fila"
+   },
+   {
+    "word": "Oyster card",
+    "translation": "o cartão de transporte"
+   },
+   {
+    "word": "the high street",
+    "translation": "a rua comercial do bairro"
+   },
+   {
+    "word": "a cuppa",
+    "translation": "uma xícara (de chá)"
+   },
+   {
+    "word": "innit?",
+    "translation": "né?"
+   }
+  ],
+  "vocabTitulo": "London English",
+  "vocabSub": "words you will hear in London · pay attention to pronunciation",
+  "video": null,
+  "leitura": null,
+  "languageGame": [
+   {
+    "question": "Only English is spoken in London.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": "Over 300 languages are spoken there."
+   },
+   {
+    "question": "The Tube is the oldest underground railway in the world.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "“Mind the gap” is about the space between the train and the platform.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "In London, jumping the queue is OK when you are in a hurry.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": "Jumping the queue is seen as very rude."
+   },
+   {
+    "question": "Many British people drink their black tea with a little milk.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   }
+  ],
+  "jogoTitulo": "True or False?",
+  "conversation": [
+   {
+    "question": "How do you go to school or work?",
+    "modelAnswers": [
+     "I go by (bus / car / subway).",
+     "I walk."
+    ]
+   },
+   {
+    "question": "Is there a metro in your city?",
+    "modelAnswers": [
+     "Yes, there is.",
+     "No, there isn’t."
+    ]
+   },
+   {
+    "question": "Do you like tea?",
+    "modelAnswers": [
+     "Yes, I do. I drink tea with (milk / lemon).",
+     "No, I don’t. I prefer coffee."
+    ]
+   },
+   {
+    "question": "Would you like to have afternoon tea with scones?",
+    "modelAnswers": [
+     "Yes, I would. It looks delicious!",
+     "No, I wouldn’t."
+    ]
+   },
+   {
+    "question": "Do you like to go to markets and fairs?",
+    "modelAnswers": [
+     "Yes, I do. I go to (a fair) on (Sundays).",
+     "No, I don’t."
+    ]
+   },
+   {
+    "question": "Which house in Notting Hill do you like the most?",
+    "modelAnswers": [
+     "I like the (blue) one."
+    ]
+   },
+   {
+    "question": "Do you wait patiently in a queue?",
+    "modelAnswers": [
+     "Yes, I do.",
+     "No, I don’t. I hate waiting!"
+    ]
+   },
+   {
+    "question": "In London, people say “cheers” for “thank you”. How do you say thank you to your friends?",
+    "modelAnswers": [
+     "I say (“valeu”)."
+    ]
+   },
+   {
+    "question": "Would you like to study English in London?",
+    "modelAnswers": [
+     "Yes, I would.",
+     "No, I’d prefer (the USA)."
+    ]
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about London?"
+   },
+   {
+    "question": "Which other cities would you like to learn more about? I’d like to know more about... (Paris)."
+   }
+  ],
+  "serie": "countries"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "countries",
+  "imgs": "countries/img/",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#ffffff",
+   "fundo2": "#eef3f8",
+   "prim": "#16365c",
+   "sec": "#c8102e",
+   "dest": "#c8102e",
+   "txt": "#16365c"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "globe-showing-americas",
+  "icones": [
+   "globe-showing-americas"
+  ]
+ }
+}
