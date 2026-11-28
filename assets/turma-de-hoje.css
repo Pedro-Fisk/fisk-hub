@@ -683,3 +683,58 @@ body.pt-ativo #conv-card{ display: none !important; }
 @media (prefers-reduced-motion: reduce){ .conv-card, .conv-card .cc-ico, .conv-card .cc-abre::after{ animation: none; } }
 @media (max-width: 640px){ .conv-card{ flex-wrap: wrap; } .conv-card .cc-abre{ width: 100%; text-align: center; } .conv-card .cc-nome{ white-space: normal; }
   .conv-card .cc-th{ width: 100%; transform: none; } }
+
+/* ═══ OS DOIS CARDS DO TOPO NUM DESENHO SÓ (Pedro, 28/11/2026: "padronizar o tamanho" e "deixar o da prioridade tão
+   bonito quanto a atividade comunicativa") ═══
+   A conversação da semana e o Planejador têm a MESMA altura mínima, o mesmo canto, o mesmo respiro, a faixa colorida com
+   confete, o rótulo em pílula amarela, o título grande e os botões VERDES à direita (verde é o botão desta página). */
+.conv-card, .fila-info.roteiro, .fila-info.roteiro.sem{ min-height: 164px; box-sizing: border-box; border-radius: 18px; padding: .9rem 1.1rem; }
+/* a conversação: o botão da direita é "Ir para Conversações", verde */
+.conv-card .cc-abre{ background: #31a889; color: #fff; box-shadow: 0 4px 0 #1f7a63, 0 8px 18px rgba(0,0,0,.18); }
+.conv-card .cc-abre:hover{ box-shadow: 0 6px 0 #1f7a63, 0 12px 22px rgba(0,0,0,.22); }
+.conv-card .cc-abre:active{ box-shadow: 0 2px 0 #1f7a63; }
+.conv-card .cc-abre::after{ background: rgba(255,255,255,.28); }
+.conv-card.cc-vazio .cc-abre{ background: #31a889; color: #fff; box-shadow: 0 4px 0 #1f7a63; }
+/* as miniaturas lado a lado: na turma mista, uma por nível, e o card NÃO cresce (a altura é a de uma miniatura) */
+.conv-card .cc-ths{ display: flex; gap: .7rem; flex: none; }
+.conv-card.cc-duas .cc-th{ width: 220px; }
+.conv-card .cc-th-nv{ position: absolute; left: 6px; top: 6px; z-index: 2; background: #fff; color: #1e293b; font-size: .68rem; font-weight: 900; border-radius: 999px; padding: 2px 8px; box-shadow: 0 2px 6px rgba(0,0,0,.2); }
+/* o Planejador com a mesma cara */
+.fila-info.roteiro, .fila-info.roteiro.sem, body.theme-dark .fila-info.roteiro{ position: relative; overflow: hidden; flex-direction: row; flex-wrap: wrap; align-items: center; gap: .8rem 1.1rem;
+  color: #fff; border: 0; background: linear-gradient(120deg, #0d9488, #0ea5e9, #2563eb, #4f46e5); background-size: 300% 300%; animation: ccDegrade 16s ease infinite;
+  box-shadow: 0 10px 26px rgba(37,99,235,.28); }
+.fila-info.roteiro::before{ content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .3;
+  background-image: radial-gradient(circle, #fff 2px, transparent 2.5px), radial-gradient(circle, #fde047 3px, transparent 3.5px), radial-gradient(circle, #fff 1.5px, transparent 2px);
+  background-size: 46px 46px, 70px 70px, 30px 30px; background-position: 0 0, 18px 26px, 8px 14px; }
+.fila-info.roteiro > *{ position: relative; }
+.fila-info.roteiro .pl-topo{ flex: 1 1 340px; flex-wrap: nowrap; align-items: center; gap: 1rem; min-width: 0; }
+.pl-ico{ font-size: 2.2rem; flex: none; animation: ccPula 2.4s ease-in-out infinite; filter: drop-shadow(0 3px 6px rgba(0,0,0,.2)); }
+.pl-txt{ flex: 1; min-width: 0; }
+.fila-info.roteiro .pl-tit, body.theme-dark .fila-info.roteiro .pl-tit{ display: inline-block; font-family: var(--font-body); font-size: .72rem; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; color: #7c2d12;
+  background: #fde047; border-radius: 999px; padding: 3px 10px; box-shadow: 0 2px 0 rgba(0,0,0,.15); }
+.pl-nome{ font-weight: 900; font-size: 1.12rem; margin-top: .25rem; text-shadow: 0 2px 6px rgba(0,0,0,.25); }
+.fila-info.roteiro .pl-topo .rt-info, .fila-info.roteiro .pl-topo .rt-info b, .fila-info.roteiro.sem .pl-topo .rt-info b{ display: block; flex-basis: auto; color: rgba(255,255,255,.92); font-size: .82rem; font-weight: 600; }
+.fila-info.roteiro .pl-topo .rt-info b{ display: inline; font-weight: 900; color: #fff; }
+.fila-info.roteiro .pl-rec, .fila-info.roteiro.sem .btn-recarrega{ flex: none; border: 1.5px solid rgba(255,255,255,.55); background: rgba(255,255,255,.16); color: #fff; }
+.fila-info.roteiro .pl-rec:hover{ background: rgba(255,255,255,.28); }
+.fila-info.roteiro .dica{ background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.6); color: #fff; flex: none; }
+.fila-info.roteiro .dica-tx{ flex-basis: 100%; order: 3; margin: 0; }
+.fila-info.roteiro .pl-acoes{ flex: 0 1 auto; align-items: center; justify-content: flex-end; }
+/* os botões verdes, com o mesmo relevo do "Ir para Conversações" */
+.fila-info.roteiro .pl-acoes .prio-grande{ flex: 0 0 auto; background: #31a889; color: #fff; border-radius: 999px; padding: .65rem 1.2rem; font-weight: 900; box-shadow: 0 4px 0 #1f7a63, 0 8px 18px rgba(0,0,0,.18); }
+.fila-info.roteiro .pl-acoes .prio-grande:hover{ transform: translateY(-1px); }
+.fila-info.roteiro .pl-acoes .prio-grande.on{ background: #fff; color: #1f7a63; box-shadow: 0 4px 0 #cbd5e1; }
+.fila-info.roteiro .pl-salvar, body.theme-dark .fila-info.roteiro .pl-salvar{ background: #fff; border: 0; border-radius: 999px; box-shadow: 0 4px 0 rgba(0,0,0,.15); }
+.fila-info.roteiro .pl-salvar .rt-data, .fila-info.roteiro .pl-salvar .rt-data input{ color: #155a48; }
+.fila-info.roteiro .pl-salvar .rt-btn.forte{ background: #31a889; color: #fff; font-weight: 900; padding: .55rem 1.1rem; }
+.fila-info.roteiro .pl-saidas > summary.rt-btn{ border: 1.5px solid rgba(255,255,255,.55); background: rgba(255,255,255,.16); color: #fff; border-radius: 999px; font-weight: 900; }
+.fila-info.roteiro .pl-mais-menu .rt-btn{ color: #1d3685; }
+@media (max-width: 1150px){ .conv-card.cc-duas .cc-th{ width: 180px; } }
+@media (max-width: 640px){
+  .conv-card .cc-ths{ width: 100%; } .conv-card .cc-ths .cc-th, .conv-card.cc-duas .cc-th{ flex: 1; width: auto; min-width: 0; }
+  .fila-info.roteiro .pl-acoes{ width: 100%; justify-content: stretch; } .fila-info.roteiro .pl-acoes .prio-grande{ flex: 1 1 100%; }
+  .fila-info.roteiro .pl-topo{ flex-wrap: wrap; } .pl-txt{ flex: 1 1 calc(100% - 3.4rem); } .pl-ico{ font-size: 1.8rem; }
+  .fila-info.roteiro .pl-rec{ margin-left: 3.2rem; }
+  .fila-info.roteiro .pl-salvar{ flex: 1 1 100%; } .fila-info.roteiro .pl-salvar .rt-data{ white-space: nowrap; display: flex; align-items: center; gap: .3rem; flex: 1; }
+}
+@media (prefers-reduced-motion: reduce){ .fila-info.roteiro, .pl-ico{ animation: none; } }
