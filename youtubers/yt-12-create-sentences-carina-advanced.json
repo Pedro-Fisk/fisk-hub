@@ -1,0 +1,88 @@
+{
+ "lesson": {
+  "coverTitle": "How to create sentences in English",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "How to create sentences in English",
+  "yt": {
+   "capaTitulo": "#12 - HOW TO CREATE SENTENCES IN ENGLISH | ADVANCED [Advanced Creativity Game]",
+   "material": [
+    "PowerPoint activity",
+    "Youtubers VIDEO FILE #12 \"How to create sentences in English - em português\" - Dropbox"
+   ],
+   "duracao": "15 minutes",
+   "objetivos": [
+    "Practicing pronunciation.",
+    "Developing fluency by using common words and expressions in English."
+   ],
+   "intro": "Today, we'll watch a video from Youtube Channel @EnglishinBrazil, from Carina Fragozo. We'll take a look at her advice on creating sentences in English. [Attention: the video is in Portuguese]",
+   "video": {
+    "drive": "1q8KMfuHDFXuZz3r1ZHvFFMLA6TpGv0Cj",
+    "youtube": "",
+    "nome": "How to create sentences in English (Carina Fragozo, em português)",
+    "instrucao": "",
+    "inicio": ""
+   },
+   "warmup": [],
+   "discussao": [],
+   "conversa": [],
+   "pratica": [
+    {
+     "tipo": "completar",
+     "titulo": "Creativity Game",
+     "instrucao": "Split the class in two groups. Each group takes turns trying to finish the sentences on the next slides. The longer/more complex the sentences, the better.",
+     "itens": [
+      "Now that I've come to think about it, I truly believe that... because...",
+      "My opinion has changed from... to...",
+      "I didn't _______ yesterday because...",
+      "My family and I are...",
+      "One of the challenges in my life is...",
+      "Between _____ and ____, I prefer _____.",
+      "Being ___ isn't as _____ as ____ because...",
+      "My favorite activity is... ( v + ing ) 'cause...",
+      "I need a favor: would you...?",
+      "Would you rather ____ or ____ ?",
+      "I'd rather _____ because...."
+     ]
+    }
+   ],
+   "jogo": [],
+   "vocab": [],
+   "avaliacao": [],
+   "fotos": {
+    "capa": "12-basic/capa.jpg",
+    "video": "12-basic/capa.jpg",
+    "conv": "12-basic/capa.jpg",
+    "intro": "12-basic/canal.jpg",
+    "outras": [
+     "12-basic/miniatura.jpg"
+    ]
+   }
+  },
+  "serie": "youtubers"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "youtuber",
+  "imgs": "youtubers/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#0D0D0D",
+   "fundo2": "#404040",
+   "prim": "#ffffff",
+   "sec": "#DC0505",
+   "dest": "#DC0505",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "television",
+  "icones": [
+   "television"
+  ]
+ }
+}

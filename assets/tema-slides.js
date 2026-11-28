@@ -100,6 +100,11 @@
     var rot = es ? { iw: 'Palabras Importantes', intro: 'Introducción', pw: 'Conversación en Parejas', jogo: 'Juego de Lengua', rev: '¿Te acuerdas?', av: 'Evaluación', fim: '¡Hasta la próxima clase!', mat: 'Material', obj: 'Objetivos', clique: 'clic para la traducción' }
       : { iw: 'Important Words', intro: 'Introduction', pw: 'Pair Work', jogo: 'Language Game', rev: 'Do You Remember?', av: 'Activity Evaluation', fim: 'See you next class!', mat: 'Material Needed', obj: 'Objectives', clique: 'clique para a tradução' };
     var slides = [], desl = 0;
+    if (design && design.pele === 'youtuber') {   /* a série YouTubers tem montador próprio (montaYt, abaixo) */
+      var sy = montaYt(L, design, base, T, B);
+      sy.forEach(function (s0) { s0.es = false; ligar(s0); });
+      return { slides: sy, receita: r };
+    }
     /* A PELE DAS BUDDY TALKS (Pedro, 28/11/2026: "mais parecido com a arte original, com a imagem original do urso"):
        fundo preto nos slides grandes e vinho nos de conteúdo, a faixa listrada vermelha e branca, o Buddy de busto nos
        slides grandes e a cabeça dele no canto dos de conteúdo (para não cobrir o texto), a introdução em balões de fala.
@@ -475,6 +480,147 @@
 
     slides.forEach(function (s) { s.es = es; ligar(s); });   /* es: o "Correct!" do jogo sai na língua da aula */
     return { slides: slides, receita: r };
+  }
+
+  /* ══ A SÉRIE "YOUTUBERS" (Pedro, 28/11/2026: refazer sem descaracterizar a arte) ═══════════════════════════════════
+     Montador próprio, porque a série tem blocos que as outras não têm (Group Discussion, Pronunciation Practice com o
+     "REPEAT THESE WORDS!", diálogos para completar, frases para desembaralhar, cartões de vocabulário português →
+     inglês). A cara é a do PowerPoint: fundos vermelho YouTube, cinza-escuro, preto e vinho; a faixa do cabeçalho do
+     YouTube no topo, o logo FISK no canto e a barra vermelha embaixo; títulos de seção em branco, caixa alta. As imagens
+     da série ficam em youtubers/img/. design.pele = 'youtuber'. */
+  function montaYt(L, design, base, T, B) {
+    var Y = L.yt || {}, img = base + (design.imgs || 'youtubers/img/'), F = Y.fotos || {}, slides = [];
+    var COR = { vermelho: '#DC0505', cinza: '#404040', preto: '#0D0D0D', vinho: '#580000' }, AMAR = '#FFC000', AZUL = '#00B0F0';
+    var u = function (n) { return /^https?:|^\//.test(String(n)) ? String(n) : img + n; };
+    function novoY(tipo, cor, corpo) {
+      var el = document.createElement('div'); el.className = 'ft-s';
+      el.style.cssText = 'background:' + (COR[cor] || cor) + ';color:#ffffff;font-family:"' + B + '",sans-serif';
+      el.innerHTML = '<div style="position:absolute;left:0;right:0;top:0;height:52px;background:#fff url(&quot;' + img + 'topo.jpg&quot;) left center/auto 100% no-repeat"></div>' +
+        '<img alt="FISK" src="' + img + 'fisk.jpg" style="position:absolute;right:18px;top:6px;height:40px">' +
+        '<div style="position:absolute;left:0;right:0;bottom:0;height:26px;background:#C00000"></div>' + corpo;
+      var et = 0; [].forEach.call(el.querySelectorAll('[data-e]'), function (x) { et = Math.max(et, +x.getAttribute('data-e')); });
+      slides.push({ tipo: tipo, etapas: et, el: el });
+      return slides[slides.length - 1];
+    }
+    var tit = function (t, sub, tam) { return '<div style="position:absolute;left:80px;right:80px;top:52px;bottom:26px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">' +
+      '<div style="font:900 ' + (tam || 150) + 'px/1.08 \'' + T + '\';text-transform:uppercase">' + esc(t) + '</div>' + (sub ? '<div style="font:500 52px/1.3 \'' + B + '\';margin-top:30px">' + esc(sub) + '</div>' : '') + '</div>'; };
+    var ouvir = function (w, cor) { return '<button type="button" class="ft-ouvir" data-ouvir="' + esc(w) + '" title="Ouvir" style="flex:none;width:60px;height:60px;border-radius:50%;border:0;cursor:pointer;background:' + (cor || '#C00000') + ';color:#fff;font-size:28px;line-height:1;vertical-align:middle">🔊</button>'; };
+    /* perguntas numeradas, uma por clique, com as respostas-modelo embaixo (em amarelo no vinho, como no original) */
+    function perguntas(tipo, cor, lista, corResp, porSlide) {
+      for (var k = 0; k < lista.length; k += porSlide) (function (grupo, n0) {
+        novoY(tipo, cor, '<div style="position:absolute;left:90px;right:90px;top:90px;bottom:60px;display:flex;flex-direction:column;justify-content:center">' + grupo.map(function (q, j) {
+          return '<div data-e="' + (j + 1) + '" class="ft-off" style="display:flex;gap:22px;margin-bottom:34px"><span style="flex:none;font:600 60px/1.2 \'' + B + '\'">' + (n0 + j + 1) + '.</span><div><div style="font:600 60px/1.2 \'' + B + '\'">' + esc(q[0]) + '</div>' +
+            q.slice(1).map(function (r) { return '<div style="font:italic 500 50px/1.3 \'' + B + '\';color:' + corResp + ';margin-top:6px">' + esc(r) + '</div>'; }).join('') + '</div></div>'; }).join('') + '</div>');
+      })(lista.slice(k, k + porSlide), k);
+    }
+
+    /* 1. capa: a tela do vídeo, com o painel preto do logo "YouTuber" e o título */
+    var capa = '<div style="position:absolute;inset:0;background:#fff url(&quot;' + esc(u(F.capa || F.video || 'topo.jpg')) + '&quot;) center/cover no-repeat"></div>' +
+      '<div style="position:absolute;left:0;top:0;width:1080px;height:760px;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center">' +
+      '<img alt="YouTuber" src="' + img + 'logo.png" style="width:820px">' +
+      '<div style="font:600 70px/1.15 \'' + B + '\';margin-top:30px;text-align:center;padding:0 40px">' + esc(Y.capaTitulo || L.coverTitle || '') + '</div></div>';
+    novoY('capa', '#ffffff', capa);
+    /* 2. material, objetivos e introdução */
+    novoY('material', 'vermelho', '<div style="position:absolute;left:90px;right:90px;top:100px;text-align:center"><div style="font:500 110px/1.1 \'' + B + '\'">MATERIAL NEEDED</div>' +
+      '<div style="text-align:left;display:inline-block;margin-top:50px;font:500 60px/1.5 \'' + B + '\'">' + (Y.material || ['PowerPoint activity']).map(function (m, i) { return (i + 1) + '. ' + esc(m); }).join('<br>') + '</div>' +
+      '<div style="margin-top:70px;font:500 60px \'' + B + '\'">LENGTH: ' + esc(String(Y.duracao || '20 minutes').toUpperCase()) + '</div></div>');
+    if ((Y.objetivos || []).length) novoY('objetivos', 'cinza', '<div style="position:absolute;left:90px;right:90px;top:100px;text-align:center"><div style="font:500 110px/1.1 \'' + B + '\'">AIMS OF THE <span style="color:#ff2a2a">ACTIVITY</span></div>' +
+      '<div style="text-align:left;display:inline-block;margin-top:60px">' + Y.objetivos.map(function (o, i) { return '<div data-e="' + (i + 1) + '" class="ft-off" style="font:500 70px/1.4 \'' + B + '\'">• ' + esc(o) + '</div>'; }).join('') + '</div></div>');
+    if (Y.intro) {
+      novoY('divisor', 'vermelho', tit('Introduction', '', 190));
+      var fotosIntro = [F.intro].concat((F.outras || []).filter(function (x) { return !/capa|topo/.test(x); }).slice(0, 2)).filter(Boolean);
+      novoY('introducao', 'vermelho', '<div style="position:absolute;left:80px;right:80px;top:80px;height:420px;display:flex;gap:40px;align-items:center;justify-content:center">' +
+        fotosIntro.map(function (f) { return '<img alt="" src="' + esc(u(f)) + '" style="max-height:400px;max-width:620px;border:6px solid #fff;border-radius:8px">'; }).join('') + '</div>' +
+        '<div style="position:absolute;left:100px;right:100px;top:530px;bottom:50px;display:flex;align-items:center;justify-content:center;text-align:center;font:500 ' + (String(Y.intro).length > 300 ? 50 : 58) + 'px/1.35 \'' + B + '\'">' + esc(Y.intro) + '</div>');
+    }
+    /* 3. o vídeo (o player do Drive nasce no toque do professor, como no Countries) */
+    var VD = Y.video || {};
+    if (VD.drive || VD.youtube) {
+      var sv = novoY('video', 'preto', '<div style="position:absolute;left:70px;top:90px;width:560px;bottom:60px;display:flex;flex-direction:column;justify-content:center;text-align:center"><div style="font:900 96px/1.05 \'' + T + '\'">WATCH THE VIDEO</div>' +
+        (VD.instrucao ? '<div style="font:500 44px/1.35 \'' + B + '\';margin-top:30px">' + esc(VD.instrucao) + '</div>' : '') + '</div>' +
+        '<div class="ft-video" data-drive="' + esc(VD.drive || '') + '" data-youtube="' + esc(VD.youtube || '') + '" style="position:absolute;left:680px;top:110px;width:1180px;height:664px;border-radius:12px;overflow:hidden;background:#000 url(&quot;' + esc(u(F.video || F.capa || 'topo.jpg')) + '&quot;) center/cover;cursor:pointer">' +
+        '<div class="ft-video-capa" style="position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px">' +
+        '<div style="width:210px;height:150px;border-radius:40px;background:#FF0000;color:#fff;font-size:96px;display:flex;align-items:center;justify-content:center;padding-left:12px">▶</div>' +
+        '<div style="font:800 54px \'' + B + '\';text-shadow:0 4px 14px rgba(0,0,0,.7);padding:0 30px;text-align:center">' + esc(VD.nome || '') + '</div></div></div>' +
+        (VD.inicio ? '<div style="position:absolute;left:680px;top:800px;font:600 40px \'' + B + '\'">⏱ ' + esc(VD.inicio) + '</div>' : ''));
+      sv.video = { drive: String(VD.drive || ''), youtube: String(VD.youtube || '') };
+    }
+    /* 4. depois do vídeo: Group Discussion */
+    if ((Y.discussao || []).length) { novoY('divisor', 'cinza', tit('Group Discussion', '', 170)); perguntas('conversa', 'vermelho', Y.discussao, '#ffffff', 2); }
+
+    var feitoJogo = false, feitoVocab = false;
+    function blocoJogo() {
+      if (feitoJogo || !(Y.jogo || []).length) return; feitoJogo = true;
+      novoY('divisor', 'cinza', tit('Language Practice', 'Choose the best alternative.', 140));
+      Y.jogo.forEach(function (g) {
+        var linhas = String(g.q).split(/\s*\|\s*/);
+        var s = novoY('jogo', 'preto', '<div style="position:absolute;left:90px;right:90px;top:100px;font:500 66px/1.4 \'' + B + '\'">' + linhas.map(esc).join('<br>') + '</div>' +
+          '<div style="position:absolute;left:90px;right:90px;top:' + (linhas.length > 1 ? 330 : 260) + 'px;border-top:3px solid #fff"></div>' +
+          '<div data-jogo="' + g.correct + '" style="position:absolute;left:90px;top:' + (linhas.length > 1 ? 370 : 300) + 'px;width:1000px;display:flex;flex-direction:column;gap:18px">' + (g.options || []).map(function (o, i) {
+            return '<button type="button" class="ft-op" data-op="' + i + '" style="text-align:left;font:500 62px \'' + B + '\';border-radius:60px;padding:12px 34px;background:transparent;color:#fff;border:4px solid rgba(255,255,255,.35)">' + (i + 1) + '. ' + esc(o) + '</button>'; }).join('') + '</div>' +
+          '<div class="ft-msg" style="position:absolute;left:90px;top:900px;font-size:54px;font-weight:900"></div>' +
+          '<span data-e="1" class="ft-off ft-revela" hidden></span>' +
+          (g.dica ? '<div data-e="1" class="ft-off" style="position:absolute;right:120px;top:560px;background:#009A00;color:#fff;border-radius:90px;padding:26px 60px;font:500 50px/1.2 \'' + B + '\';transform:rotate(-8deg);max-width:620px;text-align:center">' + esc(g.dica) + '</div>' : ''));
+        s.jogo = { pergunta: linhas.join(' '), opcoes: (g.options || []).map(String), certa: +g.correct };
+      });
+    }
+    function blocoVocab() {
+      if (feitoVocab || !(Y.vocab || []).length) return; feitoVocab = true;
+      novoY('divisor', 'preto', tit('Vocabulary Practice', 'Guess the word in English and repeat.', 140));
+      Y.vocab.forEach(function (v, i) {
+        var s = novoY('vocabulario', 'vinho', '<div style="position:absolute;left:80px;right:80px;top:110px;text-align:center;font:500 110px/1.1 \'' + B + '\'">' + esc(v[1] || '') + '</div>' +
+          '<div data-e="1" class="ft-off" style="position:absolute;left:80px;right:80px;top:620px;display:flex;gap:30px;align-items:center;justify-content:center"><span style="font:500 120px/1.1 \'' + B + '\';color:' + AMAR + '">' + esc(v[0]) + '</span>' + ouvir(v[0]) + '</div>');
+        if (i === Y.vocab.length - 1) s.vocab = Y.vocab.map(function (x) { return String(x[0]); });
+      });
+    }
+    function repetir(p, pares) {
+      novoY('divisor', 'preto', tit(p.titulo || 'Pronunciation Practice', p.instrucao || 'Repeat the words after the teacher', 130));
+      var itens = p.itens || [];
+      for (var k = 0; k < itens.length; k += 6) novoY('pratica', 'preto', '<div style="position:absolute;left:80px;width:1100px;top:90px;bottom:60px;display:flex;flex-direction:column;justify-content:center;gap:26px">' +
+        itens.slice(k, k + 6).map(function (it) { var w = pares ? it[0] : it, n = pares ? it[1] : '';
+          return '<div style="display:flex;align-items:center;gap:24px">' + ouvir(w) + '<div><div style="font:500 64px/1.1 \'' + B + '\'">' + esc(w) + '</div>' + (n ? '<div style="font:italic 500 40px/1.25 \'' + B + '\';color:' + AZUL + '">' + esc(n) + '</div>' : '') + '</div></div>'; }).join('') + '</div>' +
+        '<div style="position:absolute;right:90px;top:200px;width:560px;height:640px;background:#C00000;display:flex;align-items:center;justify-content:center;text-align:center;font:500 96px/1.25 \'' + B + '\'">REPEAT<br>THESE<br>WORDS!</div>');
+    }
+    function bloco(p) {
+      var t = p.tipo;
+      if (t === 'repetir') return repetir(p, false);
+      if (t === 'pronuncia' || t === 'expressoes') return repetir(p, true);
+      if (t === 'nota') {
+        if (/jogo/.test(p.instrucao || '')) return blocoJogo();
+        if (/vocab/.test(p.instrucao || '')) return blocoVocab();
+        return novoY('nota', 'cinza', tit(p.titulo || '', p.instrucao || '', 110));
+      }
+      if (t === 'revisao') {
+        novoY('divisor', 'preto', tit(p.titulo || 'Do you remember?', p.instrucao || '', 140));
+        return (p.itens || []).forEach(function (it) { novoY('revisao', 'vinho', '<div style="position:absolute;left:80px;right:80px;top:110px;text-align:center;font:500 96px/1.15 \'' + B + '\'">' + esc(it[0]) + '</div>' +
+          '<div data-e="1" class="ft-off" style="position:absolute;left:80px;right:80px;top:620px;display:flex;gap:30px;align-items:center;justify-content:center"><span style="font:500 110px/1.1 \'' + B + '\';color:' + AMAR + '">' + esc(it[1]) + '</span>' + ouvir(it[1]) + '</div>'); });
+      }
+      novoY('divisor', 'cinza', tit(p.titulo || 'Language Practice', p.instrucao || '', 130));
+      var itens = p.itens || [];
+      if (t === 'dialogos') for (var k = 0; k < itens.length; k += 2) novoY('pratica', 'preto', '<div style="position:absolute;left:100px;right:100px;top:90px;bottom:60px;display:flex;flex-direction:column;justify-content:center">' +
+        itens.slice(k, k + 2).map(function (d, j) { return '<div data-e="' + (j + 1) + '" class="ft-off" style="margin-bottom:70px;font:500 64px/1.45 \'' + B + '\'">' + d.map(esc).join('<br>') + '</div>'; }).join('') + '</div>');
+      else if (t === 'desembaralhar') itens.forEach(function (d) { novoY('pratica', 'preto', '<div style="position:absolute;left:100px;right:100px;top:200px;text-align:center;font:500 80px/1.3 \'' + B + '\'">' + esc(d[0]) + '</div>' +
+        '<div data-e="1" class="ft-off" style="position:absolute;left:100px;right:100px;top:560px;text-align:center;font:italic 600 80px/1.3 \'' + B + '\';color:' + AMAR + '">' + esc(d[1]) + '</div>'); });
+      else if (t === 'completar') for (var c = 0; c < itens.length; c += 2) novoY('pratica', 'vinho', '<div style="position:absolute;left:100px;right:100px;top:90px;bottom:60px;display:flex;flex-direction:column;justify-content:center;gap:90px">' +
+        itens.slice(c, c + 2).map(function (f, j) { return '<div data-e="' + (j + 1) + '" class="ft-off" style="font:500 78px/1.3 \'' + B + '\'">' + esc(f) + '</div>'; }).join('') + '</div>');
+      else if (t === 'figuras') for (var g2 = 0; g2 < itens.length; g2 += 4) novoY('pratica', 'preto', '<div style="position:absolute;left:80px;right:80px;top:90px;bottom:60px;display:grid;grid-template-columns:repeat(4,1fr);gap:30px;align-items:center">' +
+        itens.slice(g2, g2 + 4).map(function (f, j) { return '<div style="text-align:center"><img alt="" src="' + esc(u(f[1])) + '" style="width:100%;height:440px;object-fit:contain;background:#fff;border-radius:12px">' +
+          '<div data-e="' + (j + 1) + '" class="ft-off" style="margin-top:24px;font:600 52px \'' + B + '\';color:' + AMAR + '">' + esc(f[0]) + '</div></div>'; }).join('') + '</div>');
+    }
+    var prat = Y.pratica || [], pron = prat.filter(function (p) { return /^(repetir|pronuncia|expressoes)$/.test(p.tipo); }), resto = prat.filter(function (p) { return pron.indexOf(p) < 0; });
+    pron.forEach(bloco);
+    /* 5. Pair Conversation (no vinho, respostas em amarelo) */
+    if ((Y.conversa || []).length) { novoY('divisor', 'preto', tit('Pair', '', 220).replace('</div></div>', '</div><div style="font:500 80px \'' + B + '\'">CONVERSATION</div></div>')); perguntas('conversa', 'vinho', Y.conversa, AMAR, 2); }
+    (Y.warmup || []).length && perguntas('conversa', 'vinho', Y.warmup, AMAR, 2);
+    resto.forEach(bloco);
+    blocoJogo(); blocoVocab();
+    /* 6. Activity Evaluation (no celular também, com nota e comentário) */
+    if ((Y.avaliacao || []).length) {
+      novoY('divisor', 'preto', tit('Activity Evaluation', '', 150));
+      perguntas('avaliacao', 'vermelho', Y.avaliacao, '#ffffff', 2);
+      slides[slides.length - 1].aval = Y.avaliacao.map(function (q) { return String(q[0]); });
+    }
+    return slides;
   }
 
   /* o que é clicável dentro do slide: as cartas do vocabulário e as opções do jogo */

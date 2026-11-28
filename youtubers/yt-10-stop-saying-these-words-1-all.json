@@ -1,0 +1,141 @@
+{
+ "lesson": {
+  "coverTitle": "Stop saying these 10 words – Part 1",
+  "coverLevel": "All Levels",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Stop saying these 10 words – Part 1",
+  "yt": {
+   "capaTitulo": "#10 - STOP SAYING THESE WORDS - PART 1 - ALL LEVELS",
+   "material": [
+    "PowerPoint activity",
+    "Youtubers VIDEO FILE #10 \"Stop saying these words - Part 1\" - Dropbox"
+   ],
+   "duracao": "15 minutes",
+   "objetivos": [
+    "Practicing pronunciation.",
+    "Developing fluency by using common words and expressions in English."
+   ],
+   "intro": "Today, we will watch another video produced by Gavin, from the Youtube Channel @SmallAdvantages. Gavin is an American who teaches English to Brazilians online. Today, we'll take a look at his video on 10 words we shouldn't say in English. We'll practice the first 5.",
+   "video": {
+    "drive": "1pnhMqYhT5yfoj88BO6JV5waPIRuJlLig",
+    "youtube": "do3d6mfUsWU",
+    "nome": "PARE DE FALAR AGORA ESSAS 10 PALAVRAS EM INGLÊS | DICA #77 (parte 1)",
+    "instrucao": "O vídeo é dividido em 2 atividades: pare por volta de 4:24 (a outra metade é a AC #11).",
+    "inicio": "1:29",
+    "fim": "4:24"
+   },
+   "warmup": [],
+   "discussao": [],
+   "conversa": [
+    [
+     "What is hard for you in English?",
+     "For me, _____ is hard.",
+     "LISTENING / SPEAKING / WRITING / OTHER"
+    ],
+    [
+     "In school, which subject is hard for you?",
+     "For me, _____ is hard.",
+     "MATH / SCIENCE / CHEMISTRY / OTHER"
+    ],
+    [
+     "Do you drink coffee?"
+    ],
+    [
+     "Do you think coffee can be addictive?",
+     "Why / why not?"
+    ],
+    [
+     "When was the last time you had a bad cough?"
+    ]
+   ],
+   "pratica": [
+    {
+     "tipo": "expressoes",
+     "titulo": "Review the Expressions",
+     "instrucao": "",
+     "itens": [
+      [
+       "HARD",
+       "= difícil"
+      ],
+      [
+       "QUESTION",
+       "= pergunta, dúvida"
+      ],
+      [
+       "SONG",
+       "= música (canção)"
+      ],
+      [
+       "COFFEE",
+       "= café"
+      ],
+      [
+       "MAN",
+       "= \"cara\", homem"
+      ]
+     ]
+    }
+   ],
+   "jogo": [],
+   "vocab": [
+    [
+     "HARD",
+     "difícil"
+    ],
+    [
+     "QUESTION",
+     "pergunta, dúvida"
+    ],
+    [
+     "SONG",
+     "música (canção)"
+    ],
+    [
+     "COFFEE",
+     "café"
+    ],
+    [
+     "MAN",
+     "\"cara\", homem"
+    ]
+   ],
+   "avaliacao": [],
+   "fotos": {
+    "capa": "10-all/capa.jpg",
+    "video": "10-all/capa.jpg",
+    "conv": "07-basic/capa.jpg",
+    "intro": "gavin.jpg",
+    "outras": [
+     "10-all/intro.jpg",
+     "smalladvantages.jpg"
+    ]
+   }
+  },
+  "serie": "youtubers"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "youtuber",
+  "imgs": "youtubers/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#0D0D0D",
+   "fundo2": "#404040",
+   "prim": "#ffffff",
+   "sec": "#DC0505",
+   "dest": "#DC0505",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "television",
+  "icones": [
+   "television"
+  ]
+ }
+}

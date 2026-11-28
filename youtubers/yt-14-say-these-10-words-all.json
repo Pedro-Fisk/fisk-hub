@@ -1,0 +1,99 @@
+{
+ "lesson": {
+  "coverTitle": "Say these 10 words",
+  "coverLevel": "All Levels",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Say these 10 words",
+  "yt": {
+   "capaTitulo": "#14 - ALL LEVELS",
+   "material": [
+    "PowerPoint activity",
+    "Youtubers VIDEO FILE #14 - Dropbox"
+   ],
+   "duracao": "20 minutes",
+   "objetivos": [],
+   "intro": "English teacher Jackie is a big Youtuber. Watching her Youtube Channel @AskJackie is a great way to study. Today we'll take a look at her video about 10 words people usually don't pronounce correctly. We'll take a look at some of them.",
+   "video": {
+    "drive": "1qIsfPvl0KZ4BX6JSE0_qSSJs9X8ngcfi",
+    "youtube": "",
+    "nome": "10 palavras simples e comuns que você está pronunciando ERRADO...possivelmente :)",
+    "instrucao": "",
+    "inicio": ""
+   },
+   "warmup": [],
+   "discussao": [],
+   "conversa": [
+    [
+     "Would you like to work at an office?"
+    ],
+    [
+     "Do you need to practice more English?"
+    ],
+    [
+     "How often do you drink coffee?"
+    ],
+    [
+     "Do you know how to prepare a good cup of coffee?"
+    ],
+    [
+     "Some people are addicted to coffee. What's your opinion about this?"
+    ],
+    [
+     "Do you cough when you get a cold?"
+    ]
+   ],
+   "pratica": [
+    {
+     "tipo": "repetir",
+     "titulo": "Pronunciation Practice",
+     "instrucao": "Practice the expressions shown in the video",
+     "itens": [
+      "OFFice - PRACtice - NOtice",
+      "to = too = two ≠ chew",
+      "restaurant - rural - rarely",
+      "coffee ≠ cough",
+      "three ≠ tree ≠ free"
+     ]
+    }
+   ],
+   "jogo": [],
+   "vocab": [],
+   "avaliacao": [],
+   "fotos": {
+    "capa": "14-all/capa.jpg",
+    "video": "14-all/capa.jpg",
+    "conv": "14-all/capa.jpg",
+    "intro": "jackie-hello.jpg",
+    "outras": [
+     "13-all/capa.jpg",
+     "askjackie.jpg"
+    ]
+   }
+  },
+  "serie": "youtubers"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "youtuber",
+  "imgs": "youtubers/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#0D0D0D",
+   "fundo2": "#404040",
+   "prim": "#ffffff",
+   "sec": "#DC0505",
+   "dest": "#DC0505",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "television",
+  "icones": [
+   "television"
+  ]
+ }
+}

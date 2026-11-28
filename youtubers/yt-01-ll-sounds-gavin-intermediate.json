@@ -1,0 +1,158 @@
+{
+ "lesson": {
+  "coverTitle": "'LL Sounds with Gavin",
+  "coverLevel": "Intermediate",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "'LL Sounds with Gavin",
+  "yt": {
+   "capaTitulo": "'LL Sounds with Gavin - INTER",
+   "material": [
+    "PowerPoint activity",
+    "Youtubers VIDEO FILE #01 - Dropbox"
+   ],
+   "duracao": "20 minutes",
+   "objetivos": [
+    "Practicing pronunciation.",
+    "Developing fluency."
+   ],
+   "intro": "Today, we will watch a video produced by Gavin, from the Youtube Channel Small Advantages. Gavin is an American guy that learned Portuguese by himself. In his channel, he gives tips about the English language and culture. Today, we'll take a look at a part of his video about PRONUNCIATION of the 'LL sound.",
+   "video": {
+    "drive": "1p3BITT61FmEZTT3nTK2IU6H7l14i3tQY",
+    "youtube": "",
+    "nome": "Como pronunciar 'LL em inglês | CONTRAÇÕES #3",
+    "instrucao": "Every time the word PRACTICE appears, repeat the sentence on the screen. Pay attention to your pronunciation!",
+    "inicio": ""
+   },
+   "warmup": [],
+   "discussao": [
+    [
+     "Do you know this Youtube Channel?",
+     "a. Yes, I know it.",
+     "b. No, I don't know it."
+    ],
+    [
+     "What's your opinion about his Portuguese?",
+     "In my opinion it is... funny / nice / correct / incorrect / other"
+    ]
+   ],
+   "conversa": [
+    [
+     "Do you watch videos on Youtube?"
+    ],
+    [
+     "How often do you watch them?"
+    ],
+    [
+     "Which kind of videos do you watch?",
+     "I usually watch _______ videos.",
+     "tutorial / funny / gameplay / other"
+    ],
+    [
+     "Is it easy or difficult for you to pronounce the 'LL sound?",
+     "a. Come on, it's easy!",
+     "b. It's OK I guess.",
+     "c. I need more practice."
+    ],
+    [
+     "Do you watch videos online to study?"
+    ]
+   ],
+   "pratica": [
+    {
+     "tipo": "nota",
+     "titulo": "Exploration of WILL",
+     "instrucao": "Teacher, make sure every student is familiar with the auxiliary WILL and its CONTRACTION form. If necessary, explore this structure on the board."
+    },
+    {
+     "tipo": "dialogos",
+     "titulo": "Language Practice 1",
+     "instrucao": "Ask different students to act out the dialogs. Give the student time to come up with answers to fill in the blanks. Pay attention to the pronunciation of the contractions!",
+     "itens": [
+      [
+       "A: What will you have for dinner?",
+       "B: I think I'll have _________ ."
+      ],
+      [
+       "A: Where do you think she'll go?",
+       "B: I guess she'll probably go to ______ ."
+      ],
+      [
+       "A: Do you study ________?",
+       "B: No, I don't. But I'll do it someday."
+      ],
+      [
+       "A: When will they start the project?",
+       "B: They'll start it ________. (future)"
+      ]
+     ]
+    },
+    {
+     "tipo": "desembaralhar",
+     "titulo": "Language Practice 2",
+     "instrucao": "Unscramble the words.",
+     "itens": [
+      [
+       "he'll / America / in / study",
+       "He'll study in America."
+      ],
+      [
+       "tomorrow / dinner / they'll / cook",
+       "They'll cook dinner tomorrow."
+      ],
+      [
+       "you / ? / the movie / watch / will",
+       "Will you watch the movie?"
+      ]
+     ]
+    }
+   ],
+   "jogo": [],
+   "vocab": [],
+   "avaliacao": [
+    [
+     "What did you like about today's activity?",
+     "I liked the... VIDEO / GAMES / CONVERSATION"
+    ],
+    [
+     "Will you watch Gavin's videos?",
+     "Yes, I'll watch them.",
+     "No, I don't think so."
+    ]
+   ],
+   "fotos": {
+    "capa": "01-basic/capa.jpg",
+    "video": "01-basic/capa.jpg",
+    "conv": "01-basic/capa.jpg",
+    "intro": "gavin.jpg",
+    "outras": [
+     "smalladvantages.jpg"
+    ]
+   }
+  },
+  "serie": "youtubers"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "youtuber",
+  "imgs": "youtubers/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#0D0D0D",
+   "fundo2": "#404040",
+   "prim": "#ffffff",
+   "sec": "#DC0505",
+   "dest": "#DC0505",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "television",
+  "icones": [
+   "television"
+  ]
+ }
+}

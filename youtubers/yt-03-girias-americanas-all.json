@@ -1,0 +1,211 @@
+{
+ "lesson": {
+  "coverTitle": "Gírias que os americanos usam",
+  "coverLevel": "All Levels",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Gírias que os americanos usam",
+  "yt": {
+   "capaTitulo": "#03 - ALL LEVELS",
+   "material": [
+    "PowerPoint activity",
+    "Youtubers VIDEO FILE #16 - Dropbox"
+   ],
+   "duracao": "20 minutes",
+   "objetivos": [],
+   "intro": "Jackie (AskJackie) and Seth (AmigoGringo) are big YouTubers. Watching their channels on YouTube is a great way to study English and learn about American culture. Today we'll take a look at their video about 'GÍRIAS (SLANGS) QUE OS AMERICANOS USAM'. We'll take a look at five of them. Are you ready?",
+   "video": {
+    "drive": "1pFhnOt4T-Rs88AD8SSeOMWEQ4Khc5Uan",
+    "youtube": "",
+    "nome": "Gírias que os americanos usam",
+    "instrucao": "",
+    "inicio": ""
+   },
+   "warmup": [],
+   "discussao": [],
+   "conversa": [],
+   "pratica": [
+    {
+     "tipo": "expressoes",
+     "titulo": "Pronunciation Practice",
+     "instrucao": "Practice the slangs shown in the video.",
+     "itens": [
+      [
+       "Gotcha",
+       "Eu entendi."
+      ],
+      [
+       "Shut up!",
+       "Não acredito! / Fala sério!"
+      ],
+      [
+       "I'm beat.",
+       "Estou exausto(a)."
+      ],
+      [
+       "No sweat.",
+       "No problem. / Fácil."
+      ],
+      [
+       "You made it.",
+       "Você conseguiu (fazer)."
+      ]
+     ]
+    },
+    {
+     "tipo": "dialogos",
+     "titulo": "Pair Work",
+     "instrucao": "Practice the questions and answers with the correct slang.",
+     "itens": [
+      [
+       "Did you understand what I mean?",
+       "(Você entendeu o que eu quis dizer?)",
+       "Yeah, I gotcha!",
+       "(Sim, entendi!)"
+      ],
+      [
+       "Did you know that I got an A in Math?",
+       "(Sabia que eu tirei um A em Matemática?)",
+       "Shut up!",
+       "(Não acredito! / Fala sério!)"
+      ],
+      [
+       "Do you want to go out tonight?",
+       "(Você quer sair esta noite?)",
+       "Sorry, I can't. I'm beat and I have to wake up early tomorrow.",
+       "(Desculpe, não posso. Estou cansado e tenho que acordar cedo amanhã.)"
+      ],
+      [
+       "Can you fix my car for me?",
+       "(Você pode consertar meu carro para mim?)",
+       "No sweat!",
+       "(No problem. / Fácil.)"
+      ],
+      [
+       "What a great surprise! I'm so happy you are here.",
+       "(Que grande surpresa! Estou tão feliz por você estar aqui.)",
+       "Oh, I made it despite the traffic.",
+       "(Oh, consegui apesar do tráfego.)"
+      ],
+      [
+       "Did you understand the project correctly?",
+       "(Você entendeu o projeto corretamente?)",
+       "Of course teacher, I gotcha!",
+       "(É claro professor. Eu entendi.)"
+      ],
+      [
+       "My friend Paul got a trip to Europe.",
+       "(Meu amigo Paul ganhou uma viagem para a Europa.)",
+       "Shut up!",
+       "(Não acredito! / Fala sério!)"
+      ],
+      [
+       "Let's take another walk around the block?",
+       "(Vamos dar mais uma volta no quarteirão?)",
+       "Oh man, I'm beat.",
+       "(Oh cara, estou exausto.)"
+      ],
+      [
+       "Could you help me with the housework, please?",
+       "(Você poderia me ajudar com as tarefas domésticas, por favor?)",
+       "No sweat.",
+       "(No problem. / Fácil.)"
+      ],
+      [
+       "I can't believe you made it. It was a difficult task.",
+       "(Não acredito que você conseguiu. Foi uma tarefa difícil.)",
+       "Yeah. I studied very hard for this.",
+       "(Sim. Eu estudei muito para isso.)"
+      ]
+     ]
+    },
+    {
+     "tipo": "revisao",
+     "titulo": "Do you remember?",
+     "instrucao": "Practice the expressions shown in the video.",
+     "itens": [
+      [
+       "Eu entendi.",
+       "Gotcha"
+      ],
+      [
+       "Não acredito! / Fala sério!",
+       "Shut up!"
+      ],
+      [
+       "Estou exausto(a).",
+       "I'm beat."
+      ],
+      [
+       "No problem. / Fácil.",
+       "No sweat."
+      ],
+      [
+       "Você conseguiu (fazer).",
+       "You made it."
+      ]
+     ]
+    }
+   ],
+   "jogo": [],
+   "vocab": [
+    [
+     "Gotcha",
+     "Eu entendi."
+    ],
+    [
+     "Shut up!",
+     "Não acredito! / Fala sério!"
+    ],
+    [
+     "I'm beat.",
+     "Estou exausto(a)."
+    ],
+    [
+     "No sweat.",
+     "No problem. / Fácil."
+    ],
+    [
+     "You made it.",
+     "Você conseguiu (fazer)."
+    ]
+   ],
+   "avaliacao": [],
+   "fotos": {
+    "capa": "03-all/capa.jpg",
+    "video": "03-all/capa.jpg",
+    "conv": "03-all/capa.jpg",
+    "intro": "jackie-hello.jpg",
+    "outras": [
+     "02-basic/video.jpg",
+     "03-all/amigogringo.jpg",
+     "03-all/seth.jpg"
+    ]
+   }
+  },
+  "serie": "youtubers"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "youtuber",
+  "imgs": "youtubers/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#0D0D0D",
+   "fundo2": "#404040",
+   "prim": "#ffffff",
+   "sec": "#DC0505",
+   "dest": "#DC0505",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "television",
+  "icones": [
+   "television"
+  ]
+ }
+}

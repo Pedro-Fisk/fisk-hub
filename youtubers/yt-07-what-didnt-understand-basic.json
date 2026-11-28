@@ -1,0 +1,112 @@
+{
+ "lesson": {
+  "coverTitle": "7 ways to say you didn't understand",
+  "coverLevel": "Basic & Teens",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "7 ways to say you didn't understand",
+  "yt": {
+   "capaTitulo": "\"WHAT?\" – BASIC + TEENS",
+   "material": [
+    "PowerPoint activity",
+    "Youtubers VIDEO FILE #07 - Dropbox"
+   ],
+   "duracao": "20 minutes",
+   "objetivos": [
+    "Practicing pronunciation.",
+    "Developing fluency."
+   ],
+   "intro": "Today, we will watch another video produced by Gavin, from the Youtube Channel @SmallAdvantages. Gavin is an American who teaches English to Brazilians online. Today, we'll take a look at his video on how to say that you don't understand something.",
+   "video": {
+    "drive": "1pcbOC3uwbCt-exWr2LcPoD-qmhKH4pcJ",
+    "youtube": "",
+    "nome": "7 maneiras de falar NÃO ENTENDI em inglês | Dica #13",
+    "instrucao": "Repeat the sentences after him!",
+    "inicio": ""
+   },
+   "warmup": [],
+   "discussao": [],
+   "conversa": [
+    [
+     "How often do you misunderstand people in English?",
+     "I ___ misunderstand people in English.",
+     "NEVER / SOMETIMES / ALWAYS"
+    ],
+    [
+     "Do you think people understand your English?",
+     "Yes I do.",
+     "Not so much."
+    ],
+    [
+     "Are there accents in Portuguese language?",
+     "Yeah! There's the (paulistano) accent, etc..."
+    ],
+    [
+     "Do you understand Brazilians with different accents?",
+     "Sure! I understand every one of them.",
+     "It's really hard to understand the (capixaba)..."
+    ]
+   ],
+   "pratica": [
+    {
+     "tipo": "repetir",
+     "titulo": "Review the Expressions",
+     "instrucao": "",
+     "itens": [
+      "What?",
+      "What'd you say? [= What did you say?]",
+      "Could you say that again?",
+      "Come again?",
+      "Sorry, I didn't understand that.",
+      "I didn't catch that.",
+      "I beg your pardon?"
+     ]
+    }
+   ],
+   "jogo": [],
+   "vocab": [],
+   "avaliacao": [
+    [
+     "When you don't understand something, do you say \"What'd you say?\" for example or do you pretend that everything is OK?",
+     "When I don't understand something, I...",
+     "... ask them \"Come again?\" or \"What?\".",
+     "... pretend that I understood."
+    ]
+   ],
+   "fotos": {
+    "capa": "07-basic/capa.jpg",
+    "video": "07-basic/capa.jpg",
+    "conv": "07-basic/capa.jpg",
+    "intro": "gavin.jpg",
+    "outras": [
+     "07-basic/intro.jpg",
+     "smalladvantages.jpg"
+    ]
+   }
+  },
+  "serie": "youtubers"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "youtuber",
+  "imgs": "youtubers/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#0D0D0D",
+   "fundo2": "#404040",
+   "prim": "#ffffff",
+   "sec": "#DC0505",
+   "dest": "#DC0505",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "television",
+  "icones": [
+   "television"
+  ]
+ }
+}

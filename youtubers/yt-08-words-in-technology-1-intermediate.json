@@ -1,0 +1,158 @@
+{
+ "lesson": {
+  "coverTitle": "Words in Technology – Part 1",
+  "coverLevel": "Intermediate & Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Words in Technology – Part 1",
+  "yt": {
+   "capaTitulo": "TIPS IN ENGLISH 8 - INTER + ADV",
+   "material": [
+    "PowerPoint activity",
+    "Youtubers VIDEO FILE #08 - Dropbox"
+   ],
+   "duracao": "20 minutes",
+   "objetivos": [
+    "Practicing pronunciation.",
+    "Learning new words about TECHNOLOGY."
+   ],
+   "intro": "Jackie has one of the biggest Youtube Channels for learning English, @AskJackie. Today, we'll take a look at a part of her video about PRONUNCIATION of vocabulary related to TECHNOLOGY.",
+   "video": {
+    "drive": "1pdAqNwxiT8FZO37UmEvRmjvkB0ZfKn46",
+    "youtube": "",
+    "nome": "10 palavras da TECNOLOGIA que você está pronunciando errado em inglês...possivelmente. ;) (parte 1)",
+    "instrucao": "Pay attention to the WRONG pronunciation and the CORRECT pronunciation. Repeat the words.",
+    "inicio": ""
+   },
+   "warmup": [],
+   "discussao": [
+    [
+     "Were there any new words for you?",
+     "Yeah. The word ____ was new for me."
+    ],
+    [
+     "Which words are hard for you to pronounce?",
+     "It's hard for me to pronounce..."
+    ]
+   ],
+   "conversa": [
+    [
+     "Does your phone have bluetooth?"
+    ],
+    [
+     "Would you like to have a tablet?"
+    ],
+    [
+     "How often do you use the internet?"
+    ],
+    [
+     "Is there internet in your house / workplace / school?"
+    ],
+    [
+     "Is your internet at home fast or slow?"
+    ],
+    [
+     "How often do you disconnect from the internet?"
+    ],
+    [
+     "\"Internet can be a distraction.\" What's your opinion about this?"
+    ],
+    [
+     "Do you know anyone who is addicted to the internet?"
+    ]
+   ],
+   "pratica": [
+    {
+     "tipo": "repetir",
+     "titulo": "Pronunciation Practice",
+     "instrucao": "Repeat the words after the teacher",
+     "itens": [
+      "BLUETOOTH",
+      "IPAD",
+      "TABLET",
+      "INTERNET",
+      "HOME THEATER"
+     ]
+    },
+    {
+     "tipo": "nota",
+     "titulo": "TH sounds",
+     "instrucao": "It can feel weird pronouncing the TH sounds, because we're not used to doing it in Portuguese. Take a look at some comments on this video about this problem.",
+     "foto": "08-basic/comentarios.jpg"
+    },
+    {
+     "tipo": "figuras",
+     "titulo": "Language Practice",
+     "instrucao": "",
+     "itens": [
+      [
+       "TABLET",
+       "08-basic/tablet.jpg"
+      ],
+      [
+       "HOME THEATER",
+       "08-basic/home-theater.jpg"
+      ],
+      [
+       "INTERNET",
+       "08-basic/internet.jpg"
+      ],
+      [
+       "BLUETOOTH",
+       "08-basic/bluetooth.png"
+      ]
+     ]
+    }
+   ],
+   "jogo": [],
+   "vocab": [],
+   "avaliacao": [
+    [
+     "Do you use the internet to study?"
+    ],
+    [
+     "How often do you watch English classes online?"
+    ]
+   ],
+   "fotos": {
+    "capa": "08-basic/capa.jpg",
+    "video": "08-basic/capa.jpg",
+    "conv": "08-basic/capa.jpg",
+    "intro": "jackie-hello.jpg",
+    "outras": [
+     "08-basic/intro.jpg",
+     "08-basic/comentarios.jpg",
+     "08-basic/tablet.jpg",
+     "08-basic/home-theater.jpg",
+     "08-basic/internet.jpg",
+     "08-basic/bluetooth.png",
+     "askjackie.jpg"
+    ]
+   }
+  },
+  "serie": "youtubers"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "youtuber",
+  "imgs": "youtubers/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#0D0D0D",
+   "fundo2": "#404040",
+   "prim": "#ffffff",
+   "sec": "#DC0505",
+   "dest": "#DC0505",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "television",
+  "icones": [
+   "television"
+  ]
+ }
+}

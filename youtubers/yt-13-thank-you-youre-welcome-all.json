@@ -1,0 +1,117 @@
+{
+ "lesson": {
+  "coverTitle": "5 ways to say THANK YOU and YOU'RE WELCOME",
+  "coverLevel": "All Levels",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "5 ways to say THANK YOU and YOU'RE WELCOME",
+  "yt": {
+   "capaTitulo": "ALL LEVELS",
+   "material": [
+    "PowerPoint activity",
+    "Youtubers VIDEO FILE #13 - Dropbox"
+   ],
+   "duracao": "20 minutes",
+   "objetivos": [
+    "Practicing pronunciation.",
+    "Learning different ways to say THANK YOU and YOU'RE WELCOME.",
+    "Talking about FAVORS."
+   ],
+   "intro": "English teacher Jackie is a big Youtuber. Watching her Youtube Channel @AskJackie is a great way to study.",
+   "video": {
+    "drive": "1FY0VmqEj-u3sredFDfR0Sp5o-wz186HH",
+    "youtube": "",
+    "nome": "5 jeitos de falar THANK YOU, YOU'RE WELCOME, e mais 5 frases \"bem-educadas\" em INGLÊS",
+    "instrucao": "",
+    "inicio": ""
+   },
+   "warmup": [
+    [
+     "Do you know different ways of saying THANK YOU and YOU'RE WELCOME?",
+     "Teacher, have the students guess other ways of saying these expressions."
+    ]
+   ],
+   "discussao": [],
+   "conversa": [
+    [
+     "When was the last time you did someone a favor?"
+    ],
+    [
+     "Who was the last person you've helped?"
+    ],
+    [
+     "In your family, who asks a lot of favors?"
+    ],
+    [
+     "Is it easy or difficult for you to say no when someone asks you a favor?"
+    ],
+    [
+     "What favor would you never do for someone?"
+    ]
+   ],
+   "pratica": [
+    {
+     "tipo": "repetir",
+     "titulo": "Pronunciation Practice",
+     "instrucao": "Practice the expressions shown in the video",
+     "itens": [
+      "Thanks!",
+      "I appreciate it.",
+      "I'm so grateful.",
+      "I owe you.",
+      "You're the best."
+     ]
+    },
+    {
+     "tipo": "repetir",
+     "titulo": "Pronunciation Practice",
+     "instrucao": "Practice the expressions shown in the video",
+     "itens": [
+      "No problem.",
+      "My pleasure.",
+      "You bet.",
+      "No sweat.",
+      "No worries. / Don't worry about it."
+     ]
+    }
+   ],
+   "jogo": [],
+   "vocab": [],
+   "avaliacao": [],
+   "fotos": {
+    "capa": "13-all/capa.jpg",
+    "video": "13-all/capa.jpg",
+    "conv": "13-all/capa.jpg",
+    "intro": "jackie-hello.jpg",
+    "outras": [
+     "askjackie.jpg",
+     "instagram.png"
+    ]
+   }
+  },
+  "serie": "youtubers"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "youtuber",
+  "imgs": "youtubers/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#0D0D0D",
+   "fundo2": "#404040",
+   "prim": "#ffffff",
+   "sec": "#DC0505",
+   "dest": "#DC0505",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "television",
+  "icones": [
+   "television"
+  ]
+ }
+}
