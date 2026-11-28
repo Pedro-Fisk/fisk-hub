@@ -13,129 +13,39 @@
  },
  "bt-him-her-them-basic": {
   "voz": "en-US-GuyNeural",
-  "a": {
-   "tell him": "5ff19178e6e3d0d6.mp3",
-   "call her": "95fc2c65d2c8f916.mp3",
-   "meet them": "527ad7a5a1487a4b.mp3",
-   "ask him": "0dc0b5f0918b94ce.mp3",
-   "help her": "b10d0c22f2d6a3a0.mp3",
-   "text them": "da48a28800729888.mp3",
-   "give him": "32f1c0a483563bda.mp3",
-   "show her": "32e9de5e52cbdb87.mp3",
-   "join them": "4791c3cee35ebd4a.mp3"
-  }
+  "a": {}
  },
  "bt-him-her-them-intermediate": {
   "voz": "en-US-AndrewNeural",
-  "a": {
-   "tell him": "0308fd0374276b49.mp3",
-   "call her": "26181b0a6f31f28f.mp3",
-   "meet them": "ee1d44fc47c80f23.mp3",
-   "trust him": "c0f1e66aa502face.mp3",
-   "convince her": "3e8e5bfa6d65f216.mp3",
-   "remind them": "eff719d29a704908.mp3",
-   "introduce him": "d300b88f0c681a30.mp3",
-   "recommend her": "0dabd9844eeebcaa.mp3",
-   "contact them": "4a2e0ef21da819c3.mp3"
-  }
+  "a": {}
  },
  "bt-him-her-them-advanced": {
   "voz": "en-US-AndrewNeural",
-  "a": {
-   "persuade him": "3d4cdb1919773c99.mp3",
-   "brief her": "c0d969db8474b0d6.mp3",
-   "involve them": "f9aeaf79689d26a0.mp3",
-   "approach him": "d342b8cf97c622a8.mp3",
-   "reassure her": "58f1a640b5278fae.mp3",
-   "update them": "5125ef66e4e50011.mp3",
-   "consult him": "1d48073297ac682a.mp3",
-   "nominate her": "06abfa69fe635321.mp3",
-   "engage them": "8dc25e4b40a614d0.mp3"
-  }
+  "a": {}
  },
  "bt-and-of-basic": {
   "voz": "en-US-EricNeural",
-  "a": {
-   "a cup of tea": "f3e745ff53964722.mp3",
-   "a lot of work": "7b0d0b2ed4124ec7.mp3",
-   "out of town": "accf6149bf44d718.mp3",
-   "most of them": "90be1538e797e172.mp3",
-   "kind of cold": "87e190daaf1436b1.mp3",
-   "bread and jam": "81298dd10bc2054e.mp3",
-   "nice and easy": "a59f73b2c658016b.mp3",
-   "mom and dad": "3259349b36a0d89d.mp3",
-   "black and white": "3ddccfbad54e335f.mp3"
-  }
+  "a": {}
  },
  "bt-and-of-intermediate": {
   "voz": "en-US-AndrewNeural",
-  "a": {
-   "a piece of cake": "53de10af2c71ccf4.mp3",
-   "plenty of room": "1660e9acc26867d6.mp3",
-   "out of order": "391b3f9591b6cf6c.mp3",
-   "in front of it": "08960e5e0963995a.mp3",
-   "instead of that": "310be9b22e318d41.mp3",
-   "safe and sound": "c57d29b668ebffc8.mp3",
-   "back and forth": "f03b753d0ff42c4e.mp3",
-   "peace and quiet": "9a26cbd09641c27c.mp3",
-   "rest and relax": "7f453b906340daaf.mp3"
-  }
+  "a": {}
  },
  "bt-and-of-advanced": {
   "voz": "en-US-EmmaNeural",
-  "a": {
-   "ahead of time": "adc20eb8d6809606.mp3",
-   "short of time": "663d95528ef38779.mp3",
-   "aware of that": "10c6393884709865.mp3",
-   "capable of it": "df4f6ccc78a6d2a9.mp3",
-   "regardless of": "75a670a61a1d7a70.mp3",
-   "time and again": "4af27334519c564a.mp3",
-   "trial and error": "48510d4fffba0cfd.mp3",
-   "give and take": "c38135f9e6b32b80.mp3",
-   "wear and tear": "465e41acc6717623.mp3"
-  }
+  "a": {}
  },
  "bt-the-basic": {
   "voz": "en-US-AriaNeural",
-  "a": {
-   "the app": "bf3c88def05d9f74.mp3",
-   "the game": "5bb71dbc5dc9f870.mp3",
-   "the end": "26bf6a57cadc88bf.mp3",
-   "the box": "5d09707efb136b67.mp3",
-   "the hour": "c5d2214aa791bf27.mp3",
-   "the phone": "3f3a5f16128581db.mp3",
-   "the icon": "9d38f06f9f33030d.mp3",
-   "the code": "00e93352451875cb.mp3",
-   "the email": "17b0db137bfe528b.mp3"
-  }
+  "a": {}
  },
  "bt-the-intermediate": {
   "voz": "en-US-BrianNeural",
-  "a": {
-   "the hour": "2abe13e98123ae59.mp3",
-   "the user": "7ba011a36152fa47.mp3",
-   "the idea": "4155f18a8be97872.mp3",
-   "the engine": "c41fd3921cf191cd.mp3",
-   "the update": "d220fd485d18afbf.mp3",
-   "the device": "edad1f7507e7c952.mp3",
-   "the answer": "77029f7d96060492.mp3",
-   "the screen": "987360f500997422.mp3",
-   "the option": "37826447f611381d.mp3"
-  }
+  "a": {}
  },
  "bt-the-advanced": {
   "voz": "en-US-EmmaNeural",
-  "a": {
-   "the issue": "724e1cf37cd9b52f.mp3",
-   "the offer": "22dec87669921c20.mp3",
-   "the honor": "6d03b9b84f95bf45.mp3",
-   "the union": "312e694cc7858866.mp3",
-   "the effort": "47127c8cf836a148.mp3",
-   "the impact": "522215507aec78cd.mp3",
-   "the plan": "8f1a49a2b7091311.mp3",
-   "the origin": "ea19178ee605a3c9.mp3",
-   "the client": "c197fc80cb614172.mp3"
-  }
+  "a": {}
  },
  "bt-mispronounced-basic": {
   "voz": "en-US-GuyNeural",
@@ -395,17 +305,7 @@
  },
  "bt-ae-ei-advanced": {
   "voz": "en-US-MichelleNeural",
-  "a": {
-   "ratio · ration": "495e3162bbd4a14d.mp3",
-   "apparatus": "de9e8298cdb2d134.mp3",
-   "vacancy": "390b3d3bc76eae96.mp3",
-   "adequate": "485d25eb959d637a.mp3",
-   "stagnant": "06ef9b45776dab7b.mp3",
-   "capacity": "c6ec78e42fb21e83.mp3",
-   "patience": "31ae37e43335e390.mp3",
-   "sacred": "95f09c35a9a82cb0.mp3",
-   "vacant": "16e38fbff386feae.mp3"
-  }
+  "a": {}
  },
  "bt-au-ou-basic": {
   "voz": "en-US-AndrewNeural",

@@ -97,7 +97,14 @@ function jogoDe(itens) {
    recebe as palavras para tocar. Quem dá o modelo é o áudio do livro (o ▶ do "Let's practice") e o professor. Tópico
    entra aqui quando o que se ensina é algo que o TTS não reproduz de propósito: melodia, ligação entre palavras, forma
    fraca em frase solta. */
-const SEM_VOZ = { 'tag-questions': 'a entonação que sobe e desce (↑ ↓)' };
+const SEM_VOZ = {
+  'tag-questions': 'a entonação que sobe e desce (↑ ↓)',
+  'him-her-them': 'a ligação que some com o H ("tell him" → "tellim"): lida solta, a expressão sai com o H inteiro',
+  'and-of': 'as formas fracas de "of" e "and" na frase corrida: a frase curta e solta sai cuidadosa demais',
+  the: 'o /ði/ × /ðə/: a voz escolhe o som por conta própria, e o "ouça e escolha" corrigiria o aluno pelo som errado',
+  /* só o Advanced: "apparatus" e "ration" têm duas pronúncias aceitas, e "apparatus" estava no "ouça e escolha" */
+  'ae-ei:ADVANCED': 'palavras com duas pronúncias aceitas (/æ/ ou /eɪ/)',
+};
 
 function aula(conteudo, nivelChave, topico) {
   const n = conteudo.niveis[nivelChave], livro = C.LIVROS[topico.livro];
@@ -109,7 +116,7 @@ function aula(conteudo, nivelChave, topico) {
   const conversation = (n.dialogos || []).map((d) => ({ question: d[0], modelAnswers: d.slice(1) }))
     .concat((n.conversacao || []).map((q) => ({ question: q[0], modelAnswers: q[1] ? [q[1]] : [] })));
   const ids = AUDIOS[conteudo.chave] || [];
-  const semVoz = !!SEM_VOZ[conteudo.chave];
+  const semVoz = !!(SEM_VOZ[conteudo.chave] || SEM_VOZ[conteudo.chave + ':' + nivelChave]);
   return {
     coverTitle: 'Buddy Talks · ' + titulo(n.titulo),
     coverLevel: NIVEL[nivelChave], ageLabel: '', language: 'english',

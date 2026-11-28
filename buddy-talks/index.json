@@ -85,7 +85,7 @@
   "num": 16,
   "nome": "16 - The - Basic",
   "nivel": "Basic",
-  "jogo": 6,
+  "jogo": 0,
   "audios": 2,
   "livro": "Transitions 1 L6"
  },
@@ -94,7 +94,7 @@
   "num": 16,
   "nome": "16 - The - Intermediate",
   "nivel": "Intermediate",
-  "jogo": 6,
+  "jogo": 0,
   "audios": 2,
   "livro": "Transitions 1 L6"
  },
@@ -103,7 +103,7 @@
   "num": 16,
   "nome": "16 - The - Advanced",
   "nivel": "Advanced",
-  "jogo": 6,
+  "jogo": 0,
   "audios": 2,
   "livro": "Transitions 1 L6"
  },
@@ -265,7 +265,7 @@
   "num": 22,
   "nome": "22 - /æ/ vs. /eɪ/ - Advanced",
   "nivel": "Advanced",
-  "jogo": 6,
+  "jogo": 0,
   "audios": 2,
   "livro": "Transitions 2 L9"
  },
