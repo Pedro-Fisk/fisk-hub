@@ -49,6 +49,12 @@
    }
   ],
   "introText": "Hey guys! I’m BUDDY! Today, we’ll fix the melody that tells people whether you are asking or stating. It’s... …TAG QUESTIONS! The words are the same. The music is not: haven’t you?\n\nFalling: you are stating something and inviting the other person to agree. Rising: you are genuinely asking, and you are handing the turn to the other person.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll fix the melody that tells people whether you are asking or stating. It’s...",
+   "…TAG QUESTIONS!\nThe words are the same. The music is not:\nhaven’t you?",
+   "Falling: you are stating something and inviting the other person to agree.",
+   "Rising: you are genuinely asking, and you are handing the turn to the other person."
+  ],
   "audios": [
    {
     "nome": "Saying it right A",
@@ -147,28 +153,25 @@
  },
  "design": {
   "modelo": "tema",
-  "escuro": false,
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
   "paleta": {
-   "fundo": "#f7fbff",
-   "fundo2": "#dbeafe",
-   "prim": "#1d4ed8",
-   "sec": "#93c5fd",
-   "dest": "#f59e0b",
-   "txt": "#0f172a"
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
   },
   "fontes": {
-   "titulo": "Fredoka",
+   "titulo": "Montserrat",
    "corpo": "Nunito"
   },
-  "fundo": "bolhas",
+  "fundo": "gradiente",
   "heroi": "bear",
   "icones": [
-   "bear",
-   "speaker-high-volume",
-   "ear-light",
-   "speech-balloon",
-   "studio-microphone",
-   "sparkles"
+   "bear"
   ]
  }
 }

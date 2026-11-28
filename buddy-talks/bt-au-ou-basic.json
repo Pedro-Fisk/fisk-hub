@@ -1,6 +1,6 @@
 {
  "lesson": {
-  "coverTitle": "Buddy Talks · /Aʊ/ Vs. /Oʊ/",
+  "coverTitle": "Buddy Talks · /aʊ/ vs. /oʊ/",
   "coverLevel": "Basic",
   "ageLabel": "",
   "language": "english",
@@ -49,6 +49,12 @@
    }
   ],
   "introText": "Hey guys! I’m BUDDY! Today, we’ll practice two sounds that are almost opposite, but we mix them up. They’re... …NOW and NO! Two vowels in one sound, going different ways: now x no\n\nIn now, house and down the mouth opens wide first, then closes. In no, home and don’t the lips are round from the very beginning.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll practice two sounds that are almost opposite, but we mix them up. They’re...",
+   "…NOW and NO!\nTwo vowels in one sound, going different ways:\nnow x no",
+   "In now, house and down the mouth opens wide first, then closes.",
+   "In no, home and don’t the lips are round from the very beginning."
+  ],
   "audios": [
    {
     "nome": "Saying it right A",
@@ -208,28 +214,25 @@
  },
  "design": {
   "modelo": "tema",
-  "escuro": false,
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
   "paleta": {
-   "fundo": "#f7fbff",
-   "fundo2": "#dbeafe",
-   "prim": "#1d4ed8",
-   "sec": "#93c5fd",
-   "dest": "#f59e0b",
-   "txt": "#0f172a"
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
   },
   "fontes": {
-   "titulo": "Fredoka",
+   "titulo": "Montserrat",
    "corpo": "Nunito"
   },
-  "fundo": "bolhas",
+  "fundo": "gradiente",
   "heroi": "bear",
   "icones": [
-   "bear",
-   "speaker-high-volume",
-   "ear-light",
-   "speech-balloon",
-   "studio-microphone",
-   "sparkles"
+   "bear"
   ]
  }
 }

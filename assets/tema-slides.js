@@ -100,20 +100,47 @@
     var rot = es ? { iw: 'Palabras Importantes', intro: 'Introducción', pw: 'Conversación en Parejas', jogo: 'Juego de Lengua', rev: '¿Te acuerdas?', av: 'Evaluación', fim: '¡Hasta la próxima clase!', mat: 'Material', obj: 'Objetivos', clique: 'clic para la traducción' }
       : { iw: 'Important Words', intro: 'Introduction', pw: 'Pair Work', jogo: 'Language Game', rev: 'Do You Remember?', av: 'Activity Evaluation', fim: 'See you next class!', mat: 'Material Needed', obj: 'Objectives', clique: 'clique para a tradução' };
     var slides = [], desl = 0;
+    /* A PELE DAS BUDDY TALKS (Pedro, 28/11/2026: "mais parecido com a arte original, com a imagem original do urso"):
+       fundo preto nos slides grandes e vinho nos de conteúdo, a faixa listrada vermelha e branca, o Buddy de busto nos
+       slides grandes e a cabeça dele no canto dos de conteúdo (para não cobrir o texto), a introdução em balões de fala.
+       As imagens são as do PowerPoint original, em buddy-talks/img/. design.pele = 'buddy' liga; o resto não muda. */
+    var pele = design && design.pele === 'buddy' ? { img: base + (design.imgs || 'buddy-talks/img/') } : null;
+    function buddyFundo(tipo, capa) {
+      var grande = capa || /^(divisor|introducao|audio|fechamento)$/.test(tipo);
+      var faixa = function (larg) { return '<div style="position:absolute;right:0;top:0;bottom:0;width:' + larg + 'px;background:#c1121f"><div style="position:absolute;left:' + Math.round(larg * .28) + 'px;top:0;bottom:0;width:' + Math.round(larg * .1) + 'px;background:#f3f4f6"></div><div style="position:absolute;left:' + Math.round(larg * .46) + 'px;top:0;bottom:0;width:' + Math.round(larg * .05) + 'px;background:#f3f4f6"></div></div>'; };
+      return { css: 'background:' + (grande ? '#0b0b0b' : 'linear-gradient(160deg,#5b1616 0%,#3a0d0d 100%)') + ';',
+        html: grande ? faixa(capa ? 760 : 470) + (capa ? '' : '<img alt="" src="' + pele.img + 'urso.png" style="position:absolute;right:10px;bottom:0;height:640px;pointer-events:none">')
+          : faixa(120) + '<img alt="" src="' + pele.img + 'cabeca.png" style="position:absolute;right:16px;bottom:18px;width:190px;pointer-events:none;filter:drop-shadow(0 8px 14px rgba(0,0,0,.4))">' };
+    }
     function novo(tipo, corpo, capa) {
       var el = document.createElement('div'); el.className = 'ft-s';
+      if (pele) {
+        var bf = buddyFundo(tipo, capa && tipo === 'capa');
+        el.style.cssText = bf.css + 'font-family:"' + B + '",sans-serif;color:#ffffff';
+        el.innerHTML = bf.html + corpo;
+        var et0 = 0; [].forEach.call(el.querySelectorAll('[data-e]'), function (x) { et0 = Math.max(et0, +x.getAttribute('data-e')); });
+        slides.push({ tipo: tipo, etapas: et0, el: el });
+        return el;
+      }
       el.style.cssText = fundoCss(r) + 'font-family:"' + B + '",sans-serif;color:' + p.txt;
       el.innerHTML = enfeites(r, base, capa ? POS_CAPA : POS, desl++) + '<div style="position:absolute;left:0;top:0;right:0;height:24px;background:linear-gradient(90deg,' + p.prim + ',' + p.sec + ',' + p.dest + ')"></div>' + corpo;
       var etapas = 0; [].forEach.call(el.querySelectorAll('[data-e]'), function (x) { etapas = Math.max(etapas, +x.getAttribute('data-e')); });
       slides.push({ tipo: tipo, etapas: etapas, el: el });
       return el;
     }
-    var h2 = function (t) { return '<h2 style="position:absolute;left:250px;top:60px;margin:0;font:800 100px/1.1 \'' + T + '\';color:' + p.prim + '">' + esc(t) + '</h2>'; };
+    var h2 = function (t) { return '<h2 style="position:absolute;left:250px;top:60px;margin:0;font:800 ' + (pele ? '86px' : '100px') + '/1.1 \'' + T + '\';color:' + p.prim + (pele ? ';text-transform:uppercase' : '') + '">' + esc(t) + '</h2>'; };
     var balao = '<div style="position:absolute;left:70px;bottom:60px;background:#fff;border:6px solid #111;border-radius:40px;padding:26px 40px;transform:rotate(-4deg);box-shadow:8px 8px 0 rgba(0,0,0,.15)"><img alt="FISK" src="' + base + 'assets/fisk-marca.png" style="height:110px;display:block"></div>';
     var chip = function (t, bg, cor) { return '<span style="display:inline-block;font-weight:800;font-size:34px;padding:10px 26px;border-radius:99px;letter-spacing:.06em;background:' + bg + ';color:' + cor + ';margin-right:12px">' + esc(t) + '</span>'; };
 
     /* 1. capa */
-    novo('capa', '<div style="position:absolute;left:200px;top:220px;width:900px">' + chip(es ? 'CONVERSACIÓN' : 'CONVERSATION', p.dest, sobreDest) +
+    if (pele) novo('capa', '<img alt="BUDDY TALKS" src="' + pele.img + 'logo.png" style="position:absolute;left:150px;top:110px;width:620px">' +
+      '<div style="position:absolute;left:150px;top:470px;width:900px">' +
+      (L.topic ? '<div style="font:800 64px/1.1 \'' + T + '\';color:#38bdf8">' + esc(L.topic) + '</div>' : '') +
+      '<div style="font:800 104px/1.05 \'' + T + '\';margin:22px 0 30px;color:#fff">' + esc(String(L.coverTitle || '').replace(/^Buddy Talks\s*·\s*/i, '')) + '</div>' +
+      (L.coverLevel ? chip(String(L.coverLevel).toUpperCase(), '#38bdf8', '#0b0b0b') : '') + '</div>' +
+      '<div style="position:absolute;right:40px;top:40px;background:#fff;border-radius:18px;padding:14px 22px"><img alt="FISK" src="' + base + 'assets/fisk-marca.png" style="height:90px;display:block"></div>' +
+      '<img alt="" src="' + pele.img + 'urso.png" style="position:absolute;right:20px;bottom:0;height:900px">', true);
+    else novo('capa', '<div style="position:absolute;left:200px;top:220px;width:900px">' + chip(es ? 'CONVERSACIÓN' : 'CONVERSATION', p.dest, sobreDest) +
       '<div style="font:800 132px/1.04 \'' + T + '\';margin:36px 0 34px;color:' + p.prim + '">' + esc(L.coverTitle || L.topic || '') + '</div>' +
       (L.coverLevel ? chip(String(L.coverLevel).toUpperCase(), p.prim, sobrePrim) : '') + (L.perfil ? chip(L.perfil, p.sec, legivel('#111827', p.sec, '#ffffff')) : '') + '</div>' +
       '<img alt="" src="' + ico(base, r.heroi) + '" onerror="this.remove()" style="position:absolute;right:170px;top:290px;width:480px;filter:drop-shadow(0 30px 40px rgba(0,0,0,.28))">' + balao, true);
@@ -121,7 +148,7 @@
     if ((L.objectives || []).length) novo('objetivos', h2(rot.obj) + '<div style="position:absolute;left:250px;right:250px;top:270px">' + L.objectives.map(function (o, i) {
       return '<div data-e="' + (i + 1) + '" class="ft-off" style="display:flex;gap:28px;align-items:center;margin-bottom:46px"><span style="flex:none;width:90px;height:90px;border-radius:28px;background:' + p.dest + ';color:' + sobreDest + ';font:800 54px \'' + T + '\';display:flex;align-items:center;justify-content:center">' + (i + 1) + '</span><span style="font-size:64px;font-weight:800;line-height:1.2">' + esc(o) + '</span></div>'; }).join('') + '</div>');
     /* 3. abertura do capítulo e vocabulário (a tradução num clique separado, palavra por palavra) */
-    var divisor = function (t, n) { return novo('divisor', '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:30px"><img alt="" src="' + ico(base, r.icones[n % r.icones.length]) + '" onerror="this.remove()" style="width:260px"><div style="font:800 150px/1 \'' + T + '\';color:' + p.prim + ';text-align:center">' + esc(t) + '</div></div>'); };
+    var divisor = function (t, n) { return novo('divisor', '<div style="position:absolute;inset:0;' + (pele ? 'right:760px;left:80px;' : '') + 'display:flex;align-items:center;justify-content:center;flex-direction:column;gap:30px">' + (pele ? '' : '<img alt="" src="' + ico(base, r.icones[n % r.icones.length]) + '" onerror="this.remove()" style="width:260px">') + '<div style="font:800 ' + (pele ? 124 : 150) + 'px/1.05 \'' + T + '\';color:' + p.prim + ';text-align:center">' + esc(t) + '</div></div>'); };
     var voc = L.vocabulary || [];
     if (voc.length) {
       divisor(rot.iw, 0);
@@ -131,22 +158,28 @@
         /* PRONÚNCIA (27/11/2026): o 🔊 do canto toca a palavra em voz neural (FiskTema.aoOuvir, como no ouça e escolha) */
         return '<div data-carta="' + (i + 1) + '" style="position:relative;background:' + cartao + ';border-radius:26px;padding:24px 28px;border:4px solid ' + p.sec + ';cursor:pointer;min-height:' + (voc.length > 8 ? 150 : 190) + 'px">' +
           '<button type="button" class="ft-ouvir" data-ouvir="' + esc(v.word) + '" title="Ouvir" style="position:absolute;right:14px;top:14px;width:62px;height:62px;border-radius:50%;border:0;cursor:pointer;background:' + p.dest + ';color:' + sobreDest + ';font-size:30px;line-height:1">🔊</button>' +
-          '<div style="font:800 ' + Math.min(58, Math.floor((longa ? 440 : 330) / (0.6 * maior))) + 'px/1.1 \'' + T + '\';color:' + p.prim + '">' + esc(v.word) + '</div>' +
+          '<div style="padding-right:66px;font:800 ' + Math.min(58, Math.floor((longa ? 380 : 270) / (0.6 * maior))) + 'px/1.1 \'' + T + '\';color:' + p.prim + '">' + esc(v.word) + '</div>' +   /* 66 px: o 🔊 do canto não cobre a palavra */
           /* sem tradução (as listas de pronúncia das Buddy Talks), sem o clique de revelar: seria um clique para nada */
           (String(v.translation || '').trim() ? '<div data-e="' + (i + 1) + '" class="ft-trad ft-off" style="font-size:42px;font-weight:700;margin-top:10px;color:' + legivel(p.dest, r.escuro ? p.fundo : '#ffffff') + '">' + esc(v.translation) + '</div>' : '') + '</div>'; }).join('') + '</div>');
       slides[slides.length - 1].vocab = voc.map(function (v) { return String(v.word || '').trim(); }).filter(Boolean);
     }
-    /* 4. introdução */
-    if (L.introText) { divisor(rot.intro, 1); novo('introducao', h2(rot.intro) + '<div style="position:absolute;left:250px;right:250px;top:250px;font-size:' + (String(L.introText).length > 420 ? 48 : 58) + 'px;font-weight:700;line-height:1.35">' + esc(L.introText).replace(/\n\n/g, '<br><br>') + '</div>'); }
+    /* 4. introdução (na pele das Buddy Talks: cada fala do Buddy num balão, como no PowerPoint original) */
+    if (pele && (L.buddyBaloes || []).length) {
+      L.buddyBaloes.forEach(function (fala) {
+        var tam = String(fala).length > 150 ? 54 : String(fala).length > 90 ? 62 : 72;
+        novo('introducao', '<img alt="" src="' + pele.img + 'balao.png" style="position:absolute;left:110px;top:120px;width:1200px;height:763px;transform:scaleX(-1)">' +
+          '<div style="position:absolute;left:210px;top:190px;width:1000px;height:470px;display:flex;align-items:center;justify-content:center;text-align:center;color:#12306b;font:700 ' + tam + 'px/1.35 \'' + B + '\'">' + esc(fala).replace(/\n/g, '<br>') + '</div>');
+      });
+    } else if (L.introText) { divisor(rot.intro, 1); novo('introducao', h2(rot.intro) + '<div style="position:absolute;left:250px;right:250px;top:250px;font-size:' + (String(L.introText).length > 420 ? 48 : 58) + 'px;font-weight:700;line-height:1.35">' + esc(L.introText).replace(/\n\n/g, '<br><br>') + '</div>'); }
     /* 4b. O ÁUDIO DO LIVRO (Buddy Talks, 28/11/2026): um slide por faixa, "🎧 Let's practice!", com o botão grande e de
        onde vem a faixa. Quem toca é a conversacao.html (FiskTema.aoAudio): o áudio fica no Drive, nunca neste código. */
     (L.audios || []).forEach(function (a, ai) {
       novo('audio', h2((es ? '🎧 ¡A practicar!' : "🎧 Let's practice!") + ((L.audios.length > 1) ? ' (' + (ai + 1) + ')' : '')) +
         '<div style="position:absolute;left:250px;right:250px;top:300px;display:flex;align-items:center;gap:60px">' +
         '<button type="button" class="ft-audio" data-audio="' + ai + '" style="flex:none;width:280px;height:280px;border-radius:50%;border:0;cursor:pointer;background:' + p.dest + ';color:' + sobreDest + ';font-size:130px;box-shadow:0 16px 40px rgba(0,0,0,.2)">▶</button>' +
-        '<div><div style="font:800 84px/1.1 \'' + T + '\';color:' + p.prim + '">' + esc(a.nome || '') + '</div>' +
+        '<div style="max-width:' + (pele ? 760 : 1000) + 'px"><div style="font:800 84px/1.1 \'' + T + '\';color:' + p.prim + '">' + esc(a.nome || '') + '</div>' +
         (a.ref ? '<div style="margin-top:24px;font-size:48px;font-weight:700;opacity:.75">📖 ' + esc(a.ref) + '</div>' : '') +
-        '<div class="ft-leia-audio" style="margin-top:24px;font-size:40px;font-weight:700;color:#b91c1c"></div></div></div>');
+        '<div class="ft-leia-audio" style="margin-top:24px;font-size:40px;font-weight:700;line-height:1.25;color:' + (pele || r.escuro ? '#fca5a5' : '#b91c1c') + '"></div></div></div>');
       slides[slides.length - 1].audio = { i: ai, nome: String(a.nome || ''), ref: String(a.ref || ''), id: String(a.id || '') };
     });
     /* 5. pair work: 3 perguntas por slide, uma por clique; o começo de resposta aparece com a pergunta.
@@ -258,7 +291,9 @@
       return '<div data-e="' + (j + 1) + '" class="ft-off" style="font-size:64px;font-weight:800;line-height:1.2;margin-bottom:50px">' + esc(q.question) + '</div>'; }).join('') + '</div>');
     /* a avaliação no celular dos alunos (27/11/2026): as perguntas cruas, a nota e o comentário saem de lá */
     if ((L.evaluation || []).length) slides[slides.length - 1].aval = L.evaluation.map(function (q) { return String(q.question || ''); });
-    novo('fechamento', '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><div style="font:800 150px/1.05 \'' + T + '\';color:' + p.prim + ';text-align:center;max-width:1300px">' + esc(rot.fim) + '</div></div>' + balao, true);
+    if (pele) novo('fechamento', '<div style="position:absolute;left:100px;top:0;bottom:0;width:1100px;display:flex;align-items:center;justify-content:center"><div style="font:800 130px/1.05 \'' + T + '\';color:#38bdf8;text-align:center">' + esc(rot.fim) + '</div></div>' +
+      '<div style="position:absolute;left:70px;bottom:60px;background:#fff;border-radius:18px;padding:14px 22px"><img alt="FISK" src="' + base + 'assets/fisk-marca.png" style="height:90px;display:block"></div>');
+    else novo('fechamento', '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><div style="font:800 150px/1.05 \'' + T + '\';color:' + p.prim + ';text-align:center;max-width:1300px">' + esc(rot.fim) + '</div></div>' + balao, true);
 
     slides.forEach(function (s) { s.es = es; ligar(s); });   /* es: o "Correct!" do jogo sai na língua da aula */
     return { slides: slides, receita: r };

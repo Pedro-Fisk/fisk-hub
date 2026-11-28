@@ -52,15 +52,18 @@ const AUDIOS = {
   'word-endings': ['1HgUpi67ato5Wpa7gbvIQ4JhqXCBl1TmS', '10fWjkYEMOZ4rm0pXLyFbuGap2_HNcSEU'],
 };
 
-/* a cara da série: o urso do Buddy, azul e amarelo (a mesma para todos os tópicos, para a turma reconhecer a série) */
-const DESIGN = { modelo: 'tema', escuro: false,
-  paleta: { fundo: '#f7fbff', fundo2: '#dbeafe', prim: '#1d4ed8', sec: '#93c5fd', dest: '#f59e0b', txt: '#0f172a' },
-  fontes: { titulo: 'Fredoka', corpo: 'Nunito' }, fundo: 'bolhas', heroi: 'bear',
-  icones: ['bear', 'speaker-high-volume', 'ear-light', 'speech-balloon', 'studio-microphone', 'sparkles'] };
+/* a cara da série é a do PowerPoint ORIGINAL (Pedro, 28/11/2026: "mais parecido com a arte original, com a imagem
+   original do urso"): a pele 'buddy' do assets/tema-slides.js, com as imagens tiradas do .pptx em buddy-talks/img/
+   (o Buddy de busto, a cabeça, o logo BUDDY TALKS e o balão de fala), fundo preto e vinho, títulos azul-claros */
+const DESIGN = { modelo: 'tema', pele: 'buddy', imgs: 'buddy-talks/img/', escuro: true,
+  paleta: { fundo: '#3a0d0d', fundo2: '#5b1616', prim: '#38bdf8', sec: '#f87171', dest: '#dc2626', txt: '#ffffff' },
+  fontes: { titulo: 'Montserrat', corpo: 'Nunito' }, fundo: 'gradiente', heroi: 'bear', icones: ['bear'] };
 
 const NIVEL = { BASIC: 'Basic', INTERMEDIATE: 'Intermediate', ADVANCED: 'Advanced' };
 const junta = (linhas) => (linhas || []).map((x) => String(x)).join('').replace(/\s+/g, ' ').trim();
-const titulo = (t) => String(t).toLowerCase().replace(/(^|[\s/(])([a-z])/g, (m, a, b) => a + b.toUpperCase()).replace(/\bTh\b/g, 'TH');
+/* "THE FINAL -ED" → "The Final -ed"; o símbolo fonético entre barras fica como está ("/æ/ vs. /eɪ/", "The /s/ Sound") */
+const titulo = (t) => String(t).split(' ').map((w) => (/^\/.+\/$/.test(w) || w === '/' ? w : w.toLowerCase() === 'vs.' ? 'vs.'
+  : w.toLowerCase().replace(/^([a-z])/, (m, a) => a.toUpperCase()))).join(' ');
 
 /** "walked  /t/" → { w: 'walked', tag: '/t/' }; "man x main" → { par: ['man', 'main'] }; o resto → { w } */
 function lerItem(x) {
@@ -104,6 +107,8 @@ function aula(conteudo, nivelChave, topico) {
     coverLevel: NIVEL[nivelChave], ageLabel: '', language: 'english',
     topic: n.subtitulo || '', objectives: n.objetivos || [],
     vocabulary, introText: intro.trim(),
+    /* as falas do Buddy, uma por balão, na ordem do PowerPoint: a apresentação, o som revelado, por que importa, se errar */
+    buddyBaloes: [junta(n.buddy), [rv.titulo, rv.explicacao, rv.exemplo].filter(Boolean).join('\n'), junta(n.porQue), junta(n.seErrar)].filter(Boolean),
     audios: ids.map((id, k) => ({ nome: 'Saying it right ' + 'AB'[k], ref, id })),
     conversation, languageGame: jogoDe(itens),
     evaluation: n.avaliacao ? [{ question: n.avaliacao }] : [],

@@ -49,6 +49,12 @@
    }
   ],
   "introText": "Hey guys! I’m BUDDY! Today, we’ll practice three little words that almost disappear when people speak fast. They’re... …HIM, HER, THEM! Native speakers glue them to the verb: tell him\n\nThe H of him and her is very weak, and them often sounds like ’em. If we say every word slowly, our English sounds like reading, not talking.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll practice three little words that almost disappear when people speak fast. They’re...",
+   "…HIM, HER, THEM!\nNative speakers glue them to the verb:\ntell him",
+   "The H of him and her is very weak, and them often sounds like ’em.",
+   "If we say every word slowly, our English sounds like reading, not talking."
+  ],
   "audios": [
    {
     "nome": "Saying it right A",
@@ -147,28 +153,25 @@
  },
  "design": {
   "modelo": "tema",
-  "escuro": false,
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
   "paleta": {
-   "fundo": "#f7fbff",
-   "fundo2": "#dbeafe",
-   "prim": "#1d4ed8",
-   "sec": "#93c5fd",
-   "dest": "#f59e0b",
-   "txt": "#0f172a"
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
   },
   "fontes": {
-   "titulo": "Fredoka",
+   "titulo": "Montserrat",
    "corpo": "Nunito"
   },
-  "fundo": "bolhas",
+  "fundo": "gradiente",
   "heroi": "bear",
   "icones": [
-   "bear",
-   "speaker-high-volume",
-   "ear-light",
-   "speech-balloon",
-   "studio-microphone",
-   "sparkles"
+   "bear"
   ]
  }
 }

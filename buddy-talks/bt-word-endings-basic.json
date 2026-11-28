@@ -49,6 +49,12 @@
    }
   ],
   "introText": "Hey guys! I’m BUDDY! Today, we’ll practice the last part of long words, which is always weak in English. It’s... …WORD ENDINGS! The ending is quiet. The strong part is before: -tion\n\nIn English the ending is short and weak, never the loud part. If we push the ending, the word sounds Portuguese and hard to understand.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll practice the last part of long words, which is always weak in English. It’s...",
+   "…WORD ENDINGS!\nThe ending is quiet. The strong part is before:\n-tion",
+   "In English the ending is short and weak, never the loud part.",
+   "If we push the ending, the word sounds Portuguese and hard to understand."
+  ],
   "audios": [
    {
     "nome": "Saying it right A",
@@ -147,28 +153,25 @@
  },
  "design": {
   "modelo": "tema",
-  "escuro": false,
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
   "paleta": {
-   "fundo": "#f7fbff",
-   "fundo2": "#dbeafe",
-   "prim": "#1d4ed8",
-   "sec": "#93c5fd",
-   "dest": "#f59e0b",
-   "txt": "#0f172a"
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
   },
   "fontes": {
-   "titulo": "Fredoka",
+   "titulo": "Montserrat",
    "corpo": "Nunito"
   },
-  "fundo": "bolhas",
+  "fundo": "gradiente",
   "heroi": "bear",
   "icones": [
-   "bear",
-   "speaker-high-volume",
-   "ear-light",
-   "speech-balloon",
-   "studio-microphone",
-   "sparkles"
+   "bear"
   ]
  }
 }

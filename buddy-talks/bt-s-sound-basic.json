@@ -1,6 +1,6 @@
 {
  "lesson": {
-  "coverTitle": "Buddy Talks · The /S/ Sound",
+  "coverTitle": "Buddy Talks · The /s/ Sound",
   "coverLevel": "Basic",
   "ageLabel": "",
   "language": "english",
@@ -49,6 +49,12 @@
    }
   ],
   "introText": "Hey guys! I’m BUDDY! Today, we’ll remove one little vowel that we add without even noticing. It’s the... …GHOST E! We say e-study, but the word starts with S: study\n\nStart with the air of the S first, and only then let your voice in. With the extra E, school becomes eschool and the word gains a syllable.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll remove one little vowel that we add without even noticing. It’s the...",
+   "…GHOST E!\nWe say e-study, but the word starts with S:\nstudy",
+   "Start with the air of the S first, and only then let your voice in.",
+   "With the extra E, school becomes eschool and the word gains a syllable."
+  ],
   "audios": [
    {
     "nome": "Saying it right A",
@@ -147,28 +153,25 @@
  },
  "design": {
   "modelo": "tema",
-  "escuro": false,
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
   "paleta": {
-   "fundo": "#f7fbff",
-   "fundo2": "#dbeafe",
-   "prim": "#1d4ed8",
-   "sec": "#93c5fd",
-   "dest": "#f59e0b",
-   "txt": "#0f172a"
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
   },
   "fontes": {
-   "titulo": "Fredoka",
+   "titulo": "Montserrat",
    "corpo": "Nunito"
   },
-  "fundo": "bolhas",
+  "fundo": "gradiente",
   "heroi": "bear",
   "icones": [
-   "bear",
-   "speaker-high-volume",
-   "ear-light",
-   "speech-balloon",
-   "studio-microphone",
-   "sparkles"
+   "bear"
   ]
  }
 }

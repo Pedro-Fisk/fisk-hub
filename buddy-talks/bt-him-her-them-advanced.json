@@ -49,6 +49,12 @@
    }
   ],
   "introText": "Hey guys! I’m BUDDY! Today, we’ll work on three words that fluent speakers reduce almost to nothing. They’re... …HIM, HER, THEM! Fluent speech attaches them to the verb: meet them\n\nReducing them is not lazy speech: it is what puts the stress on the right word. Pronouncing them in full sounds emphatic, as if you were correcting someone.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll work on three words that fluent speakers reduce almost to nothing. They’re...",
+   "…HIM, HER, THEM!\nFluent speech attaches them to the verb:\nmeet them",
+   "Reducing them is not lazy speech: it is what puts the stress on the right word.",
+   "Pronouncing them in full sounds emphatic, as if you were correcting someone."
+  ],
   "audios": [
    {
     "nome": "Saying it right A",
@@ -147,28 +153,25 @@
  },
  "design": {
   "modelo": "tema",
-  "escuro": false,
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
   "paleta": {
-   "fundo": "#f7fbff",
-   "fundo2": "#dbeafe",
-   "prim": "#1d4ed8",
-   "sec": "#93c5fd",
-   "dest": "#f59e0b",
-   "txt": "#0f172a"
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
   },
   "fontes": {
-   "titulo": "Fredoka",
+   "titulo": "Montserrat",
    "corpo": "Nunito"
   },
-  "fundo": "bolhas",
+  "fundo": "gradiente",
   "heroi": "bear",
   "icones": [
-   "bear",
-   "speaker-high-volume",
-   "ear-light",
-   "speech-balloon",
-   "studio-microphone",
-   "sparkles"
+   "bear"
   ]
  }
 }

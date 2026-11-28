@@ -1,6 +1,6 @@
 {
  "lesson": {
-  "coverTitle": "Buddy Talks · /æ/ Vs. /Eɪ/",
+  "coverTitle": "Buddy Talks · /æ/ vs. /eɪ/",
   "coverLevel": "Intermediate",
   "ageLabel": "",
   "language": "english",
@@ -49,6 +49,12 @@
    }
   ],
   "introText": "Hey guys! I’m BUDDY! Today, we’ll separate two vowels that turn one word into a completely different one. …CAT and CAKE! The /æ/ of cat does not exist in Portuguese: snack\n\nSo we borrow the nearest sound we have, and the word turns into another one. Then fat becomes fate, and the sentence means something you never said.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll separate two vowels that turn one word into a completely different one.",
+   "…CAT and CAKE!\nThe /æ/ of cat does not exist in Portuguese:\nsnack",
+   "So we borrow the nearest sound we have, and the word turns into another one.",
+   "Then fat becomes fate, and the sentence means something you never said."
+  ],
   "audios": [
    {
     "nome": "Saying it right A",
@@ -208,28 +214,25 @@
  },
  "design": {
   "modelo": "tema",
-  "escuro": false,
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
   "paleta": {
-   "fundo": "#f7fbff",
-   "fundo2": "#dbeafe",
-   "prim": "#1d4ed8",
-   "sec": "#93c5fd",
-   "dest": "#f59e0b",
-   "txt": "#0f172a"
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
   },
   "fontes": {
-   "titulo": "Fredoka",
+   "titulo": "Montserrat",
    "corpo": "Nunito"
   },
-  "fundo": "bolhas",
+  "fundo": "gradiente",
   "heroi": "bear",
   "icones": [
-   "bear",
-   "speaker-high-volume",
-   "ear-light",
-   "speech-balloon",
-   "studio-microphone",
-   "sparkles"
+   "bear"
   ]
  }
 }

@@ -49,6 +49,12 @@
    }
   ],
   "introText": "Hey guys! I’m BUDDY! Today, we’ll practice endings that decide where the strong syllable of a word goes. They’re... …WORD ENDINGS! The syllable before the ending is the strong one: decision\n\n-tion, -sion, -ture and -ous are always weak, and they pull the stress back. Stressing the ending is the single most Brazilian-sounding habit in long words.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll practice endings that decide where the strong syllable of a word goes. They’re...",
+   "…WORD ENDINGS!\nThe syllable before the ending is the strong one:\ndecision",
+   "-tion, -sion, -ture and -ous are always weak, and they pull the stress back.",
+   "Stressing the ending is the single most Brazilian-sounding habit in long words."
+  ],
   "audios": [
    {
     "nome": "Saying it right A",
@@ -147,28 +153,25 @@
  },
  "design": {
   "modelo": "tema",
-  "escuro": false,
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
   "paleta": {
-   "fundo": "#f7fbff",
-   "fundo2": "#dbeafe",
-   "prim": "#1d4ed8",
-   "sec": "#93c5fd",
-   "dest": "#f59e0b",
-   "txt": "#0f172a"
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
   },
   "fontes": {
-   "titulo": "Fredoka",
+   "titulo": "Montserrat",
    "corpo": "Nunito"
   },
-  "fundo": "bolhas",
+  "fundo": "gradiente",
   "heroi": "bear",
   "icones": [
-   "bear",
-   "speaker-high-volume",
-   "ear-light",
-   "speech-balloon",
-   "studio-microphone",
-   "sparkles"
+   "bear"
   ]
  }
 }

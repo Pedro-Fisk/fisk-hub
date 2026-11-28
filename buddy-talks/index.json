@@ -191,7 +191,7 @@
  {
   "id": "bt-uh-er-basic",
   "num": 20,
-  "nome": "20 - /ʌ/ Vs. /ɝ/ - Basic",
+  "nome": "20 - /ʌ/ vs. /ɝ/ - Basic",
   "nivel": "Basic",
   "jogo": 6,
   "audios": 2,
@@ -200,7 +200,7 @@
  {
   "id": "bt-uh-er-intermediate",
   "num": 20,
-  "nome": "20 - /ʌ/ Vs. /ɝ/ - Intermediate",
+  "nome": "20 - /ʌ/ vs. /ɝ/ - Intermediate",
   "nivel": "Intermediate",
   "jogo": 6,
   "audios": 2,
@@ -209,7 +209,7 @@
  {
   "id": "bt-uh-er-advanced",
   "num": 20,
-  "nome": "20 - /ʌ/ Vs. /ɝ/ - Advanced",
+  "nome": "20 - /ʌ/ vs. /ɝ/ - Advanced",
   "nivel": "Advanced",
   "jogo": 6,
   "audios": 2,
@@ -218,7 +218,7 @@
  {
   "id": "bt-s-sound-basic",
   "num": 21,
-  "nome": "21 - The /S/ Sound - Basic",
+  "nome": "21 - The /s/ Sound - Basic",
   "nivel": "Basic",
   "jogo": 0,
   "audios": 2,
@@ -227,7 +227,7 @@
  {
   "id": "bt-s-sound-intermediate",
   "num": 21,
-  "nome": "21 - The /S/ Sound - Intermediate",
+  "nome": "21 - The /s/ Sound - Intermediate",
   "nivel": "Intermediate",
   "jogo": 0,
   "audios": 2,
@@ -236,7 +236,7 @@
  {
   "id": "bt-s-sound-advanced",
   "num": 21,
-  "nome": "21 - The /S/ Sound - Advanced",
+  "nome": "21 - The /s/ Sound - Advanced",
   "nivel": "Advanced",
   "jogo": 0,
   "audios": 2,
@@ -245,7 +245,7 @@
  {
   "id": "bt-ae-ei-basic",
   "num": 22,
-  "nome": "22 - /æ/ Vs. /Eɪ/ - Basic",
+  "nome": "22 - /æ/ vs. /eɪ/ - Basic",
   "nivel": "Basic",
   "jogo": 6,
   "audios": 2,
@@ -254,7 +254,7 @@
  {
   "id": "bt-ae-ei-intermediate",
   "num": 22,
-  "nome": "22 - /æ/ Vs. /Eɪ/ - Intermediate",
+  "nome": "22 - /æ/ vs. /eɪ/ - Intermediate",
   "nivel": "Intermediate",
   "jogo": 6,
   "audios": 2,
@@ -263,7 +263,7 @@
  {
   "id": "bt-ae-ei-advanced",
   "num": 22,
-  "nome": "22 - /æ/ Vs. /Eɪ/ - Advanced",
+  "nome": "22 - /æ/ vs. /eɪ/ - Advanced",
   "nivel": "Advanced",
   "jogo": 6,
   "audios": 2,
@@ -272,7 +272,7 @@
  {
   "id": "bt-au-ou-basic",
   "num": 23,
-  "nome": "23 - /Aʊ/ Vs. /Oʊ/ - Basic",
+  "nome": "23 - /aʊ/ vs. /oʊ/ - Basic",
   "nivel": "Basic",
   "jogo": 6,
   "audios": 2,
@@ -281,7 +281,7 @@
  {
   "id": "bt-au-ou-intermediate",
   "num": 23,
-  "nome": "23 - /Aʊ/ Vs. /Oʊ/ - Intermediate",
+  "nome": "23 - /aʊ/ vs. /oʊ/ - Intermediate",
   "nivel": "Intermediate",
   "jogo": 6,
   "audios": 2,
@@ -290,7 +290,7 @@
  {
   "id": "bt-au-ou-advanced",
   "num": 23,
-  "nome": "23 - /Aʊ/ Vs. /Oʊ/ - Advanced",
+  "nome": "23 - /aʊ/ vs. /oʊ/ - Advanced",
   "nivel": "Advanced",
   "jogo": 6,
   "audios": 2,

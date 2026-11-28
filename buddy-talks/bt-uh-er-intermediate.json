@@ -1,6 +1,6 @@
 {
  "lesson": {
-  "coverTitle": "Buddy Talks · /ʌ/ Vs. /ɝ/",
+  "coverTitle": "Buddy Talks · /ʌ/ vs. /ɝ/",
   "coverLevel": "Intermediate",
   "ageLabel": "",
   "language": "english",
@@ -49,6 +49,12 @@
    }
   ],
   "introText": "Hey guys! I’m BUDDY! Today, we’ll separate two vowels that Portuguese puts in the very same place. They’re... …/ʌ/ and /ɝ/! One is short and open. The other is long: work\n\n/ɝ/ does not exist in Portuguese, so we replace it with the closest vowel. Then work sounds like walk, and the listener has to guess from context.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll separate two vowels that Portuguese puts in the very same place. They’re...",
+   "…/ʌ/ and /ɝ/!\nOne is short and open. The other is long:\nwork",
+   "/ɝ/ does not exist in Portuguese, so we replace it with the closest vowel.",
+   "Then work sounds like walk, and the listener has to guess from context."
+  ],
   "audios": [
    {
     "nome": "Saying it right A",
@@ -208,28 +214,25 @@
  },
  "design": {
   "modelo": "tema",
-  "escuro": false,
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
   "paleta": {
-   "fundo": "#f7fbff",
-   "fundo2": "#dbeafe",
-   "prim": "#1d4ed8",
-   "sec": "#93c5fd",
-   "dest": "#f59e0b",
-   "txt": "#0f172a"
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
   },
   "fontes": {
-   "titulo": "Fredoka",
+   "titulo": "Montserrat",
    "corpo": "Nunito"
   },
-  "fundo": "bolhas",
+  "fundo": "gradiente",
   "heroi": "bear",
   "icones": [
-   "bear",
-   "speaker-high-volume",
-   "ear-light",
-   "speech-balloon",
-   "studio-microphone",
-   "sparkles"
+   "bear"
   ]
  }
 }

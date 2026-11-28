@@ -49,6 +49,12 @@
    }
   ],
   "introText": "Hey guys! I’m BUDDY! Today, we’ll work on two words that fluent speakers reduce to almost nothing at all. They are... …AND and OF! Function words compress; content words don’t: ahead of\n\nEnglish rhythm depends on compressing the small words between the stressed ones. Giving every word equal weight is what makes fluent speech sound mechanical.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll work on two words that fluent speakers reduce to almost nothing at all. They are...",
+   "…AND and OF!\nFunction words compress; content words don’t:\nahead of",
+   "English rhythm depends on compressing the small words between the stressed ones.",
+   "Giving every word equal weight is what makes fluent speech sound mechanical."
+  ],
   "audios": [
    {
     "nome": "Saying it right A",
@@ -147,28 +153,25 @@
  },
  "design": {
   "modelo": "tema",
-  "escuro": false,
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
   "paleta": {
-   "fundo": "#f7fbff",
-   "fundo2": "#dbeafe",
-   "prim": "#1d4ed8",
-   "sec": "#93c5fd",
-   "dest": "#f59e0b",
-   "txt": "#0f172a"
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
   },
   "fontes": {
-   "titulo": "Fredoka",
+   "titulo": "Montserrat",
    "corpo": "Nunito"
   },
-  "fundo": "bolhas",
+  "fundo": "gradiente",
   "heroi": "bear",
   "icones": [
-   "bear",
-   "speaker-high-volume",
-   "ear-light",
-   "speech-balloon",
-   "studio-microphone",
-   "sparkles"
+   "bear"
   ]
  }
 }
