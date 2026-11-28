@@ -1,0 +1,241 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · The Final -ed",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Past Tense Sounds",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing the -ed sounds.",
+   "Developing pronunciation."
+  ],
+  "vocabulary": [
+   {
+    "word": "achieved",
+    "translation": "/d/"
+   },
+   {
+    "word": "attempted",
+    "translation": "/ɪd/"
+   },
+   {
+    "word": "convinced",
+    "translation": "/t/"
+   },
+   {
+    "word": "expanded",
+    "translation": "/ɪd/"
+   },
+   {
+    "word": "managed",
+    "translation": "/d/"
+   },
+   {
+    "word": "developed",
+    "translation": "/t/"
+   },
+   {
+    "word": "recognized",
+    "translation": "/d/"
+   },
+   {
+    "word": "admitted",
+    "translation": "/ɪd/"
+   },
+   {
+    "word": "increased",
+    "translation": "/t/"
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll fix the ending that gives away an accent when you talk about the past. It’s... …THE -ED ENDING! Three sounds hide behind these two letters: ACHIEVED\n\nGetting -ed right is what separates fluent English from careful English. An extra syllable in every past verb makes fluent speech sound heavy.",
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 2 - L 6 - pg 55",
+    "id": "1KGHqL0cICaoc5Y3peCyTwKsZ4mwf7Gh_"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 2 - L 6 - pg 55",
+    "id": "1y5QPVJNWvdIFa2oNRdYOOsPhTCxo6aL3"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: How did the presentation go?",
+    "modelAnswers": [
+     "B: It worked out. They accepted my ideas."
+    ]
+   },
+   {
+    "question": "A: Have your skills improved this year?",
+    "modelAnswers": [
+     "B: Yes, I practiced almost every day."
+    ]
+   },
+   {
+    "question": "A: What convinced you to take the job?",
+    "modelAnswers": [
+     "B: They offered more than I expected."
+    ]
+   },
+   {
+    "question": "What habit has gotten out of hand for you?",
+    "modelAnswers": [
+     "It started when I..."
+    ]
+   },
+   {
+    "question": "What convinced you to face it?",
+    "modelAnswers": [
+     "I was convinced when..."
+    ]
+   },
+   {
+    "question": "Have you ever underestimated a habit?",
+    "modelAnswers": [
+     "I underestimated..."
+    ]
+   },
+   {
+    "question": "What have you sacrificed for it?",
+    "modelAnswers": [
+     "I sacrificed..."
+    ]
+   },
+   {
+    "question": "Who supported you the most?",
+    "modelAnswers": [
+     "My... supported me and I..."
+    ]
+   },
+   {
+    "question": "What strategy has worked for you?",
+    "modelAnswers": [
+     "I managed to... when I..."
+    ]
+   },
+   {
+    "question": "How has your routine changed since then?",
+    "modelAnswers": [
+     "My routine changed after I..."
+    ]
+   },
+   {
+    "question": "What have you learned about yourself?",
+    "modelAnswers": [
+     "I realized that I..."
+    ]
+   },
+   {
+    "question": "What advice would you have wanted?",
+    "modelAnswers": [
+     "I wish someone had warned me..."
+    ]
+   }
+  ],
+  "languageGame": [
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "achieved",
+    "options": [
+     "/d/",
+     "/ɪd/",
+     "/t/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "attempted",
+    "options": [
+     "/d/",
+     "/ɪd/",
+     "/t/"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "convinced",
+    "options": [
+     "/d/",
+     "/ɪd/",
+     "/t/"
+    ],
+    "correctIndex": 2
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "expanded",
+    "options": [
+     "/d/",
+     "/ɪd/",
+     "/t/"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "managed",
+    "options": [
+     "/d/",
+     "/ɪd/",
+     "/t/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "developed",
+    "options": [
+     "/d/",
+     "/ɪd/",
+     "/t/"
+    ],
+    "correctIndex": 2
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Do you notice the -ed ending when you speak?"
+   }
+  ],
+  "temaDaConversa": "When habits get out of hand",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#f7fbff",
+   "fundo2": "#dbeafe",
+   "prim": "#1d4ed8",
+   "sec": "#93c5fd",
+   "dest": "#f59e0b",
+   "txt": "#0f172a"
+  },
+  "fontes": {
+   "titulo": "Fredoka",
+   "corpo": "Nunito"
+  },
+  "fundo": "bolhas",
+  "heroi": "bear",
+  "icones": [
+   "bear",
+   "speaker-high-volume",
+   "ear-light",
+   "speech-balloon",
+   "studio-microphone",
+   "sparkles"
+  ]
+ }
+}

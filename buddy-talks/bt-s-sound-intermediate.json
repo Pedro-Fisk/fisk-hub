@@ -1,0 +1,174 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · The /S/ Sound",
+  "coverLevel": "Intermediate",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "The Ghost Vowel",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing initial /s/.",
+   "Developing pronunciation."
+  ],
+  "vocabulary": [
+   {
+    "word": "structure",
+    "translation": ""
+   },
+   {
+    "word": "stability",
+    "translation": ""
+   },
+   {
+    "word": "spread",
+    "translation": ""
+   },
+   {
+    "word": "scale",
+    "translation": ""
+   },
+   {
+    "word": "sphere",
+    "translation": ""
+   },
+   {
+    "word": "statement",
+    "translation": ""
+   },
+   {
+    "word": "strategy",
+    "translation": ""
+   },
+   {
+    "word": "specific",
+    "translation": ""
+   },
+   {
+    "word": "stranded",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll delete the vowel that Portuguese inserts at the start of a word. It’s the... …GHOST E! Portuguese never starts with S + consonant: storm\n\nSo our mouth solves the problem by adding a vowel that English never had. The extra syllable is the single most recognisable Brazilian accent marker.",
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 2 - L 8 - pg 71",
+    "id": "1zF3FADzYkMu4y24ewa8rrFHgW_GxyzqG"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 2 - L 8 - pg 71",
+    "id": "1sdWS5G-g3vcHmlzcalAUkDA3RIDdzcf3"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: What is the strategy?",
+    "modelAnswers": [
+     "B: A specific plan for each stage."
+    ]
+   },
+   {
+    "question": "A: Did the fire spread?",
+    "modelAnswers": [
+     "B: On a scale nobody expected."
+    ]
+   },
+   {
+    "question": "A: Was anyone stranded?",
+    "modelAnswers": [
+     "B: The whole street, for two days."
+    ]
+   },
+   {
+    "question": "What natural disaster worries you the most?",
+    "modelAnswers": [
+     "I worry about..."
+    ]
+   },
+   {
+    "question": "Have you ever been stranded by the weather?",
+    "modelAnswers": [
+     "I was stranded when..."
+    ]
+   },
+   {
+    "question": "What do you say to someone who lost everything?",
+    "modelAnswers": [
+     "I would say..."
+    ]
+   },
+   {
+    "question": "Is your city prepared for a storm?",
+    "modelAnswers": [
+     "The structure of my city..."
+    ]
+   },
+   {
+    "question": "What small thing becomes a big problem?",
+    "modelAnswers": [
+     "A small..."
+    ]
+   },
+   {
+    "question": "How do people help each other in a disaster?",
+    "modelAnswers": [
+     "People start to..."
+    ]
+   },
+   {
+    "question": "Have you ever donated or volunteered?",
+    "modelAnswers": [
+     "I helped when..."
+    ]
+   },
+   {
+    "question": "Is the media too dramatic about weather?",
+    "modelAnswers": [
+     "I think the news..."
+    ]
+   },
+   {
+    "question": "What would you save from your house?",
+    "modelAnswers": [
+     "I would save..."
+    ]
+   }
+  ],
+  "languageGame": [],
+  "evaluation": [
+   {
+    "question": "Which S word still gets an E from you?"
+   }
+  ],
+  "temaDaConversa": "When disaster strikes",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#f7fbff",
+   "fundo2": "#dbeafe",
+   "prim": "#1d4ed8",
+   "sec": "#93c5fd",
+   "dest": "#f59e0b",
+   "txt": "#0f172a"
+  },
+  "fontes": {
+   "titulo": "Fredoka",
+   "corpo": "Nunito"
+  },
+  "fundo": "bolhas",
+  "heroi": "bear",
+  "icones": [
+   "bear",
+   "speaker-high-volume",
+   "ear-light",
+   "speech-balloon",
+   "studio-microphone",
+   "sparkles"
+  ]
+ }
+}

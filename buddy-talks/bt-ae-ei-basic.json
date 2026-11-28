@@ -1,0 +1,235 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · /æ/ Vs. /Eɪ/",
+  "coverLevel": "Basic",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Cat or Cake",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing minimal pairs.",
+   "Developing pronunciation."
+  ],
+  "vocabulary": [
+   {
+    "word": "man · main",
+    "translation": ""
+   },
+   {
+    "word": "fat · fate",
+    "translation": ""
+   },
+   {
+    "word": "hat · hate",
+    "translation": ""
+   },
+   {
+    "word": "tap · tape",
+    "translation": ""
+   },
+   {
+    "word": "can · cane",
+    "translation": ""
+   },
+   {
+    "word": "mad · made",
+    "translation": ""
+   },
+   {
+    "word": "pan · pain",
+    "translation": ""
+   },
+   {
+    "word": "back · bake",
+    "translation": ""
+   },
+   {
+    "word": "at · ate",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll practice two vowels that change the word completely. They are in... …CAT and CAKE! One vowel is open. The other is a glide: cat\n\nIn cat, man and hat the mouth opens wide. It’s a short, flat sound. In cake, main and hate the sound slides, like ei. Two sounds in one.",
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 2 - L 9 - pg 79",
+    "id": "1dR26ZtLoSK3C0vpGowv7IWB6V8AlBwN2"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 2 - L 9 - pg 79",
+    "id": "1RD4XKFa0ex_4dx-O4BizlXNg1acYhETz"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: Do you want a cake?",
+    "modelAnswers": [
+     "B: I can’t. I ate a lot today."
+    ]
+   },
+   {
+    "question": "A: Is that man your uncle?",
+    "modelAnswers": [
+     "B: Yes! He made the cake."
+    ]
+   },
+   {
+    "question": "A: Where is the pan?",
+    "modelAnswers": [
+     "B: On the table, at the back."
+    ]
+   },
+   {
+    "question": "What did you eat today?",
+    "modelAnswers": [
+     "Today I ate..."
+    ]
+   },
+   {
+    "question": "Do you like cake or fruit?",
+    "modelAnswers": [
+     "I like... because..."
+    ]
+   },
+   {
+    "question": "What snack do you have at school?",
+    "modelAnswers": [
+     "My snack is..."
+    ]
+   },
+   {
+    "question": "Can you cook? What do you make?",
+    "modelAnswers": [
+     "I can make..."
+    ]
+   },
+   {
+    "question": "What food is bad for you but you love?",
+    "modelAnswers": [
+     "I love... but it is bad."
+    ]
+   },
+   {
+    "question": "Do you eat salad at home?",
+    "modelAnswers": [
+     "I eat salad when..."
+    ]
+   },
+   {
+    "question": "What is on your plate at lunch?",
+    "modelAnswers": [
+     "On my plate there is..."
+    ]
+   },
+   {
+    "question": "Who makes the best food in your family?",
+    "modelAnswers": [
+     "My... makes the best..."
+    ]
+   },
+   {
+    "question": "What food do you hate?",
+    "modelAnswers": [
+     "I hate..."
+    ]
+   }
+  ],
+  "languageGame": [
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "man",
+    "options": [
+     "man",
+     "main"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "fate",
+    "options": [
+     "fat",
+     "fate"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "hat",
+    "options": [
+     "hat",
+     "hate"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "tape",
+    "options": [
+     "tap",
+     "tape"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "can",
+    "options": [
+     "can",
+     "cane"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "made",
+    "options": [
+     "mad",
+     "made"
+    ],
+    "correctIndex": 1
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Can you hear the difference: man or main?"
+   }
+  ],
+  "temaDaConversa": "What you eat",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#f7fbff",
+   "fundo2": "#dbeafe",
+   "prim": "#1d4ed8",
+   "sec": "#93c5fd",
+   "dest": "#f59e0b",
+   "txt": "#0f172a"
+  },
+  "fontes": {
+   "titulo": "Fredoka",
+   "corpo": "Nunito"
+  },
+  "fundo": "bolhas",
+  "heroi": "bear",
+  "icones": [
+   "bear",
+   "speaker-high-volume",
+   "ear-light",
+   "speech-balloon",
+   "studio-microphone",
+   "sparkles"
+  ]
+ }
+}

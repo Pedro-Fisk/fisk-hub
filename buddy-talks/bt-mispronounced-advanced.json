@@ -1,0 +1,174 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · Tricky Words",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Spelling Traps",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing tricky words.",
+   "Developing pronunciation."
+  ],
+  "vocabulary": [
+   {
+    "word": "colonel",
+    "translation": ""
+   },
+   {
+    "word": "epitome",
+    "translation": ""
+   },
+   {
+    "word": "hyperbole",
+    "translation": ""
+   },
+   {
+    "word": "mischievous",
+    "translation": ""
+   },
+   {
+    "word": "anonymous",
+    "translation": ""
+   },
+   {
+    "word": "entrepreneur",
+    "translation": ""
+   },
+   {
+    "word": "questionnaire",
+    "translation": ""
+   },
+   {
+    "word": "infamous",
+    "translation": ""
+   },
+   {
+    "word": "suite",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll work on words that give away a learner even at an advanced level. They’re... …TRICKY WORDS! Fluent speakers still get these wrong: colonel\n\nThese words rarely appear in class, so nobody ever hears them corrected. The higher your level, the more one mispronounced word stands out.",
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 1 - L 10 - pg 87",
+    "id": "1Eu58CCufrFZrLshtpGx1JvCE2lj5DIFe"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 1 - L 10 - pg 87",
+    "id": "1pdE8prAg_Pcv0fCanZZVa9ckJ8vYCEZg"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: Was the survey long?",
+    "modelAnswers": [
+     "B: The questionnaire took an hour."
+    ]
+   },
+   {
+    "question": "A: Is she the entrepreneur you mentioned?",
+    "modelAnswers": [
+     "B: She is the epitome of persistence."
+    ]
+   },
+   {
+    "question": "A: Did he stay in a room?",
+    "modelAnswers": [
+     "B: In a suite, of course."
+    ]
+   },
+   {
+    "question": "What quality do you look for in a close friend?",
+    "modelAnswers": [
+     "I look for..."
+    ]
+   },
+   {
+    "question": "What is the pet peeve you cannot forgive?",
+    "modelAnswers": [
+     "I cannot stand it when..."
+    ]
+   },
+   {
+    "question": "Have you ever been the difficult friend?",
+    "modelAnswers": [
+     "I admit that I..."
+    ]
+   },
+   {
+    "question": "How do you handle an awkward subject?",
+    "modelAnswers": [
+     "I change the subject by..."
+    ]
+   },
+   {
+    "question": "Do friendships survive distance?",
+    "modelAnswers": [
+     "In my experience, they..."
+    ]
+   },
+   {
+    "question": "What ended a friendship of yours?",
+    "modelAnswers": [
+     "It ended when..."
+    ]
+   },
+   {
+    "question": "Is honesty always the best policy with friends?",
+    "modelAnswers": [
+     "I believe that..."
+    ]
+   },
+   {
+    "question": "Who has known you the longest?",
+    "modelAnswers": [
+     "The person who..."
+    ]
+   },
+   {
+    "question": "What would you apologize for today?",
+    "modelAnswers": [
+     "I would apologize for..."
+    ]
+   }
+  ],
+  "languageGame": [],
+  "evaluation": [
+   {
+    "question": "Which of these words have you been saying wrong?"
+   }
+  ],
+  "temaDaConversa": "What keeps people getting along",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#f7fbff",
+   "fundo2": "#dbeafe",
+   "prim": "#1d4ed8",
+   "sec": "#93c5fd",
+   "dest": "#f59e0b",
+   "txt": "#0f172a"
+  },
+  "fontes": {
+   "titulo": "Fredoka",
+   "corpo": "Nunito"
+  },
+  "fundo": "bolhas",
+  "heroi": "bear",
+  "icones": [
+   "bear",
+   "speaker-high-volume",
+   "ear-light",
+   "speech-balloon",
+   "studio-microphone",
+   "sparkles"
+  ]
+ }
+}

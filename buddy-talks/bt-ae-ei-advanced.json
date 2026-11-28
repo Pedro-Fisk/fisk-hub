@@ -1,0 +1,235 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · /æ/ Vs. /Eɪ/",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Cat or Cake",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing minimal pairs.",
+   "Developing pronunciation."
+  ],
+  "vocabulary": [
+   {
+    "word": "ratio · ration",
+    "translation": ""
+   },
+   {
+    "word": "apparatus",
+    "translation": "/æ/"
+   },
+   {
+    "word": "vacancy",
+    "translation": "/eɪ/"
+   },
+   {
+    "word": "adequate",
+    "translation": "/æ/"
+   },
+   {
+    "word": "stagnant",
+    "translation": "/æ/"
+   },
+   {
+    "word": "capacity",
+    "translation": "/æ/"
+   },
+   {
+    "word": "patience",
+    "translation": "/eɪ/"
+   },
+   {
+    "word": "sacred",
+    "translation": "/eɪ/"
+   },
+   {
+    "word": "vacant",
+    "translation": "/eɪ/"
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll work on two vowels that stay blurred long after fluency arrives. They are... …CAT and CAKE! The contrast survives in real minimal pairs: vanish\n\nIsolated, each word sounds acceptable. Side by side, the difference is obvious. That is why the pair, and not the single word, is the only useful exercise here.",
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 2 - L 9 - pg 79",
+    "id": "1dR26ZtLoSK3C0vpGowv7IWB6V8AlBwN2"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 2 - L 9 - pg 79",
+    "id": "1RD4XKFa0ex_4dx-O4BizlXNg1acYhETz"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: Was the evidence valid?",
+    "modelAnswers": [
+     "B: Or was it veiled as evidence?"
+    ]
+   },
+   {
+    "question": "A: What is the ratio of sugar?",
+    "modelAnswers": [
+     "B: They ration it carefully now."
+    ]
+   },
+   {
+    "question": "A: Did the appetite vanish?",
+    "modelAnswers": [
+     "B: Mainly after the diagnosis."
+    ]
+   },
+   {
+    "question": "What does your diet say about your life?",
+    "modelAnswers": [
+     "My diet says that..."
+    ]
+   },
+   {
+    "question": "Is the food industry to blame for our habits?",
+    "modelAnswers": [
+     "The industry..."
+    ]
+   },
+   {
+    "question": "Have you ever changed your diet radically?",
+    "modelAnswers": [
+     "I changed when..."
+    ]
+   },
+   {
+    "question": "Is eating well a matter of money or knowledge?",
+    "modelAnswers": [
+     "In my view..."
+    ]
+   },
+   {
+    "question": "What food trend do you find absurd?",
+    "modelAnswers": [
+     "The trend that..."
+    ]
+   },
+   {
+    "question": "Would you give up meat? Why?",
+    "modelAnswers": [
+     "I would / wouldn’t because..."
+    ]
+   },
+   {
+    "question": "What surprised you about eating abroad?",
+    "modelAnswers": [
+     "I was amazed that..."
+    ]
+   },
+   {
+    "question": "Does cooking matter to you?",
+    "modelAnswers": [
+     "Cooking matters because..."
+    ]
+   },
+   {
+    "question": "What meal would you never forget?",
+    "modelAnswers": [
+     "The meal I remember is..."
+    ]
+   }
+  ],
+  "languageGame": [
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "apparatus",
+    "options": [
+     "/æ/",
+     "/eɪ/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "vacancy",
+    "options": [
+     "/æ/",
+     "/eɪ/"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "adequate",
+    "options": [
+     "/æ/",
+     "/eɪ/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "stagnant",
+    "options": [
+     "/æ/",
+     "/eɪ/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "capacity",
+    "options": [
+     "/æ/",
+     "/eɪ/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "patience",
+    "options": [
+     "/æ/",
+     "/eɪ/"
+    ],
+    "correctIndex": 1
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Do your minimal pairs survive fast speech?"
+   }
+  ],
+  "temaDaConversa": "What our food says about us",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#f7fbff",
+   "fundo2": "#dbeafe",
+   "prim": "#1d4ed8",
+   "sec": "#93c5fd",
+   "dest": "#f59e0b",
+   "txt": "#0f172a"
+  },
+  "fontes": {
+   "titulo": "Fredoka",
+   "corpo": "Nunito"
+  },
+  "fundo": "bolhas",
+  "heroi": "bear",
+  "icones": [
+   "bear",
+   "speaker-high-volume",
+   "ear-light",
+   "speech-balloon",
+   "studio-microphone",
+   "sparkles"
+  ]
+ }
+}

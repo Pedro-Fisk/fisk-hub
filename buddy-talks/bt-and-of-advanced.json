@@ -1,0 +1,174 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · And / Of",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Weak Words",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing weak words.",
+   "Developing pronunciation."
+  ],
+  "vocabulary": [
+   {
+    "word": "ahead of time",
+    "translation": ""
+   },
+   {
+    "word": "short of time",
+    "translation": ""
+   },
+   {
+    "word": "aware of that",
+    "translation": ""
+   },
+   {
+    "word": "capable of it",
+    "translation": ""
+   },
+   {
+    "word": "regardless of",
+    "translation": ""
+   },
+   {
+    "word": "time and again",
+    "translation": ""
+   },
+   {
+    "word": "trial and error",
+    "translation": ""
+   },
+   {
+    "word": "give and take",
+    "translation": ""
+   },
+   {
+    "word": "wear and tear",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll work on two words that fluent speakers reduce to almost nothing at all. They are... …AND and OF! Function words compress; content words don’t: ahead of\n\nEnglish rhythm depends on compressing the small words between the stressed ones. Giving every word equal weight is what makes fluent speech sound mechanical.",
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 1 - L 5 - pg 43",
+    "id": "1y612hkl243MfeLCuY9THWzic5AWxqbm4"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 1 - L 5 - pg 43",
+    "id": "10PbcEN035qB-9qjfdDFmo4Iuzu8k1Xmz"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: Did the booking go through?",
+    "modelAnswers": [
+     "B: I confirmed it well ahead of time."
+    ]
+   },
+   {
+    "question": "A: How did you choose the place?",
+    "modelAnswers": [
+     "B: Trial and error, to be honest."
+    ]
+   },
+   {
+    "question": "A: Was it worth the price?",
+    "modelAnswers": [
+     "B: Given the wear and tear, hardly."
+    ]
+   },
+   {
+    "question": "What makes a place worth the money?",
+    "modelAnswers": [
+     "Regardless of the price, I look for..."
+    ]
+   },
+   {
+    "question": "Have you ever complained about a room?",
+    "modelAnswers": [
+     "I complained because of..."
+    ]
+   },
+   {
+    "question": "What are you never short of when packing?",
+    "modelAnswers": [
+     "I always take plenty of..."
+    ]
+   },
+   {
+    "question": "Do you plan ahead of time or improvise?",
+    "modelAnswers": [
+     "I plan ahead of time because..."
+    ]
+   },
+   {
+    "question": "What kind of place would you avoid?",
+    "modelAnswers": [
+     "I would avoid a kind of..."
+    ]
+   },
+   {
+    "question": "Is a review worth trusting?",
+    "modelAnswers": [
+     "It depends on..."
+    ]
+   },
+   {
+    "question": "Tell me about a place that surprised you.",
+    "modelAnswers": [
+     "It was full of..."
+    ]
+   },
+   {
+    "question": "What is the trade-off between price and comfort?",
+    "modelAnswers": [
+     "It is a give and take between..."
+    ]
+   },
+   {
+    "question": "Would you go back to the same place?",
+    "modelAnswers": [
+     "Time and again, because..."
+    ]
+   }
+  ],
+  "languageGame": [],
+  "evaluation": [
+   {
+    "question": "Do your small words compress when you speak?"
+   }
+  ],
+  "temaDaConversa": "Judging a place to stay",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#f7fbff",
+   "fundo2": "#dbeafe",
+   "prim": "#1d4ed8",
+   "sec": "#93c5fd",
+   "dest": "#f59e0b",
+   "txt": "#0f172a"
+  },
+  "fontes": {
+   "titulo": "Fredoka",
+   "corpo": "Nunito"
+  },
+  "fundo": "bolhas",
+  "heroi": "bear",
+  "icones": [
+   "bear",
+   "speaker-high-volume",
+   "ear-light",
+   "speech-balloon",
+   "studio-microphone",
+   "sparkles"
+  ]
+ }
+}

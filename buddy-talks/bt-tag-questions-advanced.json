@@ -1,0 +1,174 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · Tag Questions",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Question Melody",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing tag questions.",
+   "Developing pronunciation."
+  ],
+  "vocabulary": [
+   {
+    "word": "hasn’t he? ↓",
+    "translation": ""
+   },
+   {
+    "word": "wouldn’t you? ↑",
+    "translation": ""
+   },
+   {
+    "word": "weren’t they? ↓",
+    "translation": ""
+   },
+   {
+    "word": "isn’t she? ↑",
+    "translation": ""
+   },
+   {
+    "word": "haven’t we? ↓",
+    "translation": ""
+   },
+   {
+    "word": "couldn’t she? ↑",
+    "translation": ""
+   },
+   {
+    "word": "won’t they? ↓",
+    "translation": ""
+   },
+   {
+    "word": "didn’t it? ↑",
+    "translation": ""
+   },
+   {
+    "word": "aren’t we? ↓",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll fix the melody that tells people whether you are asking or stating. It’s... …TAG QUESTIONS! The words are the same. The music is not: haven’t you?\n\nFalling: you are stating something and inviting the other person to agree. Rising: you are genuinely asking, and you are handing the turn to the other person.",
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 1 - L 1 - pg 11",
+    "id": "1pKUxLKtJSzM85kb2Hz1cgOKoAadpe1D-"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 1 - L 1 - pg 11",
+    "id": "1wvT1-2r55pnUkLGDnhp0PodyYiWs3tQ5"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: You’ve noticed that trend, haven’t you? ↑",
+    "modelAnswers": [
+     "B: I have, and I still don’t get it."
+    ]
+   },
+   {
+    "question": "A: It was overrated, wasn’t it? ↓",
+    "modelAnswers": [
+     "B: Completely. It faded in a month."
+    ]
+   },
+   {
+    "question": "A: You wouldn’t call that popular, would you? ↑",
+    "modelAnswers": [
+     "B: Not by any serious measure."
+    ]
+   },
+   {
+    "question": "Trends fade quickly now, don’t they? ↓",
+    "modelAnswers": [
+     "They do, because..."
+    ]
+   },
+   {
+    "question": "You’ve dropped an app recently, haven’t you? ↑",
+    "modelAnswers": [
+     "I dropped..."
+    ]
+   },
+   {
+    "question": "Popularity isn’t quality, is it? ↓",
+    "modelAnswers": [
+     "In my opinion..."
+    ]
+   },
+   {
+    "question": "You wouldn’t follow a trend blindly, would you? ↑",
+    "modelAnswers": [
+     "I would only if..."
+    ]
+   },
+   {
+    "question": "Algorithms decide what we see, don’t they? ↓",
+    "modelAnswers": [
+     "They decide because..."
+    ]
+   },
+   {
+    "question": "You’ve been influenced by one, haven’t you? ↑",
+    "modelAnswers": [
+     "Once I was influenced by..."
+    ]
+   },
+   {
+    "question": "Nobody reads long posts anymore, do they? ↓",
+    "modelAnswers": [
+     "Some people still..."
+    ]
+   },
+   {
+    "question": "You could live without it, couldn’t you? ↑",
+    "modelAnswers": [
+     "I could, but..."
+    ]
+   },
+   {
+    "question": "This will look silly in ten years, won’t it? ↓",
+    "modelAnswers": [
+     "I imagine that..."
+    ]
+   }
+  ],
+  "languageGame": [],
+  "evaluation": [
+   {
+    "question": "Do you control the melody of your questions?"
+   }
+  ],
+  "temaDaConversa": "What’s trending now",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#f7fbff",
+   "fundo2": "#dbeafe",
+   "prim": "#1d4ed8",
+   "sec": "#93c5fd",
+   "dest": "#f59e0b",
+   "txt": "#0f172a"
+  },
+  "fontes": {
+   "titulo": "Fredoka",
+   "corpo": "Nunito"
+  },
+  "fundo": "bolhas",
+  "heroi": "bear",
+  "icones": [
+   "bear",
+   "speaker-high-volume",
+   "ear-light",
+   "speech-balloon",
+   "studio-microphone",
+   "sparkles"
+  ]
+ }
+}

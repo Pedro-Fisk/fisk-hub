@@ -1,0 +1,174 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · And / Of",
+  "coverLevel": "Basic",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Weak Words",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing weak words.",
+   "Developing pronunciation."
+  ],
+  "vocabulary": [
+   {
+    "word": "a cup of tea",
+    "translation": ""
+   },
+   {
+    "word": "a lot of work",
+    "translation": ""
+   },
+   {
+    "word": "out of town",
+    "translation": ""
+   },
+   {
+    "word": "most of them",
+    "translation": ""
+   },
+   {
+    "word": "kind of cold",
+    "translation": ""
+   },
+   {
+    "word": "bread and jam",
+    "translation": ""
+   },
+   {
+    "word": "nice and easy",
+    "translation": ""
+   },
+   {
+    "word": "mom and dad",
+    "translation": ""
+   },
+   {
+    "word": "black and white",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll practice two tiny words that we almost never say completely. They are... …AND and OF! Listen: they almost disappear in speech. a cup of tea\n\nSaying them fast is what gives English its rhythm and speed. Saying AND and OF slowly makes every sentence sound long and heavy.",
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 1 - L 5 - pg 43",
+    "id": "1y612hkl243MfeLCuY9THWzic5AWxqbm4"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 1 - L 5 - pg 43",
+    "id": "10PbcEN035qB-9qjfdDFmo4Iuzu8k1Xmz"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: What do you have for breakfast?",
+    "modelAnswers": [
+     "B: Bread and jam and a cup of tea."
+    ]
+   },
+   {
+    "question": "A: Where is the hotel?",
+    "modelAnswers": [
+     "B: It’s out of town, in front of a park."
+    ]
+   },
+   {
+    "question": "A: Was the room good?",
+    "modelAnswers": [
+     "B: It was kind of small, but nice and clean."
+    ]
+   },
+   {
+    "question": "What is in front of your house?",
+    "modelAnswers": [
+     "In front of my house there is..."
+    ]
+   },
+   {
+    "question": "What do you have in your room?",
+    "modelAnswers": [
+     "I have a bed and a..."
+    ]
+   },
+   {
+    "question": "Where do you go on Saturdays?",
+    "modelAnswers": [
+     "I go out of town / I stay..."
+    ]
+   },
+   {
+    "question": "What kind of house do you live in?",
+    "modelAnswers": [
+     "I live in a kind of..."
+    ]
+   },
+   {
+    "question": "Who do you live with?",
+    "modelAnswers": [
+     "I live with my mom and..."
+    ]
+   },
+   {
+    "question": "What is your street like?",
+    "modelAnswers": [
+     "It is quiet and..."
+    ]
+   },
+   {
+    "question": "Have you stayed in a hotel?",
+    "modelAnswers": [
+     "The room was nice and..."
+    ]
+   },
+   {
+    "question": "What do you take on a trip?",
+    "modelAnswers": [
+     "I take a lot of..."
+    ]
+   },
+   {
+    "question": "What is close to your home?",
+    "modelAnswers": [
+     "There is a shop and a..."
+    ]
+   }
+  ],
+  "languageGame": [],
+  "evaluation": [
+   {
+    "question": "Is it easy to say and and of very fast?"
+   }
+  ],
+  "temaDaConversa": "Your home and your street",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#f7fbff",
+   "fundo2": "#dbeafe",
+   "prim": "#1d4ed8",
+   "sec": "#93c5fd",
+   "dest": "#f59e0b",
+   "txt": "#0f172a"
+  },
+  "fontes": {
+   "titulo": "Fredoka",
+   "corpo": "Nunito"
+  },
+  "fundo": "bolhas",
+  "heroi": "bear",
+  "icones": [
+   "bear",
+   "speaker-high-volume",
+   "ear-light",
+   "speech-balloon",
+   "studio-microphone",
+   "sparkles"
+  ]
+ }
+}

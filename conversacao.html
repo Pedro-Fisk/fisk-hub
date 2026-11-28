@@ -394,7 +394,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js"></script>
-<script src="assets/tema-slides.js?v=63826218e7"></script>
+<script src="assets/tema-slides.js?v=3bc06787ba"></script>
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
@@ -457,6 +457,21 @@
       autor: m.autor, nota: m.nota, notas: m.notas, minha: m.minha }; });
     dados.vazio = false;
   }
+  /* AS BUDDY TALKS (Pedro, 28/11/2026): a série de pronúncia dos Transitions, gerada do conteúdo do Conversation Maker
+     por scripts/build-buddy-talks.js em buddy-talks/ (ao lado desta página: sem backend para listar nem abrir). Valem em
+     qualquer semana. O áudio do livro vem do Drive pelo backend (cmAudio), no slide "Let's practice". */
+  var BUDDY = 'Buddy Talks', ultBuddy = null;
+  function pedeBuddy() {
+    return fetch('buddy-talks/index.json', { cache: 'no-cache' }).then(function (r) { return r.json(); })
+      .then(function (l) { return Array.isArray(l) ? l : []; }).catch(function () { return []; });
+  }
+  function juntaBuddy(itens) {
+    if (!dados) return; dados.idiomas = dados.idiomas || {};
+    delete dados.idiomas[BUDDY];
+    if (!itens || !itens.length) return;
+    dados.idiomas[BUDDY] = itens.map(function (m) { return { id: m.id, nome: m.nome, tipo: 'cm', niveis: [m.nivel], pronto: true, origem: 'buddy', livro: m.livro }; });
+    dados.vazio = false;
+  }
   function juntaMinhas(itens) {
     if (!dados) return; dados.idiomas = dados.idiomas || {};
     delete dados.idiomas[MINHAS];
@@ -471,7 +486,7 @@
   try { ultMinhas = JSON.parse(localStorage.getItem(CH_MINHAS) || 'null'); } catch (e) {}
   function guardada(id) { try { return JSON.parse(localStorage.getItem(CH_LISTA + (id || 'atual')) || 'null'); } catch (e) { return null; } }
   function semCarimbo(j) { return JSON.stringify({ s: j && j.semana, i: j && j.idiomas, ss: j && j.semanas }); }
-  function aplica(j) { dados = j; semKids(); juntaMinhas(ultMinhas || []); juntaAcervo(ultAcervo || []); semanaId = j.semana ? j.semana.id : ''; desenhaLista(); }
+  function aplica(j) { dados = j; semKids(); juntaMinhas(ultMinhas || []); juntaAcervo(ultAcervo || []); juntaBuddy(ultBuddy || []); semanaId = j.semana ? j.semana.id : ''; desenhaLista(); }
   function carregaLista(id, depois) {
     var vez = ++vezLista, g = guardada(id), viu = false;
     if (g && g.semana && g.idiomas) { delete g._offline; aplica(g); viu = true; if (depois) { depois(); depois = null; } }
@@ -527,7 +542,7 @@
       if (!x) return '<span class="sem vazia"></span>';
       var p = partesSemana(x.nome);
       return '<button type="button" class="sem' + (k === 1 ? ' on' : '') + '" data-sem="' + esc(x.id) + '"><b>' + esc(p.n) + (x.atual ? ' · hoje' : '') + '</b><span>' + esc(p.d) + '</span>' +
-        (k === 1 ? (function () { var ks = Object.keys(dados.idiomas || {}).filter(function (x) { return x !== MINHAS && x !== ACERVO; }), n = 0; ks.forEach(function (x) { n += dados.idiomas[x].length; }); return '<small>' + (n ? n + (n === 1 ? ' atividade' : ' atividades') + ' · ' + esc(ks.join(', ')) : 'nenhuma atividade da semana ainda') + '</small>'; })() : '') + '</button>';
+        (k === 1 ? (function () { var ks = Object.keys(dados.idiomas || {}).filter(function (x) { return x !== MINHAS && x !== ACERVO && x !== BUDDY; }), n = 0; ks.forEach(function (x) { n += dados.idiomas[x].length; }); return '<small>' + (n ? n + (n === 1 ? ' atividade' : ' atividades') + ' · ' + esc(ks.join(', ')) : 'nenhuma atividade da semana ainda') + '</small>'; })() : '') + '</button>';
     }).join('');
   }
   function turmaBase() { var t = typeof fiskTurmaDeAgora === 'function' ? fiskTurmaDeAgora(s) : null, agora = !!t; if (!t && typeof fiskTurmaProxima === 'function') t = fiskTurmaProxima(s); if (t) t.agora = agora; return t; }
@@ -565,7 +580,7 @@
     var out = [], extras = [];
     ['English', 'Español'].concat(Object.keys(dados.idiomas || {}).filter(function (k) { return k !== 'English' && k !== 'Español'; })).forEach(function (idioma) {
       var itens = (dados.idiomas[idioma] || []).filter(function (it) { return it !== dest; }), soltos = itens.filter(function (it) { return !it.grupo; });
-      var band = idioma === 'English' ? '🇺🇸 ' : idioma === 'Español' ? '🇪🇸 ' : idioma === MINHAS ? '🧩 ' : idioma === ACERVO ? '🗂️ ' : '📁 ';
+      var band = idioma === 'English' ? '🇺🇸 ' : idioma === 'Español' ? '🇪🇸 ' : idioma === MINHAS ? '🧩 ' : idioma === ACERVO ? '🗂️ ' : idioma === BUDDY ? '🐻 ' : '📁 ';
       var ord = function (a, b) { var o = { Teens: 0, Basic: 1, Intermediate: 2, Advanced: 3, Todos: 4 }; return ((o[nivelDe(a)] == null ? 9 : o[nivelDe(a)]) - (o[nivelDe(b)] == null ? 9 : o[nivelDe(b)])) || (perfilDe(a) === perfilDe(b) ? 0 : (perfilDe(a) === 'Jovens' ? -1 : 1)); };
       if (soltos.length) out.push({ k: idioma, rot: band + idioma, itens: soltos.sort(ord) });
       var gs = {}; itens.filter(function (it) { return it.grupo; }).forEach(function (it) { (gs[it.grupo] = gs[it.grupo] || []).push(it); });
@@ -684,6 +699,7 @@
   function obterCm(it) {
     var k = chaveCache(it);
     var baixa = function () {
+      if (it.origem === 'buddy') return fetch('buddy-talks/' + encodeURIComponent(it.id) + '.json', { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error('não veio'); return r.text(); });
       var doMaker = it.origem === 'minha' || it.origem === 'acervo';   /* do Conversation Maker: as minhas e as do acervo */
       var pedido = doMaker ? { action: 'cmLer', token: s.token, id: it.id } : { action: 'conversaLer', token: s.token, id: it.id };
       return fiskFetch(FISK_HUB_EP, pedido, { timeoutMs: 60000 }).then(function (j) {
@@ -725,7 +741,7 @@
   /* guardar a semana inteira neste computador (o Hub já faz isso sozinho ao abrir; este botão força agora) */
   function guardarSemana() {
     var b = $('bOff'); if (!dados || !window.caches) return;
-    var prontos = todos().filter(function (i) { return i.pronto && i.origem !== 'acervo'; }), feitos = 0;   /* o acervo não desce inteiro */
+    var prontos = todos().filter(function (i) { return i.pronto && i.origem !== 'acervo' && i.origem !== 'buddy'; }), feitos = 0;   /* o acervo não desce inteiro */
     b.disabled = true;
     fiskGuardarPaginaOffline('conversacao.html').then(function () {
       var cadeia = Promise.resolve();
@@ -851,7 +867,7 @@
     history.replaceState(null, '', 'conversacao.html' + (semanaId ? '?semana=' + encodeURIComponent(semanaId) : ''));
     marcaOffline();
   }
-  $('palco').addEventListener('click', function (e) { if (!tocando) return; if (deck && e.target.closest('[data-carta],.ft-op,.ft-ouvir')) return; (e.clientX < window.innerWidth * 0.2 ? ant : prox)(); });
+  $('palco').addEventListener('click', function (e) { if (!tocando) return; if (deck && e.target.closest('[data-carta],.ft-op,.ft-ouvir,.ft-audio')) return; (e.clientX < window.innerWidth * 0.2 ? ant : prox)(); });
   window.addEventListener('resize', function () { if (deck && tocando) mostraCm(); });
   $('bProx').onclick = prox; $('bAnt').onclick = ant; $('bInicio').onclick = function () { mostra(0); };
   $('bCheia').onclick = cheia; $('bSair').onclick = function () { if (document.fullscreenElement) document.exitFullscreen(); capa(); };
@@ -994,6 +1010,36 @@
     });
   }
   FiskTema.aoOuvir = vozToca;
+  /* ── O ÁUDIO DO LIVRO (Buddy Talks, 28/11/2026) ── O slide "Let's practice" traz só o id do arquivo no Drive; o
+     backend (cmAudio) devolve a faixa, que fica guardada aqui enquanto a atividade está aberta. Sem o backend com a
+     rota, a TV diz qual faixa do livro tocar. */
+  var audioCache = {}, audioAgora = null;
+  function audioDe(id) {
+    if (!audioCache[id]) audioCache[id] = fiskFetch(FISK_HUB_EP, { action: 'cmAudio', token: s.token, id: id }, { timeoutMs: 60000 })
+      .then(function (j) { if (!j || !j.ok || !j.b64) throw new Error((j && j.error) || 'sem áudio'); return { b64: j.b64, mime: j.mime || 'audio/mpeg' }; })
+      .catch(function (e) { delete audioCache[id]; throw e; });
+    return audioCache[id];
+  }
+  FiskTema.aoAudio = function (i, botao, slideEl) {
+    var sl = deck && deck.slides.filter(function (x) { return x.el === slideEl; })[0], a = sl && sl.audio; if (!a) return;
+    try { if (audioAgora && !audioAgora.paused) { audioAgora.pause(); botao.textContent = '▶'; return; } } catch (e) {}
+    botao.textContent = '⏳';
+    audioDe(a.id).then(function (x) {
+      audioAgora = new Audio('data:' + x.mime + ';base64,' + x.b64);
+      audioAgora.onended = function () { botao.textContent = '▶'; };
+      botao.textContent = '⏸'; return audioAgora.play();
+    }).catch(function () {
+      botao.textContent = '▶';
+      var av = slideEl.querySelector('.ft-leia-audio'); if (av) av.textContent = '📢 Toque a faixa do livro: ' + (a.ref || '') + ' · ' + (a.nome || '');
+    });
+  };
+  /* para o celular dos alunos: a faixa vai junto do clique do slide, se couber no limite do servidor da aula */
+  function aulaAudioPasso(k) {
+    if (!deck) return Promise.resolve(null);
+    var p = aulaPasso(k - 1), sl = p && deck.slides[p.i];
+    if (!sl || !sl.audio) return Promise.resolve(null);
+    return audioDe(sl.audio.id).then(function (x) { return { nome: sl.audio.nome, s: x.b64.length <= 700 * 1024 ? x.b64 : null }; }, function () { return { nome: sl.audio.nome, s: null }; });
+  }
   var aula = null, aulaFila = Promise.resolve();
   function aulaApi(c, ms) {
     var ctl = new AbortController(), t = setTimeout(function () { ctl.abort(); }, ms || 20000);
@@ -1122,7 +1168,10 @@
         var jg = aulaJogo(k);
         /* ouça e escolha: o mesmo mp3 que a TV tocou vai para os celulares (se a voz falhou, vai sem áudio) */
         return (jg && jg.ot ? vozMp3(jg.ot).catch(function () { return null; }) : Promise.resolve(null)).then(function (mp3) {
-          return aulaApi({ op: 'clique', aula: a.id, chave: a.chave, n: k, atual: a.agora, img: img, jogo: jg, s: mp3 || undefined, vocab: aulaVocab(k), aval: aulaAval(k) });
+          return aulaAudioPasso(k).then(function (au) {
+            return aulaApi({ op: 'clique', aula: a.id, chave: a.chave, n: k, atual: a.agora, img: img, jogo: jg, s: mp3 || (au && au.s) || undefined,
+              somPasso: au ? { nome: au.nome } : undefined, vocab: aulaVocab(k), aval: aulaAval(k) });
+          });
         });
       }).then(function (r) {
         if (!r || !r.ok) throw new Error('não gravou');
@@ -1413,6 +1462,7 @@
   var q = new URLSearchParams(location.search), qId = q.get('id'), qSem = q.get('semana');
   carregaLista(qSem || '', qId ? function () { abre(qId); } : null);
   pedeMinhas().then(function (itens) { ultMinhas = itens; if (dados && !$('lista').hidden) { juntaMinhas(itens); desenhaLista(); } });
+  pedeBuddy().then(function (itens) { ultBuddy = itens; if (dados && !$('lista').hidden) { juntaBuddy(itens); desenhaLista(); } });
   pedeAcervo().then(function (itens) { ultAcervo = itens; if (dados && !$('lista').hidden) { juntaAcervo(itens); desenhaLista(); } });
   try { if (localStorage.getItem('fisk_theme') === 'dark') document.body.classList.add('theme-dark'); } catch (e) {}
   fiskApresEnviar(false);   /* o que ficou na fila de uma aula sem internet */

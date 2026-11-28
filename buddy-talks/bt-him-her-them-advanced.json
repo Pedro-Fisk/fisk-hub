@@ -1,0 +1,174 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · Him / Her / Them",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Linking Pronouns",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing weak pronouns.",
+   "Developing pronunciation."
+  ],
+  "vocabulary": [
+   {
+    "word": "persuade him",
+    "translation": ""
+   },
+   {
+    "word": "brief her",
+    "translation": ""
+   },
+   {
+    "word": "involve them",
+    "translation": ""
+   },
+   {
+    "word": "approach him",
+    "translation": ""
+   },
+   {
+    "word": "reassure her",
+    "translation": ""
+   },
+   {
+    "word": "update them",
+    "translation": ""
+   },
+   {
+    "word": "consult him",
+    "translation": ""
+   },
+   {
+    "word": "nominate her",
+    "translation": ""
+   },
+   {
+    "word": "engage them",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll work on three words that fluent speakers reduce almost to nothing. They’re... …HIM, HER, THEM! Fluent speech attaches them to the verb: meet them\n\nReducing them is not lazy speech: it is what puts the stress on the right word. Pronouncing them in full sounds emphatic, as if you were correcting someone.",
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 1 - L 4 - pg 35",
+    "id": "1jcEuJ9-Y-6sXkaLM4esgp72B18aB2b2I"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 1 - L 4 - pg 35",
+    "id": "12WgplHIe15LWB1HgKGm1m62H5sFHOGw8"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: How did you get that partnership?",
+    "modelAnswers": [
+     "B: I approached him at a conference."
+    ]
+   },
+   {
+    "question": "A: Did the team accept the change?",
+    "modelAnswers": [
+     "B: I briefed them before announcing it."
+    ]
+   },
+   {
+    "question": "A: Who recommended you for the role?",
+    "modelAnswers": [
+     "B: A former manager nominated me."
+    ]
+   },
+   {
+    "question": "Who opened a door for you professionally?",
+    "modelAnswers": [
+     "I met him / her when..."
+    ]
+   },
+   {
+    "question": "How do you approach someone you admire?",
+    "modelAnswers": [
+     "I approach them by..."
+    ]
+   },
+   {
+    "question": "Have you ever recommended someone?",
+    "modelAnswers": [
+     "I recommended him / her because..."
+    ]
+   },
+   {
+    "question": "What makes a contact worth keeping?",
+    "modelAnswers": [
+     "I keep them close when..."
+    ]
+   },
+   {
+    "question": "Who challenged your way of thinking?",
+    "modelAnswers": [
+     "My... challenged me and I..."
+    ]
+   },
+   {
+    "question": "How do you reconnect after years?",
+    "modelAnswers": [
+     "I message them and..."
+    ]
+   },
+   {
+    "question": "Have you ever disappointed a contact?",
+    "modelAnswers": [
+     "I disappointed him / her when..."
+    ]
+   },
+   {
+    "question": "Who would you consult before a big decision?",
+    "modelAnswers": [
+     "I would consult them because..."
+    ]
+   },
+   {
+    "question": "What do people come to you for?",
+    "modelAnswers": [
+     "They ask me because I..."
+    ]
+   }
+  ],
+  "languageGame": [],
+  "evaluation": [
+   {
+    "question": "Do your pronouns disappear when you speak fast?"
+   }
+  ],
+  "temaDaConversa": "The network that opened doors",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#f7fbff",
+   "fundo2": "#dbeafe",
+   "prim": "#1d4ed8",
+   "sec": "#93c5fd",
+   "dest": "#f59e0b",
+   "txt": "#0f172a"
+  },
+  "fontes": {
+   "titulo": "Fredoka",
+   "corpo": "Nunito"
+  },
+  "fundo": "bolhas",
+  "heroi": "bear",
+  "icones": [
+   "bear",
+   "speaker-high-volume",
+   "ear-light",
+   "speech-balloon",
+   "studio-microphone",
+   "sparkles"
+  ]
+ }
+}

@@ -1,0 +1,174 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · Tag Questions",
+  "coverLevel": "Basic",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Question Melody",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing tag questions.",
+   "Developing pronunciation."
+  ],
+  "vocabulary": [
+   {
+    "word": "isn’t it? ↓",
+    "translation": ""
+   },
+   {
+    "word": "aren’t you? ↑",
+    "translation": ""
+   },
+   {
+    "word": "don’t you? ↑",
+    "translation": ""
+   },
+   {
+    "word": "doesn’t he? ↑",
+    "translation": ""
+   },
+   {
+    "word": "didn’t they? ↓",
+    "translation": ""
+   },
+   {
+    "word": "can’t she? ↓",
+    "translation": ""
+   },
+   {
+    "word": "won’t they? ↑",
+    "translation": ""
+   },
+   {
+    "word": "haven’t you? ↓",
+    "translation": ""
+   },
+   {
+    "word": "wasn’t it? ↑",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll learn a little melody that changes the meaning of a question in English. It’s... …TAG QUESTIONS! Listen to the music at the end of these: isn’t it?\n\nWhen our voice goes DOWN, we already know it and we just confirm. When our voice goes UP, we really don’t know, and we want an answer.",
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 1 - L 1 - pg 11",
+    "id": "1pKUxLKtJSzM85kb2Hz1cgOKoAadpe1D-"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 1 - L 1 - pg 11",
+    "id": "1wvT1-2r55pnUkLGDnhp0PodyYiWs3tQ5"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: You’re on TikTok, aren’t you? ↑",
+    "modelAnswers": [
+     "B: Yes, I post videos every week."
+    ]
+   },
+   {
+    "question": "A: This song is a hit, isn’t it? ↓",
+    "modelAnswers": [
+     "B: Everybody is listening to it."
+    ]
+   },
+   {
+    "question": "A: You didn’t see the video, did you? ↑",
+    "modelAnswers": [
+     "B: No. Send me the link!"
+    ]
+   },
+   {
+    "question": "You use your phone a lot, don’t you? ↑",
+    "modelAnswers": [
+     "I use it..."
+    ]
+   },
+   {
+    "question": "You have Instagram, don’t you? ↑",
+    "modelAnswers": [
+     "Yes, I do. / No, I don’t."
+    ]
+   },
+   {
+    "question": "That video was funny, wasn’t it? ↓",
+    "modelAnswers": [
+     "I thought it was..."
+    ]
+   },
+   {
+    "question": "You watch short videos, don’t you? ↑",
+    "modelAnswers": [
+     "I watch them when..."
+    ]
+   },
+   {
+    "question": "Everybody posts photos, don’t they? ↓",
+    "modelAnswers": [
+     "My friends post..."
+    ]
+   },
+   {
+    "question": "You don’t watch TV much, do you? ↑",
+    "modelAnswers": [
+     "I still watch..."
+    ]
+   },
+   {
+    "question": "Games are more fun online, aren’t they? ↓",
+    "modelAnswers": [
+     "For me, games are..."
+    ]
+   },
+   {
+    "question": "You follow a singer, don’t you? ↑",
+    "modelAnswers": [
+     "I follow..."
+    ]
+   },
+   {
+    "question": "This app is popular now, isn’t it? ↓",
+    "modelAnswers": [
+     "I think it is popular because..."
+    ]
+   }
+  ],
+  "languageGame": [],
+  "evaluation": [
+   {
+    "question": "Is it easy to hear the melody of a tag?"
+   }
+  ],
+  "temaDaConversa": "What’s trending now",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#f7fbff",
+   "fundo2": "#dbeafe",
+   "prim": "#1d4ed8",
+   "sec": "#93c5fd",
+   "dest": "#f59e0b",
+   "txt": "#0f172a"
+  },
+  "fontes": {
+   "titulo": "Fredoka",
+   "corpo": "Nunito"
+  },
+  "fundo": "bolhas",
+  "heroi": "bear",
+  "icones": [
+   "bear",
+   "speaker-high-volume",
+   "ear-light",
+   "speech-balloon",
+   "studio-microphone",
+   "sparkles"
+  ]
+ }
+}

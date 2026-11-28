@@ -1,0 +1,235 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · /æ/ Vs. /Eɪ/",
+  "coverLevel": "Intermediate",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Cat or Cake",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing minimal pairs.",
+   "Developing pronunciation."
+  ],
+  "vocabulary": [
+   {
+    "word": "bat · bait",
+    "translation": ""
+   },
+   {
+    "word": "rat · rate",
+    "translation": ""
+   },
+   {
+    "word": "mat · mate",
+    "translation": ""
+   },
+   {
+    "word": "cap · cape",
+    "translation": ""
+   },
+   {
+    "word": "van · vain",
+    "translation": ""
+   },
+   {
+    "word": "sack · sake",
+    "translation": ""
+   },
+   {
+    "word": "lack · lake",
+    "translation": ""
+   },
+   {
+    "word": "snack · snake",
+    "translation": ""
+   },
+   {
+    "word": "gram · grain",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll separate two vowels that turn one word into a completely different one. …CAT and CAKE! The /æ/ of cat does not exist in Portuguese: snack\n\nSo we borrow the nearest sound we have, and the word turns into another one. Then fat becomes fate, and the sentence means something you never said.",
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 2 - L 9 - pg 79",
+    "id": "1dR26ZtLoSK3C0vpGowv7IWB6V8AlBwN2"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 2 - L 9 - pg 79",
+    "id": "1RD4XKFa0ex_4dx-O4BizlXNg1acYhETz"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: Is this a healthy snack?",
+    "modelAnswers": [
+     "B: Less fat, but it tastes great."
+    ]
+   },
+   {
+    "question": "A: How many grams of sugar?",
+    "modelAnswers": [
+     "B: The label says it’s fine."
+    ]
+   },
+   {
+    "question": "A: Did you pack lunch?",
+    "modelAnswers": [
+     "B: A sandwich and a salad, as always."
+    ]
+   },
+   {
+    "question": "Have you ever been on a diet?",
+    "modelAnswers": [
+     "I went on a diet when..."
+    ]
+   },
+   {
+    "question": "What food do you refuse to give up?",
+    "modelAnswers": [
+     "I could never give up..."
+    ]
+   },
+   {
+    "question": "Do you read labels before buying?",
+    "modelAnswers": [
+     "I check the label for..."
+    ]
+   },
+   {
+    "question": "What is a healthy meal for you?",
+    "modelAnswers": [
+     "A healthy meal has..."
+    ]
+   },
+   {
+    "question": "What surprised you about a food you tried?",
+    "modelAnswers": [
+     "I was amazed when..."
+    ]
+   },
+   {
+    "question": "Is fast food always bad?",
+    "modelAnswers": [
+     "Fast food is..."
+    ]
+   },
+   {
+    "question": "What did your family eat when you were a kid?",
+    "modelAnswers": [
+     "We always ate..."
+    ]
+   },
+   {
+    "question": "Would you pay more for organic food?",
+    "modelAnswers": [
+     "I would pay more because..."
+    ]
+   },
+   {
+    "question": "What would you cook to impress someone?",
+    "modelAnswers": [
+     "I would make..."
+    ]
+   }
+  ],
+  "languageGame": [
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "bat",
+    "options": [
+     "bat",
+     "bait"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "rate",
+    "options": [
+     "rat",
+     "rate"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "mat",
+    "options": [
+     "mat",
+     "mate"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "cape",
+    "options": [
+     "cap",
+     "cape"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "van",
+    "options": [
+     "van",
+     "vain"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "sake",
+    "options": [
+     "sack",
+     "sake"
+    ],
+    "correctIndex": 1
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Which pair is hardest for you to separate?"
+   }
+  ],
+  "temaDaConversa": "Food and diets",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#f7fbff",
+   "fundo2": "#dbeafe",
+   "prim": "#1d4ed8",
+   "sec": "#93c5fd",
+   "dest": "#f59e0b",
+   "txt": "#0f172a"
+  },
+  "fontes": {
+   "titulo": "Fredoka",
+   "corpo": "Nunito"
+  },
+  "fundo": "bolhas",
+  "heroi": "bear",
+  "icones": [
+   "bear",
+   "speaker-high-volume",
+   "ear-light",
+   "speech-balloon",
+   "studio-microphone",
+   "sparkles"
+  ]
+ }
+}

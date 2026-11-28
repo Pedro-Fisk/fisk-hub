@@ -1,0 +1,174 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · Him / Her / Them",
+  "coverLevel": "Intermediate",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Linking Pronouns",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing weak pronouns.",
+   "Developing pronunciation."
+  ],
+  "vocabulary": [
+   {
+    "word": "tell him",
+    "translation": ""
+   },
+   {
+    "word": "call her",
+    "translation": ""
+   },
+   {
+    "word": "meet them",
+    "translation": ""
+   },
+   {
+    "word": "trust him",
+    "translation": ""
+   },
+   {
+    "word": "convince her",
+    "translation": ""
+   },
+   {
+    "word": "remind them",
+    "translation": ""
+   },
+   {
+    "word": "introduce him",
+    "translation": ""
+   },
+   {
+    "word": "recommend her",
+    "translation": ""
+   },
+   {
+    "word": "contact them",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll practice three words native speakers swallow in almost every sentence. They’re... …HIM, HER, THEM! They lean on the verb and lose their H: call her\n\nWeak pronouns are what make a sentence flow instead of sounding chopped. Stressing him, her or them changes the meaning: it sounds like a correction.",
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 1 - L 4 - pg 35",
+    "id": "1jcEuJ9-Y-6sXkaLM4esgp72B18aB2b2I"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 1 - L 4 - pg 35",
+    "id": "12WgplHIe15LWB1HgKGm1m62H5sFHOGw8"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: Did you speak to the manager?",
+    "modelAnswers": [
+     "B: I contacted him this morning."
+    ]
+   },
+   {
+    "question": "A: How did you find that job?",
+    "modelAnswers": [
+     "B: A friend recommended me for it."
+    ]
+   },
+   {
+    "question": "A: What about your old classmates?",
+    "modelAnswers": [
+     "B: I still keep in touch with them."
+    ]
+   },
+   {
+    "question": "Who introduced you to your best friend?",
+    "modelAnswers": [
+     "My... introduced me to him / her."
+    ]
+   },
+   {
+    "question": "How often do you contact old friends?",
+    "modelAnswers": [
+     "I contact them..."
+    ]
+   },
+   {
+    "question": "Who would you ask for a recommendation?",
+    "modelAnswers": [
+     "I would ask him / her because..."
+    ]
+   },
+   {
+    "question": "Do you find it easy to meet new people?",
+    "modelAnswers": [
+     "When I meet them, I usually..."
+    ]
+   },
+   {
+    "question": "Who taught you something important?",
+    "modelAnswers": [
+     "My... taught me and I thank him / her..."
+    ]
+   },
+   {
+    "question": "How do you keep a friendship alive?",
+    "modelAnswers": [
+     "I call them when..."
+    ]
+   },
+   {
+    "question": "Have you ever lost touch with someone?",
+    "modelAnswers": [
+     "I lost touch with her when..."
+    ]
+   },
+   {
+    "question": "Who do people ask for help at work?",
+    "modelAnswers": [
+     "They ask him / her because..."
+    ]
+   },
+   {
+    "question": "What makes you trust a new contact?",
+    "modelAnswers": [
+     "I trust them when..."
+    ]
+   }
+  ],
+  "languageGame": [],
+  "evaluation": [
+   {
+    "question": "Which pronoun disappears the most for you?"
+   }
+  ],
+  "temaDaConversa": "How you build your network",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#f7fbff",
+   "fundo2": "#dbeafe",
+   "prim": "#1d4ed8",
+   "sec": "#93c5fd",
+   "dest": "#f59e0b",
+   "txt": "#0f172a"
+  },
+  "fontes": {
+   "titulo": "Fredoka",
+   "corpo": "Nunito"
+  },
+  "fundo": "bolhas",
+  "heroi": "bear",
+  "icones": [
+   "bear",
+   "speaker-high-volume",
+   "ear-light",
+   "speech-balloon",
+   "studio-microphone",
+   "sparkles"
+  ]
+ }
+}

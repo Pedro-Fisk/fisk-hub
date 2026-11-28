@@ -1,0 +1,174 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · Word Endings",
+  "coverLevel": "Basic",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Weak Endings",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing word endings.",
+   "Developing pronunciation."
+  ],
+  "vocabulary": [
+   {
+    "word": "attention",
+    "translation": ""
+   },
+   {
+    "word": "question",
+    "translation": ""
+   },
+   {
+    "word": "future",
+    "translation": ""
+   },
+   {
+    "word": "famous",
+    "translation": ""
+   },
+   {
+    "word": "nature",
+    "translation": ""
+   },
+   {
+    "word": "action",
+    "translation": ""
+   },
+   {
+    "word": "nervous",
+    "translation": ""
+   },
+   {
+    "word": "picture",
+    "translation": ""
+   },
+   {
+    "word": "station",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll practice the last part of long words, which is always weak in English. It’s... …WORD ENDINGS! The ending is quiet. The strong part is before: -tion\n\nIn English the ending is short and weak, never the loud part. If we push the ending, the word sounds Portuguese and hard to understand.",
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 2 - L 1 - pg 11",
+    "id": "1HgUpi67ato5Wpa7gbvIQ4JhqXCBl1TmS"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 2 - L 1 - pg 11",
+    "id": "10fWjkYEMOZ4rm0pXLyFbuGap2_HNcSEU"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: Can I ask you a question?",
+    "modelAnswers": [
+     "B: Sure, you have my attention."
+    ]
+   },
+   {
+    "question": "A: Is he famous?",
+    "modelAnswers": [
+     "B: He is famous for action movies."
+    ]
+   },
+   {
+    "question": "A: Where is the picture?",
+    "modelAnswers": [
+     "B: Near the station, in nature."
+    ]
+   },
+   {
+    "question": "Who is famous in your country now?",
+    "modelAnswers": [
+     "The famous person is..."
+    ]
+   },
+   {
+    "question": "What song gets a lot of attention?",
+    "modelAnswers": [
+     "The song is..."
+    ]
+   },
+   {
+    "question": "What is your favorite action movie?",
+    "modelAnswers": [
+     "My favorite action movie is..."
+    ]
+   },
+   {
+    "question": "Do you want to be famous in the future?",
+    "modelAnswers": [
+     "In the future I want..."
+    ]
+   },
+   {
+    "question": "What picture did you post last?",
+    "modelAnswers": [
+     "The picture was of..."
+    ]
+   },
+   {
+    "question": "What makes a person popular at school?",
+    "modelAnswers": [
+     "A popular person is..."
+    ]
+   },
+   {
+    "question": "What suggestion do you have for a friend?",
+    "modelAnswers": [
+     "My suggestion is..."
+    ]
+   },
+   {
+    "question": "Are you nervous in front of people?",
+    "modelAnswers": [
+     "I am nervous when..."
+    ]
+   },
+   {
+    "question": "What question would you ask a famous person?",
+    "modelAnswers": [
+     "I would ask..."
+    ]
+   }
+  ],
+  "languageGame": [],
+  "evaluation": [
+   {
+    "question": "Is it easy to keep the ending weak?"
+   }
+  ],
+  "temaDaConversa": "Who is famous now",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#f7fbff",
+   "fundo2": "#dbeafe",
+   "prim": "#1d4ed8",
+   "sec": "#93c5fd",
+   "dest": "#f59e0b",
+   "txt": "#0f172a"
+  },
+  "fontes": {
+   "titulo": "Fredoka",
+   "corpo": "Nunito"
+  },
+  "fundo": "bolhas",
+  "heroi": "bear",
+  "icones": [
+   "bear",
+   "speaker-high-volume",
+   "ear-light",
+   "speech-balloon",
+   "studio-microphone",
+   "sparkles"
+  ]
+ }
+}

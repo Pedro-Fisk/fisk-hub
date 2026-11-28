@@ -1,0 +1,235 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · /ʌ/ Vs. /ɝ/",
+  "coverLevel": "Basic",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Two Vowels",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing two vowels.",
+   "Developing pronunciation."
+  ],
+  "vocabulary": [
+   {
+    "word": "cup",
+    "translation": "/ʌ/"
+   },
+   {
+    "word": "much",
+    "translation": "/ʌ/"
+   },
+   {
+    "word": "sunny",
+    "translation": "/ʌ/"
+   },
+   {
+    "word": "money",
+    "translation": "/ʌ/"
+   },
+   {
+    "word": "lunch",
+    "translation": "/ʌ/"
+   },
+   {
+    "word": "bird",
+    "translation": "/ɝ/"
+   },
+   {
+    "word": "work",
+    "translation": "/ɝ/"
+   },
+   {
+    "word": "learn",
+    "translation": "/ɝ/"
+   },
+   {
+    "word": "girl",
+    "translation": "/ɝ/"
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll practice two vowels that sound the same to us, but not to a native. They’re... …/ʌ/ and /ɝ/! Listen: cup is short, bird is long: bird\n\nIn cup, much and sunny the sound is short and open. It’s /ʌ/. In bird, work and learn the sound is longer, with the tongue pulled back.",
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 2 - L 7 - pg 63",
+    "id": "1wbvVr-yXXtPQHFu4pEpQaGHPVFUsjTSY"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 2 - L 7 - pg 63",
+    "id": "10Ip23XKVVY3jivzrRcdYVX9aVsnNsafe"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: Do you work on Sunday?",
+    "modelAnswers": [
+     "B: No, I study and learn at home."
+    ]
+   },
+   {
+    "question": "A: What do you want for lunch?",
+    "modelAnswers": [
+     "B: Just a cup of soup, thanks."
+    ]
+   },
+   {
+    "question": "A: Is it sunny today?",
+    "modelAnswers": [
+     "B: Yes! Perfect to see the birds."
+    ]
+   },
+   {
+    "question": "What do you want to be in the future?",
+    "modelAnswers": [
+     "I want to work as a..."
+    ]
+   },
+   {
+    "question": "What do you learn at school that you like?",
+    "modelAnswers": [
+     "I like to learn..."
+    ]
+   },
+   {
+    "question": "Do you work hard or study hard?",
+    "modelAnswers": [
+     "I work hard when..."
+    ]
+   },
+   {
+    "question": "What is something you did well?",
+    "modelAnswers": [
+     "I did... very well."
+    ]
+   },
+   {
+    "question": "Do you earn money? How?",
+    "modelAnswers": [
+     "I earn money by..."
+    ]
+   },
+   {
+    "question": "What is worth the effort for you?",
+    "modelAnswers": [
+     "It is worth it when..."
+    ]
+   },
+   {
+    "question": "Who works a lot in your family?",
+    "modelAnswers": [
+     "My... works a lot."
+    ]
+   },
+   {
+    "question": "What do you want to learn this year?",
+    "modelAnswers": [
+     "I want to learn..."
+    ]
+   },
+   {
+    "question": "What makes you happy on a sunny day?",
+    "modelAnswers": [
+     "On a sunny day I..."
+    ]
+   }
+  ],
+  "languageGame": [
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "cup",
+    "options": [
+     "/ʌ/",
+     "/ɝ/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "much",
+    "options": [
+     "/ʌ/",
+     "/ɝ/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "sunny",
+    "options": [
+     "/ʌ/",
+     "/ɝ/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "money",
+    "options": [
+     "/ʌ/",
+     "/ɝ/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "lunch",
+    "options": [
+     "/ʌ/",
+     "/ɝ/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "bird",
+    "options": [
+     "/ʌ/",
+     "/ɝ/"
+    ],
+    "correctIndex": 1
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Can you hear the difference: cup or bird?"
+   }
+  ],
+  "temaDaConversa": "What you want to be",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#f7fbff",
+   "fundo2": "#dbeafe",
+   "prim": "#1d4ed8",
+   "sec": "#93c5fd",
+   "dest": "#f59e0b",
+   "txt": "#0f172a"
+  },
+  "fontes": {
+   "titulo": "Fredoka",
+   "corpo": "Nunito"
+  },
+  "fundo": "bolhas",
+  "heroi": "bear",
+  "icones": [
+   "bear",
+   "speaker-high-volume",
+   "ear-light",
+   "speech-balloon",
+   "studio-microphone",
+   "sparkles"
+  ]
+ }
+}

@@ -1,0 +1,241 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · The Final -ed",
+  "coverLevel": "Basic",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Past Tense Sounds",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing the -ed sounds.",
+   "Developing pronunciation."
+  ],
+  "vocabulary": [
+   {
+    "word": "walked",
+    "translation": "/t/"
+   },
+   {
+    "word": "helped",
+    "translation": "/t/"
+   },
+   {
+    "word": "played",
+    "translation": "/d/"
+   },
+   {
+    "word": "cleaned",
+    "translation": "/d/"
+   },
+   {
+    "word": "wanted",
+    "translation": "/ɪd/"
+   },
+   {
+    "word": "watched",
+    "translation": "/t/"
+   },
+   {
+    "word": "lived",
+    "translation": "/d/"
+   },
+   {
+    "word": "needed",
+    "translation": "/ɪd/"
+   },
+   {
+    "word": "studied",
+    "translation": "/d/"
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll practice a very small ending that changes your past tense in English. It’s... …THE -ED ENDING! It has THREE sounds. Listen to this one: WALKED\n\nWhen we say -ed correctly, people understand our past better. If we add one more syllable, like “walk-ED”, our English sounds strange.",
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 2 - L 6 - pg 55",
+    "id": "1KGHqL0cICaoc5Y3peCyTwKsZ4mwf7Gh_"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 2 - L 6 - pg 55",
+    "id": "1y5QPVJNWvdIFa2oNRdYOOsPhTCxo6aL3"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: What did you do yesterday?",
+    "modelAnswers": [
+     "B: I watched TV and played games."
+    ]
+   },
+   {
+    "question": "A: Did you study for the test?",
+    "modelAnswers": [
+     "B: Yes, I studied a lot."
+    ]
+   },
+   {
+    "question": "A: Why did you call me?",
+    "modelAnswers": [
+     "B: I needed your help."
+    ]
+   },
+   {
+    "question": "What did you do on your phone today?",
+    "modelAnswers": [
+     "I watched... I played... I posted..."
+    ]
+   },
+   {
+    "question": "How many hours did you use it?",
+    "modelAnswers": [
+     "I used it for..."
+    ]
+   },
+   {
+    "question": "Did you try to stop for a day?",
+    "modelAnswers": [
+     "I tried and I..."
+    ]
+   },
+   {
+    "question": "What game or app did you play a lot?",
+    "modelAnswers": [
+     "I played..."
+    ]
+   },
+   {
+    "question": "Did anyone ask you to stop?",
+    "modelAnswers": [
+     "My mom asked me to..."
+    ]
+   },
+   {
+    "question": "What did you do before phones?",
+    "modelAnswers": [
+     "I played... I talked..."
+    ]
+   },
+   {
+    "question": "Did you sleep well last night?",
+    "modelAnswers": [
+     "I stayed up and..."
+    ]
+   },
+   {
+    "question": "What habit did you change this year?",
+    "modelAnswers": [
+     "I changed..."
+    ]
+   },
+   {
+    "question": "Did you enjoy a day without the phone?",
+    "modelAnswers": [
+     "I enjoyed... / I missed..."
+    ]
+   }
+  ],
+  "languageGame": [
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "walked",
+    "options": [
+     "/t/",
+     "/d/",
+     "/ɪd/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "helped",
+    "options": [
+     "/t/",
+     "/d/",
+     "/ɪd/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "played",
+    "options": [
+     "/t/",
+     "/d/",
+     "/ɪd/"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "cleaned",
+    "options": [
+     "/t/",
+     "/d/",
+     "/ɪd/"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "wanted",
+    "options": [
+     "/t/",
+     "/d/",
+     "/ɪd/"
+    ],
+    "correctIndex": 2
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "watched",
+    "options": [
+     "/t/",
+     "/d/",
+     "/ɪd/"
+    ],
+    "correctIndex": 0
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Is it easy or difficult for you to say -ed?"
+   }
+  ],
+  "temaDaConversa": "Habits and screen time",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#f7fbff",
+   "fundo2": "#dbeafe",
+   "prim": "#1d4ed8",
+   "sec": "#93c5fd",
+   "dest": "#f59e0b",
+   "txt": "#0f172a"
+  },
+  "fontes": {
+   "titulo": "Fredoka",
+   "corpo": "Nunito"
+  },
+  "fundo": "bolhas",
+  "heroi": "bear",
+  "icones": [
+   "bear",
+   "speaker-high-volume",
+   "ear-light",
+   "speech-balloon",
+   "studio-microphone",
+   "sparkles"
+  ]
+ }
+}

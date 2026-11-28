@@ -1,0 +1,174 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · Him / Her / Them",
+  "coverLevel": "Basic",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Linking Pronouns",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing weak pronouns.",
+   "Developing pronunciation."
+  ],
+  "vocabulary": [
+   {
+    "word": "tell him",
+    "translation": ""
+   },
+   {
+    "word": "call her",
+    "translation": ""
+   },
+   {
+    "word": "meet them",
+    "translation": ""
+   },
+   {
+    "word": "ask him",
+    "translation": ""
+   },
+   {
+    "word": "help her",
+    "translation": ""
+   },
+   {
+    "word": "text them",
+    "translation": ""
+   },
+   {
+    "word": "give him",
+    "translation": ""
+   },
+   {
+    "word": "show her",
+    "translation": ""
+   },
+   {
+    "word": "join them",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll practice three little words that almost disappear when people speak fast. They’re... …HIM, HER, THEM! Native speakers glue them to the verb: tell him\n\nThe H of him and her is very weak, and them often sounds like ’em. If we say every word slowly, our English sounds like reading, not talking.",
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 1 - L 4 - pg 35",
+    "id": "1jcEuJ9-Y-6sXkaLM4esgp72B18aB2b2I"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 1 - L 4 - pg 35",
+    "id": "12WgplHIe15LWB1HgKGm1m62H5sFHOGw8"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: Do you know that new student?",
+    "modelAnswers": [
+     "B: Yes, I met him last week."
+    ]
+   },
+   {
+    "question": "A: Where is your sister?",
+    "modelAnswers": [
+     "B: I called her, but she is busy."
+    ]
+   },
+   {
+    "question": "A: Are your friends coming?",
+    "modelAnswers": [
+     "B: I invited them yesterday."
+    ]
+   },
+   {
+    "question": "Who do you call every week?",
+    "modelAnswers": [
+     "I call him... I call her..."
+    ]
+   },
+   {
+    "question": "How do you talk to your friends?",
+    "modelAnswers": [
+     "I text them on..."
+    ]
+   },
+   {
+    "question": "Who helps you with homework?",
+    "modelAnswers": [
+     "My... helps me and I help her..."
+    ]
+   },
+   {
+    "question": "Do you meet your cousins often?",
+    "modelAnswers": [
+     "I meet them..."
+    ]
+   },
+   {
+    "question": "Who do you send photos to?",
+    "modelAnswers": [
+     "I send them to..."
+    ]
+   },
+   {
+    "question": "Do you know your neighbors?",
+    "modelAnswers": [
+     "I know him / her, but..."
+    ]
+   },
+   {
+    "question": "Who did you visit last month?",
+    "modelAnswers": [
+     "I visited him / her in..."
+    ]
+   },
+   {
+    "question": "Do you follow your friends online?",
+    "modelAnswers": [
+     "I follow them and they..."
+    ]
+   },
+   {
+    "question": "Who would you like to see soon?",
+    "modelAnswers": [
+     "I would like to see them..."
+    ]
+   }
+  ],
+  "languageGame": [],
+  "evaluation": [
+   {
+    "question": "Is it hard to say him and her quickly?"
+   }
+  ],
+  "temaDaConversa": "How you keep in touch",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#f7fbff",
+   "fundo2": "#dbeafe",
+   "prim": "#1d4ed8",
+   "sec": "#93c5fd",
+   "dest": "#f59e0b",
+   "txt": "#0f172a"
+  },
+  "fontes": {
+   "titulo": "Fredoka",
+   "corpo": "Nunito"
+  },
+  "fundo": "bolhas",
+  "heroi": "bear",
+  "icones": [
+   "bear",
+   "speaker-high-volume",
+   "ear-light",
+   "speech-balloon",
+   "studio-microphone",
+   "sparkles"
+  ]
+ }
+}

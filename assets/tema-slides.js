@@ -132,11 +132,23 @@
         return '<div data-carta="' + (i + 1) + '" style="position:relative;background:' + cartao + ';border-radius:26px;padding:24px 28px;border:4px solid ' + p.sec + ';cursor:pointer;min-height:' + (voc.length > 8 ? 150 : 190) + 'px">' +
           '<button type="button" class="ft-ouvir" data-ouvir="' + esc(v.word) + '" title="Ouvir" style="position:absolute;right:14px;top:14px;width:62px;height:62px;border-radius:50%;border:0;cursor:pointer;background:' + p.dest + ';color:' + sobreDest + ';font-size:30px;line-height:1">🔊</button>' +
           '<div style="font:800 ' + Math.min(58, Math.floor((longa ? 440 : 330) / (0.6 * maior))) + 'px/1.1 \'' + T + '\';color:' + p.prim + '">' + esc(v.word) + '</div>' +
-          '<div data-e="' + (i + 1) + '" class="ft-trad ft-off" style="font-size:42px;font-weight:700;margin-top:10px;color:' + legivel(p.dest, r.escuro ? p.fundo : '#ffffff') + '">' + esc(v.translation) + '</div></div>'; }).join('') + '</div>');
+          /* sem tradução (as listas de pronúncia das Buddy Talks), sem o clique de revelar: seria um clique para nada */
+          (String(v.translation || '').trim() ? '<div data-e="' + (i + 1) + '" class="ft-trad ft-off" style="font-size:42px;font-weight:700;margin-top:10px;color:' + legivel(p.dest, r.escuro ? p.fundo : '#ffffff') + '">' + esc(v.translation) + '</div>' : '') + '</div>'; }).join('') + '</div>');
       slides[slides.length - 1].vocab = voc.map(function (v) { return String(v.word || '').trim(); }).filter(Boolean);
     }
     /* 4. introdução */
     if (L.introText) { divisor(rot.intro, 1); novo('introducao', h2(rot.intro) + '<div style="position:absolute;left:250px;right:250px;top:250px;font-size:' + (String(L.introText).length > 420 ? 48 : 58) + 'px;font-weight:700;line-height:1.35">' + esc(L.introText).replace(/\n\n/g, '<br><br>') + '</div>'); }
+    /* 4b. O ÁUDIO DO LIVRO (Buddy Talks, 28/11/2026): um slide por faixa, "🎧 Let's practice!", com o botão grande e de
+       onde vem a faixa. Quem toca é a conversacao.html (FiskTema.aoAudio): o áudio fica no Drive, nunca neste código. */
+    (L.audios || []).forEach(function (a, ai) {
+      novo('audio', h2((es ? '🎧 ¡A practicar!' : "🎧 Let's practice!") + ((L.audios.length > 1) ? ' (' + (ai + 1) + ')' : '')) +
+        '<div style="position:absolute;left:250px;right:250px;top:300px;display:flex;align-items:center;gap:60px">' +
+        '<button type="button" class="ft-audio" data-audio="' + ai + '" style="flex:none;width:280px;height:280px;border-radius:50%;border:0;cursor:pointer;background:' + p.dest + ';color:' + sobreDest + ';font-size:130px;box-shadow:0 16px 40px rgba(0,0,0,.2)">▶</button>' +
+        '<div><div style="font:800 84px/1.1 \'' + T + '\';color:' + p.prim + '">' + esc(a.nome || '') + '</div>' +
+        (a.ref ? '<div style="margin-top:24px;font-size:48px;font-weight:700;opacity:.75">📖 ' + esc(a.ref) + '</div>' : '') +
+        '<div class="ft-leia-audio" style="margin-top:24px;font-size:40px;font-weight:700;color:#b91c1c"></div></div></div>');
+      slides[slides.length - 1].audio = { i: ai, nome: String(a.nome || ''), ref: String(a.ref || ''), id: String(a.id || '') };
+    });
     /* 5. pair work: 3 perguntas por slide, uma por clique; o começo de resposta aparece com a pergunta.
        Sem o título "Pair Work" em cada slide (Pedro 27/11/2026): um divisor anuncia uma vez, e as perguntas ganham a tela, centradas */
     var conv = L.conversation || [];
@@ -232,8 +244,9 @@
         '<div data-e="1" class="ft-off" style="position:absolute;left:420px;right:420px;top:560px;height:150px;display:flex;align-items:center;justify-content:center;font:800 72px \'' + T + '\';' + verde + '">' + esc(ops[0] || '') + '</div>' + fonte);
       slides[slides.length - 1].jogo = { tipo: 'digitar', pergunta: q, opcoes: [], certa: ops.slice(0, 6) };
     }
-    /* 7. revisão: o português primeiro, o inglês no clique */
-    if (voc.length) {
+    /* 7. revisão: o português primeiro, o inglês no clique (fora quando a lista não é de tradução: as Buddy Talks
+       treinam pronúncia, e "/t/ → walked" não é revisão) */
+    if (voc.length && !L.semRevisao) {
       var longaR = voc.some(function (v) { return String(v.word).length > 14 || String(v.translation).length > 16; }), colsR = longaR ? 3 : 4;
       var tam = function (t, larg, max) { var m = Math.max.apply(null, String(t).split(/\s+/).map(function (x) { return x.length; })); return Math.min(max, Math.floor(larg / (0.6 * m))); };
       novo('revisao', h2(rot.rev) + '<div style="position:absolute;left:250px;right:250px;top:240px;display:grid;grid-template-columns:repeat(' + colsR + ',minmax(0,1fr));gap:24px">' + voc.map(function (v, i) {
@@ -256,6 +269,9 @@
     var el = s.el;
     [].forEach.call(el.querySelectorAll('[data-carta]'), function (c) {
       c.addEventListener('click', function (ev) { ev.stopPropagation(); var t = c.querySelector('.ft-trad'); if (t) t.classList.remove('ft-off'); });
+    });
+    [].forEach.call(el.querySelectorAll('.ft-audio'), function (b) {
+      b.addEventListener('click', function (ev) { ev.stopPropagation(); if (raiz.FiskTema && raiz.FiskTema.aoAudio) raiz.FiskTema.aoAudio(+b.getAttribute('data-audio'), b, el); });
     });
     [].forEach.call(el.querySelectorAll('.ft-ouvir'), function (b) {
       b.addEventListener('click', function (ev) { ev.stopPropagation(); if (raiz.FiskTema && raiz.FiskTema.aoOuvir) raiz.FiskTema.aoOuvir(b.getAttribute('data-ouvir'), b); });

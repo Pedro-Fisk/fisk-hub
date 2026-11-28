@@ -1,0 +1,174 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · Tricky Words",
+  "coverLevel": "Intermediate",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Spelling Traps",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing tricky words.",
+   "Developing pronunciation."
+  ],
+  "vocabulary": [
+   {
+    "word": "recipe",
+    "translation": ""
+   },
+   {
+    "word": "salmon",
+    "translation": ""
+   },
+   {
+    "word": "iron",
+    "translation": ""
+   },
+   {
+    "word": "receipt",
+    "translation": ""
+   },
+   {
+    "word": "colonel",
+    "translation": ""
+   },
+   {
+    "word": "temperature",
+    "translation": ""
+   },
+   {
+    "word": "vegetable",
+    "translation": ""
+   },
+   {
+    "word": "restaurant",
+    "translation": ""
+   },
+   {
+    "word": "jewelry",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll fix words that almost everybody says with one syllable too many. They’re... …TRICKY WORDS! The spelling promises more than it gives: recipe\n\nSome words lose a syllable and some hide a silent letter completely. Reading them out loud from the spelling is exactly how the mistake happens.",
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 1 - L 10 - pg 87",
+    "id": "1Eu58CCufrFZrLshtpGx1JvCE2lj5DIFe"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 1 - L 10 - pg 87",
+    "id": "1pdE8prAg_Pcv0fCanZZVa9ckJ8vYCEZg"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: Do you have the recipe?",
+    "modelAnswers": [
+     "B: It’s salmon with vegetables."
+    ]
+   },
+   {
+    "question": "A: Did you keep the receipt?",
+    "modelAnswers": [
+     "B: I left it at the restaurant."
+    ]
+   },
+   {
+    "question": "A: What is the temperature today?",
+    "modelAnswers": [
+     "B: Cold enough for a jacket."
+    ]
+   },
+   {
+    "question": "What type of friend are you?",
+    "modelAnswers": [
+     "I am the type who..."
+    ]
+   },
+   {
+    "question": "What is the pet peeve that annoys you the most?",
+    "modelAnswers": [
+     "It annoys me when people..."
+    ]
+   },
+   {
+    "question": "Do you have a friend who is always late?",
+    "modelAnswers": [
+     "I have a friend who..."
+    ]
+   },
+   {
+    "question": "How do you change the subject politely?",
+    "modelAnswers": [
+     "I usually say..."
+    ]
+   },
+   {
+    "question": "What habit of yours annoys other people?",
+    "modelAnswers": [
+     "People say I..."
+    ]
+   },
+   {
+    "question": "Who is the friend you can call at 3 a.m.?",
+    "modelAnswers": [
+     "The friend is..."
+    ]
+   },
+   {
+    "question": "Have you ever ended a friendship?",
+    "modelAnswers": [
+     "I ended it because..."
+    ]
+   },
+   {
+    "question": "What do you and your friends argue about?",
+    "modelAnswers": [
+     "We argue about..."
+    ]
+   },
+   {
+    "question": "What makes a friendship last?",
+    "modelAnswers": [
+     "A friendship lasts when..."
+    ]
+   }
+  ],
+  "languageGame": [],
+  "evaluation": [
+   {
+    "question": "Which word will you have to practice at home?"
+   }
+  ],
+  "temaDaConversa": "Types of friends and pet peeves",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#f7fbff",
+   "fundo2": "#dbeafe",
+   "prim": "#1d4ed8",
+   "sec": "#93c5fd",
+   "dest": "#f59e0b",
+   "txt": "#0f172a"
+  },
+  "fontes": {
+   "titulo": "Fredoka",
+   "corpo": "Nunito"
+  },
+  "fundo": "bolhas",
+  "heroi": "bear",
+  "icones": [
+   "bear",
+   "speaker-high-volume",
+   "ear-light",
+   "speech-balloon",
+   "studio-microphone",
+   "sparkles"
+  ]
+ }
+}
