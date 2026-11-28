@@ -1,0 +1,285 @@
+{
+ "yt-01-ll-sounds-gavin-basic": {
+  "voz": "en-US-EricNeural",
+  "a": {}
+ },
+ "yt-01-ll-sounds-gavin-intermediate": {
+  "voz": "en-US-AriaNeural",
+  "a": {}
+ },
+ "yt-01-ll-sounds-gavin-advanced": {
+  "voz": "en-US-JennyNeural",
+  "a": {}
+ },
+ "yt-02-palavras-em-ingles-basic": {
+  "voz": "en-US-MichelleNeural",
+  "a": {
+   "spare tire": "c5629eb85e119fd9.mp3",
+   "billboard": "13a0232fa1908a51.mp3",
+   "tuxedo": "c4718966e4bb89e5.mp3",
+   "concert": "defa4990db49d817.mp3",
+   "work from home": "01c75f68344170a8.mp3",
+   "screenshot": "cb46df6fa8a0446e.mp3",
+   "laptop": "bf82094c40a6c32d.mp3",
+   "underscore": "65fe976c4228a6c1.mp3"
+  }
+ },
+ "yt-02-palavras-em-ingles-intermediate": {
+  "voz": "en-US-MichelleNeural",
+  "a": {
+   "spare tire": "c5629eb85e119fd9.mp3",
+   "billboard": "13a0232fa1908a51.mp3",
+   "concert": "defa4990db49d817.mp3",
+   "tuxedo": "c4718966e4bb89e5.mp3",
+   "work from home": "01c75f68344170a8.mp3",
+   "screenshot": "cb46df6fa8a0446e.mp3",
+   "laptop": "bf82094c40a6c32d.mp3",
+   "underscore": "65fe976c4228a6c1.mp3"
+  }
+ },
+ "yt-02-palavras-em-ingles-advanced": {
+  "voz": "en-US-JennyNeural",
+  "a": {
+   "spare tire": "48582a77a6472f4f.mp3",
+   "billboard": "e5865d3545a342d6.mp3",
+   "tuxedo": "674ec892fd74cb05.mp3",
+   "concert": "0962fcb62c1b12c9.mp3",
+   "work from home": "65fe2336f089108a.mp3",
+   "screenshot": "9082ff63ed5e4634.mp3",
+   "laptop": "e1c851f2e4ce65b3.mp3",
+   "underscore": "79fd8b4cc0606b69.mp3"
+  }
+ },
+ "yt-03-girias-americanas-all": {
+  "voz": "en-US-GuyNeural",
+  "a": {
+   "Gotcha": "4bd860ee26f4ca0b.mp3",
+   "Shut up!": "04c51385dd32bcb9.mp3",
+   "I'm beat.": "be9967d63f972238.mp3",
+   "No sweat.": "3a0502e59ca0dc21.mp3",
+   "You made it.": "2d92de11401c3bf5.mp3"
+  }
+ },
+ "yt-05-tips-in-english-1-basic": {
+  "voz": "en-US-ChristopherNeural",
+  "a": {
+   "FUNCTION": "3cb48fca5d6e25c4.mp3",
+   "PRODUCTION": "198e33ebbb427b69.mp3",
+   "CONSTRUCTION": "4ba3ccdffbbf96b1.mp3",
+   "WOMAN / WOMEN": "f47d5e07b7867109.mp3",
+   "MAN / MEN": "a7c3ea0cf42a4036.mp3",
+   "SUNSET": "05935e44e852f0a4.mp3",
+   "SUNRISE": "e6a0bf15d2c7bff2.mp3",
+   "WOMAN": "6240bce4fa782acf.mp3",
+   "WOMEN": "4c660eb56267f69b.mp3",
+   "SWEET DREAMS": "3a109d174bf63aeb.mp3",
+   "NIGHTMARE": "ffa955259b93c83a.mp3"
+  }
+ },
+ "yt-05-tips-in-english-1-teens": {
+  "voz": "en-US-JennyNeural",
+  "a": {
+   "FUNCTION": "cf515d4c31cc4e76.mp3",
+   "PRODUCTION": "9ddda47235013e19.mp3",
+   "CONSTRUCTION": "12e9a5bb29eadf6b.mp3",
+   "WOMAN / WOMEN": "329f7b0bce7f19da.mp3",
+   "MAN / MEN": "83164166c18966d9.mp3",
+   "SUNSET": "2e7bfbad3d52aee9.mp3",
+   "SUNRISE": "a569c1606dcc0e30.mp3",
+   "WOMAN": "e9423671f3d052dd.mp3",
+   "WOMEN": "753d5d7c3d394e7a.mp3",
+   "SWEET DREAMS": "405e4d4904ca0d2c.mp3",
+   "NIGHTMARE": "3f3bc5ecb204d024.mp3"
+  }
+ },
+ "yt-05-tips-in-english-1-intermediate": {
+  "voz": "en-US-EricNeural",
+  "a": {
+   "FUNCTION": "38cde0226a2bd326.mp3",
+   "PRODUCTION": "b3bc919122e743e6.mp3",
+   "CONSTRUCTION": "2ecc57e68772ac75.mp3",
+   "WOMAN / WOMEN": "953a2e39379d2976.mp3",
+   "MAN / MEN": "f84ebf3e27b3bf31.mp3",
+   "SUNSET": "36dddd60e1cfe76c.mp3",
+   "SUNRISE": "641e2c388ef4cdb2.mp3",
+   "WOMAN": "52641669672ee42e.mp3",
+   "WOMEN": "5019c64be1766bb9.mp3",
+   "SWEET DREAMS": "255abec1d03f1b5f.mp3",
+   "NIGHTMARE": "5bae9d26487867a8.mp3"
+  }
+ },
+ "yt-05-tips-in-english-1-advanced": {
+  "voz": "en-US-AvaNeural",
+  "a": {
+   "FUNCTION": "bfbda0e49efc1fab.mp3",
+   "PRODUCTION": "863a0b3b1905c4d4.mp3",
+   "CONSTRUCTION": "b5db53d83fa9722c.mp3",
+   "WOMAN / WOMEN": "e2b34340e59c63e4.mp3",
+   "MAN / MEN": "24411b0abc9e2bd4.mp3"
+  }
+ },
+ "yt-06-tips-in-english-2-all": {
+  "voz": "en-US-EricNeural",
+  "a": {
+   "to / too / two": "73efd796eed95477.mp3",
+   "chew": "7b733a7cbc9fe6e2.mp3",
+   "worth": "3b10dcdc546ea9d7.mp3",
+   "schedule": "92559d3f9cdd86d1.mp3",
+   "WOMAN / WOMEN": "953a2e39379d2976.mp3",
+   "NOT MY THING / NOT MY CUP OF TEA": "65eadb24abafe131.mp3",
+   "IT'S WORTH IT.": "a25ab64ff7822ad8.mp3",
+   "WOMAN": "52641669672ee42e.mp3",
+   "WOMEN": "5019c64be1766bb9.mp3",
+   "TO BE THE THIRD WHEEL": "182c826a7c5b0f1a.mp3"
+  }
+ },
+ "yt-07-what-didnt-understand-basic": {
+  "voz": "en-US-MichelleNeural",
+  "a": {
+   "What?": "b2c110d53f561230.mp3",
+   "What'd you say? [= What did you say?]": "fac02178d8b6ce8c.mp3",
+   "Could you say that again?": "d27106ed2cb3b5d6.mp3",
+   "Come again?": "e8f964337ba65ab6.mp3",
+   "Sorry, I didn't understand that.": "05c432ab741ca034.mp3",
+   "I didn't catch that.": "80203e6dda7eb18e.mp3",
+   "I beg your pardon?": "ab6c675ddbbcb5a3.mp3"
+  }
+ },
+ "yt-07-what-didnt-understand-intermediate": {
+  "voz": "en-US-AndrewNeural",
+  "a": {
+   "What?": "44e799846c43c8fd.mp3",
+   "What'd you say? [= What did you say?]": "f8d46867820b5463.mp3",
+   "Could you say that again?": "53da95551efadee2.mp3",
+   "Come again?": "fe25bc29b55e0cb3.mp3",
+   "Sorry, I didn't understand that.": "2c294d4930a0c630.mp3",
+   "I didn't catch that.": "be68a537232f7b49.mp3",
+   "I beg your pardon?": "90ed80559789d31f.mp3"
+  }
+ },
+ "yt-07-what-didnt-understand-advanced": {
+  "voz": "en-US-AvaNeural",
+  "a": {
+   "What?": "0bf55e712a4aff2d.mp3",
+   "What'd you say? [= What did you say?]": "9c80e66724cd950f.mp3",
+   "Could you say that again?": "00ee06c8657ea1f1.mp3",
+   "Come again?": "6acd2036c87f48ba.mp3",
+   "Sorry, I didn't understand that.": "18c2be5f5d8a4ed8.mp3",
+   "I didn't catch that.": "92c5d049919782da.mp3",
+   "I beg your pardon?": "c5bef1659495137c.mp3"
+  }
+ },
+ "yt-08-words-in-technology-1-basic": {
+  "voz": "en-US-ChristopherNeural",
+  "a": {
+   "BLUETOOTH": "31ff6a483af2ac99.mp3",
+   "IPAD": "c3b024065053d689.mp3",
+   "TABLET": "4f4e75922c7ff6eb.mp3",
+   "INTERNET": "386c1c8c88de3696.mp3",
+   "HOME THEATER": "8ed8c0b68b26c3d6.mp3"
+  }
+ },
+ "yt-08-words-in-technology-1-teens": {
+  "voz": "en-US-JennyNeural",
+  "a": {
+   "BLUETOOTH": "c75aae78ff26a826.mp3",
+   "IPAD": "6bd833d2c86301e4.mp3",
+   "TABLET": "5b7427968fca017f.mp3",
+   "INTERNET": "8ed9e6972d119ad2.mp3",
+   "HOME THEATER": "ae55ded3c58d2fd2.mp3"
+  }
+ },
+ "yt-08-words-in-technology-1-intermediate": {
+  "voz": "en-US-AriaNeural",
+  "a": {
+   "BLUETOOTH": "15debac4f62af06f.mp3",
+   "IPAD": "f3161c3d1abfb172.mp3",
+   "TABLET": "0ca7521a3c1b5b95.mp3",
+   "INTERNET": "e341c96468756e60.mp3",
+   "HOME THEATER": "02b1d02971228752.mp3"
+  }
+ },
+ "yt-09-words-in-technology-2-all": {
+  "voz": "en-US-JennyNeural",
+  "a": {
+   "CELL PHONE": "db65d0b9cc7df59f.mp3",
+   "MOBILE": "d491e091ce51747a.mp3",
+   "NOTEBOOK": "ab1c0033e2c15232.mp3",
+   "FACEBOOK": "2aa378ee19c4daf9.mp3",
+   "WIFI": "4f867deb7262ab45.mp3",
+   "MODEM": "c3a0d7ae4cda44d8.mp3",
+   "LAPTOP": "bb56339efe404247.mp3",
+   "FACEBOOK / NOTEBOOK": "9af94cbf7b51a6d9.mp3"
+  }
+ },
+ "yt-10-stop-saying-these-words-1-all": {
+  "voz": "en-US-AriaNeural",
+  "a": {
+   "HARD": "394b2a7d5ca1247b.mp3",
+   "QUESTION": "18edd6f8417d45be.mp3",
+   "SONG": "891e3054937200d5.mp3",
+   "COFFEE": "e094d428f989fb30.mp3",
+   "MAN": "666d864aa79a4fa5.mp3"
+  }
+ },
+ "yt-11-stop-saying-these-words-2-all": {
+  "voz": "en-US-EmmaNeural",
+  "a": {
+   "MAIS OU MENOS": "a0bb0a875d18f5c4.mp3",
+   "PODE SER? TUDO BEM?": "eb5aa1483b8c6248.mp3",
+   "VOCÊ É MUITO BOM!": "646957e553af585d.mp3",
+   "TCHAU": "7a6149f7db191254.mp3",
+   "ABOUT - OR SO - ISH - PRETTY MUCH": "d5feadad5f2f13f3.mp3",
+   "YOU ROCK!": "a03d41cbea02ad6c.mp3",
+   "BYE - SEE YA": "2e7ee7eb8b3904db.mp3",
+   "SOUND GOOD?": "e5575f5caab5686b.mp3",
+   "ABOUT / OR SO / -ISH / PRETTY MUCH": "3b6b8105e382c381.mp3",
+   "BYE / SEE YA": "06a58fff4949e404.mp3"
+  }
+ },
+ "yt-12-create-sentences-carina-basic": {
+  "voz": "en-US-JennyNeural",
+  "a": {}
+ },
+ "yt-12-create-sentences-carina-advanced": {
+  "voz": "en-US-EmmaNeural",
+  "a": {}
+ },
+ "yt-13-thank-you-youre-welcome-all": {
+  "voz": "en-US-AndrewNeural",
+  "a": {
+   "Thanks!": "63ff3b1780448710.mp3",
+   "I appreciate it.": "62d65db0f41951ab.mp3",
+   "I'm so grateful.": "ee540ef1cc6c1de6.mp3",
+   "I owe you.": "867889b8ef4673d3.mp3",
+   "You're the best.": "aab479c8138b4f85.mp3",
+   "No problem.": "9a71b65f8b8e222a.mp3",
+   "My pleasure.": "909abe474f892ee4.mp3",
+   "You bet.": "74d942c747d3f84d.mp3",
+   "No sweat.": "9399145780abdbc0.mp3",
+   "No worries. / Don't worry about it.": "62826008fbee8545.mp3"
+  }
+ },
+ "yt-14-say-these-10-words-all": {
+  "voz": "en-US-GuyNeural",
+  "a": {
+   "OFFice - PRACtice - NOtice": "2d817c76fe8ea866.mp3",
+   "to = too = two ≠ chew": "555d056fcbe08c7d.mp3",
+   "restaurant - rural - rarely": "9eb88bd3c011378e.mp3",
+   "coffee ≠ cough": "019f881addd3f318.mp3",
+   "three ≠ tree ≠ free": "1a3f92ba8606284c.mp3"
+  }
+ },
+ "yt-15-words-to-have-a-conversation-all": {
+  "voz": "en-US-AndrewNeural",
+  "a": {
+   "How is it going? = How are things? | Great! / Good! / Okay. Not bad. / Fine.": "680b2db92a8c44d5.mp3",
+   "What's going on? = What's happening? = What's up? (very informal) | Nothing / Not much / Not a whole lot / I'm ....": "780f0cb3e4e36053.mp3",
+   "Ya know what I mean?": "e0fb12b66f73c649.mp3",
+   "How is it going? / How are things?": "548ae1b78280502e.mp3",
+   "Great! / Good! / Okay. Not bad. / Fine.": "fd82cb1936605532.mp3",
+   "What's going on? = What's happening? = What's up?": "db33f7514184b22b.mp3",
+   "Nothing / Not much / Not a whole lot / I'm ....": "cd0bdc8c90234158.mp3"
+  }
+ }
+}

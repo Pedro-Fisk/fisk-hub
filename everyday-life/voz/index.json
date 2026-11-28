@@ -1,0 +1,318 @@
+{
+ "el-01-everyday-chores-basic": {
+  "voz": "en-US-JennyNeural",
+  "a": {
+   "(to) buy groceries": "ee42e09820a0bba3.mp3",
+   "(to) pay the bills": "591afe9118062141.mp3",
+   "(to) do the dishes": "7bb8c056c82c0210.mp3",
+   "(to) do the laundry": "0acaff8ab7fcb6f6.mp3",
+   "(to) make the bed": "a2dd218eaaf91e32.mp3",
+   "(to) iron the clothes": "b085ed04aa354a0c.mp3"
+  }
+ },
+ "el-01-everyday-chores-intermediate": {
+  "voz": "en-US-AriaNeural",
+  "a": {
+   "(to) buy groceries": "97aafc74a9b33978.mp3",
+   "(to) pay the bills": "8b293763e715aefc.mp3",
+   "(to) do the dishes": "c287ff9fcd7b892a.mp3",
+   "(to) do the laundry": "6af2b1457593699d.mp3",
+   "(to) make the bed": "9c69641cc69799f6.mp3",
+   "(to) iron the clothes": "1ea856fee7b07cf7.mp3"
+  }
+ },
+ "el-01-everyday-chores-advanced": {
+  "voz": "en-US-GuyNeural",
+  "a": {
+   "(to) buy groceries": "7faa6a0751d507d9.mp3",
+   "(to) pay the bills": "173533a6b87702c7.mp3",
+   "(to) do the dishes": "b3f4a732ebbdbb0a.mp3",
+   "(to) do the laundry": "428cb548ef632624.mp3",
+   "(to) make the bed": "8a62c7e76cb38bab.mp3",
+   "(to) iron the clothes": "a04cca17ae12d400.mp3",
+   "(to) put up with": "18d3c364d97fff64.mp3",
+   "(to) argue about": "10b32fe9ce2edaa3.mp3",
+   "(to) get along": "993ad2ffa56f8a36.mp3",
+   "(to) help out": "a721a16c19daeac7.mp3",
+   "(to) eat up": "8245b4e914db767c.mp3"
+  }
+ },
+ "el-02-vacation-basic": {
+  "voz": "en-US-AriaNeural",
+  "a": {
+   "(to) go on vacation": "b3431ccbd54253e0.mp3",
+   "holiday(s)": "ab5425d7aa2773ab.mp3",
+   "(to) go on a trip": "b8e6acd9eff8c26a.mp3",
+   "(to) chill out": "3200a444f7582e84.mp3",
+   "beach": "4705aa6d8b11b536.mp3",
+   "mountain": "0a8a6ea9916b0277.mp3",
+   "(to) pack": "b7a48fd36be25ba1.mp3"
+  }
+ },
+ "el-02-vacation-intermediate": {
+  "voz": "en-US-ChristopherNeural",
+  "a": {
+   "(to) go on vacation": "bfa88f6a8e7d62b3.mp3",
+   "holiday(s)": "e0f1cc9b2e7a58a7.mp3",
+   "(to) go on a trip": "a83ad8385905a5cd.mp3",
+   "(to) chill": "a1110d80027ec65b.mp3",
+   "beach": "a2a55b7c6734fcb0.mp3",
+   "mountain": "4d14cacfe2119ef8.mp3",
+   "(to) pack": "3fca15bf8aafb6d3.mp3"
+  }
+ },
+ "el-02-vacation-advanced": {
+  "voz": "en-US-EmmaNeural",
+  "a": {
+   "(to) go on vacation": "1c6949e25563232a.mp3",
+   "(to) go on a trip": "ae3e85beaffb8422.mp3",
+   "(to) chill": "bbddfc966131e7eb.mp3",
+   "(to) pack": "a0555553e9a161ee.mp3",
+   "(to) put up with": "e28014bdc7d533a0.mp3",
+   "(to) break down": "70fe996ec4c44f14.mp3",
+   "(to) stay in": "44ad0b755c624faa.mp3",
+   "(to) go out": "7837726c19b8c657.mp3",
+   "(to) be one’s cup of tea": "0569bcb93ed04791.mp3"
+  }
+ },
+ "el-03-going-shopping-basic": {
+  "voz": "en-US-AndrewNeural",
+  "a": {
+   "(to) spend": "5f3889e3e4701655.mp3",
+   "on sale": "6c621020d26fbf20.mp3",
+   "(to) look for": "e7b1f870218a1dd3.mp3",
+   "(to) save money": "e872db6a3d8f2b98.mp3",
+   "(to) shop for": "1de9d453bec11624.mp3",
+   "(to) go shopping": "e1c4d68d37acc987.mp3",
+   "(to) go to the shopping mall": "9756fe77557a4e86.mp3"
+  }
+ },
+ "el-03-going-shopping-intermediate": {
+  "voz": "en-US-MichelleNeural",
+  "a": {
+   "(to) spend": "e1d17e639749e827.mp3",
+   "on sale": "62b120fb331f75d5.mp3",
+   "(to) look for": "d3940133d0d03bb2.mp3",
+   "(to) save money": "ca4cf2e586e2078e.mp3",
+   "(to) shop for": "3168e7f336559143.mp3",
+   "(to) hate": "de06ea205c25d254.mp3",
+   "(to) go shopping": "460b2fb68b8ca01d.mp3",
+   "(to) go to the shopping mall": "13914bccb07b8ad1.mp3"
+  }
+ },
+ "el-03-going-shopping-advanced": {
+  "voz": "en-US-ChristopherNeural",
+  "a": {
+   "(to) spend": "4aa9bce76279f512.mp3",
+   "on sale": "b3c1614d7cb4cf5f.mp3",
+   "(to) look for": "31e331ef209a73c5.mp3",
+   "(to) make money": "89a73a54b8d94fa5.mp3",
+   "inexpensive x cheap": "a6d69934889439a7.mp3",
+   "(to) be crazy for": "dc3ff6fa920c854d.mp3",
+   "(to) hate": "09c05d96afafd331.mp3",
+   "(to) regret; to repent": "baaa7685570a1cd5.mp3",
+   "(to) go shopping": "51b3cc4ee41fe0e7.mp3",
+   "(to) go to the shopping mall": "75ab87ee697f9024.mp3"
+  }
+ },
+ "el-04-babies-basic": {
+  "voz": "en-US-GuyNeural",
+  "a": {
+   "baby / babies": "08123f8c390385b0.mp3",
+   "[to] grow up": "8002beee1c27145c.mp3",
+   "[to] take care of (a baby)": "364b92d3eb894c62.mp3",
+   "diaper": "6dde4ddbbfb0bd75.mp3",
+   "lullaby": "c972b20c97858977.mp3",
+   "pacifier": "e5e7a08d281ff5c9.mp3"
+  }
+ },
+ "el-04-babies-intermediate": {
+  "voz": "en-US-BrianNeural",
+  "a": {
+   "baby / babies": "5b007a26a8d576b7.mp3",
+   "[to] grow up": "cb9312d8ade79d88.mp3",
+   "[to] take care of (a baby)": "915d9276b229ce9e.mp3",
+   "diaper": "244378f8b400faeb.mp3",
+   "lullaby": "b21e7f4bfe91968a.mp3",
+   "pacifier": "fd5e83c7ac2331b8.mp3"
+  }
+ },
+ "el-04-babies-advanced": {
+  "voz": "en-US-AvaNeural",
+  "a": {
+   "[to] grow up": "d73dac9b32fa5f7f.mp3",
+   "[to] take care of (a baby)": "411fb8c7584053aa.mp3",
+   "diaper": "86007f46447b6a9f.mp3",
+   "lullaby": "067125e49e95793f.mp3",
+   "pacifier": "fbe5d4e884c974e8.mp3",
+   "little angel": "c2d08a327277dd8e.mp3",
+   "little brat": "c9ed51bb717312e5.mp3",
+   "(to) build castles in the air": "67f30696edff86e2.mp3"
+  }
+ },
+ "el-05-acting-basic": {
+  "voz": "en-US-AndrewNeural",
+  "a": {
+   "[to] play": "48f4d932aad93104.mp3",
+   "acting": "d0b70bc1c04df9a1.mp3",
+   "actor / actress": "619230483049872e.mp3",
+   "character": "124887484e6eb686.mp3",
+   "soap opera": "94391907d06f22a8.mp3",
+   "series": "3dd671f2913eedae.mp3"
+  }
+ },
+ "el-05-acting-intermediate": {
+  "voz": "en-US-ChristopherNeural",
+  "a": {
+   "[to] play": "7a74db67e74de831.mp3",
+   "acting": "fc6564837415dccf.mp3",
+   "actor / actress": "0b0c5d6f2f32d4c6.mp3",
+   "character": "37fc0b7662dbe267.mp3",
+   "soap opera": "3d9eeb2117b47a92.mp3",
+   "series": "33eb71481431aafb.mp3"
+  }
+ },
+ "el-05-acting-advanced": {
+  "voz": "en-US-AriaNeural",
+  "a": {
+   "[to] play": "b9ff76b3258cd838.mp3",
+   "acting": "8b74f58d893e7989.mp3",
+   "character": "0c8b929e49d0dd0f.mp3",
+   "soap opera": "a1f201733441deb9.mp3",
+   "series": "344c40e4ca097b70.mp3"
+  }
+ },
+ "el-06-chocolate-basic": {
+  "voz": "en-US-BrianNeural",
+  "a": {
+   "kind": "ddd8b1a9aabdd4db.mp3",
+   "brand": "89c397a491eaa19c.mp3",
+   "factory": "cf829b56ac087dc9.mp3",
+   "health": "1f1e83c90605f2df.mp3",
+   "dark": "29761ee9d37eb986.mp3",
+   "regular": "830927ec1985db3e.mp3",
+   "white": "09f3b0d11f40dbf7.mp3",
+   "crunchy": "7edaaa0b07216797.mp3"
+  }
+ },
+ "el-06-chocolate-intermediate": {
+  "voz": "en-US-AvaNeural",
+  "a": {
+   "cut down on": "2e9efd7018bbc1f1.mp3",
+   "pig out on": "8a05794d88ba401e.mp3",
+   "brand": "6687bc4385eface8.mp3",
+   "health": "b3a8967d40095a81.mp3",
+   "dark": "0c74c2fe7211f2bc.mp3",
+   "regular": "a65b22e1a8fef216.mp3",
+   "white": "3343e136b869e1ca.mp3",
+   "crunchy": "df39ec7426493e76.mp3"
+  }
+ },
+ "el-06-chocolate-advanced": {
+  "voz": "en-US-AndrewNeural",
+  "a": {
+   "cut down on": "b40312cefe0b3851.mp3",
+   "pig out on": "f35ea559d273f867.mp3",
+   "eat out": "40f51d66fc86f203.mp3",
+   "brand": "8604e4b5579623a6.mp3",
+   "dark": "32d57b9fcb4b78fe.mp3",
+   "regular": "d448923e037d6c55.mp3",
+   "white": "ae643e6741c32b78.mp3",
+   "crunchy": "8aedafc32362be46.mp3"
+  }
+ },
+ "el-07-social-media-basic": {
+  "voz": "en-US-EmmaNeural",
+  "a": {
+   "social media": "36aad44c6f8e1aac.mp3",
+   "(to) text": "fda0a513a8aadceb.mp3",
+   "How often...?": "d8fd02d54ad23dc2.mp3",
+   "(to) check": "02675a480986ccb7.mp3",
+   "(to) spend time": "78ecd0d2988fa89c.mp3",
+   "advantage": "794fca2359f2b0bf.mp3",
+   "disadvantage": "8502d3ffd2af7c84.mp3"
+  }
+ },
+ "el-07-social-media-intermediate": {
+  "voz": "en-US-EricNeural",
+  "a": {
+   "social media": "c581be3dcd6edb48.mp3",
+   "(to) text": "abfb11d369b8fbdf.mp3",
+   "How often...?": "4cb975a94916c193.mp3",
+   "(to) check": "2694c7425099b14c.mp3",
+   "(to) spend time": "f3951563e73fec9b.mp3",
+   "advantage": "03e7977d0452cd78.mp3",
+   "disadvantage": "11d45fd66af7bdd2.mp3"
+  }
+ },
+ "el-07-social-media-advanced": {
+  "voz": "en-US-AndrewNeural",
+  "a": {
+   "social media": "9b2faa59a155a754.mp3",
+   "(to) text": "e6ffa25bd11ab7b1.mp3",
+   "addiction / addicted": "2d7439acaa6a5b38.mp3",
+   "(to) get by": "8ee0e6b8aabfe8ae.mp3",
+   "(to) cut down on": "316a558731a7c6a0.mp3",
+   "(to) update your status": "4cb37438a210fa22.mp3",
+   "disadvantage": "52db25be0a6838a3.mp3"
+  }
+ },
+ "el-10-series-basic": {
+  "voz": "en-US-EmmaNeural",
+  "a": {
+   "TV shows": "a63f009d8760cf04.mp3",
+   "series": "dd67a8fa73794fe5.mp3",
+   "(to) show": "4480c217aad56912.mp3",
+   "character": "8355deb66014170e.mp3",
+   "Soap opera": "13c225daf45d6c53.mp3",
+   "most famous": "9ee9bf4399d14dc5.mp3",
+   "(to) prefer": "3cd6d93cadba09bc.mp3"
+  }
+ },
+ "el-10-series-intermediate": {
+  "voz": "en-US-EricNeural",
+  "a": {
+   "TV shows": "d8ab751846f02530.mp3",
+   "series": "68fb39a77e1eb2d1.mp3",
+   "(to) show": "0caddc4b33255671.mp3",
+   "character": "685df1c39a0f36db.mp3",
+   "Soap opera": "c3359f2ad36774a3.mp3",
+   "most famous": "cd44e4610099f5ee.mp3",
+   "(to) prefer": "9849eb2371fdf5de.mp3"
+  }
+ },
+ "el-10-series-advanced": {
+  "voz": "en-US-ChristopherNeural",
+  "a": {
+   "(to) care for": "7d780d17ad62cff1.mp3",
+   "series / (to) show": "19d966e34d701d9d.mp3",
+   "soap opera / character": "007e92ce029098e2.mp3",
+   "to binge-watch": "f869b975f8437022.mp3",
+   "to give up": "79334462829e62dc.mp3"
+  }
+ },
+ "el-11-music-basic": {
+  "voz": "en-US-EmmaNeural",
+  "a": {
+   "genre": "30190180fe78d70c.mp3",
+   "instrument": "12a8a0c6221290be.mp3",
+   "(to) play": "2b61845f1cad374c.mp3",
+   "song": "28972e1aa3917638.mp3",
+   "(to) be able to": "182901481a5bce90.mp3"
+  }
+ },
+ "el-11-music-intermediate": {
+  "voz": "en-US-AvaNeural",
+  "a": {
+   "genre": "3b69bd132d019816.mp3",
+   "instrument": "f7f1be46e81a3ba7.mp3",
+   "(to) play": "61159dcfa547d623.mp3",
+   "song (≠ music)": "62d114c6aa9d3fbd.mp3",
+   "(to) be able to": "3b973f37a0ce871d.mp3"
+  }
+ },
+ "el-11-music-advanced": {
+  "voz": "en-US-AriaNeural",
+  "a": {}
+ }
+}

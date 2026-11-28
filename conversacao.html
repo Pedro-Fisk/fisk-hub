@@ -199,7 +199,7 @@
   #avalVer .it{ border-top: 1px solid #e2e8f0; padding: 10px 0; } #avalVer .it .em{ font-size: 1.5rem; }
   #avalVer .it p{ margin: 4px 0; } #avalVer .it small{ color: #64748b; } #avalVer .com{ font-weight: 700; }
   #avalVer button{ margin-top: 12px; border: 0; border-radius: 999px; padding: 10px 20px; background: #1d3a8a; color: #fff; font-weight: 800; cursor: pointer; }
-  /* FERRAMENTAS DA AULA (Pedro, 27/11/2026): o cronômetro do Pair Work (ligado por padrão, o professor desliga) e o
+  /* FERRAMENTAS DA AULA (Pedro, 27/11/2026): o cronômetro do Pair Work (desligado por padrão desde 28/11/2026, o professor liga) e o
      sorteio (desligado por padrão, o professor ativa). Liga e desliga no ⚙ da barra, guardado neste computador. */
   #ferr{ position: fixed; right: 14px; bottom: 74px; z-index: 30; background: #fff; color: #0f172a; border-radius: 14px; padding: 14px 16px; box-shadow: 0 10px 30px rgba(0,0,0,.35); display: flex; flex-direction: column; gap: 8px; font: 600 .92rem system-ui, sans-serif; min-width: 270px; }
   #ferr[hidden]{ display: none; }
@@ -810,7 +810,7 @@
     if (atual.tipo === 'cm') {
       obterCm(atual).then(function (o) {
         deck = deckDe(o); deckFoto = deckDe(o); paginas = []; ci = 0; et = 0; $('palco').innerHTML = '';
-        vozLingua = o.lesson && o.lesson.language === 'spanish' ? 'es' : 'en'; vozAntecipa();
+        vozLingua = o.lesson && o.lesson.language === 'spanish' ? 'es' : 'en'; vozCache = {}; vozArqCarrega(atual).then(vozAntecipa);
         aulaBotao();
         capa();
       }).catch(function (e) { $('capaCorpo').innerHTML = '<p class="erro">Não consegui abrir (' + esc(e.message) + ').</p><div class="linha"><button class="sec" id="bVolta">← Voltar à lista</button></div>'; $('bVolta').onclick = volta; });
@@ -1027,11 +1027,38 @@
      voz falhar, o texto aparece no slide para o professor ler. Os áudios da atividade são pedidos já ao abrir, para a
      TV não esperar na hora; o mesmo mp3 vai para os celulares junto do item. */
   var VOZ_API = 'https://portalfisk.com.br/api/voz', vozLingua = 'en', vozCache = {}, vozAgora = null, vozOnde = '';
+  /* AS VOZES DAS SÉRIES (Pedro, 28/11/2026: "pode gerar pelo TTS e já deixar embutido dentro da atividade"): Buddy
+     Talks, Countries, Everyday Life e YouTubers têm o texto fixo, então cada palavra e cada frase de escuta já vem em mp3
+     gerado offline pelo edge-tts (scripts/series-vozes.py), em <série>/voz/, uma voz por atividade. A API da Azure fica
+     só para as atividades do Conversation Maker, que nascem na hora. O mapa texto → arquivo é <série>/voz/index.json. */
+  var SERIE_PASTA = { buddy: 'buddy-talks', countries: 'countries', everyday: 'everyday-life', youtubers: 'youtubers' }, vozArq = {}, vozMapas = {};
+  function vozArqCarrega(it) {
+    vozArq = {};
+    var pasta = it && SERIE_PASTA[it.origem]; if (!pasta) return Promise.resolve();
+    if (!vozMapas[pasta]) vozMapas[pasta] = fetch(pasta + '/voz/index.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { delete vozMapas[pasta]; return {}; });
+    return vozMapas[pasta].then(function (m) {
+      var a = (m[it.id] || {}).a || {}, fora = {};
+      Object.keys(a).forEach(function (t) { fora[t] = new URL(pasta + '/voz/' + a[t], location.href).href; });
+      if (atual === it) vozArq = fora;
+    });
+  }
+  function base64De(buf) {
+    var u = new Uint8Array(buf), out = '';
+    for (var i = 0; i < u.length; i += 0x8000) out += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000));
+    return btoa(out);
+  }
   function vozMp3(texto) {
-    if (!vozCache[texto]) vozCache[texto] = fetch(VOZ_API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ token: s.token, texto: texto, lingua: vozLingua, semente: atual ? atual.id : '' }) })
-      .then(function (r) { return r.json(); }).then(function (j) { if (!j || !j.ok || !j.mp3) throw new Error((j && j.error) || 'sem voz'); return j.mp3; })
-      .catch(function (e) { delete vozCache[texto]; throw e; });
+    if (!vozCache[texto]) {
+      var daApi = function () {
+        return fetch(VOZ_API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ token: s.token, texto: texto, lingua: vozLingua, semente: atual ? atual.id : '' }),
+          signal: window.AbortSignal && AbortSignal.timeout ? AbortSignal.timeout(15000) : undefined })
+        .then(function (r) { return r.json(); }).then(function (j) { if (!j || !j.ok || !j.mp3) throw new Error((j && j.error) || 'sem voz'); return j.mp3; });
+      };
+      var url = vozArq[texto];
+      vozCache[texto] = (url ? fetch(url).then(function (r) { if (!r.ok) throw new Error('sem arquivo'); return r.arrayBuffer(); }).then(base64De).catch(daApi) : daApi())
+        .catch(function (e) { delete vozCache[texto]; throw e; });
+    }
     return vozCache[texto];
   }
   function vozAntecipa() {
@@ -1046,11 +1073,20 @@
       vozAgora.onended = function () { if (botao) botao.style.opacity = ''; };
       return vozAgora.play();
     }).catch(function () {
-      /* sem voz: o professor lê. A frase aparece embaixo do 🔊 (nunca a voz do navegador) */
-      if (botao) { botao.style.opacity = ''; var el = botao.parentNode, aviso = el.querySelector('.ft-leia');
-        if (!aviso) { aviso = document.createElement('div'); aviso.className = 'ft-leia'; aviso.style.cssText = 'position:absolute;left:0;top:215px;font:700 40px/1.2 system-ui,sans-serif;color:#b91c1c'; el.appendChild(aviso); }
-        aviso.textContent = (vozLingua === 'es' ? '📢 Lee en voz alta: “' : '📢 Read aloud: “') + texto + '”'; }
+      /* sem voz: o professor lê (nunca a voz do navegador). UM aviso só, num balão no rodapé da tela, que troca a cada
+         clique e some sozinho; antes era um texto por linha da lista, todos no mesmo ponto, empilhados (Pedro, 28/11/2026) */
+      if (botao) botao.style.opacity = '';
+      vozAviso((vozLingua === 'es' ? '📢 Lee en voz alta: “' : '📢 Read aloud: “') + texto + '”');
     });
+  }
+  var vozAvisoT = 0;
+  function vozAviso(txt) {
+    var a = document.getElementById('vozAviso');
+    if (!a) { a = document.createElement('div'); a.id = 'vozAviso'; a.setAttribute('role', 'status');
+      a.style.cssText = 'position:fixed;left:50%;bottom:4vh;transform:translateX(-50%);z-index:9999;max-width:90vw;padding:.55em 1.1em;border-radius:999px;background:#fff;color:#b91c1c;font:700 clamp(18px,2.6vw,34px)/1.2 system-ui,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.35);pointer-events:none;transition:opacity .25s';
+      document.body.appendChild(a); }
+    a.textContent = txt; a.style.opacity = '1'; a.hidden = false;
+    clearTimeout(vozAvisoT); vozAvisoT = setTimeout(function () { a.style.opacity = '0'; }, 5000);
   }
   FiskTema.aoOuvir = vozToca;
   /* ── O ÁUDIO DO LIVRO (Buddy Talks, 28/11/2026) ── O slide "Let's practice" traz só o id do arquivo no Drive; o
@@ -1065,6 +1101,9 @@
   }
   /* Desde 28/11/2026 a TV toca DIRETO do Drive: os mp3 do livro estão em "qualquer pessoa com o link" e o <audio> não
      precisa de CORS. O backend (cmAudio) virou a segunda tentativa, e o aviso de tocar pelo livro, a última. */
+  /* EMBUTIDO NO HUB (Pedro, 28/11/2026: "pode salvar os áudios no repositório do Hub"): as faixas do livro dos Buddy
+     Talks moram em buddy-talks/livro/<id do Drive>.mp3 e são a PRIMEIRA tentativa; o Drive e o backend ficam de reserva */
+  function livroAudio(id) { return atual && atual.origem === 'buddy' && /^[A-Za-z0-9_-]{20,80}$/.test(id) ? new URL('buddy-talks/livro/' + id + '.mp3', location.href).href : ''; }
   function driveAudio(id) { return 'https://drive.google.com/uc?export=download&id=' + encodeURIComponent(id); }
   function tocaUrl(url, botao) {
     return new Promise(function (ok, falha) {
@@ -1074,6 +1113,8 @@
       au.onerror = function () { if (!comecou) falha(new Error('sem áudio')); else botao.textContent = '▶'; };
       audioAgora = au;
       var pr = au.play(); if (pr && pr.catch) pr.catch(function (e) { if (!comecou) falha(e); });
+      /* o Drive às vezes não responde nem dá erro: em 12 s sem tocar, desiste e passa para a próxima tentativa */
+      setTimeout(function () { if (!comecou) { try { au.pause(); au.removeAttribute('src'); au.load(); } catch (e) {} falha(new Error('demorou')); } }, 12000);
     });
   }
   FiskTema.aoAudio = function (i, botao, slideEl) {
@@ -1081,7 +1122,8 @@
     try { if (audioAgora && !audioAgora.paused) { audioAgora.pause(); botao.textContent = '▶'; return; } } catch (e) {}
     try { if (audioAgora && audioAgora.paused && audioAgora.__id === a.id && audioAgora.currentTime > 0 && !audioAgora.ended) { botao.textContent = '⏸'; audioAgora.play(); return; } } catch (e) {}
     botao.textContent = '⏳';
-    tocaUrl(driveAudio(a.id), botao).then(function (au) { au.__id = a.id; }, function () {
+    var tentaLivro = livroAudio(a.id) ? tocaUrl(livroAudio(a.id), botao) : Promise.reject(new Error('sem arquivo'));
+    tentaLivro.catch(function () { return tocaUrl(driveAudio(a.id), botao); }).then(function (au) { au.__id = a.id; }, function () {
       return audioDe(a.id).then(function (x) { return tocaUrl('data:' + x.mime + ';base64,' + x.b64, botao); }).then(function (au) { au.__id = a.id; });
     }).catch(function () {
       botao.textContent = '▶';
@@ -1094,6 +1136,8 @@
     var p = aulaPasso(k - 1), sl = p && deck.slides[p.i];
     if (!sl || !sl.audio) return Promise.resolve(null);
     /* o celular toca do Drive também (d); o mp3 pelo servidor da aula só se o backend entregar e couber */
+    var u = livroAudio(sl.audio.id);
+    if (u) return Promise.resolve({ nome: sl.audio.nome, d: sl.audio.id, u: u, s: null });   /* o celular toca do Hub */
     return audioDe(sl.audio.id).then(function (x) { return { nome: sl.audio.nome, d: sl.audio.id, s: x.b64.length <= 700 * 1024 ? x.b64 : null }; }, function () { return { nome: sl.audio.nome, d: sl.audio.id, s: null }; });
   }
   var aula = null, aulaFila = Promise.resolve();
@@ -1226,7 +1270,7 @@
         return (jg && jg.ot ? vozMp3(jg.ot).catch(function () { return null; }) : Promise.resolve(null)).then(function (mp3) {
           return aulaAudioPasso(k).then(function (au) {
             return aulaApi({ op: 'clique', aula: a.id, chave: a.chave, n: k, atual: a.agora, img: img, jogo: jg, s: mp3 || (au && au.s) || undefined,
-              somPasso: au ? { nome: au.nome, d: au.d } : undefined, vocab: aulaVocab(k), aval: aulaAval(k) });
+              somPasso: au ? { nome: au.nome, d: au.d, u: au.u } : undefined, vocab: aulaVocab(k), vocabArq: aulaVocabArq(k), aval: aulaAval(k) });
           });
         });
       }).then(function (r) {
@@ -1351,6 +1395,12 @@
     var p = aulaPasso(k - 1), sl = p && deck.slides[p.i];
     return sl && sl.vocab && sl.vocab.length ? sl.vocab : undefined;
   }
+  /* o mp3 de cada palavra, quando a série tem (vozArq): o celular toca o arquivo do Hub, sem precisar da Azure */
+  function aulaVocabArq(k) {
+    var v = aulaVocab(k); if (!v) return undefined;
+    var l = v.map(function (w) { return vozArq[w] || ''; });
+    return l.some(Boolean) ? l : undefined;
+  }
   function aulaAval(k) {
     if (!deck) return undefined;
     var p = aulaPasso(k - 1), sl = p && deck.slides[p.i];
@@ -1421,10 +1471,11 @@
      🎲 SORTEIO: desligado por padrão; ligado no ⚙, aparece na barra. Sorteia um nome da turma de agora (a grade da
      Minha semana, já no aparelho: nenhuma chamada nova) sem repetir até acabar a lista, ou forma duplas (sobrou um,
      vira trio). O que a turma lê sai na língua da aula; os botões do professor, em português. */
-  var FERR = { crono: 'conv:crono', min: 'conv:cronoMin', sorteio: 'conv:sorteio' };
+  var FERR = { crono: 'conv:crono2', min: 'conv:cronoMin', sorteio: 'conv:sorteio' };
   function pref(k, padrao) { try { var v = localStorage.getItem(FERR[k]); return v == null ? padrao : v; } catch (e) { return padrao; } }
   function guardaPref(k, v) { try { localStorage.setItem(FERR[k], String(v)); } catch (e) {} }
-  var cronoLig = pref('crono', '1') === '1', cronoMin = Math.max(1, Math.min(15, parseInt(pref('min', '3'), 10) || 3)), sorteioLig = pref('sorteio', '0') === '1';
+  /* o cronômetro nasce desligado (Pedro, 28/11/2026); a chave mudou para conv:crono2 para quem já tinha o '1' guardado */
+  var cronoLig = pref('crono', '0') === '1', cronoMin = Math.max(1, Math.min(15, parseInt(pref('min', '3'), 10) || 3)), sorteioLig = pref('sorteio', '0') === '1';
   var crono = { fim: 0, resta: 0, t: null, pausa: false, total: 0, slide: -1 };
   function cronoDesenha() {
     var seg = Math.max(0, Math.ceil(crono.resta / 1000)), el = $('crono');

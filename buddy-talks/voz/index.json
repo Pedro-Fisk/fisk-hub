@@ -1,0 +1,488 @@
+{
+ "bt-tag-questions-basic": {
+  "voz": "en-US-EricNeural",
+  "a": {
+   "isn’t it? ↓": "8d217f081d649778.mp3",
+   "aren’t you? ↑": "c6919f98aca0434a.mp3",
+   "don’t you? ↑": "1525f2c6760ddf5b.mp3",
+   "doesn’t he? ↑": "6891196e83f85509.mp3",
+   "didn’t they? ↓": "e5718cd1e1c0ddbf.mp3",
+   "can’t she? ↓": "5b727724ef267ef6.mp3",
+   "won’t they? ↑": "c47ea06455325060.mp3",
+   "haven’t you? ↓": "efb66d6f86e27a12.mp3",
+   "wasn’t it? ↑": "67f67c6f40a40867.mp3"
+  }
+ },
+ "bt-tag-questions-intermediate": {
+  "voz": "en-US-AriaNeural",
+  "a": {
+   "isn’t it? ↓": "e5ae7df0e8bc19f4.mp3",
+   "aren’t they? ↑": "b27db3444b87fb8e.mp3",
+   "haven’t you? ↓": "5c2c8aa944ad503c.mp3",
+   "doesn’t she? ↑": "9e8f542fd12990a2.mp3",
+   "didn’t we? ↓": "8423444d88468a90.mp3",
+   "shouldn’t we? ↑": "65c0c5cbc0bef8ca.mp3",
+   "wouldn’t it? ↓": "df2cb2321bdc701e.mp3",
+   "can’t they? ↑": "5909ebfc388c5b4b.mp3",
+   "hasn’t he? ↓": "958f2ca553f6100d.mp3"
+  }
+ },
+ "bt-tag-questions-advanced": {
+  "voz": "en-US-AriaNeural",
+  "a": {
+   "hasn’t he? ↓": "958f2ca553f6100d.mp3",
+   "wouldn’t you? ↑": "0f9d0265385ddfb7.mp3",
+   "weren’t they? ↓": "727f12312401d46d.mp3",
+   "isn’t she? ↑": "cd81d849bed68ea9.mp3",
+   "haven’t we? ↓": "3b05a32f98643ccc.mp3",
+   "couldn’t she? ↑": "c4867c4b278fd631.mp3",
+   "won’t they? ↓": "fa4a108ea97ed39f.mp3",
+   "didn’t it? ↑": "f2467b5e7e101a4f.mp3",
+   "aren’t we? ↓": "f4b9bee7628a0c2a.mp3"
+  }
+ },
+ "bt-him-her-them-basic": {
+  "voz": "en-US-GuyNeural",
+  "a": {
+   "tell him": "5ff19178e6e3d0d6.mp3",
+   "call her": "95fc2c65d2c8f916.mp3",
+   "meet them": "527ad7a5a1487a4b.mp3",
+   "ask him": "0dc0b5f0918b94ce.mp3",
+   "help her": "b10d0c22f2d6a3a0.mp3",
+   "text them": "da48a28800729888.mp3",
+   "give him": "32f1c0a483563bda.mp3",
+   "show her": "32e9de5e52cbdb87.mp3",
+   "join them": "4791c3cee35ebd4a.mp3"
+  }
+ },
+ "bt-him-her-them-intermediate": {
+  "voz": "en-US-AndrewNeural",
+  "a": {
+   "tell him": "0308fd0374276b49.mp3",
+   "call her": "26181b0a6f31f28f.mp3",
+   "meet them": "ee1d44fc47c80f23.mp3",
+   "trust him": "c0f1e66aa502face.mp3",
+   "convince her": "3e8e5bfa6d65f216.mp3",
+   "remind them": "eff719d29a704908.mp3",
+   "introduce him": "d300b88f0c681a30.mp3",
+   "recommend her": "0dabd9844eeebcaa.mp3",
+   "contact them": "4a2e0ef21da819c3.mp3"
+  }
+ },
+ "bt-him-her-them-advanced": {
+  "voz": "en-US-AndrewNeural",
+  "a": {
+   "persuade him": "3d4cdb1919773c99.mp3",
+   "brief her": "c0d969db8474b0d6.mp3",
+   "involve them": "f9aeaf79689d26a0.mp3",
+   "approach him": "d342b8cf97c622a8.mp3",
+   "reassure her": "58f1a640b5278fae.mp3",
+   "update them": "5125ef66e4e50011.mp3",
+   "consult him": "1d48073297ac682a.mp3",
+   "nominate her": "06abfa69fe635321.mp3",
+   "engage them": "8dc25e4b40a614d0.mp3"
+  }
+ },
+ "bt-and-of-basic": {
+  "voz": "en-US-EricNeural",
+  "a": {
+   "a cup of tea": "f3e745ff53964722.mp3",
+   "a lot of work": "7b0d0b2ed4124ec7.mp3",
+   "out of town": "accf6149bf44d718.mp3",
+   "most of them": "90be1538e797e172.mp3",
+   "kind of cold": "87e190daaf1436b1.mp3",
+   "bread and jam": "81298dd10bc2054e.mp3",
+   "nice and easy": "a59f73b2c658016b.mp3",
+   "mom and dad": "3259349b36a0d89d.mp3",
+   "black and white": "3ddccfbad54e335f.mp3"
+  }
+ },
+ "bt-and-of-intermediate": {
+  "voz": "en-US-AndrewNeural",
+  "a": {
+   "a piece of cake": "53de10af2c71ccf4.mp3",
+   "plenty of room": "1660e9acc26867d6.mp3",
+   "out of order": "391b3f9591b6cf6c.mp3",
+   "in front of it": "08960e5e0963995a.mp3",
+   "instead of that": "310be9b22e318d41.mp3",
+   "safe and sound": "c57d29b668ebffc8.mp3",
+   "back and forth": "f03b753d0ff42c4e.mp3",
+   "peace and quiet": "9a26cbd09641c27c.mp3",
+   "rest and relax": "7f453b906340daaf.mp3"
+  }
+ },
+ "bt-and-of-advanced": {
+  "voz": "en-US-EmmaNeural",
+  "a": {
+   "ahead of time": "adc20eb8d6809606.mp3",
+   "short of time": "663d95528ef38779.mp3",
+   "aware of that": "10c6393884709865.mp3",
+   "capable of it": "df4f6ccc78a6d2a9.mp3",
+   "regardless of": "75a670a61a1d7a70.mp3",
+   "time and again": "4af27334519c564a.mp3",
+   "trial and error": "48510d4fffba0cfd.mp3",
+   "give and take": "c38135f9e6b32b80.mp3",
+   "wear and tear": "465e41acc6717623.mp3"
+  }
+ },
+ "bt-the-basic": {
+  "voz": "en-US-AriaNeural",
+  "a": {
+   "the app": "bf3c88def05d9f74.mp3",
+   "the game": "5bb71dbc5dc9f870.mp3",
+   "the end": "26bf6a57cadc88bf.mp3",
+   "the box": "5d09707efb136b67.mp3",
+   "the hour": "c5d2214aa791bf27.mp3",
+   "the phone": "3f3a5f16128581db.mp3",
+   "the icon": "9d38f06f9f33030d.mp3",
+   "the code": "00e93352451875cb.mp3",
+   "the email": "17b0db137bfe528b.mp3"
+  }
+ },
+ "bt-the-intermediate": {
+  "voz": "en-US-BrianNeural",
+  "a": {
+   "the hour": "2abe13e98123ae59.mp3",
+   "the user": "7ba011a36152fa47.mp3",
+   "the idea": "4155f18a8be97872.mp3",
+   "the engine": "c41fd3921cf191cd.mp3",
+   "the update": "d220fd485d18afbf.mp3",
+   "the device": "edad1f7507e7c952.mp3",
+   "the answer": "77029f7d96060492.mp3",
+   "the screen": "987360f500997422.mp3",
+   "the option": "37826447f611381d.mp3"
+  }
+ },
+ "bt-the-advanced": {
+  "voz": "en-US-EmmaNeural",
+  "a": {
+   "the issue": "724e1cf37cd9b52f.mp3",
+   "the offer": "22dec87669921c20.mp3",
+   "the honor": "6d03b9b84f95bf45.mp3",
+   "the union": "312e694cc7858866.mp3",
+   "the effort": "47127c8cf836a148.mp3",
+   "the impact": "522215507aec78cd.mp3",
+   "the plan": "8f1a49a2b7091311.mp3",
+   "the origin": "ea19178ee605a3c9.mp3",
+   "the client": "c197fc80cb614172.mp3"
+  }
+ },
+ "bt-mispronounced-basic": {
+  "voz": "en-US-GuyNeural",
+  "a": {
+   "chocolate": "bd39b69fa9662d96.mp3",
+   "vegetable": "efc33f3f7929f651.mp3",
+   "clothes": "87caed3adddb58ae.mp3",
+   "business": "a7cb3e865847640c.mp3",
+   "Wednesday": "b8cacea921885a0a.mp3",
+   "comfortable": "a158056f2655c686.mp3",
+   "favorite": "c37f58d8a6b68c2f.mp3",
+   "different": "3107b0469c381eb1.mp3",
+   "interesting": "b54289fb7961492f.mp3"
+  }
+ },
+ "bt-mispronounced-intermediate": {
+  "voz": "en-US-AriaNeural",
+  "a": {
+   "recipe": "7f3d0aa20209d690.mp3",
+   "salmon": "4a131aebee41b2c1.mp3",
+   "iron": "469796e3ce603002.mp3",
+   "receipt": "48ff0699e412d8b3.mp3",
+   "colonel": "153d350b92892f53.mp3",
+   "temperature": "b71bf25f01b7920e.mp3",
+   "vegetable": "573254c436a12729.mp3",
+   "restaurant": "6de3108021e45327.mp3",
+   "jewelry": "baedd783a665670f.mp3"
+  }
+ },
+ "bt-mispronounced-advanced": {
+  "voz": "en-US-EmmaNeural",
+  "a": {
+   "colonel": "a753ba7ed468e098.mp3",
+   "epitome": "297d203557b2fad2.mp3",
+   "hyperbole": "cb1eafc789771a5d.mp3",
+   "mischievous": "01cf88b12fb22299.mp3",
+   "anonymous": "fe39873941114c2f.mp3",
+   "entrepreneur": "f863a5334a89d465.mp3",
+   "questionnaire": "6e936bacb7e5c8b4.mp3",
+   "infamous": "b6627911049e3871.mp3",
+   "suite": "bc9830d1ed3926b8.mp3"
+  }
+ },
+ "bt-word-endings-basic": {
+  "voz": "en-US-BrianNeural",
+  "a": {
+   "attention": "87659314ba13e63d.mp3",
+   "question": "ff8cd8c25ade249a.mp3",
+   "future": "bfbf1e203a1cd83c.mp3",
+   "famous": "1a275af997c8e84e.mp3",
+   "nature": "0bbc8792a2a9954f.mp3",
+   "action": "e1e06cd88d95b5d7.mp3",
+   "nervous": "63624cb9737819e7.mp3",
+   "picture": "b7c7d8dd92fc674a.mp3",
+   "station": "0f64dd9658147650.mp3"
+  }
+ },
+ "bt-word-endings-intermediate": {
+  "voz": "en-US-AriaNeural",
+  "a": {
+   "decision": "6c081d870f760ea1.mp3",
+   "position": "03973fe745c6de33.mp3",
+   "pressure": "5961032964c0a596.mp3",
+   "creature": "dd0fbf601ef9f774.mp3",
+   "dangerous": "1829b059fc602b1d.mp3",
+   "reaction": "bf5300bd1b7b970a.mp3",
+   "adventure": "7762e0518c4b112b.mp3",
+   "curious": "ccfec8e932fadb74.mp3",
+   "occasion": "5b1ed2845b403141.mp3"
+  }
+ },
+ "bt-word-endings-advanced": {
+  "voz": "en-US-EmmaNeural",
+  "a": {
+   "conclusion": "d5cdef86e8343f52.mp3",
+   "acquisition": "30089b418bdb9025.mp3",
+   "infrastructure": "5dc3ed6a94081368.mp3",
+   "ambitious": "055f76ab38112494.mp3",
+   "supervision": "75633b873c1c3101.mp3",
+   "expectation": "77aa82366991327b.mp3",
+   "manufacture": "78832d9c95f16cfc.mp3",
+   "prestigious": "8b4e0a4999b4f783.mp3",
+   "transition": "9cc955ea133edc05.mp3"
+  }
+ },
+ "bt-final-ed-basic": {
+  "voz": "en-US-EricNeural",
+  "a": {
+   "walked": "0c9d6268d0b08dd5.mp3",
+   "helped": "f455afb784c640ea.mp3",
+   "played": "d31f83e89cca779d.mp3",
+   "cleaned": "5aac440debbea239.mp3",
+   "wanted": "1a7a2ef85bdbfe52.mp3",
+   "watched": "0a95752190f52fdc.mp3",
+   "lived": "ad9b669448b38dd6.mp3",
+   "needed": "bf9dbe3cc75f55e2.mp3",
+   "studied": "1c0b38e9f4974f9e.mp3"
+  }
+ },
+ "bt-final-ed-intermediate": {
+  "voz": "en-US-BrianNeural",
+  "a": {
+   "finished": "62ec097404a367dd.mp3",
+   "traveled": "5f4187598a1d1b9c.mp3",
+   "decided": "afc6de4d0249cbf7.mp3",
+   "practiced": "f466539c22395773.mp3",
+   "improved": "34f704f4d76af662.mp3",
+   "invited": "b85ff41e924ed271.mp3",
+   "shared": "44a3e3905a761fea.mp3",
+   "watched": "79ae4a2a69267081.mp3",
+   "started": "b1ca1058c5a3fdd7.mp3"
+  }
+ },
+ "bt-final-ed-advanced": {
+  "voz": "en-US-EmmaNeural",
+  "a": {
+   "achieved": "d77ef1cb27d4e7ce.mp3",
+   "attempted": "0e3fd93b25b7f749.mp3",
+   "convinced": "33e5dff36e8ba08e.mp3",
+   "expanded": "e238986e006b2800.mp3",
+   "managed": "0d7ef2c8894bb8bd.mp3",
+   "developed": "a918a3fd5aaa2444.mp3",
+   "recognized": "c0f3def480b5def1.mp3",
+   "admitted": "39bf2a4d0e65df98.mp3",
+   "increased": "dc24036205751ac2.mp3"
+  }
+ },
+ "bt-uh-er-basic": {
+  "voz": "en-US-EricNeural",
+  "a": {
+   "cup": "4b79954ab20ee189.mp3",
+   "much": "fd6912b0b33b176e.mp3",
+   "sunny": "ef347c2a1dc97a81.mp3",
+   "money": "21ac7e2f8d846eec.mp3",
+   "lunch": "f11bbebc792c9e95.mp3",
+   "bird": "3cdd3cb8a83e8dad.mp3",
+   "work": "b232d84f0631bfa7.mp3",
+   "learn": "b16868e770ecaec1.mp3",
+   "girl": "72cc8f66845bab0b.mp3"
+  }
+ },
+ "bt-uh-er-intermediate": {
+  "voz": "en-US-AndrewNeural",
+  "a": {
+   "budget": "80aee5a67f657030.mp3",
+   "result": "1d53c4d4d26763f3.mp3",
+   "success": "8a5f656bcae28721.mp3",
+   "struggle": "64f34c6ab9e0ddb2.mp3",
+   "public": "0c2744f081468073.mp3",
+   "purpose": "d4772b4ef0a72783.mp3",
+   "worth": "4e1fd1d5c7582064.mp3",
+   "certain": "1e08591f0283275b.mp3",
+   "deserve": "405cffa782e3ab0c.mp3"
+  }
+ },
+ "bt-uh-er-advanced": {
+  "voz": "en-US-JennyNeural",
+  "a": {
+   "bud · bird": "0162ec20d0775963.mp3",
+   "cut · curt": "27b81cbe69f0199f.mp3",
+   "hut · hurt": "9c3a40cc5b7f47c9.mp3",
+   "bun · burn": "8ebc15632c0e810b.mp3",
+   "ton · turn": "d85756acfc0ef90d.mp3",
+   "shut · shirt": "a968667120728239.mp3",
+   "cub · curb": "d6ff43ed9058277b.mp3",
+   "luck · lurk": "fe27e06590198d32.mp3",
+   "hull · hurl": "1d74fd2599410a69.mp3",
+   "bud": "72275904b6dbb020.mp3",
+   "curt": "b2b4d904750605f8.mp3",
+   "hut": "d9335f2d2645eb54.mp3",
+   "burn": "28d37b89aee58143.mp3",
+   "ton": "ef822aa5945d9ea8.mp3",
+   "shirt": "d5eb2c014a46bb81.mp3"
+  }
+ },
+ "bt-s-sound-basic": {
+  "voz": "en-US-ChristopherNeural",
+  "a": {
+   "study": "38177fdc5e31a37a.mp3",
+   "school": "12b32acd7a7f1124.mp3",
+   "stop": "1b8d7110f3a1951c.mp3",
+   "small": "10878d47f71f5a35.mp3",
+   "speak": "ab4188eed02579ab.mp3",
+   "storm": "97fadbd1046b31e1.mp3",
+   "street": "be8431dede9d7a68.mp3",
+   "start": "af0e6ad969ef6edc.mp3",
+   "strong": "10ff3041a2d81b86.mp3"
+  }
+ },
+ "bt-s-sound-intermediate": {
+  "voz": "en-US-EmmaNeural",
+  "a": {
+   "structure": "0fc0ac6af3b1e9b5.mp3",
+   "stability": "eab6db0b1cd499e6.mp3",
+   "spread": "5a5ffea49e85d6ec.mp3",
+   "scale": "efdf6f1f2728ba00.mp3",
+   "sphere": "1b056900fc073072.mp3",
+   "statement": "9080b1c322b56daa.mp3",
+   "strategy": "e5ff92cc8b5f5806.mp3",
+   "specific": "2357bb10de95b66f.mp3",
+   "stranded": "45dbad06907d0438.mp3"
+  }
+ },
+ "bt-s-sound-advanced": {
+  "voz": "en-US-EmmaNeural",
+  "a": {
+   "straightforward": "4c7f5d986290ca1b.mp3",
+   "scrutiny": "ce29d7ebb3fc636b.mp3",
+   "spontaneous": "4849413c5b3a8351.mp3",
+   "sustainability": "77b646a10d553ac1.mp3",
+   "skeptical": "c7d65edcfd0743c2.mp3",
+   "stereotype": "b7f2172c06ea50e9.mp3",
+   "screening": "9ffb37898970d82a.mp3",
+   "sprawling": "3a1815f3ca2c4325.mp3",
+   "statistics": "f09cb69678d24ce0.mp3"
+  }
+ },
+ "bt-ae-ei-basic": {
+  "voz": "en-US-EmmaNeural",
+  "a": {
+   "man · main": "17aa14ab1a9673e6.mp3",
+   "fat · fate": "805d472e53cb1ddd.mp3",
+   "hat · hate": "3252ad7ac15f6dab.mp3",
+   "tap · tape": "46d0178d962422ad.mp3",
+   "can · cane": "22746cfc54af2fff.mp3",
+   "mad · made": "b7c144cec9ae2672.mp3",
+   "pan · pain": "7eb86e2dc6bbc4b0.mp3",
+   "back · bake": "491f1e44e1b300ff.mp3",
+   "at · ate": "51835eefeff84742.mp3",
+   "man": "c4b2f837048954ad.mp3",
+   "fate": "95d47e50d9f8ac29.mp3",
+   "hat": "c60a829ddb76bdcf.mp3",
+   "tape": "e065c5f9508ec1ea.mp3",
+   "can": "1e9d2d9cf6aec3d8.mp3",
+   "made": "0cb56dc29458e8bf.mp3"
+  }
+ },
+ "bt-ae-ei-intermediate": {
+  "voz": "en-US-BrianNeural",
+  "a": {
+   "bat · bait": "97650e78c92ac385.mp3",
+   "rat · rate": "690f17125e3e108c.mp3",
+   "mat · mate": "2a0599dd7a7d4979.mp3",
+   "cap · cape": "081b42c191179de7.mp3",
+   "van · vain": "6b36d3baf754dd78.mp3",
+   "sack · sake": "a016af0f4d89f875.mp3",
+   "lack · lake": "63d5cc2332bb359a.mp3",
+   "snack · snake": "95ce28506b846116.mp3",
+   "gram · grain": "10036895308ddbd0.mp3",
+   "bat": "bf2a2faba197bcb2.mp3",
+   "rate": "7473e0c61fe95b4d.mp3",
+   "mat": "7af1b480f877c127.mp3",
+   "cape": "b8d912d9a3805dad.mp3",
+   "van": "1e7e303c341fbdbc.mp3",
+   "sake": "6427d4ff2ed331b6.mp3"
+  }
+ },
+ "bt-ae-ei-advanced": {
+  "voz": "en-US-MichelleNeural",
+  "a": {
+   "ratio · ration": "495e3162bbd4a14d.mp3",
+   "apparatus": "de9e8298cdb2d134.mp3",
+   "vacancy": "390b3d3bc76eae96.mp3",
+   "adequate": "485d25eb959d637a.mp3",
+   "stagnant": "06ef9b45776dab7b.mp3",
+   "capacity": "c6ec78e42fb21e83.mp3",
+   "patience": "31ae37e43335e390.mp3",
+   "sacred": "95f09c35a9a82cb0.mp3",
+   "vacant": "16e38fbff386feae.mp3"
+  }
+ },
+ "bt-au-ou-basic": {
+  "voz": "en-US-AndrewNeural",
+  "a": {
+   "now · no": "68eee9170e652212.mp3",
+   "town · tone": "26436237f7345cc5.mp3",
+   "loud · load": "39c19ed669a33a6a.mp3",
+   "out · oat": "fc8bd65f4f278640.mp3",
+   "house · hose": "707206f9a9bdfd95.mp3",
+   "how · hoe": "9b094a9d8a4171e4.mp3",
+   "clown · clone": "a24251459de3df46.mp3",
+   "noun · known": "9f3bad6dfd62a278.mp3",
+   "found · phoned": "dece71a6469f7d7d.mp3",
+   "now": "d0d9d4284ca99aa0.mp3",
+   "tone": "29ccde5dd26ac313.mp3",
+   "loud": "65134cac5440f3e0.mp3",
+   "oat": "c071cb90f85eee96.mp3",
+   "house": "6011f4cf2c553fb6.mp3",
+   "hoe": "67bac09ab72cc6e4.mp3"
+  }
+ },
+ "bt-au-ou-intermediate": {
+  "voz": "en-US-AriaNeural",
+  "a": {
+   "allow": "4c0c2296f7e85b15.mp3",
+   "although": "da58c4f35b9b1ca3.mp3",
+   "account": "7fdfa0bddcdb6fbb.mp3",
+   "approach": "fe389099bc22b3ed.mp3",
+   "amount": "56b45774ae96d138.mp3",
+   "alone": "27dcc25e414a1192.mp3",
+   "around": "63efe6aa395d7b0a.mp3",
+   "own": "963f83dc41b72ccc.mp3",
+   "doubt": "8c2cf1752c13ddcc.mp3"
+  }
+ },
+ "bt-au-ou-advanced": {
+  "voz": "en-US-BrianNeural",
+  "a": {
+   "profound": "f1780fed0c4691ff.mp3",
+   "propose": "c38efbe0d15043c0.mp3",
+   "announce": "de75c1e642339c7c.mp3",
+   "promote": "b13c445a1574bf5a.mp3",
+   "encounter": "3e73f0c6d21b7538.mp3",
+   "overcome": "42b348aaa97e8b15.mp3",
+   "renounce": "70232561ea65e508.mp3",
+   "suppose": "0693e6e08676db47.mp3",
+   "surround": "7737e2a84294c842.mp3"
+  }
+ }
+}
