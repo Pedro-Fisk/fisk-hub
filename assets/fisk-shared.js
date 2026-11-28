@@ -449,6 +449,20 @@ function fiskExigirSessao(el, msg) {
   return null;
 }
 
+/* ═══ AS NOVIDADES DE NOVEMBRO/2026 SÓ PARA A DIREÇÃO, ATÉ JANEIRO (Pedro, 28/11/2026: "quero que agora eles continuem
+   vendo o portal como sempre foi; só vou publicar essas mudanças para eles em janeiro") ═══
+   A classe `fk-novo` no <html> liga o desenho e o comportamento novos (Minha aula, Radar da Turma, Radar do Aluno,
+   Corretor MET, Impressões). Quem a põe é a linha de pré-pintura logo depois do <body> de cada uma dessas páginas
+   (a direção: master ou "ver como"), para não piscar o desenho novo; o kit repete aqui para o caso de a linha faltar.
+   ⚠️ EM JANEIRO, para abrir a todos: FISK_NOVIDADES_TODOS = true aqui E, nas cinco páginas, a linha de pré-pintura
+   (procure por fk-novo) passa a pôr a classe sempre. */
+var FISK_NOVIDADES_TODOS = false;
+function fiskNovidades() {
+  if (FISK_NOVIDADES_TODOS) return true;
+  try { var s = JSON.parse(localStorage.getItem('fisk_prof') || 'null'); return !!(s && (s.master || s.viewingAs)); } catch (e) { return false; }
+}
+try { if (fiskNovidades()) document.documentElement.classList.add('fk-novo'); } catch (e) {}
+
 /** Sessão do professor gravada pelo login do Hub. */
 function fiskSessao() {
   try { return JSON.parse(localStorage.getItem('fisk_prof') || 'null'); } catch (e) { return null; }

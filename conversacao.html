@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#000000">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/fisk-shared.css?v=f12a68d93f">
-<script src="assets/fisk-shared.js?v=1269b6ec82"></script>
+<script src="assets/fisk-shared.js?v=2ae5436961"></script>
 <style>
   /* A CONVERSAÇÃO DA SEMANA NA TV (Pedro, 27/11/2026; fase 1, protótipo aprovado em 26/11).
      Sem ?id: a lista das atividades da pasta da semana (backend ConversaSemana.js), por idioma.
@@ -32,12 +32,16 @@
   .jan{ background: #fff; border-radius: 26px; box-shadow: 0 18px 50px rgba(15,23,42,.14); overflow: hidden; }
   body.theme-dark .jan{ background: #182131; }
   .cab{ background: linear-gradient(120deg, #4f6df5, #7c3aed); color: #fff; padding: 1.15rem 1.4rem 1rem; }
-  .cab-top{ display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; }
-  .mes{ font: 800 1.2rem/1.15 var(--font-heading, inherit); display: flex; align-items: center; gap: .6rem; }
+  /* as setas e os meses no CENTRO do card, e os meses numa largura FIXA: "Outubro · Novembro" não empurra as setas
+     (Pedro, 28/11/2026). O "Hoje" à esquerda e o "Todas as semanas" à direita */
+  .cab-top{ display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: .7rem; }
+  .cab-top .hoje-btn{ justify-self: start; }
+  .mes{ font: 800 1.2rem/1.15 var(--font-heading, inherit); display: flex; align-items: center; gap: .6rem; justify-self: center; }
+  #semMes{ width: 15.5em; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .seta{ width: 38px; height: 38px; flex: none; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.5); background: rgba(255,255,255,.14); color: #fff; font-size: 1.2rem; font-weight: 900; cursor: pointer; }
   .seta:hover{ background: rgba(255,255,255,.26); } .seta[disabled]{ opacity: .35; cursor: default; }
   .hoje-btn{ border: 0; background: #fde047; color: #3b0764; font: 900 .88rem var(--font-body, inherit); border-radius: 99px; padding: .45rem .85rem; cursor: pointer; }
-  .pill{ margin-left: auto; font: 800 .9rem var(--font-body, inherit); background: rgba(255,255,255,.14); border: 1.5px solid rgba(255,255,255,.45); color: #fff; border-radius: 99px; padding: .5rem .95rem; cursor: pointer; }
+  .pill{ justify-self: end; font: 800 .9rem var(--font-body, inherit); background: rgba(255,255,255,.14); border: 1.5px solid rgba(255,255,255,.45); color: #fff; border-radius: 99px; padding: .5rem .95rem; cursor: pointer; }
   .pill:hover{ background: rgba(255,255,255,.26); }
   /* contain: sem ele, a faixa larga demais alargava a página inteira no celular */
   .sems{ contain: inline-size; display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 3 * 12px) / 4); gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; margin-top: 1rem; padding: 10px 2px 8px; scrollbar-width: none; }
@@ -119,7 +123,7 @@
     main.conv{ margin-top: 20px; padding: 0 12px; }
     .cab{ padding: 1rem; } .corpo{ padding: 1rem; }
     .sems{ grid-auto-columns: 78%; }
-    .pill{ margin-left: 0; }
+    .cab-top{ grid-template-columns: 1fr 1fr; } .cab-top .mes{ grid-column: 1 / -1; grid-row: 1; } #semMes{ width: 11em; font-size: 1rem; white-space: normal; }
     .agora .ok{ margin-left: 0; }
     /* celular: cada atividade numa linha compacta, a miniatura pequena à esquerda (Pedro, 28/11/2026) */
     .grade{ grid-template-columns: 1fr; gap: 12px; }
@@ -426,8 +430,8 @@
     <div class="jan">
       <div class="cab">
         <div class="cab-top">
-          <div class="mes"><button type="button" class="seta" id="semAnt" aria-label="Semanas anteriores">‹</button><span id="semMes">💬 Semanas</span><button type="button" class="seta" id="semProx" aria-label="Próximas semanas">›</button></div>
           <button type="button" class="hoje-btn" id="semHoje" title="Voltar para a semana de hoje">● Hoje</button>
+          <div class="mes"><button type="button" class="seta" id="semAnt" aria-label="Semanas anteriores">‹</button><span id="semMes">💬 Semanas</span><button type="button" class="seta" id="semProx" aria-label="Próximas semanas">›</button></div>
           <button type="button" class="pill" id="bPastas">📁 Todas as semanas</button>
         </div>
         <div class="sems" id="sems"></div>

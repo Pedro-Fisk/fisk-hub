@@ -296,6 +296,21 @@ function pintaFila() {
   var prio = estado.alunos.length > 1 ? '<button type="button" class="prio-grande" data-prio>' + (estado.prioridade ? '↺ Voltar à ordem ' + (estado.plantao ? 'de chegada' : 'da turma') : '⚡ Ordenar por prioridade') + '</button>' : '';
   /* painel do Planejador (Pedro, 17/09): título e situação em cima; ordenar, data + salvar, e as saídas agrupadas.
      O "Lançar a aula de ontem" saiu da tela até algum professor pedir (o servidor continua aceitando). */
+  /* O PROFESSOR VÊ O PLANEJADOR DE SEMPRE até as novidades abrirem (texto, ordem dos botões e desenho de antes) */
+  if (!novidades()) {
+    var infoV = plano && plano.ordem && plano.ordem.length ? '📋 <b>Ordem salva' + (plano.hoje ? ' para hoje' : ' em ' + esc(plano.data ? plano.data.split('-').reverse().join('/') : '')) + '</b> · ' + estado.alunos.filter(function (a) { return a._plan; }).length + ' de ' + estado.alunos.length + ' na ordem'
+      : '📋 <b>Sem ordem salva.</b> Os alunos estão na ordem do card.';
+    if (estado.ontem) infoV = '<span class="rt-ontem">📅 <b>Lançando a aula de ontem (' + esc(ontemIsoTH().split('-').reverse().slice(0, 2).join('/')) + ')</b> · presença e falta vão para a célula de ontem do card, só se estiver vazia</span> · ' + infoV;
+    if (nAt) infoV += ' · <b>' + nAt + ' atendido' + (nAt === 1 ? '' : 's') + '</b>';
+    f.innerHTML = '<div class="pl-topo"><span class="pl-tit">Planejador</span>' +
+      '<button type="button" class="btn-recarrega pl-rec" data-recarrega title="Lê de novo o roteiro, as anotações e as marcas dos alunos">↻ Recarregar</button><span class="rt-info">' + infoV + '</span></div>' +
+      '<div class="pl-acoes">' + prio.replace('class="prio-grande"', 'class="prio-grande' + (estado.prioridade ? ' on' : '') + '"') +
+      (estado.plantao ? '' : '<div class="pl-salvar"><label class="rt-data">Aula de <input type="date" data-rtdata value="' + dataRoteiroPadrao() + '"></label>' +
+        '<button type="button" class="rt-btn forte" data-rtsalva title="Guarda esta ordem para a aula da data escolhida">Salvar ordem</button></div>' +
+        '<details class="pl-saidas pl-mais"><summary class="rt-btn">⋯ Mais</summary><div class="pl-mais-menu"><button type="button" class="rt-btn" data-rtcopia>📋 Copiar ordem</button>' +
+        '<button type="button" class="rt-btn" data-rtpdf title="Grava o PDF da ordem na pasta da turma">💾 Salvar PDF na pasta da turma</button></div></details>') +
+      '</div>';
+  } else
   /* A MESMA CARA DO CARD DA CONVERSAÇÃO (Pedro, 28/11/2026: "padronizar o tamanho e a estética"): faixa colorida, o
      rótulo em pílula, o título grande, e os botões verdes à direita */
   f.innerHTML = '<div class="pl-topo"><span class="pl-ico">📋</span><div class="pl-txt"><span class="pl-tit">Planejador · ordem dos alunos</span>' +
@@ -601,8 +616,10 @@ function statusHtml(html, err) { var el = $('status'); el.innerHTML = html || ''
 /* O CONTADOR DE SEGUNDOS (auditoria de 30/10/2026, A6): fiskEsperando do kit no status, em toda leitura que segura a
    tela. Um de cada vez: a espera nova encerra a anterior, e `esperaFim()` encerra no sucesso E no erro. */
 var _thEsperaFim = null;
+/* as novidades de nov/2026 (card da aula com o "Ir", conversação, Planejador novo) só para a direção até janeiro */
+function novidades() { return typeof fiskNovidades === 'function' && fiskNovidades(); }
 /* o carregamento com animação (Pedro, 28/11/2026: "atualmente é só uma frase"): a rodinha e a barra correndo ao lado */
-function espera(frases) { esperaFim(); _thEsperaFim = fiskEsperando(function (t) { status(String(t).replace(/^🔄\s*/, '')); var el = $('status'); el.classList.add('esperando'); }, frases); }
+function espera(frases) { esperaFim(); _thEsperaFim = fiskEsperando(function (t) { if (!novidades()) { status(t); return; } status(String(t).replace(/^🔄\s*/, '')); $('status').classList.add('esperando'); }, frases); }
 function esperaFim() { if (_thEsperaFim) { _thEsperaFim(); _thEsperaFim = null; } var el = $('status'); if (el) el.classList.remove('esperando'); }
 function get(params) {
   params.token = token();
@@ -802,7 +819,7 @@ function initCascata() {
   }
   selTurma.addEventListener('change', function (ev) {
     if (!selTurma.value) return;
-    if (ev.isTrusted) { pintaIr(); if (!bIr.disabled) status('Turma escolhida: toque em "Ir" para carregar.'); return; }
+    if (ev.isTrusted && novidades()) { pintaIr(); if (!bIr.disabled) status('Turma escolhida: toque em "Ir" para carregar.'); return; }
     abreTurma();
   });
   bIr.addEventListener('click', abreTurma);
@@ -1078,6 +1095,7 @@ function tirarVisitante(raf) {
     var b = ev.target.closest('button[data-i]'); if (!b) return;
     trazerAluno(box._lista[+b.dataset.i]);
   });
+  if (novidades()) q.placeholder = 'Outro aluno: nome ou RAF';
   var bt = $('bTrazer'); if (bt) bt.addEventListener('click', function () { q.focus(); if (q.value.trim().length >= 3) q.dispatchEvent(new Event('input')); else { box.hidden = false; box.innerHTML = '<div class="vazio">Escreva o nome completo ou o RAF do aluno.</div>'; } });
   q.addEventListener('keydown', function (ev) {
     if (ev.key === 'Escape') { box.hidden = true; }
@@ -1224,7 +1242,7 @@ function convMini(box, it) {
 function pintaConversa() {
   var cx = $('conv-card'); if (!cx) return;
   /* o Centro de Estudos (plantão) não tem atividade comunicativa (Pedro, 28/11/2026) */
-  if (ptEstado || estado.plantao || !estado.alunos || !estado.alunos.length || typeof fiskPerfilDaTurma !== 'function') { cx.hidden = true; return; }
+  if (!novidades() || ptEstado || estado.plantao || !estado.alunos || !estado.alunos.length || typeof fiskPerfilDaTurma !== 'function') { cx.hidden = true; return; }
   var turma = estado.turma;
   var desenha = function (d) {
     if (estado.turma !== turma) return;
