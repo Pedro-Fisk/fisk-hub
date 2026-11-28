@@ -2137,6 +2137,11 @@ function fiskTurmaDeAgora(s) {
     .sort(function (a, b) { return Math.abs(a.h.ini - min) - Math.abs(b.h.ini - min); })[0];
   return t ? fiskPerfilDaTurma(t) : null;
 }
+/* o nível de conversação de um livro do card (Essentials = Basic, Transitions = Intermediate, Fluency e Focus = Advanced) */
+function fiskNivelDoLivro(livro) {
+  var L = fiskInfvNP(livro || '');
+  return /TEENS/.test(L) ? 'Teens' : /ESSENTIAL/.test(L) ? 'Basic' : /TRANSITION/.test(L) ? 'Intermediate' : /FLUENCY|FOCUS/.test(L) ? 'Advanced' : '';
+}
 /* A turma vista pela conversação (Pedro, 27/11/2026): o NÍVEL sai do livro mais comum entre os alunos (Teens Connect =
    Teens; Essentials 1 e 2 = Basic; Transitions 1 e 2 = Intermediate; Fluency 1 e 2 e Focus = Advanced) e o PERFIL,
    que é outro eixo, do título: "(+18)" ou "[+18]" = Adultos; o resto, Jovens. Livro do espanhol = Español.
@@ -2145,9 +2150,14 @@ function fiskPerfilDaTurma(t) {
   var conta = {}; (t.alunos || []).forEach(function (a) { if (a.book) conta[a.book] = (conta[a.book] || 0) + 1; });
   var livro = Object.keys(conta).sort(function (x, y) { return conta[y] - conta[x]; })[0] || '';
   var L = fiskInfvNP(livro), tit = String(t.tituloInteiro || t.titulo || '');
-  var nivel = /TEENS/.test(L) ? 'Teens' : /ESSENTIAL/.test(L) ? 'Basic' : /TRANSITION/.test(L) ? 'Intermediate' : /FLUENCY|FOCUS/.test(L) ? 'Advanced' : '';
+  var nivel = fiskNivelDoLivro(livro);
   var idioma = /INMEDIATO|ESPANOL|SPANISH|AVANZA|SIELE/.test(L) ? 'Español' : 'English';
-  return { escola: t.escola || '', turma: t.titulo || t.tituloInteiro || '', livro: livro, nivel: nivel, idioma: idioma,
+  /* TURMA MISTA (Pedro, 28/11/2026, opção A): os níveis que têm PELO MENOS 2 alunos, do maior para o menor. Com dois ou
+     mais, a conversação destaca a atividade de cada um e o professor escolhe; um aluno sozinho noutro livro não conta. */
+  var porNivel = {}; Object.keys(conta).forEach(function (b) { var n = fiskNivelDoLivro(b); if (n) porNivel[n] = (porNivel[n] || 0) + conta[b]; });
+  var niveis = Object.keys(porNivel).filter(function (n) { return porNivel[n] >= 2; }).sort(function (x, y) { return porNivel[y] - porNivel[x]; })
+    .map(function (n) { return { nivel: n, alunos: porNivel[n] }; });
+  return { escola: t.escola || '', turma: t.titulo || t.tituloInteiro || '', livro: livro, nivel: nivel, idioma: idioma, niveis: niveis,
            perfil: /[(\[]\s*\+\s*18\s*[)\]]/.test(tit) ? 'Adultos' : 'Jovens', ini: t.h ? t.h.ini : null,
            /* os RAFs da turma (27/11/2026): a conversação libera a aula no portal de cada aluno (portal-aluno-fisk/api/aula.js) */
            rafs: (t.alunos || []).map(function (a) { return String(a.raf || '').trim(); }).filter(Boolean),

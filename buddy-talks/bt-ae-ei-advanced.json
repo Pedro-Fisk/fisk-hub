@@ -146,68 +146,8 @@
     ]
    }
   ],
-  "languageGame": [
-   {
-    "type": "listen",
-    "question": "Listen. Which sound do you hear?",
-    "audio": "apparatus",
-    "options": [
-     "/æ/",
-     "/eɪ/"
-    ],
-    "correctIndex": 0
-   },
-   {
-    "type": "listen",
-    "question": "Listen. Which sound do you hear?",
-    "audio": "vacancy",
-    "options": [
-     "/æ/",
-     "/eɪ/"
-    ],
-    "correctIndex": 1
-   },
-   {
-    "type": "listen",
-    "question": "Listen. Which sound do you hear?",
-    "audio": "adequate",
-    "options": [
-     "/æ/",
-     "/eɪ/"
-    ],
-    "correctIndex": 0
-   },
-   {
-    "type": "listen",
-    "question": "Listen. Which sound do you hear?",
-    "audio": "stagnant",
-    "options": [
-     "/æ/",
-     "/eɪ/"
-    ],
-    "correctIndex": 0
-   },
-   {
-    "type": "listen",
-    "question": "Listen. Which sound do you hear?",
-    "audio": "capacity",
-    "options": [
-     "/æ/",
-     "/eɪ/"
-    ],
-    "correctIndex": 0
-   },
-   {
-    "type": "listen",
-    "question": "Listen. Which sound do you hear?",
-    "audio": "patience",
-    "options": [
-     "/æ/",
-     "/eɪ/"
-    ],
-    "correctIndex": 1
-   }
-  ],
+  "languageGame": [],
+  "semVoz": true,
   "evaluation": [
    {
     "question": "Do your minimal pairs survive fast speech?"

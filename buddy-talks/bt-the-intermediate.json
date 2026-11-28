@@ -146,68 +146,8 @@
     ]
    }
   ],
-  "languageGame": [
-   {
-    "type": "listen",
-    "question": "Listen. Which sound do you hear?",
-    "audio": "the hour",
-    "options": [
-     "/ði/",
-     "/ðə/"
-    ],
-    "correctIndex": 0
-   },
-   {
-    "type": "listen",
-    "question": "Listen. Which sound do you hear?",
-    "audio": "the user",
-    "options": [
-     "/ði/",
-     "/ðə/"
-    ],
-    "correctIndex": 1
-   },
-   {
-    "type": "listen",
-    "question": "Listen. Which sound do you hear?",
-    "audio": "the idea",
-    "options": [
-     "/ði/",
-     "/ðə/"
-    ],
-    "correctIndex": 0
-   },
-   {
-    "type": "listen",
-    "question": "Listen. Which sound do you hear?",
-    "audio": "the engine",
-    "options": [
-     "/ði/",
-     "/ðə/"
-    ],
-    "correctIndex": 0
-   },
-   {
-    "type": "listen",
-    "question": "Listen. Which sound do you hear?",
-    "audio": "the update",
-    "options": [
-     "/ði/",
-     "/ðə/"
-    ],
-    "correctIndex": 0
-   },
-   {
-    "type": "listen",
-    "question": "Listen. Which sound do you hear?",
-    "audio": "the device",
-    "options": [
-     "/ði/",
-     "/ðə/"
-    ],
-    "correctIndex": 1
-   }
-  ],
+  "languageGame": [],
+  "semVoz": true,
   "evaluation": [
    {
     "question": "Which sound of THE do you forget more?"

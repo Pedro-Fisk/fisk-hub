@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#000000">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/fisk-shared.css?v=f12a68d93f">
-<script src="assets/fisk-shared.js?v=b6079f9752"></script>
+<script src="assets/fisk-shared.js?v=1269b6ec82"></script>
 <style>
   /* A CONVERSAÇÃO DA SEMANA NA TV (Pedro, 27/11/2026; fase 1, protótipo aprovado em 26/11).
      Sem ?id: a lista das atividades da pasta da semana (backend ConversaSemana.js), por idioma.
@@ -19,62 +19,77 @@
      (sw-conversa.js + Cache Storage 'fisk-conversa-v1'); depois o mesmo endereço abre sem internet.
      CONTROLE DA DIREÇÃO: cada atividade aberta vira uma linha no registro (fiskApresentacao, no kit): turma da hora,
      semana certa ou não, tempo aberto, tempo em TELA CHEIA e até que clique foi. */
-  html, body{ margin: 0; min-height: 100%; background: #eef2f7; color: #1e293b; font-family: var(--font-body, system-ui, sans-serif); }
+  html, body{ margin: 0; min-height: 100%; background: #f1f4f9; color: #1e293b; font-family: var(--font-body, system-ui, sans-serif); }
   body.theme-dark{ background: #0f141d; color: #dbe6f3; }
   [hidden]{ display: none !important; }
   :root{ --verde: #31A889; --verde2: #23866d; }
-  /* a lista (mock 3 com o topo do mock 4, aprovados em 27/11/2026; estética da Central de Informes) */
-  #lista{ max-width: 1240px; margin: 0 auto; padding: 1.2rem 1.2rem 3rem; }
-  .volta{ display: inline-block; margin: 0 0 .7rem; color: #1d4ed8; font-weight: 800; text-decoration: none; }
-  body.theme-dark .volta{ color: #93c5fd; }
-  .jan{ background: #fff; border-radius: 22px; box-shadow: 0 12px 32px rgba(30,41,59,.14); overflow: hidden; }
+  /* A LISTA (mock-up aprovado pelo Pedro em 28/11/2026): a página padrão do Hub (o .hero preto do fisk-shared.css) e,
+     abaixo dele, com um respiro, o card grande da conversação, largo o bastante para 5 atividades por linha. No topo do
+     card, o CARROSSEL das semanas: desliza (dedo, setas), quatro por vez, e a semana escolhida não muda de lugar, só
+     ganha o contorno. Cada nível tem a SUA cor, sempre a mesma; e a ordem é a da progressão do curso. */
+  #lista{ padding: 0 0 3rem; }
+  main.conv{ max-width: 1480px; width: 100%; margin: 32px auto 0; padding: 0 24px; box-sizing: border-box; }
+  .jan{ background: #fff; border-radius: 26px; box-shadow: 0 18px 50px rgba(15,23,42,.14); overflow: hidden; }
   body.theme-dark .jan{ background: #182131; }
-  .cab{ background: linear-gradient(120deg, #2563eb, #7c3aed); color: #fff; padding: 1.1rem 1.3rem 1.2rem; position: relative; overflow: hidden; }
-  .cab::after{ content: ""; position: absolute; right: -60px; top: -80px; width: 260px; height: 260px; border-radius: 50%; background: rgba(255,255,255,.12); pointer-events: none; }
-  .cab-l{ display: flex; align-items: center; gap: .8rem; position: relative; z-index: 1; }
-  .cab h1{ font: 800 1.6rem var(--font-heading, inherit); margin: 0; flex: 1; }
-  .pill{ font: 800 .9rem var(--font-body, inherit); background: rgba(255,255,255,.18); border: 1.5px solid rgba(255,255,255,.35); color: #fff; border-radius: 99px; padding: .5rem .95rem; cursor: pointer; }
-  .pill:hover{ background: rgba(255,255,255,.28); }
-  .sems{ display: grid; grid-template-columns: 1fr 1.5fr 1fr 1fr; gap: .6rem; margin-top: .9rem; position: relative; z-index: 1; }
-  .sem{ text-align: left; background: rgba(255,255,255,.16); color: #fff; border: 1.5px solid rgba(255,255,255,.35); border-radius: 16px; padding: .65rem .9rem; cursor: pointer; font: inherit; min-width: 0; }
-  .sem:hover{ background: rgba(255,255,255,.26); }
-  .sem b{ display: block; font: 800 .98rem var(--font-heading, inherit); }
-  .sem span{ display: block; font-weight: 800; font-size: .8rem; opacity: .9; }
-  .sem small{ display: block; font-weight: 700; font-size: .75rem; opacity: .8; margin-top: .2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .sem.on{ background: #fff; color: #4c1d95; border-color: #fff; }
-  .sem.on b{ font-size: 1.15rem; }
-  .sem.vazia{ visibility: hidden; }
-  .corpo{ background: #f1f5f9; padding: 1.1rem 1.2rem 1.4rem; }
-  body.theme-dark .corpo{ background: #111827; }
-  .agora{ display: flex; align-items: center; gap: .8rem; background: #fff; border-radius: 16px; padding: .75rem 1rem; margin-bottom: 1rem; border: 1px solid #e2e8f0; font-weight: 800; flex-wrap: wrap; }
+  .cab{ background: linear-gradient(120deg, #4f6df5, #7c3aed); color: #fff; padding: 1.15rem 1.4rem 1rem; }
+  .cab-top{ display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; }
+  .mes{ font: 800 1.2rem/1.15 var(--font-heading, inherit); display: flex; align-items: center; gap: .6rem; }
+  .seta{ width: 38px; height: 38px; flex: none; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.5); background: rgba(255,255,255,.14); color: #fff; font-size: 1.2rem; font-weight: 900; cursor: pointer; }
+  .seta:hover{ background: rgba(255,255,255,.26); } .seta[disabled]{ opacity: .35; cursor: default; }
+  .hoje-btn{ border: 0; background: #fde047; color: #3b0764; font: 900 .88rem var(--font-body, inherit); border-radius: 99px; padding: .45rem .85rem; cursor: pointer; }
+  .pill{ margin-left: auto; font: 800 .9rem var(--font-body, inherit); background: rgba(255,255,255,.14); border: 1.5px solid rgba(255,255,255,.45); color: #fff; border-radius: 99px; padding: .5rem .95rem; cursor: pointer; }
+  .pill:hover{ background: rgba(255,255,255,.26); }
+  /* contain: sem ele, a faixa larga demais alargava a página inteira no celular */
+  .sems{ contain: inline-size; display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 3 * 12px) / 4); gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; margin-top: 1rem; padding: 10px 2px 8px; scrollbar-width: none; }
+  .sems::-webkit-scrollbar{ display: none; }
+  .sem{ scroll-snap-align: start; position: relative; text-align: left; background: rgba(255,255,255,.14); color: #fff; border: 1.5px solid rgba(255,255,255,.3); border-radius: 18px; padding: .75rem .9rem; cursor: pointer; font: inherit; min-width: 0; min-height: 86px; }
+  .sem:hover{ background: rgba(255,255,255,.24); }
+  .sem b{ display: block; font: 900 1.02rem var(--font-heading, inherit); }
+  .sem span{ display: block; font-weight: 800; font-size: .8rem; opacity: .92; margin-top: 2px; }
+  .sem small{ display: block; font-weight: 800; font-size: .74rem; opacity: .85; margin-top: .45rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sem.passada{ opacity: .62; }
+  .sem.hoje{ background: #fff; color: #4c1d95; border-color: #fff; opacity: 1; }
+  .sem.hoje small{ color: #6d28d9; opacity: 1; }
+  .sem .tag{ position: absolute; top: -10px; right: 12px; background: #fde047; color: #3b0764; font-weight: 900; font-size: .66rem; letter-spacing: .06em; padding: 3px 9px; border-radius: 99px; box-shadow: 0 2px 6px rgba(0,0,0,.18); }
+  .sem.on{ box-shadow: 0 0 0 3px #fde047, 0 10px 24px rgba(0,0,0,.18); opacity: 1; }
+  .pontos{ display: flex; gap: 6px; justify-content: center; margin-top: 4px; min-height: 8px; }
+  .pontos i{ width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.4); cursor: pointer; }
+  .pontos i.on{ width: 22px; border-radius: 6px; background: #fff; }
+  .corpo{ padding: 1.2rem 1.4rem 1.6rem; }
+  .agora{ display: flex; align-items: center; gap: .8rem; background: #fff; border-radius: 18px; padding: .8rem 1.1rem; margin-bottom: 1rem; border: 1px solid #e2e8f0; font-weight: 800; flex-wrap: wrap; }
   body.theme-dark .agora{ background: #1f2937; border-color: #334155; }
   .agora .em{ font-size: 1.7rem; }
   .agora small{ display: block; color: #64748b; font-weight: 700; }
-  .agora .ok{ margin-left: auto; color: var(--verde2); background: #e3f4ef; border-radius: 99px; padding: .35rem .8rem; font-size: .85rem; cursor: pointer; border: 0; font-weight: 800; font-family: inherit; }
-  .agora .ok.nao{ color: #92400e; background: #fef3c7; }
+  .agora .ok{ margin-left: auto; color: var(--verde2); background: #e3f4ef; border-radius: 99px; padding: .45rem .95rem; font-size: .88rem; cursor: pointer; border: 0; font-weight: 900; font-family: inherit; }
+  .agora .ok.nao{ color: #b45309; background: #fef3c7; }
   .aviso-sem{ background: #fef3c7; color: #92400e; border-radius: 12px; padding: .55rem .9rem; font-weight: 800; margin-bottom: .9rem; }
-  h3.sub{ font: 800 1.05rem var(--font-heading, inherit); margin: 1.3rem 0 .7rem; }
-  .tabs{ display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: .9rem; }
-  .tabs button{ font: 800 .9rem var(--font-body, inherit); padding: .5rem .9rem; border-radius: 99px; background: #fff; border: 1px solid #e2e8f0; color: inherit; cursor: pointer; }
-  .tabs button.on{ background: #1e293b; color: #fff; border-color: #1e293b; }
-  body.theme-dark .tabs button{ background: #1f2937; border-color: #334155; }
-  .grade{ display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+  h3.sub{ font: 900 1.15rem var(--font-heading, inherit); margin: 1.3rem 0 .75rem; }
+  .tabs{ display: flex; gap: .55rem; flex-wrap: wrap; margin-bottom: .4rem; }
+  .tabs button{ font: 900 .92rem var(--font-body, inherit); padding: .55rem 1rem; border-radius: 99px; background: #fff; border: 1px solid #e2e8f0; color: inherit; cursor: pointer; }
+  .tabs button.on{ background: #0f172a; color: #fff; border-color: #0f172a; }
+  body.theme-dark .tabs button{ background: #1f2937; border-color: #334155; } body.theme-dark .tabs button.on{ background: #e2e8f0; color: #0f172a; }
+  .grade{ display: grid; grid-template-columns: repeat(auto-fill, minmax(min(236px, 100%), 1fr)); gap: 30px 18px; padding: 14px 0 16px; }
   /* o cartão de uma atividade */
-  .rec{ position: relative; background: #fff; border-radius: 18px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(15,23,42,.06); display: flex; flex-direction: column; }
+  .rec{ position: relative; background: #fff; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(15,23,42,.06); display: flex; flex-direction: column; }
   body.theme-dark .rec{ background: #1f2937; border-color: #334155; }
-  .rec.hl{ border: 3px solid var(--verde); box-shadow: 0 10px 24px rgba(49,168,137,.25); margin-top: 1.1rem; }
-  .rec .flag{ position: absolute; top: -1.15rem; left: 14px; background: var(--verde); color: #fff; font-weight: 900; font-size: .8rem; border-radius: 10px 10px 0 0; padding: .25rem .8rem; }
-  .capa{ display: flex; align-items: center; gap: .6rem; padding: .55rem .9rem; color: #fff; position: relative; overflow: hidden; font-weight: 900; font-size: .8rem; letter-spacing: .05em; border-radius: 17px 17px 0 0; }
-  .rec.hl .capa{ border-radius: 15px 15px 0 0; }
-  .capa::after{ content: ""; position: absolute; right: -26px; bottom: -40px; width: 110px; height: 110px; border-radius: 50%; background: rgba(255,255,255,.14); }
-  .capa .e{ font-size: 1.3rem; }
-  .capa .tg{ background: rgba(255,255,255,.22); border-radius: 99px; padding: .15rem .6rem; }
-  .capa .pf{ margin-left: auto; background: #fff; color: #1e293b; border-radius: 99px; padding: .15rem .6rem; font-size: .75rem; position: relative; z-index: 1; }
-  .n-Basic{ background: linear-gradient(120deg, #0ea5e9, #2563eb); }
-  .n-Intermediate{ background: linear-gradient(120deg, #8b5cf6, #6d28d9); }
-  .n-Advanced{ background: linear-gradient(120deg, #f97316, #dc2626); }
-  .n-Teens{ background: linear-gradient(120deg, #f59e0b, #ea580c); }
-  .n-Todos, .n-{ background: linear-gradient(120deg, #64748b, #334155); }
+  .capa{ display: flex; align-items: center; gap: 6px; padding: .6rem .75rem; color: #fff; font-weight: 900; font-size: .84rem; border-radius: 19px 19px 0 0; }
+  .capa .e{ font-size: 1.15rem; }
+  .capa .tg{ background: rgba(255,255,255,.22); border-radius: 99px; padding: .15rem .6rem; letter-spacing: .02em; white-space: nowrap; }
+  .capa .pf{ margin-left: auto; background: #fff; color: #0f172a; border-radius: 99px; padding: .15rem .6rem; font-size: .76rem; white-space: nowrap; }
+  /* JOVENS × ADULTOS NUM OLHAR (Pedro, 28/11/2026): a bolinha antes da palavra, azul para Jovens e azul-escuro para Adultos */
+  .capa .pf.pf-Jovens::before, .capa .pf.pf-Adultos::before{ content: ""; display: inline-block; width: .62em; height: .62em; border-radius: 50%; margin-right: .35em; vertical-align: .02em; }
+  .capa .pf.pf-Jovens::before{ background: #3b82f6; }
+  .capa .pf.pf-Adultos::before{ background: #1e3a8a; }
+  /* AS CORES DOS NÍVEIS (Pedro, 28/11/2026): sempre as mesmas, em toda semana */
+  .n-Kids{ background: linear-gradient(90deg, #db2777, #f472b6); }
+  .n-Teens{ background: linear-gradient(90deg, #eab308, #facc15); color: #422006; }
+  .n-Teens .tg{ background: rgba(66,32,6,.12); }
+  .n-Basic{ background: linear-gradient(90deg, #1d4ed8, #3b82f6); }
+  .n-Intermediate{ background: linear-gradient(90deg, #78350f, #a16207); }
+  .n-Advanced{ background: linear-gradient(90deg, #0f766e, #14b8a6); }
+  .n-es{ background: linear-gradient(90deg, #ea580c, #fb923c); }
+  .n-es-adv{ background: linear-gradient(90deg, #9a3412, #c2410c); }
+  .n-Todos, .n-{ background: linear-gradient(90deg, #475569, #64748b); }
   .th{ position: relative; aspect-ratio: 16/9; background: #0b0e14; cursor: pointer; overflow: hidden; }
   .th canvas{ width: 100%; height: 100%; display: block; object-fit: contain; }
   .th .carrega{ position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #cbd5e1; font-weight: 800; font-size: .85rem; gap: .5rem; }
@@ -84,23 +99,40 @@
   .th .r{ right: 0; background: linear-gradient(270deg, rgba(0,0,0,.5), transparent); }
   .th:hover .l, .th:hover .r{ opacity: 1; }
   .th .cnt{ position: absolute; right: 8px; bottom: 8px; background: rgba(15,23,42,.75); color: #fff; font-weight: 800; font-size: .75rem; border-radius: 99px; padding: .15rem .55rem; }
-  .inf{ padding: .7rem .9rem .8rem; display: flex; flex-direction: column; gap: .55rem; flex: 1; }
-  .inf b{ font: 800 1rem var(--font-heading, inherit); line-height: 1.25; }
+  .inf{ padding: .8rem .9rem .9rem; display: flex; flex-direction: column; gap: .6rem; flex: 1; }
+  /* o título numa linha só e do mesmo tamanho em todos os cards (ajustaTitulos); o nome inteiro fica no title */
+  .inf b{ font: 900 1.05rem var(--font-heading, inherit); line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .inf .dica{ color: #64748b; font-weight: 700; font-size: .8rem; }
   .rod{ display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; margin-top: auto; }
-  .bt{ font: 900 .9rem var(--font-body, inherit); border: 0; border-radius: 12px; padding: .55rem .9rem; background: linear-gradient(120deg, var(--verde), var(--verde2)); color: #fff; cursor: pointer; }
+  .bt{ font: 900 .9rem var(--font-body, inherit); border: 0; border-radius: 12px; padding: .55rem .95rem; background: linear-gradient(120deg, var(--verde), var(--verde2)); color: #fff; cursor: pointer; }
   .bt2{ font: 800 .85rem var(--font-body, inherit); border: 1.5px solid #cbd5e1; border-radius: 12px; padding: .5rem .8rem; background: #fff; color: #334155; cursor: pointer; }
   body.theme-dark .bt2{ background: #182131; color: #dbe6f3; border-color: #334155; }
   .rod .off{ margin-left: auto; color: var(--verde2); font-weight: 800; font-size: .78rem; }
   .rod .prep{ margin-left: auto; color: #b45309; font-weight: 800; font-size: .78rem; }
-  /* o destaque: a atividade da turma de agora, na largura inteira */
-  .rec.dest{ display: grid; grid-template-columns: 1.55fr 1fr; }
-  .rec.dest .capa{ grid-column: 1 / -1; padding: .75rem 1.1rem; font-size: .9rem; }
-  .rec.dest .th{ border-radius: 0 0 0 15px; }
-  .rec.dest .inf{ padding: 1.1rem 1.2rem; gap: .8rem; }
-  .rec.dest .inf b{ font-size: 1.45rem; }
-  .rec.dest .bt{ font-size: 1.1rem; padding: .85rem 1.2rem; }
-  .rec.dest .dica{ color: #64748b; font-weight: 700; font-size: .85rem; }
-  @media (max-width: 820px){ .rec.dest{ grid-template-columns: 1fr; } .rec.dest .th{ border-radius: 0; } .sems{ grid-template-columns: 1fr 1fr; } }
+  /* A SUGERIDA PARA A TURMA DE AGORA: contorno verde e o selo na borda de BAIXO; o card não sai do lugar na ordem.
+     Turma mista (2+ alunos em cada nível): mais de um card ganha o destaque, e o professor escolhe */
+  .rec.sug{ border: 3px solid #10b981; box-shadow: 0 0 0 6px rgba(16,185,129,.18), 0 14px 30px rgba(16,185,129,.25); }
+  .rec.sug .capa{ border-radius: 17px 17px 0 0; }
+  .rec.sug .inf{ padding-bottom: 1.5rem; }
+  .sug-tag{ position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%); z-index: 3; white-space: nowrap; background: #10b981; color: #fff; font-weight: 900; font-size: .78rem; padding: 5px 12px; border-radius: 99px; box-shadow: 0 4px 12px rgba(16,185,129,.4); }
+  @media (max-width: 640px){
+    main.conv{ margin-top: 20px; padding: 0 12px; }
+    .cab{ padding: 1rem; } .corpo{ padding: 1rem; }
+    .sems{ grid-auto-columns: 78%; }
+    .pill{ margin-left: 0; }
+    .agora .ok{ margin-left: 0; }
+    /* celular: cada atividade numa linha compacta, a miniatura pequena à esquerda (Pedro, 28/11/2026) */
+    .grade{ grid-template-columns: 1fr; gap: 12px; }
+    .rec{ display: grid; grid-template-columns: 118px 1fr; grid-template-rows: auto 1fr; }
+    .rec .capa{ grid-column: 1 / -1; padding: .4rem .65rem; font-size: .76rem; }
+    .rec .th{ align-self: start; margin: 10px 0 10px 10px; border-radius: 10px; }
+    .rec .th .cnt{ font-size: .6rem; padding: 1px 5px; right: 4px; bottom: 4px; }
+    .rec .th .carrega{ font-size: .6rem; }
+    .rec .inf{ padding: .55rem .75rem .7rem; gap: .4rem; }
+    .inf b{ font-size: .98rem; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .bt{ padding: .45rem .75rem; font-size: .85rem; } .rod .off{ font-size: .72rem; }
+    .rec.sug{ margin: 4px 0 18px; }
+  }
   /* todas as semanas */
   #pastas{ position: fixed; inset: 0; background: rgba(15,23,42,.55); z-index: 20; display: flex; align-items: center; justify-content: center; padding: 1rem; }
   #pastas .cx2{ background: #fff; color: #1e293b; border-radius: 20px; max-width: 520px; width: 100%; max-height: 80vh; overflow: auto; padding: 1.1rem 1.2rem; }
@@ -349,14 +381,27 @@
 </head>
 <body>
 <div id="lista">
-  <a class="volta" href="index.html">← Hub</a>
-  <div class="jan">
-    <div class="cab">
-      <div class="cab-l"><h1>💬 Conversação da semana</h1><button type="button" class="pill" id="bPastas">📁 Todas as semanas</button></div>
-      <div class="sems" id="sems"></div>
+  <header class="hero">
+    <a class="back-link" href="index.html" title="Voltar ao Fisk Hub">&larr; Hub</a>
+    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
+    <img class="hero-logo" src="assets/fisk-logo.png" alt="FISK Taubaté · Caçapava">
+    <h1>Conversações</h1>
+    <p>As ACs (Atividades Comunicativas) previstas para cada semana</p>
+  </header>
+  <main class="conv">
+    <div class="jan">
+      <div class="cab">
+        <div class="cab-top">
+          <div class="mes"><button type="button" class="seta" id="semAnt" aria-label="Semanas anteriores">‹</button><span id="semMes">💬 Semanas</span><button type="button" class="seta" id="semProx" aria-label="Próximas semanas">›</button></div>
+          <button type="button" class="hoje-btn" id="semHoje" title="Voltar para a semana de hoje">● Hoje</button>
+          <button type="button" class="pill" id="bPastas">📁 Todas as semanas</button>
+        </div>
+        <div class="sems" id="sems"></div>
+        <div class="pontos" id="semPontos"></div>
+      </div>
+      <div class="corpo" id="corpo"><div class="espera"><i></i> Buscando as atividades da semana…</div></div>
     </div>
-    <div class="corpo" id="corpo"><div class="espera"><i></i> Buscando as atividades da semana…</div></div>
-  </div>
+  </main>
 </div>
 <div id="pastas" hidden><div class="cx2" id="pastasCx"></div></div>
 
@@ -394,7 +439,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js"></script>
-<script src="assets/tema-slides.js?v=202b14d21f"></script>
+<script src="assets/tema-slides.js?v=81aec39068"></script>
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
@@ -460,6 +505,11 @@
   /* AS BUDDY TALKS (Pedro, 28/11/2026): a série de pronúncia dos Transitions, gerada do conteúdo do Conversation Maker
      por scripts/build-buddy-talks.js em buddy-talks/ (ao lado desta página: sem backend para listar nem abrir). Valem em
      qualquer semana. O áudio do livro vem do Drive pelo backend (cmAudio), no slide "Let's practice". */
+  /* SÓ A COORDENAÇÃO VÊ AS SÉRIES (Pedro, 28/11/2026): Buddy Talks, Countries, Everyday Life e YouTubers são o acervo
+     INTERNO de onde a coordenação escolhe o que entra em cada semana. Abertas a todos, cada professor escolhia a sua, e o
+     aluno que trocava de professor repetia atividade: é por isso que há anos existe o sistema das semanas. O professor vê
+     a semana e as "Minhas conversações"; a direção (master, ou o "ver como" dela) vê também as quatro séries. */
+  var COORD = !!(s && (s.master || s.viewingAs));
   var BUDDY = 'Buddy Talks', ultBuddy = null;
   function pedeBuddy() {
     return fetch('buddy-talks/index.json', { cache: 'no-cache' }).then(function (r) { return r.json(); })
@@ -468,7 +518,7 @@
   function juntaBuddy(itens) {
     if (!dados) return; dados.idiomas = dados.idiomas || {};
     delete dados.idiomas[BUDDY];
-    if (!itens || !itens.length) return;
+    if (!COORD || !itens || !itens.length) return;
     dados.idiomas[BUDDY] = itens.map(function (m) { return { id: m.id, nome: m.nome, tipo: 'cm', niveis: [m.nivel], pronto: true, origem: 'buddy', livro: m.livro }; });
     dados.vazio = false;
   }
@@ -483,7 +533,7 @@
   function juntaYt(itens) {
     if (!dados) return; dados.idiomas = dados.idiomas || {};
     delete dados.idiomas[YT];
-    if (!itens || !itens.length) return;
+    if (!COORD || !itens || !itens.length) return;
     dados.idiomas[YT] = itens.map(function (m) { return { id: m.id, nome: m.nome, tipo: 'cm', niveis: m.niveis || [], pronto: true, origem: 'youtubers' }; });
     dados.vazio = false;
   }
@@ -495,7 +545,7 @@
   function juntaVida(itens) {
     if (!dados) return; dados.idiomas = dados.idiomas || {};
     delete dados.idiomas[VIDA];
-    if (!itens || !itens.length) return;
+    if (!COORD || !itens || !itens.length) return;
     dados.idiomas[VIDA] = itens.map(function (m) { return { id: m.id, nome: m.nome, tipo: 'cm', niveis: m.niveis || [], pronto: true, origem: 'everyday' }; });
     dados.vazio = false;
   }
@@ -506,7 +556,7 @@
   function juntaPaises(itens) {
     if (!dados) return; dados.idiomas = dados.idiomas || {};
     delete dados.idiomas[PAISES];
-    if (!itens || !itens.length) return;
+    if (!COORD || !itens || !itens.length) return;
     dados.idiomas[PAISES] = itens.map(function (m) { return { id: m.id, nome: m.nome, tipo: 'cm', niveis: m.niveis || [], pronto: true, origem: 'countries' }; });
     dados.vazio = false;
   }
@@ -569,63 +619,147 @@
   function csemTiraAcento(x) { return String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
   function nivelDe(it) { return (it.niveis || []).filter(function (n) { return /Teens|Basic|Intermediate|Advanced|Todos/.test(n); })[0] || ''; }
   function perfilDe(it) { return (it.niveis || []).filter(function (n) { return /Jovens|Adultos/.test(n); })[0] || ''; }
-  var EM = { Basic: '🌱', Intermediate: '🚀', Advanced: '🏆', Teens: '⭐', Todos: '🌍' };
+  var EM = { Kids: '🧸', Basic: '🌱', Intermediate: '🚀', Advanced: '🏆', Teens: '⭐', Todos: '🌍' };
   /* "Semana 3 - de 14 a 20 de novembro" → { n: 'Semana 3', d: '14 a 20 de novembro' } */
   function partesSemana(nome) { var m = String(nome).match(/^(Semana\s*\d+)\s*[-–]\s*(?:de\s+)?(.*?)(\s*\(.*\))?$/i); return m ? { n: m[1], d: m[2] } : { n: nome, d: '' }; }
 
-  function desenhaTopo() {
-    var lista = dados.semanas || [], i = lista.map(function (x) { return x.id; }).indexOf(dados.semana && dados.semana.id);
-    var mostra = [lista[i - 1], lista[i], lista[i + 1], lista[i + 2]];
-    $('sems').innerHTML = mostra.map(function (x, k) {
-      if (!x) return '<span class="sem vazia"></span>';
-      var p = partesSemana(x.nome);
-      return '<button type="button" class="sem' + (k === 1 ? ' on' : '') + '" data-sem="' + esc(x.id) + '"><b>' + esc(p.n) + (x.atual ? ' · hoje' : '') + '</b><span>' + esc(p.d) + '</span>' +
-        (k === 1 ? (function () { var ks = Object.keys(dados.idiomas || {}).filter(function (x) { return x !== MINHAS && x !== ACERVO && x !== BUDDY && x !== PAISES && x !== VIDA && x !== YT; }), n = 0; ks.forEach(function (x) { n += dados.idiomas[x].length; }); return '<small>' + (n ? n + (n === 1 ? ' atividade' : ' atividades') + ' · ' + esc(ks.join(', ')) : 'nenhuma atividade da semana ainda') + '</small>'; })() : '') + '</button>';
-    }).join('');
+  /* ── O CARROSSEL DAS SEMANAS (Pedro, 28/11/2026: "quando clico numa semana ela vira a do centro, isso é confuso") ──
+     Todas as semanas numa faixa que desliza, quatro por vez (uma e pouco no celular). A escolhida NÃO muda de lugar: ganha
+     o contorno amarelo. A de hoje é branca, com o selo HOJE; as passadas ficam apagadas. O título do topo diz o(s) mês(es)
+     das semanas à vista; as bolinhas são as "páginas" de quatro. */
+  var MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+  function mesesDe(txt) { var t = csemTiraAcento(String(txt || '')).toLowerCase(), out = []; MESES.forEach(function (m, k) { var re = new RegExp('\\b' + csemTiraAcento(m) + '\\b'); if (re.test(t)) out.push(k); }); return out; }
+  function contaDe(sem) {
+    var d = sem.id === (dados.semana && dados.semana.id) ? dados : guardada(sem.id); if (!d || !d.idiomas) return '';
+    var n = 0; Object.keys(d.idiomas).forEach(function (k) { if (k !== MINHAS && k !== ACERVO && k !== BUDDY && k !== PAISES && k !== VIDA && k !== YT) n += (d.idiomas[k] || []).length; });
+    return n ? n + (n === 1 ? ' atividade' : ' atividades') : (sem.id === (dados.semana && dados.semana.id) ? 'nenhuma atividade ainda' : '');
   }
+  var topoIds = '';
+  function desenhaTopo() {
+    var lista = dados.semanas || [], escolhida = dados.semana && dados.semana.id, box = $('sems');
+    var hojeI = lista.map(function (x) { return !!x.atual; }).indexOf(true), ids = lista.map(function (x) { return x.id; }).join('|');
+    var antes = box.scrollLeft, nova = ids !== topoIds; topoIds = ids;
+    box.innerHTML = lista.map(function (x, k) {
+      var p = partesSemana(x.nome), c = contaDe(x);
+      return '<button type="button" class="sem' + (hojeI > -1 && k < hojeI ? ' passada' : '') + (x.atual ? ' hoje' : '') + (x.id === escolhida ? ' on' : '') + '" data-sem="' + esc(x.id) + '" data-mes="' + mesesDe(p.d || x.nome).join(',') + '">' +
+        (x.atual ? '<i class="tag">HOJE</i>' : '') + '<b>' + esc(p.n) + '</b><span>' + esc(p.d) + '</span>' + (c ? '<small>' + esc(c) + '</small>' : '') + '</button>';
+    }).join('');
+    box.style.scrollBehavior = 'auto';
+    if (nova) { var on = box.querySelector('.sem.on') || box.querySelector('.sem.hoje'); semMostra(on, true); }
+    else { box.scrollLeft = antes; var sel = box.querySelector('.sem.on'); if (sel && !semVisivel(sel)) semMostra(sel, true); }
+    box.style.scrollBehavior = '';
+    semIndicadores();
+  }
+  function semCel() { return window.matchMedia && matchMedia('(max-width: 640px)').matches; }
+  function semVisivel(b) { var c = $('sems').getBoundingClientRect(), r = b.getBoundingClientRect(); return r.left >= c.left - 2 && r.right <= c.right + 2; }
+  /* no computador, a semana com a anterior à esquerda; no celular, ela primeiro */
+  function semMostra(b, jaPosiciona) {
+    if (!b) return; var box = $('sems'), alvo = (!semCel() && b.previousElementSibling) || b;
+    box.scrollLeft += alvo.getBoundingClientRect().left - box.getBoundingClientRect().left - 2;
+  }
+  function semIndicadores() {
+    var box = $('sems'), bs = [].slice.call(box.querySelectorAll('.sem')); if (!bs.length) { $('semPontos').innerHTML = ''; return; }
+    var vis = bs.filter(semVisivel), ms = [];
+    (vis.length ? vis : bs.slice(0, 1)).forEach(function (b) { (b.dataset.mes || '').split(',').filter(String).forEach(function (m) { if (ms.indexOf(+m) < 0) ms.push(+m); }); });
+    ms.sort(function (a, b) { return a - b; });
+    if (ms.length > 1 && ms[ms.length - 1] - ms[0] > 6) ms = ms.slice(-1).concat(ms.slice(0, -1));   /* dezembro · janeiro */
+    $('semMes').textContent = '💬 ' + (ms.length ? ms.map(function (m) { return MESES[m].charAt(0).toUpperCase() + MESES[m].slice(1); }).join(' · ') : 'Semanas');
+    var pg = Math.max(1, Math.ceil(box.scrollWidth / Math.max(1, box.clientWidth) - .05)), at = Math.round(box.scrollLeft / Math.max(1, box.clientWidth));
+    $('semPontos').innerHTML = pg > 1 ? Array.apply(null, Array(Math.min(pg, 12))).map(function (_, k) { return '<i data-pg="' + k + '"' + (k === Math.min(at, pg - 1) ? ' class="on"' : '') + '></i>'; }).join('') : '';
+    $('semAnt').disabled = box.scrollLeft < 4; $('semProx').disabled = box.scrollLeft + box.clientWidth > box.scrollWidth - 4;
+  }
+  var semT = 0;
+  $('sems').addEventListener('scroll', function () { clearTimeout(semT); semT = setTimeout(semIndicadores, 80); });
+  window.addEventListener('resize', function () { clearTimeout(semT); semT = setTimeout(semIndicadores, 120); });
+  $('semAnt').onclick = function () { var b = $('sems'); b.scrollLeft -= b.clientWidth; };
+  $('semProx').onclick = function () { var b = $('sems'); b.scrollLeft += b.clientWidth; };
+  $('semPontos').addEventListener('click', function (e) { var i = e.target.closest('[data-pg]'); if (i) { var b = $('sems'); b.scrollLeft = +i.dataset.pg * b.clientWidth; } });
+  $('semHoje').onclick = function () {
+    var h = semanaAtual(); if (!h) return;
+    semMostra($('sems').querySelector('[data-sem="' + h.id + '"]'));
+    if (h.id !== semanaId) carregaLista(h.id);
+  };
   function turmaBase() { var t = typeof fiskTurmaDeAgora === 'function' ? fiskTurmaDeAgora(s) : null, agora = !!t; if (!t && typeof fiskTurmaProxima === 'function') t = fiskTurmaProxima(s); if (t) t.agora = agora; return t; }
-  /* a atividade da turma: mesmo idioma, mesmo nível (Teens sem atividade própria → Basic Jovens) e o mesmo perfil */
+  /* A ATIVIDADE DA TURMA: mesmo idioma, mesmo nível (Teens sem atividade própria → Basic Jovens) e o mesmo perfil.
+     TURMA MISTA (Pedro, 28/11/2026, opção A): um destaque por nível que tem 2 ou mais alunos (fiskPerfilDaTurma.niveis),
+     e o professor escolhe. Devolve [{ it, nivel, alunos }], vazio quando não há o que sugerir. */
   function escolheDestaque(t) {
-    if (!t || !t.nivel || !semanaCerta()) return null;
-    var lista = (dados.idiomas && dados.idiomas[t.idioma]) || [];
-    lista = lista.filter(function (it) { return it.pronto; });
-    var nivel = t.nivel, perfil = t.perfil;
-    if (nivel === 'Teens' && !lista.some(function (it) { return nivelDe(it) === 'Teens'; })) { nivel = 'Basic'; perfil = 'Jovens'; }
-    var doNivel = lista.filter(function (it) { return nivelDe(it) === nivel; });
-    return doNivel.filter(function (it) { return !perfilDe(it) || perfilDe(it) === perfil; })[0] || doNivel[0] || null;
+    if (!t || !t.nivel || !semanaCerta()) return [];
+    var lista = ((dados.idiomas && dados.idiomas[t.idioma]) || []).filter(function (it) { return it.pronto && !it.grupo; });
+    var um = function (nivel) {
+      var perfil = t.perfil;
+      if (nivel === 'Teens' && !lista.some(function (it) { return nivelDe(it) === 'Teens'; })) { nivel = 'Basic'; perfil = 'Jovens'; }
+      var doNivel = lista.filter(function (it) { return nivelDe(it) === nivel; });
+      return doNivel.filter(function (it) { return !perfilDe(it) || perfilDe(it) === perfil; })[0] || doNivel[0] || null;
+    };
+    var nvs = t.niveis && t.niveis.length > 1 ? t.niveis : [{ nivel: t.nivel, alunos: 0 }], out = [];
+    nvs.forEach(function (n) { var it = um(n.nivel); if (it && !out.some(function (o) { return o.it === it; })) out.push({ it: it, nivel: n.nivel, alunos: n.alunos }); });
+    return out;
   }
   var aba = '';
   function desenhaLista() {
     desenhaTopo();
-    var t = turmaBase(), dest = escolheDestaque(t), h = '';
+    var t = turmaBase(), dest = escolheDestaque(t), mista = dest.length > 1, h = '';
     if (dados._offline) h += '<div class="aviso-sem">Sem internet: mostrando o que ficou guardado neste computador.</div>';
     else if (!semanaCerta()) h += '<div class="aviso-sem">Atenção: esta NÃO é a semana de hoje.</div>';
-    h += '<div class="agora"><span class="em">🕐</span><div>' + (t ? (t.agora ? 'Agora: ' : 'Próxima aula: ') + esc(t.turma) + (t.livro ? ' · ' + esc(t.livro) : '') +
-      '<small>' + (dest ? 'A atividade dela está em destaque logo abaixo' : 'As atividades desta semana estão abaixo') + '</small>' : 'Sem aula agora<small>As atividades desta semana estão abaixo</small>') +
+    var quem = t ? esc(t.turma) + (mista ? ' · turma mista: ' + t.niveis.map(function (n) { return esc(n.nivel) + ' (' + n.alunos + ')'; }).join(' + ') : (t.nivel ? ' · ' + esc(t.nivel) + (t.perfil ? ' ' + esc(t.perfil) : '') : '')) : '';
+    h += '<div class="agora"><span class="em">' + (t && t.agora ? '🟢' : '🕐') + '</span><div>' + (t ? (t.agora ? 'Aula agora: ' : 'Próxima aula: ') + quem +
+      '<small>' + (dest.length ? (mista ? 'As ACs sugeridas para cada nível estão destacadas: escolha a da turma' : 'A AC sugerida está destacada abaixo') : 'As atividades desta semana estão abaixo') + '</small>' : 'Sem aula agora<small>As atividades desta semana estão abaixo</small>') +
       '</div><button type="button" class="ok nao" id="bOff">📥 Guardar a semana neste computador</button></div>';
     if (dados.vazio || !todos().length) { $('corpo').innerHTML = h + '<p style="font-weight:700;color:#64748b">Nenhuma atividade nesta semana ainda.</p>'; marcaOffline(); return; }
-    if (dest) h += cartao(dest, true);
-    var grupos = gruposDe(dest);
+    var grupos = gruposDe(), sug = {};
+    dest.forEach(function (d) { sug[d.it.id] = mista ? '⭐ Sugerida · ' + d.alunos + ' alunos de ' + d.nivel : '⭐ Sugerida para esta turma'; });
     if (!aba || !grupos.some(function (g) { return g.k === aba; })) aba = grupos[0] ? grupos[0].k : '';
-    h += '<h3 class="sub">📚 ' + (dest ? 'Outras desta semana' : 'Desta semana') + '</h3><div class="tabs">' + grupos.map(function (g) {
+    h += '<h3 class="sub">📚 Desta semana</h3><div class="tabs">' + grupos.map(function (g) {
       return '<button type="button" data-aba="' + esc(g.k) + '"' + (g.k === aba ? ' class="on"' : '') + '>' + esc(g.rot) + ' · ' + g.itens.length + '</button>'; }).join('') + '</div>';
-    grupos.forEach(function (g) { h += '<div class="grade" data-grade="' + esc(g.k) + '"' + (g.k === aba ? '' : ' hidden') + '>' + g.itens.map(function (it) { return cartao(it, false); }).join('') + '</div>'; });
+    grupos.forEach(function (g) { h += '<div class="grade" data-grade="' + esc(g.k) + '"' + (g.k === aba ? '' : ' hidden') + '>' + g.itens.map(function (it) { return cartao(it, sug[it.id]); }).join('') + '</div>'; });
     $('corpo').innerHTML = h;
     $('bOff').onclick = guardarSemana;
-    marcaOffline(); observaMiniaturas();
+    marcaOffline(); observaMiniaturas(); ajustaTitulos();
   }
-  function gruposDe(dest) {
-    var out = [], extras = [];
-    ['English', 'Español'].concat(Object.keys(dados.idiomas || {}).filter(function (k) { return k !== 'English' && k !== 'Español'; })).forEach(function (idioma) {
-      var itens = (dados.idiomas[idioma] || []).filter(function (it) { return it !== dest; }), soltos = itens.filter(function (it) { return !it.grupo; });
-      var band = idioma === 'English' ? '🇺🇸 ' : idioma === 'Español' ? '🇪🇸 ' : idioma === MINHAS ? '🧩 ' : idioma === ACERVO ? '🗂️ ' : idioma === BUDDY ? '🐻 ' : idioma === PAISES ? '🌍 ' : idioma === VIDA ? '🏡 ' : idioma === YT ? '▶️ ' : '📁 ';
-      var ord = function (a, b) { var o = { Teens: 0, Basic: 1, Intermediate: 2, Advanced: 3, Todos: 4 }; return ((o[nivelDe(a)] == null ? 9 : o[nivelDe(a)]) - (o[nivelDe(b)] == null ? 9 : o[nivelDe(b)])) || (perfilDe(a) === perfilDe(b) ? 0 : (perfilDe(a) === 'Jovens' ? -1 : 1)); };
-      if (soltos.length) out.push({ k: idioma, rot: band + idioma, itens: soltos.sort(ord) });
-      var gs = {}; itens.filter(function (it) { return it.grupo; }).forEach(function (it) { (gs[it.grupo] = gs[it.grupo] || []).push(it); });
-      Object.keys(gs).forEach(function (g) { extras.push({ k: idioma + '|' + g, rot: '📁 ' + g.replace(/^Extra\s*-\s*/i, 'Extra: '), itens: gs[g].sort(ord) }); });
+  /* A ORDEM DA PROGRESSÃO (Pedro, 28/11/2026): Kids, Teens, Basic Jovens, Basic Adultos, Intermediate Jovens e Adultos,
+     Advanced Jovens e Adultos, e o espanhol no fim, do básico ao avançado. Inglês e espanhol na MESMA lista ("Da semana");
+     as pastas extras, as Minhas conversações e o acervo continuam em abas próprias. */
+  var ORDEM_NIVEL = { Kids: 0, Teens: 1, Basic: 2, Intermediate: 3, Advanced: 4, Todos: 5 };
+  function ehEspanhol(it) { return it._idioma === 'Español'; }
+  function ordem(a, b) {
+    var o = function (x) { return ORDEM_NIVEL[nivelDe(x)] == null ? 9 : ORDEM_NIVEL[nivelDe(x)]; }, p = function (x) { return perfilDe(x) === 'Jovens' ? 0 : perfilDe(x) === 'Adultos' ? 1 : 2; };
+    return ((ehEspanhol(a) ? 1 : 0) - (ehEspanhol(b) ? 1 : 0)) || (o(a) - o(b)) || (p(a) - p(b)) || titulo(a).localeCompare(titulo(b));
+  }
+  function gruposDe() {
+    var semana = [], out = [], extras = [];
+    Object.keys(dados.idiomas || {}).forEach(function (idioma) {
+      (dados.idiomas[idioma] || []).forEach(function (it) { it._idioma = idioma; });
     });
-    return out.concat(extras);   /* os idiomas primeiro, as pastas extras depois */
+    var daSemana = function (k) { return k !== MINHAS && k !== ACERVO && k !== BUDDY && k !== PAISES && k !== VIDA && k !== YT; };
+    Object.keys(dados.idiomas || {}).forEach(function (idioma) {
+      var itens = dados.idiomas[idioma] || [];
+      if (daSemana(idioma)) {
+        semana = semana.concat(itens.filter(function (it) { return !it.grupo; }));
+        var gs = {}; itens.filter(function (it) { return it.grupo; }).forEach(function (it) { (gs[it.grupo] = gs[it.grupo] || []).push(it); });
+        Object.keys(gs).forEach(function (g) { extras.push({ k: idioma + '|' + g, rot: '📁 ' + g.replace(/^Extra\s*-\s*/i, 'Extra: '), itens: gs[g].sort(ordem) }); });
+      }
+    });
+    if (semana.length) out.push({ k: 'semana', rot: '📅 Da semana', itens: semana.sort(ordem) });
+    out = out.concat(extras);
+    [[MINHAS, '🧩 '], [ACERVO, '🗂️ '], [BUDDY, '🐻 '], [PAISES, '🌍 '], [VIDA, '🏡 '], [YT, '▶️ ']].forEach(function (x) {
+      var itens = (dados.idiomas || {})[x[0]]; if (itens && itens.length) out.push({ k: x[0], rot: x[1] + x[0], itens: itens.slice().sort(ordem) });
+    });
+    return out;
   }
+  /* O TÍTULO NUMA LINHA SÓ E DO MESMO TAMANHO (Pedro, 28/11/2026): acha o tamanho em que o mais longo da aba cabe (até
+     78% do normal) e usa esse em todos; o que ainda não couber termina em reticências. No celular são até duas linhas. */
+  function ajustaTitulos() {
+    if (semCel()) return;
+    [].forEach.call(document.querySelectorAll('.grade:not([hidden])'), function (g) {
+      var hs = [].slice.call(g.querySelectorAll('.inf b')); if (!hs.length) return;
+      hs.forEach(function (h) { h.style.fontSize = ''; });
+      var f = parseFloat(getComputedStyle(hs[0]).fontSize), min = f * .78;
+      var cabe = function () { return hs.every(function (h) { return h.scrollWidth <= h.clientWidth; }); };
+      while (!cabe() && f > min) { f -= .5; hs.forEach(function (h) { h.style.fontSize = f + 'px'; }); }
+    });
+  }
+  var ajT = 0; window.addEventListener('resize', function () { clearTimeout(ajT); ajT = setTimeout(ajustaTitulos, 150); });
   /* a nota do acervo: as estrelas na capa da atividade; dar de novo troca a nota do professor */
   function notaAcervo() {
     var box = $('notaAc'); if (!box || !atual) return;
@@ -643,15 +777,19 @@
     };
     desenha();
   }
-  function cartao(it, dest) {
-    var n = nivelDe(it), pf = perfilDe(it);
-    return '<div class="rec' + (dest ? ' hl dest' : '') + '" data-rec="' + esc(it.id) + '">' + (dest ? '<span class="flag">★ Para a turma de agora</span>' : '') +
-      '<div class="capa n-' + esc(n) + '"><span class="e">' + (EM[n] || '💬') + '</span><span class="tg">' + esc((n === 'Todos' ? 'Todos os níveis' : n || 'Atividade').toUpperCase()) + '</span>' + (pf ? '<span class="pf">' + esc(pf) + '</span>' : '') + '</div>' +
+  /* o cartão: a faixa na cor do nível, a miniatura, o título numa linha e o ▶. sug = o texto do selo da sugerida */
+  var NIVEL_PT = { Basic: 'Básico', Intermediate: 'Intermediário', Advanced: 'Avançado', Teens: 'Teens', Kids: 'Kids', Todos: 'Todos' };
+  function cartao(it, sug) {
+    var n = nivelDe(it), pf = perfilDe(it), es = it._idioma === 'Español';
+    var cor = es ? (n === 'Advanced' ? 'n-es-adv' : 'n-es') : 'n-' + n, tg = es ? 'ESPANHOL' : (n === 'Todos' ? 'TODOS OS NÍVEIS' : (n || 'Atividade').toUpperCase());
+    var dir = es ? (NIVEL_PT[n] || '') : pf;
+    return '<div class="rec' + (sug ? ' sug' : '') + '" data-rec="' + esc(it.id) + '">' + (sug ? '<span class="sug-tag">' + esc(sug) + '</span>' : '') +
+      '<div class="capa ' + esc(cor) + '"><span class="e">' + (es ? '🌍' : (EM[n] || '💬')) + '</span><span class="tg">' + esc(tg) + '</span>' + (dir ? '<span class="pf' + (es ? '' : ' pf-' + esc(pf)) + '">' + esc(dir) + '</span>' : '') + '</div>' +
       '<div class="th" data-th="' + esc(it.id) + '" title="' + esc(it.nome) + '">' + (it.pronto ? '<span class="carrega"><i></i> preparando a miniatura…</span>' : '<span class="carrega">em preparação</span>') +
       '<span class="l" title="Slide anterior">‹</span><span class="r" title="Próximo slide">›</span><span class="cnt" hidden></span></div>' +
-      '<div class="inf"><b>' + esc(titulo(it)) + '</b>' +
-      (it.origem === 'acervo' ? '<span class="dica">por ' + esc(it.autor || '') + (it.notas ? ' · ★ ' + String(it.nota).replace('.', ',') + ' (' + it.notas + (it.notas === 1 ? ' nota' : ' notas') + ')' : ' · ainda sem nota') + '</span>' : '') + (dest ? '<span class="dica">Clique nas bordas da imagem para ver os slides antes da aula.</span>' : '') +
-      '<div class="rod">' + (it.pronto ? '<button type="button" class="bt" data-abre="' + esc(it.id) + '">▶ ' + (dest ? 'Começar na tela cheia' : 'Começar') + '</button>' : '') +
+      '<div class="inf"><b title="' + esc(titulo(it)) + '">' + esc(titulo(it)) + '</b>' +
+      (it.origem === 'acervo' ? '<span class="dica">por ' + esc(it.autor || '') + (it.notas ? ' · ★ ' + String(it.nota).replace('.', ',') + ' (' + it.notas + (it.notas === 1 ? ' nota' : ' notas') + ')' : ' · ainda sem nota') + '</span>' : '') +
+      '<div class="rod">' + (it.pronto ? '<button type="button" class="bt" data-abre="' + esc(it.id) + '">▶ Começar</button>' : '') +
       (it.pronto ? '<span class="off" data-off="' + esc(it.id) + '" hidden>✓ offline</span>' : '<span class="prep">em preparação</span>') + '</div></div></div>';
   }
   function marcaOffline() {
@@ -709,7 +847,7 @@
   function porId(id) { return todos().filter(function (i) { return i.id === id; })[0]; }
   $('corpo').addEventListener('click', function (e) {
     var t;
-    if ((t = e.target.closest('[data-aba]'))) { aba = t.dataset.aba; [].forEach.call(document.querySelectorAll('[data-aba]'), function (b) { b.classList.toggle('on', b === t); }); [].forEach.call(document.querySelectorAll('[data-grade]'), function (g) { g.hidden = g.dataset.grade !== aba; }); observaMiniaturas(); return; }
+    if ((t = e.target.closest('[data-aba]'))) { aba = t.dataset.aba; [].forEach.call(document.querySelectorAll('[data-aba]'), function (b) { b.classList.toggle('on', b === t); }); [].forEach.call(document.querySelectorAll('[data-grade]'), function (g) { g.hidden = g.dataset.grade !== aba; }); observaMiniaturas(); ajustaTitulos(); return; }
     if ((t = e.target.closest('[data-abre]'))) { abre(t.dataset.abre); return; }
     if ((t = e.target.closest('[data-th]'))) {
       var it = porId(t.dataset.th); if (!it || !it.pronto) return;
@@ -1576,12 +1714,15 @@
   var q = new URLSearchParams(location.search), qId = q.get('id'), qSem = q.get('semana');
   carregaLista(qSem || '', qId ? function () { abre(qId); } : null);
   pedeMinhas().then(function (itens) { ultMinhas = itens; if (dados && !$('lista').hidden) { juntaMinhas(itens); desenhaLista(); } });
-  pedeBuddy().then(function (itens) { ultBuddy = itens; if (dados && !$('lista').hidden) { juntaBuddy(itens); desenhaLista(); } });
-  pedePaises().then(function (itens) { ultPaises = itens; if (dados && !$('lista').hidden) { juntaPaises(itens); desenhaLista(); } });
-  pedeYt().then(function (itens) { ultYt = itens; if (dados && !$('lista').hidden) { juntaYt(itens); desenhaLista(); } });
-  pedeVida().then(function (itens) { ultVida = itens; if (dados && !$('lista').hidden) { juntaVida(itens); desenhaLista(); } });
+  if (COORD) {   /* o professor nem baixa as listas das séries */
+    pedeBuddy().then(function (itens) { ultBuddy = itens; if (dados && !$('lista').hidden) { juntaBuddy(itens); desenhaLista(); } });
+    pedePaises().then(function (itens) { ultPaises = itens; if (dados && !$('lista').hidden) { juntaPaises(itens); desenhaLista(); } });
+    pedeYt().then(function (itens) { ultYt = itens; if (dados && !$('lista').hidden) { juntaYt(itens); desenhaLista(); } });
+    pedeVida().then(function (itens) { ultVida = itens; if (dados && !$('lista').hidden) { juntaVida(itens); desenhaLista(); } });
+  }
   pedeAcervo().then(function (itens) { ultAcervo = itens; if (dados && !$('lista').hidden) { juntaAcervo(itens); desenhaLista(); } });
   try { if (localStorage.getItem('fisk_theme') === 'dark') document.body.classList.add('theme-dark'); } catch (e) {}
+  if (typeof fiskInitThemeToggle === 'function') fiskInitThemeToggle('themeToggle');   /* o 🌙 do cabeçalho padrão */
   fiskApresEnviar(false);   /* o que ficou na fila de uma aula sem internet */
   try { fiskRegistrarUso('Conversação da semana', 'conversacao'); } catch (e) {}
 })();

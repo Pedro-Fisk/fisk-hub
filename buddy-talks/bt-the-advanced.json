@@ -146,68 +146,8 @@
     ]
    }
   ],
-  "languageGame": [
-   {
-    "type": "listen",
-    "question": "Listen. Which sound do you hear?",
-    "audio": "the issue",
-    "options": [
-     "/ði/",
-     "/ðə/"
-    ],
-    "correctIndex": 0
-   },
-   {
-    "type": "listen",
-    "question": "Listen. Which sound do you hear?",
-    "audio": "the offer",
-    "options": [
-     "/ði/",
-     "/ðə/"
-    ],
-    "correctIndex": 0
-   },
-   {
-    "type": "listen",
-    "question": "Listen. Which sound do you hear?",
-    "audio": "the honor",
-    "options": [
-     "/ði/",
-     "/ðə/"
-    ],
-    "correctIndex": 0
-   },
-   {
-    "type": "listen",
-    "question": "Listen. Which sound do you hear?",
-    "audio": "the union",
-    "options": [
-     "/ði/",
-     "/ðə/"
-    ],
-    "correctIndex": 1
-   },
-   {
-    "type": "listen",
-    "question": "Listen. Which sound do you hear?",
-    "audio": "the effort",
-    "options": [
-     "/ði/",
-     "/ðə/"
-    ],
-    "correctIndex": 0
-   },
-   {
-    "type": "listen",
-    "question": "Listen. Which sound do you hear?",
-    "audio": "the impact",
-    "options": [
-     "/ði/",
-     "/ðə/"
-    ],
-    "correctIndex": 0
-   }
-  ],
+  "languageGame": [],
+  "semVoz": true,
   "evaluation": [
    {
     "question": "Do you switch between the two forms of THE?"

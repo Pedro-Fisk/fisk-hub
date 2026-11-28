@@ -147,6 +147,7 @@
    }
   ],
   "languageGame": [],
+  "semVoz": true,
   "evaluation": [
    {
     "question": "Do you control the melody of your questions?"
