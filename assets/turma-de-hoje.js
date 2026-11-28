@@ -852,7 +852,7 @@ function carregarTurma(escola, prof, linha, titulo) {
   var guardado = window.FiskPreAula ? FiskPreAula.le(escola, prof, linha) : null;
   planoTurmaDesmonta();
   estado.escola = escola; estado.prof = prof; estado.turma = titulo; estado.plantao = false; estado.prioridade = false; estado.ontem = false; estado.dia = '';
-  $('alunos').innerHTML = ''; $('resumo').hidden = true; $('legenda').hidden = true;
+  $('alunos').innerHTML = ''; $('resumo').hidden = true; $('legenda').hidden = true; if ($('conv-card')) $('conv-card').hidden = true;
   esperaFim();
   if (guardado) { guardado.vivo = true; preMostraTurma(guardado, meu, escola); }
   else espera(['Lendo a turma no card…', 'O card está demorando, mas vem…', 'Ainda lendo o card… em dias de card lento passa de 30 s']);
@@ -1087,10 +1087,58 @@ function desenharTurma() {
   ligaArrastar(caixa);
   festaSeTurmaEmDia();
 }
+/* ═══ A CONVERSAÇÃO DA SEMANA (Pedro, 28/11/2026: "a atividade comunicativa já prevista, num card retangular dentro
+   da Minha aula") ═══ A atividade sai do calendário da conversação (rota conversaSemana, a mesma da conversacao.html,
+   que guarda a semana em conv:semana:atual: as duas telas dividem o cache) com a MESMA escolha da conversação
+   (escolheDestaque de lá): mesmo idioma, mesmo nível (Teens sem atividade própria → Basic Jovens) e o mesmo perfil, pelo
+   fiskPerfilDaTurma. O botão abre a ferramenta em outra aba, já na atividade (?id=&semana=). */
+var convSemana = null, convPedido = null;
+function convLer() {
+  var g = null; try { g = JSON.parse(localStorage.getItem('conv:semana:atual') || 'null'); } catch (e) {}
+  if (g && g.idiomas) convSemana = g;
+  if (convPedido || (g && g._em && Date.now() - g._em < 30 * 6e4)) return Promise.resolve(convSemana);
+  var s = sessao(); if (!s || !s.token || typeof FISK_HUB_EP === 'undefined') return Promise.resolve(convSemana);
+  convPedido = fiskFetch(FISK_HUB_EP, { action: 'conversaSemana', token: s.token, semanaId: '' }, { timeoutMs: 60000 }).then(function (j) {
+    if (j && j.ok) { j._em = Date.now(); convSemana = j; try { localStorage.setItem('conv:semana:atual', JSON.stringify(j)); if (j.semana) localStorage.setItem('conv:semana:' + j.semana.id, JSON.stringify(j)); } catch (e) {} }
+    return convSemana;
+  }).catch(function () { return convSemana; }).then(function (r) { convPedido = null; return r; });
+  return convPedido;
+}
+function convEscolhe(t, d) {
+  if (!t || !t.nivel || !d || !d.idiomas) return null;
+  var nv = function (it) { return (it.niveis || []).filter(function (n) { return /Teens|Basic|Intermediate|Advanced|Todos/.test(n); })[0] || ''; };
+  var pf = function (it) { return (it.niveis || []).filter(function (n) { return /Jovens|Adultos/.test(n); })[0] || ''; };
+  var lista = (d.idiomas[t.idioma] || []).filter(function (it) { return it.pronto; }), nivel = t.nivel, perfil = t.perfil;
+  if (nivel === 'Teens' && !lista.some(function (it) { return nv(it) === 'Teens'; })) { nivel = 'Basic'; perfil = 'Jovens'; }
+  var doNivel = lista.filter(function (it) { return nv(it) === nivel; });
+  return doNivel.filter(function (it) { return !pf(it) || pf(it) === perfil; })[0] || doNivel[0] || null;
+}
+function pintaConversa() {
+  var cx = $('conv-card'); if (!cx) return;
+  if (ptEstado || !estado.alunos || !estado.alunos.length || typeof fiskPerfilDaTurma !== 'function') { cx.hidden = true; return; }
+  var turma = estado.turma;
+  var desenha = function (d) {
+    if (estado.turma !== turma) return;
+    var t = fiskPerfilDaTurma({ alunos: estado.alunos, tituloInteiro: estado.turma, titulo: String(estado.turma || '').split('\n')[0] });
+    var it = convEscolhe(t, d), sem = d && d.semana ? d.semana : null;
+    var url = 'conversacao.html' + (it ? '?id=' + encodeURIComponent(it.id) + (sem ? '&semana=' + encodeURIComponent(sem.id) : '') : '');
+    var nivelTxt = [t.idioma === 'Español' ? 'Español' : '', t.nivel, t.perfil].filter(Boolean).join(' · ');
+    cx.className = 'conv-card' + (it ? '' : ' cc-vazio');
+    cx.innerHTML = '<span class="cc-ico">💬</span><div class="cc-txt"><div class="cc-rot">Conversação da semana' + (sem && sem.nome ? ' · ' + esc(String(sem.nome).replace(/\s*-\s*.*$/, '')) : '') + '</div>' +
+      '<div class="cc-nome">' + (it ? esc(it.nome) : (d ? 'Sem atividade prevista para esta turma nesta semana' : 'Buscando a atividade da semana…')) + '</div>' +
+      '<div class="cc-sub">' + esc(nivelTxt || 'nível da turma não identificado') + (it ? ' · sugerida para esta turma' : ' · veja todas na ferramenta') + '</div></div>' +
+      '<a class="cc-abre" href="' + url + '" target="_blank" rel="noopener">' + (it ? '▶ Abrir a atividade' : 'Abrir a conversação') + ' ↗</a>';
+    cx.hidden = false;
+  };
+  var pedido = convLer();   /* lê o cache na hora (síncrono) e, se velho, busca de novo */
+  desenha(convSemana);
+  pedido.then(desenha);
+}
 function pintaResumo() {
   var nCk = estado.alunos.filter(function (a) { var ck = (estado.dados[a.raf] || {}).planner; return ck && ck.checking && Object.keys(ck.checking).some(function (k) { return ck.checking[k].feito; }); }).length;
   $('resumo').hidden = false;
   $('resumo').innerHTML = capasDoResumo() + '<b>' + estado.alunos.length + '</b> alunos · <b>' + nCk + '</b> com Checking';   /* a turma já está no menu de cima */
+  pintaConversa();
 }
 /* REORDENAR SEM RECONSTRUIR (27/10/2026, "Minha aula mais leve"): atender, ↑ ↓ e arrastar refaziam a turma inteira.
    Agora refaz só o cartão tocado e os que trocaram de número na prioridade, e MOVE os outros para o lugar novo.

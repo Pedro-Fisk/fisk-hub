@@ -640,3 +640,23 @@ body.theme-dark .pl-salvar .rt-data, body.theme-dark .pl-salvar .rt-data input{ 
   .al .plano-ativ, .al .atend .quando, .obs label, .obs .st, .obs .ec, .obs-toggle, .dica-tx, .aguia-topo .sub, .aula .it .pg, .aula .sug1 .pct,
   .aula .ck-feito small, .btn-ck-editar, .aula.ks .t .dt, .ksi, .ksi .pct, .ks-mais, .pl-topo .rt-info, .pl-salvar .rt-data, .pt-nota label small, .status, .al-cab .livro{ font-size: .875rem; }
 }
+
+/* A CONVERSAÇÃO DA SEMANA NA MINHA AULA (Pedro, 28/11/2026): um card retangular com a atividade comunicativa sugerida
+   para esta turma (o nível e o perfil saem do livro dos alunos, como na conversação) e o botão que abre a ferramenta
+   em outra aba, já na atividade. */
+.conv-card{ max-width: 1500px; margin: 0 auto .8rem; display: flex; align-items: center; gap: 1rem; padding: .8rem 1rem;
+  border-radius: 14px; background: linear-gradient(135deg, #eef2ff, #f5f3ff); border: 1px solid #c7d2fe; color: #1e1b4b; }
+.conv-card .cc-ico{ font-size: 1.8rem; flex: none; }
+.conv-card .cc-txt{ flex: 1; min-width: 0; }
+.conv-card .cc-rot{ font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #6366f1; }
+.conv-card .cc-nome{ font-weight: 800; font-size: 1.02rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.conv-card .cc-sub{ font-size: .8rem; color: #4b5563; }
+.conv-card .cc-abre{ flex: none; text-decoration: none; background: #4f46e5; color: #fff; font-weight: 800; border-radius: 999px; padding: .55rem 1.1rem; white-space: nowrap; }
+.conv-card .cc-abre:hover{ background: #4338ca; }
+.conv-card.cc-vazio{ background: #f8fafc; border-color: #e2e8f0; }
+.conv-card.cc-vazio .cc-abre{ background: #64748b; }
+body.theme-dark .conv-card{ background: linear-gradient(135deg, #1e1b4b, #2e1065); border-color: #4338ca; color: #e0e7ff; }
+body.theme-dark .conv-card .cc-sub{ color: #c7d2fe; }
+body.theme-dark .conv-card.cc-vazio{ background: #1f2937; border-color: #374151; }
+body.pt-ativo #conv-card{ display: none !important; }
+@media (max-width: 640px){ .conv-card{ flex-wrap: wrap; } .conv-card .cc-abre{ width: 100%; text-align: center; } .conv-card .cc-nome{ white-space: normal; } }
