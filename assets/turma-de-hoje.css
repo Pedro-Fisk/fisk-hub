@@ -688,7 +688,7 @@ body.pt-ativo #conv-card{ display: none !important; }
    bonito quanto a atividade comunicativa") ═══
    A conversação da semana e o Planejador têm a MESMA altura mínima, o mesmo canto, o mesmo respiro, a faixa colorida com
    confete, o rótulo em pílula amarela, o título grande e os botões VERDES à direita (verde é o botão desta página). */
-.conv-card, .fila-info.roteiro, .fila-info.roteiro.sem{ min-height: 164px; box-sizing: border-box; border-radius: 18px; padding: .9rem 1.1rem; }
+.conv-card, .fila-info.roteiro, .fila-info.roteiro.sem{ min-height: 168px; box-sizing: border-box; border-radius: 18px; padding: .9rem 1.1rem; }
 /* a conversação: o botão da direita é "Ir para Conversações", verde */
 .conv-card .cc-abre{ background: #31a889; color: #fff; box-shadow: 0 4px 0 #1f7a63, 0 8px 18px rgba(0,0,0,.18); }
 .conv-card .cc-abre:hover{ box-shadow: 0 6px 0 #1f7a63, 0 12px 22px rgba(0,0,0,.22); }
