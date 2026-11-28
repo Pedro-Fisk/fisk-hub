@@ -92,6 +92,13 @@ function jogoDe(itens) {
   return [];
 }
 
+/* SEM VOZ SINTÉTICA (Pedro, 28/11/2026: "como é uma fala que envolve entonação, os áudios gerados sinteticamente não
+   contemplaram as entonações, é melhor tirar"): nestes tópicos a lista não tem 🔊 nem "ouça e escolha", e o celular não
+   recebe as palavras para tocar. Quem dá o modelo é o áudio do livro (o ▶ do "Let's practice") e o professor. Tópico
+   entra aqui quando o que se ensina é algo que o TTS não reproduz de propósito: melodia, ligação entre palavras, forma
+   fraca em frase solta. */
+const SEM_VOZ = { 'tag-questions': 'a entonação que sobe e desce (↑ ↓)' };
+
 function aula(conteudo, nivelChave, topico) {
   const n = conteudo.niveis[nivelChave], livro = C.LIVROS[topico.livro];
   const ref = n.referenciaLivro || `${livro.label.toUpperCase()} - L ${topico.licao} - pg ${topico.paginaAudio}`;
@@ -102,6 +109,7 @@ function aula(conteudo, nivelChave, topico) {
   const conversation = (n.dialogos || []).map((d) => ({ question: d[0], modelAnswers: d.slice(1) }))
     .concat((n.conversacao || []).map((q) => ({ question: q[0], modelAnswers: q[1] ? [q[1]] : [] })));
   const ids = AUDIOS[conteudo.chave] || [];
+  const semVoz = !!SEM_VOZ[conteudo.chave];
   return {
     coverTitle: 'Buddy Talks · ' + titulo(n.titulo),
     coverLevel: NIVEL[nivelChave], ageLabel: '', language: 'english',
@@ -112,7 +120,7 @@ function aula(conteudo, nivelChave, topico) {
     /* as falas do Buddy, uma por balão, na ordem do PowerPoint: a apresentação, o som revelado, por que importa, se errar */
     buddyBaloes: [junta(n.buddy), [rv.titulo, rv.explicacao, rv.exemplo].filter(Boolean).join('\n'), junta(n.porQue), junta(n.seErrar)].filter(Boolean),
     audios: ids.map((id, k) => ({ nome: 'Saying it right ' + 'AB'[k], ref, id })),
-    conversation, languageGame: jogoDe(itens),
+    conversation, languageGame: semVoz ? [] : jogoDe(itens), ...(semVoz ? { semVoz: true } : {}),
     evaluation: n.avaliacao ? [{ question: n.avaliacao }] : [],
     temaDaConversa: n.temaDaConversa || '', serie: 'buddy-talks',
     semRevisao: true,   /* a lista é de pronúncia, não de tradução: o "Do You Remember?" não serve */

@@ -266,10 +266,11 @@
     } else if (voc.length && pele) {
       /* a lista do PowerPoint: duas colunas, a palavra em branco e o som em azul; o 🔊 toca a palavra */
       var metade = Math.ceil(voc.length / 2), colV = function (lst) { return '<div>' + lst.map(function (v) {
-        return '<div style="display:flex;align-items:center;gap:22px;margin-bottom:' + (voc.length > 10 ? 18 : 30) + 'px"><button type="button" class="ft-ouvir" data-ouvir="' + esc(v.word) + '" title="Ouvir" style="flex:none;width:58px;height:58px;border-radius:50%;border:0;cursor:pointer;background:#c1121f;color:#fff;font-size:28px;line-height:1">🔊</button>' +
+        return '<div style="display:flex;align-items:center;gap:22px;margin-bottom:' + (voc.length > 10 ? 18 : 30) + 'px">' + (L.semVoz ? '' : '<button type="button" class="ft-ouvir" data-ouvir="' + esc(v.word) + '" title="Ouvir" style="flex:none;width:58px;height:58px;border-radius:50%;border:0;cursor:pointer;background:#c1121f;color:#fff;font-size:28px;line-height:1">🔊</button>') +
           '<span style="font:700 ' + (voc.length > 10 ? 54 : 64) + 'px/1.1 \'' + B + '\';color:#fff">' + esc(v.word) + '</span>' + (v.translation ? '<span style="font:700 ' + (voc.length > 10 ? 50 : 58) + 'px \'' + B + '\';color:#38bdf8">' + esc(v.translation) + '</span>' : '') + '</div>'; }).join('') + '</div>'; };
       novo('vocabulario', '<div style="position:absolute;left:120px;right:200px;top:90px;bottom:60px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-content:center">' + colV(voc.slice(0, metade)) + colV(voc.slice(metade)) + '</div>');
-      slides[slides.length - 1].vocab = voc.map(function (v) { return String(v.word || '').trim(); }).filter(Boolean);
+      /* L.semVoz (build-buddy-talks.js, SEM_VOZ): sem 🔊 e sem a lista para o celular tocar */
+      if (!L.semVoz) slides[slides.length - 1].vocab = voc.map(function (v) { return String(v.word || '').trim(); }).filter(Boolean);
     } else if (voc.length) {
       divisor(cp ? (L.vocabTitulo || rot.iw) : rot.iw, cp ? 2 : 0, cp ? (L.vocabSub || '') : '');
       var longa = voc.some(function (v) { return String(v.word).length > 14 || Math.max.apply(null, String(v.word).split(/\s+/).map(function (x) { return x.length; })) > 8; }), cols = longa ? 3 : 4;

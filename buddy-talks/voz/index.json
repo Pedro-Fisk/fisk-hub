@@ -1,45 +1,15 @@
 {
  "bt-tag-questions-basic": {
   "voz": "en-US-EricNeural",
-  "a": {
-   "isn’t it? ↓": "8d217f081d649778.mp3",
-   "aren’t you? ↑": "c6919f98aca0434a.mp3",
-   "don’t you? ↑": "1525f2c6760ddf5b.mp3",
-   "doesn’t he? ↑": "6891196e83f85509.mp3",
-   "didn’t they? ↓": "e5718cd1e1c0ddbf.mp3",
-   "can’t she? ↓": "5b727724ef267ef6.mp3",
-   "won’t they? ↑": "c47ea06455325060.mp3",
-   "haven’t you? ↓": "efb66d6f86e27a12.mp3",
-   "wasn’t it? ↑": "67f67c6f40a40867.mp3"
-  }
+  "a": {}
  },
  "bt-tag-questions-intermediate": {
   "voz": "en-US-AriaNeural",
-  "a": {
-   "isn’t it? ↓": "e5ae7df0e8bc19f4.mp3",
-   "aren’t they? ↑": "b27db3444b87fb8e.mp3",
-   "haven’t you? ↓": "5c2c8aa944ad503c.mp3",
-   "doesn’t she? ↑": "9e8f542fd12990a2.mp3",
-   "didn’t we? ↓": "8423444d88468a90.mp3",
-   "shouldn’t we? ↑": "65c0c5cbc0bef8ca.mp3",
-   "wouldn’t it? ↓": "df2cb2321bdc701e.mp3",
-   "can’t they? ↑": "5909ebfc388c5b4b.mp3",
-   "hasn’t he? ↓": "958f2ca553f6100d.mp3"
-  }
+  "a": {}
  },
  "bt-tag-questions-advanced": {
   "voz": "en-US-AriaNeural",
-  "a": {
-   "hasn’t he? ↓": "958f2ca553f6100d.mp3",
-   "wouldn’t you? ↑": "0f9d0265385ddfb7.mp3",
-   "weren’t they? ↓": "727f12312401d46d.mp3",
-   "isn’t she? ↑": "cd81d849bed68ea9.mp3",
-   "haven’t we? ↓": "3b05a32f98643ccc.mp3",
-   "couldn’t she? ↑": "c4867c4b278fd631.mp3",
-   "won’t they? ↓": "fa4a108ea97ed39f.mp3",
-   "didn’t it? ↑": "f2467b5e7e101a4f.mp3",
-   "aren’t we? ↓": "f4b9bee7628a0c2a.mp3"
-  }
+  "a": {}
  },
  "bt-him-her-them-basic": {
   "voz": "en-US-GuyNeural",
