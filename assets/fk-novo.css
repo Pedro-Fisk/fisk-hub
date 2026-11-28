@@ -1,0 +1,53 @@
+/* ═══ O CARD DE ESCOLHA NO DESENHO NOVO (Pedro, 28/11/2026) ═══
+   O mesmo desenho do card da aula do Minha aula (turma-de-hoje.css, .aula-filtro): o vermelho da Fisk com confete, o
+   título em pílula amarela, os campos em pílulas brancas e o botão verde. Vale no Radar da Turma, no Corretor MET, no
+   Radar do Aluno e em Impressões, sempre preso na classe `fk-novo` do <html>: até janeiro só a direção vê
+   (fiskNovidades, no assets/fisk-shared.js); o professor continua com o card de sempre.
+   O HTML das páginas não muda: cada uma só marca o bloco com `fk-filtro` (o card inteiro) ou `fk-filtro-faixa` (só a
+   linha de busca, quando o resto do painel é lista). */
+html.fk-novo .fk-filtro, html.fk-novo .fk-filtro-faixa{
+  position: relative; color: #fff; border: 0; border-radius: 18px;
+  background: linear-gradient(120deg, #b3151c, #d81f26, #ef3b42); background-size: 300% 300%; animation: fkDegrade 18s ease infinite;
+  box-shadow: 0 10px 26px rgba(216,31,38,.3);
+}
+html.fk-novo .fk-filtro{ padding: 1rem 1.2rem 1.15rem; }
+html.fk-novo .fk-filtro-faixa{ padding: .7rem .8rem; margin-top: .6rem; }
+html.fk-novo .fk-filtro::before, html.fk-novo .fk-filtro-faixa::before{
+  content: ''; position: absolute; inset: 0; border-radius: 18px; pointer-events: none; opacity: .28;
+  background-image: radial-gradient(circle, #fff 2px, transparent 2.5px), radial-gradient(circle, #fde047 3px, transparent 3.5px), radial-gradient(circle, #fff 1.5px, transparent 2px);
+  background-size: 46px 46px, 70px 70px, 30px 30px; background-position: 0 0, 18px 26px, 8px 14px;
+}
+html.fk-novo .fk-filtro > *, html.fk-novo .fk-filtro-faixa > *{ position: relative; }
+@keyframes fkDegrade{ 0%{ background-position: 0% 50%; } 50%{ background-position: 100% 50%; } 100%{ background-position: 0% 50%; } }
+
+/* o título vira a pílula amarela; os textos de apoio ficam brancos */
+html.fk-novo .fk-filtro > h2{ display: inline-block; margin: 0 0 .55rem; font: 900 .78rem var(--font-body, inherit); letter-spacing: .06em; text-transform: uppercase;
+  color: #7c2d12; background: #fde047; border-radius: 999px; padding: 4px 12px; box-shadow: 0 2px 0 rgba(0,0,0,.15); }
+html.fk-novo .fk-filtro .sub, html.fk-novo .fk-filtro .hint{ color: rgba(255,255,255,.94); text-shadow: 0 1px 3px rgba(0,0,0,.2); }
+html.fk-novo .fk-filtro .sub b, html.fk-novo .fk-filtro .hint b{ color: #fff; }
+html.fk-novo .fk-filtro label.rot, html.fk-novo .fk-filtro label.mini, html.fk-novo .fk-filtro #vgActAsWrap > label{
+  color: #fff !important; font-size: .68rem; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+html.fk-novo .fk-filtro .status{ color: #fff; font-weight: 700; }
+html.fk-novo .fk-filtro .status.err, html.fk-novo .fk-filtro .status.erro{ background: rgba(127,29,29,.55); border-radius: 12px; padding: .45rem .8rem; }
+
+/* os campos: pílulas brancas com relevo */
+html.fk-novo .fk-filtro select, html.fk-novo .fk-filtro input[type="search"], html.fk-novo .fk-filtro input[type="date"], html.fk-novo .fk-filtro input[type="text"],
+html.fk-novo .fk-filtro-faixa select, html.fk-novo .fk-filtro-faixa input[type="search"]{
+  box-sizing: border-box; min-height: 46px; border: 0 !important; border-radius: 999px !important; padding: .55rem 1.1rem; background: #fff; color: #0f172a;
+  font: 900 .95rem var(--font-body, inherit); box-shadow: 0 4px 0 rgba(0,0,0,.15); outline: none;
+}
+html.fk-novo .fk-filtro select:disabled{ color: #94a3b8; }
+html.fk-novo .fk-filtro input[type="search"]::placeholder, html.fk-novo .fk-filtro-faixa input[type="search"]::placeholder{ font-weight: 700; color: #64748b; }
+html.fk-novo .fk-filtro select:focus-visible, html.fk-novo .fk-filtro input:focus-visible, html.fk-novo .fk-filtro-faixa input:focus-visible{ box-shadow: 0 0 0 3px #fde047, 0 4px 0 rgba(0,0,0,.15); }
+
+/* o botão principal: verde, como em toda a página */
+html.fk-novo .fk-filtro .btn-main{ border: 0; border-radius: 999px; background: #31a889; color: #fff; font-weight: 900; padding: .65rem 1.2rem; min-height: 46px; box-shadow: 0 4px 0 #1f7a63; }
+html.fk-novo .fk-filtro .btn-main:disabled{ background: #e2e8f0; color: #64748b; box-shadow: none; }
+
+/* o que abre por cima ou mora dentro do card continua legível (listas, achados, aluno escolhido) */
+html.fk-novo .fk-filtro .achados, html.fk-novo .fk-filtro .alunos, html.fk-novo .fk-filtro .escolhido, html.fk-novo .fk-filtro .vazio{ color: #14161c; }
+html.fk-novo .fk-filtro .alunos{ background: #fff; border-radius: 14px; }
+
+@media (prefers-reduced-motion: reduce){ html.fk-novo .fk-filtro, html.fk-novo .fk-filtro-faixa{ animation: none; } }
+/* Corretor MET: o quadro do aluno escolhido aparecia vazio (o display:flex da página passava por cima do hidden) */
+html.fk-novo .fk-filtro .escolhido[hidden]{ display: none; }

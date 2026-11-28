@@ -11,6 +11,7 @@
 <title>MET Practice Test Grader, FISK</title>
 <link rel="stylesheet" href="assets/fisk-shared.css?v=f12a68d93f">
 <link rel="stylesheet" href="assets/casa-tema.css?v=1e1bb28a31">
+<link rel="stylesheet" href="assets/fk-novo.css?v=66ef68482d">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='19' font-weight='800' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <!-- ═══════════════════════════════════════════════════════════════════════
      CORRETOR DO SIMULADO MET (19/09/2026): o professor fotografa o verso da
@@ -196,6 +197,7 @@
 </style>
 </head>
 <body>
+<script>/* as novidades só para a direção até janeiro (fiskNovidades, no kit) */ try { var fkS = JSON.parse(localStorage.getItem('fisk_prof') || 'null'); if (fkS && (fkS.master || fkS.viewingAs)) document.documentElement.classList.add('fk-novo'); } catch (e) {}</script>
 <script>try{if(localStorage.getItem("fisk_theme")==="dark")document.body.classList.add("theme-dark");}catch(e){}</script>
 
 <header class="hero">
@@ -220,7 +222,7 @@
   </section>
 
   <!-- 2. o aluno -->
-  <section class="painel" id="p2">
+  <section class="painel fk-filtro" id="p2">
     <h2>👤 2. De quem é a folha?</h2>
     <p class="hint">Escolha o aluno na lista das suas turmas. O nome vem daqui, nunca da folha.</p>
     <div class="linha2">
