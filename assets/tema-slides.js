@@ -105,6 +105,15 @@
        slides grandes e a cabeça dele no canto dos de conteúdo (para não cobrir o texto), a introdução em balões de fala.
        As imagens são as do PowerPoint original, em buddy-talks/img/. design.pele = 'buddy' liga; o resto não muda. */
     var pele = design && design.pele === 'buddy' ? { img: base + (design.imgs || 'buddy-talks/img/') } : null;
+    /* A PELE DO EVERYDAY LIFE (Pedro, 28/11/2026: refazer a série sem descaracterizar a arte): slides pretos com as faixas
+       da série no topo e no rodapé (azul-marinho e amarelo no Basic, verde-água no Advanced), a foto do tema no painel
+       da direita e os títulos em imagem do PowerPoint (logo, IMPORTANT WORDS, Conversation), em everyday-life/img/. */
+    var vida = design && design.pele === 'everyday' ? { img: base + (design.imgs || 'everyday-life/img/'), c1: design.faixa1 || '#002060', c2: design.faixa2 || '#FFC000', f: L.fotosSerie || {} } : null;
+    function vUrl(n) { return /^https?:|^\//.test(String(n)) ? String(n) : vida.img + n; }
+    function vFoto(k) { var f = vida.f[k] || vida.f.conv || vida.f.iw || vida.f.capa; return f ? vUrl(f) : ''; }
+    function vFaixas() { return '<div style="position:absolute;left:0;right:0;top:0;height:30px;background:' + vida.c1 + '"></div><div style="position:absolute;left:0;right:0;top:30px;height:8px;background:' + vida.c2 + '"></div>' +
+      '<div style="position:absolute;left:0;right:0;bottom:30px;height:8px;background:' + vida.c2 + '"></div><div style="position:absolute;left:0;right:0;bottom:0;height:30px;background:' + vida.c1 + '"></div>'; }
+    function vPainel(foto) { return foto ? '<div style="position:absolute;right:0;top:0;bottom:0;width:640px;background:#222 url(&quot;' + esc(foto) + '&quot;) center/cover no-repeat"></div>' : ''; }
     /* A PELE DE COUNTRIES (Pedro, 28/11/2026: as atividades de países do Drive Master): como o PowerPoint original,
        fotos do país em tela cheia e painéis brancos com o título azul-marinho; nos slides de conteúdo, a foto escurecida
        por trás. design.pele = 'countries'; as fotos vêm de L.fotos e de L.pais (countries/img/, ao lado da página). */
@@ -126,6 +135,13 @@
     }
     function novo(tipo, corpo, capa, foto) {
       var el = document.createElement('div'); el.className = 'ft-s';
+      if (vida) {
+        el.style.cssText = 'background:' + (tipo === 'capa' || tipo === 'fechamento' ? '#ffffff;color:#002060' : '#000000;color:#ffffff') + ';font-family:"' + B + '",sans-serif';
+        el.innerHTML = (tipo === 'capa' || tipo === 'fechamento' ? '' : vFaixas()) + corpo;
+        var et2 = 0; [].forEach.call(el.querySelectorAll('[data-e]'), function (x) { et2 = Math.max(et2, +x.getAttribute('data-e')); });
+        slides.push({ tipo: tipo, etapas: et2, el: el });
+        return el;
+      }
       if (cp) {
         var fd = foto ? cpUrl(foto) : (cpFotoDe(slides.length) ? cpUrl(cpFotoDe(slides.length).img) : '');
         /* os de conteúdo são brancos com o texto azul-marinho e uma faixa da foto à direita, como o Pair Work do original */
@@ -156,7 +172,17 @@
 
     /* 1. capa */
     var PA = L.pais || {};
-    if (cp) novo('capa', cpPainel((PA.bandeira ? '<img alt="" src="' + cpUrl(PA.bandeira) + '" style="width:210px;border-radius:12px;box-shadow:0 8px 22px rgba(0,0,0,.25);margin-bottom:46px;align-self:flex-start">' : '') +
+    var vCapa = function () {
+      var ic = vida.f.icone ? '<img alt="" src="' + vUrl(vida.f.icone) + '" style="position:absolute;left:1160px;top:250px;width:560px">' : '';
+      return '<img alt="EVERYDAY LIFE" src="' + vida.img + 'logo.png" style="position:absolute;left:90px;top:60px;width:560px">' +
+        '<img alt="" src="' + vida.img + 'selo.jpg" style="position:absolute;left:140px;top:560px;width:330px;height:330px;border-radius:50%;border:22px solid #e11d2a;box-sizing:content-box">' +
+        '<div style="position:absolute;left:560px;top:640px;width:560px;color:#002060;text-align:center"><div style="font:800 64px/1.15 \'' + B + '\'">' + esc(L.coverTitle || '') + '</div>' +
+        '<div style="font:800 56px/1.2 \'' + B + '\';margin-top:14px">' + esc(String(L.coverLevel || '').toUpperCase()) + '</div></div>' +
+        (ic || (vida.f.capa ? '<div style="position:absolute;right:0;top:0;bottom:0;width:780px;background:url(&quot;' + esc(vUrl(vida.f.capa)) + '&quot;) center/cover no-repeat"></div>' : '')) +
+        '<div style="position:absolute;left:0;right:0;bottom:0;height:40px;background:' + vida.c1 + '"></div>';
+    };
+    if (vida) novo('capa', vCapa(), true);
+    else if (cp) novo('capa', cpPainel((PA.bandeira ? '<img alt="" src="' + cpUrl(PA.bandeira) + '" style="width:210px;border-radius:12px;box-shadow:0 8px 22px rgba(0,0,0,.25);margin-bottom:46px;align-self:flex-start">' : '') +
       '<div style="font:800 40px/1 \'' + B + '\';letter-spacing:.14em;color:' + cp.cor + '">COUNTRIES' + (PA.num ? ' #' + String(PA.num).padStart(2, '0') : '') + '</div>' +
       '<div style="font:900 ' + (String(PA.nome || '').length > 11 ? 112 : 150) + 'px/1 \'' + T + '\';margin:20px 0 40px">' + esc(PA.nome || L.coverTitle || '') + '</div>' +
       '<div>' + (L.coverLevel ? chip(String(L.coverLevel).toUpperCase(), cp.cor, '#ffffff') : '') + '</div>' +
@@ -173,7 +199,13 @@
       (L.coverLevel ? chip(String(L.coverLevel).toUpperCase(), p.prim, sobrePrim) : '') + (L.perfil ? chip(L.perfil, p.sec, legivel('#111827', p.sec, '#ffffff')) : '') + '</div>' +
       '<img alt="" src="' + ico(base, r.heroi) + '" onerror="this.remove()" style="position:absolute;right:170px;top:290px;width:480px;filter:drop-shadow(0 30px 40px rgba(0,0,0,.28))">' + balao, true);
     /* 2. objetivos, um por clique (na pele das Buddy Talks, antes deles o Material Needed, como no PowerPoint) */
-    if (pele) {
+    if (vida) {
+      novo('material', '<div style="position:absolute;left:0;top:120px;width:1280px;height:130px;background:' + vida.c1 + ';display:flex;align-items:center;justify-content:center;font:800 76px \'' + B + '\'">MATERIAL NEEDED</div>' +
+        '<div style="position:absolute;left:90px;top:330px;width:1100px;font:600 54px/1.4 \'' + B + '\'">' + (L.material || ['PowerPoint activity']).map(function (m, i) { return '<div>' + (i + 1) + '. ' + esc(m) + '</div>'; }).join('') +
+        '<div style="margin-top:50px;font-size:64px;font-weight:800"><span style="color:#f97316">LENGTH</span> : ' + esc(String(L.duracao || '20 minutes').toUpperCase()) + '</div></div>' + vPainel(vFoto('material')));
+      if ((L.objectives || []).length) novo('objetivos', '<div style="position:absolute;left:90px;top:110px;font:900 96px \'' + B + '\'">OBJECTIVES</div><div style="position:absolute;left:90px;top:290px;width:1120px">' + L.objectives.map(function (o, i) {
+        return '<div data-e="' + (i + 1) + '" class="ft-off" style="font:600 62px/1.3 \'' + B + '\';margin-bottom:30px">' + (i + 1) + '. ' + esc(o) + '</div>'; }).join('') + '</div>' + vPainel(vFoto('objetivos')));
+    } else if (pele) {
       if ((L.material || []).length) novo('material', h2('Material needed') + '<div style="position:absolute;left:120px;right:820px;top:250px;color:#fff;font:600 60px/1.35 \'' + B + '\'">' +
         L.material.map(function (m, i) { return '<div style="margin-bottom:18px">' + (i + 1) + '. ' + esc(m) + '</div>'; }).join('') +
         (L.duracao ? '<div style="margin-top:60px;color:#38bdf8;font-weight:800">LENGTH: <span style="color:#fff">' + esc(L.duracao) + '</span></div>' : '') + '</div>');
@@ -184,6 +216,13 @@
     /* 3. abertura do capítulo e vocabulário (a tradução num clique separado, palavra por palavra) */
     var divisor = function (t, n, sub) {
       if (pele) return null;   /* o PowerPoint das Buddy Talks não tem slide de abertura de seção */
+      if (vida) {
+        var tImg = t === rot.iw ? 'iw.png' : t === rot.pw ? 'conv.png' : '', chave = t === rot.iw ? 'iw' : t === rot.pw ? 'conv' : 'jogo';
+        return novo('divisor', '<div style="position:absolute;left:0;top:38px;bottom:38px;width:1280px;display:flex;flex-direction:column;align-items:center;justify-content:center">' +
+          (tImg ? '<img alt="' + esc(t) + '" src="' + vida.img + tImg + '" style="max-width:' + (tImg === 'conv.png' ? 980 : 760) + 'px;max-height:700px">'
+            : '<div style="font:500 110px/1 \'' + B + '\';color:#1d6fd1">LANGUAGE</div><div style="font:500 230px/1 \'' + B + '\';color:#1d6fd1">GAME</div>' +
+              '<div style="font:600 52px/1.3 \'' + B + '\';margin-top:26px;text-align:center">' + esc(sub || 'Choose the correct alternative.') + '</div>') + '</div>' + vPainel(vFoto(chave)));
+      }
       if (cp) { var fdv = cpFotoDe(n + 1);
         return novo('divisor', cpPainel('<div style="font:900 ' + Math.min(116, Math.floor(640 / (0.78 * Math.max.apply(null, String(t).split(/\s+/).map(function (w) { return w.length; }))))) + 'px/1.05 \'' + T + '\';text-align:center;text-transform:uppercase">' + esc(t) + '</div>' +
           (sub ? '<div style="font:800 40px/1.3 \'' + B + '\';margin-top:30px;text-align:center;color:' + cp.cor + '">' + esc(sub) + '</div>' : ''), 820, 'align-items:center') + cpPino(fdv && fdv.local), false, fdv && fdv.img); }
@@ -206,7 +245,15 @@
     }
     var voc = L.vocabulary || [];
     function fazVocab() {
-    if (voc.length && pele) {
+    if (voc.length && vida) {
+      divisor(rot.iw, 0);
+      for (var vi = 0; vi < voc.length; vi += 3) novo('vocabulario', '<div style="position:absolute;left:120px;right:120px;top:80px;bottom:80px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">' +
+        voc.slice(vi, vi + 3).map(function (v) {
+          return '<div style="margin:22px 0"><div style="display:flex;align-items:center;justify-content:center;gap:24px"><span style="font:italic 600 78px/1.15 \'' + B + '\';color:' + vida.c2 + '">' + esc(v.word) + '</span>' +
+            '<button type="button" class="ft-ouvir" data-ouvir="' + esc(v.word) + '" title="Ouvir" style="flex:none;width:64px;height:64px;border-radius:50%;border:0;cursor:pointer;background:' + vida.c1 + ';color:#fff;font-size:30px;line-height:1">🔊</button></div>' +
+            (v.translation ? '<div style="font:italic 500 66px/1.2 \'' + B + '\'">= ' + esc(v.translation) + '</div>' : '') + '</div>'; }).join('') + '</div>');
+      slides[slides.length - 1].vocab = voc.map(function (v) { return String(v.word || '').trim(); }).filter(Boolean);
+    } else if (voc.length && pele) {
       /* a lista do PowerPoint: duas colunas, a palavra em branco e o som em azul; o 🔊 toca a palavra */
       var metade = Math.ceil(voc.length / 2), colV = function (lst) { return '<div>' + lst.map(function (v) {
         return '<div style="display:flex;align-items:center;gap:22px;margin-bottom:' + (voc.length > 10 ? 18 : 30) + 'px"><button type="button" class="ft-ouvir" data-ouvir="' + esc(v.word) + '" title="Ouvir" style="flex:none;width:58px;height:58px;border-radius:50%;border:0;cursor:pointer;background:#c1121f;color:#fff;font-size:28px;line-height:1">🔊</button>' +
@@ -229,7 +276,7 @@
       slides[slides.length - 1].vocab = voc.map(function (v) { return String(v.word || '').trim(); }).filter(Boolean);
     }
     }
-    if (!pele) fazVocab();
+    if (!pele) fazVocab();   /* (no Everyday Life também é aqui: logo depois dos objetivos) */
 
     /* 4. introdução (na pele das Buddy Talks: cada fala do Buddy num balão, como no PowerPoint original) */
     if (pele && (L.buddyBaloes || []).length) {
@@ -298,6 +345,12 @@
         var cheio = carga > 840, tamQ = cheio ? 56 : 64, tamR = cheio ? 42 : 48;
         /* cada pergunta num card que aparece com ela (Pedro 27/11/2026: mesmo clareando, o fundo atrapalhava a leitura) */
         var fundoCard = r.escuro ? alfa(p.fundo, 0.92) : 'rgba(255,255,255,.96)';
+        if (vida) {   /* o Everyday Life: numeradas, a pergunta em branco e as respostas-modelo em amarelo */
+          novo('conversa', '<div style="position:absolute;left:110px;right:160px;top:60px;bottom:60px;display:flex;flex-direction:column;justify-content:center">' + grupo.map(function (q, j) {
+            return '<div data-e="' + (j + 1) + '" class="ft-off" style="margin-bottom:' + (cheio ? 34 : 48) + 'px;display:flex;gap:26px"><span style="flex:none;font:600 ' + (tamQ + 2) + 'px/1.2 \'' + B + '\'">' + (n0 + j + 1) + '.</span><div><div style="font:600 ' + (tamQ + 2) + 'px/1.2 \'' + B + '\'">' + esc(q.question) + '</div>' +
+              (q.modelAnswers || []).map(function (r) { return '<div style="font:500 ' + tamR + 'px/1.3 \'' + B + '\';margin-top:8px;color:' + vida.c2 + '">' + esc(r) + '</div>'; }).join('') + '</div></div>'; }).join('') + '</div>');
+          n0 += grupo.length; return;
+        }
         if (pele) {   /* as Buddy Talks: a pergunta em branco e a resposta embaixo, sem cartão nem número, como no PowerPoint */
           novo('conversa', '<div style="position:absolute;left:120px;right:260px;top:70px;bottom:60px;display:flex;flex-direction:column;justify-content:center">' + grupo.map(function (q, j) {
             return '<div data-e="' + (j + 1) + '" class="ft-off" style="margin-bottom:' + (cheio ? 40 : 56) + 'px;color:#fff"><div style="font:600 ' + (tamQ + 4) + 'px/1.2 \'' + B + '\'">' + esc(q.question) + '</div>' +
@@ -312,13 +365,13 @@
       })(conv.slice(k, k + porSlide));
     }
     }
-    if (!cp) fazConversa(L.conversation || [], rot.pw);
+    if (!cp && !vida) fazConversa(L.conversation || [], rot.pw);
     /* 6. o jogo: um item por slide, opções clicáveis (o professor toca e a tela diz); o clique seguinte revela a certa */
     function fazJogo(jogo, titJogo) {
     if (jogo.length) {
       divisor(titJogo, 2);
       jogo.forEach(function (g, gi) {
-        var titJ = h2(titJogo + ' · ' + (gi + 1) + '/' + jogo.length);
+        var titJ = vida ? '' : h2(titJogo + ' · ' + (gi + 1) + '/' + jogo.length);
         if (g.type === 'order' || g.type === 'match' || g.type === 'type_in') { jogoNovo(g, titJ); return; }
         /* OUÇA E ESCOLHA (item 6, 27/11/2026): a pergunta é um áudio (voz neural, api/voz.js do portal, tocada pela
            conversacao.html por FiskTema.aoOuvir); o 🔊 toca de novo, e a revelação mostra o que foi dito */
@@ -346,7 +399,9 @@
       });
     }
     }
-    if (!cp) fazJogo(L.languageGame || [], rot.jogo);
+    if (!cp && !vida) fazJogo(L.languageGame || [], rot.jogo);
+    /* o Everyday Life: o jogo vem antes da conversa, como no PowerPoint */
+    if (vida) { fazJogo(L.languageGame || [], rot.jogo); fazConversa(L.conversation || [], rot.pw); }
     /* OS TIPOS NOVOS DO JOGO (item 7, Pedro 27/11/2026). No dado da aula, todos usam "options" (o editor do Conversation
        Maker só sabe editar lista): order = as palavras NA ORDEM CERTA; match = "palavra = par"; type_in = as respostas
        aceitas, a primeira é a que aparece. Na TV ninguém clica: o clique seguinte revela, como na múltipla escolha. O
@@ -406,7 +461,8 @@
       return '<div data-e="' + (j + 1) + '" class="ft-off" style="font-size:64px;font-weight:800;line-height:1.2;margin-bottom:50px">' + esc(q.question) + '</div>'; }).join('') + '</div>');
     /* a avaliação no celular dos alunos (27/11/2026): as perguntas cruas, a nota e o comentário saem de lá */
     if ((L.evaluation || []).length) slides[slides.length - 1].aval = L.evaluation.map(function (q) { return String(q.question || ''); });
-    if (cp) novo('fechamento', cpPainel('<div style="font:900 120px/1.05 \'' + T + '\';text-align:center">' + esc(rot.fim) + '</div>' +
+    if (vida) novo('fechamento', vCapa(), true);
+    else if (cp) novo('fechamento', cpPainel('<div style="font:900 120px/1.05 \'' + T + '\';text-align:center">' + esc(rot.fim) + '</div>' +
       '<img alt="FISK" src="' + base + 'assets/fisk-marca.png" style="height:96px;margin-top:60px;align-self:center">', 860, 'align-items:center') + cpPino(PA.capaLocal), true, PA.capa);
     else if (pele && false) novo('fechamento', '<div style="position:absolute;left:100px;top:0;bottom:0;width:1100px;display:flex;align-items:center;justify-content:center"><div style="font:800 130px/1.05 \'' + T + '\';color:#38bdf8;text-align:center">' + esc(rot.fim) + '</div></div>' +
       '<div style="position:absolute;left:70px;bottom:60px;background:#fff;border-radius:18px;padding:14px 22px"><img alt="FISK" src="' + base + 'assets/fisk-marca.png" style="height:90px;display:block"></div>');
