@@ -1113,6 +1113,69 @@ function convEscolhe(t, d) {
   var doNivel = lista.filter(function (it) { return nv(it) === nivel; });
   return doNivel.filter(function (it) { return !pf(it) || pf(it) === perfil; })[0] || doNivel[0] || null;
 }
+/* A MINIATURA (Pedro, 28/11/2026: "um thumbnail de prévia da atividade"): o primeiro slide da atividade do Conversation
+   Maker (montado pelo assets/tema-slides.js) ou a primeira página do PDF (pdf.js, carregado só quando precisa). O arquivo
+   vem da MESMA memória do navegador da conversacao.html (Cache 'fisk-conversa-v1', chave /__conversa/<id>/<quando>):
+   atividade já aberta ou guardada lá aparece na hora, e a que vier daqui fica guardada para lá também. */
+var CONV_CACHE = 'fisk-conversa-v1', convMinis = {};
+function convArquivo(it, ehCm) {
+  var k = location.origin + '/__conversa/' + it.id + '/' + it.quando;
+  var s = sessao();
+  var baixa = function () {
+    return fiskFetch(FISK_HUB_EP, { action: 'conversaLer', token: (s && s.token) || '', id: it.id }, { timeoutMs: 120000 }).then(function (j) {
+      if (!j || !j.ok || !j.dados || j.preparando) throw new Error('não veio');
+      return ehCm ? decodeURIComponent(escape(atob(j.dados))) : Uint8Array.from(atob(j.dados), function (c) { return c.charCodeAt(0); });
+    });
+  };
+  if (!window.caches) return baixa();
+  return caches.open(CONV_CACHE).then(function (c) {
+    return c.match(k).then(function (r) {
+      if (r) return ehCm ? r.text() : r.arrayBuffer().then(function (ab) { return new Uint8Array(ab); });
+      return baixa().then(function (d) {
+        return c.put(k, new Response(ehCm ? d : d.slice(), { headers: { 'Content-Type': ehCm ? 'application/json' : 'application/pdf' } })).then(function () { return d; }, function () { return d; });
+      });
+    });
+  });
+}
+function convScript(src) {
+  return new Promise(function (ok, falha) { var sc = document.createElement('script'); sc.src = src; sc.onload = ok; sc.onerror = falha; document.head.appendChild(sc); });
+}
+/* o desenhista vem com defer no fim da página: espera ele (ou o carrega, se faltou) */
+function convTema() {
+  if (window.FiskTema) return Promise.resolve();
+  if (document.readyState !== 'complete') return new Promise(function (ok) { window.addEventListener('load', ok, { once: true }); }).then(convTema);
+  return convScript('assets/tema-slides.js');
+}
+function convMini(box, it) {
+  var ehCm = it.tipo === 'cm';
+  if (!convMinis[it.id]) convMinis[it.id] = convArquivo(it, ehCm).then(function (d) {
+    if (ehCm) return convTema().then(function () {
+      var o = JSON.parse(d); if (!o || !o.lesson || !window.FiskTema) throw new Error('sem desenhista');
+      var deck = FiskTema.montar(Object.assign({}, o.lesson, { perfil: o.lesson.ageLabel || o.lesson.perfil || '' }), o.design || {}, { base: '' });
+      return { slide: deck.slides[0], total: deck.slides.length };
+    });
+    var pdfjs = window.pdfjsLib ? Promise.resolve() : convScript('https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js').then(function () {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.worker.min.js'; });
+    return pdfjs.then(function () { return pdfjsLib.getDocument({ data: d }).promise; }).then(function (doc) { return { doc: doc, total: doc.numPages }; });
+  });
+  convMinis[it.id].catch(function () { delete convMinis[it.id]; });
+  return convMinis[it.id].then(function (m) {
+    if (!box.isConnected) return;
+    box.querySelector('.cc-th-msg') && box.querySelector('.cc-th-msg').remove();
+    if (m.slide) {
+      var el = m.slide.el.cloneNode(true); el.style.pointerEvents = 'none'; box.insertBefore(el, box.firstChild);
+      FiskTema.mostrar({ slides: [{ el: el, etapas: m.slide.etapas, tipo: m.slide.tipo }] }, 0, m.slide.etapas);
+      FiskTema.encaixar(el, box); requestAnimationFrame(function () { FiskTema.encaixar(el, box); });
+      /* o card muda de largura (celular girado, janela redimensionada): o slide acompanha */
+      if (window.ResizeObserver) new ResizeObserver(function () { if (el.isConnected) FiskTema.encaixar(el, box); }).observe(box);
+    } else return m.doc.getPage(1).then(function (pg) {
+      var v1 = pg.getViewport({ scale: 1 }), larg = Math.round(box.clientWidth * (window.devicePixelRatio || 1)) || 400, vp = pg.getViewport({ scale: larg / v1.width });
+      var c = document.createElement('canvas'); c.width = Math.round(vp.width); c.height = Math.round(vp.height); box.insertBefore(c, box.firstChild);
+      return pg.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+    });
+  }).then(function () { var n = box.querySelector('.cc-th-n'); if (n && convMinis[it.id]) convMinis[it.id].then(function (m) { n.textContent = m.total + ' slides'; n.hidden = false; }); })
+    .catch(function () { var w = box.querySelector('.cc-th-msg'); if (w) w.textContent = '💬'; });
+}
 function pintaConversa() {
   var cx = $('conv-card'); if (!cx) return;
   if (ptEstado || !estado.alunos || !estado.alunos.length || typeof fiskPerfilDaTurma !== 'function') { cx.hidden = true; return; }
@@ -1124,11 +1187,15 @@ function pintaConversa() {
     var url = 'conversacao.html' + (it ? '?id=' + encodeURIComponent(it.id) + (sem ? '&semana=' + encodeURIComponent(sem.id) : '') : '');
     var nivelTxt = [t.idioma === 'Español' ? 'Español' : '', t.nivel, t.perfil].filter(Boolean).join(' · ');
     cx.className = 'conv-card' + (it ? '' : ' cc-vazio');
-    cx.innerHTML = '<span class="cc-ico">💬</span><div class="cc-txt"><div class="cc-rot">Conversação da semana' + (sem && sem.nome ? ' · ' + esc(String(sem.nome).replace(/\s*-\s*.*$/, '')) : '') + '</div>' +
+    var assin = it ? it.id + '|' + it.quando : '';
+    if (it && cx.dataset.mini === assin && cx.querySelector('.cc-th')) return;   /* mesma atividade: não remonta a miniatura */
+    cx.dataset.mini = assin;
+    cx.innerHTML = (it ? '<a class="cc-th" href="' + url + '" target="_blank" rel="noopener" title="Abrir a atividade"><span class="cc-th-msg">carregando a prévia…</span><span class="cc-th-n" hidden></span></a>' : '<span class="cc-ico">💬</span>') + '<div class="cc-txt"><div class="cc-rot">Conversação da semana' + (sem && sem.nome ? ' · ' + esc(String(sem.nome).replace(/\s*-\s*.*$/, '')) : '') + '</div>' +
       '<div class="cc-nome">' + (it ? esc(it.nome) : (d ? 'Sem atividade prevista para esta turma nesta semana' : 'Buscando a atividade da semana…')) + '</div>' +
       '<div class="cc-sub">' + esc(nivelTxt || 'nível da turma não identificado') + (it ? ' · sugerida para esta turma' : ' · veja todas na ferramenta') + '</div></div>' +
       '<a class="cc-abre" href="' + url + '" target="_blank" rel="noopener">' + (it ? '▶ Abrir a atividade' : 'Abrir a conversação') + ' ↗</a>';
     cx.hidden = false;
+    if (it && it.pronto) { var th = cx.querySelector('.cc-th'); if (th) convMini(th, it); }
   };
   var pedido = convLer();   /* lê o cache na hora (síncrono) e, se velho, busca de novo */
   desenha(convSemana);
