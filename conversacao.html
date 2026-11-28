@@ -460,6 +460,11 @@
   /* AS BUDDY TALKS (Pedro, 28/11/2026): a série de pronúncia dos Transitions, gerada do conteúdo do Conversation Maker
      por scripts/build-buddy-talks.js em buddy-talks/ (ao lado desta página: sem backend para listar nem abrir). Valem em
      qualquer semana. O áudio do livro vem do Drive pelo backend (cmAudio), no slide "Let's practice". */
+  /* SÓ A COORDENAÇÃO VÊ AS SÉRIES (Pedro, 28/11/2026): Buddy Talks, Countries, Everyday Life e YouTubers são o acervo
+     INTERNO de onde a coordenação escolhe o que entra em cada semana. Abertas a todos, cada professor escolhia a sua, e o
+     aluno que trocava de professor repetia atividade: é por isso que há anos existe o sistema das semanas. O professor vê
+     a semana e as "Minhas conversações"; a direção (master, ou o "ver como" dela) vê também as quatro séries. */
+  var COORD = !!(s && (s.master || s.viewingAs));
   var BUDDY = 'Buddy Talks', ultBuddy = null;
   function pedeBuddy() {
     return fetch('buddy-talks/index.json', { cache: 'no-cache' }).then(function (r) { return r.json(); })
@@ -468,7 +473,7 @@
   function juntaBuddy(itens) {
     if (!dados) return; dados.idiomas = dados.idiomas || {};
     delete dados.idiomas[BUDDY];
-    if (!itens || !itens.length) return;
+    if (!COORD || !itens || !itens.length) return;
     dados.idiomas[BUDDY] = itens.map(function (m) { return { id: m.id, nome: m.nome, tipo: 'cm', niveis: [m.nivel], pronto: true, origem: 'buddy', livro: m.livro }; });
     dados.vazio = false;
   }
@@ -483,7 +488,7 @@
   function juntaYt(itens) {
     if (!dados) return; dados.idiomas = dados.idiomas || {};
     delete dados.idiomas[YT];
-    if (!itens || !itens.length) return;
+    if (!COORD || !itens || !itens.length) return;
     dados.idiomas[YT] = itens.map(function (m) { return { id: m.id, nome: m.nome, tipo: 'cm', niveis: m.niveis || [], pronto: true, origem: 'youtubers' }; });
     dados.vazio = false;
   }
@@ -495,7 +500,7 @@
   function juntaVida(itens) {
     if (!dados) return; dados.idiomas = dados.idiomas || {};
     delete dados.idiomas[VIDA];
-    if (!itens || !itens.length) return;
+    if (!COORD || !itens || !itens.length) return;
     dados.idiomas[VIDA] = itens.map(function (m) { return { id: m.id, nome: m.nome, tipo: 'cm', niveis: m.niveis || [], pronto: true, origem: 'everyday' }; });
     dados.vazio = false;
   }
@@ -506,7 +511,7 @@
   function juntaPaises(itens) {
     if (!dados) return; dados.idiomas = dados.idiomas || {};
     delete dados.idiomas[PAISES];
-    if (!itens || !itens.length) return;
+    if (!COORD || !itens || !itens.length) return;
     dados.idiomas[PAISES] = itens.map(function (m) { return { id: m.id, nome: m.nome, tipo: 'cm', niveis: m.niveis || [], pronto: true, origem: 'countries' }; });
     dados.vazio = false;
   }
@@ -1569,10 +1574,12 @@
   var q = new URLSearchParams(location.search), qId = q.get('id'), qSem = q.get('semana');
   carregaLista(qSem || '', qId ? function () { abre(qId); } : null);
   pedeMinhas().then(function (itens) { ultMinhas = itens; if (dados && !$('lista').hidden) { juntaMinhas(itens); desenhaLista(); } });
-  pedeBuddy().then(function (itens) { ultBuddy = itens; if (dados && !$('lista').hidden) { juntaBuddy(itens); desenhaLista(); } });
-  pedePaises().then(function (itens) { ultPaises = itens; if (dados && !$('lista').hidden) { juntaPaises(itens); desenhaLista(); } });
-  pedeYt().then(function (itens) { ultYt = itens; if (dados && !$('lista').hidden) { juntaYt(itens); desenhaLista(); } });
-  pedeVida().then(function (itens) { ultVida = itens; if (dados && !$('lista').hidden) { juntaVida(itens); desenhaLista(); } });
+  if (COORD) {   /* o professor nem baixa as listas das séries */
+    pedeBuddy().then(function (itens) { ultBuddy = itens; if (dados && !$('lista').hidden) { juntaBuddy(itens); desenhaLista(); } });
+    pedePaises().then(function (itens) { ultPaises = itens; if (dados && !$('lista').hidden) { juntaPaises(itens); desenhaLista(); } });
+    pedeYt().then(function (itens) { ultYt = itens; if (dados && !$('lista').hidden) { juntaYt(itens); desenhaLista(); } });
+    pedeVida().then(function (itens) { ultVida = itens; if (dados && !$('lista').hidden) { juntaVida(itens); desenhaLista(); } });
+  }
   pedeAcervo().then(function (itens) { ultAcervo = itens; if (dados && !$('lista').hidden) { juntaAcervo(itens); desenhaLista(); } });
   try { if (localStorage.getItem('fisk_theme') === 'dark') document.body.classList.add('theme-dark'); } catch (e) {}
   fiskApresEnviar(false);   /* o que ficou na fila de uma aula sem internet */
