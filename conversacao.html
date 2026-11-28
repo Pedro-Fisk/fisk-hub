@@ -76,6 +76,10 @@
   .capa .e{ font-size: 1.15rem; }
   .capa .tg{ background: rgba(255,255,255,.22); border-radius: 99px; padding: .15rem .6rem; letter-spacing: .02em; white-space: nowrap; }
   .capa .pf{ margin-left: auto; background: #fff; color: #0f172a; border-radius: 99px; padding: .15rem .6rem; font-size: .76rem; white-space: nowrap; }
+  /* JOVENS × ADULTOS NUM OLHAR (Pedro, 28/11/2026): a bolinha antes da palavra, azul para Jovens e azul-escuro para Adultos */
+  .capa .pf.pf-Jovens::before, .capa .pf.pf-Adultos::before{ content: ""; display: inline-block; width: .62em; height: .62em; border-radius: 50%; margin-right: .35em; vertical-align: .02em; }
+  .capa .pf.pf-Jovens::before{ background: #3b82f6; }
+  .capa .pf.pf-Adultos::before{ background: #1e3a8a; }
   /* AS CORES DOS NÍVEIS (Pedro, 28/11/2026): sempre as mesmas, em toda semana */
   .n-Kids{ background: linear-gradient(90deg, #db2777, #f472b6); }
   .n-Teens{ background: linear-gradient(90deg, #eab308, #facc15); color: #422006; }
@@ -780,7 +784,7 @@
     var cor = es ? (n === 'Advanced' ? 'n-es-adv' : 'n-es') : 'n-' + n, tg = es ? 'ESPANHOL' : (n === 'Todos' ? 'TODOS OS NÍVEIS' : (n || 'Atividade').toUpperCase());
     var dir = es ? (NIVEL_PT[n] || '') : pf;
     return '<div class="rec' + (sug ? ' sug' : '') + '" data-rec="' + esc(it.id) + '">' + (sug ? '<span class="sug-tag">' + esc(sug) + '</span>' : '') +
-      '<div class="capa ' + esc(cor) + '"><span class="e">' + (es ? '🌍' : (EM[n] || '💬')) + '</span><span class="tg">' + esc(tg) + '</span>' + (dir ? '<span class="pf">' + esc(dir) + '</span>' : '') + '</div>' +
+      '<div class="capa ' + esc(cor) + '"><span class="e">' + (es ? '🌍' : (EM[n] || '💬')) + '</span><span class="tg">' + esc(tg) + '</span>' + (dir ? '<span class="pf' + (es ? '' : ' pf-' + esc(pf)) + '">' + esc(dir) + '</span>' : '') + '</div>' +
       '<div class="th" data-th="' + esc(it.id) + '" title="' + esc(it.nome) + '">' + (it.pronto ? '<span class="carrega"><i></i> preparando a miniatura…</span>' : '<span class="carrega">em preparação</span>') +
       '<span class="l" title="Slide anterior">‹</span><span class="r" title="Próximo slide">›</span><span class="cnt" hidden></span></div>' +
       '<div class="inf"><b title="' + esc(titulo(it)) + '">' + esc(titulo(it)) + '</b>' +
