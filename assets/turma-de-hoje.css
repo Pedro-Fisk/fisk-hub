@@ -807,3 +807,6 @@ body.theme-dark .painel.aula-filtro{ background: linear-gradient(120deg, #c2410c
   .aula-filtro .legenda{ justify-content: stretch; } .aula-filtro .leg-det, .aula-filtro .obs-toggle{ flex: 1 1 auto; text-align: center; }
 }
 @media (prefers-reduced-motion: reduce){ .painel.aula-filtro, .af-ico, .af-ir.pede, .aula-filtro .status.esperando::after{ animation: none; } }
+/* o "Ir" e o "Trazer" do MESMO tamanho (Pedro, 28/11/2026) */
+.af-ir, .af-trazer{ box-sizing: border-box; min-width: 7.2rem; height: 2.5rem; padding: 0 1rem; font: 900 .9rem var(--font-body); display: inline-flex; align-items: center; justify-content: center; }
+.af-ir.pede, .af-ir:not(.pede):not(:disabled), .af-trazer{ box-shadow: 0 3px 0 #1f7a63; }
