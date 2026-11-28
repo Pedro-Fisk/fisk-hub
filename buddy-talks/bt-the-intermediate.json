@@ -1,0 +1,243 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · The",
+  "coverLevel": "Intermediate",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Two Little Sounds",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing the article THE.",
+   "Developing pronunciation."
+  ],
+  "material": [
+   "PowerPoint activity",
+   "Buddy Talks AUDIO FILE - the two sounds of THE"
+  ],
+  "duracao": "10 minutes",
+  "vocabulary": [
+   {
+    "word": "the hour",
+    "translation": "/ði/"
+   },
+   {
+    "word": "the user",
+    "translation": "/ðə/"
+   },
+   {
+    "word": "the idea",
+    "translation": "/ði/"
+   },
+   {
+    "word": "the engine",
+    "translation": "/ði/"
+   },
+   {
+    "word": "the update",
+    "translation": "/ði/"
+   },
+   {
+    "word": "the device",
+    "translation": "/ðə/"
+   },
+   {
+    "word": "the answer",
+    "translation": "/ði/"
+   },
+   {
+    "word": "the screen",
+    "translation": "/ðə/"
+   },
+   {
+    "word": "the option",
+    "translation": "/ði/"
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll practice a word you say a hundred times a day, and it has two sounds. It’s... …THE! The SOUND after it decides, not the letter: the hour\n\nThe hour takes /ði/ because the H is silent and a vowel sound comes next. The university takes /ðə/ because the U sounds like a Y, not like a vowel.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll practice a word you say a hundred times a day, and it has two sounds. It’s...",
+   "…THE!\nThe SOUND after it decides, not the letter:\nthe hour",
+   "The hour takes /ði/ because the H is silent and a vowel sound comes next.",
+   "The university takes /ðə/ because the U sounds like a Y, not like a vowel."
+  ],
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 1 - L 6 - pg 55",
+    "id": "1ylHMum7nDnTGufcW2q1az52APzeCMfQP"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 1 - L 6 - pg 55",
+    "id": "1BawBRoZqva97ic_CN4mQV3cjypVXzMh-"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: Did you read the update?",
+    "modelAnswers": [
+     "B: The engineer explained the change."
+    ]
+   },
+   {
+    "question": "A: Is the device working?",
+    "modelAnswers": [
+     "B: The user manual is useless."
+    ]
+   },
+   {
+    "question": "A: What was the idea behind it?",
+    "modelAnswers": [
+     "B: The answer is in the first page."
+    ]
+   },
+   {
+    "question": "What is the gadget you could not live without?",
+    "modelAnswers": [
+     "The gadget is..."
+    ]
+   },
+   {
+    "question": "What is the hobby people find strange?",
+    "modelAnswers": [
+     "The hobby is..."
+    ]
+   },
+   {
+    "question": "Who is the geek in your family?",
+    "modelAnswers": [
+     "The geek is my..."
+    ]
+   },
+   {
+    "question": "What is the collection you keep?",
+    "modelAnswers": [
+     "The collection I keep is..."
+    ]
+   },
+   {
+    "question": "What is the subject you can talk about for hours?",
+    "modelAnswers": [
+     "The subject is..."
+    ]
+   },
+   {
+    "question": "What is the best advice for a beginner?",
+    "modelAnswers": [
+     "The best advice is..."
+    ]
+   },
+   {
+    "question": "What is the app you recommend the most?",
+    "modelAnswers": [
+     "The app is..."
+    ]
+   },
+   {
+    "question": "What would you encourage a friend to try?",
+    "modelAnswers": [
+     "I would encourage..."
+    ]
+   },
+   {
+    "question": "What is the technology that changed your routine?",
+    "modelAnswers": [
+     "The technology is..."
+    ]
+   }
+  ],
+  "languageGame": [
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "the hour",
+    "options": [
+     "/ði/",
+     "/ðə/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "the user",
+    "options": [
+     "/ði/",
+     "/ðə/"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "the idea",
+    "options": [
+     "/ði/",
+     "/ðə/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "the engine",
+    "options": [
+     "/ði/",
+     "/ðə/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "the update",
+    "options": [
+     "/ði/",
+     "/ðə/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "the device",
+    "options": [
+     "/ði/",
+     "/ðə/"
+    ],
+    "correctIndex": 1
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Which sound of THE do you forget more?"
+   }
+  ],
+  "temaDaConversa": "The geek in you",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "bear",
+  "icones": [
+   "bear"
+  ]
+ }
+}

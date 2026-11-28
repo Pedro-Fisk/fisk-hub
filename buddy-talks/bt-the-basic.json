@@ -1,0 +1,243 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · The",
+  "coverLevel": "Basic",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Two Little Sounds",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing the article THE.",
+   "Developing pronunciation."
+  ],
+  "material": [
+   "PowerPoint activity",
+   "Buddy Talks AUDIO FILE - the two sounds of THE"
+  ],
+  "duracao": "10 minutes",
+  "vocabulary": [
+   {
+    "word": "the app",
+    "translation": "/ði/"
+   },
+   {
+    "word": "the game",
+    "translation": "/ðə/"
+   },
+   {
+    "word": "the end",
+    "translation": "/ði/"
+   },
+   {
+    "word": "the box",
+    "translation": "/ðə/"
+   },
+   {
+    "word": "the hour",
+    "translation": "/ði/"
+   },
+   {
+    "word": "the phone",
+    "translation": "/ðə/"
+   },
+   {
+    "word": "the icon",
+    "translation": "/ði/"
+   },
+   {
+    "word": "the code",
+    "translation": "/ðə/"
+   },
+   {
+    "word": "the email",
+    "translation": "/ði/"
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll practice the smallest word in English, and it has two different sounds. It’s... …THE! The next sound decides how we say it: the app\n\nBefore a consonant sound we say /ðə/, like in the game. Before a vowel sound we say /ði/, like in the app and the end.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll practice the smallest word in English, and it has two different sounds. It’s...",
+   "…THE!\nThe next sound decides how we say it:\nthe app",
+   "Before a consonant sound we say /ðə/, like in the game.",
+   "Before a vowel sound we say /ði/, like in the app and the end."
+  ],
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 1 - L 6 - pg 55",
+    "id": "1ylHMum7nDnTGufcW2q1az52APzeCMfQP"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 1 - L 6 - pg 55",
+    "id": "1BawBRoZqva97ic_CN4mQV3cjypVXzMh-"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: Where is the game?",
+    "modelAnswers": [
+     "B: It’s on the app, in the store."
+    ]
+   },
+   {
+    "question": "A: Do you like the new phone?",
+    "modelAnswers": [
+     "B: I love the camera and the screen."
+    ]
+   },
+   {
+    "question": "A: What time is the party?",
+    "modelAnswers": [
+     "B: At the end of the afternoon."
+    ]
+   },
+   {
+    "question": "What is the best game you play?",
+    "modelAnswers": [
+     "The best game is..."
+    ]
+   },
+   {
+    "question": "What is the app you open first?",
+    "modelAnswers": [
+     "The app I open is..."
+    ]
+   },
+   {
+    "question": "What is the object you always carry?",
+    "modelAnswers": [
+     "I always carry the..."
+    ]
+   },
+   {
+    "question": "Who is the person you play with?",
+    "modelAnswers": [
+     "The person is my..."
+    ]
+   },
+   {
+    "question": "What is the coolest thing in your room?",
+    "modelAnswers": [
+     "The coolest thing is the..."
+    ]
+   },
+   {
+    "question": "What is the hardest level for you?",
+    "modelAnswers": [
+     "The hardest level is..."
+    ]
+   },
+   {
+    "question": "What is the last thing you bought?",
+    "modelAnswers": [
+     "The last thing was the..."
+    ]
+   },
+   {
+    "question": "What is the video you watch again?",
+    "modelAnswers": [
+     "The video is about..."
+    ]
+   },
+   {
+    "question": "What is the thing you want the most?",
+    "modelAnswers": [
+     "The thing I want is the..."
+    ]
+   }
+  ],
+  "languageGame": [
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "the app",
+    "options": [
+     "/ði/",
+     "/ðə/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "the game",
+    "options": [
+     "/ði/",
+     "/ðə/"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "the end",
+    "options": [
+     "/ði/",
+     "/ðə/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "the box",
+    "options": [
+     "/ði/",
+     "/ðə/"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "the hour",
+    "options": [
+     "/ði/",
+     "/ðə/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "the phone",
+    "options": [
+     "/ði/",
+     "/ðə/"
+    ],
+    "correctIndex": 1
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Can you hear the two sounds of THE?"
+   }
+  ],
+  "temaDaConversa": "Your favorite things",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "bear",
+  "icones": [
+   "bear"
+  ]
+ }
+}

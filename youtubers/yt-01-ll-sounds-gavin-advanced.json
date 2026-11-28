@@ -1,0 +1,152 @@
+{
+ "lesson": {
+  "coverTitle": "'LL Sounds with Gavin",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "'LL Sounds with Gavin",
+  "yt": {
+   "capaTitulo": "'LL Sounds with Gavin - ADV",
+   "material": [
+    "PowerPoint activity",
+    "Youtubers VIDEO FILE #01 - Dropbox"
+   ],
+   "duracao": "20 minutes",
+   "objetivos": [
+    "Practicing pronunciation.",
+    "Developing fluency."
+   ],
+   "intro": "Today, we will watch a video produced by Gavin, from the Youtube Channel Small Advantages. Gavin is an American guy that learned Portuguese all by himself. In his channel, he gives tips about the English language and culture. Today, we'll take a look at a part of his video about PRONUNCIATION of the 'LL sound.",
+   "video": {
+    "drive": "1p3BITT61FmEZTT3nTK2IU6H7l14i3tQY",
+    "youtube": "",
+    "nome": "Como pronunciar 'LL em inglês | CONTRAÇÕES #3",
+    "instrucao": "Every time the word PRACTICE appears, repeat the sentence on the screen. Pay attention to your pronunciation!",
+    "inicio": ""
+   },
+   "warmup": [],
+   "discussao": [
+    [
+     "Are you familiar with this channel?"
+    ],
+    [
+     "What's your opinion about his Portuguese?",
+     "In my opinion it is... funny / nice / correct / incorrect / other"
+    ],
+    [
+     "Do you think everyone has an accent when speaking another language?"
+    ]
+   ],
+   "conversa": [
+    [
+     "Do you spend a lot of time watching Youtube videos?"
+    ],
+    [
+     "Can Youtube be a \"time waster\"?"
+    ],
+    [
+     "Which kind of videos do you watch?",
+     "I usually watch _______ videos.",
+     "tutorial / funny / gameplay / other"
+    ],
+    [
+     "Is it easy or difficult for you to pronounce the 'LL sound?",
+     "a. Come on, it's easy!",
+     "b. It's OK I guess.",
+     "c. I need more practice."
+    ],
+    [
+     "Do you watch videos online to study?"
+    ]
+   ],
+   "pratica": [
+    {
+     "tipo": "dialogos",
+     "titulo": "Language Practice 1",
+     "instrucao": "Ask different students to act out the dialogs. Give the student time to come up with answers to fill in the blanks. Pay attention to the pronunciation of the contractions!",
+     "itens": [
+      [
+       "A: What will you have for dinner?",
+       "B: I think I'll have _________ ."
+      ],
+      [
+       "A: Where do you think she'll go?",
+       "B: I guess she'll probably go to ______ because ______ ."
+      ],
+      [
+       "A: Did you get your college admission?",
+       "B: No, I didn't. But I'll try again next year."
+      ],
+      [
+       "A: When will they start the project?",
+       "B: They'll start it ________. (future)"
+      ]
+     ]
+    },
+    {
+     "tipo": "desembaralhar",
+     "titulo": "Language Practice 2",
+     "instrucao": "Unscramble the words. After, complete the sentence.",
+     "itens": [
+      [
+       "he'll / America / in / study",
+       "He'll study in America because..."
+      ],
+      [
+       "tomorrow / dinner / they'll / cook",
+       "They'll cook dinner tomorrow if..."
+      ],
+      [
+       "you / ? / the movie / watch / will",
+       "Will you watch the movie?"
+      ]
+     ]
+    }
+   ],
+   "jogo": [],
+   "vocab": [],
+   "avaliacao": [
+    [
+     "What did you like about today's activity?",
+     "I liked the... VIDEO / GAMES / CONVERSATION"
+    ],
+    [
+     "Will you watch Gavin's videos to study English?"
+    ]
+   ],
+   "fotos": {
+    "capa": "01-basic/capa.jpg",
+    "video": "01-basic/capa.jpg",
+    "conv": "01-basic/capa.jpg",
+    "intro": "gavin.jpg",
+    "outras": [
+     "smalladvantages.jpg"
+    ]
+   }
+  },
+  "serie": "youtubers"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "youtuber",
+  "imgs": "youtubers/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#0D0D0D",
+   "fundo2": "#404040",
+   "prim": "#ffffff",
+   "sec": "#DC0505",
+   "dest": "#DC0505",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "television",
+  "icones": [
+   "television"
+  ]
+ }
+}

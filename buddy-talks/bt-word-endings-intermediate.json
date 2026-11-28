@@ -1,0 +1,182 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · Word Endings",
+  "coverLevel": "Intermediate",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Weak Endings",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing word endings.",
+   "Developing pronunciation."
+  ],
+  "material": [
+   "PowerPoint activity",
+   "Buddy Talks AUDIO FILE - word endings"
+  ],
+  "duracao": "10 minutes",
+  "vocabulary": [
+   {
+    "word": "decision",
+    "translation": ""
+   },
+   {
+    "word": "position",
+    "translation": ""
+   },
+   {
+    "word": "pressure",
+    "translation": ""
+   },
+   {
+    "word": "creature",
+    "translation": ""
+   },
+   {
+    "word": "dangerous",
+    "translation": ""
+   },
+   {
+    "word": "reaction",
+    "translation": ""
+   },
+   {
+    "word": "adventure",
+    "translation": ""
+   },
+   {
+    "word": "curious",
+    "translation": ""
+   },
+   {
+    "word": "occasion",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll practice endings that decide where the strong syllable of a word goes. They’re... …WORD ENDINGS! The syllable before the ending is the strong one: decision\n\n-tion, -sion, -ture and -ous are always weak, and they pull the stress back. Stressing the ending is the single most Brazilian-sounding habit in long words.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll practice endings that decide where the strong syllable of a word goes. They’re...",
+   "…WORD ENDINGS!\nThe syllable before the ending is the strong one:\ndecision",
+   "-tion, -sion, -ture and -ous are always weak, and they pull the stress back.",
+   "Stressing the ending is the single most Brazilian-sounding habit in long words."
+  ],
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 2 - L 1 - pg 11",
+    "id": "1HgUpi67ato5Wpa7gbvIQ4JhqXCBl1TmS"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 2 - L 1 - pg 11",
+    "id": "10fWjkYEMOZ4rm0pXLyFbuGap2_HNcSEU"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: Was it a hard decision?",
+    "modelAnswers": [
+     "B: There was a lot of pressure."
+    ]
+   },
+   {
+    "question": "A: What was their reaction?",
+    "modelAnswers": [
+     "B: Curious, and a bit dangerous."
+    ]
+   },
+   {
+    "question": "A: Was the trip good?",
+    "modelAnswers": [
+     "B: It was a real adventure."
+    ]
+   },
+   {
+    "question": "What is getting a lot of attention right now?",
+    "modelAnswers": [
+     "The thing is..."
+    ]
+   },
+   {
+    "question": "What was the reaction to it?",
+    "modelAnswers": [
+     "The reaction was..."
+    ]
+   },
+   {
+    "question": "What decision made someone famous?",
+    "modelAnswers": [
+     "The decision was..."
+    ]
+   },
+   {
+    "question": "Is popularity dangerous? Why?",
+    "modelAnswers": [
+     "Popularity is dangerous when..."
+    ]
+   },
+   {
+    "question": "What suggestion would you give to be noticed?",
+    "modelAnswers": [
+     "My suggestion is..."
+    ]
+   },
+   {
+    "question": "What position would you like in your field?",
+    "modelAnswers": [
+     "The position I want is..."
+    ]
+   },
+   {
+    "question": "What adventure would you love to try?",
+    "modelAnswers": [
+     "The adventure is..."
+    ]
+   },
+   {
+    "question": "Are you curious about fame?",
+    "modelAnswers": [
+     "I am curious about..."
+    ]
+   },
+   {
+    "question": "What creates pressure on famous people?",
+    "modelAnswers": [
+     "The pressure comes from..."
+    ]
+   }
+  ],
+  "languageGame": [],
+  "evaluation": [
+   {
+    "question": "Which ending pulls your stress to the wrong place?"
+   }
+  ],
+  "temaDaConversa": "Riding the wave of popularity",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "bear",
+  "icones": [
+   "bear"
+  ]
+ }
+}

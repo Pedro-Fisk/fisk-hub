@@ -1,0 +1,425 @@
+[
+ {
+  "id": "ct-japan-basic",
+  "num": 1,
+  "pais": "Japan",
+  "nome": "01 - Japan - Basic & Teens",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "rotulo": "Basic & Teens",
+  "jogo": 0,
+  "video": false
+ },
+ {
+  "id": "ct-japan-intermediate",
+  "num": 1,
+  "pais": "Japan",
+  "nome": "01 - Japan - Intermediate",
+  "niveis": [
+   "Intermediate"
+  ],
+  "rotulo": "Intermediate",
+  "jogo": 0,
+  "video": false
+ },
+ {
+  "id": "ct-japan-advanced",
+  "num": 1,
+  "pais": "Japan",
+  "nome": "01 - Japan - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "rotulo": "Advanced",
+  "jogo": 0,
+  "video": false
+ },
+ {
+  "id": "ct-usa-basic",
+  "num": 2,
+  "pais": "USA",
+  "nome": "02 - USA - Basic & Teens",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "rotulo": "Basic & Teens",
+  "jogo": 0,
+  "video": false
+ },
+ {
+  "id": "ct-usa-interadv",
+  "num": 2,
+  "pais": "USA",
+  "nome": "02 - USA - Intermediate & Advanced",
+  "niveis": [
+   "Intermediate",
+   "Advanced"
+  ],
+  "rotulo": "Intermediate & Advanced",
+  "jogo": 0,
+  "video": false
+ },
+ {
+  "id": "ct-spain-basic",
+  "num": 3,
+  "pais": "Spain",
+  "nome": "03 - Spain - Basic (+18)",
+  "niveis": [
+   "Basic"
+  ],
+  "rotulo": "Basic (+18)",
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "ct-spain-teens",
+  "num": 3,
+  "pais": "Spain",
+  "nome": "03 - Spain - Teens & Basic (-18)",
+  "niveis": [
+   "Teens",
+   "Basic"
+  ],
+  "rotulo": "Teens & Basic (-18)",
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "ct-spain-intermediate",
+  "num": 3,
+  "pais": "Spain",
+  "nome": "03 - Spain - Intermediate",
+  "niveis": [
+   "Intermediate"
+  ],
+  "rotulo": "Intermediate",
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "ct-spain-advanced",
+  "num": 3,
+  "pais": "Spain",
+  "nome": "03 - Spain - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "rotulo": "Advanced",
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "ct-new-zealand-basic",
+  "num": 4,
+  "pais": "New Zealand",
+  "nome": "04 - New Zealand - Teens & Basic",
+  "niveis": [
+   "Teens",
+   "Basic"
+  ],
+  "rotulo": "Teens & Basic",
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "ct-new-zealand-intermediate",
+  "num": 4,
+  "pais": "New Zealand",
+  "nome": "04 - New Zealand - Intermediate",
+  "niveis": [
+   "Intermediate"
+  ],
+  "rotulo": "Intermediate",
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "ct-new-zealand-advanced",
+  "num": 4,
+  "pais": "New Zealand",
+  "nome": "04 - New Zealand - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "rotulo": "Advanced",
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "ct-ireland-basic",
+  "num": 5,
+  "pais": "Ireland",
+  "nome": "05 - Ireland - Basic & Teens",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "rotulo": "Basic & Teens",
+  "jogo": 5,
+  "video": true
+ },
+ {
+  "id": "ct-ireland-intermediate",
+  "num": 5,
+  "pais": "Ireland",
+  "nome": "05 - Ireland - Intermediate",
+  "niveis": [
+   "Intermediate"
+  ],
+  "rotulo": "Intermediate",
+  "jogo": 5,
+  "video": true
+ },
+ {
+  "id": "ct-ireland-advanced",
+  "num": 5,
+  "pais": "Ireland",
+  "nome": "05 - Ireland - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "rotulo": "Advanced",
+  "jogo": 5,
+  "video": true
+ },
+ {
+  "id": "ct-india-basic",
+  "num": 6,
+  "pais": "India",
+  "nome": "06 - India - Basic & Teens",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "rotulo": "Basic & Teens",
+  "jogo": 4,
+  "video": true
+ },
+ {
+  "id": "ct-india-intermediate",
+  "num": 6,
+  "pais": "India",
+  "nome": "06 - India - Intermediate",
+  "niveis": [
+   "Intermediate"
+  ],
+  "rotulo": "Intermediate",
+  "jogo": 4,
+  "video": true
+ },
+ {
+  "id": "ct-india-advanced",
+  "num": 6,
+  "pais": "India",
+  "nome": "06 - India - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "rotulo": "Advanced",
+  "jogo": 4,
+  "video": true
+ },
+ {
+  "id": "ct-peru-all",
+  "num": 7,
+  "pais": "Peru",
+  "nome": "07 - Peru - All Levels",
+  "niveis": [
+   "Basic",
+   "Teens",
+   "Intermediate",
+   "Advanced"
+  ],
+  "rotulo": "All Levels",
+  "jogo": 3,
+  "video": true
+ },
+ {
+  "id": "ct-australia-basic",
+  "num": 8,
+  "pais": "Australia",
+  "nome": "08 - Australia - Basic & Teens",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "rotulo": "Basic & Teens",
+  "jogo": 5,
+  "video": false
+ },
+ {
+  "id": "ct-australia-intermediate",
+  "num": 8,
+  "pais": "Australia",
+  "nome": "08 - Australia - Intermediate",
+  "niveis": [
+   "Intermediate"
+  ],
+  "rotulo": "Intermediate",
+  "jogo": 5,
+  "video": false
+ },
+ {
+  "id": "ct-australia-advanced",
+  "num": 8,
+  "pais": "Australia",
+  "nome": "08 - Australia - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "rotulo": "Advanced",
+  "jogo": 5,
+  "video": false
+ },
+ {
+  "id": "ct-south-africa-basic",
+  "num": 9,
+  "pais": "South Africa",
+  "nome": "09 - South Africa - Basic & Teens",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "rotulo": "Basic & Teens",
+  "jogo": 5,
+  "video": false
+ },
+ {
+  "id": "ct-south-africa-intermediate",
+  "num": 9,
+  "pais": "South Africa",
+  "nome": "09 - South Africa - Intermediate",
+  "niveis": [
+   "Intermediate"
+  ],
+  "rotulo": "Intermediate",
+  "jogo": 5,
+  "video": false
+ },
+ {
+  "id": "ct-south-africa-advanced",
+  "num": 9,
+  "pais": "South Africa",
+  "nome": "09 - South Africa - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "rotulo": "Advanced",
+  "jogo": 5,
+  "video": false
+ },
+ {
+  "id": "ct-jamaica-basic",
+  "num": 10,
+  "pais": "Jamaica",
+  "nome": "10 - Jamaica - Basic & Teens",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "rotulo": "Basic & Teens",
+  "jogo": 5,
+  "video": false
+ },
+ {
+  "id": "ct-jamaica-intermediate",
+  "num": 10,
+  "pais": "Jamaica",
+  "nome": "10 - Jamaica - Intermediate",
+  "niveis": [
+   "Intermediate"
+  ],
+  "rotulo": "Intermediate",
+  "jogo": 5,
+  "video": false
+ },
+ {
+  "id": "ct-jamaica-advanced",
+  "num": 10,
+  "pais": "Jamaica",
+  "nome": "10 - Jamaica - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "rotulo": "Advanced",
+  "jogo": 5,
+  "video": false
+ },
+ {
+  "id": "ct-singapore-basic",
+  "num": 11,
+  "pais": "Singapore",
+  "nome": "11 - Singapore - Basic & Teens",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "rotulo": "Basic & Teens",
+  "jogo": 5,
+  "video": false
+ },
+ {
+  "id": "ct-singapore-intermediate",
+  "num": 11,
+  "pais": "Singapore",
+  "nome": "11 - Singapore - Intermediate",
+  "niveis": [
+   "Intermediate"
+  ],
+  "rotulo": "Intermediate",
+  "jogo": 5,
+  "video": false
+ },
+ {
+  "id": "ct-singapore-advanced",
+  "num": 11,
+  "pais": "Singapore",
+  "nome": "11 - Singapore - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "rotulo": "Advanced",
+  "jogo": 5,
+  "video": false
+ },
+ {
+  "id": "ct-london-basic",
+  "num": 12,
+  "pais": "London",
+  "nome": "12 - London - Basic & Teens",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "rotulo": "Basic & Teens",
+  "jogo": 5,
+  "video": false
+ },
+ {
+  "id": "ct-london-intermediate",
+  "num": 12,
+  "pais": "London",
+  "nome": "12 - London - Intermediate",
+  "niveis": [
+   "Intermediate"
+  ],
+  "rotulo": "Intermediate",
+  "jogo": 5,
+  "video": false
+ },
+ {
+  "id": "ct-london-advanced",
+  "num": 12,
+  "pais": "London",
+  "nome": "12 - London - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "rotulo": "Advanced",
+  "jogo": 5,
+  "video": false
+ }
+]

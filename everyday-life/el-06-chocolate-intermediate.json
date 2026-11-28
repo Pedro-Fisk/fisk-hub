@@ -1,0 +1,153 @@
+{
+ "lesson": {
+  "coverTitle": "#06 – Chocolate",
+  "coverLevel": "Intermediate",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Chocolate",
+  "objectives": [],
+  "material": [
+   "PowerPoint activity"
+  ],
+  "duracao": "20 minutes",
+  "fotosSerie": {
+   "capa": "",
+   "iw": "06-basic/iw.jpg",
+   "jogo": "",
+   "conv": "06-basic/conv.jpg",
+   "icone": "06-basic/icone.png"
+  },
+  "vocabulary": [
+   {
+    "word": "cut down on",
+    "translation": "reduzir o consumo de"
+   },
+   {
+    "word": "pig out on",
+    "translation": "eat a lot of"
+   },
+   {
+    "word": "brand",
+    "translation": "marca (empresa)"
+   },
+   {
+    "word": "health",
+    "translation": "saúde"
+   },
+   {
+    "word": "dark",
+    "translation": "amargo"
+   },
+   {
+    "word": "regular",
+    "translation": "normal, “ao leite”"
+   },
+   {
+    "word": "white",
+    "translation": "branco"
+   },
+   {
+    "word": "crunchy",
+    "translation": "crocante"
+   }
+  ],
+  "notas": [],
+  "languageGame": [],
+  "conversation": [
+   {
+    "question": "What’s your favorite kind of chocolate? (Long answer)",
+    "modelAnswers": [
+     "DARK / REGULAR / WHITE / CRUNCHY"
+    ]
+   },
+   {
+    "question": "What kind of chocolate don’t you like?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you like a specific brand of chocolate?",
+    "modelAnswers": [
+     "I like / love...",
+     "NESTLE / CACAU SHOW / GAROTO / OTHER"
+    ]
+   },
+   {
+    "question": "What makes that brand so good?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Some people really like Nutella. What about you?",
+    "modelAnswers": [
+     "I freaking love Nutella!",
+     "I like it a lil’ bit.",
+     "Actually, I don’t like it."
+    ]
+   },
+   {
+    "question": "What’s your favorite chocolate dessert? (Long answer)",
+    "modelAnswers": [
+     "PUDDING / CAKE / ICE CREAM / TRUFFLE (brigadeiro)"
+    ]
+   },
+   {
+    "question": "Would you like to work at a chocolate factory? Why / Why not?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Are you into chocolate fondue?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What’s the best weather to eat choc. fondue?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Is chocolate good or bad for your health?",
+    "modelAnswers": [
+     "For me... / I think... / To be honest..."
+    ]
+   },
+   {
+    "question": "Would it be easy for you to cut down on chocolate?",
+    "modelAnswers": []
+   },
+   {
+    "question": "When was the last time you pigged out on chocolate?",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about chocolate?"
+   }
+  ],
+  "semRevisao": true,
+  "serie": "everyday-life"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "everyday",
+  "imgs": "everyday-life/img/",
+  "faixa1": "#990000",
+  "faixa2": "#9D3D23",
+  "destaque": "#FFC000",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#000000",
+   "fundo2": "#111111",
+   "prim": "#FFC000",
+   "sec": "#990000",
+   "dest": "#FFC000",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "house",
+  "icones": [
+   "house"
+  ]
+ }
+}

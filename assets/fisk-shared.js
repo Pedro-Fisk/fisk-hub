@@ -2150,7 +2150,12 @@ function fiskPerfilDaTurma(t) {
   return { escola: t.escola || '', turma: t.titulo || t.tituloInteiro || '', livro: livro, nivel: nivel, idioma: idioma,
            perfil: /[(\[]\s*\+\s*18\s*[)\]]/.test(tit) ? 'Adultos' : 'Jovens', ini: t.h ? t.h.ini : null,
            /* os RAFs da turma (27/11/2026): a conversação libera a aula no portal de cada aluno (portal-aluno-fisk/api/aula.js) */
-           rafs: (t.alunos || []).map(function (a) { return String(a.raf || '').trim(); }).filter(Boolean) };
+           rafs: (t.alunos || []).map(function (a) { return String(a.raf || '').trim(); }).filter(Boolean),
+           /* o sorteio da conversação (27/11/2026): primeiro nome e a inicial do sobrenome, como a TV mostra */
+           nomes: (t.alunos || []).filter(function (a) { return a && a.nome && !a.saiu; }).map(function (a) {
+             var p = String(a.nome).trim().split(/\s+/); return p[0] + (p.length > 1 ? ' ' + p[p.length - 1].charAt(0) + '.' : ''); }),
+           /* os dias da semana da turma (0 = domingo): a conversação fica aberta no celular até a PRÓXIMA aula */
+           dias: t.h && t.h.dias ? t.h.dias.slice() : [] };
 }
 /* a próxima turma de hoje (para quando não há aula agora) */
 function fiskTurmaProxima(s) {

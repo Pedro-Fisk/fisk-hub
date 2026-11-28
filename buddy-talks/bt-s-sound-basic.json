@@ -1,0 +1,182 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · The /s/ Sound",
+  "coverLevel": "Basic",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "The Ghost Vowel",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing initial /s/.",
+   "Developing pronunciation."
+  ],
+  "material": [
+   "PowerPoint activity",
+   "Buddy Talks AUDIO FILE - the /s/ at the start"
+  ],
+  "duracao": "10 minutes",
+  "vocabulary": [
+   {
+    "word": "study",
+    "translation": ""
+   },
+   {
+    "word": "school",
+    "translation": ""
+   },
+   {
+    "word": "stop",
+    "translation": ""
+   },
+   {
+    "word": "small",
+    "translation": ""
+   },
+   {
+    "word": "speak",
+    "translation": ""
+   },
+   {
+    "word": "storm",
+    "translation": ""
+   },
+   {
+    "word": "street",
+    "translation": ""
+   },
+   {
+    "word": "start",
+    "translation": ""
+   },
+   {
+    "word": "strong",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll remove one little vowel that we add without even noticing. It’s the... …GHOST E! We say e-study, but the word starts with S: study\n\nStart with the air of the S first, and only then let your voice in. With the extra E, school becomes eschool and the word gains a syllable.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll remove one little vowel that we add without even noticing. It’s the...",
+   "…GHOST E!\nWe say e-study, but the word starts with S:\nstudy",
+   "Start with the air of the S first, and only then let your voice in.",
+   "With the extra E, school becomes eschool and the word gains a syllable."
+  ],
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 2 - L 8 - pg 71",
+    "id": "1zF3FADzYkMu4y24ewa8rrFHgW_GxyzqG"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 2 - L 8 - pg 71",
+    "id": "1sdWS5G-g3vcHmlzcalAUkDA3RIDdzcf3"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: Where do you study?",
+    "modelAnswers": [
+     "B: At the school on this street."
+    ]
+   },
+   {
+    "question": "A: Can you speak more slowly?",
+    "modelAnswers": [
+     "B: Sure. Stop me if it’s fast."
+    ]
+   },
+   {
+    "question": "A: Was the storm strong?",
+    "modelAnswers": [
+     "B: Strong, but the house is safe."
+    ]
+   },
+   {
+    "question": "Do you like storms? Why?",
+    "modelAnswers": [
+     "I like / don’t like storms because..."
+    ]
+   },
+   {
+    "question": "What do you do when it starts to rain?",
+    "modelAnswers": [
+     "I stop and..."
+    ]
+   },
+   {
+    "question": "Was there a strong storm in your city?",
+    "modelAnswers": [
+     "Yes, the storm..."
+    ]
+   },
+   {
+    "question": "Do you study when it rains?",
+    "modelAnswers": [
+     "When it rains I study..."
+    ]
+   },
+   {
+    "question": "What street floods near your house?",
+    "modelAnswers": [
+     "The street that floods is..."
+    ]
+   },
+   {
+    "question": "Were you scared of storms as a child?",
+    "modelAnswers": [
+     "When I was small I..."
+    ]
+   },
+   {
+    "question": "What do you say to a friend in trouble?",
+    "modelAnswers": [
+     "I say..."
+    ]
+   },
+   {
+    "question": "Do you prefer snow, sun or storms?",
+    "modelAnswers": [
+     "I prefer... because..."
+    ]
+   },
+   {
+    "question": "What is the strongest weather you saw?",
+    "modelAnswers": [
+     "The strongest was..."
+    ]
+   }
+  ],
+  "languageGame": [],
+  "evaluation": [
+   {
+    "question": "Can you say STUDY without the extra E?"
+   }
+  ],
+  "temaDaConversa": "Storms and bad weather",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "bear",
+  "icones": [
+   "bear"
+  ]
+ }
+}

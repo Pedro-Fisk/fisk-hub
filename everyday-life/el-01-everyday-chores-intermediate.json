@@ -1,0 +1,120 @@
+{
+ "lesson": {
+  "coverTitle": "#01",
+  "coverLevel": "Intermediate",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Everyday Chores",
+  "objectives": [
+   "Talking about everyday situations.",
+   "Expanding vocabulary.",
+   "Learning new expressions."
+  ],
+  "material": [
+   "PowerPoint activity"
+  ],
+  "duracao": "20 minutes",
+  "fotosSerie": {
+   "capa": "01-basic/capa.jpg",
+   "iw": "01-basic/iw.jpg",
+   "jogo": "",
+   "conv": "01-basic/conv.jpg",
+   "icone": ""
+  },
+  "vocabulary": [
+   {
+    "word": "(to) buy groceries",
+    "translation": "comprar mantimentos"
+   },
+   {
+    "word": "(to) pay the bills",
+    "translation": "pagar contas"
+   },
+   {
+    "word": "(to) do the dishes",
+    "translation": "lavar a louça"
+   },
+   {
+    "word": "(to) do the laundry",
+    "translation": "lavar as roupas"
+   },
+   {
+    "word": "(to) make the bed",
+    "translation": "arrumar a cama"
+   },
+   {
+    "word": "(to) iron the clothes",
+    "translation": "passar roupa"
+   }
+  ],
+  "notas": [],
+  "languageGame": [],
+  "conversation": [
+   {
+    "question": "Do you enjoy helping out at home?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Who usually asks for your help at home: brother, sister, parents?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Which is your favorite chore: do the dishes or do the laundry?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you complain about doing chores?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Who likes to cook in your family?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Who likes to buy the groceries in your family?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Is there any chore that you refuse to do? Why?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Is there any member of your family who doesn’t help with the chores?",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about everyday chores?"
+   }
+  ],
+  "semRevisao": true,
+  "serie": "everyday-life"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "everyday",
+  "imgs": "everyday-life/img/",
+  "faixa1": "#002060",
+  "faixa2": "#FFC000",
+  "destaque": "#FFC000",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#000000",
+   "fundo2": "#111111",
+   "prim": "#FFC000",
+   "sec": "#002060",
+   "dest": "#FFC000",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "house",
+  "icones": [
+   "house"
+  ]
+ }
+}

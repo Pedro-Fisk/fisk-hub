@@ -1,0 +1,254 @@
+{
+ "lesson": {
+  "coverTitle": "Countries · London",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "London",
+  "objectives": [
+   "Talking about London.",
+   "Developing conversation skills."
+  ],
+  "pais": {
+   "nome": "London",
+   "oficial": "",
+   "num": 12,
+   "cor": "#c8102e",
+   "bandeira": "ldn/bandeira.svg",
+   "capa": "ldn/capa.jpg",
+   "capaLocal": "Tower Bridge",
+   "mapa": "",
+   "texto": "London is the capital of the United Kingdom and a city of many languages: over 300 are spoken there.\nThe River Thames runs through the city, and under it runs the Tube, the oldest underground railway in the world, opened in 1863.",
+   "fatos": [
+    [
+     "Country",
+     "United Kingdom"
+    ],
+    [
+     "River",
+     "Thames"
+    ],
+    [
+     "Population",
+     "≈ 9 million"
+    ],
+    [
+     "Languages",
+     "more than 300 spoken in the city"
+    ],
+    [
+     "Currency",
+     "Pound sterling (£)"
+    ]
+   ]
+  },
+  "introText": "Today, we’ll talk about London. We’ll take a look at the Tube, afternoon tea, markets and the city’s many languages.",
+  "introSub": "The Tube, afternoon tea, markets and a city of many languages",
+  "warmup": [
+   {
+    "question": "What images come to your mind when you think of London?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Is a capital city a good picture of its country? Why (not)?",
+    "modelAnswers": []
+   }
+  ],
+  "fotos": [
+   {
+    "img": "ldn/bigben.jpg",
+    "local": "Big Ben"
+   },
+   {
+    "img": "ldn/tube.jpg",
+    "titulo": "The Tube",
+    "local": "A London Underground station",
+    "texto": "The Tube opened in 1863. On the platform, you hear: “Mind the gap!” (be careful with the space between the train and the platform)."
+   },
+   {
+    "img": "ldn/tea.jpg",
+    "titulo": "Afternoon tea",
+    "local": "Afternoon tea with scones",
+    "texto": "Many British people drink their black tea with a little milk. A cup of tea is “a cuppa”."
+   },
+   {
+    "img": "ldn/camden.jpg",
+    "titulo": "The sacred queue",
+    "local": "Camden Market",
+    "texto": "In a market, a shop or a bus stop, wait for your turn: jumping the queue is seen as very rude."
+   },
+   {
+    "img": "ldn/nottinghill.jpg",
+    "local": "The houses of Notting Hill"
+   },
+   {
+    "img": "ldn/city.jpg",
+    "local": "The City of London at night"
+   }
+  ],
+  "vocabulary": [
+   {
+    "word": "the Tube",
+    "translation": "o metrô de Londres"
+   },
+   {
+    "word": "Mind the gap!",
+    "translation": "cuidado com o vão!"
+   },
+   {
+    "word": "cheers",
+    "translation": "obrigado, valeu, tchau"
+   },
+   {
+    "word": "queue",
+    "translation": "fila"
+   },
+   {
+    "word": "to jump the queue",
+    "translation": "furar a fila"
+   },
+   {
+    "word": "understatement",
+    "translation": "atenuação (dizer menos do que se pensa)"
+   },
+   {
+    "word": "lift / flat",
+    "translation": "elevador / apartamento (no Reino Unido)"
+   },
+   {
+    "word": "to apologise",
+    "translation": "pedir desculpas"
+   }
+  ],
+  "vocabTitulo": "London English",
+  "vocabSub": "words you will hear in London · pay attention to pronunciation",
+  "video": null,
+  "leitura": null,
+  "languageGame": [
+   {
+    "question": "Only English is spoken in London.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": "Over 300 languages are spoken there."
+   },
+   {
+    "question": "The Tube is the oldest underground railway in the world.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "“Mind the gap” is about the space between the train and the platform.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "In London, jumping the queue is OK when you are in a hurry.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": "Jumping the queue is seen as very rude."
+   },
+   {
+    "question": "Many British people drink their black tea with a little milk.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   }
+  ],
+  "jogoTitulo": "True or False?",
+  "conversation": [
+   {
+    "question": "Over 300 languages are spoken in London. What are the advantages and the challenges of living in such a multicultural city?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Big cities like London attract many tourists. How can a city welcome tourists without becoming too expensive for the people who live there?",
+    "modelAnswers": []
+   },
+   {
+    "question": "The Tube opened in 1863. How would a better metro system change life in your city?",
+    "modelAnswers": []
+   },
+   {
+    "question": "British English runs on understatement: “It’s quite good, actually” can be praise or criticism. Is Brazilian communication more direct or indirect?",
+    "modelAnswers": []
+   },
+   {
+    "question": "In the UK, a queue-jumper meets silence and raised eyebrows, not shouting. Is silence a more effective way to criticise someone? Why?",
+    "modelAnswers": []
+   },
+   {
+    "question": "British people say “sorry” as politeness, not guilt. Which small polite expressions are important in Brazilian culture?",
+    "modelAnswers": []
+   },
+   {
+    "question": "The accent of period films is spoken by only a small part of the British population. Which English accent would you like to have? Why?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Should Brazilian students learn British English, American English, or both? Why?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Afternoon tea, pubs, the queue: which British habit would you bring to Brazil? Why?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Would you rather live in London or in a smaller British city? Why?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What can a city’s public transport tell you about its society?",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about London?"
+   },
+   {
+    "question": "Which other cities would you like to learn more about?"
+   }
+  ],
+  "serie": "countries"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "countries",
+  "imgs": "countries/img/",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#ffffff",
+   "fundo2": "#eef3f8",
+   "prim": "#16365c",
+   "sec": "#c8102e",
+   "dest": "#c8102e",
+   "txt": "#16365c"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "globe-showing-americas",
+  "icones": [
+   "globe-showing-americas"
+  ]
+ }
+}

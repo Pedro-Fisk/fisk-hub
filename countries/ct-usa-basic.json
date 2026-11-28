@@ -1,0 +1,166 @@
+{
+ "lesson": {
+  "coverTitle": "Countries · USA",
+  "coverLevel": "Basic & Teens",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "USA",
+  "objectives": [
+   "Talking about American culture.",
+   "Developing conversation skills."
+  ],
+  "pais": {
+   "nome": "USA",
+   "oficial": "United States of America",
+   "num": 2,
+   "cor": "#b22234",
+   "bandeira": "us/bandeira.svg",
+   "capa": "us/nyc.jpg",
+   "capaLocal": "New York",
+   "mapa": "",
+   "texto": "",
+   "fatos": []
+  },
+  "introText": "Today, we’ll talk about American culture. We’ll discuss American food, Hollywood, Times Square and California.",
+  "introSub": "Food, Hollywood, Times Square and California",
+  "warmup": [
+   {
+    "question": "How well do you know American culture?",
+    "modelAnswers": [
+     "I actually don’t know a lot about it.",
+     "I know it very well."
+    ]
+   }
+  ],
+  "fotos": [
+   {
+    "img": "us/burger.jpg",
+    "titulo": "Food",
+    "local": "Hamburger",
+    "texto": "Hamburgers are considered America’s traditional food."
+   },
+   {
+    "img": "us/hollywood.jpg",
+    "titulo": "Hollywood",
+    "local": "Los Angeles",
+    "texto": "Hollywood is the American city where movies are made."
+   },
+   {
+    "img": "us/timessquare.jpg",
+    "titulo": "Times Square",
+    "local": "New York",
+    "texto": "Times Square is New York’s biggest marketplace."
+   },
+   {
+    "img": "us/california.jpg",
+    "titulo": "California",
+    "local": "California",
+    "texto": "California, the “Golden Coast” of America."
+   },
+   {
+    "img": "us/goldengate.jpg",
+    "local": "Golden Gate Bridge, San Francisco",
+    "fundo": true
+   },
+   {
+    "img": "us/liberty.jpg",
+    "local": "Statue of Liberty, New York",
+    "fundo": true
+   }
+  ],
+  "vocabulary": [
+   {
+    "word": "genre",
+    "translation": "gênero"
+   },
+   {
+    "word": "marketplace",
+    "translation": "mercado"
+   }
+  ],
+  "vocabTitulo": "",
+  "vocabSub": "",
+  "video": null,
+  "leitura": null,
+  "languageGame": [],
+  "jogoTitulo": "",
+  "conversation": [
+   {
+    "question": "Do you like burgers?",
+    "modelAnswers": [
+     "Sure, I do. I love them!",
+     "I don’t like burgers very much.",
+     "Yeah, and my favorite is..."
+    ]
+   },
+   {
+    "question": "What is your favorite movie?",
+    "modelAnswers": [
+     "My favorite movie is..."
+    ]
+   },
+   {
+    "question": "What is your favorite movie genre?",
+    "modelAnswers": [
+     "My favorite movie genre is..."
+    ]
+   },
+   {
+    "question": "How often do you go shopping?",
+    "modelAnswers": [
+     "I go shopping (every weekend)."
+    ]
+   },
+   {
+    "question": "What would you buy on Times Square?",
+    "modelAnswers": [
+     "I’d buy... on Times Square."
+    ]
+   },
+   {
+    "question": "Where do you like to relax?",
+    "modelAnswers": [
+     "I like to relax... (in my bedroom)."
+    ]
+   },
+   {
+    "question": "Would you go on vacation to California?",
+    "modelAnswers": [
+     "Yeah, I’d go on vacation to California."
+    ]
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about USA?"
+   },
+   {
+    "question": "Which other countries would you like to learn more about?"
+   }
+  ],
+  "serie": "countries"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "countries",
+  "imgs": "countries/img/",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#ffffff",
+   "fundo2": "#eef3f8",
+   "prim": "#16365c",
+   "sec": "#b22234",
+   "dest": "#b22234",
+   "txt": "#16365c"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "globe-showing-americas",
+  "icones": [
+   "globe-showing-americas"
+  ]
+ }
+}

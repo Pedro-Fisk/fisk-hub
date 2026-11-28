@@ -1,0 +1,172 @@
+{
+ "lesson": {
+  "coverTitle": "#02",
+  "coverLevel": "Basic & Teens",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Vacation",
+  "objectives": [
+   "Talking about vacations.",
+   "Expanding vocabulary.",
+   "Learning new expressions."
+  ],
+  "material": [
+   "PowerPoint activity"
+  ],
+  "duracao": "20 minutes",
+  "fotosSerie": {
+   "capa": "02-basic/capa.jpg",
+   "iw": "02-basic/iw.jpg",
+   "jogo": "02-basic/jogo.jpg",
+   "conv": "02-basic/conv.jpg",
+   "icone": "02-basic/icone.png"
+  },
+  "vocabulary": [
+   {
+    "word": "(to) go on vacation",
+    "translation": "sair de férias"
+   },
+   {
+    "word": "holiday(s)",
+    "translation": "feriado(s)"
+   },
+   {
+    "word": "(to) go on a trip",
+    "translation": "fazer uma viagem"
+   },
+   {
+    "word": "(to) chill out",
+    "translation": "“ficar de boa”"
+   },
+   {
+    "word": "beach",
+    "translation": ""
+   },
+   {
+    "word": "mountain",
+    "translation": ""
+   },
+   {
+    "word": "(to) pack",
+    "translation": "fazer a mala, carregar coisas"
+   }
+  ],
+  "notas": [],
+  "languageGame": [
+   {
+    "question": "Today I want to...",
+    "options": [
+     "chill out.",
+     "pack.",
+     "go to the mountain."
+    ],
+    "correctIndex": 0
+   },
+   {
+    "question": "Você quer fazer uma viagem?",
+    "options": [
+     "Does she want to go on a trip?",
+     "Do you want to pack?",
+     "Do you want to go on a trip?"
+    ],
+    "correctIndex": 2
+   },
+   {
+    "question": "I prefer to go to the...",
+    "options": [
+     "mountain",
+     "vacation",
+     "beach."
+    ],
+    "correctIndex": 2
+   },
+   {
+    "question": "Eu vou fazer a mala amanhã.",
+    "options": [
+     "I will pack my bags tomorrow.",
+     "I don’t pack my bag.",
+     "I like to pack my bags every day."
+    ],
+    "correctIndex": 0
+   }
+  ],
+  "conversation": [
+   {
+    "question": "How often do you go on vacation?",
+    "modelAnswers": [
+     "I go on vacation...",
+     "... every year / every semester / never."
+    ]
+   },
+   {
+    "question": "Do you like to go on trips?",
+    "modelAnswers": [
+     "Yes, I like to go on trips.",
+     "Not so much, I prefer to stay home."
+    ]
+   },
+   {
+    "question": "What did you do on the last holiday?",
+    "modelAnswers": [
+     "On the last holiday, I...",
+     "... traveled to (the beach).",
+     "... stayed home."
+    ]
+   },
+   {
+    "question": "Do you prefer the beach or the mountain?",
+    "modelAnswers": [
+     "I prefer the ______ because it’s...",
+     "HOT / COLD"
+    ]
+   },
+   {
+    "question": "When you travel, do you pack a lot of things?",
+    "modelAnswers": [
+     "Yeah, I pack a lot of things.",
+     "No, I don’t pack a lot of things"
+    ]
+   },
+   {
+    "question": "What will you do on the next vacation?",
+    "modelAnswers": [
+     "On the next vacation, I’ll...",
+     "TRAVEL / CHILL AT HOME / OTHER"
+    ]
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about vacation?"
+   }
+  ],
+  "semRevisao": true,
+  "serie": "everyday-life"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "everyday",
+  "imgs": "everyday-life/img/",
+  "faixa1": "#002060",
+  "faixa2": "#FF3399",
+  "destaque": "#FFC000",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#000000",
+   "fundo2": "#111111",
+   "prim": "#FFC000",
+   "sec": "#002060",
+   "dest": "#FFC000",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "house",
+  "icones": [
+   "house"
+  ]
+ }
+}

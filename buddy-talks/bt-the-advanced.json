@@ -1,0 +1,243 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · The",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Two Little Sounds",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing the article THE.",
+   "Developing pronunciation."
+  ],
+  "material": [
+   "PowerPoint activity",
+   "Buddy Talks AUDIO FILE - the two sounds of THE"
+  ],
+  "duracao": "10 minutes",
+  "vocabulary": [
+   {
+    "word": "the issue",
+    "translation": "/ði/"
+   },
+   {
+    "word": "the offer",
+    "translation": "/ði/"
+   },
+   {
+    "word": "the honor",
+    "translation": "/ði/"
+   },
+   {
+    "word": "the union",
+    "translation": "/ðə/"
+   },
+   {
+    "word": "the effort",
+    "translation": "/ði/"
+   },
+   {
+    "word": "the impact",
+    "translation": "/ði/"
+   },
+   {
+    "word": "the plan",
+    "translation": "/ðə/"
+   },
+   {
+    "word": "the origin",
+    "translation": "/ði/"
+   },
+   {
+    "word": "the client",
+    "translation": "/ðə/"
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll work on the word you repeat most often, and most often say the same way. It’s... …THE! Two forms, decided by the following sound: the end\n\nGetting it right is invisible when correct and audible the moment it is wrong. There is a third use: stressed /ðiː/, when you mean THE one and only.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll work on the word you repeat most often, and most often say the same way. It’s...",
+   "…THE!\nTwo forms, decided by the following sound:\nthe end",
+   "Getting it right is invisible when correct and audible the moment it is wrong.",
+   "There is a third use: stressed /ðiː/, when you mean THE one and only."
+  ],
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 1 - L 6 - pg 55",
+    "id": "1ylHMum7nDnTGufcW2q1az52APzeCMfQP"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 1 - L 6 - pg 55",
+    "id": "1BawBRoZqva97ic_CN4mQV3cjypVXzMh-"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: What was the outcome of the meeting?",
+    "modelAnswers": [
+     "B: The impact was bigger than expected."
+    ]
+   },
+   {
+    "question": "A: Did they explain the concept?",
+    "modelAnswers": [
+     "B: The origin of the idea is unclear."
+    ]
+   },
+   {
+    "question": "A: Was it worth the effort?",
+    "modelAnswers": [
+     "B: It was the effort of a lifetime."
+    ]
+   },
+   {
+    "question": "What is the subject you know in depth?",
+    "modelAnswers": [
+     "The subject is..."
+    ]
+   },
+   {
+    "question": "What is the detail only you notice?",
+    "modelAnswers": [
+     "The detail is..."
+    ]
+   },
+   {
+    "question": "Is the label geek an insult or a compliment?",
+    "modelAnswers": [
+     "In my opinion, the label..."
+    ]
+   },
+   {
+    "question": "What is the obsession that paid off?",
+    "modelAnswers": [
+     "The obsession was..."
+    ]
+   },
+   {
+    "question": "What is the technology you refuse to adopt?",
+    "modelAnswers": [
+     "The technology I refuse is..."
+    ]
+   },
+   {
+    "question": "What is the hardest part of explaining it?",
+    "modelAnswers": [
+     "The hardest part is..."
+    ]
+   },
+   {
+    "question": "Who is the person who got you into it?",
+    "modelAnswers": [
+     "The person was..."
+    ]
+   },
+   {
+    "question": "What is the advice you would give a beginner?",
+    "modelAnswers": [
+     "The advice is..."
+    ]
+   },
+   {
+    "question": "What is the future of that field?",
+    "modelAnswers": [
+     "The future is..."
+    ]
+   }
+  ],
+  "languageGame": [
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "the issue",
+    "options": [
+     "/ði/",
+     "/ðə/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "the offer",
+    "options": [
+     "/ði/",
+     "/ðə/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "the honor",
+    "options": [
+     "/ði/",
+     "/ðə/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "the union",
+    "options": [
+     "/ði/",
+     "/ðə/"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "the effort",
+    "options": [
+     "/ði/",
+     "/ðə/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "the impact",
+    "options": [
+     "/ði/",
+     "/ðə/"
+    ],
+    "correctIndex": 0
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Do you switch between the two forms of THE?"
+   }
+  ],
+  "temaDaConversa": "The thing you are obsessive about",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "bear",
+  "icones": [
+   "bear"
+  ]
+ }
+}

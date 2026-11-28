@@ -1,0 +1,293 @@
+[
+ {
+  "id": "yt-01-ll-sounds-gavin-basic",
+  "num": 1,
+  "nome": "01 - 'LL Sounds with Gavin - Basic & Teens",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "yt-01-ll-sounds-gavin-intermediate",
+  "num": 1,
+  "nome": "01 - 'LL Sounds with Gavin - Intermediate",
+  "niveis": [
+   "Intermediate"
+  ],
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "yt-01-ll-sounds-gavin-advanced",
+  "num": 1,
+  "nome": "01 - 'LL Sounds with Gavin - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "yt-02-palavras-em-ingles-basic",
+  "num": 2,
+  "nome": "02 - Palavras em inglês - Basic & Teens",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "yt-02-palavras-em-ingles-intermediate",
+  "num": 2,
+  "nome": "02 - Palavras em inglês - Intermediate",
+  "niveis": [
+   "Intermediate"
+  ],
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "yt-02-palavras-em-ingles-advanced",
+  "num": 2,
+  "nome": "02 - Palavras em inglês - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "yt-03-girias-americanas-all",
+  "num": 3,
+  "nome": "03 - Gírias que os americanos usam - All Levels",
+  "niveis": [
+   "Basic",
+   "Teens",
+   "Intermediate",
+   "Advanced"
+  ],
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "yt-05-tips-in-english-1-basic",
+  "num": 5,
+  "nome": "05 - Tips in English 1 - Basic",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "jogo": 5,
+  "video": true
+ },
+ {
+  "id": "yt-05-tips-in-english-1-teens",
+  "num": 5,
+  "nome": "05 - Tips in English 1 - Teens",
+  "niveis": [
+   "Teens"
+  ],
+  "jogo": 5,
+  "video": true
+ },
+ {
+  "id": "yt-05-tips-in-english-1-intermediate",
+  "num": 5,
+  "nome": "05 - Tips in English 1 - Intermediate",
+  "niveis": [
+   "Intermediate"
+  ],
+  "jogo": 5,
+  "video": true
+ },
+ {
+  "id": "yt-05-tips-in-english-1-advanced",
+  "num": 5,
+  "nome": "05 - Tips in English 1 - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "jogo": 3,
+  "video": true
+ },
+ {
+  "id": "yt-06-tips-in-english-2-all",
+  "num": 6,
+  "nome": "06 - Tips in English 2 - All Levels",
+  "niveis": [
+   "Basic",
+   "Teens",
+   "Intermediate",
+   "Advanced"
+  ],
+  "jogo": 5,
+  "video": true
+ },
+ {
+  "id": "yt-07-what-didnt-understand-basic",
+  "num": 7,
+  "nome": "07 - 7 ways to say you didn't understand - Basic & Teens",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "yt-07-what-didnt-understand-intermediate",
+  "num": 7,
+  "nome": "07 - 7 ways to say you didn't understand - Intermediate",
+  "niveis": [
+   "Intermediate"
+  ],
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "yt-07-what-didnt-understand-advanced",
+  "num": 7,
+  "nome": "07 - 7 ways to say you didn't understand - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "yt-08-words-in-technology-1-basic",
+  "num": 8,
+  "nome": "08 - Words in Technology – Part 1 - Basic",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "yt-08-words-in-technology-1-teens",
+  "num": 8,
+  "nome": "08 - Words in Technology – Part 1 - Teens",
+  "niveis": [
+   "Teens"
+  ],
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "yt-08-words-in-technology-1-intermediate",
+  "num": 8,
+  "nome": "08 - Words in Technology – Part 1 - Intermediate & Advanced",
+  "niveis": [
+   "Intermediate",
+   "Advanced"
+  ],
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "yt-09-words-in-technology-2-all",
+  "num": 9,
+  "nome": "09 - Words in Technology – Part 2 - All Levels",
+  "niveis": [
+   "Basic",
+   "Teens",
+   "Intermediate",
+   "Advanced"
+  ],
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "yt-10-stop-saying-these-words-1-all",
+  "num": 10,
+  "nome": "10 - Stop saying these 10 words – Part 1 - All Levels",
+  "niveis": [
+   "Basic",
+   "Teens",
+   "Intermediate",
+   "Advanced"
+  ],
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "yt-11-stop-saying-these-words-2-all",
+  "num": 11,
+  "nome": "11 - Stop saying these 10 words – Part 2 - All Levels",
+  "niveis": [
+   "Basic",
+   "Teens",
+   "Intermediate",
+   "Advanced"
+  ],
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "yt-12-create-sentences-carina-basic",
+  "num": 12,
+  "nome": "12 - How to create sentences in English - Basic, Teens & Intermediate",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "yt-12-create-sentences-carina-advanced",
+  "num": 12,
+  "nome": "12 - How to create sentences in English - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "yt-13-thank-you-youre-welcome-all",
+  "num": 13,
+  "nome": "13 - 5 ways to say THANK YOU and YOU'RE WELCOME - All Levels",
+  "niveis": [
+   "Basic",
+   "Teens",
+   "Intermediate",
+   "Advanced"
+  ],
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "yt-14-say-these-10-words-all",
+  "num": 14,
+  "nome": "14 - Say these 10 words - All Levels",
+  "niveis": [
+   "Basic",
+   "Teens",
+   "Intermediate",
+   "Advanced"
+  ],
+  "jogo": 0,
+  "video": true
+ },
+ {
+  "id": "yt-15-words-to-have-a-conversation-all",
+  "num": 15,
+  "nome": "15 - 10 words to have a conversation in English - All Levels",
+  "niveis": [
+   "Basic",
+   "Teens",
+   "Intermediate",
+   "Advanced"
+  ],
+  "jogo": 0,
+  "video": true
+ }
+]

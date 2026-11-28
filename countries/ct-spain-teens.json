@@ -1,0 +1,156 @@
+{
+ "lesson": {
+  "coverTitle": "Countries · Spain",
+  "coverLevel": "Teens & Basic (-18)",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Spain",
+  "objectives": [
+   "Talking about Spain.",
+   "Developing conversation skills."
+  ],
+  "pais": {
+   "nome": "Spain",
+   "oficial": "",
+   "num": 3,
+   "cor": "#c60b1e",
+   "bandeira": "es/bandeira.svg",
+   "capa": "es/tossa.jpg",
+   "capaLocal": "Tossa de Mar",
+   "mapa": "",
+   "texto": "",
+   "fatos": []
+  },
+  "introText": "Today, we’ll talk about Spain. We’ll see youtuber Tina explore the city of Valencia.",
+  "introSub": "One day in Valencia",
+  "warmup": [
+   {
+    "question": "How well do you know Spanish culture?",
+    "modelAnswers": [
+     "I actually don’t know a lot about it.",
+     "I know it very well."
+    ]
+   },
+   {
+    "question": "Did you know that more than 40% of Spanish people speak English?",
+    "modelAnswers": [
+     "Wow, what a surprise!",
+     "Yeah, I knew that."
+    ]
+   }
+  ],
+  "fotos": [
+   {
+    "img": "es/hola.jpg",
+    "local": "Hola!",
+    "fundo": true
+   },
+   {
+    "img": "es/cidade.jpg",
+    "local": "Spain",
+    "fundo": true
+   },
+   {
+    "img": "es/rua.jpg",
+    "local": "Spain",
+    "fundo": true
+   },
+   {
+    "img": "es/viagem.jpg",
+    "local": "Spain",
+    "fundo": true
+   }
+  ],
+  "vocabulary": [],
+  "vocabTitulo": "",
+  "vocabSub": "",
+  "video": {
+   "drive": "1MqpOVeioVQTNAj9mlfN6V1-DuJzFkfN8",
+   "youtube": "qBN6bHP_kQw",
+   "nome": "One Day in Valencia, Spain",
+   "instrucao": "Teacher: pause the video from time to time to check comprehension."
+  },
+  "leitura": null,
+  "languageGame": [],
+  "jogoTitulo": "",
+  "conversation": [
+   {
+    "question": "Which words did you understand from the video?",
+    "modelAnswers": [
+     "I understood: (word), (word)."
+    ]
+   },
+   {
+    "question": "What’s your opinion about the video?",
+    "modelAnswers": [
+     "In my opinion, it is... funny / interesting / nice / cool."
+    ]
+   },
+   {
+    "question": "Can you speak Spanish?",
+    "modelAnswers": [
+     "Yes, I can. / No, I can’t."
+    ]
+   },
+   {
+    "question": "Would you like to visit Valencia?",
+    "modelAnswers": [
+     "Yes, I would.",
+     "No, I wouldn’t."
+    ]
+   },
+   {
+    "question": "Would you like to visit other Spanish speaking countries?",
+    "modelAnswers": [
+     "Yes, (Chile) for example. / No, I wouldn’t."
+    ]
+   },
+   {
+    "question": "Do you like to see the sunset?",
+    "modelAnswers": [
+     "Yes, I do.",
+     "No, I don’t."
+    ]
+   },
+   {
+    "question": "Have you ever rented a bike?",
+    "modelAnswers": [
+     "No, I have never rented a bike.",
+     "Yes, I have already rented a bike."
+    ]
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about Spain?"
+   },
+   {
+    "question": "Which other countries would you like to learn more about?"
+   }
+  ],
+  "serie": "countries"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "countries",
+  "imgs": "countries/img/",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#ffffff",
+   "fundo2": "#eef3f8",
+   "prim": "#16365c",
+   "sec": "#c60b1e",
+   "dest": "#c60b1e",
+   "txt": "#16365c"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "globe-showing-americas",
+  "icones": [
+   "globe-showing-americas"
+  ]
+ }
+}

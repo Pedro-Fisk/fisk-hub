@@ -1,0 +1,260 @@
+{
+ "lesson": {
+  "coverTitle": "Countries · Ireland",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Ireland",
+  "objectives": [
+   "Talking about Ireland.",
+   "Developing conversation skills."
+  ],
+  "pais": {
+   "nome": "Ireland",
+   "oficial": "Republic of Ireland",
+   "num": 5,
+   "cor": "#169b62",
+   "bandeira": "ie/bandeira.svg",
+   "capa": "ie/dublin.jpg",
+   "capaLocal": "Dublin",
+   "mapa": "ie/mapa.png",
+   "texto": "Ireland, also known as the Republic of Ireland, is a country in north-western Europe. It ranks among the top ten wealthiest countries in the world.\nAround a third of the country’s population of 4.8 million people resides in the greater Dublin area.",
+   "fatos": [
+    [
+     "Capital",
+     "Dublin"
+    ],
+    [
+     "Official languages",
+     "Irish and English"
+    ],
+    [
+     "Currency",
+     "Euro"
+    ],
+    [
+     "Driving side",
+     "left"
+    ]
+   ]
+  },
+  "introText": "",
+  "introSub": "Introduction and curiosities about Ireland",
+  "warmup": [],
+  "fotos": [
+   {
+    "img": "ie/cashel.jpg",
+    "local": "Irish castles"
+   },
+   {
+    "img": "ie/cobh.jpg",
+    "local": "Cobh: seaport town"
+   },
+   {
+    "img": "ie/skellig.jpg",
+    "local": "Skellig Islands"
+   },
+   {
+    "img": "ie/trinity.jpg",
+    "local": "Trinity College Library"
+   },
+   {
+    "img": "ie/glendalough.jpg",
+    "local": "Glendalough Valley"
+   },
+   {
+    "img": "ie/connemara.jpg",
+    "local": "Connemara National Park"
+   },
+   {
+    "img": "ie/causeway.jpg",
+    "local": "Giant’s Causeway"
+   },
+   {
+    "img": "ie/pub.jpg",
+    "local": "Irish pub",
+    "texto": "The Irish pub serves as a focal point for many small villages and urban neighborhoods, a place where the great Irish passion for conversation, stories, and jokes can take place."
+   }
+  ],
+  "vocabulary": [
+   {
+    "word": "amazing",
+    "translation": "surpreendente"
+   },
+   {
+    "word": "to gape",
+    "translation": "olhar boquiaberto"
+   },
+   {
+    "word": "windswept",
+    "translation": "ventoso"
+   },
+   {
+    "word": "striking",
+    "translation": "impressionante"
+   },
+   {
+    "word": "to relish",
+    "translation": "apreciar"
+   },
+   {
+    "word": "misconception",
+    "translation": "equívoco"
+   },
+   {
+    "word": "shamrock",
+    "translation": "trevo de 3 folhas"
+   },
+   {
+    "word": "harp",
+    "translation": "harpa"
+   },
+   {
+    "word": "weasel",
+    "translation": "doninha"
+   },
+   {
+    "word": "polecat",
+    "translation": "furão"
+   },
+   {
+    "word": "roe deer",
+    "translation": "veado"
+   },
+   {
+    "word": "lighthouse",
+    "translation": "farol"
+   }
+  ],
+  "vocabTitulo": "Important words",
+  "vocabSub": "for the video · pay attention to pronunciation",
+  "video": {
+   "drive": "1N63ZhaJrmcvrrepXB8xTSjNdjzb29nH9",
+   "nome": "Ireland",
+   "instrucao": "Clap your hands when you recognize a word from the vocabulary!"
+  },
+  "leitura": null,
+  "languageGame": [
+   {
+    "question": "There are striking landscapes in Ireland.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "The shamrock is the Irish national symbol.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": "The harp is."
+   },
+   {
+    "question": "There are many snakes in Ireland.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": "Ireland is a snake-free island."
+   },
+   {
+    "question": "The oldest lighthouse dates back to the 5th century.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "The white color in the Irish flag represents peace.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   }
+  ],
+  "jogoTitulo": "True or False?",
+  "conversation": [
+   {
+    "question": "What do you think about Ireland?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Would you like to visit Ireland, or live there?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Would you go to Ireland as an exchange student to learn English? Why (not)?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you think Ireland is a good tourist destination? Why do you think so?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What is your idea of a typical Irish person? Why do you think so?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What does your country have in common with Ireland?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Irish people are very friendly. They love to chat. How easy would it be for you to start a conversation with an Irish person?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Irish people get together in the pubs. What’s your favorite place to meet your friends? Why?",
+    "modelAnswers": []
+   },
+   {
+    "question": "In Ireland, the average temperature during the winter ranges between 4 and 6 °C. How do you like cold weather?",
+    "modelAnswers": []
+   },
+   {
+    "question": "The Irish cuisine is the mixing of the different cultures in Ireland. How is the Brazilian cuisine?",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about Ireland?"
+   },
+   {
+    "question": "Which other countries would you like to learn more about?"
+   }
+  ],
+  "serie": "countries"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "countries",
+  "imgs": "countries/img/",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#ffffff",
+   "fundo2": "#eef3f8",
+   "prim": "#16365c",
+   "sec": "#169b62",
+   "dest": "#169b62",
+   "txt": "#16365c"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "globe-showing-americas",
+  "icones": [
+   "globe-showing-americas"
+  ]
+ }
+}

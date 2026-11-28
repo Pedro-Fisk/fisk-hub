@@ -1,0 +1,299 @@
+[
+ {
+  "id": "bt-tag-questions-basic",
+  "num": 13,
+  "nome": "13 - Tag Questions - Basic",
+  "nivel": "Basic",
+  "jogo": 0,
+  "audios": 2,
+  "livro": "Transitions 1 L1"
+ },
+ {
+  "id": "bt-tag-questions-intermediate",
+  "num": 13,
+  "nome": "13 - Tag Questions - Intermediate",
+  "nivel": "Intermediate",
+  "jogo": 0,
+  "audios": 2,
+  "livro": "Transitions 1 L1"
+ },
+ {
+  "id": "bt-tag-questions-advanced",
+  "num": 13,
+  "nome": "13 - Tag Questions - Advanced",
+  "nivel": "Advanced",
+  "jogo": 0,
+  "audios": 2,
+  "livro": "Transitions 1 L1"
+ },
+ {
+  "id": "bt-him-her-them-basic",
+  "num": 14,
+  "nome": "14 - Him / Her / Them - Basic",
+  "nivel": "Basic",
+  "jogo": 0,
+  "audios": 2,
+  "livro": "Transitions 1 L4"
+ },
+ {
+  "id": "bt-him-her-them-intermediate",
+  "num": 14,
+  "nome": "14 - Him / Her / Them - Intermediate",
+  "nivel": "Intermediate",
+  "jogo": 0,
+  "audios": 2,
+  "livro": "Transitions 1 L4"
+ },
+ {
+  "id": "bt-him-her-them-advanced",
+  "num": 14,
+  "nome": "14 - Him / Her / Them - Advanced",
+  "nivel": "Advanced",
+  "jogo": 0,
+  "audios": 2,
+  "livro": "Transitions 1 L4"
+ },
+ {
+  "id": "bt-and-of-basic",
+  "num": 15,
+  "nome": "15 - And / Of - Basic",
+  "nivel": "Basic",
+  "jogo": 0,
+  "audios": 2,
+  "livro": "Transitions 1 L5"
+ },
+ {
+  "id": "bt-and-of-intermediate",
+  "num": 15,
+  "nome": "15 - And / Of - Intermediate",
+  "nivel": "Intermediate",
+  "jogo": 0,
+  "audios": 2,
+  "livro": "Transitions 1 L5"
+ },
+ {
+  "id": "bt-and-of-advanced",
+  "num": 15,
+  "nome": "15 - And / Of - Advanced",
+  "nivel": "Advanced",
+  "jogo": 0,
+  "audios": 2,
+  "livro": "Transitions 1 L5"
+ },
+ {
+  "id": "bt-the-basic",
+  "num": 16,
+  "nome": "16 - The - Basic",
+  "nivel": "Basic",
+  "jogo": 6,
+  "audios": 2,
+  "livro": "Transitions 1 L6"
+ },
+ {
+  "id": "bt-the-intermediate",
+  "num": 16,
+  "nome": "16 - The - Intermediate",
+  "nivel": "Intermediate",
+  "jogo": 6,
+  "audios": 2,
+  "livro": "Transitions 1 L6"
+ },
+ {
+  "id": "bt-the-advanced",
+  "num": 16,
+  "nome": "16 - The - Advanced",
+  "nivel": "Advanced",
+  "jogo": 6,
+  "audios": 2,
+  "livro": "Transitions 1 L6"
+ },
+ {
+  "id": "bt-mispronounced-basic",
+  "num": 17,
+  "nome": "17 - Tricky Words - Basic",
+  "nivel": "Basic",
+  "jogo": 0,
+  "audios": 2,
+  "livro": "Transitions 1 L10"
+ },
+ {
+  "id": "bt-mispronounced-intermediate",
+  "num": 17,
+  "nome": "17 - Tricky Words - Intermediate",
+  "nivel": "Intermediate",
+  "jogo": 0,
+  "audios": 2,
+  "livro": "Transitions 1 L10"
+ },
+ {
+  "id": "bt-mispronounced-advanced",
+  "num": 17,
+  "nome": "17 - Tricky Words - Advanced",
+  "nivel": "Advanced",
+  "jogo": 0,
+  "audios": 2,
+  "livro": "Transitions 1 L10"
+ },
+ {
+  "id": "bt-word-endings-basic",
+  "num": 18,
+  "nome": "18 - Word Endings - Basic",
+  "nivel": "Basic",
+  "jogo": 0,
+  "audios": 2,
+  "livro": "Transitions 2 L1"
+ },
+ {
+  "id": "bt-word-endings-intermediate",
+  "num": 18,
+  "nome": "18 - Word Endings - Intermediate",
+  "nivel": "Intermediate",
+  "jogo": 0,
+  "audios": 2,
+  "livro": "Transitions 2 L1"
+ },
+ {
+  "id": "bt-word-endings-advanced",
+  "num": 18,
+  "nome": "18 - Word Endings - Advanced",
+  "nivel": "Advanced",
+  "jogo": 0,
+  "audios": 2,
+  "livro": "Transitions 2 L1"
+ },
+ {
+  "id": "bt-final-ed-basic",
+  "num": 19,
+  "nome": "19 - The Final -ed - Basic",
+  "nivel": "Basic",
+  "jogo": 6,
+  "audios": 2,
+  "livro": "Transitions 2 L6"
+ },
+ {
+  "id": "bt-final-ed-intermediate",
+  "num": 19,
+  "nome": "19 - The Final -ed - Intermediate",
+  "nivel": "Intermediate",
+  "jogo": 6,
+  "audios": 2,
+  "livro": "Transitions 2 L6"
+ },
+ {
+  "id": "bt-final-ed-advanced",
+  "num": 19,
+  "nome": "19 - The Final -ed - Advanced",
+  "nivel": "Advanced",
+  "jogo": 6,
+  "audios": 2,
+  "livro": "Transitions 2 L6"
+ },
+ {
+  "id": "bt-uh-er-basic",
+  "num": 20,
+  "nome": "20 - /ʌ/ vs. /ɝ/ - Basic",
+  "nivel": "Basic",
+  "jogo": 6,
+  "audios": 2,
+  "livro": "Transitions 2 L7"
+ },
+ {
+  "id": "bt-uh-er-intermediate",
+  "num": 20,
+  "nome": "20 - /ʌ/ vs. /ɝ/ - Intermediate",
+  "nivel": "Intermediate",
+  "jogo": 6,
+  "audios": 2,
+  "livro": "Transitions 2 L7"
+ },
+ {
+  "id": "bt-uh-er-advanced",
+  "num": 20,
+  "nome": "20 - /ʌ/ vs. /ɝ/ - Advanced",
+  "nivel": "Advanced",
+  "jogo": 6,
+  "audios": 2,
+  "livro": "Transitions 2 L7"
+ },
+ {
+  "id": "bt-s-sound-basic",
+  "num": 21,
+  "nome": "21 - The /s/ Sound - Basic",
+  "nivel": "Basic",
+  "jogo": 0,
+  "audios": 2,
+  "livro": "Transitions 2 L8"
+ },
+ {
+  "id": "bt-s-sound-intermediate",
+  "num": 21,
+  "nome": "21 - The /s/ Sound - Intermediate",
+  "nivel": "Intermediate",
+  "jogo": 0,
+  "audios": 2,
+  "livro": "Transitions 2 L8"
+ },
+ {
+  "id": "bt-s-sound-advanced",
+  "num": 21,
+  "nome": "21 - The /s/ Sound - Advanced",
+  "nivel": "Advanced",
+  "jogo": 0,
+  "audios": 2,
+  "livro": "Transitions 2 L8"
+ },
+ {
+  "id": "bt-ae-ei-basic",
+  "num": 22,
+  "nome": "22 - /æ/ vs. /eɪ/ - Basic",
+  "nivel": "Basic",
+  "jogo": 6,
+  "audios": 2,
+  "livro": "Transitions 2 L9"
+ },
+ {
+  "id": "bt-ae-ei-intermediate",
+  "num": 22,
+  "nome": "22 - /æ/ vs. /eɪ/ - Intermediate",
+  "nivel": "Intermediate",
+  "jogo": 6,
+  "audios": 2,
+  "livro": "Transitions 2 L9"
+ },
+ {
+  "id": "bt-ae-ei-advanced",
+  "num": 22,
+  "nome": "22 - /æ/ vs. /eɪ/ - Advanced",
+  "nivel": "Advanced",
+  "jogo": 6,
+  "audios": 2,
+  "livro": "Transitions 2 L9"
+ },
+ {
+  "id": "bt-au-ou-basic",
+  "num": 23,
+  "nome": "23 - /aʊ/ vs. /oʊ/ - Basic",
+  "nivel": "Basic",
+  "jogo": 6,
+  "audios": 2,
+  "livro": "Transitions 2 L10"
+ },
+ {
+  "id": "bt-au-ou-intermediate",
+  "num": 23,
+  "nome": "23 - /aʊ/ vs. /oʊ/ - Intermediate",
+  "nivel": "Intermediate",
+  "jogo": 6,
+  "audios": 2,
+  "livro": "Transitions 2 L10"
+ },
+ {
+  "id": "bt-au-ou-advanced",
+  "num": 23,
+  "nome": "23 - /aʊ/ vs. /oʊ/ - Advanced",
+  "nivel": "Advanced",
+  "jogo": 6,
+  "audios": 2,
+  "livro": "Transitions 2 L10"
+ }
+]

@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#000000">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161414'/%3E%3Ctext x='16' y='23' font-family='Arial, Helvetica, sans-serif' font-size='21' font-weight='900' fill='%23d81f26' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/fisk-shared.css?v=f12a68d93f">
-<script src="assets/fisk-shared.js?v=23b61b9403"></script>
+<script src="assets/fisk-shared.js?v=b6079f9752"></script>
 <style>
   /* A CONVERSAÇÃO DA SEMANA NA TV (Pedro, 27/11/2026; fase 1, protótipo aprovado em 26/11).
      Sem ?id: a lista das atividades da pasta da semana (backend ConversaSemana.js), por idioma.
@@ -166,6 +166,9 @@
   /* a turma online (27/11/2026): no computador ninguém lê o QR; o link vai para o chat do Meet e abre numa aba (também nas sub-salas) */
   #qrAula #aulaCopia{ background: #fff; color: #14245a; box-shadow: 0 4px 0 rgba(0,0,0,.18); }
   #qrAula #aulaCopia.ok{ background: #ffd24a; }
+  #qrAula #aulaFd{ background: #facc15; color: #422006; box-shadow: 0 4px 0 rgba(0,0,0,.18); }
+  #qrAula #aulaFd.nao{ background: rgba(255,255,255,.18); color: #fff; }
+  #qrAula #aulaFd[hidden]{ display: none; }
   #qrAula button:disabled{ opacity: .6; cursor: default; }
   @keyframes aulaEntra{ from{ transform: scale(.85) translateY(20px); opacity: 0; } }
   #qrAula .bolhas .logo{ position: absolute; width: 104px; filter: drop-shadow(0 6px 10px rgba(0,0,0,.35)); animation: aulaLogo 4.6s ease-in-out infinite; }
@@ -180,6 +183,72 @@
   @media (prefers-reduced-motion: reduce){ #qrAula .cx, #qrAula .cx:before, #qrAula .cx:after, #qrAula .bolhas:before, #qrAula .bolhas i, #qrAula .bolhas .logo, #qrAula .qr, #qrAula .chip:before{ animation: none; } }
   #aulaCanto{ position: fixed; right: 14px; bottom: 74px; z-index: 12; background: #fff; border-radius: 12px; padding: 6px; box-shadow: 0 6px 20px rgba(0,0,0,.4); cursor: pointer; text-align: center; }
   #aulaCanto[hidden]{ display: none; }
+  /* o placar do jogo clicável: discreto, em cima do QR do canto */
+  #aulaPlacar{ position: fixed; right: 14px; bottom: 200px; z-index: 12; background: rgba(15,23,42,.82); color: #fff; font: 800 .95rem system-ui, sans-serif;
+    padding: 6px 12px; border-radius: 999px; box-shadow: 0 4px 14px rgba(0,0,0,.35); pointer-events: none; }
+  #aulaPlacar[hidden]{ display: none; }
+  .notaAc{ display: flex; gap: 4px; align-items: center; justify-content: center; flex-wrap: wrap; margin: .4rem 0 .2rem; font-weight: 700; }
+  .notaAc button{ border: 0; background: none; font-size: 1.9rem; line-height: 1; color: #cbd5e1; cursor: pointer; padding: 0 2px; }
+  .notaAc button.on{ color: #facc15; } .notaAc button:hover{ transform: scale(1.15); }
+  .notaAc small{ flex-basis: 100%; text-align: center; font-weight: 600; opacity: .75; }
+  #avalVer{ position: fixed; inset: 0; z-index: 45; background: rgba(8,12,24,.8); display: flex; align-items: center; justify-content: center; }
+  #avalVer[hidden]{ display: none; }
+  #avalVer .cx{ background: #fff; color: #0f172a; border-radius: 20px; padding: 24px 28px; width: min(92vw, 760px); max-height: 86vh; overflow-y: auto; font: 500 1rem/1.4 system-ui, sans-serif; }
+  #avalVer h2{ margin: 0 0 8px; } #avalVer .res{ font-size: 1.15rem; margin: 0 0 6px; }
+  #avalVer .dist{ display: flex; gap: 14px; margin-bottom: 14px; font-weight: 700; }
+  #avalVer .it{ border-top: 1px solid #e2e8f0; padding: 10px 0; } #avalVer .it .em{ font-size: 1.5rem; }
+  #avalVer .it p{ margin: 4px 0; } #avalVer .it small{ color: #64748b; } #avalVer .com{ font-weight: 700; }
+  #avalVer button{ margin-top: 12px; border: 0; border-radius: 999px; padding: 10px 20px; background: #1d3a8a; color: #fff; font-weight: 800; cursor: pointer; }
+  /* FERRAMENTAS DA AULA (Pedro, 27/11/2026): o cronômetro do Pair Work (ligado por padrão, o professor desliga) e o
+     sorteio (desligado por padrão, o professor ativa). Liga e desliga no ⚙ da barra, guardado neste computador. */
+  #ferr{ position: fixed; right: 14px; bottom: 74px; z-index: 30; background: #fff; color: #0f172a; border-radius: 14px; padding: 14px 16px; box-shadow: 0 10px 30px rgba(0,0,0,.35); display: flex; flex-direction: column; gap: 8px; font: 600 .92rem system-ui, sans-serif; min-width: 270px; }
+  #ferr[hidden]{ display: none; }
+  #ferr .min button{ border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 8px; padding: 2px 9px; font-weight: 800; cursor: pointer; }
+  #ferr small{ color: #64748b; font-weight: 500; }
+  #crono{ position: fixed; right: 18px; top: 18px; z-index: 14; width: 150px; height: 150px; cursor: pointer; filter: drop-shadow(0 8px 18px rgba(0,0,0,.35)); }
+  #crono[hidden]{ display: none; }
+  #crono svg{ width: 100%; height: 100%; transform: rotate(-90deg); }
+  #crono circle{ fill: none; stroke-width: 12; }
+  #crono .trilho{ fill: rgba(15,23,42,.78); stroke: rgba(255,255,255,.15); }
+  #crono .arco{ stroke: #31A889; stroke-linecap: round; stroke-dasharray: 326.7; transition: stroke-dashoffset 1s linear, stroke .4s; }
+  #crono.pouco .arco{ stroke: #f59e0b; } #crono.zero .arco{ stroke: #e5484d; }
+  #crono #cronoT{ position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; font: 900 2.3rem system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+  #crono.pausa #cronoT{ opacity: .55; }
+  #crono.zero{ animation: cronoPulsa .6s ease-in-out 6; }
+  @keyframes cronoPulsa{ 50%{ transform: scale(1.12); } }
+  #crono button{ position: absolute; border: 0; width: 30px; height: 30px; border-radius: 50%; background: #fff; color: #0f172a; font-weight: 900; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,.3); }
+  #cronoDe{ left: -4px; bottom: -4px; } #cronoX{ right: -4px; top: -4px; font-size: .75rem; }
+  #sorteio{ position: fixed; inset: 0; z-index: 40; background: rgba(8,12,24,.82); display: flex; align-items: center; justify-content: center; }
+  #sorteio[hidden]{ display: none; }
+  #sorteio .cx{ background: linear-gradient(135deg, #1d3a8a, #7c3aed); color: #fff; border-radius: 28px; padding: 34px 40px; width: min(92vw, 980px); text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+  #sorteio .tit{ margin: 0; font: 800 1.6rem system-ui, sans-serif; opacity: .9; }
+  #sorNome{ font: 900 clamp(3rem, 9vw, 6.5rem)/1.1 system-ui, sans-serif; margin: 18px 0 26px; min-height: 1.1em; }
+  #sorNome.rola{ opacity: .7; filter: blur(.5px); }
+  #sorNome.saiu{ animation: sorSai .5s cubic-bezier(.2,1.5,.4,1); text-shadow: 0 0 30px rgba(255,255,255,.5); }
+  @keyframes sorSai{ from{ transform: scale(.6); } }
+  #sorDuplas{ display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin: 18px 0 24px; text-align: left; }
+  #sorDuplas div{ background: rgba(255,255,255,.14); border-radius: 14px; padding: 10px 14px; font: 700 1.25rem system-ui, sans-serif; animation: sorSai .45s cubic-bezier(.2,1.5,.4,1) both; }
+  #sorteio .linha{ display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center; font: 600 .95rem system-ui, sans-serif; }
+  #sorteio .linha button{ border: 0; border-radius: 999px; padding: 10px 18px; font: 800 1rem system-ui, sans-serif; cursor: pointer; background: #fff; color: #1d3a8a; }
+  #sorteio #sorFecha{ background: rgba(255,255,255,.2); color: #fff; }
+  /* O GRÁFICO DAS RESPOSTAS (Pedro, 27/11/2026: "uma animação fluida para montar o gráfico"): depois de revelar, uma
+     barra embaixo de cada opção do slide. A caixa sobe, as barras crescem uma depois da outra e os números contam até o
+     valor; a da certa fica verde e ganha um brilho que passa. Mora DENTRO do slide (escala com a TV); o deck das fotos
+     dos celulares é outro e nunca recebe o gráfico. */
+  .ft-grafico{ opacity: 0; transform: translateY(40px); transition: opacity .55s ease, transform .7s cubic-bezier(.22,1,.36,1); }
+  .ft-grafico.on{ opacity: 1; transform: none; }
+  .ft-grafico .col{ flex: 1; min-width: 0; }
+  .ft-grafico .trilho{ position: relative; height: 74px; border-radius: 37px; background: rgba(127,127,127,.18); overflow: hidden; }
+  .ft-grafico .barra{ position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 37px; background: #94a3b8;
+    transition: width 1.5s cubic-bezier(.16,1,.3,1); overflow: hidden; }
+  .ft-grafico .barra.certa{ background: linear-gradient(90deg, #2a9a7d, #31A889 60%, #3cc29f); box-shadow: 0 0 0 6px rgba(49,168,137,.22); }
+  .ft-grafico .barra.certa:after{ content: ""; position: absolute; top: 0; bottom: 0; width: 40%; left: -45%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent); animation: ftBrilho 1.1s ease-in-out 1.7s 2; }
+  @keyframes ftBrilho{ to{ left: 110%; } }
+  .ft-grafico .num{ position: absolute; inset: 0; display: flex; align-items: center; padding: 0 28px; font: 900 44px/1 system-ui, sans-serif; color: inherit; white-space: nowrap; }
+  .ft-grafico .num small{ font-size: 30px; font-weight: 700; opacity: .7; margin-left: 12px; }
+  .ft-grafico .leg{ margin-top: 18px; text-align: center; font: 800 34px/1 system-ui, sans-serif; opacity: .7; flex-basis: 100%; }
+  @media (prefers-reduced-motion: reduce){ .ft-grafico, .ft-grafico .barra{ transition: none; } .ft-grafico .barra.certa:after{ animation: none; } }
   #aulaCanto .qr{ width: 92px; height: 92px; }
   #aulaCanto .qr svg{ width: 100%; height: 100%; display: block; }
   #aulaCanto span{ display: block; font: 800 .62rem system-ui, sans-serif; color: #0f172a; margin-top: 2px; }
@@ -222,6 +291,60 @@
   #capa .erro{ color: #b91c1c !important; }
   #capa .aviso{ color: #b45309 !important; }
   #capa .capinha{ border-color: #e2e8f0 !important; }
+
+  /* ══ NO CELULAR DO PROFESSOR (Pedro, 27/11/2026: "o menu de botões não ficou responsivo, nem de pé nem deitado") ══
+     A barra era uma linha só, com o nome escrito em cada botão, e aparecia só com o mouse: no celular vazava 300 px de
+     cada lado e nem aparecia (o toque passa o slide). Agora: em tela de toque ela fica SEMPRE visível; em tela estreita
+     os botões mostram só o ícone (o nome fica no title) e a barra quebra em duas linhas de pé; deitado, uma linha só
+     e o palco encolhe para o slide não ficar embaixo dela. Os painéis por cima (QR, ⚙, sorteio, avaliações) cabem e
+     rolam. */
+  @media (pointer: coarse){
+    body.mostra #barra, #barra{ opacity: 1; pointer-events: auto; }
+    body.esconde-cursor{ cursor: auto; }
+  }
+  @media (max-width: 900px), (max-height: 500px){
+    #barra{ left: 8px; right: 8px; transform: none; bottom: max(8px, env(safe-area-inset-bottom)); flex-wrap: wrap; justify-content: center; gap: .35rem; padding: .4rem; white-space: normal; }
+    #barra .tx{ display: none; }
+    #barra .sep{ display: none; }
+    #barra .n{ min-width: 0; font-size: .82rem; padding: 0 .2rem; white-space: nowrap; }
+    #barra button{ padding: .45rem .7rem; font-size: 1.05rem; line-height: 1; min-width: 42px; min-height: 40px; }
+    #crono{ width: 92px; height: 92px; top: max(8px, env(safe-area-inset-top)); right: 8px; }
+    #crono #cronoT{ font-size: 1.35rem; } #crono button{ width: 24px; height: 24px; font-size: .7rem; }
+    #aulaCanto{ right: 8px; bottom: auto; top: max(8px, env(safe-area-inset-top)); left: 8px; right: auto; padding: 4px; }
+    #aulaCanto .qr{ width: 58px; height: 58px; } #aulaCanto span{ font-size: .55rem; }
+    #aulaPlacar{ right: auto; left: 50%; transform: translateX(-50%); bottom: auto; top: max(8px, env(safe-area-inset-top)); font-size: .85rem; }
+    #ferr{ left: 8px; right: 8px; min-width: 0; bottom: 120px; }
+    #qrAula{ align-items: flex-start; overflow-y: auto; padding: max(8px, env(safe-area-inset-top)) 8px 8px; }
+    #qrAula .cx{ max-width: 100%; padding: 1rem 1rem .9rem; border-radius: 20px; margin: auto 0; }
+    #qrAula .bolhas{ display: none; }
+    #qrAula h2{ font-size: 1.4rem; } #qrAula p{ font-size: .9rem; }
+    #qrAula .qr{ width: min(58vw, 40vh, 15rem); height: min(58vw, 40vh, 15rem); padding: .5rem; border-radius: 16px; }
+    #qrAula .cod{ font-size: 1.1rem; }
+    #qrAula button{ padding: .6rem 1rem; font-size: .92rem; }
+    #sorteio .cx{ padding: 20px 16px; border-radius: 20px; max-height: 92vh; overflow-y: auto; }
+    #sorDuplas{ grid-template-columns: 1fr 1fr; } #sorDuplas div{ font-size: 1rem; }
+    #avalVer .cx{ padding: 16px; }
+    #capa{ padding: .6rem; align-items: flex-start; overflow-y: auto; }
+    #capa .cx{ padding: 1.1rem 1rem; margin: auto 0; } .cx h1{ font-size: 1.3rem; }
+    .comeca{ font-size: 1.05rem; padding: .8rem 1.2rem; margin-top: .9rem; }
+    .dica{ display: none; }   /* teclado e passador não existem no celular */
+  }
+  /* celular DEITADO: a barra numa linha só embaixo, e o palco acaba acima dela; o QR do painel vai para o lado dos botões */
+  @media (max-height: 500px) and (orientation: landscape){
+    #barra{ flex-wrap: nowrap; left: 50%; right: auto; transform: translateX(-50%); max-width: calc(100vw - 16px); overflow-x: auto; bottom: max(4px, env(safe-area-inset-bottom)); padding: .3rem; }
+    #barra button{ min-height: 34px; padding: .3rem .55rem; }
+    #palco{ bottom: 62px; }
+    #qrAula .cx{ display: grid; grid-template-columns: auto 1fr; column-gap: 1rem; align-items: center; text-align: left; }
+    #qrAula .cx > .qr{ grid-row: 1 / span 6; grid-column: 1; width: min(70vh, 14rem); height: min(70vh, 14rem); margin: 0; }
+    #qrAula .cx > *:not(.qr):not(.bolhas){ grid-column: 2; }
+    #qrAula .chip, #qrAula .cod{ justify-self: start; }
+    #qrAula h2{ font-size: 1.2rem; margin: .3rem 0 0; } #qrAula p{ margin: .2rem 0; font-size: .85rem; }
+    #qrAula .linha{ margin-top: .5rem; gap: .4rem; } #qrAula button{ padding: .45rem .8rem; font-size: .82rem; }
+    #qrAula .linha{ justify-content: flex-start; }
+    #aulaCanto{ top: auto; bottom: 54px; }
+    #ferr{ bottom: 54px; left: auto; right: 8px; width: 290px; }
+  }
+  @media (pointer: coarse) and (max-width: 900px) and (orientation: portrait){ #palco{ bottom: 110px; } }
 </style>
 </head>
 <body>
@@ -245,21 +368,33 @@
     <span class="n" id="bN">1 de 1</span>
     <button type="button" id="bProx" title="Próximo clique (→, espaço)">▶</button>
     <span class="sep"></span>
-    <button type="button" id="bInicio" title="Voltar ao início (Home)">⏮ Início</button>
-    <button type="button" id="bCheia" title="Tela cheia (F)">⛶ Tela cheia</button>
-    <button type="button" id="bFone" title="Usar o celular como controle remoto">📱 Controlar pelo celular</button>
-    <button type="button" id="bAlunos" title="Os alunos acompanham no celular os cliques que você já mostrou">👥 Alunos</button>
+    <button type="button" id="bInicio" title="Voltar ao início (Home)">⏮<span class="tx"> Início</span></button>
+    <button type="button" id="bCheia" title="Tela cheia (F)">⛶<span class="tx"> Tela cheia</span></button>
+    <button type="button" id="bFone" title="Usar o celular como controle remoto">📱<span class="tx"> Controlar pelo celular</span></button>
+    <button type="button" id="bSorteio" hidden title="Sortear um aluno ou formar duplas, com os nomes da turma de agora">🎲<span class="tx"> Sorteio</span></button>
+    <button type="button" id="bFerr" title="Cronômetro do Pair Work e sorteio: ligar e desligar">⚙</button>
+    <button type="button" id="bAlunos" title="Os alunos acompanham no celular os cliques que você já mostrou">👥<span class="tx"> Alunos</span></button>
     <button type="button" id="bSair" title="Voltar à abertura (Esc)">✕</button>
   </div>
   <div id="capa"><div id="capaFundo"></div><div class="cx" id="capaCorpo"></div></div>
   <div id="qrFone" hidden><div class="cx"><h2>📱 Controle pelo celular</h2><p>Abra a câmera do seu celular e aponte para o código.</p><div class="qr" id="qrImg"></div><p id="qrTxt" style="font-size:.85rem">Preparando…</p><button type="button" id="qrFecha">Fechar</button></div></div>
-  <div id="qrAula" hidden><div class="cx"><div class="bolhas" aria-hidden="true"><i style="left:5%;top:5%">💬</i><i style="right:6%;top:8%;animation-delay:.8s">🎉</i><img class="logo" src="assets/fisk-logo-balao-360.png" alt="" style="left:2.5%;top:33%"><i style="left:8%;top:64%;animation-delay:1.6s">✨</i><i style="right:7%;top:50%;animation-delay:2.2s">💬</i></div><span class="chip">AO VIVO</span><h2>Bora conversar! 📱</h2><p>Abra a câmera, aponte para o código e siga os slides junto com a turma.</p><div class="qr" id="qrAulaImg"></div><p class="cod" id="qrAulaCod"></p><p id="qrAulaTxt" style="font-size:.9rem">Preparando…</p><div class="linha"><button type="button" class="fim" id="aulaFim">✓ Finalizar e liberar a atividade inteira</button><button type="button" id="aulaCopia" title="Para a turma online: cole no chat do Google Meet e cada aluno abre numa aba">📋 Copiar o link para o chat</button><button type="button" id="qrAulaFecha">Fechar</button></div></div></div>
+  <div id="qrAula" hidden><div class="cx"><div class="bolhas" aria-hidden="true"><i style="left:5%;top:5%">💬</i><i style="right:6%;top:8%;animation-delay:.8s">🎉</i><img class="logo" src="assets/fisk-logo-balao-360.png" alt="" style="left:2.5%;top:33%"><i style="left:8%;top:64%;animation-delay:1.6s">✨</i><i style="right:7%;top:50%;animation-delay:2.2s">💬</i></div><span class="chip">AO VIVO</span><h2>Bora conversar! 📱</h2><p>Abra a câmera, aponte para o código e siga os slides junto com a turma.</p><div class="qr" id="qrAulaImg"></div><p class="cod" id="qrAulaCod"></p><p id="qrAulaTxt" style="font-size:.9rem">Preparando…</p><div class="linha"><button type="button" class="fim" id="aulaFim">✓ Finalizar e liberar a atividade inteira</button><button type="button" id="aulaFd" hidden title="Vale para a aula inteira: 20 por acerto e 5 por responder, no Portal do Aluno de quem entrou pelo card ou está logado">💰 Jogo vale Fisk Dólares: SIM</button><button type="button" id="aulaAval" title="O que a turma respondeu no slide de avaliação, com os comentários (sem nome de aluno)">📝 Avaliações</button><button type="button" id="aulaCopia" title="Para a turma online: cole no chat do Google Meet e cada aluno abre numa aba">📋 Copiar o link para o chat</button><button type="button" id="qrAulaFecha">Fechar</button></div></div></div>
+  <div id="aulaPlacar" hidden aria-live="polite"></div>
+  <div id="avalVer" hidden><div class="cx"><h2>📝 Avaliações da aula</h2><div id="avalVerCorpo"></div><button type="button" id="avalVerFecha">Fechar</button></div></div>
+  <div id="ferr" hidden><b>Ferramentas da aula</b>
+    <label><input type="checkbox" id="fCrono"> ⏱ Cronômetro no Pair Work</label>
+    <div class="min">Tempo: <button type="button" id="fMenos">−</button> <span id="fMin">3</span> min <button type="button" id="fMais">+</button> <button type="button" id="fJa" title="Começar o cronômetro agora, em qualquer slide">▶ Agora</button></div>
+    <label><input type="checkbox" id="fSorteio"> 🎲 Botão de sorteio na barra</label>
+    <small>Fica guardado neste computador.</small></div>
+  <div id="crono" hidden title="Clique para pausar ou continuar"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" class="trilho"></circle><circle cx="60" cy="60" r="52" class="arco" id="cronoArco"></circle></svg><span id="cronoT">3:00</span><button type="button" id="cronoDe" title="Recomeçar">↻</button><button type="button" id="cronoX" title="Esconder">✕</button></div>
+  <div id="sorteio" hidden><div class="cx"><p class="tit" id="sorTit">🎲</p><div id="sorNome">…</div><div id="sorDuplas" hidden></div>
+    <div class="linha"><button type="button" id="sorDeNovo">🎲 Sortear de novo</button><button type="button" id="sorDup">👥 Formar duplas</button><label><input type="checkbox" id="sorRep" checked> não repetir</label><button type="button" id="sorFecha">Fechar</button></div></div></div>
   <div id="aulaCanto" hidden title="Os alunos acompanham por este código"><div class="qr" id="aulaCantoImg"></div><span id="aulaCantoCod"></span></div>
   <div id="foneAviso" hidden>📱 Celular ligado: pode conduzir por ele</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js"></script>
-<script src="assets/tema-slides.js?v=1d06a72ab6"></script>
+<script src="assets/tema-slides.js?v=202b14d21f"></script>
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
@@ -304,6 +439,77 @@
       .then(function (j) { if (!j || !j.ok) throw 0; try { localStorage.setItem(CH_MINHAS, JSON.stringify(j.itens || [])); } catch (e) {} return j.itens || []; })
       .catch(function () { try { return JSON.parse(localStorage.getItem(CH_MINHAS) || '[]'); } catch (e) { return []; } });
   }
+  /* O ACERVO DOS PROFESSORES (Pedro, 27/11/2026): as atividades que os OUTROS professores mostraram no portal pelo
+     Conversation Maker, com o autor e a nota de quem já usou (backend CmPortal.js, cmAcervo e cmNota). Abre como as
+     "Minhas" (cmLer). Enquanto o backend não tiver a rota, a categoria simplesmente não aparece. */
+  var ACERVO = 'Acervo dos professores', CH_ACERVO = 'conv:acervo', ultAcervo = null;
+  try { ultAcervo = JSON.parse(localStorage.getItem(CH_ACERVO) || 'null'); } catch (e) {}
+  function pedeAcervo() {
+    return fiskFetch(FISK_HUB_EP, { action: 'cmAcervo', token: s.token }, { timeoutMs: 45000 })
+      .then(function (j) { if (!j || !j.ok) throw 0; try { localStorage.setItem(CH_ACERVO, JSON.stringify(j.itens || [])); } catch (e) {} return j.itens || []; })
+      .catch(function () { return ultAcervo || []; });
+  }
+  function juntaAcervo(itens) {
+    if (!dados) return; dados.idiomas = dados.idiomas || {};
+    delete dados.idiomas[ACERVO];
+    if (!itens || !itens.length) return;
+    dados.idiomas[ACERVO] = itens.map(function (m) { return { id: m.id, nome: m.nome, tipo: 'cm', niveis: [m.nivel, m.perfil].filter(Boolean), quando: m.quando, pronto: true, origem: 'acervo',
+      autor: m.autor, nota: m.nota, notas: m.notas, minha: m.minha }; });
+    dados.vazio = false;
+  }
+  /* AS BUDDY TALKS (Pedro, 28/11/2026): a série de pronúncia dos Transitions, gerada do conteúdo do Conversation Maker
+     por scripts/build-buddy-talks.js em buddy-talks/ (ao lado desta página: sem backend para listar nem abrir). Valem em
+     qualquer semana. O áudio do livro vem do Drive pelo backend (cmAudio), no slide "Let's practice". */
+  var BUDDY = 'Buddy Talks', ultBuddy = null;
+  function pedeBuddy() {
+    return fetch('buddy-talks/index.json', { cache: 'no-cache' }).then(function (r) { return r.json(); })
+      .then(function (l) { return Array.isArray(l) ? l : []; }).catch(function () { return []; });
+  }
+  function juntaBuddy(itens) {
+    if (!dados) return; dados.idiomas = dados.idiomas || {};
+    delete dados.idiomas[BUDDY];
+    if (!itens || !itens.length) return;
+    dados.idiomas[BUDDY] = itens.map(function (m) { return { id: m.id, nome: m.nome, tipo: 'cm', niveis: [m.nivel], pronto: true, origem: 'buddy', livro: m.livro }; });
+    dados.vazio = false;
+  }
+  /* AS ATIVIDADES COUNTRIES (Pedro, 28/11/2026): a série de países do Drive Master, gerada por scripts/build-countries.js
+     em countries/ (ao lado desta página, como as Buddy Talks). O vídeo toca do Drive dentro do slide. */
+  var PAISES = 'Countries', ultPaises = null, VIDA = 'Everyday Life', ultVida = null, YT = 'YouTubers', ultYt = null;
+  /* YOUTUBERS (28/11/2026): a série do Drive Master, gerada por scripts/build-youtubers.js em youtubers/ */
+  function pedeYt() {
+    return fetch('youtubers/index.json', { cache: 'no-cache' }).then(function (r) { return r.json(); })
+      .then(function (l) { return Array.isArray(l) ? l : []; }).catch(function () { return []; });
+  }
+  function juntaYt(itens) {
+    if (!dados) return; dados.idiomas = dados.idiomas || {};
+    delete dados.idiomas[YT];
+    if (!itens || !itens.length) return;
+    dados.idiomas[YT] = itens.map(function (m) { return { id: m.id, nome: m.nome, tipo: 'cm', niveis: m.niveis || [], pronto: true, origem: 'youtubers' }; });
+    dados.vazio = false;
+  }
+  /* EVERYDAY LIFE (28/11/2026): a série do Drive Master, gerada por scripts/build-everyday.js em everyday-life/ */
+  function pedeVida() {
+    return fetch('everyday-life/index.json', { cache: 'no-cache' }).then(function (r) { return r.json(); })
+      .then(function (l) { return Array.isArray(l) ? l : []; }).catch(function () { return []; });
+  }
+  function juntaVida(itens) {
+    if (!dados) return; dados.idiomas = dados.idiomas || {};
+    delete dados.idiomas[VIDA];
+    if (!itens || !itens.length) return;
+    dados.idiomas[VIDA] = itens.map(function (m) { return { id: m.id, nome: m.nome, tipo: 'cm', niveis: m.niveis || [], pronto: true, origem: 'everyday' }; });
+    dados.vazio = false;
+  }
+  function pedePaises() {
+    return fetch('countries/index.json', { cache: 'no-cache' }).then(function (r) { return r.json(); })
+      .then(function (l) { return Array.isArray(l) ? l : []; }).catch(function () { return []; });
+  }
+  function juntaPaises(itens) {
+    if (!dados) return; dados.idiomas = dados.idiomas || {};
+    delete dados.idiomas[PAISES];
+    if (!itens || !itens.length) return;
+    dados.idiomas[PAISES] = itens.map(function (m) { return { id: m.id, nome: m.nome, tipo: 'cm', niveis: m.niveis || [], pronto: true, origem: 'countries' }; });
+    dados.vazio = false;
+  }
   function juntaMinhas(itens) {
     if (!dados) return; dados.idiomas = dados.idiomas || {};
     delete dados.idiomas[MINHAS];
@@ -318,7 +524,7 @@
   try { ultMinhas = JSON.parse(localStorage.getItem(CH_MINHAS) || 'null'); } catch (e) {}
   function guardada(id) { try { return JSON.parse(localStorage.getItem(CH_LISTA + (id || 'atual')) || 'null'); } catch (e) { return null; } }
   function semCarimbo(j) { return JSON.stringify({ s: j && j.semana, i: j && j.idiomas, ss: j && j.semanas }); }
-  function aplica(j) { dados = j; semKids(); juntaMinhas(ultMinhas || []); semanaId = j.semana ? j.semana.id : ''; desenhaLista(); }
+  function aplica(j) { dados = j; semKids(); juntaMinhas(ultMinhas || []); juntaAcervo(ultAcervo || []); juntaBuddy(ultBuddy || []); juntaPaises(ultPaises || []); juntaVida(ultVida || []); juntaYt(ultYt || []); semanaId = j.semana ? j.semana.id : ''; desenhaLista(); }
   function carregaLista(id, depois) {
     var vez = ++vezLista, g = guardada(id), viu = false;
     if (g && g.semana && g.idiomas) { delete g._offline; aplica(g); viu = true; if (depois) { depois(); depois = null; } }
@@ -374,7 +580,7 @@
       if (!x) return '<span class="sem vazia"></span>';
       var p = partesSemana(x.nome);
       return '<button type="button" class="sem' + (k === 1 ? ' on' : '') + '" data-sem="' + esc(x.id) + '"><b>' + esc(p.n) + (x.atual ? ' · hoje' : '') + '</b><span>' + esc(p.d) + '</span>' +
-        (k === 1 ? (function () { var ks = Object.keys(dados.idiomas || {}).filter(function (x) { return x !== MINHAS; }), n = 0; ks.forEach(function (x) { n += dados.idiomas[x].length; }); return '<small>' + (n ? n + (n === 1 ? ' atividade' : ' atividades') + ' · ' + esc(ks.join(', ')) : 'nenhuma atividade da semana ainda') + '</small>'; })() : '') + '</button>';
+        (k === 1 ? (function () { var ks = Object.keys(dados.idiomas || {}).filter(function (x) { return x !== MINHAS && x !== ACERVO && x !== BUDDY && x !== PAISES && x !== VIDA && x !== YT; }), n = 0; ks.forEach(function (x) { n += dados.idiomas[x].length; }); return '<small>' + (n ? n + (n === 1 ? ' atividade' : ' atividades') + ' · ' + esc(ks.join(', ')) : 'nenhuma atividade da semana ainda') + '</small>'; })() : '') + '</button>';
     }).join('');
   }
   function turmaBase() { var t = typeof fiskTurmaDeAgora === 'function' ? fiskTurmaDeAgora(s) : null, agora = !!t; if (!t && typeof fiskTurmaProxima === 'function') t = fiskTurmaProxima(s); if (t) t.agora = agora; return t; }
@@ -412,7 +618,7 @@
     var out = [], extras = [];
     ['English', 'Español'].concat(Object.keys(dados.idiomas || {}).filter(function (k) { return k !== 'English' && k !== 'Español'; })).forEach(function (idioma) {
       var itens = (dados.idiomas[idioma] || []).filter(function (it) { return it !== dest; }), soltos = itens.filter(function (it) { return !it.grupo; });
-      var band = idioma === 'English' ? '🇺🇸 ' : idioma === 'Español' ? '🇪🇸 ' : idioma === MINHAS ? '🧩 ' : '📁 ';
+      var band = idioma === 'English' ? '🇺🇸 ' : idioma === 'Español' ? '🇪🇸 ' : idioma === MINHAS ? '🧩 ' : idioma === ACERVO ? '🗂️ ' : idioma === BUDDY ? '🐻 ' : idioma === PAISES ? '🌍 ' : idioma === VIDA ? '🏡 ' : idioma === YT ? '▶️ ' : '📁 ';
       var ord = function (a, b) { var o = { Teens: 0, Basic: 1, Intermediate: 2, Advanced: 3, Todos: 4 }; return ((o[nivelDe(a)] == null ? 9 : o[nivelDe(a)]) - (o[nivelDe(b)] == null ? 9 : o[nivelDe(b)])) || (perfilDe(a) === perfilDe(b) ? 0 : (perfilDe(a) === 'Jovens' ? -1 : 1)); };
       if (soltos.length) out.push({ k: idioma, rot: band + idioma, itens: soltos.sort(ord) });
       var gs = {}; itens.filter(function (it) { return it.grupo; }).forEach(function (it) { (gs[it.grupo] = gs[it.grupo] || []).push(it); });
@@ -420,13 +626,31 @@
     });
     return out.concat(extras);   /* os idiomas primeiro, as pastas extras depois */
   }
+  /* a nota do acervo: as estrelas na capa da atividade; dar de novo troca a nota do professor */
+  function notaAcervo() {
+    var box = $('notaAc'); if (!box || !atual) return;
+    var it = atual, desenha = function (msg) {
+      box.innerHTML = '<span>Já usou? Sua nota: </span>' + [1, 2, 3, 4, 5].map(function (n) { return '<button type="button" data-n="' + n + '" class="' + (n <= (it.minha || 0) ? 'on' : '') + '">★</button>'; }).join('') +
+        '<small>' + (msg || (it.notas ? 'média ' + String(it.nota).replace('.', ',') + ' de ' + it.notas : 'ninguém deu nota ainda')) + '</small>';
+      [].forEach.call(box.querySelectorAll('button'), function (b) {
+        b.onclick = function () {
+          var n = +b.getAttribute('data-n'); it.minha = n; desenha('salvando…');
+          fiskFetch(FISK_HUB_EP, { action: 'cmNota', token: s.token, id: it.id, nota: n }, { timeoutMs: 30000 }).then(function (j) {
+            if (!j || !j.ok) throw 0; it.nota = j.nota; it.notas = j.notas; desenha('✓ nota salva · média ' + String(j.nota).replace('.', ',') + ' de ' + j.notas);
+          }).catch(function () { desenha('não salvou: tente de novo'); });
+        };
+      });
+    };
+    desenha();
+  }
   function cartao(it, dest) {
     var n = nivelDe(it), pf = perfilDe(it);
     return '<div class="rec' + (dest ? ' hl dest' : '') + '" data-rec="' + esc(it.id) + '">' + (dest ? '<span class="flag">★ Para a turma de agora</span>' : '') +
       '<div class="capa n-' + esc(n) + '"><span class="e">' + (EM[n] || '💬') + '</span><span class="tg">' + esc((n === 'Todos' ? 'Todos os níveis' : n || 'Atividade').toUpperCase()) + '</span>' + (pf ? '<span class="pf">' + esc(pf) + '</span>' : '') + '</div>' +
       '<div class="th" data-th="' + esc(it.id) + '" title="' + esc(it.nome) + '">' + (it.pronto ? '<span class="carrega"><i></i> preparando a miniatura…</span>' : '<span class="carrega">em preparação</span>') +
       '<span class="l" title="Slide anterior">‹</span><span class="r" title="Próximo slide">›</span><span class="cnt" hidden></span></div>' +
-      '<div class="inf"><b>' + esc(titulo(it)) + '</b>' + (dest ? '<span class="dica">Clique nas bordas da imagem para ver os slides antes da aula.</span>' : '') +
+      '<div class="inf"><b>' + esc(titulo(it)) + '</b>' +
+      (it.origem === 'acervo' ? '<span class="dica">por ' + esc(it.autor || '') + (it.notas ? ' · ★ ' + String(it.nota).replace('.', ',') + ' (' + it.notas + (it.notas === 1 ? ' nota' : ' notas') + ')' : ' · ainda sem nota') + '</span>' : '') + (dest ? '<span class="dica">Clique nas bordas da imagem para ver os slides antes da aula.</span>' : '') +
       '<div class="rod">' + (it.pronto ? '<button type="button" class="bt" data-abre="' + esc(it.id) + '">▶ ' + (dest ? 'Começar na tela cheia' : 'Começar') + '</button>' : '') +
       (it.pronto ? '<span class="off" data-off="' + esc(it.id) + '" hidden>✓ offline</span>' : '<span class="prep">em preparação</span>') + '</div></div></div>';
   }
@@ -513,10 +737,15 @@
   function obterCm(it) {
     var k = chaveCache(it);
     var baixa = function () {
-      var pedido = it.origem === 'minha' ? { action: 'cmLer', token: s.token, id: it.id } : { action: 'conversaLer', token: s.token, id: it.id };
+      if (it.origem === 'youtubers') return fetch('youtubers/' + encodeURIComponent(it.id) + '.json', { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error('não veio'); return r.text(); });
+      if (it.origem === 'everyday') return fetch('everyday-life/' + encodeURIComponent(it.id) + '.json', { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error('não veio'); return r.text(); });
+      if (it.origem === 'countries') return fetch('countries/' + encodeURIComponent(it.id) + '.json', { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error('não veio'); return r.text(); });
+      if (it.origem === 'buddy') return fetch('buddy-talks/' + encodeURIComponent(it.id) + '.json', { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error('não veio'); return r.text(); });
+      var doMaker = it.origem === 'minha' || it.origem === 'acervo';   /* do Conversation Maker: as minhas e as do acervo */
+      var pedido = doMaker ? { action: 'cmLer', token: s.token, id: it.id } : { action: 'conversaLer', token: s.token, id: it.id };
       return fiskFetch(FISK_HUB_EP, pedido, { timeoutMs: 60000 }).then(function (j) {
         if (!j || !j.ok || !j.dados) throw new Error((j && (j.error || j.erro)) || 'não veio');
-        return it.origem === 'minha' ? j.dados : decodeURIComponent(escape(atob(j.dados)));
+        return doMaker ? j.dados : decodeURIComponent(escape(atob(j.dados)));
       });
     };
     var parse = function (t) { var o = JSON.parse(t); if (!o || !o.lesson) throw new Error('atividade sem conteúdo'); return o; };
@@ -553,7 +782,7 @@
   /* guardar a semana inteira neste computador (o Hub já faz isso sozinho ao abrir; este botão força agora) */
   function guardarSemana() {
     var b = $('bOff'); if (!dados || !window.caches) return;
-    var prontos = todos().filter(function (i) { return i.pronto; }), feitos = 0;
+    var prontos = todos().filter(function (i) { return i.pronto && i.origem !== 'acervo' && i.origem !== 'buddy' && i.origem !== 'countries' && i.origem !== 'everyday' && i.origem !== 'youtubers'; }), feitos = 0;   /* o acervo não desce inteiro */
     b.disabled = true;
     fiskGuardarPaginaOffline('conversacao.html').then(function () {
       var cadeia = Promise.resolve();
@@ -581,6 +810,7 @@
     if (atual.tipo === 'cm') {
       obterCm(atual).then(function (o) {
         deck = deckDe(o); deckFoto = deckDe(o); paginas = []; ci = 0; et = 0; $('palco').innerHTML = '';
+        vozLingua = o.lesson && o.lesson.language === 'spanish' ? 'es' : 'en'; vozAntecipa();
         aulaBotao();
         capa();
       }).catch(function (e) { $('capaCorpo').innerHTML = '<p class="erro">Não consegui abrir (' + esc(e.message) + ').</p><div class="linha"><button class="sec" id="bVolta">← Voltar à lista</button></div>'; $('bVolta').onclick = volta; });
@@ -608,16 +838,19 @@
   }
   function capa() {
     tocando = false; document.body.classList.remove('mostra', 'esconde-cursor');
+    if (typeof cronoPara === 'function') cronoPara();
     $('capa').hidden = false;
     var cf = $('capaFundo'); if (cf && paginas[0] && paginas[0].src) { cf.style.backgroundImage = 'url(' + paginas[0].src + ')'; cf.classList.add('on'); }
     if (cf && deck) { cf.style.backgroundImage = ''; cf.innerHTML = ''; var fx = deck.slides[0].el.cloneNode(true); cf.appendChild(fx); FiskTema.encaixar(fx, cf); cf.classList.add('on'); }
     $('capaCorpo').innerHTML = '<h1>💬 ' + esc(titulo(atual)) + '</h1><p class="sub">' + esc(atual.niveis.join(' · ')) + (atual.niveis.length ? ' · ' : '') + (deck ? deck.slides.length + ' slides' : paginas.length + (atual.tipo === 'pdf' ? ' slides' : ' cliques')) + '</p>' +
       (deck ? '<div class="capinha" id="capinhaCm" style="position:relative;overflow:hidden;margin:0 auto"></div>' : '<img class="capinha" src="' + (paginas[0] && paginas[0].src || '') + '" alt="">') +
-      (semanaCerta() ? '' : '<p class="aviso ruim" style="margin-top:.8rem">Esta atividade não é da semana de hoje.</p>') +
+      (atual.origem === 'acervo' ? '<p class="sub">🗂️ Do acervo · por ' + esc(atual.autor || '') + '</p><div class="notaAc" id="notaAc"></div>'
+        : semanaCerta() ? '' : '<p class="aviso ruim" style="margin-top:.8rem">Esta atividade não é da semana de hoje.</p>') +
       '<div><button type="button" class="comeca" id="comeca">▶ Começar na tela cheia</button></div>' +
       '<div class="linha"><button type="button" class="sec" id="semCheia">Começar sem tela cheia</button><button type="button" class="sec" id="bVolta">← Voltar à lista</button></div>' +
       '<p class="dica">Avance com <kbd>clique</kbd>, <kbd>→</kbd>, <kbd>espaço</kbd> ou o passador de slides. Volte com <kbd>←</kbd>.<br><kbd>F</kbd> tela cheia · <kbd>Esc</kbd> volta para cá</p>';
     salaEstado();
+    if (atual.origem === 'acervo') notaAcervo();
     $('comeca').onclick = function () { comecar(true); }; $('semCheia').onclick = function () { comecar(false); }; $('bVolta').onclick = volta;
     if (deck) { var cx = $('capinhaCm'), c0 = deck.slides[0].el.cloneNode(true); c0.style.pointerEvents = 'none'; cx.appendChild(c0); FiskTema.encaixar(c0, cx); }
   }
@@ -633,11 +866,17 @@
   function mostraCm() {
     var sl = deck.slides[ci]; $('palco').innerHTML = ''; $('palco').appendChild(sl.el);
     FiskTema.encaixar(sl.el, $('palco')); FiskTema.mostrar(deck, ci, et);
+    /* ouça e escolha: toca ao CHEGAR na pergunta (redesenhar no resize não toca de novo; o 🔊 repete) */
+    var aqui = ci + '|' + et;
+    /* a faixa do livro para quando o professor sai do slide dela */
+    if (audioAgora && String(vozOnde).split('|')[0] !== String(ci)) { try { audioAgora.pause(); } catch (e) {} audioAgora = null; }
+    if (sl.jogo && sl.jogo.ouvir && et === 0 && vozOnde !== aqui) vozToca(sl.jogo.ouvir, sl.el.querySelector('.ft-ouvir'));
+    vozOnde = aqui;
     var tot = passos(), n = passoAtual();
     $('bN').textContent = 'slide ' + (ci + 1) + ' de ' + deck.slides.length;
     $('prog').style.width = (n * 100 / tot) + '%';
     if (registro) registro.etapa(n, tot);
-    salaEstado(); aulaMostrou();
+    salaEstado(); aulaMostrou(); cronoNoSlide();
   }
   function mostra(i) {
     if (deck) { if (i === 0) { ci = 0; et = 0; } else if (i === Infinity) { ci = deck.slides.length - 1; et = deck.slides[ci].etapas; } mostraCm(); return; }
@@ -661,6 +900,7 @@
   function cheia() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(function () {}); else document.exitFullscreen(); }
   function volta() {
     if (document.fullscreenElement) document.exitFullscreen();
+    cronoPara(); $('sorteio').hidden = true;
     if (registro) { registro.fim(); registro = null; }
     paginas.forEach(function (im) { if (im.src) URL.revokeObjectURL(im.src); });
     if (doc) { try { doc.destroy(); } catch (e) {} doc = null; }
@@ -670,7 +910,7 @@
     history.replaceState(null, '', 'conversacao.html' + (semanaId ? '?semana=' + encodeURIComponent(semanaId) : ''));
     marcaOffline();
   }
-  $('palco').addEventListener('click', function (e) { if (!tocando) return; if (deck && e.target.closest('[data-carta],.ft-op')) return; (e.clientX < window.innerWidth * 0.2 ? ant : prox)(); });
+  $('palco').addEventListener('click', function (e) { if (!tocando) return; if (deck && e.target.closest('[data-carta],.ft-op,.ft-ouvir,.ft-audio')) return; (e.clientX < window.innerWidth * 0.2 ? ant : prox)(); });
   window.addEventListener('resize', function () { if (deck && tocando) mostraCm(); });
   $('bProx').onclick = prox; $('bAnt').onclick = ant; $('bInicio').onclick = function () { mostra(0); };
   $('bCheia').onclick = cheia; $('bSair').onclick = function () { if (document.fullscreenElement) document.exitFullscreen(); capa(); };
@@ -781,11 +1021,108 @@
      para as do Conversation Maker: cada etapa de cada slide é um clique, fotografado num segundo deck (FiskTema.foto)
      para o slide da TV não piscar. Sem internet, a aula na TV segue igual. */
   var AULA_API = 'https://portalfisk.com.br/api/aula', AULA_URL = 'https://portalfisk.com.br/aula.html';
+  /* ── OUÇA E ESCOLHA (item 6, 27/11/2026) ──
+     A pergunta em áudio do jogo. ⚠️ Voz SEMPRE neural (regra do Pedro): vem do portal (api/voz.js, a Azure da conversa
+     ao vivo, as vozes dos geradores offline), uma voz por atividade, guardada lá por 30 dias. Nunca speechSynthesis: se a
+     voz falhar, o texto aparece no slide para o professor ler. Os áudios da atividade são pedidos já ao abrir, para a
+     TV não esperar na hora; o mesmo mp3 vai para os celulares junto do item. */
+  var VOZ_API = 'https://portalfisk.com.br/api/voz', vozLingua = 'en', vozCache = {}, vozAgora = null, vozOnde = '';
+  function vozMp3(texto) {
+    if (!vozCache[texto]) vozCache[texto] = fetch(VOZ_API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ token: s.token, texto: texto, lingua: vozLingua, semente: atual ? atual.id : '' }) })
+      .then(function (r) { return r.json(); }).then(function (j) { if (!j || !j.ok || !j.mp3) throw new Error((j && j.error) || 'sem voz'); return j.mp3; })
+      .catch(function (e) { delete vozCache[texto]; throw e; });
+    return vozCache[texto];
+  }
+  function vozAntecipa() {
+    if (!deck) return;
+    deck.slides.forEach(function (x) { if (x.jogo && x.jogo.ouvir) vozMp3(x.jogo.ouvir).catch(function () {}); });
+  }
+  function vozToca(texto, botao) {
+    try { if (vozAgora) vozAgora.pause(); } catch (e) {}
+    if (botao) botao.style.opacity = '.6';
+    vozMp3(texto).then(function (mp3) {
+      vozAgora = new Audio('data:audio/mpeg;base64,' + mp3);
+      vozAgora.onended = function () { if (botao) botao.style.opacity = ''; };
+      return vozAgora.play();
+    }).catch(function () {
+      /* sem voz: o professor lê. A frase aparece embaixo do 🔊 (nunca a voz do navegador) */
+      if (botao) { botao.style.opacity = ''; var el = botao.parentNode, aviso = el.querySelector('.ft-leia');
+        if (!aviso) { aviso = document.createElement('div'); aviso.className = 'ft-leia'; aviso.style.cssText = 'position:absolute;left:0;top:215px;font:700 40px/1.2 system-ui,sans-serif;color:#b91c1c'; el.appendChild(aviso); }
+        aviso.textContent = (vozLingua === 'es' ? '📢 Lee en voz alta: “' : '📢 Read aloud: “') + texto + '”'; }
+    });
+  }
+  FiskTema.aoOuvir = vozToca;
+  /* ── O ÁUDIO DO LIVRO (Buddy Talks, 28/11/2026) ── O slide "Let's practice" traz só o id do arquivo no Drive; o
+     backend (cmAudio) devolve a faixa, que fica guardada aqui enquanto a atividade está aberta. Sem o backend com a
+     rota, a TV diz qual faixa do livro tocar. */
+  var audioCache = {}, audioAgora = null;
+  function audioDe(id) {
+    if (!audioCache[id]) audioCache[id] = fiskFetch(FISK_HUB_EP, { action: 'cmAudio', token: s.token, id: id }, { timeoutMs: 60000 })
+      .then(function (j) { if (!j || !j.ok || !j.b64) throw new Error((j && j.error) || 'sem áudio'); return { b64: j.b64, mime: j.mime || 'audio/mpeg' }; })
+      .catch(function (e) { delete audioCache[id]; throw e; });
+    return audioCache[id];
+  }
+  /* Desde 28/11/2026 a TV toca DIRETO do Drive: os mp3 do livro estão em "qualquer pessoa com o link" e o <audio> não
+     precisa de CORS. O backend (cmAudio) virou a segunda tentativa, e o aviso de tocar pelo livro, a última. */
+  function driveAudio(id) { return 'https://drive.google.com/uc?export=download&id=' + encodeURIComponent(id); }
+  function tocaUrl(url, botao) {
+    return new Promise(function (ok, falha) {
+      var au = new Audio(url), comecou = false; au.preload = 'auto';
+      au.onplaying = function () { comecou = true; botao.textContent = '⏸'; ok(au); };
+      au.onended = function () { botao.textContent = '▶'; };
+      au.onerror = function () { if (!comecou) falha(new Error('sem áudio')); else botao.textContent = '▶'; };
+      audioAgora = au;
+      var pr = au.play(); if (pr && pr.catch) pr.catch(function (e) { if (!comecou) falha(e); });
+    });
+  }
+  FiskTema.aoAudio = function (i, botao, slideEl) {
+    var sl = deck && deck.slides.filter(function (x) { return x.el === slideEl; })[0], a = sl && sl.audio; if (!a) return;
+    try { if (audioAgora && !audioAgora.paused) { audioAgora.pause(); botao.textContent = '▶'; return; } } catch (e) {}
+    try { if (audioAgora && audioAgora.paused && audioAgora.__id === a.id && audioAgora.currentTime > 0 && !audioAgora.ended) { botao.textContent = '⏸'; audioAgora.play(); return; } } catch (e) {}
+    botao.textContent = '⏳';
+    tocaUrl(driveAudio(a.id), botao).then(function (au) { au.__id = a.id; }, function () {
+      return audioDe(a.id).then(function (x) { return tocaUrl('data:' + x.mime + ';base64,' + x.b64, botao); }).then(function (au) { au.__id = a.id; });
+    }).catch(function () {
+      botao.textContent = '▶';
+      var av = slideEl.querySelector('.ft-leia-audio'); if (av) av.textContent = '📢 Toque a faixa do livro: ' + (a.ref || '') + ' · ' + (a.nome || '');
+    });
+  };
+  /* para o celular dos alunos: a faixa vai junto do clique do slide, se couber no limite do servidor da aula */
+  function aulaAudioPasso(k) {
+    if (!deck) return Promise.resolve(null);
+    var p = aulaPasso(k - 1), sl = p && deck.slides[p.i];
+    if (!sl || !sl.audio) return Promise.resolve(null);
+    /* o celular toca do Drive também (d); o mp3 pelo servidor da aula só se o backend entregar e couber */
+    return audioDe(sl.audio.id).then(function (x) { return { nome: sl.audio.nome, d: sl.audio.id, s: x.b64.length <= 700 * 1024 ? x.b64 : null }; }, function () { return { nome: sl.audio.nome, d: sl.audio.id, s: null }; });
+  }
   var aula = null, aulaFila = Promise.resolve();
   function aulaApi(c, ms) {
     var ctl = new AbortController(), t = setTimeout(function () { ctl.abort(); }, ms || 20000);
     return fetch(AULA_API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(c), signal: ctl.signal })
       .then(function (r) { return r.json(); }).finally(function () { clearTimeout(t); });
+  }
+  /* a língua da aula, para o celular dos alunos e o que a turma lê na TV: a do Conversation Maker; no PDF, pelo nível */
+  function aulaLingua() {
+    if (deck) return vozLingua;
+    return atual && /inmediato|espa[nñ]ol|spanish/i.test(((atual.niveis || []).join(' ') + ' ' + (atual.nome || ''))) ? 'es' : 'en';
+  }
+  /* ABERTA ATÉ A PRÓXIMA AULA (Pedro, 27/11/2026): o fim do dia (meia-noite de Brasília, em segundos) da próxima aula da
+     turma, pelos dias da grade; o servidor limita a 7 dias. Sem a grade: nada, e vale a meia-noite de hoje */
+  function aulaProxima(turma) {
+    var dias = turma && turma.dias; if (!dias || !dias.length) return undefined;
+    var d = new Date();
+    for (var k = 1; k <= 7; k++) {
+      var x = new Date(d.getFullYear(), d.getMonth(), d.getDate() + k);
+      if (dias.indexOf(x.getDay()) > -1) return Math.floor(Date.UTC(x.getFullYear(), x.getMonth(), x.getDate() + 1, 3, 0, 0) / 1000);
+    }
+    return undefined;
+  }
+  function aulaAteTexto(es) {
+    var exp = aula && aula.exp ? aula.exp * 1000 : 0;
+    if (!exp || exp - Date.now() < 26 * 3600e3) return es ? 'hasta las 23:59' : 'until 11:59 pm';
+    var d = new Date(exp - 60e3);
+    return (es ? 'hasta el ' : 'until ') + d.toLocaleDateString(es ? 'es-MX' : 'en-US', { weekday: 'long', day: 'numeric', month: es ? 'numeric' : 'short' });
   }
   function aulaBotao() { var b = $('bAlunos'); if (!b) return; b.hidden = false; b.classList.toggle('on', !!aula); }
   /* os cliques da aula: no PDF cada página é um clique; na atividade do Conversation Maker, cada etapa de cada slide */
@@ -804,10 +1141,22 @@
   function aulaTexto() {
     if (!aula) return;
     /* o texto é para a TURMA, que lê a TV (27/11/2026: o aviso para o professor, com a contagem, confundia) */
-    var tx = aula.fim ? 'A atividade inteira está aberta no celular até 23h59, para revisar e copiar o vocabulário.'
-      : aula.turma ? 'Também está no Portal do Aluno, no card "Conversação de hoje".' : '';
+    /* e na língua da aula (Pedro, 27/11/2026): os botões do professor, embaixo, continuam em português */
+    var es = aulaLingua() === 'es';
+    var tx = aula.fim ? (es ? 'Toda la actividad está abierta en el celular ' + aulaAteTexto(true) + ', para repasar, copiar el vocabulario y rehacer el juego.'
+        : 'The whole activity is open on your phone ' + aulaAteTexto(false) + ': review it, copy the vocabulary and redo the game.')
+      : aula.turma ? (es ? 'También está en el Portal del Alumno, en la tarjeta del día.' : 'It is also on the Student Portal, on today\'s card.') : '';
     $('qrAulaTxt').textContent = tx;
+    var cx = $('qrAula').querySelector('.cx');
+    cx.querySelector('.chip').textContent = es ? 'EN VIVO' : 'LIVE';
+    cx.querySelector('h2').textContent = es ? '¡A conversar! 📱' : "Let's talk! 📱";
+    cx.querySelector('h2').nextElementSibling.textContent = es ? 'Abre la cámara, apunta al código y sigue las diapositivas con la clase.' : 'Open your camera, point it at the code and follow the slides with the class.';
     $('aulaFim').hidden = !!aula.fim;
+    /* o interruptor dos Fisk Dólares: só com jogo na atividade e com o pagamento ligado no servidor */
+    var fb = $('aulaFd'), temJogo = !!(deck && deck.slides.some(function (x) { return x.tipo === 'jogo'; }));
+    fb.hidden = !aula.fdPaga || !temJogo || !!aula.fim;
+    fb.classList.toggle('nao', !aula.fd);
+    fb.textContent = '💰 Jogo vale Fisk Dólares: ' + (aula.fd ? 'SIM' : 'NÃO');
     $('qrAulaCod').textContent = aula.id;
     $('aulaCantoCod').textContent = aula.id;
   }
@@ -816,9 +1165,9 @@
     if (aula) { aulaTexto(); $('qrAula').hidden = false; return; }
     var turma = aulaTurma();
     $('qrAula').hidden = false; $('qrAulaImg').innerHTML = '<div class="espera" style="color:#475569"><i></i></div>'; $('qrAulaCod').textContent = ''; $('qrAulaTxt').textContent = 'Preparando…'; $('aulaFim').hidden = true;
-    aulaApi({ op: 'abrir', token: s.token, titulo: titulo(atual), ativ: atual.id + '_' + String(atual.quando || '').replace(/\W/g, ''), total: aulaTotal(), rafs: turma ? turma.rafs : [] }, 25000).then(function (r) {
+    aulaApi({ op: 'abrir', token: s.token, titulo: titulo(atual), ativ: atual.id + '_' + String(atual.quando || '').replace(/\W/g, ''), total: aulaTotal(), rafs: turma ? turma.rafs : [], fd: true, lingua: aulaLingua(), semente: atual.id, ate: aulaProxima(turma) }, 25000).then(function (r) {
       if (!r.ok) throw new Error(r.error || 'não deu');
-      aula = { id: r.aula, chave: r.chave, ativId: atual.id, feitos: {}, alvo: 0, agora: 1, fim: false, alunos: r.alunos, turma: turma ? turma.turma : '' };
+      aula = { exp: r.exp, id: r.aula, chave: r.chave, ativId: atual.id, feitos: {}, alvo: 0, agora: 1, fim: false, alunos: r.alunos, turma: turma ? turma.turma : '', fd: r.fd !== false, fdPaga: !!r.fdPaga };
       aulaBotao(); aulaTexto(); aulaDesenhaQr();
       $('aulaCanto').hidden = false;
       if (tocando) aulaMostrou();
@@ -872,7 +1221,14 @@
     var tentativas = 0;
     (function vai() {
       aulaImagem(k - 1).then(function (img) {
-        return aulaApi({ op: 'clique', aula: a.id, chave: a.chave, n: k, atual: a.agora, img: img });
+        var jg = aulaJogo(k);
+        /* ouça e escolha: o mesmo mp3 que a TV tocou vai para os celulares (se a voz falhou, vai sem áudio) */
+        return (jg && jg.ot ? vozMp3(jg.ot).catch(function () { return null; }) : Promise.resolve(null)).then(function (mp3) {
+          return aulaAudioPasso(k).then(function (au) {
+            return aulaApi({ op: 'clique', aula: a.id, chave: a.chave, n: k, atual: a.agora, img: img, jogo: jg, s: mp3 || (au && au.s) || undefined,
+              somPasso: au ? { nome: au.nome, d: au.d } : undefined, vocab: aulaVocab(k), aval: aulaAval(k) });
+          });
+        });
       }).then(function (r) {
         if (!r || !r.ok) throw new Error('não gravou');
         a.feitos[k] = 1; if (k === a.agora) a.avisado = k;
@@ -886,8 +1242,151 @@
     })();
   }
   function aulaMostrou() {
+    aulaTiraGraficos();   /* chegou num clique: o gráfico se monta de novo, animado, se for a revelação */
+    aulaPlacar();
     if (!aula || aula.fim || !atual || atual.id !== aula.ativId) return;
-    aulaEnvia(aulaAgora(), aulaAgora());
+    var revela = !!(deck && deck.slides[ci] && deck.slides[ci].tipo === 'jogo' && et >= 1);
+    aulaEnvia(aulaAgora(), aulaAgora()).then(function () { if (revela) { aulaPaga(); aulaPlacar(); } });   /* o servidor já sabe da revelação: o gráfico sem esperar a próxima consulta */
+  }
+  /* FISK DÓLARES (Pedro, 27/11/2026: começa ligado, vale para a aula inteira, 20 por acerto e 5 por responder). Quem
+     paga é o BACKEND: depois de cada revelação (e no Finalizar), a TV só avisa "a aula X tem resultado"; o backend lê o
+     resultado direto no portal (op fdLer, com um segredo que só os servidores conhecem) e credita uma vez por aluno e
+     por pergunta. Avisar duas vezes não paga duas vezes. Sem o pagamento ligado no servidor (fdPaga), nada disso roda. */
+  function aulaPaga() {
+    var a = aula; if (!a || !a.fdPaga) return;
+    try { fiskFetch(FISK_HUB_EP, { action: 'aulaFdPagar', token: s.token, aula: a.id }, { timeoutMs: 60000 }).catch(function () {}); } catch (e) {}
+  }
+  /* A AVALIAÇÃO DA AULA (27/11/2026): no slide de Activity Evaluation, quantos avaliaram e a média (para a turma, na
+     língua da aula); o professor lê tudo no "📝 Avaliações" do painel dos alunos (em português, sem nome de aluno) */
+  var EMO = ['😞', '🙁', '😐', '🙂', '😍'];
+  function aulaAvalPlacar(ger) {
+    var el = $('aulaPlacar'), a = aula;
+    aulaApi({ op: 'avaliacoes', aula: a.id, chave: a.chave }, 8000).then(function (r) {
+      if (ger !== placarGer || a !== aula || !r || !r.ok) return;
+      var es = aulaLingua() === 'es';
+      el.textContent = '📝 ' + r.total + (es ? (r.total === 1 ? ' evaluación' : ' evaluaciones') : (r.total === 1 ? ' answer' : ' answers')) + (r.media ? ' · ' + EMO[Math.round(r.media) - 1] + ' ' + String(r.media).replace('.', es ? ',' : '.') : '');
+      el.hidden = false;
+    }, function () {}).then(function () { if (ger === placarGer && a === aula) placarT = setTimeout(aulaPlacar, 4000); });
+  }
+  function aulaAvalVer() {
+    if (!aula) return;
+    var box = $('avalVerCorpo'); $('avalVer').hidden = false; box.innerHTML = '<p>Carregando…</p>';
+    aulaApi({ op: 'avaliacoes', aula: aula.id, chave: aula.chave }, 15000).then(function (r) {
+      if (!r || !r.ok) throw 0;
+      if (!r.total) { box.innerHTML = '<p>Nenhuma avaliação ainda. Elas aparecem quando a turma chega ao slide de avaliação.</p>'; return; }
+      var h = '<p class="res"><b>' + r.total + (r.total === 1 ? ' avaliação' : ' avaliações') + '</b>' + (r.media ? ' · média ' + EMO[Math.round(r.media) - 1] + ' ' + String(r.media).replace('.', ',') : '') + '</p>';
+      h += '<div class="dist">' + r.dist.map(function (q, i) { return '<span>' + EMO[i] + ' ' + q + '</span>'; }).join('') + '</div>';
+      h += r.itens.map(function (it) {
+        return '<div class="it">' + (it.r ? '<span class="em">' + EMO[it.r - 1] + '</span>' : '') + (it.a || []).map(function (x, i) { return x ? '<p><small>' + esc(r.perguntas[i] || '') + '</small><br>' + esc(x) + '</p>' : ''; }).join('') +
+          (it.c ? '<p class="com">💬 ' + esc(it.c) + '</p>' : '') + '</div>';
+      }).join('');
+      box.innerHTML = h;
+    }).catch(function () { box.innerHTML = '<p>Não consegui carregar. Confira a internet.</p>'; });
+  }
+  function aulaTiraGraficos() {
+    if (!deck) return;
+    deck.slides.forEach(function (x) {
+      var gr = x.el.querySelector('.ft-grafico'); if (gr) gr.remove();
+      var m = x.el.querySelector('.ft-msg'); if (m) m.style.visibility = '';
+    });
+  }
+  /* o número conta até o valor junto com a barra (a mesma curva: rápido no começo, assentando no fim) */
+  function aulaConta(el, de, ate, ms, fmt) {
+    var t0 = performance.now();
+    (function passo(t) {
+      var k = Math.min(1, (t - t0) / ms), e = 1 - Math.pow(1 - k, 4);
+      el.innerHTML = fmt(Math.round(de + (ate - de) * e));
+      if (k < 1) requestAnimationFrame(passo);
+    })(t0);
+  }
+  function aulaGrafico(slideEl, g) {
+    /* múltipla escolha: uma barra embaixo de cada opção. Os tipos novos (montar a frase, pares, digitar): duas barras,
+       acertaram e erraram, embaixo do conteúdo (g.por = [acertaram, erraram]) */
+    var j = slideEl.querySelector('[data-jogo]'), j2 = !j && slideEl.querySelector('[data-jogo2]'); if (!j && !j2) return;
+    var mc = !!j, certa = mc ? +j.getAttribute('data-jogo') : 0, nCol = mc ? j.querySelectorAll('.ft-op').length : 2, tot = g.resp || 0;
+    var rotulo = mc ? ['', '', '', '', '', ''] : ['✅ ', '❌ '];
+    var box = slideEl.querySelector('.ft-grafico'), novo = !box;
+    if (novo) {
+      box = document.createElement('div'); box.className = 'ft-grafico';
+      /* as medidas do slide (1920×1080) não sofrem a escala da TV: offset* é a coordenada do próprio slide */
+      if (mc) box.style.cssText = 'position:absolute;z-index:6;display:flex;flex-wrap:wrap;gap:40px;left:' + j.offsetLeft + 'px;width:' + j.offsetWidth + 'px;top:' + (j.offsetTop + j.offsetHeight + 36) + 'px';
+      else box.style.cssText = 'position:absolute;z-index:6;display:flex;flex-wrap:wrap;gap:40px;left:250px;right:250px;top:' + Math.min(j2.offsetTop + j2.offsetHeight + 40, 870) + 'px';
+      for (var i = 0; i < nCol; i++) box.insertAdjacentHTML('beforeend', '<div class="col"><div class="trilho"><div class="barra' + (i === certa ? ' certa' : '') + '"></div><div class="num">0</div></div></div>');
+      box.insertAdjacentHTML('beforeend', '<div class="leg"></div>');
+      slideEl.appendChild(box);
+      var m = slideEl.querySelector('.ft-msg'); if (m) m.style.visibility = 'hidden';
+      void box.offsetWidth; box.classList.add('on');
+    }
+    var cols = box.querySelectorAll('.col');
+    /* o que a TURMA lê sai na língua da aula (Pedro, 27/11/2026); os controles do professor continuam em português */
+    var es = aulaLingua() === 'es';
+    box.querySelector('.leg').textContent = tot ? '👥 ' + tot + (es ? (tot === 1 ? ' respuesta' : ' respuestas') : (tot === 1 ? ' answer' : ' answers')) : (es ? 'Nadie respondió' : 'No answers yet');
+    [].forEach.call(cols, function (c, i) {
+      var q = (g.por && g.por[i]) || 0, pct = tot ? Math.round(q * 100 / tot) : 0, barra = c.querySelector('.barra'), num = c.querySelector('.num');
+      var antes = +(num.dataset.q || 0);
+      if (!novo && antes === q && num.dataset.t === String(tot)) return;
+      num.dataset.q = q; num.dataset.t = tot;
+      var fmt = function (v) { return rotulo[i] + v + '<small>' + (tot ? Math.round(v * 100 / tot) : 0) + '%</small>'; };
+      /* uma depois da outra: a caixa sobe primeiro, e cada barra sai 180 ms depois da anterior */
+      var atraso = novo ? 450 + i * 180 : 0;
+      barra.style.transitionDelay = atraso + 'ms';
+      setTimeout(function () { aulaConta(num, antes, q, 1500, fmt); }, atraso);
+      requestAnimationFrame(function () { barra.style.width = Math.max(pct, q ? 4 : 0) + '%'; });
+    });
+  }
+  function aulaFdTroca() {
+    var a = aula; if (!a) return;
+    var b = $('aulaFd'), liga = !a.fd; b.disabled = true;
+    aulaApi({ op: 'fd', aula: a.id, chave: a.chave, liga: liga }, 15000).then(function (r) { if (r && r.ok) a.fd = r.fd; })
+      .catch(function () {}).then(function () { b.disabled = false; aulaTexto(); });
+  }
+  /* O JOGO CLICÁVEL (27/11/2026): no clique da PERGUNTA de um Language Game, o item vai junto da imagem (pergunta,
+     opções, índice certo e o clique que revela, que é o seguinte). O índice certo fica só no servidor até a revelação;
+     o aluno toca no celular e o servidor só aceita antes de a TV mostrar o clique que revela. Só nas atividades do
+     Conversation Maker: as de PDF não têm o dado do jogo. */
+  /* as palavras do slide de Important Words, em cada clique dele: o celular mostra com 🔊 (a voz que o aluno ouve é
+     autorizada pela aula: só palavras registradas aqui) */
+  function aulaVocab(k) {
+    if (!deck) return undefined;
+    var p = aulaPasso(k - 1), sl = p && deck.slides[p.i];
+    return sl && sl.vocab && sl.vocab.length ? sl.vocab : undefined;
+  }
+  function aulaAval(k) {
+    if (!deck) return undefined;
+    var p = aulaPasso(k - 1), sl = p && deck.slides[p.i];
+    return sl && sl.aval && sl.aval.length ? sl.aval : undefined;
+  }
+  function aulaJogo(k) {
+    if (!deck) return undefined;
+    var p = aulaPasso(k - 1), sl = p && deck.slides[p.i];
+    if (!sl || sl.tipo !== 'jogo' || !sl.jogo || p.et !== 0) return undefined;
+    /* a = onde cada opção está no slide (medido pelo FiskTema.foto, que roda antes deste envio): o aluno toca direto nela */
+    var jg = sl.jogo;
+    /* os tipos novos (item 7): o formato que o api/aula.js confere; a resposta certa só sai de lá depois da revelação */
+    if (jg.tipo === 'ordem') return { t: 'ordem', p: jg.pergunta, o: jg.opcoes, c: jg.certa, rev: k + 1 };
+    if (jg.tipo === 'pares') return { t: 'pares', p: jg.pergunta, o: jg.opcoes, r: jg.direita, c: jg.certa, rev: k + 1 };
+    if (jg.tipo === 'digitar') return { t: 'digitar', p: jg.pergunta, c: jg.certa, rev: k + 1 };
+    return { p: jg.pergunta, o: jg.opcoes, c: jg.certa, rev: k + 1, a: jg.areas, ot: jg.ouvir };
+  }
+  /* o contador discreto no canto: "7 responderam" e, depois de revelar, "5 de 7 acertaram". Só consulta (a cada 3 s)
+     enquanto a TV está num slide de jogo com a aula aberta. */
+  var placarT = null, placarGer = 0;
+  function aulaPlacar() {
+    clearTimeout(placarT); var ger = ++placarGer;   /* troca de slide no meio da consulta: só a mais nova continua */
+    var el = $('aulaPlacar'), sl = deck && deck.slides[ci];
+    if (aula && sl && sl.tipo === 'avaliacao' && tocando && atual.id === aula.ativId) { aulaAvalPlacar(ger); return; }
+    if (!aula || !sl || sl.tipo !== 'jogo' || !tocando || atual.id !== aula.ativId) { el.hidden = true; return; }
+    var n = aulaAgora() - et, a = aula;
+    aulaApi({ op: 'placar', aula: a.id, chave: a.chave }, 8000).then(function (r) {
+      if (ger !== placarGer || a !== aula || !r || !r.ok) return;
+      var g = r.jogos && r.jogos[n];
+      if (!g) { el.hidden = true; return; }
+      if (g.revelado && et >= 1) aulaGrafico(sl.el, g);
+      var es = aulaLingua() === 'es';
+      el.textContent = g.revelado ? '✅ ' + g.certos + (es ? ' de ' : ' of ') + g.resp + (es ? ' acertaron' : ' got it right')
+        : '👥 ' + g.resp + (es ? (g.resp === 1 ? ' respondió' : ' respondieron') : (g.resp === 1 ? ' answered' : ' answered'));
+      el.hidden = false;
+    }, function () {}).then(function () { if (ger === placarGer && a === aula) placarT = setTimeout(aulaPlacar, 3000); });
   }
   function aulaFinaliza() {
     if (!aula || aula.fim) return;
@@ -898,13 +1397,14 @@
       return aulaApi({ op: 'fim', aula: a.id, chave: a.chave });
     }).then(function (r) {
       if (!r || !r.ok) throw new Error(r && r.error || 'não deu');
-      a.fim = true; aulaTexto();
+      a.fim = true; aulaTexto(); aulaPaga();
     }).catch(function (e) { $('qrAulaTxt').textContent = 'Não consegui finalizar (' + e.message + '). Tente de novo.'; })
       .then(function () { b.disabled = false; b.textContent = '✓ Finalizar e liberar a atividade inteira'; });
   }
   /* trocar de atividade ou sair: a aula fica com o que já foi mostrado (o professor finaliza se quiser liberar tudo) */
-  function aulaSolta() { aula = null; $('aulaCanto').hidden = true; $('qrAula').hidden = true; aulaBotao(); }
-  $('bAlunos').onclick = alunosBotao; $('aulaFim').onclick = aulaFinaliza;
+  function aulaSolta() { aula = null; clearTimeout(placarT); $('aulaPlacar').hidden = true; $('aulaCanto').hidden = true; $('qrAula').hidden = true; aulaBotao(); }
+  $('aulaAval').onclick = aulaAvalVer; $('avalVerFecha').onclick = function () { $('avalVer').hidden = true; };
+  $('bAlunos').onclick = alunosBotao; $('aulaFim').onclick = aulaFinaliza; $('aulaFd').onclick = aulaFdTroca;
   $('aulaCopia').onclick = function () {
     if (!aula) return;
     var b = $('aulaCopia'), url = AULA_URL + '#a=' + aula.id, txt = '💬 Conversação ao vivo: abra numa aba e acompanhe os slides → ' + url;
@@ -914,9 +1414,115 @@
   $('aulaCanto').onclick = function () { aulaTexto(); $('qrAula').hidden = false; };
   $('qrAula').onclick = function (e) { if (e.target.id === 'qrAula' || e.target.id === 'qrAulaFecha') $('qrAula').hidden = true; };
 
+  /* ── FERRAMENTAS DA AULA (27/11/2026) ──
+     ⏱ CRONÔMETRO DO PAIR WORK: começa sozinho quando a TV CHEGA num slide de conversa em dupla (nas atividades do
+     Conversation Maker; no PDF, o "▶ Agora" do ⚙), recomeça a cada slide de conversa e some fora deles. Clique pausa;
+     no zero toca o sino e pulsa. Ligado por padrão; o professor desliga no ⚙.
+     🎲 SORTEIO: desligado por padrão; ligado no ⚙, aparece na barra. Sorteia um nome da turma de agora (a grade da
+     Minha semana, já no aparelho: nenhuma chamada nova) sem repetir até acabar a lista, ou forma duplas (sobrou um,
+     vira trio). O que a turma lê sai na língua da aula; os botões do professor, em português. */
+  var FERR = { crono: 'conv:crono', min: 'conv:cronoMin', sorteio: 'conv:sorteio' };
+  function pref(k, padrao) { try { var v = localStorage.getItem(FERR[k]); return v == null ? padrao : v; } catch (e) { return padrao; } }
+  function guardaPref(k, v) { try { localStorage.setItem(FERR[k], String(v)); } catch (e) {} }
+  var cronoLig = pref('crono', '1') === '1', cronoMin = Math.max(1, Math.min(15, parseInt(pref('min', '3'), 10) || 3)), sorteioLig = pref('sorteio', '0') === '1';
+  var crono = { fim: 0, resta: 0, t: null, pausa: false, total: 0, slide: -1 };
+  function cronoDesenha() {
+    var seg = Math.max(0, Math.ceil(crono.resta / 1000)), el = $('crono');
+    $('cronoT').textContent = Math.floor(seg / 60) + ':' + ('0' + seg % 60).slice(-2);
+    $('cronoArco').style.strokeDashoffset = String(326.7 * (1 - (crono.total ? crono.resta / crono.total : 0)));
+    el.classList.toggle('pouco', seg > 0 && seg <= 30); el.classList.toggle('zero', seg === 0); el.classList.toggle('pausa', crono.pausa);
+  }
+  function cronoTique() {
+    clearTimeout(crono.t);
+    if (crono.pausa) return;
+    crono.resta = Math.max(0, crono.fim - Date.now()); cronoDesenha();
+    if (crono.resta <= 0) { cronoSino(); return; }
+    crono.t = setTimeout(cronoTique, 250);
+  }
+  function cronoComeca() {
+    crono.total = crono.resta = cronoMin * 60000; crono.fim = Date.now() + crono.total; crono.pausa = false;
+    $('crono').hidden = false; cronoTique();
+  }
+  function cronoPara() { clearTimeout(crono.t); $('crono').hidden = true; crono.slide = -1; }
+  function cronoSino() {
+    try { var c = new (window.AudioContext || window.webkitAudioContext)(), t0 = c.currentTime;
+      [[1046.5, 0], [784, .22], [1046.5, .44], [1318.5, .66]].forEach(function (n) { var o = c.createOscillator(), g = c.createGain(); o.frequency.value = n[0];
+        g.gain.setValueAtTime(0, t0 + n[1]); g.gain.linearRampToValueAtTime(.25, t0 + n[1] + .02); g.gain.exponentialRampToValueAtTime(.001, t0 + n[1] + .7);
+        o.connect(g); g.connect(c.destination); o.start(t0 + n[1]); o.stop(t0 + n[1] + .8); }); } catch (e) {}
+  }
+  /* chamado a cada clique da TV: chegou num slide de conversa (outro, não o mesmo) → recomeça; saiu deles → some */
+  function cronoNoSlide() {
+    if (!deck || !tocando) return;
+    var sl = deck.slides[ci], conversa = sl && sl.tipo === 'conversa';
+    if (!conversa) { if (crono.slide !== -2) cronoPara(); return; }
+    if (!cronoLig || crono.slide === ci) return;
+    crono.slide = ci; cronoComeca();
+  }
+  $('crono').onclick = function (e) {
+    if (e.target.id === 'cronoDe') { cronoComeca(); return; }
+    if (e.target.id === 'cronoX') { cronoPara(); return; }
+    if (crono.resta <= 0) return;
+    crono.pausa = !crono.pausa;
+    if (!crono.pausa) crono.fim = Date.now() + crono.resta;
+    cronoTique(); cronoDesenha();
+  };
+  function ferrDesenha() {
+    $('fCrono').checked = cronoLig; $('fSorteio').checked = sorteioLig; $('fMin').textContent = cronoMin;
+    $('bSorteio').hidden = !sorteioLig;
+  }
+  $('bFerr').onclick = function (e) { e.stopPropagation(); ferrDesenha(); $('ferr').hidden = !$('ferr').hidden; };
+  $('ferr').onclick = function (e) { e.stopPropagation(); };
+  document.addEventListener('click', function () { $('ferr').hidden = true; });
+  $('fCrono').onchange = function () { cronoLig = this.checked; guardaPref('crono', cronoLig ? 1 : 0); if (!cronoLig) cronoPara(); else { crono.slide = -1; cronoNoSlide(); } };
+  $('fSorteio').onchange = function () { sorteioLig = this.checked; guardaPref('sorteio', sorteioLig ? 1 : 0); ferrDesenha(); };
+  $('fMenos').onclick = function () { cronoMin = Math.max(1, cronoMin - 1); guardaPref('min', cronoMin); ferrDesenha(); };
+  $('fMais').onclick = function () { cronoMin = Math.min(15, cronoMin + 1); guardaPref('min', cronoMin); ferrDesenha(); };
+  $('fJa').onclick = function () { crono.slide = -2; cronoComeca(); $('ferr').hidden = true; };
+  ferrDesenha();
+
+  var sorPool = [], sorUsados = {};
+  function sorNomes() {
+    var t = typeof fiskTurmaDeAgora === 'function' ? fiskTurmaDeAgora(s) : null;
+    if (!t && typeof fiskTurmaProxima === 'function') t = fiskTurmaProxima(s);
+    return (t && t.nomes) || [];
+  }
+  function sorTxt(k) {
+    var es = aulaLingua() === 'es';
+    return { tit: es ? '🎲 ¿Quién sigue?' : "🎲 Who's next?", dup: es ? '👥 Parejas' : '👥 Pairs', vazio: es ? 'Sin lista de la clase' : 'No class list' }[k];
+  }
+  function sorteia() {
+    var nomes = sorNomes(); $('sorDuplas').hidden = true; $('sorNome').hidden = false; $('sorTit').textContent = sorTxt('tit');
+    if (!nomes.length) { $('sorNome').textContent = sorTxt('vazio'); $('sorNome').className = ''; return; }
+    var rep = $('sorRep').checked, livres = nomes.filter(function (n) { return !rep || !sorUsados[n]; });
+    if (!livres.length) { sorUsados = {}; livres = nomes.slice(); }
+    var escolhido = livres[Math.floor(Math.random() * livres.length)], el = $('sorNome'), k = 0, passos = 22;
+    el.className = 'rola';
+    /* a roleta desacelera: cada troca de nome demora um pouco mais que a anterior */
+    (function gira() {
+      if (k < passos) { el.textContent = nomes[Math.floor(Math.random() * nomes.length)]; k++; setTimeout(gira, 40 + k * k * 0.9); return; }
+      el.textContent = escolhido; el.className = 'saiu'; sorUsados[escolhido] = 1; cronoSino();
+    })();
+  }
+  function duplas() {
+    var nomes = sorNomes().slice(); $('sorNome').hidden = true; $('sorTit').textContent = sorTxt('dup');
+    for (var i = nomes.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), x = nomes[i]; nomes[i] = nomes[j]; nomes[j] = x; }
+    var grupos = []; for (var k = 0; k + 1 < nomes.length; k += 2) grupos.push([nomes[k], nomes[k + 1]]);
+    if (nomes.length % 2) { if (grupos.length) grupos[grupos.length - 1].push(nomes[nomes.length - 1]); else grupos.push([nomes[0]]); }
+    var box = $('sorDuplas'); box.hidden = false; box.innerHTML = '';
+    if (!grupos.length) { box.textContent = sorTxt('vazio'); return; }
+    grupos.forEach(function (g, i) { var d = document.createElement('div'); d.style.animationDelay = (i * 0.08) + 's'; d.textContent = (i + 1) + '. ' + g.join(' & '); box.appendChild(d); });
+  }
+  $('bSorteio').onclick = function () { $('sorteio').hidden = false; sorteia(); };
+  $('sorDeNovo').onclick = sorteia; $('sorDup').onclick = duplas; $('sorFecha').onclick = function () { $('sorteio').hidden = true; };
+
   var q = new URLSearchParams(location.search), qId = q.get('id'), qSem = q.get('semana');
   carregaLista(qSem || '', qId ? function () { abre(qId); } : null);
   pedeMinhas().then(function (itens) { ultMinhas = itens; if (dados && !$('lista').hidden) { juntaMinhas(itens); desenhaLista(); } });
+  pedeBuddy().then(function (itens) { ultBuddy = itens; if (dados && !$('lista').hidden) { juntaBuddy(itens); desenhaLista(); } });
+  pedePaises().then(function (itens) { ultPaises = itens; if (dados && !$('lista').hidden) { juntaPaises(itens); desenhaLista(); } });
+  pedeYt().then(function (itens) { ultYt = itens; if (dados && !$('lista').hidden) { juntaYt(itens); desenhaLista(); } });
+  pedeVida().then(function (itens) { ultVida = itens; if (dados && !$('lista').hidden) { juntaVida(itens); desenhaLista(); } });
+  pedeAcervo().then(function (itens) { ultAcervo = itens; if (dados && !$('lista').hidden) { juntaAcervo(itens); desenhaLista(); } });
   try { if (localStorage.getItem('fisk_theme') === 'dark') document.body.classList.add('theme-dark'); } catch (e) {}
   fiskApresEnviar(false);   /* o que ficou na fila de uma aula sem internet */
   try { fiskRegistrarUso('Conversação da semana', 'conversacao'); } catch (e) {}

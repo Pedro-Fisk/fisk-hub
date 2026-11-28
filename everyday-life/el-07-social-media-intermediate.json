@@ -1,0 +1,140 @@
+{
+ "lesson": {
+  "coverTitle": "#07 – Social Media",
+  "coverLevel": "Intermediate",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Social Media",
+  "objectives": [],
+  "material": [
+   "PowerPoint activity"
+  ],
+  "duracao": "20 minutes",
+  "fotosSerie": {
+   "capa": "07-basic/capa.jpg",
+   "iw": "07-basic/iw.jpg",
+   "jogo": "",
+   "conv": "07-basic/conv.jpg",
+   "icone": "07-basic/icone.png"
+  },
+  "vocabulary": [
+   {
+    "word": "social media",
+    "translation": "mídia social"
+   },
+   {
+    "word": "(to) text",
+    "translation": "enviar mensagem"
+   },
+   {
+    "word": "How often...?",
+    "translation": "com que frequência, quantas vezes...?"
+   },
+   {
+    "word": "(to) check",
+    "translation": "checar, verificar, olhar"
+   },
+   {
+    "word": "(to) spend time",
+    "translation": "passar tempo"
+   },
+   {
+    "word": "advantage",
+    "translation": "vantagem"
+   },
+   {
+    "word": "disadvantage",
+    "translation": "disadvantage"
+   }
+  ],
+  "notas": [],
+  "languageGame": [],
+  "conversation": [
+   {
+    "question": "What’s your favorite social media?",
+    "modelAnswers": [
+     "FACEBOOK / INSTAGRAM / WHATSAPP / SNAPCHAT"
+    ]
+   },
+   {
+    "question": "What social media don’t you like to use? Why?",
+    "modelAnswers": []
+   },
+   {
+    "question": "How often do you update your status on social media?",
+    "modelAnswers": [
+     "ALMOST NEVER / ALWAYS / NEVER"
+    ]
+   },
+   {
+    "question": "How many hours do you spend on social media a day?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Would you like to reduce your hours doing this?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What’s the biggest advantage of social media?",
+    "modelAnswers": []
+   },
+   {
+    "question": "And the biggest disadvantage?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Who’s the person you text the most?",
+    "modelAnswers": []
+   },
+   {
+    "question": "About what do you usually text friends and family?",
+    "modelAnswers": [
+     "WORK / STUDIES / GOSSIPS / POLITICS"
+    ]
+   },
+   {
+    "question": "How often do you check your phone?",
+    "modelAnswers": [
+     "CONSTANTLY / NEVER / SOMETIMES / OTHER"
+    ]
+   },
+   {
+    "question": "Can you imagine your life without social media?",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about social media?"
+   }
+  ],
+  "semRevisao": true,
+  "serie": "everyday-life"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "everyday",
+  "imgs": "everyday-life/img/",
+  "faixa1": "#00ACA0",
+  "faixa2": "#00B0F0",
+  "destaque": "#FFC000",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#000000",
+   "fundo2": "#111111",
+   "prim": "#FFC000",
+   "sec": "#00ACA0",
+   "dest": "#FFC000",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "house",
+  "icones": [
+   "house"
+  ]
+ }
+}

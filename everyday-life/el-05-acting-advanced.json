@@ -1,0 +1,132 @@
+{
+ "lesson": {
+  "coverTitle": "#05 – Acting",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Acting",
+  "objectives": [
+   "Talking about acting, actors and actresses.",
+   "Expanding vocabulary."
+  ],
+  "material": [
+   "PowerPoint activity"
+  ],
+  "duracao": "20 minutes",
+  "fotosSerie": {
+   "capa": "05-basic/capa.jpg",
+   "iw": "05-basic/iw.jpg",
+   "jogo": "",
+   "conv": "05-basic/iw.jpg",
+   "icone": "05-basic/icone.png"
+  },
+  "vocabulary": [
+   {
+    "word": "[to] play",
+    "translation": "atuar"
+   },
+   {
+    "word": "acting",
+    "translation": "atuação"
+   },
+   {
+    "word": "character",
+    "translation": "personagem"
+   },
+   {
+    "word": "soap opera",
+    "translation": "novela"
+   },
+   {
+    "word": "series",
+    "translation": "série ou séries"
+   }
+  ],
+  "notas": [
+   {
+    "titulo": "Attention!",
+    "texto": "“serie” doesn’t exist!"
+   }
+  ],
+  "languageGame": [],
+  "conversation": [
+   {
+    "question": "Tell me an actor/actress you like.",
+    "modelAnswers": []
+   },
+   {
+    "question": "What movie was this person in?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Is there an actor/actress you don’t feel like watching in movies?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What kind of show do you prefer: theater plays or musical shows?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Who is the best actor/actress you’ve seen performing?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you prefer to watch movies, series or soap operas?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What is your favorite movie/series?",
+    "modelAnswers": []
+   },
+   {
+    "question": "How often are you into “series marathon”?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you have a favorite character?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What character would you like to play if you were an actor/actress?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What character would you never play? Why?",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about acting?"
+   }
+  ],
+  "semRevisao": true,
+  "serie": "everyday-life"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "everyday",
+  "imgs": "everyday-life/img/",
+  "faixa1": "#9D3D23",
+  "faixa2": "#65BBBF",
+  "destaque": "#FFC000",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#000000",
+   "fundo2": "#111111",
+   "prim": "#FFC000",
+   "sec": "#9D3D23",
+   "dest": "#FFC000",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "house",
+  "icones": [
+   "house"
+  ]
+ }
+}

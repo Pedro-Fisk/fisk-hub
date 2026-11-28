@@ -1,0 +1,272 @@
+{
+ "lesson": {
+  "coverTitle": "Countries · Australia",
+  "coverLevel": "Basic & Teens",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Australia",
+  "objectives": [
+   "Talking about Australian culture.",
+   "Developing conversation skills."
+  ],
+  "pais": {
+   "nome": "Australia",
+   "oficial": "",
+   "num": 8,
+   "cor": "#00008b",
+   "bandeira": "au/bandeira.svg",
+   "capa": "au/capa.jpg",
+   "capaLocal": "Sydney Opera House",
+   "mapa": "",
+   "texto": "Australia is a country and a continent at once. It is the home of animals like the kangaroo and the koala.\nBefore the British arrived in 1788, Aboriginal peoples already spoke hundreds of languages there. Words like kangaroo, boomerang and koala came into English from them.",
+   "fatos": [
+    [
+     "Capital",
+     "Canberra"
+    ],
+    [
+     "Languages",
+     "English and more than 100 Indigenous languages"
+    ],
+    [
+     "Currency",
+     "Australian dollar (A$)"
+    ],
+    [
+     "Population",
+     "≈ 27 million"
+    ]
+   ]
+  },
+  "introText": "Today, we’ll talk about Australia. We’ll take a look at Aussie English, food, animals and famous places.",
+  "introSub": "Aussie English, food, animals and famous places",
+  "warmup": [
+   {
+    "question": "How well do you know Australia?",
+    "modelAnswers": [
+     "I don’t know a lot about it.",
+     "I know a little: kangaroos and koalas!"
+    ]
+   },
+   {
+    "question": "Would you like to visit Australia?",
+    "modelAnswers": [
+     "Yes, I would. It looks amazing!",
+     "No, I wouldn’t. It’s too far."
+    ]
+   }
+  ],
+  "fotos": [
+   {
+    "img": "au/uluru.jpg",
+    "titulo": "Uluru",
+    "local": "Uluru, in the centre of Australia",
+    "texto": "Uluru is the red monolith in the centre of the country. It is sacred to the Anangu people."
+   },
+   {
+    "img": "au/reef.jpg",
+    "local": "Great Barrier Reef, Queensland",
+    "texto": "The Great Barrier Reef is the largest coral reef system on the planet."
+   },
+   {
+    "img": "au/bondi.jpg",
+    "titulo": "Christmas on the beach",
+    "local": "Bondi Beach, Sydney",
+    "texto": "Bondi is one of the best-known beaches in Sydney, famous for surfing. December is summer in Australia, and many people spend Christmas at the beach!"
+   },
+   {
+    "img": "au/vegemite.jpg",
+    "titulo": "Brekkie",
+    "local": "Vegemite on toast",
+    "texto": "Vegemite is a dark, very salty spread. Because it is so salty, Australians put only a thin layer on their toast."
+   },
+   {
+    "img": "au/lamington.jpg",
+    "local": "Lamington",
+    "texto": "A cube of sponge cake covered in chocolate and coconut: a classic Australian sweet."
+   }
+  ],
+  "vocabulary": [
+   {
+    "word": "g’day",
+    "translation": "olá, e aí"
+   },
+   {
+    "word": "mate",
+    "translation": "amigo, cara, parceiro"
+   },
+   {
+    "word": "arvo",
+    "translation": "tarde (afternoon)"
+   },
+   {
+    "word": "brekkie",
+    "translation": "café da manhã (breakfast)"
+   },
+   {
+    "word": "barbie",
+    "translation": "churrasco (barbecue)"
+   },
+   {
+    "word": "no worries",
+    "translation": "sem problema, de nada"
+   },
+   {
+    "word": "heaps",
+    "translation": "muito, um montão"
+   },
+   {
+    "word": "thongs",
+    "translation": "chinelos de dedo"
+   }
+  ],
+  "vocabTitulo": "Aussie English",
+  "vocabSub": "words you will hear in Australia · pay attention to pronunciation",
+  "video": null,
+  "leitura": null,
+  "languageGame": [
+   {
+    "question": "Uluru is sacred to the Anangu people.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "Australians put a thick layer of Vegemite on their toast.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": "Vegemite is very salty, so they use only a thin layer."
+   },
+   {
+    "question": "In Australia, Christmas is in the summer.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "The words kangaroo and koala came into English from Spanish.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": "They came from Aboriginal languages."
+   },
+   {
+    "question": "The Great Barrier Reef is the largest coral reef system on the planet.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   }
+  ],
+  "jogoTitulo": "True or False?",
+  "conversation": [
+   {
+    "question": "Would you like to see a kangaroo or a koala?",
+    "modelAnswers": [
+     "I’d like to see a (koala).",
+     "I’d like to see both!"
+    ]
+   },
+   {
+    "question": "Do you like the beach?",
+    "modelAnswers": [
+     "Yes, I do. I love the beach!",
+     "No, I don’t. I prefer the mountains."
+    ]
+   },
+   {
+    "question": "Would you like to spend Christmas on the beach, like many Australians?",
+    "modelAnswers": [
+     "Yes, I would. It sounds fun!",
+     "No, I wouldn’t. I prefer Christmas at home."
+    ]
+   },
+   {
+    "question": "What do you usually eat for brekkie (breakfast)?",
+    "modelAnswers": [
+     "I usually eat (bread and butter).",
+     "I usually have (coffee with milk)."
+    ]
+   },
+   {
+    "question": "Would you like to try Vegemite on toast?",
+    "modelAnswers": [
+     "Yes, I would.",
+     "No, I wouldn’t. It’s too salty for me!"
+    ]
+   },
+   {
+    "question": "What’s your favorite sweet?",
+    "modelAnswers": [
+     "My favorite sweet is (brigadeiro).",
+     "I don’t like sweets."
+    ]
+   },
+   {
+    "question": "Australians say “mate” to friends and even to strangers. What do you call your friends?",
+    "modelAnswers": [
+     "I call my friends (cara / mano / amiga)."
+    ]
+   },
+   {
+    "question": "Do you like to shorten words, like “brekkie” for breakfast?",
+    "modelAnswers": [
+     "Yes, I do. I say (“niver”) for (“aniversário”).",
+     "No, I don’t."
+    ]
+   },
+   {
+    "question": "Do you like barbecues (barbies)?",
+    "modelAnswers": [
+     "Yes, I do. We have barbecues on (Sundays).",
+     "No, I don’t."
+    ]
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about Australia?"
+   },
+   {
+    "question": "Which other countries would you like to learn more about? I’d like to know more about... (Canada)."
+   }
+  ],
+  "serie": "countries"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "countries",
+  "imgs": "countries/img/",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#ffffff",
+   "fundo2": "#eef3f8",
+   "prim": "#16365c",
+   "sec": "#00008b",
+   "dest": "#00008b",
+   "txt": "#16365c"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "globe-showing-americas",
+  "icones": [
+   "globe-showing-americas"
+  ]
+ }
+}

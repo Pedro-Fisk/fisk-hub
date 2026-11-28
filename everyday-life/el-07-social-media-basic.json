@@ -1,0 +1,147 @@
+{
+ "lesson": {
+  "coverTitle": "#07 – Social Media",
+  "coverLevel": "Basic & Teens",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Social Media",
+  "objectives": [],
+  "material": [
+   "PowerPoint activity"
+  ],
+  "duracao": "20 minutes",
+  "fotosSerie": {
+   "capa": "07-basic/capa.jpg",
+   "iw": "07-basic/iw.jpg",
+   "jogo": "",
+   "conv": "07-basic/conv.jpg",
+   "icone": "07-basic/icone.png"
+  },
+  "vocabulary": [
+   {
+    "word": "social media",
+    "translation": "mídia social"
+   },
+   {
+    "word": "(to) text",
+    "translation": "enviar mensagem"
+   },
+   {
+    "word": "How often...?",
+    "translation": "com que frequência, quantas vezes...?"
+   },
+   {
+    "word": "(to) check",
+    "translation": "checar, verificar, olhar"
+   },
+   {
+    "word": "(to) spend time",
+    "translation": "passar tempo"
+   },
+   {
+    "word": "advantage",
+    "translation": "vantagem"
+   },
+   {
+    "word": "disadvantage",
+    "translation": "disadvantage"
+   }
+  ],
+  "notas": [],
+  "languageGame": [],
+  "conversation": [
+   {
+    "question": "What’s your favorite social media?",
+    "modelAnswers": [
+     "My favorite social media is ____.",
+     "FACEBOOK / INSTAGRAM / WHATSAPP / SNAPCHAT/TWITTER"
+    ]
+   },
+   {
+    "question": "What social media don’t you like to use?",
+    "modelAnswers": [
+     "I don’t like to use _______."
+    ]
+   },
+   {
+    "question": "How often do you update your status on social media?",
+    "modelAnswers": [
+     "I _______ update my status."
+    ]
+   },
+   {
+    "question": "How many hours do you spend on social media a day?",
+    "modelAnswers": [
+     "I spend __ hours on social media a day.",
+     "Actually, I don’t know how many hours I spend."
+    ]
+   },
+   {
+    "question": "Would you like to reduce your hours doing this?",
+    "modelAnswers": [
+     "No, I wouldn’t like to reduce them.",
+     "Yes, I would like to reduce them."
+    ]
+   },
+   {
+    "question": "What’s the biggest advantage of social media?",
+    "modelAnswers": [
+     "It saves time. / It connects people. / It’s fun."
+    ]
+   },
+   {
+    "question": "And the biggest disadvantage?",
+    "modelAnswers": [
+     "I don’t have time to study.",
+     "I don’t have time for our family."
+    ]
+   },
+   {
+    "question": "Who’s the person you text the most?",
+    "modelAnswers": [
+     "I text my _______ the most."
+    ]
+   },
+   {
+    "question": "How often do you check your phone?",
+    "modelAnswers": [
+     "I _____ check my phone.",
+     "CONSTANTLY / NEVER / SOMETIMES / OTHER"
+    ]
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about social media?"
+   }
+  ],
+  "semRevisao": true,
+  "serie": "everyday-life"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "everyday",
+  "imgs": "everyday-life/img/",
+  "faixa1": "#00ACA0",
+  "faixa2": "#00B0F0",
+  "destaque": "#FFC000",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#000000",
+   "fundo2": "#111111",
+   "prim": "#FFC000",
+   "sec": "#00ACA0",
+   "dest": "#FFC000",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "house",
+  "icones": [
+   "house"
+  ]
+ }
+}

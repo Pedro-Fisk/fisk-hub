@@ -1,0 +1,173 @@
+{
+ "lesson": {
+  "coverTitle": "#03 – Going Shopping",
+  "coverLevel": "Intermediate",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Going Shopping",
+  "objectives": [
+   "Talking about going shopping.",
+   "Expanding vocabulary.",
+   "Learning new expressions."
+  ],
+  "material": [
+   "PowerPoint activity"
+  ],
+  "duracao": "20 minutes",
+  "fotosSerie": {
+   "capa": "03-basic/capa.jpg",
+   "iw": "03-basic/iw.jpg",
+   "jogo": "",
+   "conv": "03-basic/iw.jpg",
+   "icone": "03-basic/icone.png"
+  },
+  "vocabulary": [
+   {
+    "word": "(to) spend",
+    "translation": "gastar"
+   },
+   {
+    "word": "on sale",
+    "translation": "na promoção"
+   },
+   {
+    "word": "(to) look for",
+    "translation": "procurar"
+   },
+   {
+    "word": "(to) save money",
+    "translation": "economizar"
+   },
+   {
+    "word": "(to) shop for",
+    "translation": "comprar"
+   },
+   {
+    "word": "(to) hate",
+    "translation": "odiar"
+   },
+   {
+    "word": "(to) go shopping",
+    "translation": "fazer compras"
+   },
+   {
+    "word": "(to) go to the shopping mall",
+    "translation": "ir ao shopping (lugar)"
+   }
+  ],
+  "notas": [],
+  "languageGame": [
+   {
+    "question": "Comprar.",
+    "options": [
+     "(to) shop for.",
+     "(to) sell.",
+     "(to) save money."
+    ],
+    "correctIndex": 0
+   },
+   {
+    "question": "Procurar.",
+    "options": [
+     "(to) understand.",
+     "(to) look for.",
+     "(to) find."
+    ],
+    "correctIndex": 1
+   },
+   {
+    "question": "Pagar à vista.",
+    "options": [
+     "(to) pay a lot of money.",
+     "(to) pay cash.",
+     "(to) use more money."
+    ],
+    "correctIndex": 1
+   },
+   {
+    "question": "Em promoção, liquidação.",
+    "options": [
+     "In money.",
+     "In cash.",
+     "On sale."
+    ],
+    "correctIndex": 2
+   }
+  ],
+  "conversation": [
+   {
+    "question": "Do you enjoy spending money or do you prefer to save it?",
+    "modelAnswers": []
+   },
+   {
+    "question": "How often do you go shopping at the mall?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you usually look for sales when you go shopping?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Who likes to spend money and save money in your family?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Who likes to shop online in your house?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What are the advantages and disadvantages of shopping on line?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What are the advantages and disadvantages of shopping in stores?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you prefer to pay cash or to use the credit card for shopping?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What do you like to spend more money on?",
+    "modelAnswers": []
+   },
+   {
+    "question": "And what do you hate spending money on?",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about going shopping?"
+   }
+  ],
+  "semRevisao": true,
+  "serie": "everyday-life"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "everyday",
+  "imgs": "everyday-life/img/",
+  "faixa1": "#002060",
+  "faixa2": "#FFC000",
+  "destaque": "#FFC000",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#000000",
+   "fundo2": "#111111",
+   "prim": "#FFC000",
+   "sec": "#002060",
+   "dest": "#FFC000",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "house",
+  "icones": [
+   "house"
+  ]
+ }
+}

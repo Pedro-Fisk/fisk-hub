@@ -1,0 +1,182 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · Tricky Words",
+  "coverLevel": "Basic",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Spelling Traps",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing tricky words.",
+   "Developing pronunciation."
+  ],
+  "material": [
+   "PowerPoint activity",
+   "Buddy Talks AUDIO FILE - words we say wrong"
+  ],
+  "duracao": "10 minutes",
+  "vocabulary": [
+   {
+    "word": "chocolate",
+    "translation": ""
+   },
+   {
+    "word": "vegetable",
+    "translation": ""
+   },
+   {
+    "word": "clothes",
+    "translation": ""
+   },
+   {
+    "word": "business",
+    "translation": ""
+   },
+   {
+    "word": "Wednesday",
+    "translation": ""
+   },
+   {
+    "word": "comfortable",
+    "translation": ""
+   },
+   {
+    "word": "favorite",
+    "translation": ""
+   },
+   {
+    "word": "different",
+    "translation": ""
+   },
+   {
+    "word": "interesting",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll practice words that are shorter than they look when we say them. They’re... …TRICKY WORDS! We don’t say every letter we can see: chocolate\n\nChocolate has three sounds, not four: cho-co-late is wrong. If we say every letter, the word gets one syllable too many.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll practice words that are shorter than they look when we say them. They’re...",
+   "…TRICKY WORDS!\nWe don’t say every letter we can see:\nchocolate",
+   "Chocolate has three sounds, not four: cho-co-late is wrong.",
+   "If we say every letter, the word gets one syllable too many."
+  ],
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 1 - L 10 - pg 87",
+    "id": "1Eu58CCufrFZrLshtpGx1JvCE2lj5DIFe"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 1 - L 10 - pg 87",
+    "id": "1pdE8prAg_Pcv0fCanZZVa9ckJ8vYCEZg"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: What is your favorite food?",
+    "modelAnswers": [
+     "B: Chocolate! And vegetables too."
+    ]
+   },
+   {
+    "question": "A: What day is the test?",
+    "modelAnswers": [
+     "B: On Wednesday, after the class."
+    ]
+   },
+   {
+    "question": "A: Is your chair comfortable?",
+    "modelAnswers": [
+     "B: Yes, but the room is different."
+    ]
+   },
+   {
+    "question": "Who is your favorite friend? Why?",
+    "modelAnswers": [
+     "My favorite friend is..."
+    ]
+   },
+   {
+    "question": "What is different about your best friend?",
+    "modelAnswers": [
+     "He / she is different because..."
+    ]
+   },
+   {
+    "question": "What do you do together on Wednesday?",
+    "modelAnswers": [
+     "On Wednesday we..."
+    ]
+   },
+   {
+    "question": "Is your friend comfortable talking to you?",
+    "modelAnswers": [
+     "Yes, because we..."
+    ]
+   },
+   {
+    "question": "What food do your friends like?",
+    "modelAnswers": [
+     "They like chocolate and..."
+    ]
+   },
+   {
+    "question": "What is interesting about your group?",
+    "modelAnswers": [
+     "The interesting thing is..."
+    ]
+   },
+   {
+    "question": "What clothes do you and your friends wear?",
+    "modelAnswers": [
+     "We wear..."
+    ]
+   },
+   {
+    "question": "What annoys you in a friend?",
+    "modelAnswers": [
+     "It annoys me when..."
+    ]
+   },
+   {
+    "question": "What makes a friendship good?",
+    "modelAnswers": [
+     "A good friendship is..."
+    ]
+   }
+  ],
+  "languageGame": [],
+  "evaluation": [
+   {
+    "question": "Which word surprised you the most today?"
+   }
+  ],
+  "temaDaConversa": "Your friends",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "bear",
+  "icones": [
+   "bear"
+  ]
+ }
+}

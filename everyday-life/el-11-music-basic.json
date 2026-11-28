@@ -1,0 +1,119 @@
+{
+ "lesson": {
+  "coverTitle": "#11 – Music",
+  "coverLevel": "Basic & Teens",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Music",
+  "objectives": [],
+  "material": [
+   "PowerPoint activity"
+  ],
+  "duracao": "20 minutes",
+  "fotosSerie": {
+   "capa": "11-basic/capa.jpg",
+   "iw": "11-basic/iw.jpg",
+   "jogo": "",
+   "conv": "11-basic/conv.jpg",
+   "icone": "11-basic/icone.png"
+  },
+  "vocabulary": [
+   {
+    "word": "genre",
+    "translation": "gênero (musical)"
+   },
+   {
+    "word": "instrument",
+    "translation": "instrumento"
+   },
+   {
+    "word": "(to) play",
+    "translation": "tocar,brincar"
+   },
+   {
+    "word": "song",
+    "translation": "música, canção (≠ music)"
+   },
+   {
+    "word": "(to) be able to",
+    "translation": "ser capaz de"
+   }
+  ],
+  "notas": [],
+  "languageGame": [],
+  "conversation": [
+   {
+    "question": "How often do you listen to songs in English?",
+    "modelAnswers": [
+     "I _____ listen to songs in English.",
+     "always / sometimes / never"
+    ]
+   },
+   {
+    "question": "Can music help you focus?",
+    "modelAnswers": [
+     "Yes, it can. / No, it can’t."
+    ]
+   },
+   {
+    "question": "Did you use to listen to music when you were a child?",
+    "modelAnswers": [
+     "Yes, I used to listen to music when I was a child.",
+     "No, I didn’t use to listen to music when I was a child."
+    ]
+   },
+   {
+    "question": "Do you have a favorite music genre?",
+    "modelAnswers": [
+     "Yes, I do. / No, I don’t."
+    ]
+   },
+   {
+    "question": "Are you able to play an instrument?",
+    "modelAnswers": [
+     "Yes, I am able to play _________.",
+     "No, I am not able to play an instrument."
+    ]
+   },
+   {
+    "question": "Which instrument would you like to play?",
+    "modelAnswers": [
+     "I would like to play..."
+    ]
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about music?"
+   }
+  ],
+  "semRevisao": true,
+  "serie": "everyday-life"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "everyday",
+  "imgs": "everyday-life/img/",
+  "faixa1": "#00ACA0",
+  "faixa2": "#00B0F0",
+  "destaque": "#FFC000",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#000000",
+   "fundo2": "#111111",
+   "prim": "#FFC000",
+   "sec": "#00ACA0",
+   "dest": "#FFC000",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "house",
+  "icones": [
+   "house"
+  ]
+ }
+}

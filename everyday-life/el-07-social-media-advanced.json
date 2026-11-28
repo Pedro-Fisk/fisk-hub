@@ -1,0 +1,144 @@
+{
+ "lesson": {
+  "coverTitle": "#07 – Social Media",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Social Media",
+  "objectives": [],
+  "material": [
+   "PowerPoint activity"
+  ],
+  "duracao": "20 minutes",
+  "fotosSerie": {
+   "capa": "07-basic/capa.jpg",
+   "iw": "07-basic/iw.jpg",
+   "jogo": "",
+   "conv": "07-basic/conv.jpg",
+   "icone": "07-basic/icone.png"
+  },
+  "vocabulary": [
+   {
+    "word": "social media",
+    "translation": ""
+   },
+   {
+    "word": "(to) text",
+    "translation": ""
+   },
+   {
+    "word": "addiction / addicted",
+    "translation": ""
+   },
+   {
+    "word": "(to) get by",
+    "translation": "(to) survive"
+   },
+   {
+    "word": "(to) cut down on",
+    "translation": "(to) reduce"
+   },
+   {
+    "word": "(to) update your status",
+    "translation": ""
+   },
+   {
+    "word": "disadvantage",
+    "translation": ""
+   }
+  ],
+  "notas": [],
+  "languageGame": [],
+  "conversation": [
+   {
+    "question": "What social media are you more into?",
+    "modelAnswers": [
+     "FACEBOOK / INSTAGRAM / WHATSAPP / SNAPCHAT / TWITTER"
+    ]
+   },
+   {
+    "question": "What social media don’t you enjoy using? Why?",
+    "modelAnswers": []
+   },
+   {
+    "question": "How often do you update your status on social media?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Can social media become an addiction?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you know people who are addicted to their social media?",
+    "modelAnswers": []
+   },
+   {
+    "question": "How many hours do you spend on social media a day?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Would you like to cut down on your hours in your social media?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What’s the biggest advantage of social media? And the biggest disadvantage?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you get by without social media?",
+    "modelAnswers": []
+   },
+   {
+    "question": "About what do you usually text friends and family?",
+    "modelAnswers": [
+     "WORK / STUDIES / GOSSIPS / POLITICS"
+    ]
+   },
+   {
+    "question": "How often do you check your phone?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Can you imagine your life without the internet?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Tell me about a time you had to get by without your cell phone. What happened?",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about social media?"
+   }
+  ],
+  "semRevisao": true,
+  "serie": "everyday-life"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "everyday",
+  "imgs": "everyday-life/img/",
+  "faixa1": "#00ACA0",
+  "faixa2": "#00B0F0",
+  "destaque": "#FFC000",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#000000",
+   "fundo2": "#111111",
+   "prim": "#FFC000",
+   "sec": "#00ACA0",
+   "dest": "#FFC000",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "house",
+  "icones": [
+   "house"
+  ]
+ }
+}

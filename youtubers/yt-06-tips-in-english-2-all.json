@@ -1,0 +1,189 @@
+{
+ "lesson": {
+  "coverTitle": "Tips in English 2",
+  "coverLevel": "All Levels",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Tips in English 2",
+  "yt": {
+   "capaTitulo": "TIPS IN ENGLISH 2 – ALL LEVELS",
+   "material": [
+    "PowerPoint activity",
+    "Youtubers VIDEO FILE #06 - Dropbox"
+   ],
+   "duracao": "20 minutes",
+   "objetivos": [
+    "Practicing pronunciation.",
+    "Learning new expressions."
+   ],
+   "intro": "Jackie is popular for her YouTube Channel, @AskJackie. She usually posts English tips through her Instagram account. Today, we'll take a look at the second part of her video about QUICK TIPS for Learning English.",
+   "video": {
+    "drive": "1pU2bK-m9ftU6YLPF3CfzxAMJk0c2MVdJ",
+    "youtube": "",
+    "nome": "DICAS RÁPIDAS DE INGLÊS! (parte 2)",
+    "instrucao": "Some of the tips are simple, others can be surprising. Pay attention to at least 1 new thing you learned.",
+    "inicio": ""
+   },
+   "warmup": [],
+   "discussao": [
+    [
+     "Which tip was new for you?",
+     "The tip about ____ was new for me."
+    ],
+    [
+     "Which tip(s) did you already know?",
+     "I already knew the tip about...."
+    ]
+   ],
+   "conversa": [],
+   "pratica": [
+    {
+     "tipo": "repetir",
+     "titulo": "Pronunciation Practice",
+     "instrucao": "Repeat the words after the teacher",
+     "itens": [
+      "to / too / two",
+      "chew",
+      "worth",
+      "schedule",
+      "WOMAN / WOMEN"
+     ]
+    },
+    {
+     "tipo": "nota",
+     "titulo": "Language Practice",
+     "instrucao": "Choose the best alternative. (questões em jogo)"
+    },
+    {
+     "tipo": "nota",
+     "titulo": "Vocabulary Practice",
+     "instrucao": "Guess the word in English and repeat. (cartões em vocab: português → inglês)"
+    }
+   ],
+   "jogo": [
+    {
+     "q": "A: Do you like sports? | B: No, ______________.",
+     "options": [
+      "it's my thing",
+      "it's not my thing",
+      "my cup of tea"
+     ],
+     "correct": 1,
+     "dica": "não é a minha praia, não gosto disso"
+    },
+    {
+     "q": "A: God, I'm so tired! | B: Hey, you should ___ after lunch.",
+     "options": [
+      "take a sleep",
+      "to sleep a nap",
+      "take a nap"
+     ],
+     "correct": 2,
+     "dica": "TIRAR UMA SONECA"
+    },
+    {
+     "q": "A: Did you talk to our boss? | B: No, but I'll ______ tomorrow.",
+     "options": [
+      "schedule an appointment",
+      "appointment",
+      "schedule will appointment"
+     ],
+     "correct": 0,
+     "dica": "marcar uma hora, reunião"
+    },
+    {
+     "q": "A: Do you want to go to the movies with me and Julie? | B: Hell no, I don't want _______.",
+     "options": [
+      "to be wheel in third",
+      "be the third wheel",
+      "to be the third wheel"
+     ],
+     "correct": 2,
+     "dica": "segurar vela, ser a \"terceira roda\""
+    },
+    {
+     "q": "A: What do you think of the movie \"IT\"? | B: Well, for me it's ______.",
+     "options": [
+      "worth it",
+      "not worth it",
+      "is it worth"
+     ],
+     "correct": 0,
+     "aceitas": [
+      0,
+      1
+     ],
+     "dica": "vale a pena / não vale a pena"
+    }
+   ],
+   "vocab": [
+    [
+     "NOT MY THING / NOT MY CUP OF TEA",
+     "NÃO É MINHA PRAIA"
+    ],
+    [
+     "IT'S WORTH IT.",
+     "ISSO VALE A PENA."
+    ],
+    [
+     "WOMAN",
+     "MULHER"
+    ],
+    [
+     "WOMEN",
+     "MULHERES"
+    ],
+    [
+     "TO BE THE THIRD WHEEL",
+     "SEGURAR VELA"
+    ]
+   ],
+   "avaliacao": [
+    [
+     "What did you like about today's activity?",
+     "I liked the... VIDEO / GAMES / TIPS"
+    ],
+    [
+     "Will you watch Jackie's videos?",
+     "Yes, I'll check them out.",
+     "No, I don't think so."
+    ]
+   ],
+   "fotos": {
+    "capa": "02-basic/capa.jpg",
+    "video": "02-basic/capa.jpg",
+    "conv": "02-basic/capa.jpg",
+    "intro": "jackie-hello.jpg",
+    "outras": [
+     "05-basic/intro.jpg",
+     "askjackie.jpg",
+     "instagram.png"
+    ]
+   }
+  },
+  "serie": "youtubers"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "youtuber",
+  "imgs": "youtubers/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#0D0D0D",
+   "fundo2": "#404040",
+   "prim": "#ffffff",
+   "sec": "#DC0505",
+   "dest": "#DC0505",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "television",
+  "icones": [
+   "television"
+  ]
+ }
+}

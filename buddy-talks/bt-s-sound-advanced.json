@@ -1,0 +1,182 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · The /s/ Sound",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "The Ghost Vowel",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing initial /s/.",
+   "Developing pronunciation."
+  ],
+  "material": [
+   "PowerPoint activity",
+   "Buddy Talks AUDIO FILE - the /s/ at the start"
+  ],
+  "duracao": "10 minutes",
+  "vocabulary": [
+   {
+    "word": "straightforward",
+    "translation": ""
+   },
+   {
+    "word": "scrutiny",
+    "translation": ""
+   },
+   {
+    "word": "spontaneous",
+    "translation": ""
+   },
+   {
+    "word": "sustainability",
+    "translation": ""
+   },
+   {
+    "word": "skeptical",
+    "translation": ""
+   },
+   {
+    "word": "stereotype",
+    "translation": ""
+   },
+   {
+    "word": "screening",
+    "translation": ""
+   },
+   {
+    "word": "sprawling",
+    "translation": ""
+   },
+   {
+    "word": "statistics",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll remove a vowel that survives in almost every advanced speaker. It’s the... …GHOST E! It hides in the longest words you use: strategy\n\nThe longer the word, the less you hear yourself add the extra vowel. Three-consonant clusters (str-, spr-, scr-) are where it always comes back.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll remove a vowel that survives in almost every advanced speaker. It’s the...",
+   "…GHOST E!\nIt hides in the longest words you use:\nstrategy",
+   "The longer the word, the less you hear yourself add the extra vowel.",
+   "Three-consonant clusters (str-, spr-, scr-) are where it always comes back."
+  ],
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 2 - L 8 - pg 71",
+    "id": "1zF3FADzYkMu4y24ewa8rrFHgW_GxyzqG"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 2 - L 8 - pg 71",
+    "id": "1sdWS5G-g3vcHmlzcalAUkDA3RIDdzcf3"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: Was the response spontaneous?",
+    "modelAnswers": [
+     "B: It escaped any real scrutiny."
+    ]
+   },
+   {
+    "question": "A: Are the statistics reliable?",
+    "modelAnswers": [
+     "B: I am skeptical about the screening."
+    ]
+   },
+   {
+    "question": "A: How bad was the damage?",
+    "modelAnswers": [
+     "B: A sprawling area, entirely flooded."
+    ]
+   },
+   {
+    "question": "When is a crisis a storm in a teapot?",
+    "modelAnswers": [
+     "It is exaggerated when..."
+    ]
+   },
+   {
+    "question": "Are we skeptical about the right things?",
+    "modelAnswers": [
+     "We are skeptical about..."
+    ]
+   },
+   {
+    "question": "What does sustainability mean in practice?",
+    "modelAnswers": [
+     "In practice it means..."
+    ]
+   },
+   {
+    "question": "Who should be under scrutiny after a disaster?",
+    "modelAnswers": [
+     "The scrutiny should fall on..."
+    ]
+   },
+   {
+    "question": "Do statistics change how you see risk?",
+    "modelAnswers": [
+     "Statistics make me..."
+    ]
+   },
+   {
+    "question": "What stereotype exists about your region?",
+    "modelAnswers": [
+     "The stereotype is..."
+    ]
+   },
+   {
+    "question": "Has a spontaneous act of help impressed you?",
+    "modelAnswers": [
+     "I was impressed when..."
+    ]
+   },
+   {
+    "question": "How straightforward is prevention, really?",
+    "modelAnswers": [
+     "Prevention is..."
+    ]
+   },
+   {
+    "question": "What would you say to someone who lost a home?",
+    "modelAnswers": [
+     "I would say..."
+    ]
+   }
+  ],
+  "languageGame": [],
+  "evaluation": [
+   {
+    "question": "Does the ghost E come back in long words?"
+   }
+  ],
+  "temaDaConversa": "Storm in a teapot, or a real crisis",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "bear",
+  "icones": [
+   "bear"
+  ]
+ }
+}

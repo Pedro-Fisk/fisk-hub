@@ -1,0 +1,182 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · And / Of",
+  "coverLevel": "Intermediate",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Weak Words",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing weak words.",
+   "Developing pronunciation."
+  ],
+  "material": [
+   "PowerPoint activity",
+   "Buddy Talks AUDIO FILE - the weak and & of"
+  ],
+  "duracao": "10 minutes",
+  "vocabulary": [
+   {
+    "word": "a piece of cake",
+    "translation": ""
+   },
+   {
+    "word": "plenty of room",
+    "translation": ""
+   },
+   {
+    "word": "out of order",
+    "translation": ""
+   },
+   {
+    "word": "in front of it",
+    "translation": ""
+   },
+   {
+    "word": "instead of that",
+    "translation": ""
+   },
+   {
+    "word": "safe and sound",
+    "translation": ""
+   },
+   {
+    "word": "back and forth",
+    "translation": ""
+   },
+   {
+    "word": "peace and quiet",
+    "translation": ""
+   },
+   {
+    "word": "rest and relax",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll practice two words that native speakers cut down to a single sound. They are... …AND and OF! They shrink and lean on the word before: a lot of\n\nThese two are among the most frequent words, so they shape your rhythm. Pronouncing them fully gives every phrase the same weight, and nothing stands out.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll practice two words that native speakers cut down to a single sound. They are...",
+   "…AND and OF!\nThey shrink and lean on the word before:\na lot of",
+   "These two are among the most frequent words, so they shape your rhythm.",
+   "Pronouncing them fully gives every phrase the same weight, and nothing stands out."
+  ],
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 1 - L 5 - pg 43",
+    "id": "1y612hkl243MfeLCuY9THWzic5AWxqbm4"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 1 - L 5 - pg 43",
+    "id": "10PbcEN035qB-9qjfdDFmo4Iuzu8k1Xmz"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: Do you have any vacancies?",
+    "modelAnswers": [
+     "B: Plenty of room. How many nights?"
+    ]
+   },
+   {
+    "question": "A: How was the trip back?",
+    "modelAnswers": [
+     "B: Long, but we arrived safe and sound."
+    ]
+   },
+   {
+    "question": "A: Was the shower working?",
+    "modelAnswers": [
+     "B: No, it was out of order all weekend."
+    ]
+   },
+   {
+    "question": "What kind of place do you book on a trip?",
+    "modelAnswers": [
+     "I usually book a kind of..."
+    ]
+   },
+   {
+    "question": "What do you check before you book?",
+    "modelAnswers": [
+     "I check a lot of things, like..."
+    ]
+   },
+   {
+    "question": "Have you had a problem in a hotel?",
+    "modelAnswers": [
+     "Something was out of order and..."
+    ]
+   },
+   {
+    "question": "Do you prefer peace and quiet or the center?",
+    "modelAnswers": [
+     "I prefer... instead of..."
+    ]
+   },
+   {
+    "question": "How do you find your way in a new city?",
+    "modelAnswers": [
+     "I ask in front of the station and..."
+    ]
+   },
+   {
+    "question": "What is worth paying more for?",
+    "modelAnswers": [
+     "Plenty of space and..."
+    ]
+   },
+   {
+    "question": "Tell me about the best place you stayed.",
+    "modelAnswers": [
+     "It had a pool and..."
+    ]
+   },
+   {
+    "question": "Would you share a room with strangers?",
+    "modelAnswers": [
+     "I would, because of..."
+    ]
+   },
+   {
+    "question": "What do you always pack?",
+    "modelAnswers": [
+     "A couple of shirts and..."
+    ]
+   }
+  ],
+  "languageGame": [],
+  "evaluation": [
+   {
+    "question": "Which weak word is harder for you: and or of?"
+   }
+  ],
+  "temaDaConversa": "Finding a place to stay",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "bear",
+  "icones": [
+   "bear"
+  ]
+ }
+}

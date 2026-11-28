@@ -1,0 +1,111 @@
+{
+ "lesson": {
+  "coverTitle": "Palavras em inglês",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Palavras em inglês",
+  "yt": {
+   "capaTitulo": "#02 – ADVANCED",
+   "material": [
+    "PowerPoint activity",
+    "Youtubers VIDEO FILE #17 - Dropbox"
+   ],
+   "duracao": "20 minutes",
+   "objetivos": [],
+   "intro": "Jackie is popular for her YouTube Channel, @AskJackie. She usually posts English tips through her Instagram account. Today, we'll learn some words that have different meanings in Portuguese and English.",
+   "video": {
+    "drive": "1p74Wo9jJBLftwLlUVd6om_aV7ba4Y_lH",
+    "youtube": "",
+    "nome": "02 - Youtubers - AskJackie - Palavras em inglês",
+    "instrucao": "",
+    "inicio": ""
+   },
+   "warmup": [],
+   "discussao": [],
+   "conversa": [
+    [
+     "Are there a lot of billboards in your city?"
+    ],
+    [
+     "What would you like to write on a billboard?"
+    ],
+    [
+     "Are tuxedos as comfortable as casual clothes?"
+    ],
+    [
+     "What are the ideal places to wear tuxedos?"
+    ],
+    [
+     "Whose concert would you like to go to?"
+    ],
+    [
+     "Are you used to taking screenshots on your phone?"
+    ],
+    [
+     "How often do you take screenshots?"
+    ],
+    [
+     "Do you use any laptops when you study or do you prefer to write on notebooks?"
+    ],
+    [
+     "Would you rather work from home or work in an office?"
+    ]
+   ],
+   "pratica": [
+    {
+     "tipo": "repetir",
+     "titulo": "Pronunciation Practice",
+     "instrucao": "Practice the vocab shown in the video.",
+     "itens": [
+      "spare tire",
+      "billboard",
+      "tuxedo",
+      "concert",
+      "work from home",
+      "screenshot",
+      "laptop",
+      "underscore"
+     ]
+    }
+   ],
+   "jogo": [],
+   "vocab": [],
+   "avaliacao": [],
+   "fotos": {
+    "capa": "02-basic/capa.jpg",
+    "video": "02-basic/video.jpg",
+    "conv": "02-basic/video.jpg",
+    "intro": "jackie-hello.jpg",
+    "outras": [
+     "askjackie.jpg",
+     "instagram.png"
+    ]
+   }
+  },
+  "serie": "youtubers"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "youtuber",
+  "imgs": "youtubers/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#0D0D0D",
+   "fundo2": "#404040",
+   "prim": "#ffffff",
+   "sec": "#DC0505",
+   "dest": "#DC0505",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "television",
+  "icones": [
+   "television"
+  ]
+ }
+}

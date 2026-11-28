@@ -1,0 +1,147 @@
+{
+ "lesson": {
+  "coverTitle": "Countries · Peru",
+  "coverLevel": "All Levels",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Peru",
+  "objectives": [
+   "Talking about Peruvian culture.",
+   "Practicing reading and reading comprehension.",
+   "Developing listening skills by watching a NatGeo video."
+  ],
+  "pais": {
+   "nome": "Peru",
+   "oficial": "",
+   "num": 7,
+   "cor": "#d91023",
+   "bandeira": "pe/bandeira.png",
+   "capa": "pe/machupicchu.jpg",
+   "capaLocal": "Machu Picchu Sanctuary",
+   "mapa": "",
+   "texto": "",
+   "fatos": []
+  },
+  "introText": "Today, we’ll learn about Peru. We’ll watch a real National Geographic video about Machu Picchu, one of Peru’s most famous archeological sites.",
+  "introSub": "Machu Picchu, one of Peru’s most famous archeological sites",
+  "warmup": [
+   {
+    "question": "Do you know Machu Picchu?",
+    "modelAnswers": [
+     "I don’t know a lot about it.",
+     "I know it very well.",
+     "I only know it exists."
+    ]
+   }
+  ],
+  "fotos": [
+   {
+    "img": "pe/lhama.jpg",
+    "local": "Peru",
+    "fundo": true
+   },
+   {
+    "img": "pe/machupicchu.jpg",
+    "local": "Machu Picchu",
+    "fundo": true
+   }
+  ],
+  "vocabulary": [],
+  "vocabTitulo": "",
+  "vocabSub": "",
+  "video": {
+   "drive": "1-qhM9jvo66EpyrgL7dvwr0B-Wdu2rj-9",
+   "youtube": "cnMa-Sm9H4k",
+   "nome": "Machu Picchu 101 · National Geographic"
+  },
+  "leitura": {
+   "titulo": "Reading",
+   "instrucao": "Read the video script silently. Then, take turns reading it aloud, one sentence each.",
+   "paragrafos": [
+    "The stone city of Machu Picchu is one of the most fascinating archeological sites on the planet. Located northwest of Cusco, Peru, Machu Picchu is a testament to the power and ingenuity of the Inca people. During its prime, the Inca civilization stretched about 2500 miles along South America’s Pacific Coastline, from modern day Ecuador down into Chile. This distance is nearly the horizontal width of the continental United States. Machu Picchu, located at the center of this once expansive empire, is one of the few well-preserved remnants of the Inca civilization. Built around the mid 15th century, Machu Picchu is a stunning example of the Inca’s engineering feats.",
+    "The Inca constructed Machu Picchu’s palaces, temples, terraces, and infrastructure using stone and without the help of wheels or tools made of steel or iron. One particularly notable aspect of their construction is foregoing the use of mortar, a material often used to bind stones together. Nonetheless, the stones of Machu Picchu were cut so precisely that they snugly fit together. Located on two fault lines, Machu Picchu often experiences earthquakes, but because of the stones’ exceptional cut and fit, they bounce during tremors and then are able to easily fall back into position. These engineering marvels have preserved Machu Picchu’s remarkable condition for over 500 years.",
+    "Machu Picchu’s purpose is still a mystery to many archeologists. Some theorize that it may have served as a ceremonial site, a military stronghold, or a retreat for nobility. The site’s geographic layout may be significant in another way. Many of both the manmade and natural structures appear to align with astronomical events. But in the early 16th century, only about 100 years after it was built, Machu Picchu was abandoned. And since the Inca had no written language, no records exist to explain the exact purpose of the site. Although local communities knew about Machu Picchu, the site remained largely unknown to the outside world for hundreds of years.",
+    "Spanish conquistadors who invaded the Inca civilization in the 16th century never came across the site. It wasn’t until the early 20th century when Melchor Arteaga, a local farmer, debuted Machu Picchu to outsiders when he led Yale University professor Hiram Bingham to the site. Bingham and successive explorers devoted much of their academic careers to studying the archeological wonder. Despite its enigmatic nature, Machu Picchu still stands as one of the world’s most important archeological sites. In 1983, UNESCO designated Machu Picchu as a world heritage site and today visitors from around the world come to pay homage to this piece of history."
+   ]
+  },
+  "languageGame": [
+   {
+    "question": "What is the purpose of the passage?",
+    "options": [
+     "Describing an ancient city.",
+     "Talking about human ingenuity.",
+     "Presenting theories about Machu Picchu’s purpose.",
+     "Emphasizing the lack of information about the Inca empire."
+    ],
+    "correctIndex": 0
+   },
+   {
+    "question": "Why does Machu Picchu often experience earthquakes?",
+    "options": [
+     "Because the city bounces and falls back into its position.",
+     "Because the stones of the city were cut precisely.",
+     "Because Machu Picchu is located on two fault lines.",
+     "Because Machu Picchu is a marvel of engineering."
+    ],
+    "correctIndex": 2
+   },
+   {
+    "question": "How is the 20th century relevant to Machu Picchu’s history?",
+    "options": [
+     "It is the century when it was invaded.",
+     "It is when the Spanish conquerors left the city.",
+     "It is the century the city was studied thoroughly.",
+     "It is when the city became a symbol of Peru’s independence."
+    ],
+    "correctIndex": 2
+   }
+  ],
+  "jogoTitulo": "Comprehension game",
+  "conversation": [
+   {
+    "question": "Did the script help you better understand the video?",
+    "modelAnswers": []
+   },
+   {
+    "question": "How much did you understand?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Share one piece of information you learned in the video.",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy learning about Peru?"
+   },
+   {
+    "question": "Which other countries would you like to learn more about?"
+   }
+  ],
+  "serie": "countries"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "countries",
+  "imgs": "countries/img/",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#ffffff",
+   "fundo2": "#eef3f8",
+   "prim": "#16365c",
+   "sec": "#d91023",
+   "dest": "#d91023",
+   "txt": "#16365c"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "globe-showing-americas",
+  "icones": [
+   "globe-showing-americas"
+  ]
+ }
+}

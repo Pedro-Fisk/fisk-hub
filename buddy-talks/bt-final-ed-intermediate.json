@@ -1,0 +1,249 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · The Final -ed",
+  "coverLevel": "Intermediate",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Past Tense Sounds",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing the -ed sounds.",
+   "Developing pronunciation."
+  ],
+  "material": [
+   "PowerPoint activity",
+   "Buddy Talks AUDIO FILE - The final -ed sounds"
+  ],
+  "duracao": "10 minutes",
+  "vocabulary": [
+   {
+    "word": "finished",
+    "translation": "/t/"
+   },
+   {
+    "word": "traveled",
+    "translation": "/d/"
+   },
+   {
+    "word": "decided",
+    "translation": "/ɪd/"
+   },
+   {
+    "word": "practiced",
+    "translation": "/t/"
+   },
+   {
+    "word": "improved",
+    "translation": "/d/"
+   },
+   {
+    "word": "invited",
+    "translation": "/ɪd/"
+   },
+   {
+    "word": "shared",
+    "translation": "/d/"
+   },
+   {
+    "word": "watched",
+    "translation": "/t/"
+   },
+   {
+    "word": "started",
+    "translation": "/ɪd/"
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll look at a tiny ending that tells people you are talking about the past. It’s... …THE -ED ENDING! It has three different sounds, like in: DECIDED\n\nSaying -ed correctly makes your past tense clear to everyone. If we add one more syllable, our English sounds heavy and unnatural.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll look at a tiny ending that tells people you are talking about the past. It’s...",
+   "…THE -ED ENDING!\nIt has three different sounds, like in:\nDECIDED",
+   "Saying -ed correctly makes your past tense clear to everyone.",
+   "If we add one more syllable, our English sounds heavy and unnatural."
+  ],
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 2 - L 6 - pg 55",
+    "id": "1KGHqL0cICaoc5Y3peCyTwKsZ4mwf7Gh_"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 2 - L 6 - pg 55",
+    "id": "1y5QPVJNWvdIFa2oNRdYOOsPhTCxo6aL3"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: How was your weekend?",
+    "modelAnswers": [
+     "B: I traveled and visited my cousins."
+    ]
+   },
+   {
+    "question": "A: Did you finish the report?",
+    "modelAnswers": [
+     "B: Yes, I finished it last night."
+    ]
+   },
+   {
+    "question": "A: Why did you change your plans?",
+    "modelAnswers": [
+     "B: I decided to save some money."
+    ]
+   },
+   {
+    "question": "What habit have you tried to change?",
+    "modelAnswers": [
+     "I tried to..."
+    ]
+   },
+   {
+    "question": "When did it start to get out of hand?",
+    "modelAnswers": [
+     "It started when I..."
+    ]
+   },
+   {
+    "question": "Who noticed it before you did?",
+    "modelAnswers": [
+     "My... noticed that I..."
+    ]
+   },
+   {
+    "question": "What have you already stopped doing?",
+    "modelAnswers": [
+     "I stopped... I quit..."
+    ]
+   },
+   {
+    "question": "Did anything help you cut it down?",
+    "modelAnswers": [
+     "It helped when I..."
+    ]
+   },
+   {
+    "question": "How much time have you wasted on it?",
+    "modelAnswers": [
+     "I wasted..."
+    ]
+   },
+   {
+    "question": "What replaced that habit?",
+    "modelAnswers": [
+     "I replaced it with..."
+    ]
+   },
+   {
+    "question": "Have you ever relapsed? What happened?",
+    "modelAnswers": [
+     "I relapsed when..."
+    ]
+   },
+   {
+    "question": "What would you say to someone starting?",
+    "modelAnswers": [
+     "I would say that I learned..."
+    ]
+   }
+  ],
+  "languageGame": [
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "finished",
+    "options": [
+     "/t/",
+     "/d/",
+     "/ɪd/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "traveled",
+    "options": [
+     "/t/",
+     "/d/",
+     "/ɪd/"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "decided",
+    "options": [
+     "/t/",
+     "/d/",
+     "/ɪd/"
+    ],
+    "correctIndex": 2
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "practiced",
+    "options": [
+     "/t/",
+     "/d/",
+     "/ɪd/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "improved",
+    "options": [
+     "/t/",
+     "/d/",
+     "/ɪd/"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "invited",
+    "options": [
+     "/t/",
+     "/d/",
+     "/ɪd/"
+    ],
+    "correctIndex": 2
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Which -ed sound is the hardest for you? Why?"
+   }
+  ],
+  "temaDaConversa": "Habits out of hand",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "bear",
+  "icones": [
+   "bear"
+  ]
+ }
+}

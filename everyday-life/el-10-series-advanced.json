@@ -1,0 +1,135 @@
+{
+ "lesson": {
+  "coverTitle": "#10 – TV Shows or Series?",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "TV Shows or Series?",
+  "objectives": [],
+  "material": [
+   "PowerPoint activity"
+  ],
+  "duracao": "20 minutes",
+  "fotosSerie": {
+   "capa": "10-basic/capa.jpg",
+   "iw": "10-basic/iw.jpg",
+   "jogo": "",
+   "conv": "10-basic/conv.jpg",
+   "icone": "10-basic/icone.png"
+  },
+  "vocabulary": [
+   {
+    "word": "(to) care for",
+    "translation": "(to) like very much"
+   },
+   {
+    "word": "series / (to) show",
+    "translation": ""
+   },
+   {
+    "word": "soap opera / character",
+    "translation": ""
+   },
+   {
+    "word": "to binge-watch",
+    "translation": "maratonar, assistir vários episódios seguidos"
+   },
+   {
+    "word": "to give up",
+    "translation": "(to) quit; (to) stop doing"
+   }
+  ],
+  "notas": [],
+  "languageGame": [],
+  "conversation": [
+   {
+    "question": "Do you have a TV show you really care for?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Who do you consider the best artist on TV nowadays?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What kind of programs do you usually watch on TV?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Is there any series you really care for?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Who is your favorite character in series?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What makes a series a huge success?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What’s the most famous TV show in Brazil?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you like it? Why do so many people like it?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What’s the most famous series in Brazil?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Do you like it? Why do so many people like it?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Are you into soap operas? Do you watch them till the end or do you give up in the middle?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Have you ever binge-watched a series?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What kind of series are people crazy for?",
+    "modelAnswers": [
+     "Crime - Science fiction - History",
+     "Terror - Drama - Politics"
+    ]
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about tv shows or series?"
+   }
+  ],
+  "semRevisao": true,
+  "serie": "everyday-life"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "everyday",
+  "imgs": "everyday-life/img/",
+  "faixa1": "#00ACA0",
+  "faixa2": "#00B0F0",
+  "destaque": "#FFC000",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#000000",
+   "fundo2": "#111111",
+   "prim": "#FFC000",
+   "sec": "#00ACA0",
+   "dest": "#FFC000",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "house",
+  "icones": [
+   "house"
+  ]
+ }
+}

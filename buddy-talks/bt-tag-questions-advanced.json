@@ -1,0 +1,182 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · Tag Questions",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Question Melody",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing tag questions.",
+   "Developing pronunciation."
+  ],
+  "material": [
+   "PowerPoint activity",
+   "Buddy Talks AUDIO FILE - Tag question intonation"
+  ],
+  "duracao": "10 minutes",
+  "vocabulary": [
+   {
+    "word": "hasn’t he? ↓",
+    "translation": ""
+   },
+   {
+    "word": "wouldn’t you? ↑",
+    "translation": ""
+   },
+   {
+    "word": "weren’t they? ↓",
+    "translation": ""
+   },
+   {
+    "word": "isn’t she? ↑",
+    "translation": ""
+   },
+   {
+    "word": "haven’t we? ↓",
+    "translation": ""
+   },
+   {
+    "word": "couldn’t she? ↑",
+    "translation": ""
+   },
+   {
+    "word": "won’t they? ↓",
+    "translation": ""
+   },
+   {
+    "word": "didn’t it? ↑",
+    "translation": ""
+   },
+   {
+    "word": "aren’t we? ↓",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll fix the melody that tells people whether you are asking or stating. It’s... …TAG QUESTIONS! The words are the same. The music is not: haven’t you?\n\nFalling: you are stating something and inviting the other person to agree. Rising: you are genuinely asking, and you are handing the turn to the other person.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll fix the melody that tells people whether you are asking or stating. It’s...",
+   "…TAG QUESTIONS!\nThe words are the same. The music is not:\nhaven’t you?",
+   "Falling: you are stating something and inviting the other person to agree.",
+   "Rising: you are genuinely asking, and you are handing the turn to the other person."
+  ],
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 1 - L 1 - pg 11",
+    "id": "1pKUxLKtJSzM85kb2Hz1cgOKoAadpe1D-"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 1 - L 1 - pg 11",
+    "id": "1wvT1-2r55pnUkLGDnhp0PodyYiWs3tQ5"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: You’ve noticed that trend, haven’t you? ↑",
+    "modelAnswers": [
+     "B: I have, and I still don’t get it."
+    ]
+   },
+   {
+    "question": "A: It was overrated, wasn’t it? ↓",
+    "modelAnswers": [
+     "B: Completely. It faded in a month."
+    ]
+   },
+   {
+    "question": "A: You wouldn’t call that popular, would you? ↑",
+    "modelAnswers": [
+     "B: Not by any serious measure."
+    ]
+   },
+   {
+    "question": "Trends fade quickly now, don’t they? ↓",
+    "modelAnswers": [
+     "They do, because..."
+    ]
+   },
+   {
+    "question": "You’ve dropped an app recently, haven’t you? ↑",
+    "modelAnswers": [
+     "I dropped..."
+    ]
+   },
+   {
+    "question": "Popularity isn’t quality, is it? ↓",
+    "modelAnswers": [
+     "In my opinion..."
+    ]
+   },
+   {
+    "question": "You wouldn’t follow a trend blindly, would you? ↑",
+    "modelAnswers": [
+     "I would only if..."
+    ]
+   },
+   {
+    "question": "Algorithms decide what we see, don’t they? ↓",
+    "modelAnswers": [
+     "They decide because..."
+    ]
+   },
+   {
+    "question": "You’ve been influenced by one, haven’t you? ↑",
+    "modelAnswers": [
+     "Once I was influenced by..."
+    ]
+   },
+   {
+    "question": "Nobody reads long posts anymore, do they? ↓",
+    "modelAnswers": [
+     "Some people still..."
+    ]
+   },
+   {
+    "question": "You could live without it, couldn’t you? ↑",
+    "modelAnswers": [
+     "I could, but..."
+    ]
+   },
+   {
+    "question": "This will look silly in ten years, won’t it? ↓",
+    "modelAnswers": [
+     "I imagine that..."
+    ]
+   }
+  ],
+  "languageGame": [],
+  "evaluation": [
+   {
+    "question": "Do you control the melody of your questions?"
+   }
+  ],
+  "temaDaConversa": "What’s trending now",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "bear",
+  "icones": [
+   "bear"
+  ]
+ }
+}

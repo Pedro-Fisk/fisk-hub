@@ -1,0 +1,254 @@
+[
+ {
+  "id": "el-01-everyday-chores-basic",
+  "num": 1,
+  "nome": "01 - Everyday Chores - Basic & Teens",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "jogo": 4
+ },
+ {
+  "id": "el-01-everyday-chores-intermediate",
+  "num": 1,
+  "nome": "01 - Everyday Chores - Intermediate",
+  "niveis": [
+   "Intermediate"
+  ],
+  "jogo": 0
+ },
+ {
+  "id": "el-01-everyday-chores-advanced",
+  "num": 1,
+  "nome": "01 - Everyday Chores - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "jogo": 0
+ },
+ {
+  "id": "el-02-vacation-basic",
+  "num": 2,
+  "nome": "02 - Vacation - Basic & Teens",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "jogo": 4
+ },
+ {
+  "id": "el-02-vacation-intermediate",
+  "num": 2,
+  "nome": "02 - Vacation - Intermediate",
+  "niveis": [
+   "Intermediate"
+  ],
+  "jogo": 4
+ },
+ {
+  "id": "el-02-vacation-advanced",
+  "num": 2,
+  "nome": "02 - Vacation - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "jogo": 0
+ },
+ {
+  "id": "el-03-going-shopping-basic",
+  "num": 3,
+  "nome": "03 - Going Shopping - Basic & Teens",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "jogo": 4
+ },
+ {
+  "id": "el-03-going-shopping-intermediate",
+  "num": 3,
+  "nome": "03 - Going Shopping - Intermediate",
+  "niveis": [
+   "Intermediate"
+  ],
+  "jogo": 4
+ },
+ {
+  "id": "el-03-going-shopping-advanced",
+  "num": 3,
+  "nome": "03 - Going Shopping - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "jogo": 0
+ },
+ {
+  "id": "el-04-babies-basic",
+  "num": 4,
+  "nome": "04 - Babies - Basic & Teens",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "jogo": 4
+ },
+ {
+  "id": "el-04-babies-intermediate",
+  "num": 4,
+  "nome": "04 - Babies - Intermediate",
+  "niveis": [
+   "Intermediate"
+  ],
+  "jogo": 4
+ },
+ {
+  "id": "el-04-babies-advanced",
+  "num": 4,
+  "nome": "04 - Babies - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "jogo": 0
+ },
+ {
+  "id": "el-05-acting-basic",
+  "num": 5,
+  "nome": "05 - Acting - Basic & Teens",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "jogo": 0
+ },
+ {
+  "id": "el-05-acting-intermediate",
+  "num": 5,
+  "nome": "05 - Acting - Intermediate",
+  "niveis": [
+   "Intermediate"
+  ],
+  "jogo": 0
+ },
+ {
+  "id": "el-05-acting-advanced",
+  "num": 5,
+  "nome": "05 - Acting - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "jogo": 0
+ },
+ {
+  "id": "el-06-chocolate-basic",
+  "num": 6,
+  "nome": "06 - Chocolate - Basic & Teens",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "jogo": 0
+ },
+ {
+  "id": "el-06-chocolate-intermediate",
+  "num": 6,
+  "nome": "06 - Chocolate - Intermediate",
+  "niveis": [
+   "Intermediate"
+  ],
+  "jogo": 0
+ },
+ {
+  "id": "el-06-chocolate-advanced",
+  "num": 6,
+  "nome": "06 - Chocolate - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "jogo": 0
+ },
+ {
+  "id": "el-07-social-media-basic",
+  "num": 7,
+  "nome": "07 - Social Media - Basic & Teens",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "jogo": 0
+ },
+ {
+  "id": "el-07-social-media-intermediate",
+  "num": 7,
+  "nome": "07 - Social Media - Intermediate",
+  "niveis": [
+   "Intermediate"
+  ],
+  "jogo": 0
+ },
+ {
+  "id": "el-07-social-media-advanced",
+  "num": 7,
+  "nome": "07 - Social Media - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "jogo": 0
+ },
+ {
+  "id": "el-10-series-basic",
+  "num": 10,
+  "nome": "10 - TV Shows or Series? - Basic & Teens",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "jogo": 0
+ },
+ {
+  "id": "el-10-series-intermediate",
+  "num": 10,
+  "nome": "10 - TV Shows or Series? - Intermediate",
+  "niveis": [
+   "Intermediate"
+  ],
+  "jogo": 0
+ },
+ {
+  "id": "el-10-series-advanced",
+  "num": 10,
+  "nome": "10 - TV Shows or Series? - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "jogo": 0
+ },
+ {
+  "id": "el-11-music-basic",
+  "num": 11,
+  "nome": "11 - Music - Basic & Teens",
+  "niveis": [
+   "Basic",
+   "Teens"
+  ],
+  "jogo": 0
+ },
+ {
+  "id": "el-11-music-intermediate",
+  "num": 11,
+  "nome": "11 - Music - Intermediate",
+  "niveis": [
+   "Intermediate"
+  ],
+  "jogo": 0
+ },
+ {
+  "id": "el-11-music-advanced",
+  "num": 11,
+  "nome": "11 - Music - Advanced",
+  "niveis": [
+   "Advanced"
+  ],
+  "jogo": 0
+ }
+]

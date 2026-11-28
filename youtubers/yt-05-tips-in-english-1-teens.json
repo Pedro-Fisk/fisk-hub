@@ -1,0 +1,217 @@
+{
+ "lesson": {
+  "coverTitle": "Tips in English 1",
+  "coverLevel": "Teens",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Tips in English 1",
+  "yt": {
+   "capaTitulo": "TIPS IN ENGLISH 1 - TEENS",
+   "material": [
+    "PowerPoint activity",
+    "Youtubers VIDEO FILE #05 - Dropbox"
+   ],
+   "duracao": "20 minutes",
+   "objetivos": [
+    "Practicing pronunciation.",
+    "Learning new expressions."
+   ],
+   "intro": "Jackie has one of the biggest Youtube Channels for learning English, @AskJackie. She also posts English tips through her Instagram account. Today, we'll take a look at a part of her video about QUICK TIPS for Learning English. This video is the compilation of small videos she recorded for Instagram.",
+   "video": {
+    "drive": "1pRUUjm6kDBQ7VzxWd7Ff004IQmGWMs7R",
+    "youtube": "",
+    "nome": "DICAS RÁPIDAS DE INGLÊS!",
+    "instrucao": "Some of the tips are simple, others can be surprising. Pay attention to at least 1 new thing you learned.",
+    "inicio": ""
+   },
+   "warmup": [],
+   "discussao": [
+    [
+     "Which tip was new for you?",
+     "The tip about ____ was new for me."
+    ],
+    [
+     "Which tip(s) did you already know?",
+     "I already knew the tip about...."
+    ]
+   ],
+   "conversa": [
+    [
+     "Do you watch videos on Youtube to study?",
+     "Yes I do. / No, I don't!"
+    ],
+    [
+     "What's your opinion about this video?",
+     "In my opinion, it's...",
+     "GOOD / NICE / DIFFERENT / INTERESTING / OTHER"
+    ],
+    [
+     "Do you know any other Youtubers that teach English?",
+     "Yeah, I know _____.",
+     "No, I don't."
+    ],
+    [
+     "Can Instagram be used to study?",
+     "Sure, it can!",
+     "No, Instagram is only for relaxing."
+    ]
+   ],
+   "pratica": [
+    {
+     "tipo": "repetir",
+     "titulo": "Pronunciation Practice",
+     "instrucao": "Repeat the words after the teacher",
+     "itens": [
+      "FUNCTION",
+      "PRODUCTION",
+      "CONSTRUCTION",
+      "WOMAN / WOMEN",
+      "MAN / MEN"
+     ]
+    },
+    {
+     "tipo": "nota",
+     "titulo": "Language Practice",
+     "instrucao": "Choose the best alternative. (questões em jogo)"
+    },
+    {
+     "tipo": "nota",
+     "titulo": "Vocabulary Practice",
+     "instrucao": "Guess the word in English and repeat. (cartões em vocab: português → inglês)"
+    }
+   ],
+   "jogo": [
+    {
+     "q": "A: I can't believe I'm ____ ___ to John! | B: I know! He is a very nice guy.",
+     "options": [
+      "married with",
+      "married to",
+      "to marry with"
+     ],
+     "correct": 1,
+     "dica": "ESTAR CASADO COM"
+    },
+    {
+     "q": "A: OMG girl, I miss you so much! | B: Yeah! We should meet and ____ __.",
+     "options": [
+      "talk up",
+      "catch up",
+      "up catch"
+     ],
+     "correct": 1,
+     "dica": "COLOCAR O PAPO EM DIA"
+    },
+    {
+     "q": "A: Is it time to sleep, mom? | B: Yes, my dear. _____ _____.",
+     "options": [
+      "Sweet dreams",
+      "Dream sweet",
+      "Soft dreams"
+     ],
+     "correct": 0,
+     "dica": "SONHE COM OS ANJOS"
+    },
+    {
+     "q": "A: Did you sleep well last night? | B: Actually no, I had terrible _______.",
+     "options": [
+      "think",
+      "sleep nights",
+      "nightmares"
+     ],
+     "correct": 2,
+     "dica": "PESADELOS"
+    },
+    {
+     "q": "A: What did you do last year? | B: __ __ ____, I worked as a teacher.",
+     "options": [
+      "At the time",
+      "In this month",
+      "Last year I"
+     ],
+     "correct": 0,
+     "dica": "NA ÉPOCA..."
+    }
+   ],
+   "vocab": [
+    [
+     "SUNSET",
+     "PÔR DO SOL"
+    ],
+    [
+     "SUNRISE",
+     "NASCER DO SOL"
+    ],
+    [
+     "WOMAN",
+     "MULHER"
+    ],
+    [
+     "WOMEN",
+     "MULHERES"
+    ],
+    [
+     "SWEET DREAMS",
+     "SONHE COM OS ANJOS"
+    ],
+    [
+     "NIGHTMARE",
+     "PESADELO"
+    ],
+    [
+     "PRODUCTION",
+     "PRODUÇÃO"
+    ],
+    [
+     "FUNCTION",
+     "FUNÇÃO"
+    ]
+   ],
+   "avaliacao": [
+    [
+     "What did you like about today's activity?",
+     "I liked the... VIDEO / GAMES / CONVERSATION"
+    ],
+    [
+     "Will you watch Jackie's videos?",
+     "Yes, I'll check them out.",
+     "No, I don't think so."
+    ]
+   ],
+   "fotos": {
+    "capa": "02-basic/capa.jpg",
+    "video": "02-basic/capa.jpg",
+    "conv": "02-basic/capa.jpg",
+    "intro": "jackie-hello.jpg",
+    "outras": [
+     "05-basic/intro.jpg",
+     "askjackie.jpg",
+     "instagram.png"
+    ]
+   }
+  },
+  "serie": "youtubers"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "youtuber",
+  "imgs": "youtubers/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#0D0D0D",
+   "fundo2": "#404040",
+   "prim": "#ffffff",
+   "sec": "#DC0505",
+   "dest": "#DC0505",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "television",
+  "icones": [
+   "television"
+  ]
+ }
+}

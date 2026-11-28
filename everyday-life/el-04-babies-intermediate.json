@@ -1,0 +1,187 @@
+{
+ "lesson": {
+  "coverTitle": "#04 – Babies",
+  "coverLevel": "Intermediate",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Babies",
+  "objectives": [
+   "Talking about babies.",
+   "Expanding vocabulary.",
+   "Learning new expressions."
+  ],
+  "material": [
+   "PowerPoint activity"
+  ],
+  "duracao": "20 minutes",
+  "fotosSerie": {
+   "capa": "04-basic/capa.jpg",
+   "iw": "04-basic/iw.jpg",
+   "jogo": "04-basic/jogo.jpg",
+   "conv": "04-basic/conv.jpg",
+   "icone": "04-basic/icone.png"
+  },
+  "vocabulary": [
+   {
+    "word": "baby / babies",
+    "translation": "bebê / bebês"
+   },
+   {
+    "word": "[to] grow up",
+    "translation": "crescer"
+   },
+   {
+    "word": "[to] take care of (a baby)",
+    "translation": "cuidar de um bebê"
+   },
+   {
+    "word": "diaper",
+    "translation": "fralda"
+   },
+   {
+    "word": "lullaby",
+    "translation": "canção-de-ninar"
+   },
+   {
+    "word": "pacifier",
+    "translation": "chupeta"
+   }
+  ],
+  "notas": [
+   {
+    "titulo": "Learning time!",
+    "texto": "Teacher, explain the verb TO BE BORN in the whiteboard. Use the variables WAS/WERE. Practice with the students. If needed, use the following slide to explain."
+   },
+   {
+    "titulo": "Attention!",
+    "texto": "to be born = nascer · (to) born = NÃO EXISTE. Example: “I born in 1992.” (wrong) → “I was born in 1992.”"
+   }
+  ],
+  "languageGame": [
+   {
+    "question": "My son _____ in 2014.",
+    "options": [
+     "born",
+     "was born",
+     "to be born"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "question": "When I ____ __, I want to be an astronaut.",
+    "options": [
+     "go out",
+     "take care",
+     "grow up"
+    ],
+    "correctIndex": 2
+   },
+   {
+    "question": "“Can you change my baby’s ______? It stinks.” (= fede)",
+    "options": [
+     "baby",
+     "diaper",
+     "lullaby"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "question": "“I need to sing a ______ for my baby to sleep.”",
+    "options": [
+     "samba",
+     "lullaby",
+     "rock’n roll song"
+    ],
+    "correctIndex": 1
+   }
+  ],
+  "conversation": [
+   {
+    "question": "Can you take care of babies?",
+    "modelAnswers": [
+     "Yeah, I can take care of babies.",
+     "No, I can’t. It’s not for me."
+    ]
+   },
+   {
+    "question": "When was the last time you took care of a baby?",
+    "modelAnswers": [
+     "The last time I took care of a baby was...",
+     "... last week. / ...yesterday. / other",
+     "I’ve never taken care of a baby."
+    ]
+   },
+   {
+    "question": "Do you know how to change diapers?",
+    "modelAnswers": [
+     "Yeah, I know how to do it.",
+     "Gosh, no! It’s not for me."
+    ]
+   },
+   {
+    "question": "Do you know any lullaby songs?",
+    "modelAnswers": [
+     "Yeah, I know some songs.",
+     "No, I don’t know any songs."
+    ]
+   },
+   {
+    "question": "Did you use a pacifier when you were a baby?",
+    "modelAnswers": [
+     "For sure, I used it. / No, I didn’t use it."
+    ]
+   },
+   {
+    "question": "Is it easy or hard to take care of a baby?",
+    "modelAnswers": [
+     "In my opinion, it’s ______ to take care of a baby."
+    ]
+   },
+   {
+    "question": "When were you born?",
+    "modelAnswers": []
+   },
+   {
+    "question": "When was your (mother) born?",
+    "modelAnswers": []
+   },
+   {
+    "question": "When was your teacher born?",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about babies?"
+   }
+  ],
+  "semRevisao": true,
+  "serie": "everyday-life"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "everyday",
+  "imgs": "everyday-life/img/",
+  "faixa1": "#65BBBF",
+  "faixa2": "#002060",
+  "destaque": "#FFC000",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#000000",
+   "fundo2": "#111111",
+   "prim": "#FFC000",
+   "sec": "#65BBBF",
+   "dest": "#FFC000",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "house",
+  "icones": [
+   "house"
+  ]
+ }
+}

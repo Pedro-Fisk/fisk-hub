@@ -1,0 +1,256 @@
+{
+ "lesson": {
+  "coverTitle": "Countries · Australia",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Australia",
+  "objectives": [
+   "Talking about Australian culture.",
+   "Developing conversation skills."
+  ],
+  "pais": {
+   "nome": "Australia",
+   "oficial": "",
+   "num": 8,
+   "cor": "#00008b",
+   "bandeira": "au/bandeira.svg",
+   "capa": "au/capa.jpg",
+   "capaLocal": "Sydney Opera House",
+   "mapa": "",
+   "texto": "Australia is a country and a continent at once. It is the home of animals like the kangaroo and the koala.\nBefore the British arrived in 1788, Aboriginal peoples already spoke hundreds of languages there. Words like kangaroo, boomerang and koala came into English from them.",
+   "fatos": [
+    [
+     "Capital",
+     "Canberra"
+    ],
+    [
+     "Languages",
+     "English and more than 100 Indigenous languages"
+    ],
+    [
+     "Currency",
+     "Australian dollar (A$)"
+    ],
+    [
+     "Population",
+     "≈ 27 million"
+    ]
+   ]
+  },
+  "introText": "Today, we’ll talk about Australia. We’ll take a look at Aussie English, food, animals and famous places.",
+  "introSub": "Aussie English, food, animals and famous places",
+  "warmup": [
+   {
+    "question": "What images come to your mind when you think of Australia?",
+    "modelAnswers": []
+   },
+   {
+    "question": "How different do you think Australian English is from American English?",
+    "modelAnswers": []
+   }
+  ],
+  "fotos": [
+   {
+    "img": "au/uluru.jpg",
+    "titulo": "Uluru",
+    "local": "Uluru, in the centre of Australia",
+    "texto": "Uluru is the red monolith in the centre of the country. It is sacred to the Anangu people."
+   },
+   {
+    "img": "au/reef.jpg",
+    "local": "Great Barrier Reef, Queensland",
+    "texto": "The Great Barrier Reef is the largest coral reef system on the planet."
+   },
+   {
+    "img": "au/bondi.jpg",
+    "titulo": "Christmas on the beach",
+    "local": "Bondi Beach, Sydney",
+    "texto": "Bondi is one of the best-known beaches in Sydney, famous for surfing. December is summer in Australia, and many people spend Christmas at the beach!"
+   },
+   {
+    "img": "au/vegemite.jpg",
+    "titulo": "Brekkie",
+    "local": "Vegemite on toast",
+    "texto": "Vegemite is a dark, very salty spread. Because it is so salty, Australians put only a thin layer on their toast."
+   },
+   {
+    "img": "au/lamington.jpg",
+    "local": "Lamington",
+    "texto": "A cube of sponge cake covered in chocolate and coconut: a classic Australian sweet."
+   }
+  ],
+  "vocabulary": [
+   {
+    "word": "g’day",
+    "translation": "olá, e aí"
+   },
+   {
+    "word": "mate",
+    "translation": "amigo, cara, parceiro"
+   },
+   {
+    "word": "arvo",
+    "translation": "tarde (afternoon)"
+   },
+   {
+    "word": "brekkie",
+    "translation": "café da manhã (breakfast)"
+   },
+   {
+    "word": "no worries",
+    "translation": "sem problema, de nada"
+   },
+   {
+    "word": "thongs",
+    "translation": "chinelos de dedo"
+   },
+   {
+    "word": "diminutive",
+    "translation": "diminutivo"
+   },
+   {
+    "word": "register",
+    "translation": "registro (formal ou informal)"
+   },
+   {
+    "word": "sacred",
+    "translation": "sagrado"
+   },
+   {
+    "word": "compulsory",
+    "translation": "obrigatório"
+   }
+  ],
+  "vocabTitulo": "Aussie English",
+  "vocabSub": "words you will hear in Australia · pay attention to pronunciation",
+  "video": null,
+  "leitura": null,
+  "languageGame": [
+   {
+    "question": "Uluru is sacred to the Anangu people.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "Australians put a thick layer of Vegemite on their toast.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": "Vegemite is very salty, so they use only a thin layer."
+   },
+   {
+    "question": "In Australia, Christmas is in the summer.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "The words kangaroo and koala came into English from Spanish.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": "They came from Aboriginal languages."
+   },
+   {
+    "question": "The Great Barrier Reef is the largest coral reef system on the planet.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   }
+  ],
+  "jogoTitulo": "True or False?",
+  "conversation": [
+   {
+    "question": "Uluru is sacred to the Anangu people. How should tourists behave when they visit sacred or historical places?",
+    "modelAnswers": []
+   },
+   {
+    "question": "How can tourism help or harm natural wonders like the Great Barrier Reef?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Before 1788, Aboriginal peoples spoke hundreds of languages in Australia. Why is it important to protect Indigenous languages, there and in Brazil?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Words like kangaroo and koala came into English from Aboriginal languages. Which Portuguese words do you know that came from Indigenous languages?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Shortened words like “arvo” make a conversation sound friendly and relaxed. Do you speak differently with friends and at work? How?",
+    "modelAnswers": []
+   },
+   {
+    "question": "In a job interview, Australians use the full words again. Is informal language ever acceptable in professional situations? Why (not)?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Calling everybody “mate” treats people as equals. Is Brazilian culture formal or informal, in your opinion?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Tipping is not expected in Australia, because the minimum wage is high. Should tips be compulsory? Why (not)?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Australians and Brazilians have Christmas in the summer. Which Christmas traditions from colder countries don’t make sense in a tropical summer?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Would you rather explore the beaches of Sydney or the centre of the country, around Uluru? Why?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Would you rather live in Australia or just visit it? Why?",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about Australia?"
+   },
+   {
+    "question": "Which other countries would you like to learn more about?"
+   }
+  ],
+  "serie": "countries"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "countries",
+  "imgs": "countries/img/",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#ffffff",
+   "fundo2": "#eef3f8",
+   "prim": "#16365c",
+   "sec": "#00008b",
+   "dest": "#00008b",
+   "txt": "#16365c"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "globe-showing-americas",
+  "icones": [
+   "globe-showing-americas"
+  ]
+ }
+}

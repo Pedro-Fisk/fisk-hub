@@ -1,0 +1,243 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · /ʌ/ vs. /ɝ/",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Two Vowels",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing two vowels.",
+   "Developing pronunciation."
+  ],
+  "material": [
+   "PowerPoint activity",
+   "Buddy Talks AUDIO FILE - cup and bird"
+  ],
+  "duracao": "10 minutes",
+  "vocabulary": [
+   {
+    "word": "bud · bird",
+    "translation": ""
+   },
+   {
+    "word": "cut · curt",
+    "translation": ""
+   },
+   {
+    "word": "hut · hurt",
+    "translation": ""
+   },
+   {
+    "word": "bun · burn",
+    "translation": ""
+   },
+   {
+    "word": "ton · turn",
+    "translation": ""
+   },
+   {
+    "word": "shut · shirt",
+    "translation": ""
+   },
+   {
+    "word": "cub · curb",
+    "translation": ""
+   },
+   {
+    "word": "luck · lurk",
+    "translation": ""
+   },
+   {
+    "word": "hull · hurl",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll work on two vowels that stay merged even in advanced speakers. They’re... …/ʌ/ and /ɝ/! Merging them costs you real minimal pairs: hurt\n\nCompare: bud and bird, cut and curt, hut and hurt. Same consonants. Without the contrast, the listener rebuilds the word from context, every time.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll work on two vowels that stay merged even in advanced speakers. They’re...",
+   "…/ʌ/ and /ɝ/!\nMerging them costs you real minimal pairs:\nhurt",
+   "Compare: bud and bird, cut and curt, hut and hurt. Same consonants.",
+   "Without the contrast, the listener rebuilds the word from context, every time."
+  ],
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 2 - L 7 - pg 63",
+    "id": "1wbvVr-yXXtPQHFu4pEpQaGHPVFUsjTSY"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 2 - L 7 - pg 63",
+    "id": "10Ip23XKVVY3jivzrRcdYVX9aVsnNsafe"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: Did the deal hurt the company?",
+    "modelAnswers": [
+     "B: It curtailed our growth, yes."
+    ]
+   },
+   {
+    "question": "A: What turned it around?",
+    "modelAnswers": [
+     "B: A burn rate we finally controlled."
+    ]
+   },
+   {
+    "question": "A: Was the meeting curt?",
+    "modelAnswers": [
+     "B: Short, but nobody got hurt."
+    ]
+   },
+   {
+    "question": "What does the sky is the limit mean to you?",
+    "modelAnswers": [
+     "To me it means..."
+    ]
+   },
+   {
+    "question": "What has success cost you?",
+    "modelAnswers": [
+     "It cost me..."
+    ]
+   },
+   {
+    "question": "Do you disagree with how success is measured?",
+    "modelAnswers": [
+     "I disagree because..."
+    ]
+   },
+   {
+    "question": "When did persistence turn into stubbornness?",
+    "modelAnswers": [
+     "It turned when..."
+    ]
+   },
+   {
+    "question": "What is worth more: recognition or freedom?",
+    "modelAnswers": [
+     "I would choose... because..."
+    ]
+   },
+   {
+    "question": "Who deserves credit that never gets it?",
+    "modelAnswers": [
+     "The person who deserves it is..."
+    ]
+   },
+   {
+    "question": "Have you ever burned out?",
+    "modelAnswers": [
+     "I burned out when..."
+    ]
+   },
+   {
+    "question": "What would you tell your younger self about work?",
+    "modelAnswers": [
+     "I would tell myself..."
+    ]
+   },
+   {
+    "question": "Is there a limit you have accepted?",
+    "modelAnswers": [
+     "I accepted that..."
+    ]
+   }
+  ],
+  "languageGame": [
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "bud",
+    "options": [
+     "bud",
+     "bird"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "curt",
+    "options": [
+     "cut",
+     "curt"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "hut",
+    "options": [
+     "hut",
+     "hurt"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "burn",
+    "options": [
+     "bun",
+     "burn"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "ton",
+    "options": [
+     "ton",
+     "turn"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "shirt",
+    "options": [
+     "shut",
+     "shirt"
+    ],
+    "correctIndex": 1
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Do you keep bud and bird apart when you speak?"
+   }
+  ],
+  "temaDaConversa": "The price of success",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "bear",
+  "icones": [
+   "bear"
+  ]
+ }
+}

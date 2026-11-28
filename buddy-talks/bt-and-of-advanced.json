@@ -1,0 +1,182 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · And / Of",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Weak Words",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing weak words.",
+   "Developing pronunciation."
+  ],
+  "material": [
+   "PowerPoint activity",
+   "Buddy Talks AUDIO FILE - the weak and & of"
+  ],
+  "duracao": "10 minutes",
+  "vocabulary": [
+   {
+    "word": "ahead of time",
+    "translation": ""
+   },
+   {
+    "word": "short of time",
+    "translation": ""
+   },
+   {
+    "word": "aware of that",
+    "translation": ""
+   },
+   {
+    "word": "capable of it",
+    "translation": ""
+   },
+   {
+    "word": "regardless of",
+    "translation": ""
+   },
+   {
+    "word": "time and again",
+    "translation": ""
+   },
+   {
+    "word": "trial and error",
+    "translation": ""
+   },
+   {
+    "word": "give and take",
+    "translation": ""
+   },
+   {
+    "word": "wear and tear",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll work on two words that fluent speakers reduce to almost nothing at all. They are... …AND and OF! Function words compress; content words don’t: ahead of\n\nEnglish rhythm depends on compressing the small words between the stressed ones. Giving every word equal weight is what makes fluent speech sound mechanical.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll work on two words that fluent speakers reduce to almost nothing at all. They are...",
+   "…AND and OF!\nFunction words compress; content words don’t:\nahead of",
+   "English rhythm depends on compressing the small words between the stressed ones.",
+   "Giving every word equal weight is what makes fluent speech sound mechanical."
+  ],
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 1 - L 5 - pg 43",
+    "id": "1y612hkl243MfeLCuY9THWzic5AWxqbm4"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 1 - L 5 - pg 43",
+    "id": "10PbcEN035qB-9qjfdDFmo4Iuzu8k1Xmz"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: Did the booking go through?",
+    "modelAnswers": [
+     "B: I confirmed it well ahead of time."
+    ]
+   },
+   {
+    "question": "A: How did you choose the place?",
+    "modelAnswers": [
+     "B: Trial and error, to be honest."
+    ]
+   },
+   {
+    "question": "A: Was it worth the price?",
+    "modelAnswers": [
+     "B: Given the wear and tear, hardly."
+    ]
+   },
+   {
+    "question": "What makes a place worth the money?",
+    "modelAnswers": [
+     "Regardless of the price, I look for..."
+    ]
+   },
+   {
+    "question": "Have you ever complained about a room?",
+    "modelAnswers": [
+     "I complained because of..."
+    ]
+   },
+   {
+    "question": "What are you never short of when packing?",
+    "modelAnswers": [
+     "I always take plenty of..."
+    ]
+   },
+   {
+    "question": "Do you plan ahead of time or improvise?",
+    "modelAnswers": [
+     "I plan ahead of time because..."
+    ]
+   },
+   {
+    "question": "What kind of place would you avoid?",
+    "modelAnswers": [
+     "I would avoid a kind of..."
+    ]
+   },
+   {
+    "question": "Is a review worth trusting?",
+    "modelAnswers": [
+     "It depends on..."
+    ]
+   },
+   {
+    "question": "Tell me about a place that surprised you.",
+    "modelAnswers": [
+     "It was full of..."
+    ]
+   },
+   {
+    "question": "What is the trade-off between price and comfort?",
+    "modelAnswers": [
+     "It is a give and take between..."
+    ]
+   },
+   {
+    "question": "Would you go back to the same place?",
+    "modelAnswers": [
+     "Time and again, because..."
+    ]
+   }
+  ],
+  "languageGame": [],
+  "evaluation": [
+   {
+    "question": "Do your small words compress when you speak?"
+   }
+  ],
+  "temaDaConversa": "Judging a place to stay",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "bear",
+  "icones": [
+   "bear"
+  ]
+ }
+}

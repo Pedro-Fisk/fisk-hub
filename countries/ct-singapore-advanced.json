@@ -1,0 +1,261 @@
+{
+ "lesson": {
+  "coverTitle": "Countries · Singapore",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Singapore",
+  "objectives": [
+   "Talking about Singapore.",
+   "Developing conversation skills."
+  ],
+  "pais": {
+   "nome": "Singapore",
+   "oficial": "",
+   "num": 11,
+   "cor": "#ef3340",
+   "bandeira": "sg/bandeira.svg",
+   "capa": "sg/capa.jpg",
+   "capaLocal": "Gardens by the Bay",
+   "mapa": "",
+   "texto": "Singapore is an island the size of a large city: the city is the country. It has four official languages: English, Mandarin, Malay and Tamil.\nMany Singaporeans speak two Englishes: formal English at school and at work, and Singlish, the English of the street, with friends.",
+   "fatos": [
+    [
+     "Capital",
+     "Singapore (the city is the country)"
+    ],
+    [
+     "Official languages",
+     "English, Mandarin, Malay and Tamil"
+    ],
+    [
+     "Currency",
+     "Singapore dollar (S$)"
+    ],
+    [
+     "Population",
+     "≈ 6 million"
+    ],
+    [
+     "Area",
+     "about 730 km²"
+    ]
+   ]
+  },
+  "introText": "Today, we’ll talk about Singapore. We’ll take a look at Singlish, hawker centres and life in a city-state.",
+  "introSub": "Singlish, hawker centres and life in a city-state",
+  "warmup": [
+   {
+    "question": "What images come to your mind when you think of Singapore?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Can a country the size of a city be successful? How?",
+    "modelAnswers": []
+   }
+  ],
+  "fotos": [
+   {
+    "img": "sg/hawker.jpg",
+    "titulo": "Hawker centres",
+    "local": "Newton Food Centre",
+    "texto": "Halls with many stalls selling cheap food. Tip: a packet of tissues on the table means “taken”!"
+   },
+   {
+    "img": "sg/chickenrice.jpg",
+    "titulo": "Food",
+    "local": "Hainanese chicken rice",
+    "texto": "Poached chicken with rice cooked in the stock. It is often called the national dish."
+   },
+   {
+    "img": "sg/chillicrab.jpg",
+    "local": "Chilli crab",
+    "texto": "Crab in a chilli and tomato sauce, eaten with fried buns."
+   },
+   {
+    "img": "sg/kaya.jpg",
+    "local": "Kaya toast",
+    "texto": "A traditional breakfast: toast with kaya (a coconut and egg jam), soft-boiled eggs and kopi."
+   },
+   {
+    "img": "sg/kampongglam.jpg",
+    "local": "Kampong Glam",
+    "texto": "Chinatown, Little India and Kampong Glam: three neighbourhoods with three heritages, Chinese, Indian and Malay."
+   },
+   {
+    "img": "sg/marinabay.jpg",
+    "titulo": "A very orderly city",
+    "local": "ArtScience Museum, Marina Bay Sands",
+    "texto": "In Singapore, eating and drinking on the metro is not allowed, and littering gets you a fine."
+   }
+  ],
+  "vocabulary": [
+   {
+    "word": "lah",
+    "translation": "(ênfase no fim da frase)"
+   },
+   {
+    "word": "can / cannot",
+    "translation": "dá / não dá"
+   },
+   {
+    "word": "chope",
+    "translation": "guardar lugar"
+   },
+   {
+    "word": "You eat already?",
+    "translation": "já comeu? (cumprimento)"
+   },
+   {
+    "word": "kiasu",
+    "translation": "medo de ficar para trás"
+   },
+   {
+    "word": "city-state",
+    "translation": "cidade-estado"
+   },
+   {
+    "word": "mother tongue",
+    "translation": "língua materna"
+   },
+   {
+    "word": "littering",
+    "translation": "jogar lixo na rua"
+   },
+   {
+    "word": "to switch registers",
+    "translation": "trocar de registro (formal / informal)"
+   }
+  ],
+  "vocabTitulo": "Singlish",
+  "vocabSub": "words you will hear in Singapore · pay attention to pronunciation",
+  "video": null,
+  "leitura": null,
+  "languageGame": [
+   {
+    "question": "Singapore has four official languages.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "At a hawker centre, a packet of tissues on the table means “taken”.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "In Singapore, you can eat and drink on the metro.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": "It is not allowed."
+   },
+   {
+    "question": "Kaya toast is a traditional dinner.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": "It is a traditional breakfast."
+   },
+   {
+    "question": "Hainanese chicken rice is often called the national dish.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   }
+  ],
+  "jogoTitulo": "True or False?",
+  "conversation": [
+   {
+    "question": "Since the 1980s, school lessons in Singapore have been taught in English, and each student also studies their own “mother tongue”. What are the pros and cons of this system?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Should Brazilian schools teach some subjects in English? Why (not)?",
+    "modelAnswers": []
+   },
+   {
+    "question": "The government campaigned against Singlish for decades, but people learned to switch between the two Englishes. Should governments try to control how people speak?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Several Singlish words are already in the Oxford English Dictionary. Who decides what “correct” English is?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Many Singaporeans hold two versions of a language and know when each one belongs. Can you do the same in Portuguese? Give examples.",
+    "modelAnswers": []
+   },
+   {
+    "question": "“Kiasu” is the fear of falling behind, of missing out on something. Is this feeling common among people your age? Why?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Hawker culture became UNESCO Intangible Cultural Heritage in 2020. Which Brazilian food tradition deserves this recognition? Why?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Singapore has strict rules: no eating on the metro and fines for littering. Do strict rules make a city better, or do they limit freedom?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Singapore mixes Chinese, Malay and Indian heritage. What are the benefits and the challenges of a multicultural society?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Singapore is about 730 km², a little bigger than Taubaté, with about six million people. Would you like to live in such a crowded place? Why (not)?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Food is part of national identity in Singapore. What does Brazilian food say about Brazil?",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about Singapore?"
+   },
+   {
+    "question": "Which other countries would you like to learn more about?"
+   }
+  ],
+  "serie": "countries"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "countries",
+  "imgs": "countries/img/",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#ffffff",
+   "fundo2": "#eef3f8",
+   "prim": "#16365c",
+   "sec": "#ef3340",
+   "dest": "#ef3340",
+   "txt": "#16365c"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "globe-showing-americas",
+  "icones": [
+   "globe-showing-americas"
+  ]
+ }
+}

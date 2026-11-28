@@ -1,0 +1,157 @@
+{
+ "lesson": {
+  "coverTitle": "Words in Technology – Part 2",
+  "coverLevel": "All Levels",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Words in Technology – Part 2",
+  "yt": {
+   "capaTitulo": "TIPS IN ENGLISH 9 - ALL LEVELS",
+   "material": [
+    "PowerPoint activity",
+    "Youtubers VIDEO FILE #09 - Dropbox"
+   ],
+   "duracao": "20 minutes",
+   "objetivos": [
+    "Practicing pronunciation.",
+    "Learning new words about TECHNOLOGY."
+   ],
+   "intro": "English teacher Jackie is a big Youtuber. Watching her Youtube Channel @AskJackie is a great way to study. Today, we'll take a look at the second part of her video about PRONUNCIATION of vocabulary related to TECHNOLOGY.",
+   "video": {
+    "drive": "1pdteAlopvXfMCG99aAP75269N0tQqh1d",
+    "youtube": "",
+    "nome": "10 palavras da TECNOLOGIA que você está pronunciando errado em inglês...possivelmente. ;) (parte 2)",
+    "instrucao": "Pay attention to the CORRECT pronunciation. (The word #08 is not shown in the video.)",
+    "inicio": ""
+   },
+   "warmup": [],
+   "discussao": [],
+   "conversa": [],
+   "pratica": [
+    {
+     "tipo": "pronuncia",
+     "titulo": "Pronunciation Practice",
+     "instrucao": "Repeat the words after the teacher",
+     "itens": [
+      [
+       "CELL PHONE",
+       "not pronounced (o E final)"
+      ],
+      [
+       "MOBILE",
+       "EUA: \"MÔU BÊL\" /ˈmoʊbəl/ · Reino Unido: \"MÔ BÁIL\" /ˈməʊbaɪl/"
+      ],
+      [
+       "NOTEBOOK",
+       "closed consonants (T e K)"
+      ],
+      [
+       "FACEBOOK",
+       "closed consonants (C e K)"
+      ],
+      [
+       "WIFI",
+       "strongest syllable (WI)"
+      ],
+      [
+       "MODEM",
+       "\"flap\" sound - /r/ · \"MÔU RÂM\""
+      ],
+      [
+       "LAPTOP",
+       "closed consonants (P e P)"
+      ]
+     ]
+    },
+    {
+     "tipo": "repetir",
+     "titulo": "Repeat these words!",
+     "instrucao": "",
+     "itens": [
+      "CELL PHONE",
+      "MOBILE",
+      "FACEBOOK / NOTEBOOK",
+      "WIFI",
+      "MODEM",
+      "LAPTOP"
+     ]
+    },
+    {
+     "tipo": "figuras",
+     "titulo": "Pronunciation Practice",
+     "instrucao": "Create sentences using the words shown in the slides.",
+     "itens": [
+      [
+       "CELL PHONE / MOBILE",
+       "09-all/celular.png"
+      ],
+      [
+       "NOTEBOOK",
+       "09-all/notebook.jpg"
+      ],
+      [
+       "FACEBOOK",
+       "09-all/facebook.png"
+      ],
+      [
+       "WIFI",
+       "09-all/wifi.png"
+      ],
+      [
+       "MODEM",
+       "09-all/modem.png"
+      ],
+      [
+       "LAPTOP",
+       "09-all/laptop.png"
+      ]
+     ]
+    }
+   ],
+   "jogo": [],
+   "vocab": [],
+   "avaliacao": [],
+   "fotos": {
+    "capa": "08-basic/capa.jpg",
+    "video": "08-basic/capa.jpg",
+    "intro": "jackie-hello.jpg",
+    "outras": [
+     "08-basic/intro.jpg",
+     "09-all/eua.png",
+     "09-all/reino-unido.png",
+     "09-all/celular.png",
+     "09-all/notebook.jpg",
+     "09-all/facebook.png",
+     "09-all/wifi.png",
+     "09-all/modem.png",
+     "09-all/laptop.png",
+     "askjackie.jpg"
+    ]
+   }
+  },
+  "serie": "youtubers"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "youtuber",
+  "imgs": "youtubers/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#0D0D0D",
+   "fundo2": "#404040",
+   "prim": "#ffffff",
+   "sec": "#DC0505",
+   "dest": "#DC0505",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "television",
+  "icones": [
+   "television"
+  ]
+ }
+}

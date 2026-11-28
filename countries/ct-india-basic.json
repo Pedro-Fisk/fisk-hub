@@ -1,0 +1,265 @@
+{
+ "lesson": {
+  "coverTitle": "Countries · India",
+  "coverLevel": "Basic & Teens",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "India",
+  "objectives": [
+   "Talking about India.",
+   "Developing conversation skills."
+  ],
+  "pais": {
+   "nome": "India",
+   "oficial": "Republic of India",
+   "num": 6,
+   "cor": "#ff9933",
+   "bandeira": "in/bandeira.svg",
+   "capa": "in/taj.jpg",
+   "capaLocal": "Taj Mahal",
+   "mapa": "in/mapa.png",
+   "texto": "India is a country in South Asia. It is the seventh-largest country by area and the second-most populous country, after China.\nThe Taj Mahal is a mausoleum and the best known of the country’s monuments. It is classified by UNESCO as a World Heritage Site.",
+   "fatos": [
+    [
+     "Capital",
+     "New Delhi"
+    ],
+    [
+     "Official languages",
+     "Hindi and English"
+    ],
+    [
+     "Currency",
+     "Indian Rupee"
+    ],
+    [
+     "Driving side",
+     "left"
+    ],
+    [
+     "Population",
+     "1.339 billion (2017)"
+    ]
+   ]
+  },
+  "introText": "",
+  "introSub": "Introduction and curiosities about India",
+  "warmup": [],
+  "fotos": [
+   {
+    "img": "in/newdelhi.jpg",
+    "local": "New Delhi",
+    "texto": "Officially, English is the most important language of India. After Hindi, it is the most commonly spoken language."
+   },
+   {
+    "img": "in/jaisalmer.jpg",
+    "local": "Jaisalmer",
+    "texto": "The Indians have their own unique English. The Indian accent is sometimes difficult for non-Indians to understand."
+   },
+   {
+    "img": "in/varanasi.jpg",
+    "local": "Varanasi"
+   },
+   {
+    "img": "in/rishikesh.jpg",
+    "local": "Rishikesh"
+   },
+   {
+    "img": "in/manali.jpg",
+    "local": "Manali"
+   },
+   {
+    "img": "in/goa.jpg",
+    "local": "Goa"
+   },
+   {
+    "img": "in/jaipur.jpg",
+    "local": "Jaipur"
+   },
+   {
+    "img": "in/mulheres.jpg",
+    "local": "Indian women"
+   },
+   {
+    "img": "in/suntemple.jpg",
+    "local": "Sun Temple"
+   },
+   {
+    "img": "in/tirumala.jpg",
+    "local": "Tirumala Temple"
+   },
+   {
+    "img": "in/mahabodhi.jpg",
+    "local": "Mahabodhi Temple"
+   }
+  ],
+  "vocabulary": [
+   {
+    "word": "to spread",
+    "translation": "propagar, espalhar"
+   },
+   {
+    "word": "Christianity",
+    "translation": "Cristianismo"
+   },
+   {
+    "word": "press",
+    "translation": "imprensa"
+   },
+   {
+    "word": "syntax",
+    "translation": "sintaxe"
+   },
+   {
+    "word": "coinage",
+    "translation": "neologismo (palavra nova)"
+   },
+   {
+    "word": "feature",
+    "translation": "característica"
+   },
+   {
+    "word": "retroflex trilled",
+    "translation": "(o som do /r/)"
+   },
+   {
+    "word": "merging",
+    "translation": "fusão"
+   }
+  ],
+  "vocabTitulo": "Important words",
+  "vocabSub": "for the video · pay attention to pronunciation",
+  "video": {
+   "drive": "1NbhskIStuLAfTTTOuZ3In-01yiZ-nkj1",
+   "nome": "Indian English"
+  },
+  "leitura": null,
+  "languageGame": [
+   {
+    "question": "There are only two languages in India.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": "There are many languages."
+   },
+   {
+    "question": "The “Indian accent” is the way English is spoken in India.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 0,
+    "explanation": ""
+   },
+   {
+    "question": "The English vocabulary used in India is like the one used in the USA.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": ""
+   },
+   {
+    "question": "There are no changes in pronunciation in “Indian English”.",
+    "options": [
+     "True",
+     "False"
+    ],
+    "correctIndex": 1,
+    "explanation": ""
+   }
+  ],
+  "jogoTitulo": "True or False?",
+  "conversation": [
+   {
+    "question": "Who would you like to visit India with?",
+    "modelAnswers": [
+     "I’d like to visit India with my…"
+    ]
+   },
+   {
+    "question": "What would you like to see in India?",
+    "modelAnswers": [
+     "I’d like to see the... (palaces / beaches / churches / monuments / temples)"
+    ]
+   },
+   {
+    "question": "Would you like to visit or live in India?",
+    "modelAnswers": [
+     "I’d like to… India."
+    ]
+   },
+   {
+    "question": "Do you prefer to visit historical places or natural landmarks?",
+    "modelAnswers": [
+     "In my opinion, I prefer to visit…"
+    ]
+   },
+   {
+    "question": "What is the most famous monument in Brazil?",
+    "modelAnswers": [
+     "… is the most famous monument in Brazil."
+    ]
+   },
+   {
+    "question": "What tourist places in your country can you suggest to visit?",
+    "modelAnswers": [
+     "I can suggest to visit… and…"
+    ]
+   },
+   {
+    "question": "Would you like people to speak Portuguese or English in Brazil?",
+    "modelAnswers": [
+     "I’d like people to speak… in Brazil."
+    ]
+   },
+   {
+    "question": "What would you like to have, the American accent or the Indian accent?",
+    "modelAnswers": [
+     "I’d like to have the… accent."
+    ]
+   },
+   {
+    "question": "What is more beautiful to listen to, American English or Indian English?",
+    "modelAnswers": [
+     "I guess… is more beautiful to listen to."
+    ]
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about India?"
+   },
+   {
+    "question": "Which other countries would you like to learn more about?"
+   }
+  ],
+  "serie": "countries"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "countries",
+  "imgs": "countries/img/",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#ffffff",
+   "fundo2": "#eef3f8",
+   "prim": "#16365c",
+   "sec": "#ff9933",
+   "dest": "#ff9933",
+   "txt": "#16365c"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "globe-showing-americas",
+  "icones": [
+   "globe-showing-americas"
+  ]
+ }
+}

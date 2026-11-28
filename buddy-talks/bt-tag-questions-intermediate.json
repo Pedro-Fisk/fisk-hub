@@ -1,0 +1,182 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · Tag Questions",
+  "coverLevel": "Intermediate",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Question Melody",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing tag questions.",
+   "Developing pronunciation."
+  ],
+  "material": [
+   "PowerPoint activity",
+   "Buddy Talks AUDIO FILE - Tag question intonation"
+  ],
+  "duracao": "10 minutes",
+  "vocabulary": [
+   {
+    "word": "isn’t it? ↓",
+    "translation": ""
+   },
+   {
+    "word": "aren’t they? ↑",
+    "translation": ""
+   },
+   {
+    "word": "haven’t you? ↓",
+    "translation": ""
+   },
+   {
+    "word": "doesn’t she? ↑",
+    "translation": ""
+   },
+   {
+    "word": "didn’t we? ↓",
+    "translation": ""
+   },
+   {
+    "word": "shouldn’t we? ↑",
+    "translation": ""
+   },
+   {
+    "word": "wouldn’t it? ↓",
+    "translation": ""
+   },
+   {
+    "word": "can’t they? ↑",
+    "translation": ""
+   },
+   {
+    "word": "hasn’t he? ↓",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll practice a melody that decides whether you are asking or confirming. It’s... …TAG QUESTIONS! The same tag means two different things: aren’t you?\n\nA falling tag says: I know this and I only want you to agree. A rising tag says: I’m not sure at all, so please tell me the answer.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll practice a melody that decides whether you are asking or confirming. It’s...",
+   "…TAG QUESTIONS!\nThe same tag means two different things:\naren’t you?",
+   "A falling tag says: I know this and I only want you to agree.",
+   "A rising tag says: I’m not sure at all, so please tell me the answer."
+  ],
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 1 - L 1 - pg 11",
+    "id": "1pKUxLKtJSzM85kb2Hz1cgOKoAadpe1D-"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 1 - L 1 - pg 11",
+    "id": "1wvT1-2r55pnUkLGDnhp0PodyYiWs3tQ5"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: You follow that channel, don’t you? ↑",
+    "modelAnswers": [
+     "B: I do, but I skip half of it."
+    ]
+   },
+   {
+    "question": "A: That trend got old fast, didn’t it? ↓",
+    "modelAnswers": [
+     "B: It lasted about two weeks."
+    ]
+   },
+   {
+    "question": "A: You wouldn’t pay for that app, would you? ↑",
+    "modelAnswers": [
+     "B: Only if it were really useful."
+    ]
+   },
+   {
+    "question": "You spend hours online, don’t you? ↑",
+    "modelAnswers": [
+     "Actually, I spend..."
+    ]
+   },
+   {
+    "question": "You follow a lot of people, don’t you? ↑",
+    "modelAnswers": [
+     "I follow..."
+    ]
+   },
+   {
+    "question": "That trend was silly, wasn’t it? ↓",
+    "modelAnswers": [
+     "I thought it was..."
+    ]
+   },
+   {
+    "question": "You’ve seen that video, haven’t you? ↑",
+    "modelAnswers": [
+     "Yes, I have. / Not yet."
+    ]
+   },
+   {
+    "question": "People post too much, don’t they? ↓",
+    "modelAnswers": [
+     "I think people post..."
+    ]
+   },
+   {
+    "question": "You don’t watch TV anymore, do you? ↑",
+    "modelAnswers": [
+     "I still watch..."
+    ]
+   },
+   {
+    "question": "Short videos are addictive, aren’t they? ↓",
+    "modelAnswers": [
+     "They are, because..."
+    ]
+   },
+   {
+    "question": "You’d rather scroll than read, wouldn’t you? ↑",
+    "modelAnswers": [
+     "Actually, I prefer..."
+    ]
+   },
+   {
+    "question": "This app will disappear, won’t it? ↓",
+    "modelAnswers": [
+     "I doubt it, because..."
+    ]
+   }
+  ],
+  "languageGame": [],
+  "evaluation": [
+   {
+    "question": "Which tag melody is harder for you? Why?"
+   }
+  ],
+  "temaDaConversa": "What’s trending now",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "bear",
+  "icones": [
+   "bear"
+  ]
+ }
+}

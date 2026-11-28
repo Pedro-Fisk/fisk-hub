@@ -1,0 +1,243 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · /aʊ/ vs. /oʊ/",
+  "coverLevel": "Basic",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Now or No",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing two diphthongs.",
+   "Developing pronunciation."
+  ],
+  "material": [
+   "PowerPoint activity",
+   "Buddy Talks AUDIO FILE - now and no"
+  ],
+  "duracao": "10 minutes",
+  "vocabulary": [
+   {
+    "word": "now · no",
+    "translation": ""
+   },
+   {
+    "word": "town · tone",
+    "translation": ""
+   },
+   {
+    "word": "loud · load",
+    "translation": ""
+   },
+   {
+    "word": "out · oat",
+    "translation": ""
+   },
+   {
+    "word": "house · hose",
+    "translation": ""
+   },
+   {
+    "word": "how · hoe",
+    "translation": ""
+   },
+   {
+    "word": "clown · clone",
+    "translation": ""
+   },
+   {
+    "word": "noun · known",
+    "translation": ""
+   },
+   {
+    "word": "found · phoned",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll practice two sounds that are almost opposite, but we mix them up. They’re... …NOW and NO! Two vowels in one sound, going different ways: now x no\n\nIn now, house and down the mouth opens wide first, then closes. In no, home and don’t the lips are round from the very beginning.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll practice two sounds that are almost opposite, but we mix them up. They’re...",
+   "…NOW and NO!\nTwo vowels in one sound, going different ways:\nnow x no",
+   "In now, house and down the mouth opens wide first, then closes.",
+   "In no, home and don’t the lips are round from the very beginning."
+  ],
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 2 - L 10 - pg 87",
+    "id": "1DsqqDqJkZOvyQ3zzyXZMAplAK5PDSav4"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 2 - L 10 - pg 87",
+    "id": "1WiwKAtOeSUjYsEvGhiAXDFLn5JB4niwI"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: Do you live in this town?",
+    "modelAnswers": [
+     "B: No, my house is down the road."
+    ]
+   },
+   {
+    "question": "A: Is the music too loud?",
+    "modelAnswers": [
+     "B: Now it’s fine, thank you."
+    ]
+   },
+   {
+    "question": "A: Did you go out?",
+    "modelAnswers": [
+     "B: No, I stayed home all day."
+    ]
+   },
+   {
+    "question": "Do you believe in luck? Why?",
+    "modelAnswers": [
+     "I believe / don’t believe because..."
+    ]
+   },
+   {
+    "question": "What brings bad luck in your family?",
+    "modelAnswers": [
+     "My family says that..."
+    ]
+   },
+   {
+    "question": "Do you have a lucky number?",
+    "modelAnswers": [
+     "My lucky number is..."
+    ]
+   },
+   {
+    "question": "What do you do before a test?",
+    "modelAnswers": [
+     "Before a test I..."
+    ]
+   },
+   {
+    "question": "Is a black cat bad luck for you?",
+    "modelAnswers": [
+     "For me, a black cat is..."
+    ]
+   },
+   {
+    "question": "Do you know a superstition from your town?",
+    "modelAnswers": [
+     "In my town people say..."
+    ]
+   },
+   {
+    "question": "What would you never do on Friday the 13th?",
+    "modelAnswers": [
+     "I would never..."
+    ]
+   },
+   {
+    "question": "Do you cross your fingers? When?",
+    "modelAnswers": [
+     "I cross my fingers when..."
+    ]
+   },
+   {
+    "question": "Was there a day when you had good luck?",
+    "modelAnswers": [
+     "One day I found..."
+    ]
+   }
+  ],
+  "languageGame": [
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "now",
+    "options": [
+     "now",
+     "no"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "tone",
+    "options": [
+     "town",
+     "tone"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "loud",
+    "options": [
+     "loud",
+     "load"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "oat",
+    "options": [
+     "out",
+     "oat"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "house",
+    "options": [
+     "house",
+     "hose"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which word do you hear?",
+    "audio": "hoe",
+    "options": [
+     "how",
+     "hoe"
+    ],
+    "correctIndex": 1
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Can you say NOW and NO differently?"
+   }
+  ],
+  "temaDaConversa": "Luck and bad luck",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "bear",
+  "icones": [
+   "bear"
+  ]
+ }
+}

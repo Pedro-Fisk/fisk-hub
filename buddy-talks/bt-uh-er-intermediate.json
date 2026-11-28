@@ -1,0 +1,243 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · /ʌ/ vs. /ɝ/",
+  "coverLevel": "Intermediate",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Two Vowels",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing two vowels.",
+   "Developing pronunciation."
+  ],
+  "material": [
+   "PowerPoint activity",
+   "Buddy Talks AUDIO FILE - cup and bird"
+  ],
+  "duracao": "10 minutes",
+  "vocabulary": [
+   {
+    "word": "budget",
+    "translation": "/ʌ/"
+   },
+   {
+    "word": "result",
+    "translation": "/ʌ/"
+   },
+   {
+    "word": "success",
+    "translation": "/ʌ/"
+   },
+   {
+    "word": "struggle",
+    "translation": "/ʌ/"
+   },
+   {
+    "word": "public",
+    "translation": "/ʌ/"
+   },
+   {
+    "word": "purpose",
+    "translation": "/ɝ/"
+   },
+   {
+    "word": "worth",
+    "translation": "/ɝ/"
+   },
+   {
+    "word": "certain",
+    "translation": "/ɝ/"
+   },
+   {
+    "word": "deserve",
+    "translation": "/ɝ/"
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll separate two vowels that Portuguese puts in the very same place. They’re... …/ʌ/ and /ɝ/! One is short and open. The other is long: work\n\n/ɝ/ does not exist in Portuguese, so we replace it with the closest vowel. Then work sounds like walk, and the listener has to guess from context.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll separate two vowels that Portuguese puts in the very same place. They’re...",
+   "…/ʌ/ and /ɝ/!\nOne is short and open. The other is long:\nwork",
+   "/ɝ/ does not exist in Portuguese, so we replace it with the closest vowel.",
+   "Then work sounds like walk, and the listener has to guess from context."
+  ],
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 2 - L 7 - pg 63",
+    "id": "1wbvVr-yXXtPQHFu4pEpQaGHPVFUsjTSY"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 2 - L 7 - pg 63",
+    "id": "10Ip23XKVVY3jivzrRcdYVX9aVsnNsafe"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: Was the result worth the struggle?",
+    "modelAnswers": [
+     "B: Certainly. It had a purpose."
+    ]
+   },
+   {
+    "question": "A: Did the budget work out?",
+    "modelAnswers": [
+     "B: Not much, but it was a success."
+    ]
+   },
+   {
+    "question": "A: Do you deserve a break?",
+    "modelAnswers": [
+     "B: I certainly worked for one."
+    ]
+   },
+   {
+    "question": "What does success mean to you?",
+    "modelAnswers": [
+     "Success means..."
+    ]
+   },
+   {
+    "question": "What did you struggle with recently?",
+    "modelAnswers": [
+     "I struggled with..."
+    ]
+   },
+   {
+    "question": "Is hard work enough to succeed?",
+    "modelAnswers": [
+     "I think hard work..."
+    ]
+   },
+   {
+    "question": "What is worth sacrificing for a goal?",
+    "modelAnswers": [
+     "It is worth..."
+    ]
+   },
+   {
+    "question": "Who deserves the credit for your progress?",
+    "modelAnswers": [
+     "The person who deserves it is..."
+    ]
+   },
+   {
+    "question": "Do you prefer money or purpose in a job?",
+    "modelAnswers": [
+     "I prefer... because..."
+    ]
+   },
+   {
+    "question": "What result are you proud of?",
+    "modelAnswers": [
+     "The result I am proud of is..."
+    ]
+   },
+   {
+    "question": "Do you agree that the sky is the limit?",
+    "modelAnswers": [
+     "I agree / disagree because..."
+    ]
+   },
+   {
+    "question": "What would you do with a month off work?",
+    "modelAnswers": [
+     "I would..."
+    ]
+   }
+  ],
+  "languageGame": [
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "budget",
+    "options": [
+     "/ʌ/",
+     "/ɝ/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "result",
+    "options": [
+     "/ʌ/",
+     "/ɝ/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "success",
+    "options": [
+     "/ʌ/",
+     "/ɝ/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "struggle",
+    "options": [
+     "/ʌ/",
+     "/ɝ/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "public",
+    "options": [
+     "/ʌ/",
+     "/ɝ/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "purpose",
+    "options": [
+     "/ʌ/",
+     "/ɝ/"
+    ],
+    "correctIndex": 1
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Which vowel disappears in your English?"
+   }
+  ],
+  "temaDaConversa": "What success is worth",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "bear",
+  "icones": [
+   "bear"
+  ]
+ }
+}

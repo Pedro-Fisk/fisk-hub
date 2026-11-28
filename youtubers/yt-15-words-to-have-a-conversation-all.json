@@ -1,0 +1,134 @@
+{
+ "lesson": {
+  "coverTitle": "10 words to have a conversation in English",
+  "coverLevel": "All Levels",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "10 words to have a conversation in English",
+  "yt": {
+   "capaTitulo": "#15 - ALL LEVELS",
+   "material": [
+    "PowerPoint activity",
+    "Youtubers VIDEO FILE #15 - Dropbox"
+   ],
+   "duracao": "20 minutes",
+   "objetivos": [],
+   "intro": "English teacher Jackie is a big Youtuber. Watching her Youtube Channel @AskJackie is a great way to study. Today we'll take a look at her video about '10 words to have a conversation in English'. We'll take a look at five of them first. Are you ready?",
+   "video": {
+    "drive": "1qVTx2DWj9tWb57CP6GYzK-G3zEJMGv2U",
+    "youtube": "",
+    "nome": "10 words to have a conversation in English",
+    "instrucao": "",
+    "inicio": ""
+   },
+   "warmup": [],
+   "discussao": [],
+   "conversa": [
+    [
+     "How is it going?",
+     "Great! / Good! / Okay. Not bad. / Fine."
+    ],
+    [
+     "What's going on in your life?",
+     "Nothing / Not much / Not a whole lot / I'm ...."
+    ]
+   ],
+   "pratica": [
+    {
+     "tipo": "repetir",
+     "titulo": "Pronunciation Practice",
+     "instrucao": "Practice the expressions shown in the video.",
+     "itens": [
+      "How is it going? = How are things? | Great! / Good! / Okay. Not bad. / Fine.",
+      "What's going on? = What's happening? = What's up? (very informal) | Nothing / Not much / Not a whole lot / I'm ....",
+      "Ya know what I mean?"
+     ]
+    },
+    {
+     "tipo": "revisao",
+     "titulo": "Do you remember?",
+     "instrucao": "Practice the expressions shown in the video.",
+     "itens": [
+      [
+       "Como estão as coisas?",
+       "How is it going? / How are things?"
+      ],
+      [
+       "Ótimo / Bom / Ok, nada mal. / Bem",
+       "Great! / Good! / Okay. Not bad. / Fine."
+      ],
+      [
+       "O que está acontecendo? / O que está 'rolando'? / E aí?",
+       "What's going on? = What's happening? = What's up?"
+      ],
+      [
+       "Nada / Nada demais / Não muito / Eu estou ...",
+       "Nothing / Not much / Not a whole lot / I'm ...."
+      ],
+      [
+       "Sabe o que eu quero dizer?",
+       "Ya know what I mean?"
+      ]
+     ]
+    }
+   ],
+   "jogo": [],
+   "vocab": [
+    [
+     "How is it going? / How are things?",
+     "Como estão as coisas?"
+    ],
+    [
+     "Great! / Good! / Okay. Not bad. / Fine.",
+     "Ótimo / Bom / Ok, nada mal. / Bem"
+    ],
+    [
+     "What's going on? = What's happening? = What's up?",
+     "O que está acontecendo? / O que está 'rolando'? / E aí?"
+    ],
+    [
+     "Nothing / Not much / Not a whole lot / I'm ....",
+     "Nada / Nada demais / Não muito / Eu estou ..."
+    ],
+    [
+     "Ya know what I mean?",
+     "Sabe o que eu quero dizer?"
+    ]
+   ],
+   "avaliacao": [],
+   "fotos": {
+    "capa": "14-all/capa.jpg",
+    "video": "14-all/capa.jpg",
+    "conv": "14-all/capa.jpg",
+    "intro": "jackie-hello.jpg",
+    "outras": [
+     "askjackie.jpg"
+    ]
+   }
+  },
+  "serie": "youtubers"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "youtuber",
+  "imgs": "youtubers/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#0D0D0D",
+   "fundo2": "#404040",
+   "prim": "#ffffff",
+   "sec": "#DC0505",
+   "dest": "#DC0505",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "television",
+  "icones": [
+   "television"
+  ]
+ }
+}

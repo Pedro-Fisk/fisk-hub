@@ -1,0 +1,243 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · /aʊ/ vs. /oʊ/",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Now or No",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing two diphthongs.",
+   "Developing pronunciation."
+  ],
+  "material": [
+   "PowerPoint activity",
+   "Buddy Talks AUDIO FILE - now and no"
+  ],
+  "duracao": "10 minutes",
+  "vocabulary": [
+   {
+    "word": "profound",
+    "translation": "/aʊ/"
+   },
+   {
+    "word": "propose",
+    "translation": "/oʊ/"
+   },
+   {
+    "word": "announce",
+    "translation": "/aʊ/"
+   },
+   {
+    "word": "promote",
+    "translation": "/oʊ/"
+   },
+   {
+    "word": "encounter",
+    "translation": "/aʊ/"
+   },
+   {
+    "word": "overcome",
+    "translation": "/oʊ/"
+   },
+   {
+    "word": "renounce",
+    "translation": "/aʊ/"
+   },
+   {
+    "word": "suppose",
+    "translation": "/oʊ/"
+   },
+   {
+    "word": "surround",
+    "translation": "/aʊ/"
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll work on two diphthongs that keep collapsing even at a high level. They’re... …NOW and NO! The glide is where fluent speakers cut corners: profound\n\nA diphthong needs the full movement. Cutting it short flattens the word. Flattened, the two collapse, and now starts to sound exactly like no.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll work on two diphthongs that keep collapsing even at a high level. They’re...",
+   "…NOW and NO!\nThe glide is where fluent speakers cut corners:\nprofound",
+   "A diphthong needs the full movement. Cutting it short flattens the word.",
+   "Flattened, the two collapse, and now starts to sound exactly like no."
+  ],
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 2 - L 10 - pg 87",
+    "id": "1DsqqDqJkZOvyQ3zzyXZMAplAK5PDSav4"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 2 - L 10 - pg 87",
+    "id": "1WiwKAtOeSUjYsEvGhiAXDFLn5JB4niwI"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: Did the idea arouse any doubt?",
+    "modelAnswers": [
+     "B: It proposed a profound change."
+    ]
+   },
+   {
+    "question": "A: Are they devout believers?",
+    "modelAnswers": [
+     "B: They devote every Sunday to it."
+    ]
+   },
+   {
+    "question": "A: Did he renounce the claim?",
+    "modelAnswers": [
+     "B: The evidence eroded his position."
+    ]
+   },
+   {
+    "question": "Where does culture end and superstition begin?",
+    "modelAnswers": [
+     "The line is drawn when..."
+    ]
+   },
+   {
+    "question": "Why do rituals survive in rational people?",
+    "modelAnswers": [
+     "They survive because..."
+    ]
+   },
+   {
+    "question": "Have you ever renounced a belief?",
+    "modelAnswers": [
+     "I renounced it when..."
+    ]
+   },
+   {
+    "question": "Is superstition harmless?",
+    "modelAnswers": [
+     "It is harmless unless..."
+    ]
+   },
+   {
+    "question": "What ritual do you keep without believing in it?",
+    "modelAnswers": [
+     "I keep..."
+    ]
+   },
+   {
+    "question": "Do institutions rely on ritual too?",
+    "modelAnswers": [
+     "Institutions use ritual to..."
+    ]
+   },
+   {
+    "question": "What superstition surrounds your profession?",
+    "modelAnswers": [
+     "In my field people..."
+    ]
+   },
+   {
+    "question": "Is it fair to generalize about believers?",
+    "modelAnswers": [
+     "Generalising is..."
+    ]
+   },
+   {
+    "question": "What would it take to change your mind?",
+    "modelAnswers": [
+     "I would change my mind if..."
+    ]
+   }
+  ],
+  "languageGame": [
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "profound",
+    "options": [
+     "/aʊ/",
+     "/oʊ/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "propose",
+    "options": [
+     "/aʊ/",
+     "/oʊ/"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "announce",
+    "options": [
+     "/aʊ/",
+     "/oʊ/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "promote",
+    "options": [
+     "/aʊ/",
+     "/oʊ/"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "encounter",
+    "options": [
+     "/aʊ/",
+     "/oʊ/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "overcome",
+    "options": [
+     "/aʊ/",
+     "/oʊ/"
+    ],
+    "correctIndex": 1
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Do your diphthongs keep their full movement?"
+   }
+  ],
+  "temaDaConversa": "Belief, ritual and superstition",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "bear",
+  "icones": [
+   "bear"
+  ]
+ }
+}

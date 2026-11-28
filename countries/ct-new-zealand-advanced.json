@@ -1,0 +1,189 @@
+{
+ "lesson": {
+  "coverTitle": "Countries · New Zealand",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "New Zealand",
+  "objectives": [
+   "Talking about New Zealand.",
+   "Developing conversation skills."
+  ],
+  "pais": {
+   "nome": "New Zealand",
+   "oficial": "",
+   "num": 4,
+   "cor": "#00247d",
+   "bandeira": "nz/bandeira.svg",
+   "capa": "nz/alps.jpg",
+   "capaLocal": "Southern Alps",
+   "mapa": "nz/mapa.png",
+   "texto": "New Zealand is a country located right next to Australia. It’s a mix of natural wonders, beautiful lands and awesome people.\nNew Zealand is a small country that consists of two islands, North and South.",
+   "fatos": [
+    [
+     "Capital",
+     "Wellington"
+    ],
+    [
+     "Main cities",
+     "Auckland, Rotorua and Christchurch"
+    ],
+    [
+     "Islands",
+     "North and South"
+    ]
+   ]
+  },
+  "introText": "",
+  "introSub": "Introduction and curiosities about New Zealand",
+  "warmup": [],
+  "fotos": [
+   {
+    "img": "nz/auckland.jpg",
+    "local": "Auckland",
+    "texto": "Let’s see some pictures!\n(Optional game: try naming the things you see in the pictures.)"
+   },
+   {
+    "img": "nz/rotorua.jpg",
+    "local": "Rotorua"
+   },
+   {
+    "img": "nz/christchurch.jpg",
+    "local": "Christchurch"
+   },
+   {
+    "img": "nz/rugby.jpg",
+    "titulo": "Passion for rugby",
+    "local": "The All Blacks"
+   },
+   {
+    "img": "nz/kiwi.jpg",
+    "titulo": "Kiwi bird",
+    "local": "Kiwi"
+   },
+   {
+    "img": "nz/maori.jpg",
+    "titulo": "Maori traditions",
+    "local": "Maori: native New Zealanders"
+   },
+   {
+    "img": "nz/paisagem.jpg",
+    "titulo": "Beautiful landscapes",
+    "local": "Aoraki / Mount Cook"
+   },
+   {
+    "img": "nz/queenstown.jpg",
+    "local": "Queenstown"
+   },
+   {
+    "img": "nz/catedral.jpg",
+    "local": "Christchurch"
+   },
+   {
+    "img": "nz/hobbiton.jpg",
+    "local": "Hobbiton"
+   }
+  ],
+  "vocabulary": [
+   {
+    "word": "[to] show (someone) around",
+    "translation": "mostrar (o lugar) para alguém"
+   },
+   {
+    "word": "[to be] thrown head-first into",
+    "translation": "ser jogado de cabeça em"
+   },
+   {
+    "word": "“wide open”",
+    "translation": "aberto, amplo"
+   },
+   {
+    "word": "countryside",
+    "translation": "interior, campo"
+   },
+   {
+    "word": "culture",
+    "translation": "cultura"
+   },
+   {
+    "word": "within",
+    "translation": "dentro de"
+   },
+   {
+    "word": "throughout",
+    "translation": "por todo, ao longo de"
+   }
+  ],
+  "vocabTitulo": "",
+  "vocabSub": "",
+  "video": {
+   "drive": "1MrMhaIzaTW9HmnB_UQxjkfSl6D9SDVkY",
+   "nome": "A Welcoming Journey to New Zealand"
+  },
+  "leitura": null,
+  "languageGame": [],
+  "jogoTitulo": "",
+  "conversation": [
+   {
+    "question": "How does the video make you feel about visiting New Zealand?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Have you ever thought about visiting this country?",
+    "modelAnswers": []
+   },
+   {
+    "question": "What are some of the challenges of traveling to New Zealand?",
+    "modelAnswers": []
+   },
+   {
+    "question": "New Zealand has a national passion: rugby. Their team, the All Blacks, is one of the best in the world. Do you know the rules of rugby?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Would you like to know how to play it?",
+    "modelAnswers": []
+   },
+   {
+    "question": "Are you into any sports?",
+    "modelAnswers": []
+   },
+   {
+    "question": "If you could make a video promoting Brazil, what places would it feature?",
+    "modelAnswers": []
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Did you enjoy talking about New Zealand?"
+   },
+   {
+    "question": "Which other countries would you like to learn more about?"
+   }
+  ],
+  "serie": "countries"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "countries",
+  "imgs": "countries/img/",
+  "escuro": false,
+  "paleta": {
+   "fundo": "#ffffff",
+   "fundo2": "#eef3f8",
+   "prim": "#16365c",
+   "sec": "#00247d",
+   "dest": "#00247d",
+   "txt": "#16365c"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "globe-showing-americas",
+  "icones": [
+   "globe-showing-americas"
+  ]
+ }
+}

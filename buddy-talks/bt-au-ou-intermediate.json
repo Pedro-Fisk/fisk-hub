@@ -1,0 +1,243 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · /aʊ/ vs. /oʊ/",
+  "coverLevel": "Intermediate",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Now or No",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing two diphthongs.",
+   "Developing pronunciation."
+  ],
+  "material": [
+   "PowerPoint activity",
+   "Buddy Talks AUDIO FILE - now and no"
+  ],
+  "duracao": "10 minutes",
+  "vocabulary": [
+   {
+    "word": "allow",
+    "translation": "/aʊ/"
+   },
+   {
+    "word": "although",
+    "translation": "/oʊ/"
+   },
+   {
+    "word": "account",
+    "translation": "/aʊ/"
+   },
+   {
+    "word": "approach",
+    "translation": "/oʊ/"
+   },
+   {
+    "word": "amount",
+    "translation": "/aʊ/"
+   },
+   {
+    "word": "alone",
+    "translation": "/oʊ/"
+   },
+   {
+    "word": "around",
+    "translation": "/aʊ/"
+   },
+   {
+    "word": "own",
+    "translation": "/oʊ/"
+   },
+   {
+    "word": "doubt",
+    "translation": "/aʊ/"
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll separate two sounds that turn one word into its opposite. They’re... …NOW and NO! Down and don’t are not the same word: down\n\nBoth are diphthongs: two vowels glued together, moving in one breath. Portuguese pulls both to the nearest sound we have, and they collapse into one.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll separate two sounds that turn one word into its opposite. They’re...",
+   "…NOW and NO!\nDown and don’t are not the same word:\ndown",
+   "Both are diphthongs: two vowels glued together, moving in one breath.",
+   "Portuguese pulls both to the nearest sound we have, and they collapse into one."
+  ],
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 2 - L 10 - pg 87",
+    "id": "1DsqqDqJkZOvyQ3zzyXZMAplAK5PDSav4"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 2 - L 10 - pg 87",
+    "id": "1WiwKAtOeSUjYsEvGhiAXDFLn5JB4niwI"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: Was there a big crowd?",
+    "modelAnswers": [
+     "B: The whole town showed up."
+    ]
+   },
+   {
+    "question": "A: Are you proud of the result?",
+    "modelAnswers": [
+     "B: I know I sounded doubtful."
+    ]
+   },
+   {
+    "question": "A: How did you count them?",
+    "modelAnswers": [
+     "B: One row at a time, out loud."
+    ]
+   },
+   {
+    "question": "What superstition did you grow up with?",
+    "modelAnswers": [
+     "I grew up hearing that..."
+    ]
+   },
+   {
+    "question": "Do you know anyone who is very superstitious?",
+    "modelAnswers": [
+     "I know someone who..."
+    ]
+   },
+   {
+    "question": "Is there a superstition in sports?",
+    "modelAnswers": [
+     "Athletes usually..."
+    ]
+   },
+   {
+    "question": "Have you ever avoided doing something out of fear?",
+    "modelAnswers": [
+     "I avoided..."
+    ]
+   },
+   {
+    "question": "Do superstitions make people feel safer?",
+    "modelAnswers": [
+     "They allow people to..."
+    ]
+   },
+   {
+    "question": "What do people say about breaking a mirror?",
+    "modelAnswers": [
+     "People say that..."
+    ]
+   },
+   {
+    "question": "Is it wrong to generalize about luck?",
+    "modelAnswers": [
+     "I think generalising..."
+    ]
+   },
+   {
+    "question": "What ritual do you have before a big day?",
+    "modelAnswers": [
+     "Before it, I..."
+    ]
+   },
+   {
+    "question": "Would you bet on a lucky number?",
+    "modelAnswers": [
+     "I would / wouldn’t because..."
+    ]
+   }
+  ],
+  "languageGame": [
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "allow",
+    "options": [
+     "/aʊ/",
+     "/oʊ/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "although",
+    "options": [
+     "/aʊ/",
+     "/oʊ/"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "account",
+    "options": [
+     "/aʊ/",
+     "/oʊ/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "approach",
+    "options": [
+     "/aʊ/",
+     "/oʊ/"
+    ],
+    "correctIndex": 1
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "amount",
+    "options": [
+     "/aʊ/",
+     "/oʊ/"
+    ],
+    "correctIndex": 0
+   },
+   {
+    "type": "listen",
+    "question": "Listen. Which sound do you hear?",
+    "audio": "alone",
+    "options": [
+     "/aʊ/",
+     "/oʊ/"
+    ],
+    "correctIndex": 1
+   }
+  ],
+  "evaluation": [
+   {
+    "question": "Which diphthong collapses in your speech?"
+   }
+  ],
+  "temaDaConversa": "Superstitions around us",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "bear",
+  "icones": [
+   "bear"
+  ]
+ }
+}

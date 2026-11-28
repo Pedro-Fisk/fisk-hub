@@ -1,0 +1,182 @@
+{
+ "lesson": {
+  "coverTitle": "Buddy Talks · Word Endings",
+  "coverLevel": "Advanced",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Weak Endings",
+  "objectives": [
+   "Improving fluency.",
+   "Practicing word endings.",
+   "Developing pronunciation."
+  ],
+  "material": [
+   "PowerPoint activity",
+   "Buddy Talks AUDIO FILE - word endings"
+  ],
+  "duracao": "10 minutes",
+  "vocabulary": [
+   {
+    "word": "conclusion",
+    "translation": ""
+   },
+   {
+    "word": "acquisition",
+    "translation": ""
+   },
+   {
+    "word": "infrastructure",
+    "translation": ""
+   },
+   {
+    "word": "ambitious",
+    "translation": ""
+   },
+   {
+    "word": "supervision",
+    "translation": ""
+   },
+   {
+    "word": "expectation",
+    "translation": ""
+   },
+   {
+    "word": "manufacture",
+    "translation": ""
+   },
+   {
+    "word": "prestigious",
+    "translation": ""
+   },
+   {
+    "word": "transition",
+    "translation": ""
+   }
+  ],
+  "introText": "Hey guys! I’m BUDDY! Today, we’ll work on endings that move the stress and change the whole word’s shape. They’re... …WORD ENDINGS! Add the ending and the stress moves with it: -sion\n\nCompare: PHOtograph, phoTOgrapher, photoGRAPHic. The ending decides. Keeping the stress of the root word is what makes a long word sound wrong.",
+  "buddyBaloes": [
+   "Hey guys! I’m BUDDY! Today, we’ll work on endings that move the stress and change the whole word’s shape. They’re...",
+   "…WORD ENDINGS!\nAdd the ending and the stress moves with it:\n-sion",
+   "Compare: PHOtograph, phoTOgrapher, photoGRAPHic. The ending decides.",
+   "Keeping the stress of the root word is what makes a long word sound wrong."
+  ],
+  "audios": [
+   {
+    "nome": "Saying it right A",
+    "ref": "TRANSITIONS 2 - L 1 - pg 11",
+    "id": "1HgUpi67ato5Wpa7gbvIQ4JhqXCBl1TmS"
+   },
+   {
+    "nome": "Saying it right B",
+    "ref": "TRANSITIONS 2 - L 1 - pg 11",
+    "id": "10fWjkYEMOZ4rm0pXLyFbuGap2_HNcSEU"
+   }
+  ],
+  "conversation": [
+   {
+    "question": "A: What was the conclusion?",
+    "modelAnswers": [
+     "B: The acquisition was too ambitious."
+    ]
+   },
+   {
+    "question": "A: How is the transition going?",
+    "modelAnswers": [
+     "B: It needs closer supervision."
+    ]
+   },
+   {
+    "question": "A: Did they meet expectations?",
+    "modelAnswers": [
+     "B: Beyond any prestigious standard."
+    ]
+   },
+   {
+    "question": "What creates a wave of popularity today?",
+    "modelAnswers": [
+     "The creation of..."
+    ]
+   },
+   {
+    "question": "What is your conclusion about viral fame?",
+    "modelAnswers": [
+     "My conclusion is..."
+    ]
+   },
+   {
+    "question": "Is ambition necessary to stay relevant?",
+    "modelAnswers": [
+     "Ambition is..."
+    ]
+   },
+   {
+    "question": "What expectation is unfair on public people?",
+    "modelAnswers": [
+     "The expectation that..."
+    ]
+   },
+   {
+    "question": "What transition have you seen in your field?",
+    "modelAnswers": [
+     "The transition was..."
+    ]
+   },
+   {
+    "question": "What suggestion would you give a rising star?",
+    "modelAnswers": [
+     "My suggestion is..."
+    ]
+   },
+   {
+    "question": "Does prestige still mean anything?",
+    "modelAnswers": [
+     "Prestige means..."
+    ]
+   },
+   {
+    "question": "What decision would you not make for fame?",
+    "modelAnswers": [
+     "I would never..."
+    ]
+   },
+   {
+    "question": "What is the reaction you fear the most?",
+    "modelAnswers": [
+     "The reaction I fear is..."
+    ]
+   }
+  ],
+  "languageGame": [],
+  "evaluation": [
+   {
+    "question": "Does your stress move when the ending changes?"
+   }
+  ],
+  "temaDaConversa": "The shape of popularity",
+  "serie": "buddy-talks",
+  "semRevisao": true
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "buddy",
+  "imgs": "buddy-talks/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#3a0d0d",
+   "fundo2": "#5b1616",
+   "prim": "#38bdf8",
+   "sec": "#f87171",
+   "dest": "#dc2626",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "bear",
+  "icones": [
+   "bear"
+  ]
+ }
+}

@@ -1,0 +1,153 @@
+{
+ "lesson": {
+  "coverTitle": "Stop saying these 10 words – Part 2",
+  "coverLevel": "All Levels",
+  "ageLabel": "",
+  "language": "english",
+  "topic": "Stop saying these 10 words – Part 2",
+  "yt": {
+   "capaTitulo": "#11 - STOP SAYING THESE WORDS - PART 2 - ALL LEVELS",
+   "material": [
+    "PowerPoint activity",
+    "Youtubers VIDEO FILE #11 \"Stop saying these words - Part 2\" - Dropbox"
+   ],
+   "duracao": "15 minutes",
+   "objetivos": [
+    "Practicing pronunciation.",
+    "Developing fluency by using common words and expressions in English."
+   ],
+   "intro": "Today, we will watch another video produced by Gavin, from the Youtube Channel @SmallAdvantages. Gavin is an American guy who teaches English to Brazilians online. Today, we'll take a look at the second part of his video on 10 words we shouldn't say in English.",
+   "video": {
+    "drive": "1q1Q3ntuFVpIiiq7TNGRfK3cKqDbJ_tHm",
+    "youtube": "do3d6mfUsWU",
+    "nome": "PARE DE FALAR AGORA ESSAS 10 PALAVRAS EM INGLÊS | DICA #77 (parte 2)",
+    "instrucao": "Segunda metade do vídeo (a partir de ~4:24).",
+    "inicio": "4:24"
+   },
+   "warmup": [],
+   "discussao": [],
+   "conversa": [],
+   "pratica": [
+    {
+     "tipo": "expressoes",
+     "titulo": "Expressions Game",
+     "instrucao": "How can I say...",
+     "itens": [
+      [
+       "MAIS OU MENOS",
+       "ABOUT / OR SO / -ISH / PRETTY MUCH"
+      ],
+      [
+       "PODE SER? TUDO BEM?",
+       "SOUND GOOD?"
+      ],
+      [
+       "VOCÊ É MUITO BOM!",
+       "YOU ROCK!"
+      ],
+      [
+       "TCHAU",
+       "BYE / SEE YA"
+      ]
+     ]
+    },
+    {
+     "tipo": "dialogos",
+     "titulo": "Dialog Game",
+     "instrucao": "Complete the dialog by creating the missing sentence / question.",
+     "itens": [
+      [
+       "Mary: ____________________.",
+       "John: I think she is about forty."
+      ],
+      [
+       "Julia: ____________________.",
+       "Michael: Thank you so much. You rock!"
+      ],
+      [
+       "Jenny: ____________________.",
+       "Alicia: The ceremony will happen by the end of the month or so."
+      ],
+      [
+       "Rupert: ____________________.",
+       "Daniel: No man, I'm pretty much OK now."
+      ],
+      [
+       "Carl: ____________________.",
+       "Tiffany: OK, I'll catch you later. See ya!"
+      ],
+      [
+       "Brock: ____________________.",
+       "Veronica: Ok, if you insist we can go to that Mexican place you love. Sound good?"
+      ]
+     ]
+    },
+    {
+     "tipo": "repetir",
+     "titulo": "Review the Expressions",
+     "instrucao": "",
+     "itens": [
+      "ABOUT - OR SO - ISH - PRETTY MUCH",
+      "YOU ROCK!",
+      "BYE - SEE YA",
+      "SOUND GOOD?"
+     ]
+    }
+   ],
+   "jogo": [],
+   "vocab": [
+    [
+     "ABOUT / OR SO / -ISH / PRETTY MUCH",
+     "MAIS OU MENOS"
+    ],
+    [
+     "SOUND GOOD?",
+     "PODE SER? TUDO BEM?"
+    ],
+    [
+     "YOU ROCK!",
+     "VOCÊ É MUITO BOM!"
+    ],
+    [
+     "BYE / SEE YA",
+     "TCHAU"
+    ]
+   ],
+   "avaliacao": [],
+   "fotos": {
+    "capa": "10-all/capa.jpg",
+    "video": "10-all/capa.jpg",
+    "intro": "gavin.jpg",
+    "outras": [
+     "10-all/intro.jpg",
+     "smalladvantages.jpg",
+     "07-basic/capa.jpg"
+    ]
+   }
+  },
+  "serie": "youtubers"
+ },
+ "design": {
+  "modelo": "tema",
+  "pele": "youtuber",
+  "imgs": "youtubers/img/",
+  "escuro": true,
+  "paleta": {
+   "fundo": "#0D0D0D",
+   "fundo2": "#404040",
+   "prim": "#ffffff",
+   "sec": "#DC0505",
+   "dest": "#DC0505",
+   "txt": "#ffffff"
+  },
+  "fontes": {
+   "titulo": "Montserrat",
+   "corpo": "Nunito"
+  },
+  "fundo": "gradiente",
+  "heroi": "television",
+  "icones": [
+   "television"
+  ]
+ }
+}
