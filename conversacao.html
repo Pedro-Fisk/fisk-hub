@@ -827,6 +827,8 @@
     FiskTema.encaixar(sl.el, $('palco')); FiskTema.mostrar(deck, ci, et);
     /* ouça e escolha: toca ao CHEGAR na pergunta (redesenhar no resize não toca de novo; o 🔊 repete) */
     var aqui = ci + '|' + et;
+    /* a faixa do livro para quando o professor sai do slide dela */
+    if (audioAgora && String(vozOnde).split('|')[0] !== String(ci)) { try { audioAgora.pause(); } catch (e) {} audioAgora = null; }
     if (sl.jogo && sl.jogo.ouvir && et === 0 && vozOnde !== aqui) vozToca(sl.jogo.ouvir, sl.el.querySelector('.ft-ouvir'));
     vozOnde = aqui;
     var tot = passos(), n = passoAtual();
@@ -1020,14 +1022,26 @@
       .catch(function (e) { delete audioCache[id]; throw e; });
     return audioCache[id];
   }
+  /* Desde 28/11/2026 a TV toca DIRETO do Drive: os mp3 do livro estão em "qualquer pessoa com o link" e o <audio> não
+     precisa de CORS. O backend (cmAudio) virou a segunda tentativa, e o aviso de tocar pelo livro, a última. */
+  function driveAudio(id) { return 'https://drive.google.com/uc?export=download&id=' + encodeURIComponent(id); }
+  function tocaUrl(url, botao) {
+    return new Promise(function (ok, falha) {
+      var au = new Audio(url), comecou = false; au.preload = 'auto';
+      au.onplaying = function () { comecou = true; botao.textContent = '⏸'; ok(au); };
+      au.onended = function () { botao.textContent = '▶'; };
+      au.onerror = function () { if (!comecou) falha(new Error('sem áudio')); else botao.textContent = '▶'; };
+      audioAgora = au;
+      var pr = au.play(); if (pr && pr.catch) pr.catch(function (e) { if (!comecou) falha(e); });
+    });
+  }
   FiskTema.aoAudio = function (i, botao, slideEl) {
     var sl = deck && deck.slides.filter(function (x) { return x.el === slideEl; })[0], a = sl && sl.audio; if (!a) return;
     try { if (audioAgora && !audioAgora.paused) { audioAgora.pause(); botao.textContent = '▶'; return; } } catch (e) {}
+    try { if (audioAgora && audioAgora.paused && audioAgora.__id === a.id && audioAgora.currentTime > 0 && !audioAgora.ended) { botao.textContent = '⏸'; audioAgora.play(); return; } } catch (e) {}
     botao.textContent = '⏳';
-    audioDe(a.id).then(function (x) {
-      audioAgora = new Audio('data:' + x.mime + ';base64,' + x.b64);
-      audioAgora.onended = function () { botao.textContent = '▶'; };
-      botao.textContent = '⏸'; return audioAgora.play();
+    tocaUrl(driveAudio(a.id), botao).then(function (au) { au.__id = a.id; }, function () {
+      return audioDe(a.id).then(function (x) { return tocaUrl('data:' + x.mime + ';base64,' + x.b64, botao); }).then(function (au) { au.__id = a.id; });
     }).catch(function () {
       botao.textContent = '▶';
       var av = slideEl.querySelector('.ft-leia-audio'); if (av) av.textContent = '📢 Toque a faixa do livro: ' + (a.ref || '') + ' · ' + (a.nome || '');
@@ -1038,7 +1052,8 @@
     if (!deck) return Promise.resolve(null);
     var p = aulaPasso(k - 1), sl = p && deck.slides[p.i];
     if (!sl || !sl.audio) return Promise.resolve(null);
-    return audioDe(sl.audio.id).then(function (x) { return { nome: sl.audio.nome, s: x.b64.length <= 700 * 1024 ? x.b64 : null }; }, function () { return { nome: sl.audio.nome, s: null }; });
+    /* o celular toca do Drive também (d); o mp3 pelo servidor da aula só se o backend entregar e couber */
+    return audioDe(sl.audio.id).then(function (x) { return { nome: sl.audio.nome, d: sl.audio.id, s: x.b64.length <= 700 * 1024 ? x.b64 : null }; }, function () { return { nome: sl.audio.nome, d: sl.audio.id, s: null }; });
   }
   var aula = null, aulaFila = Promise.resolve();
   function aulaApi(c, ms) {
@@ -1170,7 +1185,7 @@
         return (jg && jg.ot ? vozMp3(jg.ot).catch(function () { return null; }) : Promise.resolve(null)).then(function (mp3) {
           return aulaAudioPasso(k).then(function (au) {
             return aulaApi({ op: 'clique', aula: a.id, chave: a.chave, n: k, atual: a.agora, img: img, jogo: jg, s: mp3 || (au && au.s) || undefined,
-              somPasso: au ? { nome: au.nome } : undefined, vocab: aulaVocab(k), aval: aulaAval(k) });
+              somPasso: au ? { nome: au.nome, d: au.d } : undefined, vocab: aulaVocab(k), aval: aulaAval(k) });
           });
         });
       }).then(function (r) {
