@@ -28,6 +28,36 @@ quase sempre uma apresentação oral com slides; Teens e Kids têm versões pró
 
 O espanhol acompanha quase sempre, com um deck só para todos os níveis ("Proyecto 0N").
 
+## O rodízio (Guia de Atividades Comunicativas, aba "Projetos")
+
+A planilha de controle da coordenação é o `.xlsx` **Guia de Atividades Comunicativas - Atualizado 13.10.2021**
+(`1cay8SWEgSLo8iEJPWKY-YbkqzjljsFGm`, na pasta Atividades Comunicativas Master Coordenação). Uma aba por série
+(Countries IE, Buddytalks IE, Everyday Life IE, Youtubers IE…) marca quando cada atividade foi dada (1ª, 2ª, 3ª, 4ª vez);
+a aba **Projetos** marca o projeto de cada semestre por público:
+
+| Semestre | Kids | Teens | Inglês (Jovens e Adultos) | Espanhol |
+|---|---|---|---|---|
+| 2º/2017 | Vem pro mundo | Vem pro mundo | Vem pro mundo | Vem pro mundo |
+| 1º/2018 | Fisk Fun | Masterchef | Masterchef | Masterchef |
+| 2º/2018 | LikeAPro | LikeAPro | LikeaBoss | LikeaBoss |
+| 1º/2019 | Teatro | Fisk Your Future | Fisk Your Future | Fisk Your Future |
+| 2º/2019 | LikeAPro | Cyber | Fisk Your Bio | Fisk Your Bio |
+| 2020 e 2021 | pandemia (PBF: Job Fair) | | | |
+| 1º/2022 | Teatro | Cyber | The Future Is | The Future Is |
+| 2º/2022 | Fisk Fun + Cantata | SOYL | SOYL | SOYL |
+| 1º/2023 | Job Fair (Super Kids: Jolly) | Job Fair | Vem Pro Mundo | Vem Pro Mundo |
+| 2º/2023 | Teatro Novo Natal | Teatro Novo Natal | Likeaboss (Job Fair) | Likeaboss (Job Fair) |
+| 1º/2024 | Fisk City | Fisk City | Fisk City | Fisk City |
+| 2º/2024 | Masterchef | Masterchef | Masterchef | Masterchef |
+| 1º/2025 | Teatro (novas peças) | Teatro ou Fisk Your Future | Fisk Your Future | Fisk Your Future |
+| 2º/2025 | Vem pro mundo | Vem pro mundo | Vem pro mundo | Vem pro mundo |
+| 1º/2026 | Fisk Pets (vídeo no final) | Fisk Pets | SOYL | SOYL |
+| 2º/2026 | Teatro Novo Natal + cantata | Cyber games e Gepetto + cantata | Job Fair | Job Fair |
+
+Leitura: cada projeto de Jovens e Adultos volta a cada 2 a 3 anos (Masterchef 2018 → 2024; Fisk Your Future 2019 → 2022
+→ 2025; Vem pro Mundo 2017 → 2023 → 2025; SOYL 2022 → 2026). O **Fisk Your Biography** não volta desde 2019, e o
+**Fisk City** só foi dado uma vez (2024).
+
 ## A estrutura que se repete (Jovens e Adultos)
 
 1. **Etapa 1, AC de abertura** (20 min): o projeto, o cronograma impresso num slide, conceitos-chave e uma conversa
@@ -70,5 +100,3 @@ Nomes: `Project 0N [A|B] - <Projeto> - <BASIC|INTERMEDIATE|ADVANCED|ALL LEVELS>.
 - Falta o deck da FJIXP na pasta de 2026; o Fisk World anuncia Australia & New Zealand e não há deck.
 - Biography 01 B Basic tem "???" no lugar das perguntas.
 - Não há rubrica real nem material para a família em arquivo (só citado).
-- A planilha de controle das atividades comunicativas (aba de projetos, com as datas) não foi achada por busca: o
-  Pedro vai mandar o link.
