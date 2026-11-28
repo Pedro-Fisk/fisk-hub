@@ -3,12 +3,15 @@
 atividade mesmo, não precisa passar pela chave da Azure")
 
     python3 scripts/series-vozes.py            # gera o que falta e reescreve os índices
-    python3 scripts/series-vozes.py --listar   # só diz quantas frases faltam, sem gerar nada
+    python3 scripts/series-vozes.py --listar   # só diz quantas frases faltam, sem gerar nada; sai com 1 se faltar
 
 Buddy Talks, Countries, Everyday Life e YouTubers têm o texto fixo, então cada 🔊 (as palavras do Important Words e a
 frase do "ouça e escolha") vira um mp3 gerado AQUI, offline, pelo edge-tts, e vai junto da atividade:
     <pasta>/voz/<hash>.mp3      o áudio (o nome é o hash de voz + texto: a mesma frase na mesma voz é um arquivo só)
     <pasta>/voz/index.json      { "<id da atividade>": { "voz": "...", "a": { "<texto>": "<hash>.mp3" } } }
+    <pasta>/voz/fonte.json      { "<id da atividade>": "<sha1 do <id>.json>" }: a TRAVA. O conteúdo de cada atividade
+                                quando as vozes foram geradas; o scripts/conferir-publicacao.js (sem Chromium) recusa
+                                o push se algum <id>.json mudou depois (28/11/2026)
 A conversacao.html lê o índice ao abrir a atividade e só cai na API da Azure (portal, api/voz.js) quando falta o
 arquivo, que é o caso das atividades do Conversation Maker, geradas na hora.
 
@@ -41,6 +44,12 @@ def voz_de(ident):
 def falado(texto):
     # as setas da entonação ("isn't it? ↓") e as barras são para o olho; a voz leria "down arrow"
     return re.sub(r'\s+', ' ', re.sub(r'[↑↓→←↗↘⬆⬇/]+', ' ', texto)).strip() or texto
+
+
+def fonte(pasta, ident):
+    # a impressão digital do conteúdo da atividade; o conferir-publicacao.js calcula igual (sha1 dos bytes, 16 letras)
+    with open(os.path.join(RAIZ, pasta, ident + '.json'), 'rb') as fh:
+        return hashlib.sha1(fh.read()).hexdigest()[:16]
 
 
 def arquivo(voz, texto):
@@ -80,7 +89,9 @@ async def principal(listar):
     unicos = {f[2]: f for f in faltam}
     print(f'{total} frases nas séries; faltam {len(unicos)} mp3')
     if listar:
-        return 0
+        if unicos:
+            print('✗ rode: python3 scripts/series-vozes.py')
+        return 1 if unicos else 0
     sem = asyncio.Semaphore(4)
     ok = await asyncio.gather(*[gera(sem, v, t, d) for v, t, d in unicos.values()])
     falhas = ok.count(False)
@@ -98,6 +109,11 @@ async def principal(listar):
             indice[ident] = {'voz': voz, 'a': a}
         with open(os.path.join(RAIZ, pasta, 'voz', 'index.json'), 'w', encoding='utf-8') as fh:
             json.dump(indice, fh, ensure_ascii=False, indent=1)
+            fh.write('\n')
+        # a trava só registra a atividade que ficou completa: com falha, o push segue recusado até rodar de novo
+        completas = {i: fonte(pasta, i) for i, l in atividades.items() if len(indice[i]['a']) == len(set(l))}
+        with open(os.path.join(RAIZ, pasta, 'voz', 'fonte.json'), 'w', encoding='utf-8') as fh:
+            json.dump(completas, fh, ensure_ascii=False, indent=1, sort_keys=True)
             fh.write('\n')
         for f in os.listdir(os.path.join(RAIZ, pasta, 'voz')):
             if f.endswith('.mp3') and f not in usados:
