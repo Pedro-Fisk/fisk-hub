@@ -291,6 +291,60 @@
   #capa .erro{ color: #b91c1c !important; }
   #capa .aviso{ color: #b45309 !important; }
   #capa .capinha{ border-color: #e2e8f0 !important; }
+
+  /* ══ NO CELULAR DO PROFESSOR (Pedro, 27/11/2026: "o menu de botões não ficou responsivo, nem de pé nem deitado") ══
+     A barra era uma linha só, com o nome escrito em cada botão, e aparecia só com o mouse: no celular vazava 300 px de
+     cada lado e nem aparecia (o toque passa o slide). Agora: em tela de toque ela fica SEMPRE visível; em tela estreita
+     os botões mostram só o ícone (o nome fica no title) e a barra quebra em duas linhas de pé; deitado, uma linha só
+     e o palco encolhe para o slide não ficar embaixo dela. Os painéis por cima (QR, ⚙, sorteio, avaliações) cabem e
+     rolam. */
+  @media (pointer: coarse){
+    body.mostra #barra, #barra{ opacity: 1; pointer-events: auto; }
+    body.esconde-cursor{ cursor: auto; }
+  }
+  @media (max-width: 900px), (max-height: 500px){
+    #barra{ left: 8px; right: 8px; transform: none; bottom: max(8px, env(safe-area-inset-bottom)); flex-wrap: wrap; justify-content: center; gap: .35rem; padding: .4rem; white-space: normal; }
+    #barra .tx{ display: none; }
+    #barra .sep{ display: none; }
+    #barra .n{ min-width: 0; font-size: .82rem; padding: 0 .2rem; white-space: nowrap; }
+    #barra button{ padding: .45rem .7rem; font-size: 1.05rem; line-height: 1; min-width: 42px; min-height: 40px; }
+    #crono{ width: 92px; height: 92px; top: max(8px, env(safe-area-inset-top)); right: 8px; }
+    #crono #cronoT{ font-size: 1.35rem; } #crono button{ width: 24px; height: 24px; font-size: .7rem; }
+    #aulaCanto{ right: 8px; bottom: auto; top: max(8px, env(safe-area-inset-top)); left: 8px; right: auto; padding: 4px; }
+    #aulaCanto .qr{ width: 58px; height: 58px; } #aulaCanto span{ font-size: .55rem; }
+    #aulaPlacar{ right: auto; left: 50%; transform: translateX(-50%); bottom: auto; top: max(8px, env(safe-area-inset-top)); font-size: .85rem; }
+    #ferr{ left: 8px; right: 8px; min-width: 0; bottom: 120px; }
+    #qrAula{ align-items: flex-start; overflow-y: auto; padding: max(8px, env(safe-area-inset-top)) 8px 8px; }
+    #qrAula .cx{ max-width: 100%; padding: 1rem 1rem .9rem; border-radius: 20px; margin: auto 0; }
+    #qrAula .bolhas{ display: none; }
+    #qrAula h2{ font-size: 1.4rem; } #qrAula p{ font-size: .9rem; }
+    #qrAula .qr{ width: min(58vw, 40vh, 15rem); height: min(58vw, 40vh, 15rem); padding: .5rem; border-radius: 16px; }
+    #qrAula .cod{ font-size: 1.1rem; }
+    #qrAula button{ padding: .6rem 1rem; font-size: .92rem; }
+    #sorteio .cx{ padding: 20px 16px; border-radius: 20px; max-height: 92vh; overflow-y: auto; }
+    #sorDuplas{ grid-template-columns: 1fr 1fr; } #sorDuplas div{ font-size: 1rem; }
+    #avalVer .cx{ padding: 16px; }
+    #capa{ padding: .6rem; align-items: flex-start; overflow-y: auto; }
+    #capa .cx{ padding: 1.1rem 1rem; margin: auto 0; } .cx h1{ font-size: 1.3rem; }
+    .comeca{ font-size: 1.05rem; padding: .8rem 1.2rem; margin-top: .9rem; }
+    .dica{ display: none; }   /* teclado e passador não existem no celular */
+  }
+  /* celular DEITADO: a barra numa linha só embaixo, e o palco acaba acima dela; o QR do painel vai para o lado dos botões */
+  @media (max-height: 500px) and (orientation: landscape){
+    #barra{ flex-wrap: nowrap; left: 50%; right: auto; transform: translateX(-50%); max-width: calc(100vw - 16px); overflow-x: auto; bottom: max(4px, env(safe-area-inset-bottom)); padding: .3rem; }
+    #barra button{ min-height: 34px; padding: .3rem .55rem; }
+    #palco{ bottom: 62px; }
+    #qrAula .cx{ display: grid; grid-template-columns: auto 1fr; column-gap: 1rem; align-items: center; text-align: left; }
+    #qrAula .cx > .qr{ grid-row: 1 / span 6; grid-column: 1; width: min(70vh, 14rem); height: min(70vh, 14rem); margin: 0; }
+    #qrAula .cx > *:not(.qr):not(.bolhas){ grid-column: 2; }
+    #qrAula .chip, #qrAula .cod{ justify-self: start; }
+    #qrAula h2{ font-size: 1.2rem; margin: .3rem 0 0; } #qrAula p{ margin: .2rem 0; font-size: .85rem; }
+    #qrAula .linha{ margin-top: .5rem; gap: .4rem; } #qrAula button{ padding: .45rem .8rem; font-size: .82rem; }
+    #qrAula .linha{ justify-content: flex-start; }
+    #aulaCanto{ top: auto; bottom: 54px; }
+    #ferr{ bottom: 54px; left: auto; right: 8px; width: 290px; }
+  }
+  @media (pointer: coarse) and (max-width: 900px) and (orientation: portrait){ #palco{ bottom: 110px; } }
 </style>
 </head>
 <body>
@@ -314,12 +368,12 @@
     <span class="n" id="bN">1 de 1</span>
     <button type="button" id="bProx" title="Próximo clique (→, espaço)">▶</button>
     <span class="sep"></span>
-    <button type="button" id="bInicio" title="Voltar ao início (Home)">⏮ Início</button>
-    <button type="button" id="bCheia" title="Tela cheia (F)">⛶ Tela cheia</button>
-    <button type="button" id="bFone" title="Usar o celular como controle remoto">📱 Controlar pelo celular</button>
-    <button type="button" id="bSorteio" hidden title="Sortear um aluno ou formar duplas, com os nomes da turma de agora">🎲 Sorteio</button>
+    <button type="button" id="bInicio" title="Voltar ao início (Home)">⏮<span class="tx"> Início</span></button>
+    <button type="button" id="bCheia" title="Tela cheia (F)">⛶<span class="tx"> Tela cheia</span></button>
+    <button type="button" id="bFone" title="Usar o celular como controle remoto">📱<span class="tx"> Controlar pelo celular</span></button>
+    <button type="button" id="bSorteio" hidden title="Sortear um aluno ou formar duplas, com os nomes da turma de agora">🎲<span class="tx"> Sorteio</span></button>
     <button type="button" id="bFerr" title="Cronômetro do Pair Work e sorteio: ligar e desligar">⚙</button>
-    <button type="button" id="bAlunos" title="Os alunos acompanham no celular os cliques que você já mostrou">👥 Alunos</button>
+    <button type="button" id="bAlunos" title="Os alunos acompanham no celular os cliques que você já mostrou">👥<span class="tx"> Alunos</span></button>
     <button type="button" id="bSair" title="Voltar à abertura (Esc)">✕</button>
   </div>
   <div id="capa"><div id="capaFundo"></div><div class="cx" id="capaCorpo"></div></div>
